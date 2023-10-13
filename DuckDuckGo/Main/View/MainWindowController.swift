@@ -168,8 +168,7 @@ final class MainWindowController: NSWindowController {
         let constraints = tabBarViewController.view.addConstraints(to: newParentView, [
             .leading: .leading(),
             .trailing: .trailing(),
-            .top: .top(),
-            .height: .const(tabBarViewController.view.frame.height)
+            .top: .top()
         ])
         NSLayoutConstraint.activate(constraints)
     }

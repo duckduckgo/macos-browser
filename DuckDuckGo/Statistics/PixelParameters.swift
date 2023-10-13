@@ -26,6 +26,7 @@ extension Pixel {
         static let errorCode = "e"
         static let errorDesc = "d"
         static let errorCount = "c"
+        static let errorSource = "error_source"
         static let underlyingErrorCode = "ue"
         static let underlyingErrorDesc = "ud"
         static let underlyingErrorSQLiteCode = "sqlrc"

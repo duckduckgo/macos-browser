@@ -25,12 +25,13 @@ import Common
 protocol DBPUICommunicationDelegate: AnyObject {
     func setState()
     func getUserProfile() -> DBPUIUserProfile?
+    func deleteProfileData()
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
-    func removeNameFromUserProfile(_ name: DBPUIUserProfileName) -> Bool
+    func setNameAtIndexInCurrentUserProfile(_ payload: DBPUINameAtIndex) -> Bool
     func removeNameAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
-    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear)
+    func setBirthYearForCurrentUserProfile(_ year: DBPUIBirthYear) -> Bool
     func addAddressToCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool
-    func removeAddressFromCurrentUserProfile(_ address: DBPUIUserProfileAddress) -> Bool
+    func setAddressAtIndexInCurrentUserProfile(_ payload: DBPUIAddressAtIndex) -> Bool
     func removeAddressAtIndexFromUserProfile(_ index: DBPUIIndex) -> Bool
     func startScanAndOptOut() -> Bool
 }
@@ -39,12 +40,13 @@ enum DBPUIReceivedMethodName: String {
     case handshake
     case setState
     case getCurrentUserProfile
+    case deleteUserProfileData
     case addNameToCurrentUserProfile
-    case removeNameFromCurrentUserProfile
+    case setNameAtIndexInCurrentUserProfile
     case removeNameAtIndexFromCurrentUserProfile
     case setBirthYearForCurrentUserProfile
     case addAddressToCurrentUserProfile
-    case removeAddressFromCurrentUserProfile
+    case setAddressAtIndexInCurrentUserProfile
     case removeAddressAtIndexFromCurrentUserProfile
     case startScanAndOptOut
 }
@@ -76,12 +78,13 @@ struct DBPUICommunicationLayer: Subfeature {
         case .handshake: return handshake
         case .setState: return setState
         case .getCurrentUserProfile: return getCurrentUserProfile
+        case .deleteUserProfileData: return deleteUserProfileData
         case .addNameToCurrentUserProfile: return addNameToCurrentUserProfile
-        case .removeNameFromCurrentUserProfile: return removeNameFromCurrentUserProfile
+        case .setNameAtIndexInCurrentUserProfile: return setNameAtIndexInCurrentUserProfile
         case .removeNameAtIndexFromCurrentUserProfile: return removeNameAtIndexFromCurrentUserProfile
         case .setBirthYearForCurrentUserProfile: return setBirthYearForCurrentUserProfile
         case .addAddressToCurrentUserProfile: return addAddressToCurrentUserProfile
-        case .removeAddressFromCurrentUserProfile: return removeAddressFromCurrentUserProfile
+        case .setAddressAtIndexInCurrentUserProfile: return setAddressAtIndexInCurrentUserProfile
         case .removeAddressAtIndexFromCurrentUserProfile: return removeAddressAtIndexFromCurrentUserProfile
         case .startScanAndOptOut: return startScanAndOptOut
         }
@@ -126,6 +129,11 @@ struct DBPUICommunicationLayer: Subfeature {
         return profile
     }
 
+    func deleteUserProfileData(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        delegate?.deleteProfileData()
+        return DBPUIStandardResponse(version: Constants.version, success: true)
+    }
+
     func addNameToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUIUserProfileName.self, from: data) else {
@@ -140,14 +148,14 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
-    func removeNameFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    func setNameAtIndexInCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(DBPUIUserProfileName.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUINameAtIndex.self, from: data) else {
             os_log("Failed to parse removeNameFromCurrentUserProfile message", log: .dataBrokerProtection)
             throw DBPUIError.malformedRequest
         }
 
-        if delegate?.removeNameFromUserProfile(result) == true {
+        if delegate?.setNameAtIndexInCurrentUserProfile(result) == true {
             return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 
@@ -175,9 +183,11 @@ struct DBPUICommunicationLayer: Subfeature {
             throw DBPUIError.malformedRequest
         }
 
-        delegate?.setBirthYearForCurrentUserProfile(result)
+        if delegate?.setBirthYearForCurrentUserProfile(result) == true {
+            return DBPUIStandardResponse(version: Constants.version, success: true)
+        }
 
-        return nil
+        return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
     func addAddressToCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -194,14 +204,14 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIStandardResponse(version: Constants.version, success: false)
     }
 
-    func removeAddressFromCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    func setAddressAtIndexInCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(DBPUIUserProfileAddress.self, from: data) else {
+                let result = try? JSONDecoder().decode(DBPUIAddressAtIndex.self, from: data) else {
             os_log("Failed to parse removeAddressFromCurrentUserProfile message", log: .dataBrokerProtection)
             throw DBPUIError.malformedRequest
         }
 
-        if delegate?.removeAddressFromCurrentUserProfile(result) == true {
+        if delegate?.setAddressAtIndexInCurrentUserProfile(result) == true {
             return DBPUIStandardResponse(version: Constants.version, success: true)
         }
 

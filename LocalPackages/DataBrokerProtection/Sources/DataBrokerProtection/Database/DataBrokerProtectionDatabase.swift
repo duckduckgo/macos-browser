@@ -22,6 +22,7 @@ import Common
 protocol DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async
     func fetchProfile() -> DataBrokerProtectionProfile?
+    func deleteProfileData()
 
     func fetchChildBrokers(for parentBroker: String) -> [DataBroker]
 
@@ -59,71 +60,14 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
     func save(_ profile: DataBrokerProtectionProfile) async {
         do {
             let vault = try self.vault ?? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
-            let profileQueries = profile.profileQueries
 
             if try vault.fetchProfile(with: Self.profileId) != nil {
-                // There is a profile created.
-                // 1. We update the profile in the database
-                // 2. The database layer takes care of deleting the scans related to the old profile.
-                // 3. We fetch the list of brokers
-                // 4. We save each profile query into the database
-                // 5. We initialize the scan operations (related to a profile query and a broker)
-                _ = try vault.save(profile: profile)
-                let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
-
-                try intializeDatabaseForProfile(
-                    profileId: Self.profileId,
-                    vault: vault,
-                    brokerIDs: brokerIDs,
-                    profileQueries: profileQueries
-                )
+                try await updateProfile(profile, vault: vault)
             } else {
-                // There is no profile in the database. We need to insert it.
-                // Here we do the following:
-                // 1. We save the profile into the database
-                // 2. We fetch all the broker JSON files from Resources
-                // 3. We convert those JSON files into DataBroker objects
-                // 4. We save the brokers into the database
-                // 5. We save each profile query into the database
-                // 6. We initialize the scan operations (related to a profile query and a broker)
-                _ = try vault.save(profile: profile)
-
-                if let brokers = FileResources().fetchBrokerFromResourceFiles() {
-                    var brokerIDs = [Int64]()
-
-                    for broker in brokers {
-                        let brokerId = try vault.save(broker: broker)
-                        brokerIDs.append(brokerId)
-                    }
-
-                    try intializeDatabaseForProfile(
-                        profileId: Self.profileId,
-                        vault: vault,
-                        brokerIDs: brokerIDs,
-                        profileQueries: profileQueries
-                    )
-                }
+                try await saveNewProfile(profile, vault: vault)
             }
         } catch {
             os_log("Database error: saveProfile, error: %{public}@", log: .error, error.localizedDescription)
-        }
-    }
-
-    private func intializeDatabaseForProfile(profileId: Int64,
-                                             vault: any (DataBrokerProtectionSecureVault),
-                                             brokerIDs: [Int64],
-                                             profileQueries: [ProfileQuery]) throws {
-        var profileQueryIDs = [Int64]()
-
-        for profileQuery in profileQueries {
-            let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)
-            profileQueryIDs.append(profileQueryId)
-        }
-
-        for brokerId in brokerIDs {
-            for profileQueryId in profileQueryIDs {
-                try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
-            }
         }
     }
 
@@ -134,6 +78,16 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
         } catch {
             os_log("Database error: fetchProfile, error: %{public}@", log: .error, error.localizedDescription)
             return nil
+        }
+    }
+
+    public func deleteProfileData() {
+        do {
+            let vault = try DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil)
+            try vault.deleteProfileData()
+        } catch {
+            os_log("Database error: removeProfileData, error: %{public}@", log: .error, error.localizedDescription)
+            return
         }
     }
 
@@ -348,6 +302,135 @@ final class DataBrokerProtectionDatabase: DataBrokerProtectionRepository {
                            startTime: startTime)
         } catch {
             os_log("Database error: addAttempt, error: %{public}@", log: .error, error.localizedDescription)
+        }
+    }
+}
+
+// Private Methods
+extension DataBrokerProtectionDatabase {
+
+    private func initializeDatabaseForProfile(profileId: Int64,
+                                              vault: any (DataBrokerProtectionSecureVault),
+                                              brokerIDs: [Int64],
+                                              profileQueries: [ProfileQuery]) throws {
+        var profileQueryIDs = [Int64]()
+
+        for profileQuery in profileQueries {
+            let profileQueryId = try vault.save(profileQuery: profileQuery, profileId: profileId)
+            profileQueryIDs.append(profileQueryId)
+        }
+
+        for brokerId in brokerIDs {
+            for profileQueryId in profileQueryIDs {
+                try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
+            }
+        }
+    }
+
+    private func saveNewProfile(_ profile: DataBrokerProtectionProfile, vault: any DataBrokerProtectionSecureVault) async throws {
+        let newProfileQueries = profile.profileQueries
+        _ = try vault.save(profile: profile)
+
+        if let brokers = FileResources().fetchBrokerFromResourceFiles() {
+            var brokerIDs = [Int64]()
+
+            for broker in brokers {
+                let brokerId = try vault.save(broker: broker)
+                brokerIDs.append(brokerId)
+            }
+
+            try initializeDatabaseForProfile(
+                profileId: Self.profileId,
+                vault: vault,
+                brokerIDs: brokerIDs,
+                profileQueries: newProfileQueries
+            )
+        }
+    }
+
+    // https://app.asana.com/0/481882893211075/1205574642847432/f
+    private func updateProfile(_ profile: DataBrokerProtectionProfile, vault: any DataBrokerProtectionSecureVault) async throws {
+
+        let newProfileQueries = profile.profileQueries
+
+        let databaseBrokerProfileQueryData = fetchAllBrokerProfileQueryData()
+        let databaseProfileQueries = databaseBrokerProfileQueryData.map { $0.profileQuery }
+
+        // The queries we need to create are the one that exist on the new ones but not in the database
+        let profileQueriesToCreate = Set(newProfileQueries).subtracting(Set(databaseProfileQueries))
+
+        // The queries that need update exist in both the new and the database
+        // We assume updated queries will be not deprecated
+        var profileQueriesToUpdate = Array(Set(databaseProfileQueries).intersection(Set(newProfileQueries))).map {
+            $0.with(deprecated: false)
+        }
+        // The ones that we need to remove are the ones that exist in the database but not in the new ones
+        var profileQueriesToRemove = Set(databaseProfileQueries).subtracting(Set(newProfileQueries))
+
+        // For the profile queries we are going to remove. We need to check if they have extracted profiles.
+        // If the profile query has matches, we need to set it as deprecated and add it to the updates profile
+        // we also need to remove it from the profile queries to remove.
+        for brokerProfileQueryData in databaseBrokerProfileQueryData where profileQueriesToRemove.contains(brokerProfileQueryData.profileQuery) {
+            if brokerProfileQueryData.hasMatches {
+                let deprecatedProfileQuery = brokerProfileQueryData.profileQuery.with(deprecated: true)
+                profileQueriesToUpdate.append(deprecatedProfileQuery)
+                profileQueriesToRemove.remove(brokerProfileQueryData.profileQuery)
+            }
+        }
+
+        let profileID = try vault.update(profile: profile)
+        let brokerIDs = try vault.fetchAllBrokers().compactMap({ $0.id })
+
+        // Delete
+        if !profileQueriesToRemove.isEmpty {
+            try deleteProfileQueries(Array(profileQueriesToRemove),
+                                     profileID: profileID,
+                                     vault: vault)
+        }
+
+        // Update profileQueries
+        if !profileQueriesToUpdate.isEmpty {
+            try updateProfileQueries(Array(profileQueriesToUpdate),
+                                     profileID: profileID,
+                                     brokerIDs: brokerIDs,
+                                     vault: vault)
+        }
+
+        // Create
+        if !profileQueriesToCreate.isEmpty {
+            try initializeDatabaseForProfile(
+                profileId: Self.profileId,
+                vault: vault,
+                brokerIDs: brokerIDs,
+                profileQueries: Array(profileQueriesToCreate)
+            )
+        }
+    }
+
+    private func deleteProfileQueries(_ profileQueries: [ProfileQuery],
+                                      profileID: Int64,
+                                      vault: any DataBrokerProtectionSecureVault) throws {
+
+        for profile in profileQueries {
+            try vault.delete(profileQuery: profile, profileId: profileID)
+        }
+    }
+
+    private func updateProfileQueries(_ profileQueries: [ProfileQuery],
+                                      profileID: Int64,
+                                      brokerIDs: [Int64],
+                                      vault: any DataBrokerProtectionSecureVault) throws {
+
+        for profile in profileQueries {
+            let profileQueryID = try vault.update(profile,
+                                                  brokerIDs: brokerIDs,
+                                                  profileId: profileID)
+
+            if !profile.deprecated {
+                for brokerID in brokerIDs where !profile.deprecated {
+                    updatePreferredRunDate(Date(), brokerId: brokerID, profileQueryId: profileQueryID)
+                }
+            }
         }
     }
 }
