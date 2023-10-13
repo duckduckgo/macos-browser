@@ -30,8 +30,6 @@ public final class DataBrokerProtectionManager {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
-    // TODO: fully remove this
-    //private let ipcConnection = DBPIPCConnection(log: .dbpBackgroundAgent, memoryManagementLog: .dbpBackgroundAgentMemoryManagement)
     private let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId)
     var mainAppToDBPPackageDelegate: MainAppToDBPPackageInterface?
 
@@ -44,33 +42,6 @@ public final class DataBrokerProtectionManager {
     }()
 
     lazy var scheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
-
-/*
-    lazy var scheduler: DataBrokerProtectionScheduler = {
-        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
-        let features = ContentScopeFeatureToggles(emailProtection: false,
-                                                  emailProtectionIncontextSignup: false,
-                                                  credentialsAutofill: false,
-                                                  identitiesAutofill: false,
-                                                  creditCardsAutofill: false,
-                                                  credentialsSaving: false,
-                                                  passwordGeneration: false,
-                                                  inlineIconCredentials: false,
-                                                  thirdPartyCredentialsProvider: false)
-
-        let privacySettings = PrivacySecurityPreferences.shared
-        let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
-                                                sessionKey: sessionKey,
-                                                featureToggles: features)
-
-        return DefaultDataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
-                                                  contentScopeProperties: prefs,
-                                                  dataManager: dataManager,
-                                                  notificationCenter: NotificationCenter.default,
-                                                  pixelHandler: DataBrokerProtectionPixelsHandler(),
-                                                  redeemUseCase: redeemUseCase)
-    }()*/
 
     private init() {
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
@@ -90,18 +61,6 @@ public final class DataBrokerProtectionManager {
         guard !redeemUseCase.shouldAskForInviteCode() && !DataBrokerDebugFlagBlockScheduler().isFlagOn() else { return }
 
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
-        // TODO: this should be handled already
-        /*
-        ipcConnection.register(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, delegate: self) { success in
-            DispatchQueue.main.async {
-                if success {
-                    os_log("IPC connection with agent succeeded")
-                    self.ipcConnection.appDidStart()
-                } else {
-                    os_log("IPC connection with agent failed")
-                }
-            }
-        }*/
     }
 }
 
