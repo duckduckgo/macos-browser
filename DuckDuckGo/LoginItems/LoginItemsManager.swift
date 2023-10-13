@@ -91,6 +91,7 @@ final class LoginItemsManager {
     ///
     func ensureLoginItemsAreRunning(_ items: Set<LoginItem>, log: OSLog, condition: LoginItemCheckCondition = .none, after interval: TimeInterval = .seconds(5)) {
 
+        /*
         Task {
             try await Task.sleep(interval: interval)
 
@@ -116,6 +117,6 @@ final class LoginItemsManager {
                     os_log(.error, log: log, "Login item with ID '%{public}s' could not be launched. Error: %{public}s", item.debugDescription, "\(error)")
                 }
             }
-        }
+        }*/
     }
 }

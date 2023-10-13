@@ -31,7 +31,7 @@ public final class DataBrokerProtectionBackgroundManager {
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
-    private lazy var ipcService = IPCServiceManager(scheduler: scheduler)
+    private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -65,7 +65,7 @@ public final class DataBrokerProtectionBackgroundManager {
     private init() {
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
                                            authenticationRepository: authenticationRepository)
-
+        _ = ipcServiceManager
     }
 
     public func runOperationsAndStartSchedulerIfPossible() {

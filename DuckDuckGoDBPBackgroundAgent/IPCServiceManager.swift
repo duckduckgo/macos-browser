@@ -37,6 +37,7 @@ final class IPCServiceManager {
         self.scheduler = scheduler
 
         ipcServer.serverDelegate = self
+        ipcServer.activate()
     }
 
     private func subscribeToSchedulerStatusChanges() {
