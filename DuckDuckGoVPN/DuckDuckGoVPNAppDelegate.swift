@@ -67,16 +67,18 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,
-        networkExtensionController: networkExtensionController)
+        networkExtensionController: networkExtensionController,
+        settings: .init(defaults: .shared))
 
     /// An IPC server that provides access to the tunnel controller.
     ///
     /// This is used by our main app to control the tunnel through the VPN login item.
     ///
-    private lazy var tunnelControllerIPCServer: TunnelControllerIPCServer = {
-        let ipcServer = TunnelControllerIPCServer(tunnelController: tunnelController,
-                                                  networkExtensionController: networkExtensionController,
-                                                  statusReporter: statusReporter)
+    private lazy var tunnelControllerIPCService: TunnelControllerIPCService = {
+        let ipcServer = TunnelControllerIPCService(
+            tunnelController: tunnelController,
+            networkExtensionController: networkExtensionController,
+            statusReporter: statusReporter)
         ipcServer.activate()
         return ipcServer
     }()
@@ -147,7 +149,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         bouncer.requireAuthTokenOrKillApp()
 
         // Initialize the IPC server
-        _ = tunnelControllerIPCServer
+        _ = tunnelControllerIPCService
 
         PixelKit.setUp(dryRun: false, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 

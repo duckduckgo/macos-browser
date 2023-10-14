@@ -40,10 +40,6 @@ public protocol IPCServerInterface: AnyObject {
     /// Resets all of Network Protection's state that's handled by the server
     ///
     func resetAll(uninstallSystemExtension: Bool) async
-
-    /// Sets the selected server
-    ///
-    func setSelectedServer(_ server: String) async
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -70,10 +66,6 @@ protocol XPCServerInterface {
     /// Resets all of Network Protection's state that's handled by the server
     ///
     func resetAll(uninstallSystemExtension: Bool) async
-
-    /// Sets the selected server
-    ///
-    func setSelectedServer(_ server: String) async
 }
 
 public final class TunnelControllerIPCServer {
@@ -158,9 +150,5 @@ extension TunnelControllerIPCServer: XPCServerInterface {
 
     func resetAll(uninstallSystemExtension: Bool) async {
         await serverDelegate?.resetAll(uninstallSystemExtension: uninstallSystemExtension)
-    }
-
-    func setSelectedServer(_ server: String) async {
-        await serverDelegate?.setSelectedServer(server)
     }
 }

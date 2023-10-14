@@ -1,5 +1,5 @@
 //
-//  TunnelControllerIPCServer.swift
+//  TunnelControllerIPCService.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,13 @@ import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
 
-final class TunnelControllerIPCServer {
+/// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
+/// changes that need to be relayed back to IPC clients.
+///
+/// This also includes the tunnel settings which are controller through shared `UserDefaults` as a form of IPC.
+/// Clients can edit those defaults and this class will observe the changes and relay them to the runnel.
+///
+final class TunnelControllerIPCService {
     private let tunnelController: TunnelController
     private let networkExtensionController: NetworkExtensionController
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
@@ -76,7 +82,7 @@ final class TunnelControllerIPCServer {
     }
 }
 
-extension TunnelControllerIPCServer: IPCServerInterface {
+extension TunnelControllerIPCService: IPCServerInterface {
 
     func register() {
         server.serverInfoChanged(statusReporter.serverInfoObserver.recentValue)
@@ -97,9 +103,5 @@ extension TunnelControllerIPCServer: IPCServerInterface {
 
     func resetAll(uninstallSystemExtension: Bool) async {
         try? await networkExtensionController.deactivateSystemExtension()
-    }
-
-    func setSelectedServer(_ server: String) async {
-        // TODO: set the selected server
     }
 }

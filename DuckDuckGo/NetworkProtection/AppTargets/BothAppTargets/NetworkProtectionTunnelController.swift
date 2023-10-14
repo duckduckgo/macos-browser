@@ -35,6 +35,12 @@ typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
+    let settings: TunnelSettings
+
+    // MARK: - Combine Cancellables
+
+    private var cancellables = Set<AnyCancellable>()
+
     // MARK: - Debug Helpers
 
     /// Debug simulation options to aid with testing NetP.
@@ -133,6 +139,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
+         settings: TunnelSettings,
          notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
@@ -140,7 +147,33 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
+        self.settings = settings
         self.tokenStore = tokenStore
+
+        subscribeToSettingsChanges()
+    }
+
+    // MARK: - Tunnel Settings
+
+    private func subscribeToSettingsChanges() {
+        settings.changePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { change in
+                Task { [weak self] in
+                    try? await self?.relaySettingsChange(change)
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    private func relaySettingsChange(_ change: TunnelSettings.Change) async throws {
+        guard await isConnected,
+              let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
+
+        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderRequest(.changeTunnelSetting(change))
+        if let errorMessage {
+            throw TunnelFailureError(errorDescription: errorMessage.value)
+        }
     }
 
     // MARK: - Tunnel Configuration

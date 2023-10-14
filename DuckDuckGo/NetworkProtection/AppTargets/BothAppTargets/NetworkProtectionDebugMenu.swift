@@ -84,6 +84,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
     @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
 
+    // MARK: - Tunnel Settings
+
+    private let settings = TunnelSettings(defaults: .shared)
+
     // MARK: - Debug Logic
 
     private let debugUtilities = NetworkProtectionDebugUtilities()
@@ -162,7 +166,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
             selectedServer = .endpoint(titleComponents.first!)
         }
 
-        debugUtilities.setSelectedServer(selectedServer: selectedServer)
+        settings.setSelectedServer(selectedServer: selectedServer)
+        //debugUtilities.setSelectedServer(selectedServer: selectedServer)
     }
 
     /// Expires the registration key immediately.
