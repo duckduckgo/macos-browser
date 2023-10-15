@@ -34,21 +34,21 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     private let log: OSLog
     private let loginItemsManager: LoginItemsManager
     private let pinningManager: LocalPinningManager
-    private let selectedServerUserDefaultsStore: NetworkProtectionSelectedServerUserDefaultsStore
+    private let settings: TunnelSettings
     private let userDefaults: UserDefaults
     private let ipcClient: TunnelControllerIPCClient
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .shared,
-         selectedServerUserDefaultsStore: NetworkProtectionSelectedServerUserDefaultsStore = NetworkProtectionSelectedServerUserDefaultsStore(),
+         settings: TunnelSettings = .init(defaults: .shared),
          ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId),
          log: OSLog = .networkProtection) {
 
         self.log = log
         self.loginItemsManager = loginItemsManager
         self.pinningManager = pinningManager
-        self.selectedServerUserDefaultsStore = selectedServerUserDefaultsStore
+        self.settings = settings
         self.userDefaults = userDefaults
         self.ipcClient = ipcClient
     }
@@ -124,7 +124,7 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     }
 
     private func resetUserDefaults() {
-        selectedServerUserDefaultsStore.reset()
+        settings.resetToDefaults()
         userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
     }
 }

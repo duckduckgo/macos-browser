@@ -49,10 +49,6 @@ final class NetworkProtectionDebugUtilities {
 
     private let loginItemsManager: LoginItemsManager
 
-    // MARK: - Server Selection
-
-    private let selectedServerStore = NetworkProtectionSelectedServerUserDefaultsStore()
-
     // MARK: - Initializers
 
     init(loginItemsManager: LoginItemsManager = .init()) {
@@ -106,24 +102,6 @@ final class NetworkProtectionDebugUtilities {
         }
 
         try? activeSession.sendProviderMessage(.expireRegistrationKey)
-    }
-
-    // MARK: - Server Selection
-
-    func selectedServerName() -> String? {
-        selectedServerStore.selectedServer.stringValue
-    }
-
-    func setSelectedServer(selectedServer: SelectedNetworkProtectionServer) {
-        selectedServerStore.selectedServer = selectedServer
-
-        Task {
-            guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-                return
-            }
-
-            try? activeSession.sendProviderMessage(.setSelectedServer(selectedServer.stringValue))
-        }
     }
 }
 

@@ -157,7 +157,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @IBAction
     func setSelectedServer(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedServer: SelectedNetworkProtectionServer
+        let selectedServer: TunnelSettings.SelectedServer
 
         if title == "Automatic" {
             selectedServer = .automatic
@@ -342,24 +342,24 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return
         }
 
-        let selectedServerName = debugUtilities.selectedServerName()
+        let selectedServer = settings.selectedServer
 
-        if selectedServerName == nil {
+        switch selectedServer {
+        case .automatic:
             menu.items.first?.state = .on
-        } else {
+        case .endpoint(let selectedServerName):
             menu.items.first?.state = .off
-        }
 
-        // We're skipping the first two items because they're the automatic menu item and
-        // the separator line.
-        let serverItems = menu.items.dropFirst(2)
+            // We're skipping the first two items because they're the automatic menu item and
+            // the separator line.
+            let serverItems = menu.items.dropFirst(2)
 
-        for item in serverItems {
-            if let selectedServerName,
-               item.title.hasPrefix(selectedServerName) {
-                item.state = .on
-            } else {
-                item.state = .off
+            for item in serverItems {
+                if item.title.hasPrefix(selectedServerName) {
+                    item.state = .on
+                } else {
+                    item.state = .off
+                }
             }
         }
     }
