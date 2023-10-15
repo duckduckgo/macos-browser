@@ -136,9 +136,6 @@ public struct UserDefaultsWrapper<T> {
 
         // Network Protection
 
-        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
-        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
-
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
         case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
         case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
@@ -172,6 +169,10 @@ public struct UserDefaultsWrapper<T> {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
         case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
         case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
+
+        // NetP removed keys
+        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
+        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
     }
 
     private let key: Key

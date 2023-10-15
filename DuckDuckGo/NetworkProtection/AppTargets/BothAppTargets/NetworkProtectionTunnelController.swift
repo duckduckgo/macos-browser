@@ -64,17 +64,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Debug Options Support
 
-    // TODO: replace this with a shared store
-    //private let debugUtilities = NetworkProtectionDebugUtilities()
-
     private let networkExtensionBundleID: String
     private let networkExtensionController: NetworkExtensionController
 
     // MARK: - User Defaults
-
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldIncludeAllNetworks, defaultValue: NetworkProtectionUserDefaultsConstants.shouldIncludeAllNetworks)
-    private(set) var shouldIncludeAllNetworks
 
     /// Test setting to exclude duckduckgo route from VPN
     @MainActor
@@ -174,9 +167,20 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         case .setSelectedServer:
             // Intentional no-op as this is handled by the extension
             break
+        case .setIncludeAllNetworks(let includeAllNetworks):
+            try await handleSetIncludeAllNetworks(includeAllNetworks)
         case .setEnforceRoutes(let enforceRoutes):
             try await handleSetEnforceRoutes(enforceRoutes)
         }
+    }
+
+    private func handleSetIncludeAllNetworks(_ includeAllNetworks: Bool) async throws {
+        guard let tunnelManager = await loadTunnelManager(),
+              tunnelManager.protocolConfiguration?.includeAllNetworks == !includeAllNetworks else {
+            return
+        }
+
+        try await setupAndSave(tunnelManager)
     }
 
     private func handleSetEnforceRoutes(_ enforceRoutes: Bool) async throws {
@@ -228,7 +232,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             // kill switch
             protocolConfiguration.enforceRoutes = settings.enforceRoutes
             // this setting breaks Connection Tester
-            protocolConfiguration.includeAllNetworks = shouldIncludeAllNetworks
+            protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 
             protocolConfiguration.excludeLocalNetworks = shouldExcludeLocalRoutes
 
@@ -446,40 +450,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         tunnelManager.isOnDemandEnabled = false
 
         try await tunnelManager.saveToPreferences()
-    }
-
-    @MainActor
-    func enableIncludeAllNetworks() async throws {
-        shouldIncludeAllNetworks = true
-
-        // calls setupAndSave where configuration is done
-        _=try await loadOrMakeTunnelManager()
-    }
-
-    @MainActor
-    func disableIncludeAllNetworks() async throws {
-        shouldIncludeAllNetworks = false
-
-        guard let tunnelManager = await loadTunnelManager(),
-              tunnelManager.protocolConfiguration?.includeAllNetworks == true else { return }
-
-        try await setupAndSave(tunnelManager)
-    }
-
-    @MainActor
-    func toggleShouldIncludeAllNetworks() {
-        shouldIncludeAllNetworks.toggle()
-
-        // update configuration if connected
-        Task { [shouldIncludeAllNetworks] in
-            guard await isConnected else { return }
-
-            if shouldIncludeAllNetworks {
-                try await enableIncludeAllNetworks()
-            } else {
-                try await disableIncludeAllNetworks()
-            }
-        }
     }
 
     // TO BE Refactored when the Exclusion List is added

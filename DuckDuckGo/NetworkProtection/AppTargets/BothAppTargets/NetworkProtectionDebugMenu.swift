@@ -195,8 +195,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @IBAction
     func toggleIncludeAllNetworks(_ sender: Any?) {
-        // TODO: reimplement this through IPC
-        //NetworkProtectionTunnelController().toggleShouldIncludeAllNetworks()
+        settings.includeAllNetworks.toggle()
     }
 
     @IBAction
@@ -393,13 +392,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func updateNetworkProtectionMenuItemsState() {
         shouldEnforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
+        shouldIncludeAllNetworksMenuItem.state = settings.includeAllNetworks ? .on : .off
 
         // TODO: reimplement this through IPC
         /*
         let controller = NetworkProtectionTunnelController()
 
-        shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
-        shouldIncludeAllNetworksMenuItem.state = controller.shouldIncludeAllNetworks ? .on : .off
         connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
 
         excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
