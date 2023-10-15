@@ -166,8 +166,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             selectedServer = .endpoint(titleComponents.first!)
         }
 
-        settings.setSelectedServer(selectedServer: selectedServer)
-        //debugUtilities.setSelectedServer(selectedServer: selectedServer)
+        settings.selectedServer = selectedServer
     }
 
     /// Expires the registration key immediately.
@@ -191,8 +190,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @IBAction
     func toggleEnforceRoutesAction(_ sender: Any?) {
-        // TODO: reimplement this through IPC
-        //NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
+        settings.enforceRoutes.toggle()
     }
 
     @IBAction
@@ -394,6 +392,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func updateNetworkProtectionMenuItemsState() {
+        shouldEnforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
+
         // TODO: reimplement this through IPC
         /*
         let controller = NetworkProtectionTunnelController()

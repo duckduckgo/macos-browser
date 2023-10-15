@@ -72,13 +72,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - User Defaults
 
-    /// Kill Switch: Enable enforceRoutes flag
-    ///
-    /// Applies enforceRoutes setting, sets up excludedRoutes in MacPacketTunnelProvider and disables disconnect on failure
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldEnforceRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldEnforceRoutes)
-    private(set) var shouldEnforceRoutes: Bool
-
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionShouldIncludeAllNetworks, defaultValue: NetworkProtectionUserDefaultsConstants.shouldIncludeAllNetworks)
     private(set) var shouldIncludeAllNetworks
@@ -158,12 +151,41 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     private func subscribeToSettingsChanges() {
         settings.changePublisher
             .receive(on: DispatchQueue.main)
-            .sink { change in
-                Task { [weak self] in
-                    try? await self?.relaySettingsChange(change)
+            .sink { [weak self] change in
+                guard let self else { return }
+
+                Task {
+                    // Offer the extension a chance to handle the settings change
+                    try? await self.relaySettingsChange(change)
+
+                    // Handle the settings change right in the controller
+                    try? await self.handleSettingsChange(change)
                 }
             }
             .store(in: &cancellables)
+    }
+
+    /// This is where the tunnel has a chance to handle the settings change locally.
+    ///
+    /// The extension can also handle these changes so not everything needs to be handled here.
+    ///
+    private func handleSettingsChange(_ change: TunnelSettings.Change) async throws {
+        switch change {
+        case .setSelectedServer:
+            // Intentional no-op as this is handled by the extension
+            break
+        case .setEnforceRoutes(let enforceRoutes):
+            try await handleSetEnforceRoutes(enforceRoutes)
+        }
+    }
+
+    private func handleSetEnforceRoutes(_ enforceRoutes: Bool) async throws {
+        guard let tunnelManager = await loadTunnelManager(),
+              tunnelManager.protocolConfiguration?.enforceRoutes == !enforceRoutes else {
+            return
+        }
+
+        try await setupAndSave(tunnelManager)
     }
 
     private func relaySettingsChange(_ change: TunnelSettings.Change) async throws {
@@ -204,7 +226,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.disconnectOnSleep = false
 
             // kill switch
-            protocolConfiguration.enforceRoutes = shouldEnforceRoutes
+            protocolConfiguration.enforceRoutes = settings.enforceRoutes
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = shouldIncludeAllNetworks
 
@@ -428,24 +450,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    func enableEnforceRoutes() async throws {
-        shouldEnforceRoutes = true
-
-        // calls setupAndSave where configuration is done
-        _=try await loadOrMakeTunnelManager()
-    }
-
-    @MainActor
-    func disableEnforceRoutes() async throws {
-        shouldEnforceRoutes = false
-
-        guard let tunnelManager = await loadTunnelManager(),
-              tunnelManager.protocolConfiguration?.enforceRoutes == true else { return }
-
-        try await setupAndSave(tunnelManager)
-    }
-
-    @MainActor
     func enableIncludeAllNetworks() async throws {
         shouldIncludeAllNetworks = true
 
@@ -461,22 +465,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
               tunnelManager.protocolConfiguration?.includeAllNetworks == true else { return }
 
         try await setupAndSave(tunnelManager)
-    }
-
-    @MainActor
-    func toggleShouldEnforceRoutes() {
-        shouldEnforceRoutes.toggle()
-
-        // update configuration if connected
-        Task { [shouldEnforceRoutes] in
-            guard await isConnected else { return }
-
-            if shouldEnforceRoutes {
-                try await enableEnforceRoutes()
-            } else {
-                try await disableEnforceRoutes()
-            }
-        }
     }
 
     @MainActor
@@ -532,7 +520,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             // TO BE fixed:
             // when 10.11.12.1 DNS is used 10.0.0.0/8 should be included (not excluded)
             // but marking 10.11.12.1 as an Included Route breaks tunnel (probably these routes are conflicting)
-            if shouldEnforceRoutes && range == "10.0.0.0/8" {
+            if settings.enforceRoutes && range == "10.0.0.0/8" {
                 return nil
             }
 
@@ -571,7 +559,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             return false
         }
         // TO BE fixed: see excludedRoutes()
-        if shouldEnforceRoutes && route == "10.0.0.0/8" {
+        if settings.enforceRoutes && route == "10.0.0.0/8" {
             return false
         }
         return excludedRoutesPreferences[route, default: defaultValue]
