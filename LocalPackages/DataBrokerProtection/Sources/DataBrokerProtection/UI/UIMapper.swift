@@ -120,11 +120,11 @@ struct MapperToUI {
     private func scanDate(element: Dictionary<Date?, [BrokerProfileQueryData]>.Element?) -> DBUIScanDate {
         if let element = element, let date = element.key {
             return DBUIScanDate(
-                date: date,
+                date: date.timeIntervalSince1970,
                 dataBrokers: element.value.map { DBPUIDataBroker(name: $0.dataBroker.name)}
             )
         } else {
-            return DBUIScanDate(date: Date(), dataBrokers: [DBPUIDataBroker]())
+            return DBUIScanDate(date: 0, dataBrokers: [DBPUIDataBroker]())
         }
     }
 }

@@ -165,7 +165,7 @@ struct DBPUIInitialScanState: DBPUISendableMessage {
 }
 
 struct DBUIScanDate: DBPUISendableMessage {
-    let date: Date
+    let date: Double
     let dataBrokers: [DBPUIDataBroker]
 }
 
