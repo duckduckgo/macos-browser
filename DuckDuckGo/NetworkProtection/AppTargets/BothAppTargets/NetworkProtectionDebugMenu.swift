@@ -181,10 +181,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @IBAction
     func setRegistrationKeyValidity(_ menuItem: NSMenuItem) {
-        // nil means automatic
-        let validity = menuItem.representedObject as? TimeInterval
+        guard let timeInterval = menuItem.representedObject as? TimeInterval else {
+            settings.registrationKeyValidity = .automatic
+            return
+        }
 
-        debugUtilities.registrationKeyValidity = validity
+        settings.registrationKeyValidity = .custom(timeInterval)
     }
 
     @IBAction
@@ -299,9 +301,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateExclusionsMenuItems() {
         exclusionsMenu.removeAllItems()
 
-        // TODO: reimplement this, probably moving the exclusion list definition elsewhere
-        /*
-        for item in NetworkProtectionTunnelController.exclusionList {
+        for item in settings.exclusionList {
             let menuItem: NSMenuItem
             switch item {
             case .section(let title):
@@ -316,7 +316,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
             exclusionsMenu.addItem(menuItem)
         }
-         */
     }
 
     // MARK: - Menu State Update
@@ -361,23 +360,22 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return
         }
 
-        let selectedValidity = debugUtilities.registrationKeyValidity
-
-        if selectedValidity == nil {
+        switch settings.registrationKeyValidity {
+        case .automatic:
             menu.items.first?.state = .on
-        } else {
+        case .custom(let timeInterval):
             menu.items.first?.state = .off
-        }
 
-        // We're skipping the first two items because they're the automatic menu item and
-        // the separator line.
-        let serverItems = menu.items.dropFirst(2)
+            // We're skipping the first two items because they're the automatic menu item and
+            // the separator line.
+            let serverItems = menu.items.dropFirst(2)
 
-        for item in serverItems {
-            if item.representedObject as? TimeInterval == selectedValidity {
-                item.state = .on
-            } else {
-                item.state = .off
+            for item in serverItems {
+                if item.representedObject as? TimeInterval == timeInterval {
+                    item.state = .on
+                } else {
+                    item.state = .off
+                }
             }
         }
     }

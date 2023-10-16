@@ -156,15 +156,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private func handleSettingsChange(_ change: TunnelSettings.Change) async throws {
         switch change {
-        case .setSelectedServer:
-            // Intentional no-op as this is handled by the extension
-            break
         case .setIncludeAllNetworks(let includeAllNetworks):
             try await handleSetIncludeAllNetworks(includeAllNetworks)
         case .setEnforceRoutes(let enforceRoutes):
             try await handleSetEnforceRoutes(enforceRoutes)
         case .setExcludeLocalNetworks(let excludeLocalNetworks):
             try await handleSetExcludeLocalNetworks(excludeLocalNetworks)
+        case .setRegistrationKeyValidity,
+                .setSelectedServer:
+            // Intentional no-op as this is handled by the extension
+            break
         }
     }
 
@@ -455,37 +456,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         try await tunnelManager.saveToPreferences()
     }
 
-    // TO BE Refactored when the Exclusion List is added
-    enum ExclusionListItem {
-        case section(String)
-        case exclusion(range: NetworkProtection.IPAddressRange, description: String? = nil, `default`: Bool)
-    }
-    static let exclusionList: [ExclusionListItem] = [
-        .section("IPv4 Local Routes"),
-
-        .exclusion(range: "10.0.0.0/8"     /* 255.0.0.0 */, description: "disabled for enforceRoutes", default: true),
-        .exclusion(range: "172.16.0.0/12"  /* 255.240.0.0 */, default: true),
-        .exclusion(range: "192.168.0.0/16" /* 255.255.0.0 */, default: true),
-        .exclusion(range: "169.254.0.0/16" /* 255.255.0.0 */, description: "Link-local", default: true),
-        .exclusion(range: "127.0.0.0/8"    /* 255.0.0.0 */, description: "Loopback", default: true),
-        .exclusion(range: "224.0.0.0/4"    /* 240.0.0.0 (corrected subnet mask) */, description: "Multicast", default: true),
-        .exclusion(range: "100.64.0.0/16"  /* 255.255.0.0 */, description: "Shared Address Space", default: true),
-
-        .section("IPv6 Local Routes"),
-        .exclusion(range: "fe80::/10", description: "link local", default: false),
-        .exclusion(range: "ff00::/8", description: "multicast", default: false),
-        .exclusion(range: "fc00::/7", description: "local unicast", default: false),
-        .exclusion(range: "::1/128", description: "loopback", default: false),
-
-        .section("duckduckgo.com"),
-        .exclusion(range: "52.142.124.215/32", default: false),
-        .exclusion(range: "52.250.42.157/32", default: false),
-        .exclusion(range: "40.114.177.156/32", default: false),
-    ]
-
     @MainActor
     private func excludedRoutes() -> [NetworkProtection.IPAddressRange] {
-        Self.exclusionList.compactMap { [excludedRoutesPreferences] item -> NetworkProtection.IPAddressRange? in
+        settings.exclusionList.compactMap { [excludedRoutesPreferences] item -> NetworkProtection.IPAddressRange? in
             guard case .exclusion(range: let range, description: _, default: let defaultValue) = item,
                   excludedRoutesPreferences[range.stringRepresentation, default: defaultValue] == true
             else { return nil }
@@ -515,7 +488,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @MainActor
     func isExcludedRouteEnabled(_ route: String) -> Bool {
         guard let range = IPAddressRange(from: route),
-              let exclusionListItem = Self.exclusionList.first(where: {
+              let exclusionListItem = settings.exclusionList.first(where: {
                   if case .exclusion(range: range, description: _, default: _) = $0 { return true }
                   return false
               }),

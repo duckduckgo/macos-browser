@@ -20,10 +20,6 @@ import Foundation
 import NetworkProtection
 import XPCHelper
 
-public enum DebugCommand: Codable {
-    case sendTestNotification
-}
-
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol IPCServerInterface: AnyObject {

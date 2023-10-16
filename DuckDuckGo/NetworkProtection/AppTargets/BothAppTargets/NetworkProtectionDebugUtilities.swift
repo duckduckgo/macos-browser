@@ -31,17 +31,6 @@ import NetworkProtectionIPC
 ///
 final class NetworkProtectionDebugUtilities {
 
-    // MARK: - Registration Key Validity
-
-    @UserDefaultsWrapper(key: .networkProtectionRegistrationKeyValidity, defaultValue: nil)
-    var registrationKeyValidity: TimeInterval? {
-        didSet {
-            Task {
-                await sendRegistrationKeyValidityToProvider()
-            }
-        }
-    }
-
     private let ipcClient: TunnelControllerIPCClient
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabler
 
@@ -82,22 +71,8 @@ final class NetworkProtectionDebugUtilities {
         await ipcClient.debugCommand(.sendTestNotification)
     }
 
-    // MARK: - Registation Key
-
-    private func sendRegistrationKeyValidityToProvider() async {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        try? await activeSession.sendProviderMessage(.setKeyValidity(registrationKeyValidity))
-    }
-
     func expireRegistrationKeyNow() async {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        try? await activeSession.sendProviderMessage(.expireRegistrationKey)
+        await ipcClient.debugCommand(.expireRegistrationKey)
     }
 }
 

@@ -108,13 +108,10 @@ extension TunnelControllerIPCService: IPCServerInterface {
     }
 
     func debugCommand(_ command: DebugCommand) async {
-        switch command {
-        case .sendTestNotification:
-            guard let activeSession = try? await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID) else {
-                return
-            }
-
-            try? await activeSession.sendProviderRequest(.sendTestNotification)
+        guard let activeSession = try? await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID) else {
+            return
         }
+
+        try? await activeSession.sendProviderRequest(.debugCommand(command))
     }
 }
