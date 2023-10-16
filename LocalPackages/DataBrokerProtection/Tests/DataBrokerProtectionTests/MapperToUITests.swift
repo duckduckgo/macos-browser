@@ -106,7 +106,7 @@ final class MapperToUITests: XCTestCase {
         let result = sut.maintenanceScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanSchedule.lastScan.dataBrokers.count, 2)
-        XCTAssertTrue(areDatesEqualsOnDayMonthAndYear(date1: Date().yesterday, date2: result.scanSchedule.lastScan.date))
+        XCTAssertTrue(areDatesEqualsOnDayMonthAndYear(date1: Date().yesterday, date2: Date(timeIntervalSince1970: result.scanSchedule.lastScan.date)))
     }
 
     func testNextScans_areMappedCorrectly() {
@@ -119,7 +119,7 @@ final class MapperToUITests: XCTestCase {
         let result = sut.maintenanceScanState(brokerProfileQueryData)
 
         XCTAssertEqual(result.scanSchedule.nextScan.dataBrokers.count, 2)
-        XCTAssertTrue(areDatesEqualsOnDayMonthAndYear(date1: Date().tomorrow, date2: result.scanSchedule.nextScan.date))
+        XCTAssertTrue(areDatesEqualsOnDayMonthAndYear(date1: Date().tomorrow, date2: Date(timeIntervalSince1970: result.scanSchedule.nextScan.date)))
     }
 }
 
