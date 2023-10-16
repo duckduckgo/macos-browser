@@ -22,7 +22,7 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct EnableNetworkProtectionView: View {
-    @EnvironmentObject var model: WaitlistViewModel
+    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {

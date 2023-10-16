@@ -16,46 +16,87 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 import SwiftUI
 import SwiftUIExtensions
 
+protocol JoinWaitlistViewViewData {
+    var headerImageName: String { get }
+    var title: String { get }
+    var subtitle1: String { get }
+    var subtitle2: String { get }
+    var availabilityDisclaimer: String { get }
+    var buttonCloseLabel: String { get }
+    var buttonJoinWaitlistLabel: String { get }
+}
+
 struct JoinWaitlistView: View {
-    @EnvironmentObject var model: WaitlistViewModel
+    let viewData: JoinWaitlistViewViewData
+
+    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
-                Image("JoinWaitlistHeader")
+                Image(viewData.headerImageName)
 
-                Text(UserText.networkProtectionWaitlistJoinTitle)
+                Text(viewData.title)
                     .font(.system(size: 17, weight: .bold))
 
-                Text(UserText.networkProtectionWaitlistJoinSubtitle1)
+                Text(viewData.subtitle1)
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color("BlackWhite80"))
 
-                Text(UserText.networkProtectionWaitlistJoinSubtitle2)
+                Text(viewData.subtitle2)
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color("BlackWhite80"))
 
-                Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
+                Text(viewData.availabilityDisclaimer)
+                    .multilineTextAlignment(.center)
                     .font(.system(size: 12))
                     .foregroundColor(Color("BlackWhite60"))
             }
         } buttons: {
-            Button(UserText.networkProtectionWaitlistButtonClose) {
+            Button(viewData.buttonCloseLabel) {
                 Task { await model.perform(action: .close) }
             }
 
-            Button(UserText.networkProtectionWaitlistButtonJoinWaitlist) {
+            Button(viewData.buttonJoinWaitlistLabel) {
                 Task { await model.perform(action: .joinQueue) }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: model.viewState == .notOnWaitlist))
         }
         .environmentObject(model)
     }
+}
+
+#endif
+
+#if NETWORK_PROTECTION
+
+struct NetworkProtectionJoinWaitlistViewViewData: JoinWaitlistViewViewData {
+    let headerImageName = "JoinWaitlistHeader"
+    let title = UserText.networkProtectionWaitlistJoinTitle
+    let subtitle1 = UserText.networkProtectionWaitlistJoinSubtitle1
+    let subtitle2 = UserText.networkProtectionWaitlistJoinSubtitle2
+    let availabilityDisclaimer = UserText.networkProtectionWaitlistAvailabilityDisclaimer
+    let buttonCloseLabel = UserText.networkProtectionWaitlistButtonClose
+    let buttonJoinWaitlistLabel = UserText.networkProtectionWaitlistButtonJoinWaitlist
+}
+
+#endif
+
+#if DBP
+
+struct DataBrokerProtectionJoinWaitlistViewViewData: JoinWaitlistViewViewData {
+    let headerImageName = "DBP-JoinWaitlistHeader"
+    let title = UserText.dataBrokerProtectionWaitlistJoinTitle
+    let subtitle1 = UserText.dataBrokerProtectionWaitlistJoinSubtitle1
+    let subtitle2 = UserText.dataBrokerProtectionWaitlistJoinSubtitle2
+    let availabilityDisclaimer = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
+    let buttonCloseLabel = UserText.dataBrokerProtectionWaitlistButtonClose
+    let buttonJoinWaitlistLabel = UserText.dataBrokerProtectionWaitlistButtonJoinWaitlist
 }
 
 #endif

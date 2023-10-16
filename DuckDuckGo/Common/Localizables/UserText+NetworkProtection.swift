@@ -152,3 +152,50 @@ extension UserText {
     static let networkProtectionTermsOfServiceSection8List = NSLocalizedString("network-protection.terms-of-service.section.7.list", value: "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.", comment: "Terms of Service list for Network Protection")
 
 }
+
+#if DBP
+// MARK: - Data Broker Protection Waitlist
+extension UserText {
+    static let dataBrokerProtectionWaitlistNotificationTitle = NSLocalizedString("data-broker-protection.waitlist.notification.title", value: "Personal Information Removal beta is ready!", comment: "Title for Personal Information Removal waitlist notification")
+    static let dataBrokerProtectionWaitlistNotificationText = NSLocalizedString("data-broker-protection.waitlist.notification.text", value: "Open your invite", comment: "Title for Personal Information Removal waitlist notification")
+
+    static let dataBrokerProtectionWaitlistJoinTitle = NSLocalizedString("data-broker-protection.waitlist.join.title", value: "Personal Information Removal Beta", comment: "Title for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistJoinSubtitle1 = NSLocalizedString("data-broker-protection.waitlist.join.subtitle.1", value: "Automatically scan and remove your data from 75+ sites that sell personal information with DuckDuckGo’s Personal Information Removal.", comment: "First subtitle for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistJoinSubtitle2 = NSLocalizedString("data-broker-protection.waitlist.join.subtitle.2", value: "Join the waitlist, and we’ll notify you when it’s your turn.", comment: "Second subtitle for Personal Information Removal join waitlist screen")
+
+    static let dataBrokerProtectionWaitlistJoinedTitle = NSLocalizedString("data-broker-protection.waitlist.joined.title", value: "You’re on the list!", comment: "Title for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle1 = NSLocalizedString("data-broker-protection.waitlist.joined.with-notifications.subtitle.1", value: "New invites are sent every few days, on a first come, first served basis.", comment: "Subtitle 1 for Personal Information Removal joined waitlist screen when notifications are enabled")
+    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle2 = NSLocalizedString("data-broker-protection.waitlist.joined.with-notifications.subtitle.2", value: "We’ll notify you when your invite is ready.", comment: "Subtitle 2 for Personal Information Removal joined waitlist screen when notifications are enabled")
+    static let dataBrokerProtectionWaitlistEnableNotifications = NSLocalizedString("data-broker-protection.waitlist.enable-notifications", value: "Want to get a notification when your Personal Information Removal invite is ready?", comment: "Enable notifications prompt for Personal Information Removal joined waitlist screen")
+
+    static let dataBrokerProtectionWaitlistInvitedTitle = NSLocalizedString("data-broker-protection.waitlist.invited.title", value: "You’re invited to try\nPersonal Information Removal beta!", comment: "Title for Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSubtitle = NSLocalizedString("data-broker-protection.waitlist.invited.subtitle", value: "Get an extra layer of protection online with the VPN built for speed and simplicity. Encrypt your internet connection across your entire device and hide your location and IP address from sites you visit.", comment: "Subtitle for Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistInvitedSection1Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-1.title", value: "Full-device coverage", comment: "Title for section 1 of the Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSection1Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-1.subtitle", value: "Encrypt online traffic across your browsers and apps.", comment: "Subtitle for section 1 of the Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistInvitedSection2Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-2.title", value: "Fast, reliable, and easy to use", comment: "Title for section 2 of the Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSection2Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-2.subtitle", value: "No need for a separate app. Connect in one click and see your connection status at a glance.", comment: "Subtitle for section 2 of the Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistInvitedSection3Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-3.title", value: "Strict no-logging policy", comment: "Title for section 3 of the Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSection3Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-3.subtitle", value: "We do not log or save any data that can connect you to your online activity.", comment: "Subtitle for section 3 of the Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistEnableTitle = NSLocalizedString("data-broker-protection.waitlist.enable.title", value: "Ready to enable Personal Information Removal?", comment: "Title for Personal Information Removal enable screen")
+    static let dataBrokerProtectionWaitlistEnableSubtitle = NSLocalizedString("data-broker-protection.waitlist.enable.subtitle", value: "Look for the globe icon in the browser toolbar or in the Mac menu bar.\n\nYou'll be asked to Allow a VPN connection once when setting up Personal Information Removal the first time.", comment: "Subtitle for Personal Information Removal enable screen")
+
+    static let dataBrokerProtectionWaitlistAvailabilityDisclaimer = NSLocalizedString("data-broker-protection.waitlist.availability-disclaimer", value: "Personal Information Removal is free to use during the beta.", comment: "Availability disclaimer for Personal Information Removal join waitlist screen")
+
+    static let dataBrokerProtectionWaitlistButtonClose = NSLocalizedString("data-broker-protection.waitlist.button.close", value: "Close", comment: "Close button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonDone = NSLocalizedString("data-broker-protection.waitlist.button.done", value: "Done", comment: "Close button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonDismiss = NSLocalizedString("data-broker-protection.waitlist.button.dismiss", value: "Dismiss", comment: "Dismiss button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonCancel = NSLocalizedString("data-broker-protection.waitlist.button.cancel", value: "Cancel", comment: "Cancel button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonNoThanks = NSLocalizedString("data-broker-protection.waitlist.button.no-thanks", value: "No Thanks", comment: "No Thanks button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonGetStarted = NSLocalizedString("data-broker-protection.waitlist.button.get-started", value: "Get Started", comment: "Get Started button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonGotIt = NSLocalizedString("data-broker-protection.waitlist.button.got-it", value: "Got It", comment: "Got It button for Personal Information Removal joined waitlist screen")
+
+    static let dataBrokerProtectionWaitlistButtonEnableNotifications = NSLocalizedString("data-broker-protection.waitlist.button.enable-notifications", value: "Enable Notifications", comment: "Enable Notifications button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("data-broker-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonAgreeAndContinue = NSLocalizedString("data-broker-protection.waitlist.button.agree-and-continue", value: "Agree and Continue", comment: "Agree and Continue button for Personal Information Removal join waitlist screen")
+}
+
+#endif

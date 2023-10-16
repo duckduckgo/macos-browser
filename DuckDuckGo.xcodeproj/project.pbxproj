@@ -2137,7 +2137,7 @@
 		4B9579FF2AC7AE700062CA31 /* FireViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB7320826DD0CD9002FACF9 /* FireViewController.swift */; };
 		4B957A002AC7AE700062CA31 /* OutlineSeparatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */; };
 		4B957A012AC7AE700062CA31 /* SafariDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CFD26FE191E001E4761 /* SafariDataImporter.swift */; };
-		4B957A022AC7AE700062CA31 /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
+		4B957A022AC7AE700062CA31 /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
 		4B957A032AC7AE700062CA31 /* LocalBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F829999973005D8EB6 /* LocalBookmarkStore.swift */; };
 		4B957A042AC7AE700062CA31 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; };
 		4B957A052AC7AE700062CA31 /* StatisticsLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50342726A11F00758A2B /* StatisticsLoader.swift */; };
@@ -2712,9 +2712,9 @@
 		4B9DB0232A983B24000927DB /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */; };
 		4B9DB0242A983B24000927DB /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */; };
 		4B9DB0252A983B24000927DB /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */; };
-		4B9DB0262A983B24000927DB /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
-		4B9DB0272A983B24000927DB /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
-		4B9DB0282A983B24000927DB /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
+		4B9DB0262A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
+		4B9DB0272A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
+		4B9DB0282A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
 		4B9DB0292A983B24000927DB /* WaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */; };
 		4B9DB02A2A983B24000927DB /* WaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */; };
 		4B9DB02B2A983B24000927DB /* WaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */; };
@@ -4170,7 +4170,7 @@
 		4B9DB0072A983B23000927DB /* Waitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Waitlist.swift; sourceTree = "<group>"; };
 		4B9DB0092A983B23000927DB /* ProductWaitlistRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductWaitlistRequest.swift; sourceTree = "<group>"; };
 		4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistRequest.swift; sourceTree = "<group>"; };
-		4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistViewModel.swift; sourceTree = "<group>"; };
+		4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionWaitlistViewModel.swift; sourceTree = "<group>"; };
 		4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistStorage.swift; sourceTree = "<group>"; };
 		4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistKeychainStorage.swift; sourceTree = "<group>"; };
 		4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnableNetworkProtectionView.swift; sourceTree = "<group>"; };
@@ -6142,7 +6142,7 @@
 		4B9DB00B2A983B24000927DB /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */,
+				4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -10106,7 +10106,7 @@
 				3192A0602A4C4CFF0084EA89 /* DeviceAuthenticationService.swift in Sources */,
 				3192A0612A4C4CFF0084EA89 /* AppConfigurationURLProvider.swift in Sources */,
 				3192A0622A4C4CFF0084EA89 /* AutofillPreferences.swift in Sources */,
-				4B9DB0282A983B24000927DB /* WaitlistViewModel.swift in Sources */,
+				4B9DB0282A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				3192A0632A4C4CFF0084EA89 /* WebsiteBreakage.swift in Sources */,
 				3192A0642A4C4CFF0084EA89 /* PasswordManagerCoordinator.swift in Sources */,
 				3192A0652A4C4CFF0084EA89 /* PasswordManagementIdentityModel.swift in Sources */,
@@ -11073,7 +11073,7 @@
 				3706FC29293F65D500E42796 /* QuartzIdleStateProvider.swift in Sources */,
 				3706FC2A293F65D500E42796 /* DuckPlayerPreferences.swift in Sources */,
 				3706FC2B293F65D500E42796 /* DownloadViewModel.swift in Sources */,
-				4B9DB0272A983B24000927DB /* WaitlistViewModel.swift in Sources */,
+				4B9DB0272A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				4B9DB03F2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
 				987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
@@ -11822,7 +11822,7 @@
 				4B9579FF2AC7AE700062CA31 /* FireViewController.swift in Sources */,
 				4B957A002AC7AE700062CA31 /* OutlineSeparatorViewCell.swift in Sources */,
 				4B957A012AC7AE700062CA31 /* SafariDataImporter.swift in Sources */,
-				4B957A022AC7AE700062CA31 /* WaitlistViewModel.swift in Sources */,
+				4B957A022AC7AE700062CA31 /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				4B957A032AC7AE700062CA31 /* LocalBookmarkStore.swift in Sources */,
 				4B957A042AC7AE700062CA31 /* BWEncryption.m in Sources */,
 				4B957A052AC7AE700062CA31 /* StatisticsLoader.swift in Sources */,
@@ -12506,7 +12506,7 @@
 				AAB7320926DD0CD9002FACF9 /* FireViewController.swift in Sources */,
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
 				4BB99D0426FE191E001E4761 /* SafariDataImporter.swift in Sources */,
-				4B9DB0262A983B24000927DB /* WaitlistViewModel.swift in Sources */,
+				4B9DB0262A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				987799F929999973005D8EB6 /* LocalBookmarkStore.swift in Sources */,
 				1D02633628D8A9A9005CBB41 /* BWEncryption.m in Sources */,
 				B69B503A2726A12500758A2B /* StatisticsLoader.swift in Sources */,

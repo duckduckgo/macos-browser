@@ -23,7 +23,7 @@ import SwiftUIExtensions
 
 struct NetworkProtectionTermsAndConditionsView: View {
 
-    @EnvironmentObject var model: WaitlistViewModel
+    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
 
     var body: some View {
         WaitlistDialogView(innerPadding: 0) {

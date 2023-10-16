@@ -23,7 +23,7 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct InvitedToWaitlistView: View {
-    @EnvironmentObject var model: WaitlistViewModel
+    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {
