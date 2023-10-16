@@ -67,7 +67,7 @@ public final class TunnelControllerIPCClient {
 
 // MARK: - Outgoing communication to the server
 
-extension TunnelControllerIPCClient: IPCServerInterface {
+extension TunnelControllerIPCClient: IPCServerInterface {    
     public func register() {
         try? xpc.server().register()
     }
@@ -82,6 +82,14 @@ extension TunnelControllerIPCClient: IPCServerInterface {
 
     public func resetAll(uninstallSystemExtension: Bool) async {
         try? await xpc.server().resetAll(uninstallSystemExtension: uninstallSystemExtension)
+    }
+
+    public func debugCommand(_ command: DebugCommand) async {
+        guard let payload = try? JSONEncoder().encode(command) else {
+            return
+        }
+
+        try? await xpc.server().debugCommand(payload)
     }
 }
 

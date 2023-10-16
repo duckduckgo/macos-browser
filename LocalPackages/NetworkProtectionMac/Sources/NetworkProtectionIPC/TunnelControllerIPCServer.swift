@@ -20,6 +20,10 @@ import Foundation
 import NetworkProtection
 import XPCHelper
 
+public enum DebugCommand: Codable {
+    case sendTestNotification
+}
+
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
 public protocol IPCServerInterface: AnyObject {
@@ -40,6 +44,10 @@ public protocol IPCServerInterface: AnyObject {
     /// Resets all of Network Protection's state that's handled by the server
     ///
     func resetAll(uninstallSystemExtension: Bool) async
+
+    /// Debug commands
+    ///
+    func debugCommand(_ command: DebugCommand) async
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -66,6 +74,10 @@ protocol XPCServerInterface {
     /// Resets all of Network Protection's state that's handled by the server
     ///
     func resetAll(uninstallSystemExtension: Bool) async
+
+    /// Debug commands
+    ///
+    func debugCommand(_ payload: Data) async
 }
 
 public final class TunnelControllerIPCServer {
@@ -150,5 +162,13 @@ extension TunnelControllerIPCServer: XPCServerInterface {
 
     func resetAll(uninstallSystemExtension: Bool) async {
         await serverDelegate?.resetAll(uninstallSystemExtension: uninstallSystemExtension)
+    }
+
+    func debugCommand(_ payload: Data) async {
+        guard let command = try? JSONDecoder().decode(DebugCommand.self, from: payload) else {
+            return
+        }
+
+        await serverDelegate?.debugCommand(command)
     }
 }

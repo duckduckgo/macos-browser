@@ -79,11 +79,7 @@ final class NetworkProtectionDebugUtilities {
     }
 
     func sendTestNotificationRequest() async throws {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession() else {
-            return
-        }
-
-        try? activeSession.sendProviderMessage(.triggerTestNotification)
+        await ipcClient.debugCommand(.sendTestNotification)
     }
 
     // MARK: - Registation Key
@@ -93,7 +89,7 @@ final class NetworkProtectionDebugUtilities {
             return
         }
 
-        try? activeSession.sendProviderMessage(.setKeyValidity(registrationKeyValidity))
+        try? await activeSession.sendProviderMessage(.setKeyValidity(registrationKeyValidity))
     }
 
     func expireRegistrationKeyNow() async {
@@ -101,7 +97,7 @@ final class NetworkProtectionDebugUtilities {
             return
         }
 
-        try? activeSession.sendProviderMessage(.expireRegistrationKey)
+        try? await activeSession.sendProviderMessage(.expireRegistrationKey)
     }
 }
 

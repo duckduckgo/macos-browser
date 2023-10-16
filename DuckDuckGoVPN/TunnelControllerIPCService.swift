@@ -82,6 +82,8 @@ final class TunnelControllerIPCService {
     }
 }
 
+// MARK: - Requests from the client
+
 extension TunnelControllerIPCService: IPCServerInterface {
 
     func register() {
@@ -103,5 +105,16 @@ extension TunnelControllerIPCService: IPCServerInterface {
 
     func resetAll(uninstallSystemExtension: Bool) async {
         try? await networkExtensionController.deactivateSystemExtension()
+    }
+
+    func debugCommand(_ command: DebugCommand) async {
+        switch command {
+        case .sendTestNotification:
+            guard let activeSession = try? await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID) else {
+                return
+            }
+
+            try? await activeSession.sendProviderRequest(.sendTestNotification)
+        }
     }
 }
