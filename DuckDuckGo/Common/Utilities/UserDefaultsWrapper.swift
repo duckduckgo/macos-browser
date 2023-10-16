@@ -137,8 +137,6 @@ public struct UserDefaultsWrapper<T> {
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-        case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
-        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
 
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
 
@@ -173,6 +171,8 @@ public struct UserDefaultsWrapper<T> {
         // NetP removed keys
         case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
         case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
+        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
+        case networkProtectionShouldExcludeLocalNetworks = "netp.exclude-local-routes"
     }
 
     private let key: Key

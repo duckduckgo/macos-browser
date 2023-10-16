@@ -900,35 +900,49 @@ CQ
                                                         </connections>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="FSc-gX-vGh"/>
-                                                    <menuItem title="Connect on Log In" id="fSA-hH-Vum" userLabel="Connect On Log In">
+                                                    <menuItem title="Tunnel Settings" id="Gdx-Ng-vit">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="toggleConnectOnLogInAction:" target="Rah-lS-gno" id="ZCH-Qd-oYZ"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Kill Switch (enforceRoutes)" id="9HJ-tK-AOs" userLabel="Enforce Routes">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <connections>
-                                                            <action selector="toggleEnforceRoutesAction:" target="Rah-lS-gno" id="B4i-GF-9nw"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Excluded Routes" id="jr6-YD-fe7">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" autoenablesItems="NO" id="j7y-fb-xa6">
+                                                        <menu key="submenu" title="Tunnel Settings" id="wo0-bZ-WF3">
                                                             <items>
-                                                                <menuItem title="Item 1" id="RmV-if-bZK">
+                                                                <menuItem title="Enforce Routes" id="9HJ-tK-AOs" userLabel="Enforce Routes">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleEnforceRoutesAction:" target="Rah-lS-gno" id="B4i-GF-9nw"/>
+                                                                    </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Item 2" id="BqB-a0-uua">
+                                                                <menuItem title="Include All Networks" id="mSZ-AV-Dee" userLabel="Include All Networks">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
+                                                                    </connections>
                                                                 </menuItem>
-                                                                <menuItem title="Item 3" id="CA5-Tt-ZNp">
+                                                                <menuItem title="Exclude Local Networks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
                                                                     <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <connections>
+                                                                        <action selector="toggleExcludeLocalNetworks:" target="Rah-lS-gno" id="NC6-qw-2no"/>
+                                                                    </connections>
+                                                                </menuItem>
+                                                                <menuItem isSeparatorItem="YES" id="CvF-dL-xpo"/>
+                                                                <menuItem title="Excluded Routes" id="jr6-YD-fe7">
+                                                                    <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    <menu key="submenu" autoenablesItems="NO" id="j7y-fb-xa6">
+                                                                        <items>
+                                                                            <menuItem title="Item 1" id="RmV-if-bZK">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Item 2" id="BqB-a0-uua">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                            <menuItem title="Item 3" id="CA5-Tt-ZNp">
+                                                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                                            </menuItem>
+                                                                        </items>
+                                                                        <connections>
+                                                                            <outlet property="delegate" destination="Rah-lS-gno" id="Aeg-l2-mSM"/>
+                                                                        </connections>
+                                                                    </menu>
                                                                 </menuItem>
                                                             </items>
-                                                            <connections>
-                                                                <outlet property="delegate" destination="Rah-lS-gno" id="Aeg-l2-mSM"/>
-                                                            </connections>
                                                         </menu>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="Rgl-Eu-PPS"/>
@@ -1207,31 +1221,12 @@ CQ
                                                             </connections>
                                                         </menu>
                                                     </menuItem>
-                                                    <menuItem isSeparatorItem="YES" id="7LI-vT-hd9"/>
-                                                    <menuItem title="Kill Switch (alternative approach)" id="Gdx-Ng-vit">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Kill Switch (alternative approach)" id="wo0-bZ-WF3">
-                                                            <items>
-                                                                <menuItem title="includeAllNetworks" id="mSZ-AV-Dee" userLabel="Include All Networks">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleIncludeAllNetworks:" target="Rah-lS-gno" id="c1r-Fw-0ca"/>
-                                                                    </connections>
-                                                                </menuItem>
-                                                                <menuItem title="excludeLocalNetworks" id="Zak-JJ-7hc" userLabel="Exclude Local Networks">
-                                                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                                                    <connections>
-                                                                        <action selector="toggleShouldExcludeLocalRoutes:" target="Rah-lS-gno" id="Wdd-D6-yWy"/>
-                                                                    </connections>
-                                                                </menuItem>
-                                                            </items>
-                                                        </menu>
-                                                    </menuItem>
                                                 </items>
                                                 <connections>
-                                                    <outlet property="connectOnLogInMenuItem" destination="fSA-hH-Vum" id="HSf-v8-MYh"/>
+                                                    <outlet property="enforceRoutesMenuItem" destination="9HJ-tK-AOs" id="jH4-wr-rF9"/>
                                                     <outlet property="excludeLocalNetworksMenuItem" destination="Zak-JJ-7hc" id="vYu-wC-dTl"/>
                                                     <outlet property="exclusionsMenu" destination="j7y-fb-xa6" id="igE-bU-qW4"/>
+                                                    <outlet property="includeAllNetworksMenuItem" destination="mSZ-AV-Dee" id="IQ0-pp-ZRI"/>
                                                     <outlet property="mainMenuItem" destination="Dt6-sj-4hn" id="vwa-T8-0ak"/>
                                                     <outlet property="preferredServerAutomaticItem" destination="0j8-SE-pRP" id="APF-zT-6Qd"/>
                                                     <outlet property="preferredServerMenu" destination="jbT-17-qgW" id="6qH-9G-SrT"/>
@@ -1239,8 +1234,6 @@ CQ
                                                     <outlet property="registrationKeyValidityMenu" destination="HwX-wm-4zf" id="Dpg-p8-nQ0"/>
                                                     <outlet property="registrationKeyValidityMenuItem" destination="iPz-EO-Nv6" id="XbK-zy-EGv"/>
                                                     <outlet property="registrationKeyValidityMenuSeparatorItem" destination="MEg-4g-gji" id="Pos-zQ-wJJ"/>
-                                                    <outlet property="shouldEnforceRoutesMenuItem" destination="9HJ-tK-AOs" id="kjL-wl-sji"/>
-                                                    <outlet property="shouldIncludeAllNetworksMenuItem" destination="mSZ-AV-Dee" id="IL0-vZ-MUC"/>
                                                 </connections>
                                             </menu>
                                         </menuItem>

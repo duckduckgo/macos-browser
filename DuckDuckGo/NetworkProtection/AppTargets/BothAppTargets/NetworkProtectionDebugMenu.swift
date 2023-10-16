@@ -77,9 +77,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @IBOutlet weak var preferredServerAutomaticItem: NSMenuItem!
 
     @IBOutlet weak var enableConnectOnDemandMenuItem: NSMenuItem!
-    @IBOutlet weak var shouldEnforceRoutesMenuItem: NSMenuItem!
-    @IBOutlet weak var shouldIncludeAllNetworksMenuItem: NSMenuItem!
-    @IBOutlet weak var connectOnLogInMenuItem: NSMenuItem!
+    @IBOutlet weak var enforceRoutesMenuItem: NSMenuItem!
+    @IBOutlet weak var includeAllNetworksMenuItem: NSMenuItem!
 
     @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
     @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
@@ -199,15 +198,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @IBAction
-    func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
-        // TODO: reimplement this through IPC
-        //NetworkProtectionTunnelController().toggleShouldExcludeLocalRoutes()
-    }
-
-    @IBAction
-    func toggleConnectOnLogInAction(_ sender: Any?) {
-        // TODO: reimplement this through IPC
-        //NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
+    func toggleExcludeLocalNetworks(_ sender: Any?) {
+        settings.excludeLocalNetworks.toggle()
     }
 
     @IBAction
@@ -391,20 +383,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func updateNetworkProtectionMenuItemsState() {
-        shouldEnforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
-        shouldIncludeAllNetworksMenuItem.state = settings.includeAllNetworks ? .on : .off
-
-        // TODO: reimplement this through IPC
-        /*
-        let controller = NetworkProtectionTunnelController()
-
-        connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
-
-        excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
-         */
+        enforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
+        includeAllNetworksMenuItem.state = settings.includeAllNetworks ? .on : .off
+        excludeLocalNetworksMenuItem.state = settings.excludeLocalNetworks ? .on : .off
     }
-
 }
+
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
@@ -421,7 +405,6 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
         }
          */
     }
-
 }
 
 #endif

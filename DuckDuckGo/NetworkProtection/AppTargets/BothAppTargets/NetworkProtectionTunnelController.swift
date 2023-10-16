@@ -74,14 +74,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionExcludedRoutes, defaultValue: [:])
     private(set) var excludedRoutesPreferences: [String: Bool]
 
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldExcludeLocalRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldExcludeLocalRoutes)
-    private(set) var shouldExcludeLocalRoutes: Bool
-
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionConnectionTesterEnabled, defaultValue: NetworkProtectionUserDefaultsConstants.isConnectionTesterEnabled, defaults: .shared)
-    private(set) var isConnectionTesterEnabled: Bool
-
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
@@ -171,6 +163,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             try await handleSetIncludeAllNetworks(includeAllNetworks)
         case .setEnforceRoutes(let enforceRoutes):
             try await handleSetEnforceRoutes(enforceRoutes)
+        case .setExcludeLocalNetworks(let excludeLocalNetworks):
+            try await handleSetExcludeLocalNetworks(excludeLocalNetworks)
         }
     }
 
@@ -190,6 +184,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 
         try await setupAndSave(tunnelManager)
+    }
+
+    private func handleSetExcludeLocalNetworks(_ excludeLocalNetworks: Bool) async throws {
+        guard let tunnelManager = await loadTunnelManager(),
+              tunnelManager.protocolConfiguration?.excludeLocalNetworks == !excludeLocalNetworks else {
+            return
+        }
+
+        try await setupAndSave(tunnelManager)
+        updateRoutes()
     }
 
     private func relaySettingsChange(_ change: TunnelSettings.Change) async throws {
@@ -233,8 +237,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.enforceRoutes = settings.enforceRoutes
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
-
-            protocolConfiguration.excludeLocalNetworks = shouldExcludeLocalRoutes
+            protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
 
             return protocolConfiguration
         }()
@@ -504,12 +507,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    func toggleShouldExcludeLocalRoutes() {
-        shouldExcludeLocalRoutes.toggle()
-        updateRoutes()
-    }
-
-    @MainActor
     func setExcludedRoute(_ route: String, enabled: Bool) {
         excludedRoutesPreferences[route] = enabled
         updateRoutes()
@@ -541,11 +538,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             try await activeSession.sendProviderMessage(.setIncludedRoutes(includedRoutes()))
             try await activeSession.sendProviderMessage(.setExcludedRoutes(excludedRoutes()))
         }
-    }
-
-    @MainActor
-    func toggleConnectionTesterEnabled() {
-        isConnectionTesterEnabled.toggle()
     }
 
     struct TunnelFailureError: LocalizedError {
