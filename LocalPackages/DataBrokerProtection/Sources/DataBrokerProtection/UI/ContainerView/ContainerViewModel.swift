@@ -48,9 +48,12 @@ final class ContainerViewModel: ObservableObject {
     }
 
     func runQueuedOperationsAndStartScheduler() {
-        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
-            guard let self = self else { return }
-            self.scheduler.startScheduler(showWebView: self.showWebView)
+        scheduler.runQueuedOperations(showWebView: showWebView) { [scheduler] error in
+            guard error == nil else {
+                return
+            }
+
+            scheduler.startScheduler(showWebView: self.showWebView)
         }
     }
 
@@ -59,8 +62,7 @@ final class ContainerViewModel: ObservableObject {
     }
 
     func forceRunScans(completion: @escaping (ScanResult) -> Void) {
-        scheduler.stopScheduler()
-        scheduler.scanAllBrokers(showWebView: false, completion: nil)
+        scanAndUpdateUI(completion: completion)
     }
 
     func forceRunOptOuts() {
@@ -85,10 +87,8 @@ final class ContainerViewModel: ObservableObject {
     }
 
     private func scanAndUpdateUI(completion: @escaping (ScanResult) -> Void) {
-        scheduler.stopScheduler()
-
-        scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
-            guard let self = self else { return }
+        scheduler.scanAllBrokers(showWebView: self.showWebView) { [weak self] error in
+            guard error == nil, let self = self else { return }
 
             DispatchQueue.main.async {
                 let hasResults = self.dataManager.hasMatches()

@@ -50,7 +50,7 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.statusPublisher
     }
 
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
         enableLoginItem()
         ipcScheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
@@ -61,10 +61,10 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
     }
 
     func stopScheduler() {
-        disableLoginItem()
+        ipcScheduler.stopScheduler()
     }
-    
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+
+    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
         ipcScheduler.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
@@ -72,7 +72,7 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.runAllOperations(showWebView: showWebView)
     }
 
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
         ipcScheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 }

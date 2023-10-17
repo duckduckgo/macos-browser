@@ -4308,6 +4308,7 @@
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
+		7B202A8C2ADF0E3B002FC557 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../content-scope-scripts"; sourceTree = "<group>"; };
 		7B25FE322AD12C990012AFAB /* NetworkProtectionMac */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = NetworkProtectionMac; sourceTree = "<group>"; };
 		7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAppEvents.swift; sourceTree = "<group>"; };
 		7B2DDD012A93BAA60039D884 /* NetworkProtectionBouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionBouncer.swift; sourceTree = "<group>"; };
@@ -4329,7 +4330,6 @@
 		7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionEnableOnDemand.xcconfig; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
-		7BB34F512AD98511005691AE /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../../content-scope-scripts"; sourceTree = "<group>"; };
 		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
 		7BD01C182AD8319C0088B32E /* IPCServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPCServiceManager.swift; sourceTree = "<group>"; };
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
@@ -5528,8 +5528,8 @@
 			children = (
 				1E862A852A9FBD7000F84D4B /* Account */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
-				7BB34F512AD98511005691AE /* content-scope-scripts */,
 				7B8EFE142AD6C1DB007B89B4 /* BrowserServicesKit */,
+				7B202A8C2ADF0E3B002FC557 /* content-scope-scripts */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
 				7B25FE322AD12C990012AFAB /* NetworkProtectionMac */,

@@ -106,9 +106,6 @@ final class NetworkProtectionAppEvents {
         if lastVersionRun != currentVersion {
             os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
             restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
-        } else {
-            // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            loginItemsManager.ensureLoginItemsAreRunning(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection, condition: .ifLoginItemsAreEnabled, after: 1)
         }
     }
 

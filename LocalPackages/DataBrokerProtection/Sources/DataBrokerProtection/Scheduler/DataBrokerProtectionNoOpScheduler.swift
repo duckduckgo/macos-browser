@@ -32,12 +32,10 @@ final class DataBrokerProtectionNoOpScheduler: DataBrokerProtectionScheduler {
         internalStatusPublisher.projectedValue
     }
 
-    func profileModified() { }
-    // func startScanPressed() { }
     func startScheduler(showWebView: Bool) { }
     func stopScheduler() { }
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) { }
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
+    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) { }
+    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) { }
+    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) { }
     func runAllOperations(showWebView: Bool) { }
 }

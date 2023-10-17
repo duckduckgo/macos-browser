@@ -38,9 +38,9 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func stopScheduler()
 
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?)
+    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 }
 
@@ -67,9 +67,9 @@ protocol XPCServerInterface {
     ///
     func stopScheduler()
 
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?)
+    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 }
 
@@ -131,15 +131,15 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
         serverDelegate?.stopScheduler()
     }
 
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
         serverDelegate?.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
         serverDelegate?.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
         serverDelegate?.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 

@@ -65,33 +65,65 @@ public final class DataBrokerProtectionIPCClient {
 // MARK: - Outgoing communication to the server
 
 extension DataBrokerProtectionIPCClient: IPCServerInterface {
-    
+
     public func register() {
-        try? xpc.server().register()
+        xpc.execute(call: { server in
+            server.register()
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func startScheduler(showWebView: Bool) {
-        try? xpc.server().startScheduler(showWebView: showWebView)
+        xpc.execute(call: { server in
+            server.startScheduler(showWebView: showWebView)
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func stopScheduler() {
-        try? xpc.server().stopScheduler()
+        xpc.execute(call: { server in
+            server.stopScheduler()
+        }, xpcReplyErrorHandler: { error in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
-    public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        try? xpc.server().optOutAllBrokers(showWebView: showWebView, completion: completion)
+    public func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+        xpc.execute(call: { server in
+            server.optOutAllBrokers(showWebView: showWebView, completion: completion)
+        }, xpcReplyErrorHandler: { error in
+            completion?(error)
+        })
     }
 
-    public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        try? xpc.server().scanAllBrokers(showWebView: showWebView, completion: completion)
+    public func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+        xpc.execute(call: { server in
+            server.scanAllBrokers(showWebView: showWebView, completion: completion)
+        }, xpcReplyErrorHandler: { error in
+            completion?(error)
+        })
     }
 
-    public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
-        try? xpc.server().runQueuedOperations(showWebView: showWebView, completion: completion)
+    public func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
+        xpc.execute(call: { server in
+            server.runQueuedOperations(showWebView: showWebView, completion: completion)
+        }, xpcReplyErrorHandler: { error in
+            completion?(error)
+        })
     }
 
     public func runAllOperations(showWebView: Bool) {
-        try? xpc.server().runAllOperations(showWebView: showWebView)
+        xpc.execute(call: { server in
+            server.runAllOperations(showWebView: showWebView)
+        }, xpcReplyErrorHandler: { error in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 }
 

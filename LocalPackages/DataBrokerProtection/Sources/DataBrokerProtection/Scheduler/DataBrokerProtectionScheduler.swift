@@ -35,9 +35,9 @@ public protocol DataBrokerProtectionScheduler {
     func startScheduler(showWebView: Bool)
     func stopScheduler()
 
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?)
+    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 }
 
@@ -74,6 +74,10 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
 
+    /// Ensures that only one scheduler operation is executed at the same time.
+    ///
+    private let schedulerDispatchQueue = DispatchQueue(label: "schedulerDispatchQueue", qos: .default)
+
     @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
 
     public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status }
@@ -99,7 +103,6 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 redeemUseCase: DataBrokerProtectionRedeemUseCase
     ) {
-
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
         activity.interval = SchedulerCycle.interval
@@ -150,22 +153,31 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.dataBrokerProcessor.runAllOperations(showWebView: showWebView)
     }
 
-    public func runQueuedOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    public func runQueuedOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
-                                                completion: completion)
+                                                completion: { completion?(nil) })
 
     }
 
-    public func scanAllBrokers(showWebView: Bool = false, completion: (() -> Void)? = nil) {
-        os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runAllScanOperations(showWebView: showWebView,
-                                                      completion: completion)
+    public func scanAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
+        disablingScheduler(showWebView: showWebView) { completion in
+            os_log("Scanning all brokers...", log: .dataBrokerProtection)
+            dataBrokerProcessor.runAllScanOperations(showWebView: showWebView, completion: completion)
+        }
     }
 
-    public func optOutAllBrokers(showWebView: Bool = false, completion: (() -> Void)?) {
+    public func optOutAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)?) {
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
-                                                        completion: completion)
+                                                        completion: { completion?(nil) })
+    }
+
+    private func disablingScheduler(showWebView: Bool, run: (@escaping () -> Void) -> Void) {
+        stopScheduler()
+
+        run { [weak self] in
+            self?.startScheduler(showWebView: showWebView)
+        }
     }
 }

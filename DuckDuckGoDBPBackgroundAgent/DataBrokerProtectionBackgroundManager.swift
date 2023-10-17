@@ -72,13 +72,17 @@ public final class DataBrokerProtectionBackgroundManager {
 
         // If there's no saved profile we don't need to start the scheduler
         if dataManager.fetchProfile() != nil {
-            scheduler.runQueuedOperations(showWebView: false) { [weak self] in
+            scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
+                guard error == nil else {
+                    return
+                }
+
                 self?.scheduler.startScheduler()
             }
         }
     }
 }
-
+/*
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
     public init() {
@@ -90,4 +94,4 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
     override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
         fatalError("Use init()")
     }
-}
+}*/

@@ -38,11 +38,6 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         ipcClient.schedulerStatusPublisher
     }
 
-    public func profileModified() {
-        ipcClient.stopScheduler()
-        ipcClient.startScheduler(showWebView: false)
-    }
-
     public func startScheduler(showWebView: Bool) {
         ipcClient.startScheduler(showWebView: showWebView)
     }
@@ -51,15 +46,15 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
         ipcClient.stopScheduler()
     }
 
-    public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+    public func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
         ipcClient.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+    public func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
         ipcClient.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+    public func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
         ipcClient.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
