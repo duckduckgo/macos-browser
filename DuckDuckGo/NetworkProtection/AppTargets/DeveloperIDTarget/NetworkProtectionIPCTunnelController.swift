@@ -49,7 +49,7 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
     ///
     var isConnected: Bool {
-        get async {
+        get {
             if case .connected = ipcClient.connectionStatusObserver.recentValue {
                 return true
             }
