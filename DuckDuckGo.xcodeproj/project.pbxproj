@@ -2236,7 +2236,7 @@
 		4B957A622AC7AE700062CA31 /* AddressBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */; };
 		4B957A632AC7AE700062CA31 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527D263B05C600B973F8 /* HistoryEntry.swift */; };
 		4B957A642AC7AE700062CA31 /* FaviconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5FA69C275F945C00DCE9C9 /* FaviconStore.swift */; };
-		4B957A652AC7AE700062CA31 /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
+		4B957A652AC7AE700062CA31 /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
 		4B957A662AC7AE700062CA31 /* SuggestionListCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */; };
 		4B957A672AC7AE700062CA31 /* TimeIntervalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAADFD05264AA282001555EA /* TimeIntervalExtension.swift */; };
 		4B957A682AC7AE700062CA31 /* NetworkProtectionFeatureDisabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */; };
@@ -2724,9 +2724,9 @@
 		4B9DB0322A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
 		4B9DB0332A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
 		4B9DB0342A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
-		4B9DB0352A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
-		4B9DB0362A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
-		4B9DB0372A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
+		4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
+		4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
+		4B9DB0372A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
 		4B9DB0382A983B24000927DB /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
 		4B9DB0392A983B24000927DB /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
 		4B9DB03A2A983B24000927DB /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
@@ -4174,7 +4174,7 @@
 		4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistStorage.swift; sourceTree = "<group>"; };
 		4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistKeychainStorage.swift; sourceTree = "<group>"; };
 		4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnableNetworkProtectionView.swift; sourceTree = "<group>"; };
-		4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTermsAndConditionsView.swift; sourceTree = "<group>"; };
+		4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistTermsAndConditionsView.swift; sourceTree = "<group>"; };
 		4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoinedWaitlistView.swift; sourceTree = "<group>"; };
 		4B9DB0162A983B24000927DB /* InvitedToWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvitedToWaitlistView.swift; sourceTree = "<group>"; };
 		4B9DB0172A983B24000927DB /* JoinWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoinWaitlistView.swift; sourceTree = "<group>"; };
@@ -6172,7 +6172,7 @@
 			isa = PBXGroup;
 			children = (
 				4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */,
-				4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */,
+				4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */,
 				4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */,
 				4B9DB0162A983B24000927DB /* InvitedToWaitlistView.swift */,
 				4B9DB0172A983B24000927DB /* JoinWaitlistView.swift */,
@@ -10223,7 +10223,7 @@
 				3192A0CB2A4C4CFF0084EA89 /* ContinueSetUpView.swift in Sources */,
 				3192A0CC2A4C4CFF0084EA89 /* PasswordManagementListSection.swift in Sources */,
 				3192A0CD2A4C4CFF0084EA89 /* FaviconReferenceCache.swift in Sources */,
-				4B9DB0372A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B9DB0372A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				3192A0CE2A4C4CFF0084EA89 /* BookmarkTreeController.swift in Sources */,
 				3192A0CF2A4C4CFF0084EA89 /* FirefoxEncryptionKeyReader.swift in Sources */,
 				3192A0D02A4C4CFF0084EA89 /* EventMapping+NetworkProtectionError.swift in Sources */,
@@ -10775,7 +10775,7 @@
 				3706FB35293F65D500E42796 /* FlatButton.swift in Sources */,
 				3706FB36293F65D500E42796 /* PinnedTabView.swift in Sources */,
 				3706FB37293F65D500E42796 /* DataEncryption.swift in Sources */,
-				4B9DB0362A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				37197EA82942443D00394917 /* BrowserTabViewController.swift in Sources */,
 				3706FB39293F65D500E42796 /* PrivacyDashboardPopover.swift in Sources */,
 				3706FB3B293F65D500E42796 /* RootView.swift in Sources */,
@@ -11924,7 +11924,7 @@
 				4B957A622AC7AE700062CA31 /* AddressBarButton.swift in Sources */,
 				4B957A632AC7AE700062CA31 /* HistoryEntry.swift in Sources */,
 				4B957A642AC7AE700062CA31 /* FaviconStore.swift in Sources */,
-				4B957A652AC7AE700062CA31 /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B957A652AC7AE700062CA31 /* WaitlistTermsAndConditionsView.swift in Sources */,
 				4B957A662AC7AE700062CA31 /* SuggestionListCharacteristics.swift in Sources */,
 				4B957A672AC7AE700062CA31 /* TimeIntervalExtension.swift in Sources */,
 				4B957A682AC7AE700062CA31 /* NetworkProtectionFeatureDisabler.swift in Sources */,
@@ -12604,7 +12604,7 @@
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */,
 				AA5FA69D275F945C00DCE9C9 /* FaviconStore.swift in Sources */,
-				4B9DB0352A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */,
 				AAADFD06264AA282001555EA /* TimeIntervalExtension.swift in Sources */,
 				4B6785472AA8DE68008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */,

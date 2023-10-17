@@ -156,6 +156,8 @@ extension UserText {
 #if DBP
 // MARK: - Data Broker Protection Waitlist
 extension UserText {
+    static let dataBrokerProtectionPrivacyPolicyTitle = NSLocalizedString("data-broker-protection.privacy-policy.title", value: "Privacy Policy", comment: "Privacy Policy title for Personal Information Removal")
+
     static let dataBrokerProtectionWaitlistNotificationTitle = NSLocalizedString("data-broker-protection.waitlist.notification.title", value: "Personal Information Removal beta is ready!", comment: "Title for Personal Information Removal waitlist notification")
     static let dataBrokerProtectionWaitlistNotificationText = NSLocalizedString("data-broker-protection.waitlist.notification.text", value: "Open your invite", comment: "Title for Personal Information Removal waitlist notification")
 
