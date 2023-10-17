@@ -38,6 +38,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
     var continuation: CheckedContinuation<ReturnValue, Error>? { get set }
     var extractedProfile: ExtractedProfile? { get set }
     var shouldRunNextStep: () -> Bool { get }
+    var retriesCountOnError: Int { get set }
 
     func run(inputValue: InputValue,
              webViewHandler: WebViewHandler?,
@@ -46,6 +47,7 @@ protocol DataBrokerOperation: CCFCommunicationDelegate {
              showWebView: Bool) async throws -> ReturnValue
 
     func executeNextStep() async
+    func executeCurrentAction() async
 }
 
 extension DataBrokerOperation {
@@ -101,6 +103,15 @@ extension DataBrokerOperation {
                 await onError(error: .emailError(error as? EmailError))
                 return
             }
+        }
+
+        if action as? GetCaptchaInfoAction != nil {
+            // Captcha is a third-party resource that sometimes takes more time to load
+            // if we are not able to get the captcha information. We will try to run the action again
+            // instead of failing the whole thing.
+            //
+            // https://app.asana.com/0/1203581873609357/1205476538384291/f
+            retriesCountOnError = 3
         }
 
         if let extractedProfile = self.extractedProfile {
@@ -191,7 +202,23 @@ extension DataBrokerOperation {
     }
 
     func onError(error: DataBrokerProtectionError) async {
-        await webViewHandler?.finish()
-        failed(with: error)
+        if retriesCountOnError > 0 {
+            await executeCurrentAction()
+        } else {
+            await webViewHandler?.finish()
+            failed(with: error)
+        }
+    }
+
+    func executeCurrentAction() async {
+        let waitTimeUntilRunningTheActionAgain: TimeInterval = 3
+        try? await Task.sleep(nanoseconds: UInt64(waitTimeUntilRunningTheActionAgain) * 1_000_000_000)
+
+        if let currentAction = self.actionsHandler?.currentAction() {
+            retriesCountOnError -= 1
+            await runNextAction(currentAction)
+        } else {
+            await onError(error: .unknown("No current action to execute"))
+        }
     }
 }

@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+# The following URLs shall match the ones in AppConfigurationURLprovider.swift. 
+# Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
 TDS_URL="https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json"
 CONFIG_URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-config.json"
 
