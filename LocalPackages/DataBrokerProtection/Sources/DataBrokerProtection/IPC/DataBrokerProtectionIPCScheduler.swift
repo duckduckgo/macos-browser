@@ -39,7 +39,7 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
     }
 
     public func profileModified() {
-        //ipcConnection.profileModified()
+        // ipcConnection.profileModified()
         ipcClient.restartScheduler()
     }
 /*
@@ -48,34 +48,34 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
     }
 */
     public func startScheduler(showWebView: Bool) {
-        //ipcConnection.startScheduler(showWebView: showWebView)
+        // ipcConnection.startScheduler(showWebView: showWebView)
         ipcClient.startScheduler()
     }
 
     public func stopScheduler() {
-        //ipcConnection.stopScheduler()
+        // ipcConnection.stopScheduler()
         ipcClient.stopScheduler()
     }
 
     public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        //ipcConnection.optOutAllBrokers(showWebView: showWebView, completion: completion)
+        // ipcConnection.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        //ipcConnection.scanAllBrokers(showWebView: showWebView, completion: completion)
+        // ipcConnection.scanAllBrokers(showWebView: showWebView, completion: completion)
         ipcClient.startScheduler()
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
-        //ipcConnection.runQueuedOperations(showWebView: showWebView, completion: completion)
+        // ipcConnection.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
     public func runAllOperations(showWebView: Bool) {
-        //ipcConnection.runAllOperations(showWebView: showWebView)
+        // ipcConnection.runAllOperations(showWebView: showWebView)
     }
 }
 
-//I'm not sure how to do this way aroung right now
+// I'm not sure how to do this way aroung right now
 @objc public protocol MainAppToDBPPackageInterface {
     func brokersScanCompleted()
 }

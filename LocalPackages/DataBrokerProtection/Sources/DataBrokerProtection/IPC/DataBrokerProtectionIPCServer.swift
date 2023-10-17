@@ -98,7 +98,7 @@ public final class DataBrokerProtectionIPCServer {
 // MARK: - Outgoing communication to the clients
 
 extension DataBrokerProtectionIPCServer: IPCClientInterface {
-    
+
     public func schedulerStatusChanges(_ status: DataBrokerProtectionSchedulerStatus) {
         let payload: Data
 

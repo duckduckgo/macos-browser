@@ -53,7 +53,7 @@ final class ContainerViewModel: ObservableObject {
 
     func startScan() {
         // TODO: decide what to do
-        //scheduler.startScan()
+        // scheduler.startScan()
         scheduler.startScheduler()
     }
 

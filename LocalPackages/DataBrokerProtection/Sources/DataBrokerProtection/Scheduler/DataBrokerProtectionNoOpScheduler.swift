@@ -33,7 +33,7 @@ final class DataBrokerProtectionNoOpScheduler: DataBrokerProtectionScheduler {
     }
 
     func profileModified() { }
-    //func startScanPressed() { }
+    // func startScanPressed() { }
     func startScheduler(showWebView: Bool) { }
     func stopScheduler() { }
     func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }

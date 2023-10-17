@@ -94,8 +94,8 @@ public final class DataBrokerProtectionBackgroundManager {
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
     public init() {
-        super.init { event, _, _, _ in
-            
+        super.init { _, _, _, _ in
+
         }
     }
 

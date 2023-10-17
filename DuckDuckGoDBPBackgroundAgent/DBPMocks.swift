@@ -46,7 +46,6 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
         return data!
     }
 
-
     var currentConfig: Data {
         data
     }

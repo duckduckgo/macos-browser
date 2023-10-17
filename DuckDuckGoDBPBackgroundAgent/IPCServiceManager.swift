@@ -57,7 +57,7 @@ extension IPCServiceManager: IPCServerInterface {
     }
 
     func startScheduler() {
-        //scheduler.startScheduler()
+        // scheduler.startScheduler()
         scheduler.scanAllBrokers(showWebView: true,
                                  completion: {
             print("Listo!")
