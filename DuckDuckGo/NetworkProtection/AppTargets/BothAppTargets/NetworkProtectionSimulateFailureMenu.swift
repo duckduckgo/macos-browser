@@ -42,7 +42,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     private var simulationOptions: NetworkProtectionSimulationOptions {
         // TODO: fix this
         NetworkProtectionSimulationOptions()
-        //NetworkProtectionTunnelController.simulationOptions
+        // NetworkProtectionTunnelController.simulationOptions
     }
 
     /// Simulates a controller failure the next time Network Protection is started.
@@ -57,7 +57,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBAction
     func simulateTunnelFailure(_ menuItem: NSMenuItem) {
         // TODO: fix this
-        //simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
+        // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
     }
 
     /// Simulates a fatal error on the tunnel the next time Network Protection is started.
@@ -65,7 +65,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBAction
     func simulateTunnelCrash(_ menuItem: NSMenuItem) {
         // TODO: fix this
-        //simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
+        // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
     }
 
     @IBAction
