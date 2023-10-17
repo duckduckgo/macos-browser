@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
 
 extension NSMenuItem {
 
