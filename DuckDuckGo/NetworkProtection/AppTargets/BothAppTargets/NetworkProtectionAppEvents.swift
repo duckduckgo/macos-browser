@@ -21,6 +21,7 @@ import Foundation
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionIPC
 
 /// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
 ///
@@ -106,27 +107,24 @@ final class NetworkProtectionAppEvents {
         if lastVersionRun != currentVersion {
             os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
             restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
-        } else {
-            // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            loginItemsManager.ensureLoginItemsAreRunning(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection, condition: .ifLoginItemsAreEnabled, after: 1)
         }
     }
 
     private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
-        // TODO: reimplement this through IPC
-        /*
+
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
 
         Task {
-            let provider = NetworkProtectionTunnelController()
+            let machServiceName = Bundle.main.vpnMenuAgentBundleId
+            let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+            let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
             // Restart NetP SysEx on app update
-            if await provider.isConnected {
-                await provider.stop()
-                await provider.start()
+            if await controller.isConnected {
+                await controller.stop()
+                await controller.start()
             }
         }
-         */
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.

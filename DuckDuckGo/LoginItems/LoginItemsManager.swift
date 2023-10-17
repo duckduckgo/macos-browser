@@ -28,12 +28,10 @@ final class LoginItemsManager {
 
     func enableLoginItems(_ items: Set<LoginItem>, log: OSLog) {
         updateLoginItems(items, whatAreWeDoing: "enable", using: LoginItem.enable)
-        ensureLoginItemsAreRunning(items, log: log)
     }
 
     func restartLoginItems(_ items: Set<LoginItem>, log: OSLog) {
         updateLoginItems(items, whatAreWeDoing: "restart", using: LoginItem.restart)
-        ensureLoginItemsAreRunning(items, log: log, condition: .ifLoginItemsAreEnabled)
     }
 
     func disableLoginItems(_ items: Set<LoginItem>) {

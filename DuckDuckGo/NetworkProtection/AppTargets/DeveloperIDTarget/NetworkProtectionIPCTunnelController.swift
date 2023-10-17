@@ -44,6 +44,20 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
         ipcClient.stop()
     }
 
+    /// Queries Network Protection to know if its VPN is connected.
+    ///
+    /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
+    ///
+    var isConnected: Bool {
+        get async {
+            if case .connected = ipcClient.connectionStatusObserver.recentValue {
+                return true
+            }
+
+            return false
+        }
+    }
+
     // MARK: - Login Items Manager
 
     private func enableLoginItems() {

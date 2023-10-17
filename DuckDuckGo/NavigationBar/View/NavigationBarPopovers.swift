@@ -102,18 +102,6 @@ final class NavigationBarPopovers {
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
 #if NETWORK_PROTECTION
         networkProtectionPopoverManager.toggle(positionedBelow: view, withDelegate: delegate)
-/*
-        if let networkProtectionPopover, networkProtectionPopover.isShown {
-            networkProtectionPopover.close()
-        } else {
-            let featureVisibility = DefaultNetworkProtectionVisibility()
-
-            if featureVisibility.isNetworkProtectionVisible() {
-                showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
-            } else {
-                featureVisibility.disableForWaitlistUsers()
-            }
-        }*/
 #endif
     }
 
