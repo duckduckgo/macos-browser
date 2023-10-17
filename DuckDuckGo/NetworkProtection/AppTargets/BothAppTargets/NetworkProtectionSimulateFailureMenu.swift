@@ -25,7 +25,6 @@ import SwiftUI
 
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
-@objc
 @MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
 

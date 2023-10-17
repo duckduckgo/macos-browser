@@ -62,7 +62,7 @@ struct MapperToDB {
 
     func mapToDB(_ profileQuery: ProfileQuery, relatedTo profileId: Int64) throws -> ProfileQueryDB {
         .init(
-            id: nil,
+            id: profileQuery.id,
             profileId: profileId,
             first: try mechanism(profileQuery.firstName.encoded),
             last: try mechanism(profileQuery.lastName.encoded),
@@ -73,7 +73,8 @@ struct MapperToDB {
             street: try profileQuery.street.encoded(mechanism),
             zipCode: try profileQuery.zip.encoded(mechanism),
             phone: try profileQuery.phone.encoded(mechanism),
-            birthYear: try withUnsafeBytes(of: profileQuery.birthYear) { try mechanism(Data($0)) }
+            birthYear: try withUnsafeBytes(of: profileQuery.birthYear) { try mechanism(Data($0)) },
+            deprecated: profileQuery.deprecated
         )
     }
 
@@ -189,7 +190,8 @@ struct MapperToModel {
             phone: try profileQueryDB.phone.decode(mechanism),
             birthYear: try mechanism(profileQueryDB.birthYear).withUnsafeBytes {
                 $0.load(as: Int.self)
-            }
+            },
+            deprecated: profileQueryDB.deprecated
         )
     }
 

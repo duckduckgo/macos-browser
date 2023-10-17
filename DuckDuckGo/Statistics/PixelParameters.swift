@@ -16,38 +16,7 @@
 //  limitations under the License.
 //
 
-extension Pixel {
-
-    enum Parameters {
-        static let duration = "duration"
-        static let test = "test"
-        static let appVersion = "appVersion"
-
-        static let errorCode = "e"
-        static let errorDesc = "d"
-        static let errorCount = "c"
-        static let underlyingErrorCode = "ue"
-        static let underlyingErrorDesc = "ud"
-        static let underlyingErrorSQLiteCode = "sqlrc"
-        static let underlyingErrorSQLiteExtendedCode = "sqlerc"
-        static let keychainErrorCode = "keychain_error_code"
-
-        static let emailCohort = "cohort"
-        static let emailLastUsed = "duck_address_last_used"
-
-        static let assertionMessage = "message"
-        static let assertionFile = "file"
-        static let assertionLine = "line"
-
-        // Pixel experiments
-        static let experimentCohort = "cohort"
-    }
-
-    enum Values {
-        static let test = "1"
-    }
-
-}
+import PixelKit
 
 extension Pixel.Event {
 
@@ -58,9 +27,9 @@ extension Pixel.Event {
             var params = error?.pixelParameters ?? [:]
 
             if case let .assertionFailure(message, file, line) = debugEvent {
-                params[Pixel.Parameters.assertionMessage] = message
-                params[Pixel.Parameters.assertionFile] = String(file)
-                params[Pixel.Parameters.assertionLine] = String(line)
+                params[PixelKit.Parameters.assertionMessage] = message
+                params[PixelKit.Parameters.assertionFile] = String(file)
+                params[PixelKit.Parameters.assertionLine] = String(line)
             }
 
             return params
@@ -69,13 +38,13 @@ extension Pixel.Event {
             return error.pixelParameters
 
         case .launchInitial(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
+            return [PixelKit.Parameters.experimentCohort: cohort]
         case .serpInitial(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
+            return [PixelKit.Parameters.experimentCohort: cohort]
         case .serpDay21to27(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
+            return [PixelKit.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
         case .setAsDefaultInitial(let cohort):
-            return [Pixel.Parameters.experimentCohort: cohort]
+            return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .dailyPixel(let pixel, isFirst: _):
             return pixel.parameters
@@ -149,7 +118,8 @@ extension Pixel.Event {
             .optOutFinish,
             .optOutSubmitSuccess,
             .optOutSuccess,
-            .optOutFailure:
+            .optOutFailure,
+            .parentChildMatches:
           return nil
 #endif
         }
@@ -162,26 +132,26 @@ extension Error {
     var pixelParameters: [String: String] {
         var params = [String: String]()
 
-        if let errorWithUserInfo = self as? ErrorWithParameters {
+        if let errorWithUserInfo = self as? ErrorWithPixelParameters {
             params = errorWithUserInfo.errorParameters
         }
 
         let nsError = self as NSError
 
-        params[Pixel.Parameters.errorCode] = "\(nsError.code)"
-        params[Pixel.Parameters.errorDesc] = nsError.domain
+        params[PixelKit.Parameters.errorCode] = "\(nsError.code)"
+        params[PixelKit.Parameters.errorDesc] = nsError.domain
 
         if let underlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
-            params[Pixel.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
-            params[Pixel.Parameters.underlyingErrorDesc] = underlyingError.domain
+            params[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            params[PixelKit.Parameters.underlyingErrorDesc] = underlyingError.domain
         }
 
         if let sqlErrorCode = nsError.userInfo["SQLiteResultCode"] as? NSNumber {
-            params[Pixel.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
+            params[PixelKit.Parameters.underlyingErrorSQLiteCode] = "\(sqlErrorCode.intValue)"
         }
 
         if let sqlExtendedErrorCode = nsError.userInfo["SQLiteExtendedResultCode"] as? NSNumber {
-            params[Pixel.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
+            params[PixelKit.Parameters.underlyingErrorSQLiteExtendedCode] = "\(sqlExtendedErrorCode.intValue)"
         }
 
         return params

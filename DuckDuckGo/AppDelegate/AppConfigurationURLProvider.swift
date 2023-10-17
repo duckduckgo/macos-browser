@@ -22,12 +22,14 @@ import Configuration
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     func url(for configuration: Configuration) -> URL {
+        // URLs for privacyConfiguration and trackerDataSet shall match the ones in update_embedded.sh. 
+        // Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
         switch configuration {
         case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
         case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
         case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
         case .privacyConfiguration: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-config.json")!
-        case .surrogates: return URL(string: "https://duckduckgo.com/contentblocking.js?l=surrogates")!
+        case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
         case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")!
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
         case .FBConfig: return URL(string: "https://staticcdn.duckduckgo.com/useragents/")!

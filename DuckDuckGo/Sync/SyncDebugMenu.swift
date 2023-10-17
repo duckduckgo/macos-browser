@@ -19,7 +19,7 @@
 import Foundation
 import DDGSync
 
-@objc @MainActor
+@MainActor
 final class SyncDebugMenu: NSMenu {
 
     private let environmentMenu = NSMenu()

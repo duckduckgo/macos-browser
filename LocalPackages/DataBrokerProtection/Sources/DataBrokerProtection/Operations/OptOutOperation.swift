@@ -38,6 +38,7 @@ final class OptOutOperation: DataBrokerOperation {
     var stageCalculator: DataBrokerProtectionStageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
+    var retriesCountOnError: Int = 0
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
@@ -71,26 +72,22 @@ final class OptOutOperation: DataBrokerOperation {
                                  isFakeBroker: query.dataBroker.isFakeBroker,
                                  showWebView: showWebView)
 
-                do {
-                    if let optOutStep = try query.dataBroker.optOutStep() {
-                        if let actionsHandler = actionsHandler {
-                            self.actionsHandler = actionsHandler
-                        } else {
-                            self.actionsHandler = ActionsHandler(step: optOutStep)
-                        }
-
-                        if self.shouldRunNextStep() {
-                            await executeNextStep()
-                        } else {
-                            failed(with: DataBrokerProtectionError.cancelled)
-                        }
-
+                if let optOutStep = query.dataBroker.optOutStep() {
+                    if let actionsHandler = actionsHandler {
+                        self.actionsHandler = actionsHandler
                     } else {
-                        // If we try to run an optout on a broker without an optout step, we throw.
-                        failed(with: .noOptOutStep)
+                        self.actionsHandler = ActionsHandler(step: optOutStep)
                     }
-                } catch {
-                    failed(with: DataBrokerProtectionError.unknown(error.localizedDescription))
+
+                    if self.shouldRunNextStep() {
+                        await executeNextStep()
+                    } else {
+                        failed(with: DataBrokerProtectionError.cancelled)
+                    }
+
+                } else {
+                    // If we try to run an optout on a broker without an optout step, we throw.
+                    failed(with: .noOptOutStep)
                 }
             }
         }
@@ -101,6 +98,7 @@ final class OptOutOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
+        retriesCountOnError = 0 // We reset the retries on error when it is successful
         os_log("OPTOUT Waiting %{public}f seconds...", log: .action, operationAwaitTime)
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
 

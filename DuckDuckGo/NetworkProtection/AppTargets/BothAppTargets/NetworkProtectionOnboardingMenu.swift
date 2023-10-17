@@ -26,7 +26,6 @@ import SwiftUI
 
 /// Implements the logic for Network Protection's onboarding menu.
 ///
-@objc
 @MainActor
 final class NetworkProtectionOnboardingMenu: NSMenu {
 

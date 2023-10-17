@@ -42,20 +42,13 @@ public final class StatusBarMenu {
     /// - Parameters:
     ///     - statusItem: (meant for testing) this allows us to inject our own status `NSStatusItem` to make automated testing easier..
     ///
+    @MainActor
     public init(statusItem: NSStatusItem? = nil,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
-                statusReporter: NetworkProtectionStatusReporter? = nil,
+                statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
                 menuItems: [MenuItem]) {
-
-        let statusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
-            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
-            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
-            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-        )
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)
@@ -84,7 +77,10 @@ public final class StatusBarMenu {
     }
 
     private func subscribeToIconUpdates() {
-        iconPublisherCancellable = iconPublisher.$icon.sink { [weak self] icon in
+        iconPublisherCancellable = iconPublisher.$icon
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] icon in
+
             self?.statusItem.button?.image = .image(for: icon)
         }
     }

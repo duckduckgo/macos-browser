@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionWaitlistMenu.swift
+//  NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -26,9 +26,8 @@ import SwiftUI
 
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
-@objc
 @MainActor
-final class NetworkProtectionWaitlistMenu: NSMenu {
+final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
 
     // MARK: - Waitlist Active Properties
 
@@ -53,27 +52,29 @@ final class NetworkProtectionWaitlistMenu: NSMenu {
     private var waitlistEnabledOverrideValue: Int
 
     init() {
-        waitlistActiveUseRemoteValueMenuItem = NSMenuItem(title: "Remote Value", action: #selector(NetworkProtectionWaitlistMenu.waitlistEnabledUseRemoteValue))
-        waitlistActiveOverrideONMenuItem = NSMenuItem(title: "ON", action: #selector(NetworkProtectionWaitlistMenu.waitlistEnabledOverrideON))
-        waitlistActiveOverrideOFFMenuItem = NSMenuItem(title: "OFF", action: #selector(NetworkProtectionWaitlistMenu.waitlistEnabledOverrideOFF))
+        waitlistActiveUseRemoteValueMenuItem = NSMenuItem(title: "Remote Value", action: #selector(Self.waitlistEnabledUseRemoteValue))
+        waitlistActiveOverrideONMenuItem = NSMenuItem(title: "ON", action: #selector(Self.waitlistEnabledOverrideON))
+        waitlistActiveOverrideOFFMenuItem = NSMenuItem(title: "OFF", action: #selector(Self.waitlistEnabledOverrideOFF))
 
-        waitlistEnabledUseRemoteValueMenuItem = NSMenuItem(title: "Remote Value", action: #selector(NetworkProtectionWaitlistMenu.waitlistActiveUseRemoteValue))
-        waitlistEnabledOverrideONMenuItem = NSMenuItem(title: "ON", action: #selector(NetworkProtectionWaitlistMenu.waitlistActiveOverrideON))
-        waitlistEnabledOverrideOFFMenuItem = NSMenuItem(title: "OFF", action: #selector(NetworkProtectionWaitlistMenu.waitlistActiveOverrideOFF))
+        waitlistEnabledUseRemoteValueMenuItem = NSMenuItem(title: "Remote Value", action: #selector(Self.waitlistActiveUseRemoteValue))
+        waitlistEnabledOverrideONMenuItem = NSMenuItem(title: "ON", action: #selector(Self.waitlistActiveOverrideON))
+        waitlistEnabledOverrideOFFMenuItem = NSMenuItem(title: "OFF", action: #selector(Self.waitlistActiveOverrideOFF))
 
         super.init(title: "")
         buildItems {
-            NSMenuItem(title: "Reset Waitlist Overrides", action: #selector(NetworkProtectionWaitlistMenu.waitlistResetFeatureOverrides))
+            NSMenuItem(title: "Reset Waitlist Overrides", action: #selector(Self.waitlistResetFeatureOverrides)).targetting(self)
             NSMenuItem.separator()
+
             NSMenuItem(title: "Waitlist Enabled") {
-                waitlistActiveUseRemoteValueMenuItem
-                waitlistActiveOverrideONMenuItem
-                waitlistActiveOverrideOFFMenuItem
+                waitlistActiveUseRemoteValueMenuItem.targetting(self)
+                waitlistActiveOverrideONMenuItem.targetting(self)
+                waitlistActiveOverrideOFFMenuItem.targetting(self)
             }
+
             NSMenuItem(title: "Waitlist Active") {
-                waitlistEnabledUseRemoteValueMenuItem
-                waitlistEnabledOverrideONMenuItem
-                waitlistEnabledOverrideOFFMenuItem
+                waitlistEnabledUseRemoteValueMenuItem.targetting(self)
+                waitlistEnabledOverrideONMenuItem.targetting(self)
+                waitlistEnabledOverrideOFFMenuItem.targetting(self)
             }
         }
     }
@@ -162,7 +163,7 @@ final class NetworkProtectionWaitlistMenu: NSMenu {
 
 #if DEBUG
 #Preview {
-    return MenuPreview(menu: NetworkProtectionWaitlistMenu())
+    return MenuPreview(menu: NetworkProtectionWaitlistFeatureFlagOverridesMenu())
 }
 #endif
 

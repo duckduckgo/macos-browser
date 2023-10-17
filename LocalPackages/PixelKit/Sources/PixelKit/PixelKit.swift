@@ -1,5 +1,5 @@
 //
-//  Pixel.swift
+//  PixelKit.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,36 +19,11 @@
 import Foundation
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
-public protocol PixelEvent {
-    var name: String { get }
-    var parameters: [String: String]? { get }
-}
+public final class PixelKit {
 
-extension URL {
-    // MARK: Pixel
-
-    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
-
-    public static func pixelUrl(forPixelNamed pixelName: String) -> URL {
-        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
-        let url = URL(string: urlString)!
-        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
-        // https://app.asana.com/0/1177771139624306/1199951074455863/f
-        return url
-    }
-}
-
-public final class Pixel {
-
-    enum Header {
-        static let acceptEncoding = "Accept-Encoding"
-        static let acceptLanguage = "Accept-Language"
-        static let userAgent = "User-Agent"
-        static let ifNoneMatch = "If-None-Match"
-        static let moreInfo = "X-DuckDuckGo-MoreInfo"
-    }
-
-    public enum PixelFrequency {
+    /// The frequency with which a pixel is sent to our endpoint.
+    ///
+    public enum Frequency {
         /// The default frequency for pixels. This fires pixels with the event names as-is.
         case standard
 
@@ -61,6 +36,14 @@ public final class Pixel {
         case dailyAndContinuous
     }
 
+    enum Header {
+        static let acceptEncoding = "Accept-Encoding"
+        static let acceptLanguage = "Accept-Language"
+        static let userAgent = "User-Agent"
+        static let ifNoneMatch = "If-None-Match"
+        static let moreInfo = "X-DuckDuckGo-MoreInfo"
+    }
+
     /// A closure typealias to request sending pixels through the network.
     ///
     public typealias FireRequest = (
@@ -71,25 +54,26 @@ public final class Pixel {
         _ callBackOnMainThread: Bool,
         _ onComplete: @escaping (Error?) -> Void) -> Void
 
-    public typealias Event = PixelEvent
+    public typealias Event = PixelKitEvent
 
     static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
-    private static let storage: UserDefaults = UserDefaults.standard
+    private let defaults: UserDefaults
+
     private static let defaultDailyPixelCalendar: Calendar = {
         var calendar = Calendar.current
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         return calendar
     }()
 
-    public private(set) static var shared: Pixel?
+    public private(set) static var shared: PixelKit?
     private let appVersion: String
     private let defaultHeaders: [String: String]
     private let log: OSLog
     private let fireRequest: FireRequest
 
     public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, fireRequest: @escaping FireRequest) {
-        shared = Pixel(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, fireRequest: fireRequest)
+        shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, fireRequest: fireRequest)
     }
 
     static func tearDown() {
@@ -104,27 +88,26 @@ public final class Pixel {
          defaultHeaders: [String: String],
          log: OSLog,
          dailyPixelCalendar: Calendar? = nil,
+         defaults: UserDefaults = .standard,
          fireRequest: @escaping FireRequest) {
+
         self.dryRun = dryRun
         self.appVersion = appVersion
         self.defaultHeaders = defaultHeaders
         self.log = log
         self.pixelCalendar = dailyPixelCalendar ?? Self.defaultDailyPixelCalendar
+        self.defaults = defaults
         self.fireRequest = fireRequest
     }
 
-    public func fire(pixelNamed pixelName: String,
-                     frequency: PixelFrequency,
-                     withHeaders headers: [String: String]? = nil,
-                     withAdditionalParameters params: [String: String]? = nil,
-                     allowedQueryReservedCharacters: CharacterSet? = nil,
-                     includeAppVersionParameter: Bool = true,
-                     dailyPixelCalendar: Calendar? = nil,
-                     onComplete: @escaping (Error?) -> Void = {_ in }) {
-        if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName, dailyPixelStorage: Self.storage, calendar: self.pixelCalendar) {
-            onComplete(nil)
-            return
-        }
+    private func fire(pixelNamed pixelName: String,
+                      frequency: Frequency,
+                      withHeaders headers: [String: String]? = nil,
+                      withAdditionalParameters params: [String: String]? = nil,
+                      allowedQueryReservedCharacters: CharacterSet? = nil,
+                      includeAppVersionParameter: Bool = true,
+                      dailyPixelCalendar: Calendar? = nil,
+                      onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
         if includeAppVersionParameter {
@@ -155,7 +138,7 @@ public final class Pixel {
             updatePixelLastFireDate(pixelName: pixelName)
             fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
         case .dailyAndContinuous:
-            if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: Self.storage, calendar: self.pixelCalendar) {
+            if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
                 fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
             }
 
@@ -165,15 +148,36 @@ public final class Pixel {
         }
     }
 
-    public static func fire(_ event: Pixel.Event,
-                            frequency: PixelFrequency,
-                            withHeaders headers: [String: String],
-                            withAdditionalParameters parameters: [String: String]? = nil,
-                            allowedQueryReservedCharacters: CharacterSet? = nil,
-                            includeAppVersionParameter: Bool = true,
-                            onComplete: @escaping (Error?) -> Void = {_ in }) {
+    private func prefixedName(for event: Event) -> String {
+        if event.name.hasPrefix("m_mac_") {
+            return event.name
+        }
+
+        if let debugEvent = event as? DebugEvent {
+            return "m_mac_debug_\(debugEvent.name)"
+        } else {
+            return "m_mac_\(event.name)"
+        }
+    }
+
+    public func fire(_ event: Event,
+                     frequency: Frequency,
+                     withHeaders headers: [String: String]? = nil,
+                     withAdditionalParameters params: [String: String]? = nil,
+                     allowedQueryReservedCharacters: CharacterSet? = nil,
+                     includeAppVersionParameter: Bool = true,
+                     dailyPixelCalendar: Calendar? = nil,
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+
+        let pixelName = prefixedName(for: event)
+
+        if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
+            onComplete(nil)
+            return
+        }
+
         let newParams: [String: String]?
-        switch (event.parameters, parameters) {
+        switch (event.parameters, params) {
         case (.some(let parameters), .none):
             newParams = parameters
         case (.none, .some(let parameters)):
@@ -184,17 +188,35 @@ public final class Pixel {
             newParams = nil
         }
 
-        Self.shared?.fire(pixelNamed: event.name,
+        fire(pixelNamed: pixelName,
+             frequency: frequency,
+             withHeaders: headers,
+             withAdditionalParameters: newParams,
+             allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+             includeAppVersionParameter: includeAppVersionParameter,
+             dailyPixelCalendar: dailyPixelCalendar,
+             onComplete: onComplete)
+    }
+
+    public static func fire(_ event: Event,
+                            frequency: Frequency,
+                            withHeaders headers: [String: String] = [:],
+                            withAdditionalParameters parameters: [String: String]? = nil,
+                            allowedQueryReservedCharacters: CharacterSet? = nil,
+                            includeAppVersionParameter: Bool = true,
+                            onComplete: @escaping (Error?) -> Void = {_ in }) {
+
+        Self.shared?.fire(event,
                           frequency: frequency,
                           withHeaders: headers,
-                          withAdditionalParameters: newParams,
+                          withAdditionalParameters: parameters,
                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                           includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)
     }
 
     private func updatePixelLastFireDate(pixelName: String) {
-        Self.storage.set(Date(), forKey: userDefaultsKeyName(forPixelName: pixelName))
+        defaults.set(Date(), forKey: userDefaultsKeyName(forPixelName: pixelName))
     }
 
     private func pixelHasBeenFiredToday(_ name: String, dailyPixelStorage: UserDefaults, calendar: Calendar) -> Bool {

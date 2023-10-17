@@ -21,6 +21,7 @@ import DataBrokerProtection
 import AppKit
 import Common
 import SwiftUI
+import BrowserServicesKit
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -31,9 +32,28 @@ final class DBPHomeViewController: NSViewController {
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
-        DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
+        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
+        let features = ContentScopeFeatureToggles(emailProtection: false,
+                                                  emailProtectionIncontextSignup: false,
+                                                  credentialsAutofill: false,
+                                                  identitiesAutofill: false,
+                                                  creditCardsAutofill: false,
+                                                  credentialsSaving: false,
+                                                  passwordGeneration: false,
+                                                  inlineIconCredentials: false,
+                                                  thirdPartyCredentialsProvider: false)
+
+        let privacySettings = PrivacySecurityPreferences.shared
+        let sessionKey = UUID().uuidString
+        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+                                                sessionKey: sessionKey,
+                                                featureToggles: features)
+
+        return DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
                                            dataManager: dataBrokerProtectionManager.dataManager,
-                                           notificationCenter: NotificationCenter.default)
+                                           notificationCenter: NotificationCenter.default,
+                                           privacyConfig: privacyConfigurationManager,
+                                           prefs: prefs)
     }()
 
     init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
@@ -114,6 +134,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .dataBrokerProtectionError, error: error), withAdditionalParameters: event.params)
+            case .parentChildMatches:
+                Pixel.fire(.parentChildMatches, withAdditionalParameters: event.params)
             case .optOutStart:
                 Pixel.fire(.optOutStart, withAdditionalParameters: event.params)
             case .optOutEmailGenerate:

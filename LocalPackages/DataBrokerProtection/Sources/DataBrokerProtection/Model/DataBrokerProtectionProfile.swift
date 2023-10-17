@@ -79,7 +79,8 @@ internal extension DataBrokerProtectionProfile {
                     middleName: name.middleName,
                     city: address.city,
                     state: address.state,
-                    birthYear: birthYear)
+                    birthYear: birthYear,
+                    deprecated: false)
             }
         }
     }

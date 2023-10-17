@@ -116,7 +116,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "NetP Waitlist") {
                 NSMenuItem(title: "Reset Waitlist State", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionWaitlistState))
                     .targetting(self)
-                NSMenuItem(title: "Reset T&amp;C Acceptance", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionTermsAndConditionsAcceptance))
+                NSMenuItem(title: "Reset T&C Acceptance", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionTermsAndConditionsAcceptance))
                     .targetting(self)
 
                 enterWaitlistInviteCodeItem
@@ -133,7 +133,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
 
             NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
-                .submenu(NetworkProtectionWaitlistMenu())
+                .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
             NSMenuItem.separator()
 
             NSMenuItem(title: "Kill Switch (alternative approach)") {
@@ -144,6 +144,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
 
             NSMenuItem(title: "Open App Container in Finder", action: #selector(NetworkProtectionDebugMenu.openAppContainerInFinder))
+                .targetting(self)
         }
 
         preferredServerMenu.autoenablesItems = false

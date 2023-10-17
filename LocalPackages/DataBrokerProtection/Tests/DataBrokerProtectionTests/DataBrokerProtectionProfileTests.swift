@@ -18,6 +18,7 @@
 
 import XCTest
 @testable import DataBrokerProtection
+import SecureStorage
 
 final class DataBrokerProtectionProfileTests: XCTestCase {
     func testProfileQueriesWithSingleAddressMultipleNames() {
@@ -153,16 +154,116 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
 
         XCTAssertEqual(queries.count, 0)
     }
-}
 
-extension ProfileQuery: Equatable {
-    public static func == (lhs: ProfileQuery, rhs: ProfileQuery) -> Bool {
-        return lhs.firstName == rhs.firstName &&
-        lhs.lastName == rhs.lastName &&
-        lhs.city == rhs.city &&
-        lhs.state == rhs.state &&
-        lhs.age == rhs.age &&
-        lhs.fullName == rhs.fullName
+    func testSaveNewProfileQuery_thenSaveProfileQueryIsCalled() async throws {
+        let vault: DataBrokerProtectionSecureVaultMock = try DataBrokerProtectionSecureVaultMock(providers:
+                                                            SecureStorageProviders(
+                                                                crypto: EmptySecureStorageCryptoProviderMock(),
+                                                                database: SecureStorageDatabaseProviderMock(),
+                                                                keystore: EmptySecureStorageKeyStoreProviderMock()))
+
+        let database = DataBrokerProtectionDatabase(vault: vault)
+
+        let profile = DataBrokerProtectionProfile(
+            names: [
+                DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Doe"),
+            ],
+            addresses: [
+                DataBrokerProtectionProfile.Address(city: "New York", state: "NY"),
+            ],
+            phones: [String](),
+            birthYear: 1980
+        )
+
+        await database.save(profile)
+        XCTAssertTrue(vault.wasSaveProfileQueryCalled)
+        XCTAssertFalse(vault.wasUpdateProfileQueryCalled)
+        XCTAssertFalse(vault.wasDeleteProfileQueryCalled)
+    }
+
+    func testSaveNewProfileWithSavedQueriesWithOptOut_thenSaveNewProfileQueryAndUpdateProfileQueryIsCalled() async throws {
+        let vault: DataBrokerProtectionSecureVaultMock = try DataBrokerProtectionSecureVaultMock(providers:
+                                                            SecureStorageProviders(
+                                                                crypto: EmptySecureStorageCryptoProviderMock(),
+                                                                database: SecureStorageDatabaseProviderMock(),
+                                                                keystore: EmptySecureStorageKeyStoreProviderMock()))
+
+        let database = DataBrokerProtectionDatabase(vault: vault)
+
+        vault.brokers = [DataBroker.mock]
+        vault.profileQueries = [ProfileQuery.mock]
+        vault.scanOperationData = [ScanOperationData.mock]
+        vault.optOutOperationData = [OptOutOperationData.mock(with: ExtractedProfile.mockWithoutRemovedDate)]
+
+        vault.profile = DataBrokerProtectionProfile(
+            names: [
+                DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Doe"),
+            ],
+            addresses: [
+                DataBrokerProtectionProfile.Address(city: "New York", state: "NY"),
+            ],
+            phones: [String](),
+            birthYear: 1980
+        )
+
+        let newProfile = DataBrokerProtectionProfile(
+            names: [
+                DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Smith"),
+            ],
+            addresses: [
+                DataBrokerProtectionProfile.Address(city: "New York", state: "NY"),
+            ],
+            phones: [String](),
+            birthYear: 1980
+        )
+
+        await database.save(newProfile)
+
+        XCTAssertTrue(vault.wasSaveProfileQueryCalled)
+        XCTAssertTrue(vault.wasUpdateProfileQueryCalled)
+        XCTAssertFalse(vault.wasDeleteProfileQueryCalled)
+    }
+
+    func testSaveNewProfileWithoutSavedQueriesWithOptOut_thenSaveNewProfileQueryAndDeleteProfileQueryIsCalled() async throws {
+        let vault: DataBrokerProtectionSecureVaultMock = try DataBrokerProtectionSecureVaultMock(providers:
+                                                            SecureStorageProviders(
+                                                                crypto: EmptySecureStorageCryptoProviderMock(),
+                                                                database: SecureStorageDatabaseProviderMock(),
+                                                                keystore: EmptySecureStorageKeyStoreProviderMock()))
+
+        let database = DataBrokerProtectionDatabase(vault: vault)
+
+        vault.brokers = [DataBroker.mock]
+        vault.profileQueries = [ProfileQuery.mock]
+        vault.scanOperationData = [ScanOperationData.mock]
+
+        vault.profile = DataBrokerProtectionProfile(
+            names: [
+                DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Doe"),
+            ],
+            addresses: [
+                DataBrokerProtectionProfile.Address(city: "New York", state: "NY"),
+            ],
+            phones: [String](),
+            birthYear: 1980
+        )
+
+        let newProfile = DataBrokerProtectionProfile(
+            names: [
+                DataBrokerProtectionProfile.Name(firstName: "John", lastName: "Smith"),
+            ],
+            addresses: [
+                DataBrokerProtectionProfile.Address(city: "New York", state: "NY"),
+            ],
+            phones: [String](),
+            birthYear: 1980
+        )
+
+        await database.save(newProfile)
+
+        XCTAssertTrue(vault.wasSaveProfileQueryCalled)
+        XCTAssertFalse(vault.wasUpdateProfileQueryCalled)
+        XCTAssertTrue(vault.wasDeleteProfileQueryCalled)
     }
 }
 

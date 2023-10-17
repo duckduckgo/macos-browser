@@ -307,9 +307,10 @@ final class LocalBookmarkManager: BookmarkManager {
             return
         }
 
-        store.resetBookmarks()
-        loadBookmarks()
-        requestSync()
+        store.resetBookmarks { [self] _ in
+            self.loadBookmarks()
+            self.requestSync()
+        }
     }
 
     func requestSync() {
