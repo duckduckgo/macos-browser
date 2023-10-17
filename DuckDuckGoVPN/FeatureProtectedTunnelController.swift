@@ -23,11 +23,11 @@ import NetworkProtectionUI
 /// A tunnel controller that will kill the current app if Network Protection is disabled.
 ///
 final class FeatureProtectingTunnelController: TunnelController {
-    private let controller: AppLaunchingController
+    private let controller: TunnelController
     private let bouncer: NetworkProtectionBouncer
 
-    init(appLauncher: AppLauncher, bouncer: NetworkProtectionBouncer) {
-        self.controller = AppLaunchingController(appLauncher: appLauncher)
+    init(controller: TunnelController, bouncer: NetworkProtectionBouncer) {
+        self.controller = controller
         self.bouncer = bouncer
     }
 
@@ -39,5 +39,11 @@ final class FeatureProtectingTunnelController: TunnelController {
     func stop() async {
         bouncer.requireAuthTokenOrKillApp()
         await controller.stop()
+    }
+
+    var isConnected: Bool {
+        get async {
+            await controller.isConnected
+        }
     }
 }
