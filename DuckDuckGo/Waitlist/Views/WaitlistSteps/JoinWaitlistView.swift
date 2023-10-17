@@ -33,7 +33,6 @@ protocol JoinWaitlistViewViewData {
 
 struct JoinWaitlistView: View {
     let viewData: JoinWaitlistViewViewData
-
     @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
 
     var body: some View {
@@ -75,7 +74,7 @@ struct JoinWaitlistView: View {
 
 #if NETWORK_PROTECTION
 
-struct NetworkProtectionJoinWaitlistViewViewData: JoinWaitlistViewViewData {
+struct NetworkProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
     let headerImageName = "JoinWaitlistHeader"
     let title = UserText.networkProtectionWaitlistJoinTitle
     let subtitle1 = UserText.networkProtectionWaitlistJoinSubtitle1

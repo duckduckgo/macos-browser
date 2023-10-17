@@ -22,58 +22,56 @@ import Foundation
 import SwiftUI
 import SwiftUIExtensions
 
+protocol InvitedToWaitlistViewData {
+    var headerImageName: String { get }
+    var title: String { get }
+    var subtitle: String { get }
+    var entryViewViewDataList: [WaitlistEntryViewItemViewData] { get }
+    var availabilityDisclaimer: String { get }
+    var buttonDismissLabel: String { get }
+    var buttonGetStartedLabel: String { get }
+}
+
 struct InvitedToWaitlistView: View {
+    let viewData: InvitedToWaitlistViewData
     @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
-                Image("Gift-96")
+                Image(viewData.headerImageName)
 
-                Text(UserText.networkProtectionWaitlistInvitedTitle)
+                Text(viewData.title)
                     .font(.system(size: 17, weight: .bold))
                     .multilineTextAlignment(.center)
 
-                Text(UserText.networkProtectionWaitlistInvitedSubtitle)
+                Text(viewData.subtitle)
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color("BlackWhite80"))
 
                 VStack(spacing: 16.0) {
-                    WaitlistListEntryView(
-                        imageName: "Shield-16",
-                        title: UserText.networkProtectionWaitlistInvitedSection1Title,
-                        subtitle: UserText.networkProtectionWaitlistInvitedSection1Subtitle
-                    )
-
-                    WaitlistListEntryView(
-                        imageName: "Rocket-16",
-                        title: UserText.networkProtectionWaitlistInvitedSection2Title,
-                        subtitle: UserText.networkProtectionWaitlistInvitedSection2Subtitle
-                    )
-
-                    WaitlistListEntryView(
-                        imageName: "Card-16",
-                        title: UserText.networkProtectionWaitlistInvitedSection3Title,
-                        subtitle: UserText.networkProtectionWaitlistInvitedSection3Subtitle
-                    )
+                    ForEach(viewData.entryViewViewDataList) { itemData in
+                        WaitlistListEntryView(viewData: itemData)
+                    }
                 }
                 .padding(20.0)
                 .frame(maxWidth: .infinity)
                 .background(Color("BlackWhite1"))
                 .border(Color("BlackWhite5"))
 
-                Text(UserText.networkProtectionWaitlistAvailabilityDisclaimer)
+                Text(viewData.availabilityDisclaimer)
+                    .multilineTextAlignment(.center)
                     .font(.system(size: 12))
                     .foregroundColor(Color("BlackWhite60"))
             }
         } buttons: {
-            Button(UserText.networkProtectionWaitlistButtonDismiss) {
+            Button(viewData.buttonDismissLabel) {
                 Task {
                     await model.perform(action: .close)
                 }
             }
 
-            Button(UserText.networkProtectionWaitlistButtonGetStarted) {
+            Button(viewData.buttonGetStartedLabel) {
                 Task {
                     await model.perform(action: .showTermsAndConditions)
                 }
@@ -85,23 +83,21 @@ struct InvitedToWaitlistView: View {
 }
 
 private struct WaitlistListEntryView: View {
-    let imageName: String
-    let title: String
-    let subtitle: String
+    let viewData: WaitlistEntryViewItemViewData
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            Image(imageName)
+            Image(viewData.imageName)
                 .frame(maxWidth: 16, maxHeight: 16)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(title)
+                Text(viewData.title)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(Color("BlackWhite80"))
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                Text(subtitle)
+                Text(viewData.subtitle)
                     .font(.system(size: 13))
                     .foregroundColor(Color("BlackWhite60"))
                     .multilineTextAlignment(.leading)
@@ -112,6 +108,67 @@ private struct WaitlistListEntryView: View {
             Spacer()
         }
     }
+}
+
+struct WaitlistEntryViewItemViewData: Identifiable {
+    let id = UUID()
+    let imageName: String
+    let title: String
+    let subtitle: String
+}
+
+#endif
+
+#if NETWORK_PROTECTION
+
+struct NetworkProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData {
+    let headerImageName = "Gift-96"
+    let title = UserText.networkProtectionWaitlistInvitedTitle
+    let subtitle = UserText.networkProtectionWaitlistInvitedSubtitle
+    let buttonDismissLabel = UserText.networkProtectionWaitlistButtonDismiss
+    let buttonGetStartedLabel = UserText.networkProtectionWaitlistButtonGetStarted
+    let availabilityDisclaimer = UserText.networkProtectionWaitlistAvailabilityDisclaimer
+    let entryViewViewDataList: [WaitlistEntryViewItemViewData] =
+    [
+        .init(imageName: "Shield-16",
+              title: UserText.networkProtectionWaitlistInvitedSection1Title,
+              subtitle: UserText.networkProtectionWaitlistInvitedSection1Subtitle),
+
+        .init(imageName: "Rocket-16",
+                  title: UserText.networkProtectionWaitlistInvitedSection2Title,
+                  subtitle: UserText.networkProtectionWaitlistInvitedSection2Subtitle),
+
+        .init(imageName: "Card-16",
+                  title: UserText.networkProtectionWaitlistInvitedSection3Title,
+                  subtitle: UserText.networkProtectionWaitlistInvitedSection3Subtitle),
+    ]
+}
+
+#endif
+
+#if DBP
+
+struct DataBrokerProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData {
+    let headerImageName = "Gift-96"
+    let title = UserText.dataBrokerProtectionWaitlistInvitedTitle
+    let subtitle = UserText.dataBrokerProtectionWaitlistInvitedSubtitle
+    let buttonDismissLabel = UserText.dataBrokerProtectionWaitlistButtonDismiss
+    let buttonGetStartedLabel = UserText.dataBrokerProtectionWaitlistButtonGetStarted
+    let availabilityDisclaimer = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
+    let entryViewViewDataList: [WaitlistEntryViewItemViewData] =
+    [
+        .init(imageName: "Shield-16",
+              title: UserText.dataBrokerProtectionWaitlistInvitedSection1Title,
+              subtitle: UserText.dataBrokerProtectionWaitlistInvitedSection1Subtitle),
+
+        .init(imageName: "Rocket-16",
+                  title: UserText.dataBrokerProtectionWaitlistInvitedSection2Title,
+                  subtitle: UserText.dataBrokerProtectionWaitlistInvitedSection2Subtitle),
+
+        .init(imageName: "Card-16",
+                  title: UserText.dataBrokerProtectionWaitlistInvitedSection3Title,
+                  subtitle: UserText.dataBrokerProtectionWaitlistInvitedSection3Subtitle),
+    ]
 }
 
 #endif
