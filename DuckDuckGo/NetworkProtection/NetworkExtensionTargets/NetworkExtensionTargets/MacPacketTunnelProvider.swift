@@ -150,20 +150,17 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
-                includeAppVersionParameter: true
-            )
+                includeAppVersionParameter: true)
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionLatency(ms: ms, server: server, networkType: networkType),
                 frequency: .standard,
-                includeAppVersionParameter: true
-            )
+                includeAppVersionParameter: true)
         case .rekeyCompleted:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
                 frequency: .dailyAndContinuous,
-                includeAppVersionParameter: true
-            )
+                includeAppVersionParameter: true)
         }
     }
 
