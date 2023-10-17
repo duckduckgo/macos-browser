@@ -2197,7 +2197,7 @@
 		4B957A3B2AC7AE700062CA31 /* CookieNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */; };
 		4B957A3C2AC7AE700062CA31 /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
 		4B957A3D2AC7AE700062CA31 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
-		4B957A3E2AC7AE700062CA31 /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
+		4B957A3E2AC7AE700062CA31 /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
 		4B957A3F2AC7AE700062CA31 /* GrammarFeaturesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4FF40B2624751A004E2377 /* GrammarFeaturesManager.swift */; };
 		4B957A402AC7AE700062CA31 /* WaitlistModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */; };
 		4B957A412AC7AE700062CA31 /* WKMenuItemIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E7291401D700225DE2 /* WKMenuItemIdentifier.swift */; };
@@ -2721,9 +2721,9 @@
 		4B9DB02C2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
 		4B9DB02D2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
 		4B9DB02E2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
-		4B9DB0322A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
-		4B9DB0332A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
-		4B9DB0342A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
+		4B9DB0322A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
+		4B9DB0332A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
+		4B9DB0342A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
 		4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
 		4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
 		4B9DB0372A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
@@ -4173,7 +4173,7 @@
 		4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionWaitlistViewModel.swift; sourceTree = "<group>"; };
 		4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistStorage.swift; sourceTree = "<group>"; };
 		4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistKeychainStorage.swift; sourceTree = "<group>"; };
-		4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnableNetworkProtectionView.swift; sourceTree = "<group>"; };
+		4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnableWaitlistFeatureView.swift; sourceTree = "<group>"; };
 		4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistTermsAndConditionsView.swift; sourceTree = "<group>"; };
 		4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoinedWaitlistView.swift; sourceTree = "<group>"; };
 		4B9DB0162A983B24000927DB /* InvitedToWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvitedToWaitlistView.swift; sourceTree = "<group>"; };
@@ -6171,7 +6171,7 @@
 		4B9DB0122A983B24000927DB /* WaitlistSteps */ = {
 			isa = PBXGroup;
 			children = (
-				4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */,
+				4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */,
 				4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */,
 				4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */,
 				4B9DB0162A983B24000927DB /* InvitedToWaitlistView.swift */,
@@ -10185,7 +10185,7 @@
 				3192A0A72A4C4CFF0084EA89 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				3192A0A82A4C4CFF0084EA89 /* AddressBarButton.swift in Sources */,
 				3192A0A92A4C4CFF0084EA89 /* HistoryEntry.swift in Sources */,
-				4B9DB0342A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */,
+				4B9DB0342A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */,
 				3192A0AA2A4C4CFF0084EA89 /* FaviconStore.swift in Sources */,
 				3192A0AB2A4C4CFF0084EA89 /* SuggestionListCharacteristics.swift in Sources */,
 				3192A0AC2A4C4CFF0084EA89 /* TimeIntervalExtension.swift in Sources */,
@@ -10628,7 +10628,7 @@
 				3706FAB7293F65D500E42796 /* PixelParameters.swift in Sources */,
 				3706FAB8293F65D500E42796 /* FaviconImageCache.swift in Sources */,
 				3706FAB9293F65D500E42796 /* TabBarViewController.swift in Sources */,
-				4B9DB0332A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */,
+				4B9DB0332A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */,
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				3706FABB293F65D500E42796 /* PasswordManagementBitwardenItemView.swift in Sources */,
 				3706FABC293F65D500E42796 /* CookieConsentPopover.swift in Sources */,
@@ -11883,7 +11883,7 @@
 				4B957A3B2AC7AE700062CA31 /* CookieNotificationAnimationModel.swift in Sources */,
 				4B957A3C2AC7AE700062CA31 /* JoinedWaitlistView.swift in Sources */,
 				4B957A3D2AC7AE700062CA31 /* SharingMenu.swift in Sources */,
-				4B957A3E2AC7AE700062CA31 /* EnableNetworkProtectionView.swift in Sources */,
+				4B957A3E2AC7AE700062CA31 /* EnableWaitlistFeatureView.swift in Sources */,
 				4B957A3F2AC7AE700062CA31 /* GrammarFeaturesManager.swift in Sources */,
 				4B957A402AC7AE700062CA31 /* WaitlistModalViewController.swift in Sources */,
 				4B957A412AC7AE700062CA31 /* WKMenuItemIdentifier.swift in Sources */,
@@ -12566,7 +12566,7 @@
 				3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */,
 				4B9DB0382A983B24000927DB /* JoinedWaitlistView.swift in Sources */,
 				B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */,
-				4B9DB0322A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */,
+				4B9DB0322A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */,
 				4B9DB0442A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
 				B6DA06E8291401D700225DE2 /* WKMenuItemIdentifier.swift in Sources */,

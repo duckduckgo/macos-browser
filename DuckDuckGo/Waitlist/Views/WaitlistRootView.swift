@@ -38,7 +38,7 @@ struct WaitlistRootView: View {
                     NetworkProtectionTermsAndConditionsContentView()
                 }
             case .readyToEnable:
-                EnableNetworkProtectionView()
+                EnableWaitlistFeatureView(viewData: EnableNetworkProtectionViewData())
             }
         }
         .environmentObject(model)
