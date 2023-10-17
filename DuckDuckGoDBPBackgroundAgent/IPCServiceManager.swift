@@ -51,25 +51,33 @@ final class IPCServiceManager {
 }
 
 extension IPCServiceManager: IPCServerInterface {
+
     func register() {
         // When a new client registers, send the last known status
         ipcServer.schedulerStatusChanges(scheduler.status)
     }
 
-    func startScheduler() {
-        // scheduler.startScheduler()
-        scheduler.scanAllBrokers(showWebView: true,
-                                 completion: {
-            print("Listo!")
-        })
+    func startScheduler(showWebView: Bool) {
+        scheduler.startScheduler(showWebView: showWebView)
     }
 
     func stopScheduler() {
         scheduler.stopScheduler()
     }
 
-    func restartScheduler() {
-        scheduler.stopScheduler()
-        scheduler.startScheduler()
+    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        scheduler.optOutAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+        scheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    func runAllOperations(showWebView: Bool) {
+        scheduler.runAllOperations(showWebView: showWebView)
     }
 }

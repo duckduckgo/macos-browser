@@ -168,15 +168,15 @@ final public class DataBrokerProtectionViewController: NSViewController {
     }
 
     override public func loadView() {
-//        let containerView = DataBrokerProtectionContainerView(
-//            containerViewModel: containerViewModel,
-//            navigationViewModel: navigationViewModel,
-//            profileViewModel: profileViewModel,
-//            resultsViewModel: resultsViewModel)
-//
-//        let hostingController = NSHostingController(rootView: containerView)
-//        view = hostingController.view
+        let containerView = DataBrokerProtectionContainerView(
+            containerViewModel: containerViewModel,
+            navigationViewModel: navigationViewModel,
+            profileViewModel: profileViewModel,
+            resultsViewModel: resultsViewModel)
 
+        let hostingController = NSHostingController(rootView: containerView)
+        view = hostingController.view
+/*
         guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
@@ -192,10 +192,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
         button.setButtonType(.momentaryLight)
         button.contentTintColor = .black
         button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
-        view.addSubview(button)
-    }
-
-    public func getMainAppDelegate() -> MainAppToDBPPackageInterface {
-        return containerViewModel
+        view.addSubview(button)*/
     }
 }

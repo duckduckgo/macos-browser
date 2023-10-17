@@ -2890,6 +2890,7 @@
 		7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
+		7B6D98672ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */; };
 		7B736E582A4A22B700F9922A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5F14C52A145D6A0060320F /* Main.swift */; };
 		7B736E6A2A4A22FC00F9922A /* enableOnDemand.app in Embed NetP Controller Apps */ = {isa = PBXBuildFile; fileRef = 7B736E5F2A4A22B700F9922A /* enableOnDemand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7B74F2482ADEB03900147283 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B74F2472ADEB03900147283 /* PixelKit */; };
@@ -4320,6 +4321,7 @@
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDeveloperID.xcconfig; sourceTree = "<group>"; };
+		7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemScheduler.swift; sourceTree = "<group>"; };
 		7B736E5F2A4A22B700F9922A /* enableOnDemand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = enableOnDemand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8EFE142AD6C1DB007B89B4 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
@@ -5357,6 +5359,7 @@
 			children = (
 				3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */,
 				3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */,
+				7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */,
 				9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */,
 			);
 			path = DBP;
@@ -10704,6 +10707,7 @@
 				3192A1F02A4C4CFF0084EA89 /* FireproofDomains.swift in Sources */,
 				3192A1F12A4C4CFF0084EA89 /* Database.swift in Sources */,
 				3192A1F22A4C4CFF0084EA89 /* HorizontallyCenteredLayout.swift in Sources */,
+				7B6D98672ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift in Sources */,
 				3192A1F32A4C4CFF0084EA89 /* BookmarksOutlineView.swift in Sources */,
 				3192A1F42A4C4CFF0084EA89 /* CountryList.swift in Sources */,
 				3192A1F52A4C4CFF0084EA89 /* PreferencesSection.swift in Sources */,

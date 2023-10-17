@@ -65,20 +65,33 @@ public final class DataBrokerProtectionIPCClient {
 // MARK: - Outgoing communication to the server
 
 extension DataBrokerProtectionIPCClient: IPCServerInterface {
+    
     public func register() {
         try? xpc.server().register()
     }
 
-    public func startScheduler() {
-        try? xpc.server().startScheduler()
+    public func startScheduler(showWebView: Bool) {
+        try? xpc.server().startScheduler(showWebView: showWebView)
     }
 
     public func stopScheduler() {
         try? xpc.server().stopScheduler()
     }
 
-    public func restartScheduler() {
-        try? xpc.server().restartScheduler()
+    public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        try? xpc.server().optOutAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        try? xpc.server().scanAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+        try? xpc.server().runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    public func runAllOperations(showWebView: Bool) {
+        try? xpc.server().runAllOperations(showWebView: showWebView)
     }
 }
 

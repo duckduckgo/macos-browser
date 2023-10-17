@@ -30,10 +30,6 @@ public final class DataBrokerProtectionManager {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
-    private let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId)
-    var mainAppToDBPPackageDelegate: MainAppToDBPPackageInterface?
-
-    private let loginItemsManager = LoginItemsManager()
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         let dataManager = DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -41,7 +37,12 @@ public final class DataBrokerProtectionManager {
         return dataManager
     }()
 
-    lazy var scheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
+    lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
+        let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId)
+        let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
+
+        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler)
+    }()
 
     private init() {
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService,
@@ -49,37 +50,17 @@ public final class DataBrokerProtectionManager {
 
     }
 
-    public func appDidStart() {
-        startLoginItemIfPossible()
-    }
-
     public func shouldAskForInviteCode() -> Bool {
         redeemUseCase.shouldAskForInviteCode()
-    }
-
-    public func startLoginItemIfPossible() {
-        guard !redeemUseCase.shouldAskForInviteCode() && !DataBrokerDebugFlagBlockScheduler().isFlagOn() else { return }
-
-        loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 }
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
     public func dataBrokerProtectionDataManagerDidUpdateData() {
-        startLoginItemIfPossible()
         scheduler.startScheduler()
     }
 
     public func dataBrokerProtectionDataManagerDidDeleteData() {
         scheduler.stopScheduler()
-        loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 }
-/*
-extension DataBrokerProtectionManager: DBPBackgroundAgentToMainAppCommunication {
-    public func brokersScanCompleted() {
-        os_log("Brokers scan completed called on main app")
-        mainAppToDBPPackageDelegate?.brokersScanCompleted()
-    }
-}
-*/

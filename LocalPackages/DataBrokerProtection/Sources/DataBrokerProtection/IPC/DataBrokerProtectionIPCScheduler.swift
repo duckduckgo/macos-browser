@@ -1,5 +1,5 @@
 //
-//  DBPToApp.swift
+//  DataBrokerProtectionIPCScheduler.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -39,43 +39,31 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
     }
 
     public func profileModified() {
-        // ipcConnection.profileModified()
-        ipcClient.restartScheduler()
+        ipcClient.stopScheduler()
+        ipcClient.startScheduler(showWebView: false)
     }
-/*
-    public func startScan() {
-        ipcConnection.startScanPressed()
-    }
-*/
+
     public func startScheduler(showWebView: Bool) {
-        // ipcConnection.startScheduler(showWebView: showWebView)
-        ipcClient.startScheduler()
+        ipcClient.startScheduler(showWebView: showWebView)
     }
 
     public func stopScheduler() {
-        // ipcConnection.stopScheduler()
         ipcClient.stopScheduler()
     }
 
     public func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        // ipcConnection.optOutAllBrokers(showWebView: showWebView, completion: completion)
+        ipcClient.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
-        // ipcConnection.scanAllBrokers(showWebView: showWebView, completion: completion)
-        ipcClient.startScheduler()
+        ipcClient.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
-        // ipcConnection.runQueuedOperations(showWebView: showWebView, completion: completion)
+        ipcClient.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
     public func runAllOperations(showWebView: Bool) {
-        // ipcConnection.runAllOperations(showWebView: showWebView)
+        ipcClient.runAllOperations(showWebView: showWebView)
     }
-}
-
-// I'm not sure how to do this way aroung right now
-@objc public protocol MainAppToDBPPackageInterface {
-    func brokersScanCompleted()
 }

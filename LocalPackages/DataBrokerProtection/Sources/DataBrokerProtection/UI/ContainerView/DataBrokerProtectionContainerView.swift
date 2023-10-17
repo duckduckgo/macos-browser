@@ -55,8 +55,6 @@ struct DataBrokerProtectionContainerView: View {
                             viewModel: profileViewModel,
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
-                                containerViewModel.startScan()
-                                /*
                                 containerViewModel.scanAfterProfileCreation { scanResult in
                                     updateUIWithScanResult(scanResult: scanResult)
 
@@ -64,7 +62,6 @@ struct DataBrokerProtectionContainerView: View {
                                         containerViewModel.runQueuedOperationsAndStartScheduler()
                                     }
                                 }
-                                 */
                             }, backToDashboardClicked: {
                                 navigationViewModel.updateNavigation(.results)
                             })
@@ -165,7 +162,6 @@ struct DataBrokerProtectionContainerView: View {
                     shouldShowDebugUI.toggle()
                 },
                                     editProfileClicked: {
-                    containerViewModel.editProfilePressed()
                     navigationViewModel.updateNavigation(.createProfile)
                 })
                 .frame(height: 300)

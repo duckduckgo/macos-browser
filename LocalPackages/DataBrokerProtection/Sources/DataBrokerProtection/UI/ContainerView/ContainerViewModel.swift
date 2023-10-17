@@ -47,14 +47,15 @@ final class ContainerViewModel: ObservableObject {
         showWebView = DataBrokerDebugFlagShowWebView().isFlagOn()
     }
 
-    func forceSchedulerRun() {
-        scheduler.runAllOperations(showWebView: showWebView)
+    func runQueuedOperationsAndStartScheduler() {
+        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
+            guard let self = self else { return }
+            self.scheduler.startScheduler(showWebView: self.showWebView)
+        }
     }
 
-    func startScan() {
-        // TODO: decide what to do
-        // scheduler.startScan()
-        scheduler.startScheduler()
+    func forceSchedulerRun() {
+        scheduler.runAllOperations(showWebView: showWebView)
     }
 
     func forceRunScans(completion: @escaping (ScanResult) -> Void) {
@@ -79,22 +80,24 @@ final class ContainerViewModel: ObservableObject {
         exit(0)
     }
 
-    func editProfilePressed() {
-        scheduler.stopScheduler()
-        scheduler.startScheduler()
+    func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
+        scanAndUpdateUI(completion: completion)
     }
-}
 
-extension ContainerViewModel: MainAppToDBPPackageInterface {
+    private func scanAndUpdateUI(completion: @escaping (ScanResult) -> Void) {
+        scheduler.stopScheduler()
 
-    func brokersScanCompleted() {
-        DispatchQueue.main.async { [self] in
-            let hasResults = self.dataManager.hasMatches()
+        scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
+            guard let self = self else { return }
 
-            if hasResults {
-                self.scanResults = .results
-            } else {
-                self.scanResults = .noResults
+            DispatchQueue.main.async {
+                let hasResults = self.dataManager.hasMatches()
+
+                if hasResults {
+                    completion(.results)
+                } else {
+                    completion(.noResults)
+                }
             }
         }
     }

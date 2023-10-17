@@ -32,15 +32,16 @@ public protocol IPCServerInterface: AnyObject {
 
     /// Start the scheduler
     ///
-    func startScheduler()
+    func startScheduler(showWebView: Bool)
 
     /// Stop the scheduler
     ///
     func stopScheduler()
 
-    /// Restart the scheduler
-    ///
-    func restartScheduler()
+    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
+    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?)
+    func runAllOperations(showWebView: Bool)
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -60,15 +61,16 @@ protocol XPCServerInterface {
 
     /// Start the scheduler
     ///
-    func startScheduler()
+    func startScheduler(showWebView: Bool)
 
     /// Stop the scheduler
     ///
     func stopScheduler()
 
-    /// Restart the scheduler
-    ///
-    func restartScheduler()
+    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
+    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?)
+    func runAllOperations(showWebView: Bool)
 }
 
 public final class DataBrokerProtectionIPCServer {
@@ -121,15 +123,27 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
         serverDelegate?.register()
     }
 
-    func startScheduler() {
-        serverDelegate?.startScheduler()
+    func startScheduler(showWebView: Bool) {
+        serverDelegate?.startScheduler(showWebView: showWebView)
     }
 
     func stopScheduler() {
         serverDelegate?.stopScheduler()
     }
 
-    func restartScheduler() {
-        serverDelegate?.restartScheduler()
+    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        serverDelegate?.optOutAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) {
+        serverDelegate?.scanAllBrokers(showWebView: showWebView, completion: completion)
+    }
+
+    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) {
+        serverDelegate?.runQueuedOperations(showWebView: showWebView, completion: completion)
+    }
+
+    func runAllOperations(showWebView: Bool) {
+        serverDelegate?.runAllOperations(showWebView: showWebView)
     }
 }

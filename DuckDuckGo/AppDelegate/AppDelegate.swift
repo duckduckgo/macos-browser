@@ -219,10 +219,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 #endif
-
-#if DBP
-        DataBrokerProtectionManager.shared.appDidStart()
-#endif
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
