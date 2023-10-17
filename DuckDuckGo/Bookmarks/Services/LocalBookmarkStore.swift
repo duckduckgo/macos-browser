@@ -173,7 +173,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func commonOnSaveErrorHandler(_ error: Error) {
-        guard NSApp.runType.shouldLoadEnvironment else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         assertionFailure("LocalBookmarkStore: Saving of context failed")
 
@@ -692,7 +692,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
-            if NSApp.runType.shouldLoadEnvironment {
+            if NSApp.runType.requiresEnvironment {
                 Pixel.fire(.debug(event: .bookmarksSaveFailedOnImport, error: error),
                            withAdditionalParameters: processedErrors.errorPixelParameters)
                 assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")

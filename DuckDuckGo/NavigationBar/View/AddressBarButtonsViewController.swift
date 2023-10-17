@@ -548,7 +548,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
             let newAnimationView: AnimationView
             // For unknown reason, this caused infinite execution of various unit tests.
-            if NSApp.runType.shouldLoadEnvironment {
+            if NSApp.runType.requiresEnvironment {
                 newAnimationView = getAnimationView(for: animationName) ?? AnimationView()
             } else {
                 newAnimationView = AnimationView()
@@ -641,7 +641,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: PrivacyDashboardPopover) {
         privacyDashboadPendingUpdatesCancellable?.cancel()
-        guard NSApp.runType.shouldLoadEnvironment else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController.rulesUpdateObserver
             .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
@@ -759,7 +759,7 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     private func updatePrivacyEntryPointIcon() {
-        guard NSApp.runType.shouldLoadEnvironment else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
         privacyEntryPointButton.image = nil
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {

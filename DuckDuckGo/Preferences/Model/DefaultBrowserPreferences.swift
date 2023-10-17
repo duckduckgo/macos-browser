@@ -75,7 +75,7 @@ final class DefaultBrowserPreferences: ObservableObject {
         didSet {
             // Temporary pixel for first time user import data
 #if DEBUG
-            guard NSApp.runType.shouldLoadEnvironment else { return }
+            guard NSApp.runType.requiresEnvironment else { return }
 #endif
             if Pixel.isNewUser && isDefault {
                 PixelExperiment.fireSetAsDefaultInitialPixel()

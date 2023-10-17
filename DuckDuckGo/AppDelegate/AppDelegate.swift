@@ -33,35 +33,6 @@ import UserNotifications
 import NetworkProtection
 #endif
 
-@objc(Application)
-final class Application: NSApplication {
-
-    private let copyHandler = CopyHandler()
-    private var _delegate: AppDelegate!
-
-    override init() {
-        super.init()
-
-        _delegate = AppDelegate()
-        self.delegate = _delegate
-
-        let mainMenu = MainMenu(featureFlagger: _delegate.featureFlagger,
-                                bookmarkManager: _delegate.bookmarksManager,
-                                faviconManager: FaviconManager.shared,
-                                copyHandler: copyHandler)
-        self.mainMenu = mainMenu
-
-        // Makes sure Spotlight search is part of Help menu
-        self.helpMenu = mainMenu.helpMenu
-        self.windowsMenu = mainMenu.windowsMenu
-        self.servicesMenu = mainMenu.servicesMenu
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("\(Self.self): Bad initializer")
-    }
-}
-
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
@@ -110,7 +81,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     // swiftlint:disable:next function_body_length
     override init() {
         do {
-            let encryptionKey = NSApplication.runType.shouldLoadEnvironment ? try keyStore.readKey() : nil
+            let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
             fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
         } catch {
             os_log("App Encryption Key could not be read: %s", "\(error)")
@@ -120,7 +91,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
-        if NSApplication.runType.shouldLoadEnvironment {
+        if NSApplication.runType.requiresEnvironment {
 #if DEBUG
             Pixel.setUp(dryRun: true)
 #else
@@ -163,7 +134,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
 
 #if DEBUG
-        AppPrivacyFeatures.shared = NSApplication.runType.shouldLoadEnvironment
+        AppPrivacyFeatures.shared = NSApplication.runType.requiresEnvironment
         // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
         ? AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
         : AppPrivacyFeatures(contentBlocking: ContentBlockingMock(), httpsUpgradeStore: HTTPSUpgradeStoreMock())
@@ -190,7 +161,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        guard NSApp.runType.shouldLoadEnvironment else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
         defer {
             didFinishLaunching = true
         }
@@ -216,7 +187,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
-        let statisticsLoader = NSApp.runType.shouldLoadEnvironment ? StatisticsLoader.shared : nil
+        let statisticsLoader = NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil
         statisticsLoader?.load()
 
         startupSync()

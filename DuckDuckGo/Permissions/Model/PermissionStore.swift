@@ -44,7 +44,7 @@ final class LocalPermissionStore: PermissionStore {
     private var context: NSManagedObjectContext? {
         if case .none = _context {
 #if DEBUG
-            guard NSApp.runType.shouldLoadEnvironment else {
+            guard NSApp.runType.requiresEnvironment else {
                 _context = .some(.none)
                 return .none
             }

@@ -34,7 +34,7 @@ struct TabExtensionsBuilder: TabExtensionsBuilderProtocol {
 
     static var `default`: TabExtensionsBuilderProtocol {
 #if DEBUG
-        return NSApp.runType.shouldLoadEnvironment ? TabExtensionsBuilder() : TestTabExtensionsBuilder.shared
+        return NSApp.runType.requiresEnvironment ? TabExtensionsBuilder() : TestTabExtensionsBuilder.shared
 #else
         return TabExtensionsBuilder()
 #endif
@@ -159,7 +159,7 @@ struct TabExtensionBuildingBlock<T> {
     }
 
     init<Extension: TabExtension>(_ makeTabExtension: @escaping () -> Extension) where Extension.PublicProtocol == T {
-        if NSApp.runType.shouldLoadEnvironment {
+        if NSApp.runType.requiresEnvironment {
             state = .loaded(makeTabExtension().getPublicProtocol())
         } else {
             state = .lazy(.init(makeTabExtension))
@@ -235,7 +235,7 @@ struct TabExtensions {
         let tabExtension = extensions[ObjectIdentifier(T.PublicProtocol.self)]?.getPublicProtocol() as? T.PublicProtocol
         guard isNullable != .nullable else { return tabExtension}
 #if DEBUG
-        assert(!NSApp.runType.shouldLoadEnvironment || tabExtension != nil)
+        assert(!NSApp.runType.requiresEnvironment || tabExtension != nil)
 #else
         os_log("%s Tab Extension not initialised for Unit Tests, activate it in TabExtensions.swift", log: .autoconsent, type: .debug, "\(T.self)")
 #endif

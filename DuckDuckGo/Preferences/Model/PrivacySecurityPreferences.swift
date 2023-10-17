@@ -43,7 +43,7 @@ final class PrivacySecurityPreferences {
     public var autoconsentEnabled: Bool? {
         didSet {
             // Temporary pixel for first time user enables cookies management
-            guard NSApp.runType.shouldLoadEnvironment else { return }
+            guard NSApp.runType.requiresEnvironment else { return }
 
             if Pixel.isNewUser && autoconsentEnabled ?? false {
                 let repetition = Pixel.Event.Repetition(key: Pixel.Event.cookieManagementEnabledInitial.name)

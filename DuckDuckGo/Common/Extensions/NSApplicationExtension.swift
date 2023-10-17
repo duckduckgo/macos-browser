@@ -32,7 +32,8 @@ extension NSApplication {
         case uiTests
         case xcPreviews
 
-        var shouldLoadEnvironment: Bool {
+        /// Defines if app run type requires loading full environment, i.e. databases, saved state, keychain etc.
+        var requiresEnvironment: Bool {
             switch self {
             case .normal, .integrationTests, .uiTests:
                 return true

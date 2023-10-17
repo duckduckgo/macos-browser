@@ -25,7 +25,7 @@ final class SecureVaultErrorReporter: SecureVaultErrorReporting {
     private init() {}
 
     func secureVaultInitFailed(_ error: SecureStorageError) {
-        guard NSApp.runType.shouldLoadEnvironment else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         switch error {
         case .initFailed, .failedToOpenDatabase:
