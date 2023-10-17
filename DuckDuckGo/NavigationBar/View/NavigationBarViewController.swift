@@ -23,6 +23,7 @@ import BrowserServicesKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 #endif
 
@@ -78,7 +79,8 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private var popovers = NavigationBarPopovers()
+    private var popovers: NavigationBarPopovers
+
     var isDownloadsPopoverShown: Bool {
         popovers.isDownloadsPopoverShown
     }
@@ -105,8 +107,16 @@ final class NavigationBarViewController: NSViewController {
 
 #if NETWORK_PROTECTION
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore()) {
+
+        let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
+        let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
+        ipcClient.register()
+
+        let networkProtectionPopoverManager = NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
+
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager)
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
+        self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager)
         self.isBurner = isBurner
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
@@ -115,6 +125,7 @@ final class NavigationBarViewController: NSViewController {
     }
 #else
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+        self.popovers = NavigationBarPopovers()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = isBurner
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
@@ -851,7 +862,7 @@ extension NavigationBarViewController: NSMenuDelegate {
         let featureVisibility = DefaultNetworkProtectionVisibility()
 
         if featureVisibility.isNetworkProtectionVisible() {
-            popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
+            popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
                                                   withDelegate: networkProtectionButtonModel)
         } else {
             featureVisibility.disableForWaitlistUsers()

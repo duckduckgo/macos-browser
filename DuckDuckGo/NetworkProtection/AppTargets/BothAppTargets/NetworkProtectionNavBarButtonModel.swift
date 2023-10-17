@@ -31,8 +31,14 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .disconnected
-    private let popovers: NavigationBarPopovers
+    private let popoverManager: NetworkProtectionNavBarPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
+
+    // MARK: - IPC
+
+    public var ipcClient: TunnelControllerIPCClient {
+        popoverManager.ipcClient
+    }
 
     // MARK: - Subscriptions
 
@@ -68,24 +74,25 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    init(popovers: NavigationBarPopovers,
+    init(popoverManager: NetworkProtectionNavBarPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
          statusReporter: NetworkProtectionStatusReporter? = nil,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
         let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
-        let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
-        ipcClient.register()
+        self.popoverManager = popoverManager
 
-        self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: ipcClient.connectionStatusObserver,
-            serverInfoObserver: ipcClient.serverInfoObserver,
-            connectionErrorObserver: ipcClient.connectionErrorObserver,
-            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+        let ipcClient = popoverManager.ipcClient
+
+        self.networkProtectionStatusReporter = statusReporter
+            ?? DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.connectionStatusObserver,
+                serverInfoObserver: ipcClient.serverInfoObserver,
+                connectionErrorObserver: ipcClient.connectionErrorObserver,
+                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
-        self.popovers = popovers
         self.pinningManager = pinningManager
         isPinned = pinningManager.isPinned(.networkProtection)
 
@@ -184,7 +191,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         }
 
         guard !isPinned,
-              !popovers.isNetworkProtectionPopoverShown else {
+              !popoverManager.isShown else {
             showButton = true
             return
         }

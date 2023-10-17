@@ -41,7 +41,11 @@ final class NavigationBarPopovers {
     private(set) var downloadsPopover: DownloadsPopover?
 
 #if NETWORK_PROTECTION
-    private(set) var networkProtectionPopover: NetworkProtectionPopover?
+    private let networkProtectionPopoverManager: NetworkProtectionNavBarPopoverManager
+
+    init(networkProtectionPopoverManager: NetworkProtectionNavBarPopoverManager) {
+        self.networkProtectionPopoverManager = networkProtectionPopoverManager
+    }
 #endif
 
     var passwordManagementDomain: String? {
@@ -69,7 +73,7 @@ final class NavigationBarPopovers {
     @MainActor
     var isNetworkProtectionPopoverShown: Bool {
 #if NETWORK_PROTECTION
-        networkProtectionPopover?.isShown ?? false
+        networkProtectionPopoverManager.isShown
 #else
         return false
 #endif
@@ -97,6 +101,8 @@ final class NavigationBarPopovers {
 
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
 #if NETWORK_PROTECTION
+        networkProtectionPopoverManager.toggle(positionedBelow: view, withDelegate: delegate)
+/*
         if let networkProtectionPopover, networkProtectionPopover.isShown {
             networkProtectionPopover.close()
         } else {
@@ -107,7 +113,7 @@ final class NavigationBarPopovers {
             } else {
                 featureVisibility.disableForWaitlistUsers()
             }
-        }
+        }*/
 #endif
     }
 
@@ -167,8 +173,8 @@ final class NavigationBarPopovers {
         }
 
 #if NETWORK_PROTECTION
-        if networkProtectionPopover?.isShown ?? false {
-            networkProtectionPopover?.close()
+        if networkProtectionPopoverManager.isShown {
+            networkProtectionPopoverManager.close()
         }
 #endif
 
@@ -288,12 +294,12 @@ final class NavigationBarPopovers {
     // MARK: - Network Protection
 
 #if NETWORK_PROTECTION
-    func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
+    func showNetworkProtectionPopover(
+        positionedBelow view: NSView,
+        withDelegate delegate: NSPopoverDelegate) {
+            networkProtectionPopoverManager.show(positionedBelow: view, withDelegate: delegate)
+/*
         let popover = networkProtectionPopover ?? {
-            // TODO: The code in this method is excessively detailed and should be abstracted elsewhere.
-            let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
-            let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
-            ipcClient.register()
 
             let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
@@ -322,7 +328,7 @@ final class NavigationBarPopovers {
             networkProtectionPopover = popover
             return popover
         }()
-        show(popover, positionedBelow: view)
+        show(popover, positionedBelow: view)*/
     }
 #endif
 }
