@@ -88,7 +88,7 @@ struct NetworkProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
 
 #if DBP
 
-struct DataBrokerProtectionJoinWaitlistViewViewData: JoinWaitlistViewViewData {
+struct DataBrokerProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
     let headerImageName = "DBP-JoinWaitlistHeader"
     let title = UserText.dataBrokerProtectionWaitlistJoinTitle
     let subtitle1 = UserText.dataBrokerProtectionWaitlistJoinSubtitle1
