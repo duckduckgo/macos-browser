@@ -77,18 +77,6 @@ public final class DataBrokerProtectionBackgroundManager {
             }
         }
     }
-/*
-    public func startScheduler(showWebView: Bool = false) {
-        scheduler.startScheduler(showWebView: showWebView)
-    }
-
-    public func stopScheduler() {
-        scheduler.stopScheduler()
-    }
-
-    public func scanAllBrokers(showWebView: Bool = false, completion: (() -> Void)?) {
-        scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
-    }*/
 }
 
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
