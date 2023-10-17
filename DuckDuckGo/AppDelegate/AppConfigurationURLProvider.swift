@@ -22,6 +22,8 @@ import Configuration
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
     func url(for configuration: Configuration) -> URL {
+        // URLs for privacyConfiguration and trackerDataSet shall match the ones in update_embedded.sh. 
+        // Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
         switch configuration {
         case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
         case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!

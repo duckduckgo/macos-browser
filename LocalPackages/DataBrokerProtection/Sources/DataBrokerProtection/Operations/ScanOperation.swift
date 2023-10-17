@@ -38,13 +38,14 @@ final class ScanOperation: DataBrokerOperation {
     var stageCalculator: DataBrokerProtectionStageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
+    var retriesCountOnError: Int = 0
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
-         operationAwaitTime: TimeInterval = 1,
+         operationAwaitTime: TimeInterval = 3,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -92,6 +93,7 @@ final class ScanOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
+        retriesCountOnError = 0 // We reset the retries on error when it is successful
         os_log("SCAN Waiting %{public}f seconds...", log: .action, operationAwaitTime)
 
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)
