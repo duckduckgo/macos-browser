@@ -286,37 +286,6 @@ final class NavigationBarPopovers {
         positionedBelow view: NSView,
         withDelegate delegate: NSPopoverDelegate) {
             networkProtectionPopoverManager.show(positionedBelow: view, withDelegate: delegate)
-/*
-        let popover = networkProtectionPopover ?? {
-
-            let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-
-            let statusReporter = DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.connectionStatusObserver,
-                serverInfoObserver: ipcClient.serverInfoObserver,
-                connectionErrorObserver: ipcClient.connectionErrorObserver,
-                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-            )
-
-            let menuItems = [
-                NetworkProtectionStatusView.Model.MenuItem(
-                    name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                    action: {
-                        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                        await appLauncher.launchApp(withCommand: .shareFeedback)
-                })
-            ]
-
-            let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
-
-            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
-            popover.delegate = delegate
-
-            networkProtectionPopover = popover
-            return popover
-        }()
-        show(popover, positionedBelow: view)*/
     }
 #endif
 }
