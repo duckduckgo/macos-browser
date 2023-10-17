@@ -1,6 +1,6 @@
 {
   "name": "usa-people-search.com",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "parent": "peoplefinders.com",
   "addedDatetime": 1678078800000,
   "steps": [
@@ -10,12 +10,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "2da14c82-c712-48a8-ba4f-19706c009bb9",
-          "url": "https://usa-people-search.com/name/${firstName}-${lastName}/${city}-${state}?age=${age}"
+          "id": "2c4b31a3-661b-4f30-a4d3-b5a4a13c95db",
+          "url": "https://usa-people-search.com/name/${firstName|downcase}-${lastName|downcase}/${city|downcase}-${state|stateFull|downcase}?age=${age}"
         },
         {
           "actionType": "extract",
-          "id": "4254d010-f71f-419f-b38d-ef9895a9bd44",
+          "id": "20a4d510-56b6-46a8-92ce-be16ed3ce049",
           "selector": ".card-block",
           "profile": {
             "name": {
