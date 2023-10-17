@@ -29,13 +29,8 @@ struct WaitlistRootView: View {
             case .notOnWaitlist, .joiningWaitlist:
                 JoinWaitlistView(viewData: NetworkProtectionJoinWaitlistViewData())
             case .joinedWaitlist(let state):
-                if state == .notificationAllowed {
-                    JoinedWaitlistView(viewData: NetworkProtectionJoinedWaitlistViewData(),
-                                       notificationsAllowed: true)
-                } else {
-                    JoinedWaitlistView(viewData: NetworkProtectionJoinedWaitlistViewData(),
-                                       notificationsAllowed: false)
-                }
+                JoinedWaitlistView(viewData: NetworkProtectionJoinedWaitlistViewData(),
+                                   notificationsAllowed: state == .notificationAllowed)
             case .invited:
                 InvitedToWaitlistView(viewData: NetworkProtectionInvitedToWaitlistViewData())
             case .termsAndConditions:
