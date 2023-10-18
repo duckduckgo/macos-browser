@@ -57,7 +57,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         // Comment this line 👇
 //        webView?.loadHTMLString(debugPage, baseURL: nil)
         // Uncomment this line and add your dev URL 👇
-        webView?.load(URL(string: "https://bhall.duckduckgo.com/data-broker-protection")!)
+        webView?.load(URL(string: "https://bhall.duckduckgo.com/dbp")!)
     }
 
 }
