@@ -51,7 +51,6 @@ final class DBPHomeViewController: NSViewController {
 
         return DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
                                            dataManager: dataBrokerProtectionManager.dataManager,
-                                           notificationCenter: NotificationCenter.default,
                                            privacyConfig: privacyConfigurationManager,
                                            prefs: prefs)
     }()
