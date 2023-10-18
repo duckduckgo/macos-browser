@@ -19,6 +19,7 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import PixelKit
 
 final class DataBrokerProtectionStageDurationCalculator {
 
@@ -128,9 +129,38 @@ public enum DataBrokerProtectionPixels: Equatable {
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double)
 }
 
-public extension DataBrokerProtectionPixels {
+extension DataBrokerProtectionPixels: PixelKitEvent {
+    public var name: String {
+        switch self {
+        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
+            // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
+            // Stage Pixels
+        case .optOutStart: return "dbp_macos_optout_stage_start"
+        case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"
+        case .optOutCaptchaParse: return "dbp_macos_optout_stage_captcha-parse"
+        case .optOutCaptchaSend: return "dbp_macos_optout_stage_captcha-send"
+        case .optOutCaptchaSolve: return "dbp_macos_optout_stage_captcha-solve"
+        case .optOutSubmit: return "dbp_macos_optout_stage_submit"
+        case .optOutEmailReceive: return "dbp_macos_optout_stage_email-receive"
+        case .optOutEmailConfirm: return "dbp_macos_optout_stage_email-confirm"
+        case .optOutValidate: return "dbp_macos_optout_stage_validate"
+        case .optOutFinish: return "dbp_macos_optout_stage_finish"
 
-    var params: [String: String] {
+            // Process Pixels
+        case .optOutSubmitSuccess: return "dbp_macos_optout_process_submit-success"
+        case .optOutSuccess: return "dbp_macos_optout_process_success"
+        case .optOutFailure: return "dbp_macos_optout_process_failure"
+
+            // Debug Pixels
+        case .error: return "data_broker_error"
+        }
+    }
+
+    public var params: [String: String]? {
+        parameters
+    }
+
+    public var parameters: [String: String]? {
         switch self {
         case .error(let error, let dataBroker):
             if case let .actionFailed(actionID, message) = error {

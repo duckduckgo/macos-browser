@@ -58,39 +58,12 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func mapToPixelEvent(_ dbpPixel: DataBrokerProtectionPixels) -> Pixel.Event {
         switch dbpPixel {
         case .error(let error, _):
-            return .debug(event: .dataBrokerProtectionError, error: error)
-        case .parentChildMatches:
-            return .parentChildMatches
-        case .optOutStart:
-            return .optOutStart
-        case .optOutEmailGenerate:
-            return .optOutEmailGenerate
-        case .optOutCaptchaParse:
-            return .optOutCaptchaParse
-        case .optOutCaptchaSend:
-            return .optOutCaptchaSend
-        case .optOutCaptchaSolve:
-            return .optOutCaptchaSolve
-        case .optOutSubmit:
-            return .optOutSubmit
-        case .optOutEmailReceive:
-            return .optOutEmailReceive
-        case .optOutEmailConfirm:
-            return .optOutEmailConfirm
-        case .optOutValidate:
-            return .optOutValidate
-        case .optOutFinish:
-            return .optOutFinish
-        case .optOutSubmitSuccess:
-            return .optOutSubmitSuccess
-        case .optOutSuccess:
-            return .optOutSuccess
-        case .optOutFailure:
-            return .optOutFailure
+            return .debug(event: .pixelKitEvent(dbpPixel), error: error)
+        default:
+            return .pixelKitEvent(dbpPixel)
         }
     }
 
@@ -131,9 +104,9 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
 
             // Validate that the dbp-specific params are present in the fire event parameters
             XCTAssertTrue(
-                dbpEvent.params.allSatisfy({ key, value in
+                dbpEvent.params?.allSatisfy({ key, value in
                     parameters[key] == value
-                }))
+                }) ?? false)
 
             callbackExecuted.fulfill()
             onComplete(nil)
