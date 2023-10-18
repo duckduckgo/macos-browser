@@ -209,7 +209,7 @@ func checkGenerateAppcastRecency() -> Bool {
     }
 
     if modificationDate < releaseDate {
-        print("The generate_appcast utility is older than the last known release date. It might be outdated.")
+        print("Sparkle binary utilities are outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
         return false
     }
 
