@@ -111,16 +111,7 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     print("DMG Path: \(dmgPath)")
     print("Release Notes Path: \(releaseNotesPath)")
 
-    if !checkGenerateAppcastRecency() {
-        exit(1)
-    }
-
-    if !verifySigningKeys() {
-        exit(1)
-    }
-
-    // Download appcast and update files
-    AppcastDownloader().download()
+    performCommonChecksAndOperations()
 
     // Handle dmg file
     guard let dmgURL = handleDMGFile(dmgPath: dmgPath, updatesDirectoryURL: specificDir) else {
@@ -149,16 +140,7 @@ case .releaseToPublicChannel:
     print("Action: Release to public channel")
     print("Version: \(version)")
 
-    if !checkGenerateAppcastRecency() {
-        exit(1)
-    }
-
-    if !verifySigningKeys() {
-        exit(1)
-    }
-
-    // Download appcast and update files
-    AppcastDownloader().download()
+    performCommonChecksAndOperations()
 
     // Verify version
     if !verifyVersion(version: version, atDirectory: specificDir) {
@@ -180,6 +162,23 @@ case .releaseToPublicChannel:
     }
 
     runGenerateAppcast(withVersions: version, rolloutInterval: "43200")
+}
+
+// MARK: - Common
+
+func performCommonChecksAndOperations() {
+    // Check if generate_appcast is recent
+    if !checkGenerateAppcastRecency() {
+        exit(1)
+    }
+
+    // Verify signing keys
+    if !verifySigningKeys() {
+        exit(1)
+    }
+
+    // Download appcast and update files
+    AppcastDownloader().download()
 }
 
 func getDmgFilename(for version: String) -> String {
@@ -243,7 +242,6 @@ func verifySigningKeys() -> Bool {
         return false
     }
 }
-
 
 // MARK: - Downloading of Appcast and Files
 
