@@ -178,14 +178,14 @@ public class AccountManager {
                 }
 
                 storeAuthToken(token: authToken)
-                exchangeTokenAndRefreshEntitlements(with: authToken)
+                exchangeTokensAndRefreshEntitlements(with: authToken)
             }
         }
     }
 
-    public func exchangeTokenAndRefreshEntitlements(with authToken: String) {
+    public func exchangeTokensAndRefreshEntitlements(with authToken: String) {
         Task {
-            // Exchange short-lived token to a long-lived one
+            // Exchange short-lived auth token to a long-lived access token
             let accessToken: String
             switch await AuthService.getAccessToken(token: authToken) {
             case .success(let response):
