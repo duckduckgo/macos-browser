@@ -517,8 +517,29 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
         print("Error writing diff to file: \(error)")
     }
 
+    // Move files back to the original location
+    moveFiles(from: specificDir.appendingPathComponent("old_updates"), to: specificDir)
+    print("Old update files moved back to \(specificDir.path)")
+
     // Open specific directory in Finder
     shell("open", specificDir.path)
+}
+
+func moveFiles(from sourceDir: URL, to destinationDir: URL) {
+    let fileManager = FileManager.default
+    do {
+        let fileURLs = try fileManager.contentsOfDirectory(at: sourceDir, includingPropertiesForKeys: nil)
+        for fileURL in fileURLs {
+            let destinationURL = destinationDir.appendingPathComponent(fileURL.lastPathComponent)
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                try fileManager.removeItem(at: destinationURL)
+            }
+            try fileManager.moveItem(at: fileURL, to: destinationURL)
+        }
+    } catch {
+        print("Failed to move files from \(sourceDir.path) to \(destinationDir.path): \(error).")
+        exit(1)
+    }
 }
 
 @discardableResult func shell(_ command: String, _ arguments: String...) -> String {
