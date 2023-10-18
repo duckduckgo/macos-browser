@@ -117,7 +117,7 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let token = AccountManager().shortLivedToken ?? ""
+        let token = AccountManager().authToken ?? ""
         let subscription = Subscription(token: token)
         return subscription
     }

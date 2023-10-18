@@ -42,12 +42,12 @@ public class AccountManager {
         self.storage = storage
     }
 
-    public var token: String? {
+    public var authToken: String? {
         do {
-            return try storage.getToken()
+            return try storage.getAuthToken()
         } catch {
             if let error = error as? AccountKeychainAccessError {
-                delegate?.accountManagerKeychainAccessFailed(accessType: .getToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getAuthToken, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -55,13 +55,13 @@ public class AccountManager {
             return nil
         }
     }
-
-    public var shortLivedToken: String? {
+    
+    public var token: String? {
         do {
-            return try storage.getShortLivedToken()
+            return try storage.getToken()
         } catch {
             if let error = error as? AccountKeychainAccessError {
-                delegate?.accountManagerKeychainAccessFailed(accessType: .getShortLivedToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getToken, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -98,12 +98,12 @@ public class AccountManager {
         }
     }
 
-    public func storeShortLivedToken(token: String) {
+    public func storeAuthToken(token: String) {
         do {
-            try storage.store(shortLivedToken: token)
+            try storage.store(authToken: token)
         } catch {
             if let error = error as? AccountKeychainAccessError {
-                delegate?.accountManagerKeychainAccessFailed(accessType: .storeToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .storeAuthToken, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -168,38 +168,38 @@ public class AccountManager {
                 guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
 
                 // Do the store login to get short-lived token
-                let shortLivedToken: String
+                let authToken: String
                 switch await AuthService.storeLogin(signature: jwsRepresentation) {
                 case .success(let response):
-                    shortLivedToken = response.authToken
+                    authToken = response.authToken
                 case .failure(let error):
                     os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
                     return
                 }
 
-                storeShortLivedToken(token: shortLivedToken)
-                exchangeTokenAndRefreshEntitlements(with: shortLivedToken)
+                storeAuthToken(token: authToken)
+                exchangeTokenAndRefreshEntitlements(with: authToken)
             }
         }
     }
 
-    public func exchangeTokenAndRefreshEntitlements(with shortLivedToken: String) {
+    public func exchangeTokenAndRefreshEntitlements(with authToken: String) {
         Task {
             // Exchange short-lived token to a long-lived one
-            let longLivedToken: String
-            switch await AuthService.getAccessToken(token: shortLivedToken) {
+            let accessToken: String
+            switch await AuthService.getAccessToken(token: authToken) {
             case .success(let response):
-                longLivedToken = response.accessToken
+                accessToken = response.accessToken
             case .failure(let error):
                 os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
                 return
             }
 
             // Fetch entitlements and account details and store the data
-            switch await AuthService.validateToken(accessToken: longLivedToken) {
+            switch await AuthService.validateToken(accessToken: accessToken) {
             case .success(let response):
-                self.storeShortLivedToken(token: shortLivedToken)
-                self.storeAccount(token: longLivedToken,
+                self.storeAuthToken(token: authToken)
+                self.storeAccount(token: accessToken,
                                   email: response.account.email,
                                   externalID: response.account.externalID)
 

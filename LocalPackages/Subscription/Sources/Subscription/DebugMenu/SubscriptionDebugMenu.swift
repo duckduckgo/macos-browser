@@ -65,7 +65,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func showAccountDetails() {
         let title = accountManager.isSignedIn ? "Authenticated" : "Not Authenticated"
         let message = accountManager.isSignedIn ? ["Token: \(accountManager.token ?? "")",
-                                                   "Short-lived Token: \(accountManager.shortLivedToken ?? "")",
+                                                   "Short-lived Token: \(accountManager.authToken ?? "")",
                                                    "Email: \(accountManager.email ?? "")",
                                                    "ExternalID: \(accountManager.externalID ?? "")"].joined(separator: "\n") : nil
         showAlert(title: title, message: message)

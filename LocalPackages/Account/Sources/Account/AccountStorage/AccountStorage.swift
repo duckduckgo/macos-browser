@@ -19,10 +19,10 @@
 import Foundation
 
 public protocol AccountStorage: AnyObject {
+    func getAuthToken() throws -> String?
+    func store(authToken: String) throws
     func getToken() throws -> String?
     func store(token: String) throws
-    func getShortLivedToken() throws -> String?
-    func store(shortLivedToken: String) throws
     func getEmail() throws -> String?
     func store(email: String?) throws
     func getExternalID() throws -> String?

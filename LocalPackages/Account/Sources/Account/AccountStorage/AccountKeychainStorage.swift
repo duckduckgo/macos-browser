@@ -21,8 +21,8 @@ import Foundation
 public enum AccountKeychainAccessType: String {
     case getToken
     case storeToken
-    case getShortLivedToken
-    case storeShortLivedToken
+    case getAuthToken
+    case storeAuthToken
     case getEmail
     case storeEmail
     case getExternalID
@@ -52,20 +52,20 @@ public class AccountKeychainStorage: AccountStorage {
 
     public init() {}
 
+    public func getAuthToken() throws -> String? {
+        try Self.getString(forField: .authToken)
+    }
+
+    public func store(authToken: String) throws {
+        try Self.set(string: authToken, forField: .authToken)
+    }
+
     public func getToken() throws -> String? {
         try Self.getString(forField: .token)
     }
 
     public func store(token: String) throws {
         try Self.set(string: token, forField: .token)
-    }
-
-    public func getShortLivedToken() throws -> String? {
-        try Self.getString(forField: .shortLivedToken)
-    }
-
-    public func store(shortLivedToken: String) throws {
-        try Self.set(string: shortLivedToken, forField: .shortLivedToken)
     }
 
     public func getEmail() throws -> String? {
@@ -93,8 +93,8 @@ public class AccountKeychainStorage: AccountStorage {
     }
 
     public func clearAuthenticationState() throws {
+        try Self.deleteItem(forField: .authToken)
         try Self.deleteItem(forField: .token)
-        try Self.deleteItem(forField: .shortLivedToken)
         try Self.deleteItem(forField: .email)
         try Self.deleteItem(forField: .externalID)
     }
@@ -108,8 +108,8 @@ private extension AccountKeychainStorage {
      multiple accounts/tokens at the same time
     */
     enum AccountKeychainField: String, CaseIterable {
+        case authToken = "account.authToken"
         case token = "account.token"
-        case shortLivedToken = "account.shortLivedToken"
         case email = "account.email"
         case externalID = "account.external_id"
 
