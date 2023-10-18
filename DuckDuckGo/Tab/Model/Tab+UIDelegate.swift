@@ -54,19 +54,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @MainActor
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        Swift.print("Window Features")
-        Swift.print("===============")
-        Swift.print("toolbarsVisibility: \(String(reflecting: windowFeatures.toolbarsVisibility))")
-        Swift.print("menuBarVisibility: \(String(reflecting: windowFeatures.menuBarVisibility))")
-        Swift.print("statusBarVisibility: \(String(reflecting: windowFeatures.statusBarVisibility))")
-        Swift.print("allowsResizing: \(String(reflecting: windowFeatures.allowsResizing))")
-        Swift.print("origin: \(String(reflecting: windowFeatures.origin))")
-        Swift.print("size: \(String(reflecting: windowFeatures.size))")
-        Swift.print("width: \(String(reflecting: windowFeatures.width))")
-        Swift.print("height: \(String(reflecting: windowFeatures.height))")
-        Swift.print("x: \(String(reflecting: windowFeatures.x))")
-        Swift.print("y: \(String(reflecting: windowFeatures.y))")
-        Swift.print("===============")
 
         var isCalledSynchronously = true
         var synchronousResultWebView: WKWebView?
