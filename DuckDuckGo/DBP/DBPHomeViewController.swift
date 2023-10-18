@@ -127,3 +127,34 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
         NotificationCenter.default.post(name: .dbpDidClose, object: nil)
     }
 }
+
+public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    public init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .error(let error, _):
+                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+            case .parentChildMatches,
+                    .optOutStart,
+                    .optOutEmailGenerate,
+                    .optOutCaptchaParse,
+                    .optOutCaptchaSend,
+                    .optOutCaptchaSolve,
+                    .optOutSubmit,
+                    .optOutEmailReceive,
+                    .optOutEmailConfirm,
+                    .optOutValidate,
+                    .optOutFinish,
+                    .optOutSubmitSuccess,
+                    .optOutSuccess,
+                    .optOutFailure:
+                Pixel.fire(.pixelKitEvent(event))
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
+        fatalError("Use init()")
+    }
+}

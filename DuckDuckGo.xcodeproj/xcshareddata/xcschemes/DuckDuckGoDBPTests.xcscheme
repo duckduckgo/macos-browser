@@ -1,26 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1430"
+   LastUpgradeVersion = "1500"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "31929F7B2A4C4CFF0084EA89"
-               BuildableName = "DuckDuckGoDBP.app"
-               BlueprintName = "DuckDuckGo DBP"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
    </BuildAction>
    <TestAction
       buildConfiguration = "Debug"
@@ -34,7 +18,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7BB06BCD2AE01B2200869706"
+               BlueprintIdentifier = "7B96D0CE2ADFDA7E007E02C8"
                BuildableName = "DuckDuckGoDBPTests.xctest"
                BlueprintName = "DuckDuckGoDBPTests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
@@ -52,16 +36,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "31929F7B2A4C4CFF0084EA89"
-            BuildableName = "DuckDuckGoDBP.app"
-            BlueprintName = "DuckDuckGo DBP"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -69,16 +43,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "31929F7B2A4C4CFF0084EA89"
-            BuildableName = "DuckDuckGoDBP.app"
-            BlueprintName = "DuckDuckGo DBP"
-            ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

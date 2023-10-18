@@ -100,7 +100,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 }
 
-public enum DataBrokerProtectionPixels: Equatable, PixelKitEvent {
+public enum DataBrokerProtectionPixels: Equatable {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
         static let appVersionParamKey = "app_version"
@@ -127,6 +127,9 @@ public enum DataBrokerProtectionPixels: Equatable, PixelKitEvent {
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double)
+}
+
+extension DataBrokerProtectionPixels: PixelKitEvent {
 
     public var name: String {
         switch self {
@@ -154,7 +157,11 @@ public enum DataBrokerProtectionPixels: Equatable, PixelKitEvent {
         }
     }
 
-    public var parameters: [String : String]? {
+    public var params: [String: String]? {
+        parameters
+    }
+
+    public var parameters: [String: String]? {
         switch self {
         case .error(let error, let dataBroker):
             if case let .actionFailed(actionID, message) = error {

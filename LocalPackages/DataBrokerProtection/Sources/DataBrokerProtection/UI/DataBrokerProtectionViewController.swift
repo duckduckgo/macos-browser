@@ -200,17 +200,16 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
         let hostingController = NSHostingController(rootView: containerView)
         view = hostingController.view
-/*
-        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
-        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
-        view = webView!
+//        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
+//
+//        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
+//        view = webView!
 
         // FOR LOCAL WEB UI DEVELOPMENT:
         // Comment this line 👇
-        webView?.loadHTMLString(debugPage, baseURL: nil)
+//        webView?.loadHTMLString(debugPage, baseURL: nil)
         // Uncomment this line and add your dev URL 👇
 //        webView?.load(URL(string: "https://<your url>")!)
-        */
     }
 }

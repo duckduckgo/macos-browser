@@ -20,10 +20,16 @@ import Foundation
 import BrowserServicesKit
 import Bookmarks
 import Configuration
+import PixelKit
 
 extension Pixel {
 
     indirect enum Event {
+        /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
+        /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
+        /// nothing breaks in the migration towards `PixelKit`.
+        case pixelKitEvent(_ event: PixelKitEvent)
+
         case crash
 
         case brokenSiteReport
@@ -170,6 +176,10 @@ extension Pixel {
         case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
+            /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
+            /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
+            /// nothing breaks in the migration towards `PixelKit`.
+            case pixelKitEvent(_ event: PixelKitEvent)
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
 
@@ -323,6 +333,9 @@ extension Pixel.Event {
 
     var name: String {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.name
+
         case .crash:
             return "m_mac_crash"
 
@@ -489,6 +502,8 @@ extension Pixel.Event.Debug {
 
     var name: String {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.name
 
         case .assertionFailure:
             return "assertion_failure"

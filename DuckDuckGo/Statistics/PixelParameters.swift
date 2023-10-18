@@ -22,6 +22,9 @@ extension Pixel.Event {
 
     var parameters: [String: String]? {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.parameters
+
         case .debug(event: let debugEvent, error: let error):
 
             var params = error?.pixelParameters ?? [:]
