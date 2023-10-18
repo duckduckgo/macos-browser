@@ -128,7 +128,7 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
             return nil
         }
 
-        AccountManager().exchangeTokenAndRefreshEntitlements(with: subscriptionValues.token)
+        AccountManager().exchangeTokensAndRefreshEntitlements(with: subscriptionValues.token)
         return nil
     }
 

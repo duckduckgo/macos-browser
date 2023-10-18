@@ -36,15 +36,26 @@ public final class DebugPurchaseModel: ObservableObject {
     func purchase(_ product: Product) {
         print("Attempting purchase: \(product.displayName)")
 
-        if let externalID = AccountManager().externalID {
-            print("ExternalID: \(externalID)")
-            manager.purchase(product, customUUID: externalID)
-        } else {
-            Task {
+        Task {
+            guard let token = AccountManager().accessToken else { return }
+
+            var externalID: String?
+
+            switch await AuthService.validateToken(accessToken: token) {
+            case .success(let response):
+                externalID = response.account.externalID
+            case .failure(let error):
+                print("Error: \(error)")
+                return
+            }
+
+            if let externalID {
+                manager.purchase(product, customUUID: externalID)
+            } else {
                 switch await AuthService.createAccount() {
                 case .success(let response):
                     manager.purchase(product, customUUID: response.externalID)
-                    AccountManager().exchangeTokenAndRefreshEntitlements(with: response.authToken)
+                    AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
                 case .failure(let error):
                     print("Error: \(error)")
                     return

@@ -53,7 +53,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func simulateSubscriptionActiveState() {
-        accountManager.storeAccount(token: "fake-token", email: "fake@email.com", externalID: "fake-externalID")
+        accountManager.storeAccount(token: "fake-token", email: "fake@email.com")
     }
 
     @objc
@@ -66,8 +66,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         let title = accountManager.isSignedIn ? "Authenticated" : "Not Authenticated"
         let message = accountManager.isSignedIn ? ["AuthToken: \(accountManager.authToken ?? "")",
                                                    "AccessToken: \(accountManager.accessToken ?? "")",
-                                                   "Email: \(accountManager.email ?? "")",
-                                                   "ExternalID: \(accountManager.externalID ?? "")"].joined(separator: "\n") : nil
+                                                   "Email: \(accountManager.email ?? "")"].joined(separator: "\n") : nil
         showAlert(title: title, message: message)
     }
 

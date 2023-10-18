@@ -144,7 +144,7 @@ public final class PurchaseManager: ObservableObject {
 
     @MainActor
     public static func mostRecentTransaction() async -> String? {
-        print(" -- [PurchaseManager] updatePurchasedProducts()")
+        print(" -- [PurchaseManager] mostRecentTransaction()")
 
         var transactions: [VerificationResult<Transaction>] = []
 

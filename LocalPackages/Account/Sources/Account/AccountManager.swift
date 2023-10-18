@@ -84,20 +84,6 @@ public class AccountManager {
         }
     }
 
-    public var externalID: String? {
-        do {
-            return try storage.getExternalID()
-        } catch {
-            if let error = error as? AccountKeychainAccessError {
-                delegate?.accountManagerKeychainAccessFailed(accessType: .getExternalID, error: error)
-            } else {
-                assertionFailure("Expected AccountKeychainAccessError")
-            }
-
-            return nil
-        }
-    }
-
     public func storeAuthToken(token: String) {
         do {
             try storage.store(authToken: token)
@@ -110,8 +96,8 @@ public class AccountManager {
         }
     }
 
-    public func storeAccount(token: String, email: String?, externalID: String?) {
-        os_log("AccountManager: storeAccount token: %@ email: %@ externalID:%@", log: .account, token, email ?? "nil", externalID ?? "nil")
+    public func storeAccount(token: String, email: String?) {
+        os_log("AccountManager: storeAccount token: %@ email: %@ externalID:%@", log: .account, token, email ?? "nil")
         do {
             try storage.store(accessToken: token)
         } catch {
@@ -127,16 +113,6 @@ public class AccountManager {
         } catch {
             if let error = error as? AccountKeychainAccessError {
                 delegate?.accountManagerKeychainAccessFailed(accessType: .storeEmail, error: error)
-            } else {
-                assertionFailure("Expected AccountKeychainAccessError")
-            }
-        }
-
-        do {
-            try storage.store(externalID: externalID)
-        } catch {
-            if let error = error as? AccountKeychainAccessError {
-                delegate?.accountManagerKeychainAccessFailed(accessType: .storeExternalID, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -165,7 +141,10 @@ public class AccountManager {
         if #available(macOS 12.0, *) {
             Task {
                 // Fetch most recent purchase
-                guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
+                guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else {
+                    os_log("No transactions", log: .error)
+                    return
+                }
 
                 // Do the store login to get short-lived token
                 let authToken: String
@@ -200,8 +179,7 @@ public class AccountManager {
             case .success(let response):
                 self.storeAuthToken(token: authToken)
                 self.storeAccount(token: accessToken,
-                                  email: response.account.email,
-                                  externalID: response.account.externalID)
+                                  email: response.account.email)
 
             case .failure(let error):
                 os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
