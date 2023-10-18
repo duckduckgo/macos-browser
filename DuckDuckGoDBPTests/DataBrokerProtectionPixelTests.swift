@@ -31,23 +31,23 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         func set(_ value: Int, forKey: String, completionHandler: ((Error?) -> Void)?) {
             completionHandler?(nil)
         }
-        
+
         func set(_ value: String, forKey: String, completionHandler: ((Error?) -> Void)?) {
             completionHandler?(nil)
         }
-        
+
         func set(_ value: Double, forKey: String, completionHandler: ((Error?) -> Void)?) {
             completionHandler?(nil)
         }
-        
+
         func value(forKey key: String) -> Double? {
             nil
         }
-        
+
         func value(forKey key: String) -> Int? {
             nil
         }
-        
+
         func value(forKey key: String) -> String? {
             nil
         }
@@ -57,12 +57,11 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         }
     }
 
-    /// This method implements basic validation logic that can be used to test several events.
+    /// This method implements validation logic that can be used to test several events.
     ///
-    func basicPixelValidation(for event: Pixel.Event) {
+    func validatePixel(for inEvent: Pixel.Event) {
         let inAppVersion = "1.0.1"
-        let inEvent: Pixel.Event = .optOutStart
-        let inUserAgent = "ddg_mac/\(inAppVersion) (com.duckduckgo.macos.browser.dbp.debug"
+        let inUserAgent = "ddg_mac/\(inAppVersion) (com.duckduckgo.macos.browser.dbp.debug; macOS Version 14.0 (Build 23A344))"
 
         // We want to make sure the callback is executed exactly once to validate
         // all of the fire parameters
@@ -80,7 +79,14 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
             // Validate that the event is the one we expect
             XCTAssertEqual(event, inEvent)
 
-            PixelRequestValidator().validateBasicTestPixelRequest(inAppVersion: inAppVersion, inUserAgent: inUserAgent, requestParameters: parameters, requestHeaders: headers.httpHeaders)
+            let pixelRequestValidator = PixelRequestValidator()
+            pixelRequestValidator.validateBasicPixelParams(expectedAppVersion: inAppVersion, expectedUserAgent: inUserAgent, requestParameters: parameters, requestHeaders: headers.httpHeaders)
+
+            if case .debug(let wrappedEvent, let error) = inEvent {
+                XCTAssertEqual("m_mac_debug_\(wrappedEvent.name)", inEvent.name)
+
+                pixelRequestValidator.validateDebugPixelParams(expectedError: error, requestParameters: parameters)
+            }
 
             callbackExecuted.fulfill()
             onComplete(nil)
@@ -92,7 +98,12 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
     }
 
     func testBasicPixelValidation() {
+        enum TestError: Error {
+            case testError
+        }
+
         let eventsToTest: [Pixel.Event] = [
+            .debug(event: .dataBrokerProtectionError, error: TestError.testError),
             .parentChildMatches,
             .optOutStart,
             .optOutEmailGenerate,
@@ -110,7 +121,7 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         ]
 
         for event in eventsToTest {
-            basicPixelValidation(for: event)
+            validatePixel(for: event)
         }
     }
 }
