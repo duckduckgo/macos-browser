@@ -54,6 +54,19 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @MainActor
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        Swift.print("Window Features")
+        Swift.print("===============")
+        Swift.print("toolbarsVisibility: \(String(reflecting: windowFeatures.toolbarsVisibility))")
+        Swift.print("menuBarVisibility: \(String(reflecting: windowFeatures.menuBarVisibility))")
+        Swift.print("statusBarVisibility: \(String(reflecting: windowFeatures.statusBarVisibility))")
+        Swift.print("allowsResizing: \(String(reflecting: windowFeatures.allowsResizing))")
+        Swift.print("origin: \(String(reflecting: windowFeatures.origin))")
+        Swift.print("size: \(String(reflecting: windowFeatures.size))")
+        Swift.print("width: \(String(reflecting: windowFeatures.width))")
+        Swift.print("height: \(String(reflecting: windowFeatures.height))")
+        Swift.print("x: \(String(reflecting: windowFeatures.x))")
+        Swift.print("y: \(String(reflecting: windowFeatures.y))")
+        Swift.print("===============")
 
         var isCalledSynchronously = true
         var synchronousResultWebView: WKWebView?
@@ -78,7 +91,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                                             windowFeatures: WKWindowFeatures,
                                             completionHandler: @escaping (WKWebView?) -> Void) {
 
-        switch newWindowPolicy(for: navigationAction) {
+        switch newWindowPolicy(for: navigationAction, windowFeatures: windowFeatures) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
             // proceed to web view creation
@@ -123,7 +136,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         }
     }
 
-    private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
+    private func newWindowPolicy(for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> NavigationDecision? {
         if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
             return newWindowPolicy
         }
@@ -132,6 +145,13 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         for handler in self.newWindowPolicyDecisionMakers ?? [] {
             guard let newWindowPolicy = handler.decideNewWindowPolicy(for: navigationAction) else { continue }
             return newWindowPolicy
+        }
+
+        if #available(macOS 14.1, *) {
+            if windowFeatures.statusBarVisibility != nil || windowFeatures.menuBarVisibility != nil {
+                return nil
+            }
+            return .allow(.tab(selected: true, burner: burnerMode.isBurner))
         }
 
         // allow popups opened from an empty window console
