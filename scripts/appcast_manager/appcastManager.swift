@@ -111,6 +111,11 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     print("DMG Path: \(dmgPath)")
     print("Release Notes Path: \(releaseNotesPath)")
 
+    if !checkGenerateAppcastRecency() {
+        print("generate_appcast utility might be outdated. Please check and update if necessary.")
+        exit(1)
+    }
+
     // Download appcast and update files
     AppcastDownloader().download()
 
@@ -141,6 +146,11 @@ case .releaseToPublicChannel:
     print("Action: Release to public channel")
     print("Version: \(version)")
 
+    if !checkGenerateAppcastRecency() {
+        print("generate_appcast utility might be outdated. Please check and update if necessary.")
+        exit(1)
+    }
+
     // Download appcast and update files
     AppcastDownloader().download()
 
@@ -169,6 +179,51 @@ case .releaseToPublicChannel:
 func getDmgFilename(for version: String) -> String {
     return "duckduckgo-\(version).dmg"
 }
+
+// MARK: - Checking the recency of Sparkle tools
+
+func checkGenerateAppcastRecency() -> Bool {
+    // Get the path to the binary using the shell function
+    let binaryPath = shell("which", "generate_appcast").trimmingCharacters(in: .whitespacesAndNewlines)
+
+    if binaryPath.isEmpty {
+        print("Failed to find the path for generate_appcast.")
+        return false
+    }
+
+    guard let binaryAttributes = try? FileManager.default.attributesOfItem(atPath: binaryPath),
+          let modificationDate = binaryAttributes[.modificationDate] as? Date else {
+        print("Failed to get the modification date for generate_appcast.")
+        return false
+    }
+
+    // Get the current script's path and navigate to the root folder to get the release date file
+    let currentScriptPath = URL(fileURLWithPath: #file)
+    let rootDirectory = currentScriptPath.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    let releaseDateFilePath = rootDirectory.appendingPathComponent(".generate_appcast_release_date")
+
+    guard let releaseDateString = try? String(contentsOf: releaseDateFilePath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
+          let releaseDate = DateFormatter.yyyyMMdd.date(from: releaseDateString) else {
+        print("Failed to get the release date from .generate_appcast_release_date.")
+        return false
+    }
+
+    if modificationDate < releaseDate {
+        print("The generate_appcast utility is older than the last known release date. It might be outdated.")
+        return false
+    }
+
+    return true
+}
+
+extension DateFormatter {
+    static let yyyyMMdd: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+}
+
 
 // MARK: - Downloading of Appcast and Files
 
