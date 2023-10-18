@@ -60,17 +60,33 @@ final class SyncBookmarksAdapter {
         }
     }
 
+    @MainActor
     func setUpProviderIfNeeded(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
             return
         }
 
+        let faviconsFetcher = BookmarksFaviconsFetcher(
+            database: database,
+            metadataStore: BookmarkFaviconsMetadataStorage(applicationSupportURL: .sandboxApplicationSupportURL),
+            fetcher: FaviconFetcher(),
+            store: FaviconManager.shared
+        )
+
         let provider = BookmarksProvider(
             database: database,
-            metadataStore: metadataStore) { [weak self] in
+            metadataStore: metadataStore,
+            syncDidUpdateData: { [weak self] changes in
+                Task {
+                    try await faviconsFetcher.startFetching(
+                        with: changes[BookmarksProvider.ChangesKey.modified] ?? [],
+                        deletedBookmarkIDs: changes[BookmarksProvider.ChangesKey.deleted] ?? []
+                    )
+                }
                 LocalBookmarkManager.shared.loadBookmarks()
                 self?.isSyncBookmarksPaused = false
             }
+        )
 
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in

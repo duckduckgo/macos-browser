@@ -336,3 +336,60 @@ final class FaviconManager: FaviconManagement {
         }
     }
 }
+
+import Bookmarks
+
+extension FaviconManager: Bookmarks.FaviconStoring {
+    func handleFaviconLinks(_ links: Bookmarks.BookmarkFaviconLinks) async throws {
+        let faviconLinks: [FaviconUserScript.FaviconLink] = links.links.map { link in
+//            var href = link.href
+//            if var components = URLComponents(string: href) {
+//                var updated = false
+//                if components.host == nil {
+//                    components.host = links.documentURL.host
+//                    updated = true
+//                }
+//                if components.scheme == nil {
+//                    components.scheme = "https" // links.documentURL.scheme
+//                    updated = true
+//                }
+//                if updated, let url = components.url {
+//                    href = url.absoluteString
+//                }
+//            }
+            return FaviconUserScript.FaviconLink(href: link.href, rel: link.rel)
+        }
+
+        print("Handling favicon links for \(links.documentURL)")
+        handleFaviconLinks(faviconLinks, documentUrl: links.documentURL, completion: { _ in })
+    }
+
+    func storeFavicon(_ image: NSImage, for documentURL: URL) throws {
+
+        Task {
+            await self.awaitFaviconsLoaded()
+
+            let favicon = Favicon(identifier: UUID(),
+                                  url: documentURL.appendingPathComponent(UUID().uuidString),
+                                  image: image,
+                                  relationString: "favicon",
+                                  documentUrl: documentURL,
+                                  dateCreated: Date())
+
+            // Fetch favicons if needed
+            let newFavicons = [favicon]
+
+            // Pick most suitable favicons
+            let weekAgo = Date.weekAgo
+
+            let cachedFavicons = self.imageCache.getFavicons(with: [documentURL])?
+                .filter { favicon in
+                    favicon.dateCreated > weekAgo
+                }
+
+            // Insert new favicons to cache
+            self.imageCache.insert(newFavicons)
+            self.handleFaviconReferenceCacheInsertion(documentURL: documentURL, cachedFavicons: cachedFavicons ?? [], newFavicons: newFavicons)
+        }
+    }
+}
