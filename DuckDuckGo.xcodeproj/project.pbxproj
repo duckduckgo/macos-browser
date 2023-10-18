@@ -2906,6 +2906,8 @@
 		7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
 		7BE146082A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
+		7BF1A9D82AE054D300FCA683 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7BF1A9D72AE054D300FCA683 /* Info.plist */; };
+		7BF1A9DC2AE0551C00FCA683 /* DBPUnitTests.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */; };
 		7BF7705F2AD6C999001C9182 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BF7705E2AD6C999001C9182 /* PixelKit */; };
 		7BF770612AD6CA06001C9182 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BF770602AD6CA06001C9182 /* PixelKit */; };
 		7BF770632AD6CA0E001C9182 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BF770622AD6CA0E001C9182 /* PixelKit */; };
@@ -4320,6 +4322,8 @@
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
 		7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
 		7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugMenu.swift; sourceTree = "<group>"; };
+		7BF1A9D72AE054D300FCA683 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DBPUnitTests.xcconfig; sourceTree = "<group>"; };
 		7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionWaitlistMenu.swift; sourceTree = "<group>"; };
 		7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionWaitlist.swift"; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
@@ -5462,6 +5466,7 @@
 			children = (
 				373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */,
 				378B588D295CF447002C0CC0 /* UnitTests.xcconfig */,
+				7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */,
 				378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */,
 				37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */,
 				37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */,
@@ -6486,6 +6491,7 @@
 		7B96D0D02ADFDA7F007E02C8 /* DuckDuckGoDBPTests */ = {
 			isa = PBXGroup;
 			children = (
+				7BF1A9D72AE054D300FCA683 /* Info.plist */,
 				7B96D0DB2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift */,
 			);
 			path = DuckDuckGoDBPTests;
@@ -9404,6 +9410,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7BF1A9D82AE054D300FCA683 /* Info.plist in Resources */,
+				7BF1A9DC2AE0551C00FCA683 /* DBPUnitTests.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13848,6 +13856,7 @@
 		};
 		7B96D0D62ADFDA7F007E02C8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -13881,12 +13890,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -13909,19 +13915,16 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DuckDuckGoDBPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGoDBP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGoDBP";
 			};
 			name = Debug;
 		};
 		7B96D0D72ADFDA7F007E02C8 /* CI */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -13955,9 +13958,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -13976,18 +13977,15 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DuckDuckGoDBPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGoDBP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGoDBP";
 			};
 			name = CI;
 		};
 		7B96D0D82ADFDA7F007E02C8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -14021,9 +14019,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -14042,18 +14038,15 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DuckDuckGoDBPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGoDBP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGoDBP";
 			};
 			name = Release;
 		};
 		7B96D0D92ADFDA7F007E02C8 /* Review */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -14087,9 +14080,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -14108,13 +14099,9 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.DuckDuckGoDBPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DuckDuckGoDBP.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DuckDuckGoDBP";
 			};
 			name = Review;
 		};
