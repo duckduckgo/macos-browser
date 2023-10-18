@@ -350,8 +350,11 @@ extension FaviconManager: Bookmarks.FaviconStoring {
 
             await self.awaitFaviconsLoaded()
 
+            let faviconIdentifier = "sync-favicon.ico"
+            let faviconURL = documentURL.appendingPathComponent(faviconIdentifier)
+
             let favicon = Favicon(identifier: UUID(),
-                                  url: documentURL,
+                                  url: faviconURL,
                                   image: image,
                                   relationString: "favicon",
                                   documentUrl: documentURL,
@@ -363,7 +366,7 @@ extension FaviconManager: Bookmarks.FaviconStoring {
             // Pick most suitable favicons
             let weekAgo = Date.weekAgo
 
-            let cachedFavicons = self.imageCache.getFavicons(with: [documentURL])?
+            let cachedFavicons = self.imageCache.getFavicons(with: [faviconURL])?
                 .filter { favicon in
                     favicon.dateCreated > weekAgo
                 }
