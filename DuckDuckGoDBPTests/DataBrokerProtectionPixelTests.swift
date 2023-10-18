@@ -58,7 +58,6 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     func mapToPixelEvent(_ dbpPixel: DataBrokerProtectionPixels) -> Pixel.Event {
         switch dbpPixel {
         case .error(let error, _):
