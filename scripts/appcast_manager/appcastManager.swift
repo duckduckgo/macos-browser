@@ -112,7 +112,10 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     print("Release Notes Path: \(releaseNotesPath)")
 
     if !checkGenerateAppcastRecency() {
-        print("generate_appcast utility might be outdated. Please check and update if necessary.")
+        exit(1)
+    }
+
+    if !verifySigningKeys() {
         exit(1)
     }
 
@@ -147,7 +150,10 @@ case .releaseToPublicChannel:
     print("Version: \(version)")
 
     if !checkGenerateAppcastRecency() {
-        print("generate_appcast utility might be outdated. Please check and update if necessary.")
+        exit(1)
+    }
+
+    if !verifySigningKeys() {
         exit(1)
     }
 
@@ -222,6 +228,20 @@ extension DateFormatter {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
+}
+
+// MARK: - Verification of the signing keys
+
+func verifySigningKeys() -> Bool {
+    let publicKeyOutput = shell("generate_keys", "-p").trimmingCharacters(in: .whitespacesAndNewlines)
+    let desiredPublicKey = "ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo="
+
+    if publicKeyOutput == desiredPublicKey {
+        return true
+    } else {
+        print("Incorrect or missing public signing key. Please ensure you have the correct keys installed.")
+        return false
+    }
 }
 
 
