@@ -2878,6 +2878,7 @@
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
+		7B20D5C62ADFEC6E0053C42A /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 7B20D5C52ADFEC6E0053C42A /* PixelKitTestingUtilities */; };
 		7B2DDCF82A93A8BB0039D884 /* NetworkProtectionAppEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */; };
 		7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7B2DDCFB2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
@@ -5078,6 +5079,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B20D5C62ADFEC6E0053C42A /* PixelKitTestingUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8898,9 +8900,13 @@
 			buildRules = (
 			);
 			dependencies = (
+				7B20D5C82ADFEC730053C42A /* PBXTargetDependency */,
 				7B96D0D42ADFDA7F007E02C8 /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoDBPTests;
+			packageProductDependencies = (
+				7B20D5C52ADFEC6E0053C42A /* PixelKitTestingUtilities */,
+			);
 			productName = DuckDuckGoDBPTests;
 			productReference = 7B96D0CF2ADFDA7E007E02C8 /* DuckDuckGoDBPTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -13338,6 +13344,10 @@
 			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
 			targetProxy = 4B9579282AC7AE700062CA31 /* PBXContainerItemProxy */;
 		};
+		7B20D5C82ADFEC730053C42A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 7B20D5C72ADFEC730053C42A /* PixelKitTestingUtilities */;
+		};
 		7B4CE8E026F02108009134B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
@@ -14972,6 +14982,14 @@
 		4B9579422AC7AE700062CA31 /* Purchase */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Purchase;
+		};
+		7B20D5C52ADFEC6E0053C42A /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
+		};
+		7B20D5C72ADFEC730053C42A /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
 		};
 		7BF7705E2AD6C999001C9182 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;

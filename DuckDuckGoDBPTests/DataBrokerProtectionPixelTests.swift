@@ -19,6 +19,7 @@
 import Networking
 import Foundation
 import PixelKit
+import PixelKitTestingUtilities
 import XCTest
 @testable import DuckDuckGo_DBP
 
@@ -74,23 +75,15 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
 
         let storeMock = PixelDataStoreMock()
 
-        let pixel = Pixel(appVersion: inAppVersion, store: storeMock) { (event, parameters, characterSet, headers, onComplete) in
+        let pixel = Pixel(appVersion: inAppVersion, store: storeMock) { (event, parameters, _, headers, onComplete) in
 
             // Validate that the event is the one we expect
             XCTAssertEqual(event, inEvent)
 
-            XCTAssertEqual(parameters.count, 2)
-            XCTAssertEqual(parameters[PixelKit.Parameters.test], "1")
-            XCTAssertEqual(parameters[PixelKit.Parameters.appVersion], inAppVersion)
-
-            XCTAssertNil(characterSet)
-
-            XCTAssertEqual(headers.httpHeaders[PixelKit.Header.userAgent], inUserAgent)
-            XCTAssertEqual(headers.httpHeaders[PixelKit.Header.acceptEncoding], "gzip;q=1.0, compress;q=0.5")
-            XCTAssertNotNil(headers.httpHeaders[PixelKit.Header.acceptLanguage])
-            XCTAssertNotNil(headers.httpHeaders[PixelKit.Header.moreInfo], PixelKit.duckDuckGoMorePrivacyInfo.absoluteString)
+            PixelRequestValidator().validateBasicTestPixelRequest(inAppVersion: inAppVersion, inUserAgent: inUserAgent, requestParameters: parameters, requestHeaders: headers.httpHeaders)
 
             callbackExecuted.fulfill()
+            onComplete(nil)
         }
 
         pixel.fire(inEvent, withAdditionalParameters: inEvent.parameters)
