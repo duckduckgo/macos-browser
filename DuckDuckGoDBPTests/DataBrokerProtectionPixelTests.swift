@@ -58,9 +58,18 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         }
     }
 
+    func mapToPixelEvent(_ dbpPixel: DataBrokerProtectionPixels) -> Pixel.Event {
+        switch dbpPixel {
+        case .error(let error, _):
+            return .debug(event: .pixelKitEvent(dbpPixel), error: error)
+        default:
+            return .pixelKitEvent(dbpPixel)
+        }
+    }
+
     /// This method implements validation logic that can be used to test several events.
     ///
-    func validatePixel(for inEvent: PixelKitEvent) {
+    func validatePixel(for dbpEvent: DataBrokerProtectionPixels) {
         let inAppVersion = "1.0.1"
         let inUserAgent = "ddg_mac/\(inAppVersion) (com.duckduckgo.macos.browser.dbp.debug; macOS Version 14.0 (Build 23A344))"
 
@@ -75,64 +84,58 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
 
         let storeMock = PixelDataStoreMock()
 
+        let inEvent = mapToPixelEvent(dbpEvent)
+
         let pixel = Pixel(appVersion: inAppVersion, store: storeMock) { (event, parameters, _, headers, onComplete) in
 
             // Validate that the event is the one we expect
-            XCTAssertEqual(event.name, inEvent.name)
+            XCTAssertEqual(event, inEvent)
 
+            // Validate that the basic params are present
             let pixelRequestValidator = PixelRequestValidator()
             pixelRequestValidator.validateBasicPixelParams(expectedAppVersion: inAppVersion, expectedUserAgent: inUserAgent, requestParameters: parameters, requestHeaders: headers.httpHeaders)
 
+            // Validate that the debug params are present
             if case .debug(let wrappedEvent, let error) = inEvent {
                 XCTAssertEqual("m_mac_debug_\(wrappedEvent.name)", inEvent.name)
 
                 pixelRequestValidator.validateDebugPixelParams(expectedError: error, requestParameters: parameters)
             }
 
+            // Validate that the dbp-specific params are present in the fire event parameters
+            XCTAssertTrue(
+                dbpEvent.params?.allSatisfy({ key, value in
+                    parameters[key] == value
+                }) ?? false)
+
             callbackExecuted.fulfill()
             onComplete(nil)
         }
 
-        pixel.fire(inEvent, withAdditionalParameters: inEvent.parameters)
+        pixel.fire(inEvent, withAdditionalParameters: dbpEvent.params)
 
         waitForExpectations(timeout: 0.1)
     }
 
     func testBasicPixelValidation() {
-        enum TestError: Error {
-            case testError
-        }
+        let inDataBroker = "inDataBroker"
 
         let eventsToTest: [DataBrokerProtectionPixels] = [
-            DebugEvent(event: .dataBrokerProtectionError, error: TestError.testError),
-            .parentChildMatches(parent: "", child: "", value: 0),
-            .optOutStart(dataBroker: "", attemptId: UUID()),
-            .optOutEmailGenerate(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutCaptchaParse(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutCaptchaSend(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutCaptchaSolve(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutSubmit(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutEmailReceive(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutEmailConfirm(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutValidate(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutFinish(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutSubmitSuccess(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutSuccess(dataBroker: "", attemptId: UUID(), duration: 0),
-            .optOutFailure(dataBroker: "", attemptId: UUID(), duration: 0)
-        ]
-
-        for event in eventsToTest {
-            validatePixel(for: event)
-        }
-    }
-
-    func testBasicPixelValidation() {
-        enum TestError: Error {
-            case testError
-        }
-
-        let eventsToTest: [DebugEvent] = [
-            DebugEvent(event: DataBrokerProtectionPixels.error(error: TestError.error, dataBroker: ""))
+            .error(error: DataBrokerProtectionError.cancelled, dataBroker: inDataBroker),
+            .parentChildMatches(parent: "a", child: "b", value: 5),
+            .optOutStart(dataBroker: "a", attemptId: UUID()),
+            .optOutEmailGenerate(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutCaptchaParse(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutCaptchaSend(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutCaptchaSolve(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutSubmit(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutEmailReceive(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutEmailConfirm(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutValidate(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutFinish(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutSubmitSuccess(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutSuccess(dataBroker: "a", attemptId: UUID(), duration: 5),
+            .optOutFailure(dataBroker: "a", attemptId: UUID(), duration: 5)
         ]
 
         for event in eventsToTest {
