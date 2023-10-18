@@ -208,7 +208,25 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
 
     public init() {
         super.init { event, _, _, _ in
-            PixelKit.fire(event, frequency: .dailyAndContinuous)
+            switch event {
+            case .error(let error, _):
+                PixelKit.fire(PixelKitEvent.debug(event: event, error: error))
+            case .parentChildMatches,
+                    .optOutStart,
+                    .optOutEmailGenerate,
+                    .optOutCaptchaParse,
+                    .optOutCaptchaSend,
+                    .optOutCaptchaSolve,
+                    .optOutSubmit,
+                    .optOutEmailReceive,
+                    .optOutEmailConfirm,
+                    .optOutValidate,
+                    .optOutFinish,
+                    .optOutSubmitSuccess,
+                    .optOutSuccess,
+                    .optOutFailure:
+                PixelKit.fire(event)
+            }
         }
     }
 
