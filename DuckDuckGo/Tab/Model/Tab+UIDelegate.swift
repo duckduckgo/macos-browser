@@ -134,6 +134,8 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             return newWindowPolicy
         }
 
+        // This is a temporary fix for macOS 14.1 WKWindowFeatures being empty when opening a new regular tab
+        // Instead of defaulting to no policy, we default to tab policy, and allow popups in some limited scenarios.
         if #available(macOS 14.1, *) {
             if windowFeatures.statusBarVisibility != nil || windowFeatures.menuBarVisibility != nil {
                 return nil
