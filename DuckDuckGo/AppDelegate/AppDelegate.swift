@@ -28,7 +28,6 @@ import DDGSync
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
-import PixelKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
