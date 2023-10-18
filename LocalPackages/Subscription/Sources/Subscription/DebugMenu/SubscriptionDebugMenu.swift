@@ -64,7 +64,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func showAccountDetails() {
         let title = accountManager.isSignedIn ? "Authenticated" : "Not Authenticated"
-        let message = accountManager.isSignedIn ? ["Token: \(accountManager.token ?? "")",
+        let message = accountManager.isSignedIn ? ["Token: \(accountManager.accessToken ?? "")",
                                                    "Short-lived Token: \(accountManager.authToken ?? "")",
                                                    "Email: \(accountManager.email ?? "")",
                                                    "ExternalID: \(accountManager.externalID ?? "")"].joined(separator: "\n") : nil
@@ -74,7 +74,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func validateToken() {
         Task {
-            guard let token = accountManager.token else { return }
+            guard let token = accountManager.accessToken else { return }
             switch await AuthService.validateToken(accessToken: token) {
             case .success(let response):
                 showAlert(title: "Validate token", message: "\(response)")

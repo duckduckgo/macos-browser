@@ -35,7 +35,7 @@ public class AccountManager {
     public weak var delegate: AccountManagerKeychainAccessDelegate?
 
     public var isSignedIn: Bool {
-        return token != nil
+        return accessToken != nil
     }
 
     public init(storage: AccountStorage = AccountKeychainStorage()) {
@@ -56,12 +56,12 @@ public class AccountManager {
         }
     }
     
-    public var token: String? {
+    public var accessToken: String? {
         do {
-            return try storage.getToken()
+            return try storage.getAccessToken()
         } catch {
             if let error = error as? AccountKeychainAccessError {
-                delegate?.accountManagerKeychainAccessFailed(accessType: .getToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getAccessToken, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
@@ -113,10 +113,10 @@ public class AccountManager {
     public func storeAccount(token: String, email: String?, externalID: String?) {
         os_log("AccountManager: storeAccount token: %@ email: %@ externalID:%@", log: .account, token, email ?? "nil", externalID ?? "nil")
         do {
-            try storage.store(token: token)
+            try storage.store(accessToken: token)
         } catch {
             if let error = error as? AccountKeychainAccessError {
-                delegate?.accountManagerKeychainAccessFailed(accessType: .storeToken, error: error)
+                delegate?.accountManagerKeychainAccessFailed(accessType: .storeAccessToken, error: error)
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
