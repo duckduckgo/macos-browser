@@ -82,16 +82,3 @@ public final class DataBrokerProtectionBackgroundManager {
         }
     }
 }
-/*
-public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
-
-    public init() {
-        super.init { _, _, _, _ in
-
-        }
-    }
-
-    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
-        fatalError("Use init()")
-    }
-}*/
