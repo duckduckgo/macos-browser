@@ -23,7 +23,6 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
 import ServiceManagement
-import BrowserServicesKit
 
 @objc(Application)
 final class DuckDuckGoAgentApplication: NSApplication {
