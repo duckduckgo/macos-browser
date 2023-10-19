@@ -42,6 +42,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Show account details", action: #selector(showAccountDetails), target: self))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
+        menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
         menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         menu.addItem(.separator())
         if #available(macOS 12.0, *) {
@@ -79,6 +80,17 @@ public final class SubscriptionDebugMenu: NSMenuItem {
                 showAlert(title: "Validate token", message: "\(response)")
             case .failure(let error):
                 showAlert(title: "Validate token", message: "\(error)")
+            }
+        }
+    }
+
+    @objc
+    func checkEntitlements() {
+        Task {
+            
+            for entitlementName in ["fake", "dummy1", "dummy2", "dummy3"] {
+                let result = await AccountManager().hasEntitlement(for: entitlementName)
+                print("Entitlement check for \(entitlementName): \(result)")
             }
         }
     }

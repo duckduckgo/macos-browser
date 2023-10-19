@@ -137,6 +137,22 @@ public class AccountManager {
 
     // MARK: -
 
+    public func hasEntitlement(for name: String) async -> Bool {
+        guard let accessToken else { return false }
+
+        switch await AuthService.validateToken(accessToken: accessToken) {
+        case .success(let response):
+            let entitlements = response.account.entitlements
+            return entitlements.contains { entitlement in
+                entitlement.name == name
+            }
+
+        case .failure(let error):
+            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+            return false
+        }
+    }
+
     public func signInByRestoringPastPurchases() {
         if #available(macOS 12.0, *) {
             Task {
