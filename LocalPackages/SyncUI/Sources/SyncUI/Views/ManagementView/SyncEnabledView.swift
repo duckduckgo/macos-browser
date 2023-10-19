@@ -23,6 +23,13 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
+        if model.isSyncBookmarksPaused {
+            syncPaused(for: .bookmarks)
+        }
+        if model.isSyncCredentialsPaused {
+            syncPaused(for: .credentials)
+        }
+
         PreferencePaneSection(vericalPadding: 12) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
@@ -93,5 +100,51 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             }
             .padding(16)
         }
+    }
+
+    @ViewBuilder
+    func syncPaused(for itemType: LimitedItemType) -> some View {
+        var description: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.bookmarksLimitExceededDescription
+            case .credentials:
+                return UserText.credentialsLimitExceededDescription
+            }
+        }
+        var actionTitle: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.bookmarksLimitExceededAction
+            case .credentials:
+                return UserText.credentialsLimitExceededAction
+            }
+        }
+        PreferencePaneSection(vericalPadding: 12) {
+            HStack(alignment: .top, spacing: 8) {
+                Text("⚠️")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(UserText.syncLimitExceededTitle)
+                        .bold()
+                    Text(description)
+                    Button(actionTitle) {
+                        switch itemType {
+                        case .bookmarks:
+                            model.manageBookmarks()
+                        case .credentials:
+                            model.manageLogins()
+                        }
+                    }
+                    .padding(.top, 8)
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
+    }
+
+    enum LimitedItemType {
+        case bookmarks
+        case credentials
     }
 }

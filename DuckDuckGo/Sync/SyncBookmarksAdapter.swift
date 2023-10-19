@@ -28,6 +28,13 @@ final class SyncBookmarksAdapter {
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
 
+    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
+    private var isSyncBookmarksPaused: Bool {
+        didSet {
+            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
+        }
+    }
+
     init(
         database: CoreDataDatabase,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
@@ -60,15 +67,26 @@ final class SyncBookmarksAdapter {
 
         let provider = BookmarksProvider(
             database: database,
-            metadataStore: metadataStore,
-            syncDidUpdateData: LocalBookmarkManager.shared.loadBookmarks
-        )
+            metadataStore: metadataStore) { [weak self] in
+                LocalBookmarkManager.shared.loadBookmarks()
+                self?.isSyncBookmarksPaused = false
+            }
 
         syncErrorCancellable = provider.syncErrorPublisher
-            .sink { error in
+            .sink { [weak self] error in
                 switch error {
                 case let syncError as SyncError:
                     Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
+                    // If bookmarks count limit has been exceeded
+                    if syncError == .unexpectedStatusCode(409) {
+                        self?.isSyncBookmarksPaused = true
+                        Pixel.fire(.syncBookmarksCountLimitExceededDaily, limitTo: .dailyFirst)
+                    }
+                    // If bookmarks request size limit has been exceeded
+                    if syncError == .unexpectedStatusCode(413) {
+                        self?.isSyncBookmarksPaused = true
+                        Pixel.fire(.syncBookmarksRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                    }
                 default:
                     let nsError = error as NSError
                     if nsError.domain != NSURLErrorDomain {

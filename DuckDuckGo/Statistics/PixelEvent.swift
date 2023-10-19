@@ -162,6 +162,12 @@ extension Pixel {
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
 
+        // Sync
+        case syncBookmarksCountLimitExceededDaily
+        case syncCredentialsCountLimitExceededDaily
+        case syncBookmarksRequestSizeLimitExceededDaily
+        case syncCredentialsRequestSizeLimitExceededDaily
+
         // 28-day Home Button
         case enableHomeButton
         case disableHomeButton
@@ -489,6 +495,12 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_dismissed_\(messageID)"
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
+
+        // Sync
+        case .syncBookmarksCountLimitExceededDaily: return "m.mac.sync_bookmarks_count_limit_exceeded_daily"
+        case .syncCredentialsCountLimitExceededDaily: return "m.mac.sync_credentials_count_limit_exceeded_daily"
+        case .syncBookmarksRequestSizeLimitExceededDaily: return "m.mac.sync_bookmarks_request_size_limit_exceeded_daily"
+        case .syncCredentialsRequestSizeLimitExceededDaily: return "m.mac.sync_credentials_request_size_limit_exceeded_daily"
 
         // 28-day Home Button
         case .enableHomeButton:

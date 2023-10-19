@@ -24,6 +24,8 @@ public protocol ManagementViewModel: ObservableObject {
     var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
+    var isSyncBookmarksPaused: Bool { get }
+    var isSyncCredentialsPaused: Bool { get }
 
     var recoveryCode: String? { get }
     var codeToDisplay: String? { get }
@@ -43,4 +45,7 @@ public protocol ManagementViewModel: ObservableObject {
     func turnOnSync()
     func startPollingForRecoveryKey()
     func stopPollingForRecoveryKey()
+
+    func manageBookmarks()
+    func manageLogins()
 }

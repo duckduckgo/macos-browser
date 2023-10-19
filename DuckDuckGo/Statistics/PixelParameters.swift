@@ -135,7 +135,11 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageOpened,
              .enableHomeButton,
              .disableHomeButton,
-             .setnewHomePage:
+             .setnewHomePage,
+             .syncBookmarksCountLimitExceededDaily,
+             .syncCredentialsCountLimitExceededDaily,
+             .syncBookmarksRequestSizeLimitExceededDaily,
+             .syncCredentialsRequestSizeLimitExceededDaily:
             return nil
 #if DBP
         case .optOutStart,
