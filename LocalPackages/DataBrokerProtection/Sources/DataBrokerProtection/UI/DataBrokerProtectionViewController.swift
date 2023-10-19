@@ -55,6 +55,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
+        webView?.uiDelegate = self
         view = webView!
 
         // FOR LOCAL WEB UI DEVELOPMENT:
