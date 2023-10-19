@@ -87,7 +87,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     public func stopScheduler() {
         xpc.execute(call: { server in
             server.stopScheduler()
-        }, xpcReplyErrorHandler: { error in
+        }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })
@@ -120,7 +120,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     public func runAllOperations(showWebView: Bool) {
         xpc.execute(call: { server in
             server.runAllOperations(showWebView: showWebView)
-        }, xpcReplyErrorHandler: { error in
+        }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
             // If you add a completion block, please remember to call it here too!
         })

@@ -23,7 +23,6 @@ import Common
 import SwiftUI
 import BrowserServicesKit
 
-
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
 }
