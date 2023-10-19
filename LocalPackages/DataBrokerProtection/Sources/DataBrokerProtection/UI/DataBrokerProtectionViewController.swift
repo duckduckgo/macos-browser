@@ -29,12 +29,16 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
     private let webUIViewModel: DBPUIViewModel
 
+    private let openURLHandler: (URL?) -> Void
+
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
                 privacyConfig: PrivacyConfigurationManaging? = nil, 
-                prefs: ContentScopeProperties? = nil) {
+                prefs: ContentScopeProperties? = nil,
+                openURLHandler: @escaping (URL?) -> Void) {
         self.scheduler = scheduler
         self.dataManager = dataManager
+        self.openURLHandler = openURLHandler
 
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
 
@@ -60,4 +64,11 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView?.load(URL(string: "https://bhall.duckduckgo.com/dbp")!)
     }
 
+}
+
+extension DataBrokerProtectionViewController: WKUIDelegate {
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        openURLHandler(navigationAction.request.url)
+        return nil
+    }
 }

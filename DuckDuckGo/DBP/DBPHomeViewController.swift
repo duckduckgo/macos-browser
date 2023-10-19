@@ -52,7 +52,10 @@ final class DBPHomeViewController: NSViewController {
         return DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
                                            dataManager: dataBrokerProtectionManager.dataManager,
                                            privacyConfig: privacyConfigurationManager,
-                                           prefs: prefs)
+                                           prefs: prefs,
+                                           openURLHandler: { url in
+                                              WindowControllersManager.shared.show(url: url, newTab: true)
+                                           })
     }()
 
     init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
