@@ -18,11 +18,21 @@
 
 import AppKit
 import Account
+import Purchase
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
     var currentViewController: () -> NSViewController?
     private let accountManager = AccountManager()
+
+    private var _purchaseManager: Any?
+    @available(macOS 12.0, *)
+    fileprivate var purchaseManager: PurchaseManager {
+        if _purchaseManager == nil {
+            _purchaseManager = PurchaseManager()
+        }
+        return _purchaseManager as! PurchaseManager
+    }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -43,6 +53,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
         menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
+        if #available(macOS 12.0, *) {
+            menu.addItem(NSMenuItem(title: "Check Purchase Products Availability", action: #selector(checkProductsAvailability), target: self))
+        }
         menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         menu.addItem(.separator())
         if #available(macOS 12.0, *) {
@@ -87,11 +100,26 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func checkEntitlements() {
         Task {
+            var results: [String] = []
             
             for entitlementName in ["fake", "dummy1", "dummy2", "dummy3"] {
                 let result = await AccountManager().hasEntitlement(for: entitlementName)
-                print("Entitlement check for \(entitlementName): \(result)")
+                let resultSummary = "Entitlement check for \(entitlementName): \(result)"
+                results.append(resultSummary)
+                print(resultSummary)
             }
+
+            showAlert(title: "Check Entitlements", message: results.joined(separator: "\n"))
+        }
+    }
+
+    @available(macOS 12.0, *)
+    @objc
+    func checkProductsAvailability() {
+        Task {
+            let result = await purchaseManager.hasProductsAvailable()
+            showAlert(title: "Check App Store Product Availability",
+                      message: "Can purchase: \(result ? "YES" : "NO")")
         }
     }
 

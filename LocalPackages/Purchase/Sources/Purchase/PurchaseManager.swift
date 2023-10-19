@@ -28,7 +28,6 @@ public enum StoreError: Error {
 }
 
 @available(macOS 12.0, *)
-@MainActor
 public final class PurchaseManager: ObservableObject {
 
     static let productIdentifiers = ["subscription.1week", "subscription.1month", "subscription.1year",
@@ -53,6 +52,18 @@ public final class PurchaseManager: ObservableObject {
     deinit {
         transactionUpdates?.cancel()
         storefrontChanges?.cancel()
+    }
+
+    @MainActor
+    public func hasProductsAvailable() async -> Bool {
+        do {
+            let availableProducts = try await Product.products(for: Self.productIdentifiers)
+            print(" -- [PurchaseManager] updateAvailableProducts(): fetched \(availableProducts.count)")
+            return !availableProducts.isEmpty
+        } catch {
+            print("Error fetching available products: \(error)")
+            return false
+        }
     }
 
     @MainActor
