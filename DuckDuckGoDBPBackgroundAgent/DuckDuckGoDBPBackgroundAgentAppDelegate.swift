@@ -53,8 +53,5 @@ final class DuckDuckGoDBPBackgroundAgentAppDelegate: NSObject, NSApplicationDele
 
         let manager = DataBrokerProtectionBackgroundManager.shared
         manager.runOperationsAndStartSchedulerIfPossible()
-        // TODO: remove this?
-        // Although if app is not running we should run anyway
-        // Does anything go wrong if we run runQueuedOperations twice? Does it matter?
     }
 }
