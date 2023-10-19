@@ -161,9 +161,12 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     }
 
     public func scanAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
-        disablingScheduler(showWebView: showWebView) { completion in
-            os_log("Scanning all brokers...", log: .dataBrokerProtection)
-            dataBrokerProcessor.runAllScanOperations(showWebView: showWebView, completion: completion)
+        stopScheduler()
+
+        os_log("Scanning all brokers...", log: .dataBrokerProtection)
+        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] in
+            self?.startScheduler(showWebView: showWebView)
+            completion?(nil)
         }
     }
 
@@ -171,13 +174,5 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
                                                         completion: { completion?(nil) })
-    }
-
-    private func disablingScheduler(showWebView: Bool, run: (@escaping () -> Void) -> Void) {
-        stopScheduler()
-
-        run { [weak self] in
-            self?.startScheduler(showWebView: showWebView)
-        }
     }
 }
