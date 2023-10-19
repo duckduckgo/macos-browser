@@ -53,7 +53,9 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
 
     var privacyConfig: BrowserServicesKit.PrivacyConfiguration {
-        let privacyConfigurationData = try! PrivacyConfigurationData(data: data)
+        guard let privacyConfigurationData = try? PrivacyConfigurationData(data: data) else {
+            fatalError("Could not retrieve privacy configuration data")
+        }
         let privacyConfig = privacyConfiguration(withData: privacyConfigurationData)
         return privacyConfig
     }
@@ -83,6 +85,6 @@ final class MockDomainsProtectionStore: DomainsProtectionStore {
     }
 }
 
-class InternalUserDeciderStoreMock: InternalUserStoring {
+final class InternalUserDeciderStoreMock: InternalUserStoring {
     var isInternalUser: Bool = false
 }
