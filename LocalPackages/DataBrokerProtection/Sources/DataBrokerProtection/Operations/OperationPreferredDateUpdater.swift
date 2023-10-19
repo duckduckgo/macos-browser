@@ -37,7 +37,7 @@ protocol OperationPreferredDateUpdater {
 }
 
 struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
-    
+
     let database: DataBrokerProtectionRepository
     private let calculator = OperationPreferredDateCalculator()
 

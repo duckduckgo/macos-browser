@@ -16,13 +16,13 @@
 //  limitations under the License.
 //
 
+// swiftlint:disable type_body_length
+
 import XCTest
 import BrowserServicesKit
 @testable import DataBrokerProtection
 
-// swiftlint:disable type_body_length
 final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
-
     let sut = DataBrokerProfileQueryOperationManager()
     let mockWebOperationRunner = MockWebOperationRunner()
     let mockDatabase = MockDatabase()

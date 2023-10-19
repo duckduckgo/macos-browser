@@ -20,7 +20,6 @@ import XCTest
 @testable import DataBrokerProtection
 // https://app.asana.com/0/1204586965688315/1204834439855281/f
 
-// swiftlint:disable type_body_length
 final class OperationPreferredDateCalculatorTests: XCTestCase {
 
     private let schedulingConfig = DataBrokerScheduleConfig(
@@ -602,4 +601,3 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 }
-// swiftlint:enable type_body_length
