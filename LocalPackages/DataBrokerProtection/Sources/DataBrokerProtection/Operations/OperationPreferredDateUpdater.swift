@@ -97,8 +97,8 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                                                           extractedProfileID: extractedProfileId,
                                                                           schedulingConfig: schedulingConfig,
                                                                           isDeprecated: brokerProfileQuery.profileQuery.deprecated)
-        if origin == .optOut {
-            newScanPreferredRunDate = returnMostRecentDate(currentScanPreferredRunDate, newScanPreferredRunDate)
+        if let newDate = newScanPreferredRunDate, origin == .optOut {
+            newScanPreferredRunDate = returnMostRecentDate(currentScanPreferredRunDate, newDate)
         }
 
         if newScanPreferredRunDate != currentScanPreferredRunDate {
@@ -124,8 +124,8 @@ struct OperationPreferredDateUpdaterUseCase: OperationPreferredDateUpdater {
                                                                            extractedProfileID: extractedProfileId,
                                                                            schedulingConfig: schedulingConfig)
 
-        if origin == .scan {
-            newOptOutPreferredDate = returnMostRecentDate(currentOptOutPreferredRunDate, newOptOutPreferredDate)
+        if let newDate = newOptOutPreferredDate, origin == .scan {
+            newOptOutPreferredDate = returnMostRecentDate(currentOptOutPreferredRunDate, newDate)
         }
 
         if newOptOutPreferredDate != currentOptOutPreferredRunDate {
