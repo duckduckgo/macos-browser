@@ -28,6 +28,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     let dataBroker: String
     let startTime: Date
     var lastStateTime: Date
+    var stage: String?
 
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
@@ -56,6 +57,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutStart() {
+        setStartStage()
         handler.fire(.optOutStart(dataBroker: dataBroker, attemptId: attemptId))
     }
 
@@ -76,6 +78,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutSubmit() {
+        setSubmitStage()
         handler.fire(.optOutSubmit(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
@@ -88,6 +91,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutValidate() {
+        setValidateStage()
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
@@ -96,7 +100,46 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutFailure() {
-        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime()))
+        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime(), stage: stage ?? "other"))
+    }
+
+    // Helper methods to set the stage that is about to run. This help us
+    // identifying the stage so we can know which one was the one that failed.
+
+    func setStartStage() {
+        stage = "start"
+    }
+
+    func setEmailGenerateStage() {
+        stage = "email-generate"
+    }
+
+    func setCaptchaParseStage() {
+        stage = "captcha-parse"
+    }
+
+    func setCaptchaSendStage() {
+        stage = "captcha-send"
+    }
+
+    func setCaptchaSolveStage() {
+        stage = "captcha-solve"
+    }
+
+    func setSubmitStage() {
+        stage = "submit"
+    }
+
+    func setEmailReceiveStage() {
+        stage = "email-receive"
+    }
+
+    func setEmailConfirmStage() {
+        stage = "email-confirm"
+    }
+
+    func setValidateStage() {
+        stage = "validate"
     }
 }
 
@@ -106,6 +149,7 @@ public enum DataBrokerProtectionPixels: Equatable {
         static let appVersionParamKey = "app_version"
         static let attemptIdParamKey = "attempt_id"
         static let durationParamKey = "duration"
+        static let stageKey = "stage"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -126,7 +170,7 @@ public enum DataBrokerProtectionPixels: Equatable {
     // Process Pixels
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String)
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -197,8 +241,8 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
-        case .optOutFailure(let dataBroker, let attemptId, let duration):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
+        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage]
         }
     }
 }
