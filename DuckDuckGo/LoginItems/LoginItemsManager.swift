@@ -23,7 +23,6 @@ import LoginItems
 /// Class to manage the login items for Network Protection and DBP
 /// 
 final class LoginItemsManager {
-
     // MARK: - Main Interactions
 
     func enableLoginItems(_ items: Set<LoginItem>, log: OSLog) {

@@ -2887,6 +2887,7 @@
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
+		7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */; };
 		7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */; };
 		7BA7CC3A2AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */; };
 		7BA7CC3B2AD11E330042E5CE /* Bundle+Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC0F2AD11DC80042E5CE /* Bundle+Configuration.swift */; };
@@ -5047,6 +5048,7 @@
 				7BF7705F2AD6C999001C9182 /* PixelKit in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
+				7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */,
 				371D00E129D8509400EC8598 /* OpenSSL in Frameworks */,
 				1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */,
 				4BF0E50E2AD2555D00FFEC9E /* (null) in Frameworks */,
@@ -8811,6 +8813,7 @@
 				1E3ED4FC2AC1E0290075F60F /* Purchase */,
 				7B31FD8B2AD125620086AA24 /* NetworkProtectionIPC */,
 				7BF7705E2AD6C999001C9182 /* PixelKit */,
+				7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -8864,7 +8867,7 @@
 		AA585D76248FD31100E9A3E2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = DuckDuckGo;
 				TargetAttributes = {
@@ -14347,6 +14350,10 @@
 		7B31FD8F2AD1257B0086AA24 /* NetworkProtectionIPC */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionIPC;
+		};
+		7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SystemExtensionManager;
 		};
 		7BA7CC5E2AD1210C0042E5CE /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;
