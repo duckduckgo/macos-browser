@@ -177,6 +177,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         database.updateRemovedDate(Date(), on: extractedProfileId)
 
                         try updateOperationDataDates(
+                            origin: .scan,
                             brokerId: brokerId,
                             profileQueryId: profileQueryId,
                             extractedProfileId: extractedProfileId,
@@ -198,6 +199,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 }
             } else {
                 try updateOperationDataDates(
+                    origin: .scan,
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: nil,
@@ -244,6 +246,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             do {
                 try updateOperationDataDates(
+                    origin: .optOut,
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: extractedProfileId,
@@ -295,6 +298,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     }
 
     internal func updateOperationDataDates(
+        origin: OperationPreferredDateUpdaterOrigin,
         brokerId: Int64,
         profileQueryId: Int64,
         extractedProfileId: Int64?,
@@ -302,7 +306,8 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         database: DataBrokerProtectionRepository) throws {
 
             let dateUpdater = OperationPreferredDateUpdaterUseCase(database: database)
-            try dateUpdater.updateOperationDataDates(brokerId: brokerId,
+            try dateUpdater.updateOperationDataDates(origin: origin,
+                                                     brokerId: brokerId,
                                                      profileQueryId: profileQueryId,
                                                      extractedProfileId: extractedProfileId,
                                                      schedulingConfig: schedulingConfig)
