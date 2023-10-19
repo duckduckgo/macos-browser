@@ -18,9 +18,9 @@
 
 import XCTest
 @testable import DataBrokerProtection
-// swiftlint:disable type_body_length
 // https://app.asana.com/0/1204586965688315/1204834439855281/f
 
+// swiftlint:disable type_body_length
 final class OperationPreferredDateCalculatorTests: XCTestCase {
 
     private let schedulingConfig = DataBrokerScheduleConfig(

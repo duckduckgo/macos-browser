@@ -20,6 +20,7 @@ import XCTest
 import BrowserServicesKit
 @testable import DataBrokerProtection
 
+// swiftlint:disable type_body_length
 final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
 
     let sut = DataBrokerProfileQueryOperationManager()
@@ -698,3 +699,4 @@ extension ExtractedProfile {
         ExtractedProfile(name: "Some name", profileUrl: "someOtherURL")
     }
 }
+// swiftlint:enable type_body_length
