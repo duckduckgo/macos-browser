@@ -161,7 +161,7 @@ public final class PixelKit {
     }
 
     public func fire(_ event: Event,
-                     frequency: Frequency,
+                     frequency: Frequency = .standard,
                      withHeaders headers: [String: String]? = nil,
                      withAdditionalParameters params: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
@@ -199,7 +199,7 @@ public final class PixelKit {
     }
 
     public static func fire(_ event: Event,
-                            frequency: Frequency,
+                            frequency: Frequency = .standard,
                             withHeaders headers: [String: String] = [:],
                             withAdditionalParameters parameters: [String: String]? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,

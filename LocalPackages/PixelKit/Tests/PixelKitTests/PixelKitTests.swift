@@ -52,7 +52,7 @@ final class PixelKitTests: XCTestCase {
             }
         }
 
-        var frequency: PixelKitEventFrequency {
+        var frequency: PixelKit.Frequency {
             switch self {
             case .testEvent, .testEventWithoutParameters:
                 return .standard

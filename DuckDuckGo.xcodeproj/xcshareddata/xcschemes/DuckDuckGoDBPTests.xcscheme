@@ -18,7 +18,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7BB06BCD2AE01B2200869706"
+               BlueprintIdentifier = "7B96D0CE2ADFDA7E007E02C8"
                BuildableName = "DuckDuckGoDBPTests.xctest"
                BlueprintName = "DuckDuckGoDBPTests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">

@@ -210,7 +210,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         super.init { event, _, _, _ in
             switch event {
             case .error(let error, _):
-                PixelKit.fire(PixelKitEvent.debug(event: event, error: error))
+                PixelKit.fire(DebugEvent(event, error: error))
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,

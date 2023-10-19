@@ -25,12 +25,6 @@ public protocol PixelKitEvent {
     var parameters: [String: String]? { get }
 }
 
-extension PixelKitEvent {
-    public static func debug(_ event: PixelKitEvent, error: Error) -> PixelKitEvent {
-        DebugEvent(event: event, error: error)
-    }
-}
-
 /// Implementation of ``PixelKitEvent`` with specific logic for debug events.
 ///
 public final class DebugEvent: PixelKitEvent {
@@ -47,7 +41,7 @@ public final class DebugEvent: PixelKitEvent {
         self.error = error
     }
 
-    public init(event: PixelKitEvent, error: Error? = nil) {
+    public init(_ event: PixelKitEvent, error: Error? = nil) {
         self.eventType = .custom(event)
         self.error = error
     }
