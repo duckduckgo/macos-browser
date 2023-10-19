@@ -168,11 +168,11 @@ final class NetworkProtectionAppEvents {
     // MARK: - Legacy Login Item and Extension
 
     private func removeLegacyLoginItemAndVPNConfiguration() async {
-        LoginItem(bundleId: "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug").forceStop()
+        LoginItem(bundleId: legacyAgentBundleID).forceStop()
 
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
         let tunnel = tunnels?.first {
-            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == "com.duckduckgo.macos.browser.debug.network-protection-extension"
+            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == legacySystemExtensionBundleID
         }
 
         guard let tunnel else {
