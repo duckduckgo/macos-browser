@@ -209,11 +209,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             }
 
         } catch {
-            handleOperationError(brokerId: brokerId,
+            handleOperationError(origin: .scan,
+                                 brokerId: brokerId,
                                  profileQueryId: profileQueryId,
                                  extractedProfileId: nil,
                                  error: error,
-                                 database: database)
+                                 database: database,
+                                 schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig)
             throw error
         }
     }
@@ -255,11 +257,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 )
             } catch {
                 handleOperationError(
+                    origin: .optOut,
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: extractedProfileId,
                     error: error,
-                    database: database
+                    database: database,
+                    schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig
                 )
             }
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
@@ -287,11 +291,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         } catch {
             stageDurationCalculator.fireOptOutFailure()
             handleOperationError(
+                origin: .optOut,
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
                 extractedProfileId: extractedProfileId,
                 error: error,
-                database: database
+                database: database,
+                schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig
             )
             throw error
         }
@@ -313,7 +319,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                                      schedulingConfig: schedulingConfig)
         }
 
-    private func handleOperationError(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64?, error: Error, database: DataBrokerProtectionRepository) {
+    private func handleOperationError(origin: OperationPreferredDateUpdaterOrigin,
+                                      brokerId: Int64,
+                                      profileQueryId: Int64,
+                                      extractedProfileId: Int64?,
+                                      error: Error,
+                                      database: DataBrokerProtectionRepository,
+                                      schedulingConfig: DataBrokerScheduleConfig) {
         let event: HistoryEvent
 
         if let extractedProfileId = extractedProfileId {
@@ -331,6 +343,19 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         database.add(event)
+
+        do {
+            try updateOperationDataDates(
+                origin: origin,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId,
+                schedulingConfig: schedulingConfig,
+                database: database
+            )
+        } catch {
+            os_log("Can't update operation date after error")
+        }
 
         os_log("Error on operation : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
     }
