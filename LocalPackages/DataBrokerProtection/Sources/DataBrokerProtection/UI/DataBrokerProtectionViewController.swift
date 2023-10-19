@@ -33,7 +33,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
-                privacyConfig: PrivacyConfigurationManaging? = nil, 
+                privacyConfig: PrivacyConfigurationManaging? = nil,
                 prefs: ContentScopeProperties? = nil,
                 openURLHandler: @escaping (URL?) -> Void) {
         self.scheduler = scheduler
