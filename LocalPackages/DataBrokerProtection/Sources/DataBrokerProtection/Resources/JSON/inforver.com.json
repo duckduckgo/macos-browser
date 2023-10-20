@@ -1,6 +1,6 @@
 {
   "name": "inforver.com",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "parent": "verecor.com",
   "addedDatetime": 1677733200000,
   "steps": [
@@ -10,8 +10,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "9848d43d-b7ea-4bce-b337-fd166578f3e7",
-          "url": "https://inforver.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${ageRange}",
+          "id": "a56ab792-fc1b-4e60-b0b9-0bd4f580476f",
+          "url": "https://inforver.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
             "31-40",
@@ -24,7 +24,7 @@
         },
         {
           "actionType": "extract",
-          "id": "90800598-e7e4-4086-a107-12424582ca34",
+          "id": "591ba784-106c-421b-b188-a376f1f9cb01",
           "selector": ".search-item",
           "profile": {
             "name": {

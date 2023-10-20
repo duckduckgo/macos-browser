@@ -49,7 +49,11 @@ struct OperationPreferredDateCalculator {
             newDate = Date().addingTimeInterval(schedulingConfig.confirmOptOutScan.hoursToSeconds)
         }
 
-        return returnMostRecentDate(newDate, currentPreferredRunDate)
+        if let newDate = newDate {
+            return returnMostRecentDate(newDate, currentPreferredRunDate)
+        } else {
+            return nil
+        }
     }
 
     func dateForOptOutOperation(currentPreferredRunDate: Date?,
@@ -81,7 +85,11 @@ struct OperationPreferredDateCalculator {
             newDate = nil
         }
 
-        return returnMostRecentDate(newDate, currentPreferredRunDate)
+        if let newDate = newDate {
+            return returnMostRecentDate(newDate, currentPreferredRunDate)
+        } else {
+            return nil
+        }
     }
 
     private func returnMostRecentDate(_ date1: Date?, _ date2: Date?) -> Date? {

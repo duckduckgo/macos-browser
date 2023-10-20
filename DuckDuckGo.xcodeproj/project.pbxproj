@@ -2118,7 +2118,7 @@
 		4B9579FF2AC7AE700062CA31 /* FireViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB7320826DD0CD9002FACF9 /* FireViewController.swift */; };
 		4B957A002AC7AE700062CA31 /* OutlineSeparatorViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */; };
 		4B957A012AC7AE700062CA31 /* SafariDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB99CFD26FE191E001E4761 /* SafariDataImporter.swift */; };
-		4B957A022AC7AE700062CA31 /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
+		4B957A022AC7AE700062CA31 /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
 		4B957A032AC7AE700062CA31 /* LocalBookmarkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987799F829999973005D8EB6 /* LocalBookmarkStore.swift */; };
 		4B957A042AC7AE700062CA31 /* BWEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D02633528D8A9A9005CBB41 /* BWEncryption.m */; };
 		4B957A052AC7AE700062CA31 /* StatisticsLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50342726A11F00758A2B /* StatisticsLoader.swift */; };
@@ -2178,7 +2178,7 @@
 		4B957A3B2AC7AE700062CA31 /* CookieNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */; };
 		4B957A3C2AC7AE700062CA31 /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
 		4B957A3D2AC7AE700062CA31 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
-		4B957A3E2AC7AE700062CA31 /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
+		4B957A3E2AC7AE700062CA31 /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
 		4B957A3F2AC7AE700062CA31 /* GrammarFeaturesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4FF40B2624751A004E2377 /* GrammarFeaturesManager.swift */; };
 		4B957A402AC7AE700062CA31 /* WaitlistModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */; };
 		4B957A412AC7AE700062CA31 /* WKMenuItemIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E7291401D700225DE2 /* WKMenuItemIdentifier.swift */; };
@@ -2217,7 +2217,7 @@
 		4B957A622AC7AE700062CA31 /* AddressBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC5E4F025D6BF10007F5990 /* AddressBarButton.swift */; };
 		4B957A632AC7AE700062CA31 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527D263B05C600B973F8 /* HistoryEntry.swift */; };
 		4B957A642AC7AE700062CA31 /* FaviconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5FA69C275F945C00DCE9C9 /* FaviconStore.swift */; };
-		4B957A652AC7AE700062CA31 /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
+		4B957A652AC7AE700062CA31 /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
 		4B957A662AC7AE700062CA31 /* SuggestionListCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */; };
 		4B957A672AC7AE700062CA31 /* TimeIntervalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAADFD05264AA282001555EA /* TimeIntervalExtension.swift */; };
 		4B957A682AC7AE700062CA31 /* NetworkProtectionFeatureDisabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */; };
@@ -2689,21 +2689,21 @@
 		4B9DB0232A983B24000927DB /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */; };
 		4B9DB0242A983B24000927DB /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */; };
 		4B9DB0252A983B24000927DB /* WaitlistRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */; };
-		4B9DB0262A983B24000927DB /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
-		4B9DB0272A983B24000927DB /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
-		4B9DB0282A983B24000927DB /* WaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */; };
+		4B9DB0262A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
+		4B9DB0272A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
+		4B9DB0282A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */; };
 		4B9DB0292A983B24000927DB /* WaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */; };
 		4B9DB02A2A983B24000927DB /* WaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */; };
 		4B9DB02B2A983B24000927DB /* WaitlistStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */; };
 		4B9DB02C2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
 		4B9DB02D2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
 		4B9DB02E2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */; };
-		4B9DB0322A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
-		4B9DB0332A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
-		4B9DB0342A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */; };
-		4B9DB0352A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
-		4B9DB0362A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
-		4B9DB0372A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */; };
+		4B9DB0322A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
+		4B9DB0332A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
+		4B9DB0342A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */; };
+		4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
+		4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
+		4B9DB0372A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */; };
 		4B9DB0382A983B24000927DB /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
 		4B9DB0392A983B24000927DB /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
 		4B9DB03A2A983B24000927DB /* JoinedWaitlistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */; };
@@ -2870,6 +2870,7 @@
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
+		7B20D5C62ADFEC6E0053C42A /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 7B20D5C52ADFEC6E0053C42A /* PixelKitTestingUtilities */; };
 		7B2DDCF82A93A8BB0039D884 /* NetworkProtectionAppEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */; };
 		7B2DDCFA2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7B2DDCFB2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
@@ -2886,6 +2887,7 @@
 		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
+		7B96D0DC2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B96D0DB2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */; };
 		7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */; };
@@ -2935,6 +2937,8 @@
 		7BEEA5122AD1235B00A9E72B /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5112AD1235B00A9E72B /* NetworkProtectionIPC */; };
 		7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */; };
 		7BEEA5162AD1236E00A9E72B /* NetworkProtectionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */; };
+		7BF1A9D82AE054D300FCA683 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7BF1A9D72AE054D300FCA683 /* Info.plist */; };
+		7BF1A9DC2AE0551C00FCA683 /* DBPUnitTests.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */; };
 		7BF7705F2AD6C999001C9182 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BF7705E2AD6C999001C9182 /* PixelKit */; };
 		7BFCB74E2ADE7E1A00DA3EA7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */; };
 		7BFCB7502ADE7E2300DA3EA7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */; };
@@ -3689,6 +3693,13 @@
 			remoteGlobalIDString = 4B2537592A11BE7300610219;
 			remoteInfo = NetworkProtectionSystemExtension;
 		};
+		7B96D0D32ADFDA7F007E02C8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31929F7B2A4C4CFF0084EA89;
+			remoteInfo = "DuckDuckGo DBP";
+		};
 		AA585D91248FD31400E9A3E2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -4131,11 +4142,11 @@
 		4B9DB0072A983B23000927DB /* Waitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Waitlist.swift; sourceTree = "<group>"; };
 		4B9DB0092A983B23000927DB /* ProductWaitlistRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductWaitlistRequest.swift; sourceTree = "<group>"; };
 		4B9DB00A2A983B24000927DB /* WaitlistRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistRequest.swift; sourceTree = "<group>"; };
-		4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistViewModel.swift; sourceTree = "<group>"; };
+		4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionWaitlistViewModel.swift; sourceTree = "<group>"; };
 		4B9DB00E2A983B24000927DB /* WaitlistStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistStorage.swift; sourceTree = "<group>"; };
 		4B9DB00F2A983B24000927DB /* WaitlistKeychainStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistKeychainStorage.swift; sourceTree = "<group>"; };
-		4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnableNetworkProtectionView.swift; sourceTree = "<group>"; };
-		4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionTermsAndConditionsView.swift; sourceTree = "<group>"; };
+		4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnableWaitlistFeatureView.swift; sourceTree = "<group>"; };
+		4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistTermsAndConditionsView.swift; sourceTree = "<group>"; };
 		4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoinedWaitlistView.swift; sourceTree = "<group>"; };
 		4B9DB0162A983B24000927DB /* InvitedToWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InvitedToWaitlistView.swift; sourceTree = "<group>"; };
 		4B9DB0172A983B24000927DB /* JoinWaitlistView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JoinWaitlistView.swift; sourceTree = "<group>"; };
@@ -4276,6 +4287,9 @@
 		7BA7CC182AD11DC80042E5CE /* DuckDuckGoVPNDebug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPNDebug.entitlements; sourceTree = "<group>"; };
 		7BA7CC1A2AD11DC80042E5CE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7BA7CC4D2AD11F6F0042E5CE /* NetworkProtectionIPCTunnelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionIPCTunnelController.swift; sourceTree = "<group>"; };
+		7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionEnableOnDemand.xcconfig; sourceTree = "<group>"; };
+		7B96D0CF2ADFDA7E007E02C8 /* DuckDuckGoDBPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuckDuckGoDBPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B96D0DB2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionPixelTests.swift; sourceTree = "<group>"; };
 		7BB108572A43375D000AB95F /* PFMoveApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PFMoveApplication.h; sourceTree = "<group>"; };
 		7BB108582A43375D000AB95F /* PFMoveApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PFMoveApplication.m; sourceTree = "<group>"; };
 		7BBD45B02A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugUtilities.swift; sourceTree = "<group>"; };
@@ -4284,6 +4298,8 @@
 		7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
 		7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugMenu.swift; sourceTree = "<group>"; };
 		7BEC182D2AD5D89C00D30536 /* SystemExtensionManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SystemExtensionManager; sourceTree = "<group>"; };
+		7BF1A9D72AE054D300FCA683 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DBPUnitTests.xcconfig; sourceTree = "<group>"; };
 		7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionWaitlistMenu.swift; sourceTree = "<group>"; };
 		7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionWaitlist.swift"; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
@@ -5027,6 +5043,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7B736E592A4A22B700F9922A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B96D0CC2ADFDA7E007E02C8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B20D5C62ADFEC6E0053C42A /* PixelKitTestingUtilities in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA585D7B248FD31100E9A3E2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -5409,6 +5440,7 @@
 			children = (
 				373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */,
 				378B588D295CF447002C0CC0 /* UnitTests.xcconfig */,
+				7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */,
 				378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */,
 				37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */,
 				37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */,
@@ -6080,7 +6112,7 @@
 		4B9DB00B2A983B24000927DB /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */,
+				4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -6109,8 +6141,8 @@
 		4B9DB0122A983B24000927DB /* WaitlistSteps */ = {
 			isa = PBXGroup;
 			children = (
-				4B9DB0132A983B24000927DB /* EnableNetworkProtectionView.swift */,
-				4B9DB0142A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift */,
+				4B9DB0132A983B24000927DB /* EnableWaitlistFeatureView.swift */,
+				4B9DB0142A983B24000927DB /* WaitlistTermsAndConditionsView.swift */,
 				4B9DB0152A983B24000927DB /* JoinedWaitlistView.swift */,
 				4B9DB0162A983B24000927DB /* InvitedToWaitlistView.swift */,
 				4B9DB0172A983B24000927DB /* JoinWaitlistView.swift */,
@@ -6420,6 +6452,15 @@
 				7BA7CC102AD11DC80042E5CE /* Info-AppStore.plist */,
 			);
 			path = DuckDuckGoVPN;
+			sourceTree = "<group>";
+		};
+		7B96D0D02ADFDA7F007E02C8 /* DuckDuckGoDBPTests */ = {
+			isa = PBXGroup;
+			children = (
+				7BF1A9D72AE054D300FCA683 /* Info.plist */,
+				7B96D0DB2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift */,
+			);
+			path = DuckDuckGoDBPTests;
 			sourceTree = "<group>";
 		};
 		7BB108552A43375D000AB95F /* LocalThirdParty */ = {
@@ -6898,6 +6939,7 @@
 				4B1AD89E25FC27E200261379 /* IntegrationTests */,
 				7B4CE8DB26F02108009134B1 /* UITests */,
 				B6EC37E929B5DA2A001ACE79 /* tests-server */,
+				7B96D0D02ADFDA7F007E02C8 /* DuckDuckGoDBPTests */,
 				4B5F14F72A148B230060320F /* NetworkProtectionAppExtension */,
 				4B25375C2A11BE7500610219 /* NetworkProtectionSystemExtension */,
 				7BA7CC0D2AD11DC80042E5CE /* DuckDuckGoVPN */,
@@ -6924,6 +6966,7 @@
 				4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */,
 				3192A26E2A4C4CFF0084EA89 /* DuckDuckGoDBP.app */,
 				4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */,
+				7B96D0CF2ADFDA7E007E02C8 /* DuckDuckGoDBPTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -8770,6 +8813,28 @@
 			productReference = 7B4CE8DA26F02108009134B1 /* UI Tests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		7B96D0CE2ADFDA7E007E02C8 /* DuckDuckGoDBPTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7B96D0D52ADFDA7F007E02C8 /* Build configuration list for PBXNativeTarget "DuckDuckGoDBPTests" */;
+			buildPhases = (
+				7B96D0CB2ADFDA7E007E02C8 /* Sources */,
+				7B96D0CC2ADFDA7E007E02C8 /* Frameworks */,
+				7B96D0CD2ADFDA7E007E02C8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7B20D5C82ADFEC730053C42A /* PBXTargetDependency */,
+				7B96D0D42ADFDA7F007E02C8 /* PBXTargetDependency */,
+			);
+			name = DuckDuckGoDBPTests;
+			packageProductDependencies = (
+				7B20D5C52ADFEC6E0053C42A /* PixelKitTestingUtilities */,
+			);
+			productName = DuckDuckGoDBPTests;
+			productReference = 7B96D0CF2ADFDA7E007E02C8 /* DuckDuckGoDBPTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA585DA4248FD31500E9A3E2 /* Build configuration list for PBXNativeTarget "DuckDuckGo Privacy Browser" */;
@@ -8902,6 +8967,10 @@
 						CreatedOnToolsVersion = 12.5.1;
 						TestTargetID = AA585D7D248FD31100E9A3E2;
 					};
+					7B96D0CE2ADFDA7E007E02C8 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = 31929F7B2A4C4CFF0084EA89;
+					};
 					AA585D7D248FD31100E9A3E2 = {
 						CreatedOnToolsVersion = 11.5;
 					};
@@ -8949,6 +9018,7 @@
 				4B2D06382A11CFBA00DE1F49 /* DuckDuckGoVPN */,
 				4B2D06682A13318400DE1F49 /* DuckDuckGoVPNAppStore */,
 				31929F7B2A4C4CFF0084EA89 /* DuckDuckGo DBP */,
+				7B96D0CE2ADFDA7E007E02C8 /* DuckDuckGoDBPTests */,
 				4B9579252AC7AE700062CA31 /* DuckDuckGo Privacy Pro */,
 			);
 		};
@@ -9240,6 +9310,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B96D0CD2ADFDA7E007E02C8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7BF1A9D82AE054D300FCA683 /* Info.plist in Resources */,
+				7BF1A9DC2AE0551C00FCA683 /* DBPUnitTests.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9945,7 +10024,7 @@
 				3192A0602A4C4CFF0084EA89 /* DeviceAuthenticationService.swift in Sources */,
 				3192A0612A4C4CFF0084EA89 /* AppConfigurationURLProvider.swift in Sources */,
 				3192A0622A4C4CFF0084EA89 /* AutofillPreferences.swift in Sources */,
-				4B9DB0282A983B24000927DB /* WaitlistViewModel.swift in Sources */,
+				4B9DB0282A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				3192A0632A4C4CFF0084EA89 /* WebsiteBreakage.swift in Sources */,
 				3192A0642A4C4CFF0084EA89 /* PasswordManagerCoordinator.swift in Sources */,
 				3192A0652A4C4CFF0084EA89 /* PasswordManagementIdentityModel.swift in Sources */,
@@ -10025,7 +10104,7 @@
 				3192A0A72A4C4CFF0084EA89 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				3192A0A82A4C4CFF0084EA89 /* AddressBarButton.swift in Sources */,
 				3192A0A92A4C4CFF0084EA89 /* HistoryEntry.swift in Sources */,
-				4B9DB0342A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */,
+				4B9DB0342A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */,
 				3192A0AA2A4C4CFF0084EA89 /* FaviconStore.swift in Sources */,
 				3192A0AB2A4C4CFF0084EA89 /* SuggestionListCharacteristics.swift in Sources */,
 				3192A0AC2A4C4CFF0084EA89 /* TimeIntervalExtension.swift in Sources */,
@@ -10063,7 +10142,7 @@
 				3192A0CB2A4C4CFF0084EA89 /* ContinueSetUpView.swift in Sources */,
 				3192A0CC2A4C4CFF0084EA89 /* PasswordManagementListSection.swift in Sources */,
 				3192A0CD2A4C4CFF0084EA89 /* FaviconReferenceCache.swift in Sources */,
-				4B9DB0372A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B9DB0372A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				3192A0CE2A4C4CFF0084EA89 /* BookmarkTreeController.swift in Sources */,
 				3192A0CF2A4C4CFF0084EA89 /* FirefoxEncryptionKeyReader.swift in Sources */,
 				3192A0D02A4C4CFF0084EA89 /* EventMapping+NetworkProtectionError.swift in Sources */,
@@ -10470,7 +10549,7 @@
 				3706FAB7293F65D500E42796 /* PixelParameters.swift in Sources */,
 				3706FAB8293F65D500E42796 /* FaviconImageCache.swift in Sources */,
 				3706FAB9293F65D500E42796 /* TabBarViewController.swift in Sources */,
-				4B9DB0332A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */,
+				4B9DB0332A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */,
 				3706FABA293F65D500E42796 /* BookmarkOutlineViewDataSource.swift in Sources */,
 				3706FABB293F65D500E42796 /* PasswordManagementBitwardenItemView.swift in Sources */,
 				3706FABC293F65D500E42796 /* CookieConsentPopover.swift in Sources */,
@@ -10617,7 +10696,7 @@
 				3706FB35293F65D500E42796 /* FlatButton.swift in Sources */,
 				3706FB36293F65D500E42796 /* PinnedTabView.swift in Sources */,
 				3706FB37293F65D500E42796 /* DataEncryption.swift in Sources */,
-				4B9DB0362A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B9DB0362A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				37197EA82942443D00394917 /* BrowserTabViewController.swift in Sources */,
 				3706FB39293F65D500E42796 /* PrivacyDashboardPopover.swift in Sources */,
 				3706FB3B293F65D500E42796 /* RootView.swift in Sources */,
@@ -10915,7 +10994,7 @@
 				3706FC29293F65D500E42796 /* QuartzIdleStateProvider.swift in Sources */,
 				3706FC2A293F65D500E42796 /* DuckPlayerPreferences.swift in Sources */,
 				3706FC2B293F65D500E42796 /* DownloadViewModel.swift in Sources */,
-				4B9DB0272A983B24000927DB /* WaitlistViewModel.swift in Sources */,
+				4B9DB0272A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				4B9DB03F2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
 				987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
@@ -11671,7 +11750,7 @@
 				4B9579FF2AC7AE700062CA31 /* FireViewController.swift in Sources */,
 				4B957A002AC7AE700062CA31 /* OutlineSeparatorViewCell.swift in Sources */,
 				4B957A012AC7AE700062CA31 /* SafariDataImporter.swift in Sources */,
-				4B957A022AC7AE700062CA31 /* WaitlistViewModel.swift in Sources */,
+				4B957A022AC7AE700062CA31 /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				4B957A032AC7AE700062CA31 /* LocalBookmarkStore.swift in Sources */,
 				4B957A042AC7AE700062CA31 /* BWEncryption.m in Sources */,
 				4B957A052AC7AE700062CA31 /* StatisticsLoader.swift in Sources */,
@@ -11732,7 +11811,7 @@
 				4B957A3B2AC7AE700062CA31 /* CookieNotificationAnimationModel.swift in Sources */,
 				4B957A3C2AC7AE700062CA31 /* JoinedWaitlistView.swift in Sources */,
 				4B957A3D2AC7AE700062CA31 /* SharingMenu.swift in Sources */,
-				4B957A3E2AC7AE700062CA31 /* EnableNetworkProtectionView.swift in Sources */,
+				4B957A3E2AC7AE700062CA31 /* EnableWaitlistFeatureView.swift in Sources */,
 				4B957A3F2AC7AE700062CA31 /* GrammarFeaturesManager.swift in Sources */,
 				4B957A402AC7AE700062CA31 /* WaitlistModalViewController.swift in Sources */,
 				4B957A412AC7AE700062CA31 /* WKMenuItemIdentifier.swift in Sources */,
@@ -11774,7 +11853,7 @@
 				4B957A622AC7AE700062CA31 /* AddressBarButton.swift in Sources */,
 				4B957A632AC7AE700062CA31 /* HistoryEntry.swift in Sources */,
 				4B957A642AC7AE700062CA31 /* FaviconStore.swift in Sources */,
-				4B957A652AC7AE700062CA31 /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B957A652AC7AE700062CA31 /* WaitlistTermsAndConditionsView.swift in Sources */,
 				4B957A662AC7AE700062CA31 /* SuggestionListCharacteristics.swift in Sources */,
 				4B957A672AC7AE700062CA31 /* TimeIntervalExtension.swift in Sources */,
 				4B957A682AC7AE700062CA31 /* NetworkProtectionFeatureDisabler.swift in Sources */,
@@ -12159,6 +12238,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7B736E572A4A22B700F9922A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B736E582A4A22B700F9922A /* Main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B96D0CB2ADFDA7E007E02C8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7B96D0DC2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA585D7A248FD31100E9A3E2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -12345,12 +12440,13 @@
 				AAC5E4D025D6A709007F5990 /* Bookmark.swift in Sources */,
 				4BBDEE9328FC14760092FAA6 /* ConnectBitwardenViewModel.swift in Sources */,
 				4B5A4F4C27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift in Sources */,
+				7B96D0C62ADFD460007E02C8 /* DataBrokerProtectionPixelTests.swift in Sources */,
 				B64C853826944B880048FEBE /* StoredPermission.swift in Sources */,
 				AAE246F8270A406200BEEAEE /* FirePopoverCollectionViewHeader.swift in Sources */,
 				AAB7320926DD0CD9002FACF9 /* FireViewController.swift in Sources */,
 				4B92928C26670D1700AD2C21 /* OutlineSeparatorViewCell.swift in Sources */,
 				4BB99D0426FE191E001E4761 /* SafariDataImporter.swift in Sources */,
-				4B9DB0262A983B24000927DB /* WaitlistViewModel.swift in Sources */,
+				4B9DB0262A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */,
 				987799F929999973005D8EB6 /* LocalBookmarkStore.swift in Sources */,
 				1D02633628D8A9A9005CBB41 /* BWEncryption.m in Sources */,
 				B69B503A2726A12500758A2B /* StatisticsLoader.swift in Sources */,
@@ -12410,7 +12506,7 @@
 				3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */,
 				4B9DB0382A983B24000927DB /* JoinedWaitlistView.swift in Sources */,
 				B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */,
-				4B9DB0322A983B24000927DB /* EnableNetworkProtectionView.swift in Sources */,
+				4B9DB0322A983B24000927DB /* EnableWaitlistFeatureView.swift in Sources */,
 				AA4FF40C2624751A004E2377 /* GrammarFeaturesManager.swift in Sources */,
 				4B9DB0442A983B24000927DB /* WaitlistModalViewController.swift in Sources */,
 				B6DA06E8291401D700225DE2 /* WKMenuItemIdentifier.swift in Sources */,
@@ -12448,7 +12544,7 @@
 				AAC5E4F125D6BF10007F5990 /* AddressBarButton.swift in Sources */,
 				AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */,
 				AA5FA69D275F945C00DCE9C9 /* FaviconStore.swift in Sources */,
-				4B9DB0352A983B24000927DB /* NetworkProtectionTermsAndConditionsView.swift in Sources */,
+				4B9DB0352A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				AAB8203C26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift in Sources */,
 				AAADFD06264AA282001555EA /* TimeIntervalExtension.swift in Sources */,
 				4B6785472AA8DE68008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */,
@@ -13104,6 +13200,15 @@
 			isa = PBXTargetDependency;
 			productRef = 4B5F14FB2A15291D0060320F /* InputFilesChecker */;
 		};
+		4B9579272AC7AE700062CA31 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
+			targetProxy = 4B9579282AC7AE700062CA31 /* PBXContainerItemProxy */;
+		};
+		7B20D5C82ADFEC730053C42A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 7B20D5C72ADFEC730053C42A /* PixelKitTestingUtilities */;
+		};
 		7B4CE8E026F02108009134B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
@@ -13113,6 +13218,11 @@
 			isa = PBXTargetDependency;
 			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
 			targetProxy = 7BEC18302AD5DA3300D30536 /* PBXContainerItemProxy */;
+		};
+		7B96D0D42ADFDA7F007E02C8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31929F7B2A4C4CFF0084EA89 /* DuckDuckGo DBP */;
+			targetProxy = 7B96D0D32ADFDA7F007E02C8 /* PBXContainerItemProxy */;
 		};
 		AA585D92248FD31400E9A3E2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -13526,6 +13636,62 @@
 			};
 			name = Release;
 		};
+		7B736E5B2A4A22B700F9922A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		7B736E5C2A4A22B700F9922A /* CI */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
+			buildSettings = {
+			};
+			name = CI;
+		};
+		7B736E5D2A4A22B700F9922A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		7B736E5E2A4A22B700F9922A /* Review */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B9459632A4A5BAF0012535A /* NetworkProtectionEnableOnDemand.xcconfig */;
+			buildSettings = {
+			};
+			name = Review;
+		};
+		7B96D0D62ADFDA7F007E02C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		7B96D0D72ADFDA7F007E02C8 /* CI */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
+			buildSettings = {
+			};
+			name = CI;
+		};
+		7B96D0D82ADFDA7F007E02C8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		7B96D0D92ADFDA7F007E02C8 /* Review */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
+			buildSettings = {
+			};
+			name = Review;
+		};
 		AA585DA2248FD31500E9A3E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
@@ -13762,6 +13928,17 @@
 				7B4CE8E226F02108009134B1 /* CI */,
 				7B4CE8E326F02108009134B1 /* Release */,
 				AAE814AF2716DFE8009D3531 /* Review */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B96D0D52ADFDA7F007E02C8 /* Build configuration list for PBXNativeTarget "DuckDuckGoDBPTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7B96D0D62ADFDA7F007E02C8 /* Debug */,
+				7B96D0D72ADFDA7F007E02C8 /* CI */,
+				7B96D0D82ADFDA7F007E02C8 /* Release */,
+				7B96D0D92ADFDA7F007E02C8 /* Review */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -14388,6 +14565,14 @@
 		7BEEA5152AD1236E00A9E72B /* NetworkProtectionUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = NetworkProtectionUI;
+		};
+		7B20D5C52ADFEC6E0053C42A /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
+		};
+		7B20D5C72ADFEC730053C42A /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
 		};
 		7BF7705E2AD6C999001C9182 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
