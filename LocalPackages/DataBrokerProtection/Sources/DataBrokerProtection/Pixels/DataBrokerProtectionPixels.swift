@@ -22,7 +22,7 @@ import BrowserServicesKit
 import PixelKit
 
 final class DataBrokerProtectionStageDurationCalculator {
-    
+
     enum Stage: String {
         case start
         case emailGenerate = "email-generate"
