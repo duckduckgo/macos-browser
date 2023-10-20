@@ -40,9 +40,8 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     @IBOutlet weak var simulateConnectionInterruptionMenuItem: NSMenuItem!
 
     private var simulationOptions: NetworkProtectionSimulationOptions {
-        // TODO: fix this
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
         NetworkProtectionSimulationOptions()
-        // NetworkProtectionTunnelController.simulationOptions
     }
 
     /// Simulates a controller failure the next time Network Protection is started.
@@ -56,7 +55,7 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     ///
     @IBAction
     func simulateTunnelFailure(_ menuItem: NSMenuItem) {
-        // TODO: fix this
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
         // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
     }
 
@@ -64,13 +63,13 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     ///
     @IBAction
     func simulateTunnelCrash(_ menuItem: NSMenuItem) {
-        // TODO: fix this
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
         // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
     }
 
     @IBAction
     func simulateConnectionInterruption(_ menuItem: NSMenuItem) {
-        // TODO: fix this
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
         // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateConnectionInterruption)
     }
 
