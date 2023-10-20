@@ -36,106 +36,130 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
     private let debugPage: String = """
     <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-    </head>
-    <body>
-        <form>
-            <input type="button" value="Add Name" onclick="addName()">
-            <input type="button" value="Add Address" onclick="addAddress()">
-            <input type="button" value="Set Birth Year" onclick="setBirthYear()">
-            <input type="button" value="Set State" onclick="handshake()">
-            <input type="button" value="Get Profile" onclick="getProfile()">
-            <input type="button" value="Start Scan" onclick="startScan()">
-            <input type="button" value="Remove All Data" onclick="removeAllData()">
-        </form>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+        </head>
+        <body>
+            <form>
+                <input type="button" value="Add Name" onclick="addName()">
+                <input type="button" value="Add Address" onclick="addAddress()">
+                <input type="button" value="Set Birth Year" onclick="setBirthYear()">
+                <input type="button" value="Set State" onclick="handshake()">
+                <input type="button" value="Get Profile" onclick="getProfile()">
+                <input type="button" value="Start Scan" onclick="startScan()">
+                <input type="button" value="Initial Scan Data" onclick="initialScanStatus()">
+                <input type="button" value="Remove All Data" onclick="removeAllData()">
+            </form>
 
-        <p id="output"></p>
+            <p id="output"></p>
 
-        <script type="text/javascript">
-            function addName() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "addNameToCurrentUserProfile",
-                    "id": "abc123",
-                    "params": {
-                        "first": "Bradley",
-                        "middle": "Curtis",
-                        "last": "Slayter"
-                    }
-                })
-            }
+            <script type="text/javascript">
+                function addName() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "addNameToCurrentUserProfile",
+                        "id": "abc123",
+                        "params": {
+                            "first": "Bradley",
+                            "middle": "Curtis",
+                            "last": "Slayter"
+                        }
+                    })
+                }
 
-            function addAddress() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "addAddressToCurrentUserProfile",
-                    "id": "abc123",
-                    "params": {
-                        "street": "3003 Lake Ridge Dr",
-                        "city": "Sanger",
-                        "state": "TX"
-                    }
-                })
-            }
+                function addAddress() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "addAddressToCurrentUserProfile",
+                        "id": "abc123",
+                        "params": {
+                            "street": "3003 Lake Ridge Dr",
+                            "city": "Sanger",
+                            "state": "TX"
+                        }
+                    })
+                }
 
-            function setBirthYear() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "setBirthYearForCurrentUserProfile",
-                    "params": {
-                        "year": 1993
-                    }
-                })
-            }
+                function setBirthYear() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "setBirthYearForCurrentUserProfile",
+                        "params": {
+                            "year": 1993
+                        }
+                    })
+                }
 
-            function startScan() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "startScanAndOptOut"
-                })
-            }
+                function startScan() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "startScanAndOptOut"
+                    })
+                }
 
-            function removeAllData() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "deleteUserProfileData"
-                })
-            }
+                function removeAllData() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "deleteUserProfileData"
+                    })
+                }
 
-            function handshake() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "setState",
-                    "id": "abc123",
-                    "params": {
-                        "state": "ProfileReview"
-                    }
-                })
-            }
+                function handshake() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "setState",
+                        "id": "abc123",
+                        "params": {
+                            "state": "ProfileReview"
+                        }
+                    })
+                }
 
-            function getProfile() {
-                window.webkit.messageHandlers.dbpui.postMessage({
-                    "context": "dbpui",
-                    "featureName": "dbpuiCommunication",
-                    "method": "getCurrentUserProfile",
-                    "id": "abc123",
-                }).then(data => {
-                    document.getElementById('output').textContent = JSON.stringify(data, null, 4)
-                })
-            }
-        </script>
-    </body>
-    </html>
+                function handshake() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "setState",
+                        "id": "abc123",
+                        "params": {
+                            "state": "ProfileReview"
+                        }
+                    })
+                }
+
+                function getProfile() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "getCurrentUserProfile",
+                        "id": "abc123",
+                    }).then(data => {
+                        document.getElementById('output').textContent = JSON.stringify(data, null, 4)
+                    })
+                }
+
+                function initialScanStatus() {
+                    window.webkit.messageHandlers.dbpui.postMessage({
+                        "context": "dbpui",
+                        "featureName": "dbpuiCommunication",
+                        "method": "initialScanStatus",
+                        "id": "abc123",
+                    }).then(data => {
+                        document.getElementById('output').textContent = JSON.stringify(data, null, 4)
+                    })
+                }
+            </script>
+        </body>
+        </html>
     """
 
     public init(scheduler: DataBrokerProtectionScheduler,
@@ -167,31 +191,25 @@ final public class DataBrokerProtectionViewController: NSViewController {
     }
 
     override public func loadView() {
-//        let containerView = DataBrokerProtectionContainerView(
-//            containerViewModel: containerViewModel,
-//            navigationViewModel: navigationViewModel,
-//            profileViewModel: profileViewModel,
-//            resultsViewModel: resultsViewModel)
+        let containerView = DataBrokerProtectionContainerView(
+            containerViewModel: containerViewModel,
+            navigationViewModel: navigationViewModel,
+            profileViewModel: profileViewModel,
+            resultsViewModel: resultsViewModel)
+
+        let hostingController = NSHostingController(rootView: containerView)
+        view = hostingController.view
+
+//        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 //
-//        let hostingController = NSHostingController(rootView: containerView)
-//        view = hostingController.view
-
-        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
-
-        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
-        view = webView!
+//        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
+//        view = webView!
 
         // FOR LOCAL WEB UI DEVELOPMENT:
         // Comment this line 👇
-        webView?.loadHTMLString(debugPage, baseURL: nil)
+//        webView?.loadHTMLString(debugPage, baseURL: nil)
         // Uncomment this line and add your dev URL 👇
 //        webView?.load(URL(string: "https://<your url>")!)
-
-        let button = NSButton(title: "Set State", target: self, action: #selector(webUIViewModel.reloadData))
-        button.setButtonType(.momentaryLight)
-        button.contentTintColor = .black
-        button.frame = CGRect(x: 10, y: 100, width: 100, height: 50)
-        view.addSubview(button)
     }
 
 }

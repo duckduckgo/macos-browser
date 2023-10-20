@@ -80,7 +80,13 @@ final class Pixel {
         }
     }
 
-    init(store: @escaping @autoclosure () -> PixelDataStore, requestSender: @escaping RequestSender) {
+    private let appVersion: String
+
+    init(appVersion: String = AppVersion.shared.versionNumber,
+         store: @escaping @autoclosure () -> PixelDataStore,
+         requestSender: @escaping RequestSender) {
+
+        self.appVersion = appVersion
         self.store = store
         self.sendRequest = requestSender
     }
@@ -124,7 +130,7 @@ final class Pixel {
         }
 
         if includeAppVersionParameter {
-            newParams[PixelKit.Parameters.appVersion] = AppVersion.shared.versionNumber
+            newParams[PixelKit.Parameters.appVersion] = appVersion
         }
 #if DEBUG
         newParams[PixelKit.Parameters.test] = PixelKit.Values.test
