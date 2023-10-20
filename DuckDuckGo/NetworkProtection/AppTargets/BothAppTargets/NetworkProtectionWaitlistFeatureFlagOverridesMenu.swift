@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionWaitlistMenu.swift
+//  NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,31 +16,24 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import AppKit
 import Foundation
-
-#if !NETWORK_PROTECTION
-
-@objc
-final class NetworkProtectionWaitlistMenu: NSMenu {
-}
-
-#else
-
 import NetworkProtection
 import NetworkProtectionUI
+import SwiftUI
 
 /// Implements the logic for Network Protection's simulate failures menu.
 ///
-@objc
 @MainActor
-final class NetworkProtectionWaitlistMenu: NSMenu {
+final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
 
     // MARK: - Waitlist Active Properties
 
-    @IBOutlet weak var waitlistActiveUseRemoteValueMenuItem: NSMenuItem!
-    @IBOutlet weak var waitlistActiveOverrideONMenuItem: NSMenuItem!
-    @IBOutlet weak var waitlistActiveOverrideOFFMenuItem: NSMenuItem!
+    private let waitlistActiveUseRemoteValueMenuItem: NSMenuItem
+    private let waitlistActiveOverrideONMenuItem: NSMenuItem
+    private let waitlistActiveOverrideOFFMenuItem: NSMenuItem
 
     @UserDefaultsWrapper(key: .networkProtectionWaitlistActiveOverrideRawValue,
                          defaultValue: WaitlistOverride.default.rawValue,
@@ -49,37 +42,65 @@ final class NetworkProtectionWaitlistMenu: NSMenu {
 
     // MARK: - Waitlist Enabled Properties
 
-    @IBOutlet weak var waitlistEnabledUseRemoteValueMenuItem: NSMenuItem!
-    @IBOutlet weak var waitlistEnabledOverrideONMenuItem: NSMenuItem!
-    @IBOutlet weak var waitlistEnabledOverrideOFFMenuItem: NSMenuItem!
+    private let waitlistEnabledUseRemoteValueMenuItem: NSMenuItem
+    private let waitlistEnabledOverrideONMenuItem: NSMenuItem
+    private let waitlistEnabledOverrideOFFMenuItem: NSMenuItem
 
     @UserDefaultsWrapper(key: .networkProtectionWaitlistEnabledOverrideRawValue,
                          defaultValue: WaitlistOverride.default.rawValue,
                          defaults: .shared)
     private var waitlistEnabledOverrideValue: Int
 
+    init() {
+        waitlistActiveUseRemoteValueMenuItem = NSMenuItem(title: "Remote Value", action: #selector(Self.waitlistEnabledUseRemoteValue))
+        waitlistActiveOverrideONMenuItem = NSMenuItem(title: "ON", action: #selector(Self.waitlistEnabledOverrideON))
+        waitlistActiveOverrideOFFMenuItem = NSMenuItem(title: "OFF", action: #selector(Self.waitlistEnabledOverrideOFF))
+
+        waitlistEnabledUseRemoteValueMenuItem = NSMenuItem(title: "Remote Value", action: #selector(Self.waitlistActiveUseRemoteValue))
+        waitlistEnabledOverrideONMenuItem = NSMenuItem(title: "ON", action: #selector(Self.waitlistActiveOverrideON))
+        waitlistEnabledOverrideOFFMenuItem = NSMenuItem(title: "OFF", action: #selector(Self.waitlistActiveOverrideOFF))
+
+        super.init(title: "")
+        buildItems {
+            NSMenuItem(title: "Reset Waitlist Overrides", action: #selector(Self.waitlistResetFeatureOverrides)).targetting(self)
+            NSMenuItem.separator()
+
+            NSMenuItem(title: "Waitlist Enabled") {
+                waitlistActiveUseRemoteValueMenuItem.targetting(self)
+                waitlistActiveOverrideONMenuItem.targetting(self)
+                waitlistActiveOverrideOFFMenuItem.targetting(self)
+            }
+
+            NSMenuItem(title: "Waitlist Active") {
+                waitlistEnabledUseRemoteValueMenuItem.targetting(self)
+                waitlistEnabledOverrideONMenuItem.targetting(self)
+                waitlistEnabledOverrideOFFMenuItem.targetting(self)
+            }
+        }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     // MARK: - Misc IBActions
 
-    @IBAction
-    func waitlistResetFeatureOverrides(sender: NSMenuItem) {
+    @objc func waitlistResetFeatureOverrides(sender: NSMenuItem) {
         waitlistActiveOverrideValue = WaitlistOverride.default.rawValue
         waitlistEnabledOverrideValue = WaitlistOverride.default.rawValue
     }
 
     // MARK: - Waitlist Active IBActions
 
-    @IBAction
-    func waitlistActiveUseRemoteValue(sender: NSMenuItem) {
+    @objc func waitlistActiveUseRemoteValue(sender: NSMenuItem) {
         waitlistActiveOverrideValue = WaitlistOverride.useRemoteValue.rawValue
     }
 
-    @IBAction
-    func waitlistActiveOverrideON(sender: NSMenuItem) {
+    @objc func waitlistActiveOverrideON(sender: NSMenuItem) {
         waitlistActiveOverrideValue = WaitlistOverride.on.rawValue
     }
 
-    @IBAction
-    func waitlistActiveOverrideOFF(sender: NSMenuItem) {
+    @objc func waitlistActiveOverrideOFF(sender: NSMenuItem) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await waitlistOFFAlert().runModal() else {
                 return
@@ -91,18 +112,15 @@ final class NetworkProtectionWaitlistMenu: NSMenu {
 
     // MARK: - Waitlist Enabled IBActions
 
-    @IBAction
-    func waitlistEnabledUseRemoteValue(sender: NSMenuItem) {
+    @objc func waitlistEnabledUseRemoteValue(sender: NSMenuItem) {
         waitlistEnabledOverrideValue = WaitlistOverride.useRemoteValue.rawValue
     }
 
-    @IBAction
-    func waitlistEnabledOverrideON(sender: NSMenuItem) {
+    @objc func waitlistEnabledOverrideON(sender: NSMenuItem) {
         waitlistEnabledOverrideValue = WaitlistOverride.on.rawValue
     }
 
-    @IBAction
-    func waitlistEnabledOverrideOFF(sender: NSMenuItem) {
+    @objc func waitlistEnabledOverrideOFF(sender: NSMenuItem) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await waitlistOFFAlert().runModal() else {
                 return
@@ -142,5 +160,11 @@ final class NetworkProtectionWaitlistMenu: NSMenu {
         return alert
     }
 }
+
+#if DEBUG
+#Preview {
+    return MenuPreview(menu: NetworkProtectionWaitlistFeatureFlagOverridesMenu())
+}
+#endif
 
 #endif
