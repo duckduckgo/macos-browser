@@ -23,6 +23,11 @@ import WebKit
 import Combine
 
 final public class DataBrokerProtectionViewController: NSViewController {
+
+    private enum Constants {
+        static let dbpUiUrl = "https://duckduckgo.com/dbp"
+    }
+
     private let dataManager: DataBrokerProtectionDataManaging
     private let scheduler: DataBrokerProtectionScheduler
     private var webView: WKWebView?
@@ -42,7 +47,9 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
 
-        _ = dataManager.fetchProfile(ignoresCache: true)
+        Task {
+            _ = dataManager.fetchProfile(ignoresCache: true)
+        }
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -58,11 +65,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView?.uiDelegate = self
         view = webView!
 
-        // FOR LOCAL WEB UI DEVELOPMENT:
-        // Comment this line 👇
-//        webView?.loadHTMLString(debugPage, baseURL: nil)
-        // Uncomment this line and add your dev URL 👇
-        webView?.load(URL(string: "https://bhall.duckduckgo.com/dbp")!)
+        webView?.load(URL(string: Constants.dbpUiUrl)!)
     }
 
 }
