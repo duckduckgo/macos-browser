@@ -65,7 +65,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
 
         // load the test page
         let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         let trackersCount = try await trackersCountPromise.value
         XCTAssertEqual(trackersCount, 1)
@@ -78,7 +78,7 @@ class PrivacyDashboardIntegrationTests: XCTestCase {
             .timeout(10)
             .first()
             .promise()
-        _=await tab.setUrl(URL.testsServer, userEntered: nil)?.value?.result
+        _=await tab.setUrl(URL.testsServer, userEntered: nil)?.result
 
         let trackersCount2 = try await trackersCountPromise2.value
         XCTAssertEqual(trackersCount2, 0)
