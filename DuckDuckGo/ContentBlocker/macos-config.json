@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1697729446093,
+    "version": 1697802863205,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1925,6 +1925,15 @@
                         ]
                     },
                     {
+                        "domain": "avito.ru",
+                        "rules": [
+                            {
+                                "selector": "[class*='advert-mimicry-block']",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "bbc.com",
                         "rules": [
                             {
@@ -3145,6 +3154,15 @@
                         ]
                     },
                     {
+                        "domain": "whitakerfuneralhome.com",
+                        "rules": [
+                            {
+                                "selector": ".top-banner",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "winnipegfreepress.com",
                         "rules": [
                             {
@@ -3311,7 +3329,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "733a7c9cd590ef218027167c632a3125"
+            "hash": "5c92278b92b084940cc99a794908039f"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3747,6 +3765,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/644"
                 },
                 {
+                    "domain": "crunchyroll.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1422"
+                },
+                {
                     "domain": "eventbrite.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/700"
                 },
@@ -3788,7 +3810,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "402a82434b6f2b8a5321d9f004a7c33f"
+            "hash": "5c43f4f38bad7596fa34ac88305f444a"
         },
         "harmfulApis": {
             "settings": {

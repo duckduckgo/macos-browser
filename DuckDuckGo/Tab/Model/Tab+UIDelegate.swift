@@ -78,7 +78,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                                             windowFeatures: WKWindowFeatures,
                                             completionHandler: @escaping (WKWebView?) -> Void) {
 
-        switch newWindowPolicy(for: navigationAction, windowFeatures: windowFeatures) {
+        switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
             // proceed to web view creation
@@ -123,7 +123,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         }
     }
 
-    private func newWindowPolicy(for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> NavigationDecision? {
+    private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
         if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
             return newWindowPolicy
         }
@@ -132,16 +132,6 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         for handler in self.newWindowPolicyDecisionMakers ?? [] {
             guard let newWindowPolicy = handler.decideNewWindowPolicy(for: navigationAction) else { continue }
             return newWindowPolicy
-        }
-
-        // This is a temporary fix for macOS 14.1 WKWindowFeatures being empty when opening a new regular tab
-        // Instead of defaulting to no policy, we default to tab policy, and allow popups in some limited scenarios.
-        // See https://app.asana.com/0/1177771139624306/1205690527704551/f.
-        if #available(macOS 14.1, *) {
-            if windowFeatures.statusBarVisibility != nil || windowFeatures.menuBarVisibility != nil {
-                return nil
-            }
-            return .allow(.tab(selected: true, burner: burnerMode.isBurner))
         }
 
         // allow popups opened from an empty window console
