@@ -220,7 +220,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-        DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
+        DispatchQueue.global(qos: .background).async {
+            DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
+        }
 #endif
     }
 
