@@ -52,6 +52,9 @@ extension Pixel.Event {
         case .dailyPixel(let pixel, isFirst: _):
             return pixel.parameters
 
+        case .dailyOsVersionCounter:
+            return [PixelKit.Parameters.osMajorVersion: "\(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)"]
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,

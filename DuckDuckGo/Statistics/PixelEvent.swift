@@ -98,6 +98,8 @@ extension Pixel {
         case serpInitial(cohort: String)
         case serpDay21to27(cohort: String)
 
+        case dailyOsVersionCounter
+
         case dataImportFailed(any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
@@ -347,6 +349,9 @@ extension Pixel.Event {
 
         case .serp:
             return "m_mac_navigation_search"
+
+        case .dailyOsVersionCounter:
+            return "m_mac_daily-os-version-counter"
 
         case .dataImportFailed(let error) where error.action == .favicons:
             return "m_mac_favicon-import-failed_\(error.source)"
