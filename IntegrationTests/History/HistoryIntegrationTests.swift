@@ -65,7 +65,6 @@ class HistoryIntegrationTests: XCTestCase {
         """
 
         let url = URL.testsServer.appendingTestParameters(data: html.utf8data)
-        OSLog.enabledLoggingCategories.insert(OSLog.AppCategories.navigation.rawValue)
         let titleChangedPromise1 = tab.$title
             .filter { $0 == "Title 1" }
             .receive(on: DispatchQueue.main)
