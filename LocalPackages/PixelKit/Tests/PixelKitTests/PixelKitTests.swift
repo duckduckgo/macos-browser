@@ -18,7 +18,7 @@
 
 import XCTest
 @testable import PixelKit
-import os.log // swiftlint:disable:this enforce_os_log_wrapper
+import os.log
 
 final class PixelKitTests: XCTestCase {
 
@@ -157,7 +157,7 @@ final class PixelKitTests: XCTestCase {
         }
 
         // Run test
-        pixelKit.fire(event)
+        pixelKit.fire(event, frequency: .dailyOnly)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
@@ -201,8 +201,8 @@ final class PixelKitTests: XCTestCase {
         }
 
         // Run test
-        pixelKit.fire(event)
-        pixelKit.fire(event)
+        pixelKit.fire(event, frequency: .dailyOnly)
+        pixelKit.fire(event, frequency: .dailyOnly)
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)

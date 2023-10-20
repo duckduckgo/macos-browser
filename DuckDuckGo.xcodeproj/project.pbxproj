@@ -4331,6 +4331,8 @@
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B5291892A169BC90022E406 /* NetworkProtectionDeveloperID.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = NetworkProtectionDeveloperID.xcconfig; sourceTree = "<group>"; };
 		7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionLoginItemScheduler.swift; sourceTree = "<group>"; };
+		7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgentAppStore.xcconfig; sourceTree = "<group>"; };
+		7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBPAgent.xcconfig; sourceTree = "<group>"; };
 		7B736E5F2A4A22B700F9922A /* enableOnDemand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = enableOnDemand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionShared.swift"; sourceTree = "<group>"; };
@@ -4458,7 +4460,7 @@
 		9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginItem+NetworkProtection.swift"; sourceTree = "<group>"; };
 		9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginItemsManager.swift; sourceTree = "<group>"; };
 		9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoDBPBackgroundAgent.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9D9AE8F22AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoDBPBackgroundAgentAppStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D9AE8F22AAA39D30026E7DC /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = .app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-AppStore.plist"; sourceTree = "<group>"; };
 		9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckDuckGoDBPBackgroundAgentAppDelegate.swift; sourceTree = "<group>"; };
 		9D9AE9162AAA3B450026E7DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -5514,6 +5516,7 @@
 				4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */,
 				378E2799296F6FDE00FCADA2 /* ManualAppStoreRelease.xcconfig */,
 				3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */,
+				7B6EC5E32AE2D88C004FE6DF /* DBP */,
 				4B18E3222A1D31E4005D0AAA /* NetworkProtection */,
 			);
 			path = App;
@@ -6546,6 +6549,15 @@
 			path = UITests;
 			sourceTree = "<group>";
 		};
+		7B6EC5E32AE2D88C004FE6DF /* DBP */ = {
+			isa = PBXGroup;
+			children = (
+				7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */,
+				7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */,
+			);
+			path = DBP;
+			sourceTree = "<group>";
+		};
 		7B96D0D02ADFDA7F007E02C8 /* DuckDuckGoDBPTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -7080,7 +7092,7 @@
 				7B736E5F2A4A22B700F9922A /* enableOnDemand.app */,
 				3192A26E2A4C4CFF0084EA89 /* DuckDuckGoDBP.app */,
 				9D9AE8D12AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent.app */,
-				9D9AE8F22AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.app */,
+				9D9AE8F22AAA39D30026E7DC /* .app */,
 				4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */,
 				7B96D0CF2ADFDA7E007E02C8 /* DuckDuckGoDBPTests.xctest */,
 			);
@@ -9037,7 +9049,7 @@
 				9D6983FA2AC773C8002C02FC /* PixelKit */,
 			);
 			productName = DuckDuckGoAgent;
-			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore.app */;
+			productReference = 9D9AE8F22AAA39D30026E7DC /* .app */;
 			productType = "com.apple.product-type.application";
 		};
 		AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */ = {
@@ -14072,159 +14084,57 @@
 		};
 		9D9AE8CD2AAA39A70026E7DC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
-					"DEBUG=1",
-					"$(inherited)",
-					"DBP=1",
-					"NETP_SYSTEM_EXTENSION=1",
-				);
-				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent.debug;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
 		9D9AE8CE2AAA39A70026E7DC /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
-					"NETP_SYSTEM_EXTENSION=1",
-					"DBP=1",
-					"DEBUG=1",
-					"CI=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent.debug;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = CI;
 		};
 		9D9AE8CF2AAA39A70026E7DC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
-					"DBP=1",
-					"NETP_SYSTEM_EXTENSION=1",
-				);
-				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 		9D9AE8D02AAA39A70026E7DC /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
-					"REVIEW=1",
-					"$(inherited)",
-					"NETP_SYSTEM_EXTENSION=1",
-					"DBP=1",
-				);
-				INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent.review;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Review;
 		};
 		9D9AE8EE2AAA39D30026E7DC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
-					"DEBUG=1",
-					"$(inherited)",
-					"DBP=1",
-					"NETP_SYSTEM_EXTENSION=1",
-				);
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent.debug;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
 		9D9AE8EF2AAA39D30026E7DC /* CI */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
-					"NETP_SYSTEM_EXTENSION=1",
-					"DBP=1",
-					"DEBUG=1",
-					"CI=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent.debug;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = CI;
 		};
 		9D9AE8F02AAA39D30026E7DC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
-					"DBP=1",
-					"NETP_SYSTEM_EXTENSION=1",
-				);
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 		9D9AE8F12AAA39D30026E7DC /* Review */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4B2D064B2A11D04000DE1F49 /* DuckDuckGoAgent.xcconfig */;
+			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgentAppStore.entitlements;
-				"GCC_PREPROCESSOR_DEFINITIONS[sdk=*][arch=*]" = (
-					"REVIEW=1",
-					"$(inherited)",
-					"NETP_SYSTEM_EXTENSION=1",
-					"DBP=1",
-				);
-				INFOPLIST_FILE = "DuckDuckGoDBPBackgroundAgent/Info-AppStore.plist";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSPrincipalClass = Application;
-				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.DBP.backgroundAgent.review;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Review;
 		};
