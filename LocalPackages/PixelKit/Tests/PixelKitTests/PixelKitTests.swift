@@ -18,7 +18,7 @@
 
 import XCTest
 @testable import PixelKit
-import os.log
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 final class PixelKitTests: XCTestCase {
 
