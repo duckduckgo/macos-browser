@@ -23,12 +23,15 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        if model.isSyncBookmarksPaused {
-            syncPaused(for: .bookmarks)
+        VStack(alignment: .leading, spacing: 16) {
+            if model.isSyncBookmarksPaused {
+                syncPaused(for: .bookmarks)
+            }
+            if model.isSyncCredentialsPaused {
+                syncPaused(for: .credentials)
+            }
         }
-        if model.isSyncCredentialsPaused {
-            syncPaused(for: .credentials)
-        }
+        .padding(.top, 20)
 
         PreferencePaneSection(vericalPadding: 12) {
             SyncStatusView<ViewModel>()
@@ -120,7 +123,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return UserText.credentialsLimitExceededAction
             }
         }
-        PreferencePaneSection(vericalPadding: 12) {
+        PreferencePaneSection(vericalPadding: 16) {
             HStack(alignment: .top, spacing: 8) {
                 Text("⚠️")
                 VStack(alignment: .leading, spacing: 8) {
@@ -140,6 +143,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             }
             .padding(.horizontal, 16)
         }
+        .frame(width: 512, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
     }
 
