@@ -37,7 +37,7 @@ enum NewWindowPolicy {
         // See https://app.asana.com/0/1177771139624306/1205690527704551/f.
         if #available(macOS 14.1, *),
            windowFeatures.statusBarVisibility == nil && windowFeatures.menuBarVisibility == nil {
-            self = .tab(selected: true, burner: isBurner)
+            self = .tab(selected: shouldSelectNewTab, burner: isBurner)
 
         } else {
             self = .window(active: true, burner: isBurner)

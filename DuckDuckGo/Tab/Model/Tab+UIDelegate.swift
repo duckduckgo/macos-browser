@@ -78,7 +78,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                                             windowFeatures: WKWindowFeatures,
                                             completionHandler: @escaping (WKWebView?) -> Void) {
 
-        switch newWindowPolicy(for: navigationAction, windowFeatures: windowFeatures) {
+        switch newWindowPolicy(for: navigationAction) {
         // popup kind is known, action doesn‘t require Popup Permission
         case .allow(let targetKind):
             // proceed to web view creation
@@ -123,7 +123,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         }
     }
 
-    private func newWindowPolicy(for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> NavigationDecision? {
+    private func newWindowPolicy(for navigationAction: WKNavigationAction) -> NavigationDecision? {
         if let newWindowPolicy = self.decideNewWindowPolicy(for: navigationAction) {
             return newWindowPolicy
         }
