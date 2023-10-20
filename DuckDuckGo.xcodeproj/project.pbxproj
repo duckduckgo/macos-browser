@@ -13347,8 +13347,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS NetP VPN SysEx - Release (XPC)";
 			};
 			name = Release;
 		};
@@ -13356,8 +13354,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS NetP VPN SysEx - Review (XPC)";
 			};
 			name = Review;
 		};
@@ -13379,8 +13375,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS NetP VPN App - Release (XPC)";
 			};
 			name = Release;
 		};
@@ -13388,8 +13382,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "macOS Network Protection VPN - Review";
 			};
 			name = Review;
 		};
