@@ -30,6 +30,15 @@ enum NewWindowPolicy {
                         burner: isBurner)
         } else if windowFeatures.width != nil {
             self = .popup(origin: windowFeatures.origin, size: windowFeatures.size)
+
+        } else
+        // This is a temporary fix for macOS 14.1 WKWindowFeatures being empty when opening a new regular tab
+        // Instead of defaulting to window policy, we default to tab policy, and allow popups in some limited scenarios.
+        // See https://app.asana.com/0/1177771139624306/1205690527704551/f.
+        if #available(macOS 14.1, *),
+           windowFeatures.statusBarVisibility == nil && windowFeatures.menuBarVisibility == nil {
+            self = .tab(selected: true, burner: isBurner)
+
         } else {
             self = .window(active: true, burner: isBurner)
         }
