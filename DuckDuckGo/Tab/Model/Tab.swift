@@ -529,7 +529,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     @discardableResult
-    func setContent(_ newContent: TabContent) -> Task<ExpectedNavigation?, Never>? {
+    func setContent(_ newContent: TabContent) -> ExpectedNavigation? {
         guard contentChangeEnabled else { return nil }
 
         let oldContent = self.content
@@ -554,13 +554,11 @@ protocol NewWindowPolicyDecisionMaker {
             self.title = title
         }
 
-        return Task {
-            await reloadIfNeeded(shouldLoadInBackground: true)
-        }
+        return reloadIfNeeded(shouldLoadInBackground: true)
     }
 
     @discardableResult
-    func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
+    func setUrl(_ url: URL?, userEntered: String?) -> ExpectedNavigation? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -772,7 +770,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor(unsafe)
     @discardableResult
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {
-        guard case .url(let url, credential: _, userEntered: let userEntered) = content else { return nil }
+        guard case .url(let url, credential: _, userEntered: let userEntered) = content, url.scheme != "about" else { return nil }
 
         let userForcedReload = (url.absoluteString == userEntered) ? shouldLoadInBackground : false
 
@@ -932,9 +930,11 @@ protocol NewWindowPolicyDecisionMaker {
         }.store(in: &webViewCancellables)
 
         // background tab loading should start immediately
-        reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
-        if !shouldLoadInBackground {
-            addHomePageToWebViewIfNeeded()
+        DispatchQueue.main.async {
+            self.reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+            if !shouldLoadInBackground {
+                self.addHomePageToWebViewIfNeeded()
+            }
         }
     }
 
