@@ -36,12 +36,12 @@ public final class PixelKit {
         case dailyAndContinuous
     }
 
-    enum Header {
-        static let acceptEncoding = "Accept-Encoding"
-        static let acceptLanguage = "Accept-Language"
-        static let userAgent = "User-Agent"
-        static let ifNoneMatch = "If-None-Match"
-        static let moreInfo = "X-DuckDuckGo-MoreInfo"
+    public enum Header {
+        public static let acceptEncoding = "Accept-Encoding"
+        public static let acceptLanguage = "Accept-Language"
+        public static let userAgent = "User-Agent"
+        public static let ifNoneMatch = "If-None-Match"
+        public static let moreInfo = "X-DuckDuckGo-MoreInfo"
     }
 
     /// A closure typealias to request sending pixels through the network.
@@ -56,7 +56,7 @@ public final class PixelKit {
 
     public typealias Event = PixelKitEvent
 
-    static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
+    public static let duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
     private let defaults: UserDefaults
 

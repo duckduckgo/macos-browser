@@ -20,10 +20,16 @@ import Foundation
 import BrowserServicesKit
 import Bookmarks
 import Configuration
+import PixelKit
 
 extension Pixel {
 
     indirect enum Event {
+        /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
+        /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
+        /// nothing breaks in the migration towards `PixelKit`.
+        case pixelKitEvent(_ event: PixelKitEvent)
+
         case crash
 
         case brokenSiteReport
@@ -166,29 +172,12 @@ extension Pixel {
         case setnewHomePage
 
         case dailyPixel(Event, isFirst: Bool)
-#if DBP
-        case parentChildMatches
-        // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
-
-        // Stage Pixels
-        case optOutStart
-        case optOutEmailGenerate
-        case optOutCaptchaParse
-        case optOutCaptchaSend
-        case optOutCaptchaSolve
-        case optOutSubmit
-        case optOutEmailReceive
-        case optOutEmailConfirm
-        case optOutValidate
-        case optOutFinish
-
-        // Process Pixels
-        case optOutSubmitSuccess
-        case optOutSuccess
-        case optOutFailure
-#endif
 
         enum Debug {
+            /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
+            /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
+            /// nothing breaks in the migration towards `PixelKit`.
+            case pixelKitEvent(_ event: PixelKitEvent)
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
 
@@ -321,10 +310,6 @@ extension Pixel {
 
             case networkProtectionRemoteMessageFetchingFailed
             case networkProtectionRemoteMessageStorageFailed
-
-#if DBP
-            case dataBrokerProtectionError
-#endif
         }
 
     }
@@ -334,6 +319,9 @@ extension Pixel.Event {
 
     var name: String {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.name
+
         case .crash:
             return "m_mac_crash"
 
@@ -482,25 +470,6 @@ extension Pixel.Event {
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
-#if DBP
-        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
-            // Stage Pixels
-        case .optOutStart: return "dbp_macos_optout_stage_start"
-        case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"
-        case .optOutCaptchaParse: return "dbp_macos_optout_stage_captcha-parse"
-        case .optOutCaptchaSend: return "dbp_macos_optout_stage_captcha-send"
-        case .optOutCaptchaSolve: return "dbp_macos_optout_stage_captcha-solve"
-        case .optOutSubmit: return "dbp_macos_optout_stage_submit"
-        case .optOutEmailReceive: return "dbp_macos_optout_stage_email-receive"
-        case .optOutEmailConfirm: return "dbp_macos_optout_stage_email-confirm"
-        case .optOutValidate: return "dbp_macos_optout_stage_validate"
-        case .optOutFinish: return "dbp_macos_optout_stage_finish"
-
-            // Process Pixels
-        case .optOutSubmitSuccess: return "dbp_macos_optout_process_submit-success"
-        case .optOutSuccess: return "dbp_macos_optout_process_success"
-        case .optOutFailure: return "dbp_macos_optout_process_failure"
-#endif
         }
     }
 }
@@ -517,6 +486,8 @@ extension Pixel.Event.Debug {
 
     var name: String {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.name
 
         case .assertionFailure:
             return "assertion_failure"
@@ -734,10 +705,6 @@ extension Pixel.Event.Debug {
 
         case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
         case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
-
-#if DBP
-        case .dataBrokerProtectionError: return "data_broker_error"
-#endif
         }
     }
 }

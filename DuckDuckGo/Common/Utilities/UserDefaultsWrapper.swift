@@ -189,7 +189,7 @@ public struct UserDefaultsWrapper<T> {
         if case .normal = NSApplication.runType {
             return .standard
         } else {
-            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApplication.runType.description)!
+            return UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
         }
 #else
         return .standard

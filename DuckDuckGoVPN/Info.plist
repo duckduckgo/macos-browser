@@ -8,5 +8,9 @@
 	<string>$(NETP_APP_GROUP)</string>
 	<key>SYSEX_BUNDLE_ID</key>
 	<string>$(SYSEX_BUNDLE_ID)</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
 </dict>
 </plist>

@@ -1,6 +1,6 @@
 {
   "name": "spokeo.com",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "addedDatetime": 1692590400000,
   "steps": [
     {
@@ -9,12 +9,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "9b9ca680-a65c-4ab7-a425-466140a13a2b",
-          "url": "https://www.spokeo.com/${firstName}-${lastName}/${stateFull}/${city}"
+          "id": "169c9600-433e-4de9-b357-8c659b113556",
+          "url": "https://www.spokeo.com/${firstName}-${lastName}/${state|stateFull}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "77b0db3b-e7c9-4a1f-879f-04380c0f5991",
+          "id": "4bb496d5-63d4-4d36-bab5-e923387f8c75",
           "selector": ".single-column-list-item",
           "profile": {
             "name": {
@@ -46,12 +46,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "0843c5ba-866a-4bf6-85c2-1f3361c259bf",
+          "id": "cc521fcb-a8ea-4820-8bc1-0ccce9dbd8fd",
           "url": "https://www.spokeo.com/optout"
         },
         {
           "actionType": "fillForm",
-          "id": "a322b3e2-c717-439c-8791-4e46fe184875",
+          "id": "147ebdbd-e96a-4c39-b1d6-7f7e77e6369d",
           "selector": ".optout_container",
           "elements": [
             {
@@ -66,17 +66,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "89e966cb-fbc3-4e1c-ad6d-816a021f9fdf",
+          "id": "2e4b92a1-12ab-482d-b83e-e9de82c2b992",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "3e350a87-b310-4790-9351-774f72e18fcb",
+          "id": "4a0bbc9a-a717-4b1d-b3a6-af8131621f52",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "6896ac98-8663-4564-8836-2610060224a1",
+          "id": "79cb3967-20d9-46c5-b4ec-f2da86b481fb",
           "elements": [
             {
               "type": "button",
@@ -86,7 +86,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "046b0dee-d380-41c6-935a-a90ecec80381",
+          "id": "990e3970-6d50-4bbc-9c34-c26929646083",
           "expectations": [
             {
               "type": "text",
@@ -97,12 +97,12 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "c8d03ce7-9d0a-48fb-b98e-7f29745546be",
+          "id": "8993da43-4b9b-4d5b-b59a-efcc609d2583",
           "pollingTime": 30
         },
         {
           "actionType": "expectation",
-          "id": "9bbcfbf2-da07-45f9-a493-f0baddb770bb",
+          "id": "69810d0a-8de0-4613-ad63-f549ea72ef29",
           "expectations": [
             {
               "type": "text",

@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-@testable import DuckDuckGo_Privacy_Browser
 import BrowserServicesKit
 import Combine
 
-@objc(ContentBlockerRulesManagerMock)
+#if DEBUG
+
 final class ContentBlockerRulesManagerMock: NSObject, ContentBlockerRulesManagerProtocol {
     func scheduleCompilation() -> BrowserServicesKit.ContentBlockerRulesManager.CompletionToken {
         fatalError()
@@ -39,3 +39,5 @@ final class ContentBlockerRulesManagerMock: NSObject, ContentBlockerRulesManager
     var currentRules: [ContentBlockerRulesManager.Rules] = []
 
 }
+
+#endif

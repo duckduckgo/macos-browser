@@ -34,9 +34,10 @@ public struct SystemExtensionManager {
     private let manager: OSSystemExtensionManager
     private let workspace: NSWorkspace
 
-    public init(extensionBundleID: String,
-         manager: OSSystemExtensionManager = .shared,
-         workspace: NSWorkspace = .shared) {
+    public init(
+        extensionBundleID: String,
+        manager: OSSystemExtensionManager = .shared,
+        workspace: NSWorkspace = .shared) {
 
         self.extensionBundleID = extensionBundleID
         self.manager = manager

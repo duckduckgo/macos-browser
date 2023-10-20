@@ -265,15 +265,8 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModel.tab.openHomePage()
     }
 
-    // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-
-        guard let internalUserDecider = (NSApp.delegate as! AppDelegate).internalUserDecider else {
-            assertionFailure("\(className): internalUserDecider is nil")
-            os_log("%s: internalUserDecider is nil", type: .error, className)
-            return
-        }
-
+        let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    internalUserDecider: internalUserDecider)
@@ -281,7 +274,6 @@ final class NavigationBarViewController: NSViewController {
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)
     }
-    // swiftlint:enable force_cast
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
         popovers.bookmarksButtonPressed(anchorView: bookmarkListButton,
