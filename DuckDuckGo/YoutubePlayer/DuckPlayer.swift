@@ -253,7 +253,7 @@ extension DuckPlayer {
         let preferencesPersistor = DuckPlayerPreferencesPersistorMock(duckPlayerMode: mode, youtubeOverlayInteracted: true)
         let preferences = DuckPlayerPreferences(persistor: preferencesPersistor)
         // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-        let privacyConfigurationManager = ((NSClassFromString("MockPrivacyConfigurationManager") as? NSObject.Type)!.init() as? PrivacyConfigurationManaging)!
+        let privacyConfigurationManager = MockPrivacyConfigurationManager()
         return DuckPlayer(preferences: preferences, privacyConfigurationManager: privacyConfigurationManager)
     }
 

@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
-import XCTest
 import BrowserServicesKit
 import Combine
-@testable import DuckDuckGo_Privacy_Browser
 
-class MockPrivacyConfiguration: PrivacyConfiguration {
+#if DEBUG
+
+final class MockPrivacyConfiguration: PrivacyConfiguration {
 
     var isSubfeatureKeyEnabled: ((any PrivacySubfeature, AppVersionProvider) -> Bool)?
     func isSubfeatureEnabled(_ subfeature: any PrivacySubfeature, versionProvider: AppVersionProvider, randomizer: (Range<Double>) -> Double) -> Bool {
@@ -51,8 +51,7 @@ class MockPrivacyConfiguration: PrivacyConfiguration {
     func userDisabledProtection(forDomain: String) {}
 }
 
-@objc(MockPrivacyConfigurationManager)
-class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
+final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
     var embeddedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData {
         fatalError("not implemented")
     }
@@ -72,3 +71,5 @@ class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
 }
+
+#endif
