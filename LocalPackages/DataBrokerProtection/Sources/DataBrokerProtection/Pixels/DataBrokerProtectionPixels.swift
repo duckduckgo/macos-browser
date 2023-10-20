@@ -22,13 +22,26 @@ import BrowserServicesKit
 import PixelKit
 
 final class DataBrokerProtectionStageDurationCalculator {
+    
+    enum Stage: String {
+        case start
+        case emailGenerate = "email-generate"
+        case captchaParse = "captcha-parse"
+        case captchaSend = "captcha-send"
+        case captchaSolve = "captcha-solve"
+        case submit
+        case emailReceive = "email-receive"
+        case emailConfirm = "email-confirm"
+        case validate
+        case other
+    }
 
     let handler: EventMapping<DataBrokerProtectionPixels>
     let attemptId: UUID
     let dataBroker: String
     let startTime: Date
     var lastStateTime: Date
-    var stage: String?
+    var stage: Stage = .other
 
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
@@ -57,7 +70,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutStart() {
-        setStartStage()
+        setStage(.start)
         handler.fire(.optOutStart(dataBroker: dataBroker, attemptId: attemptId))
     }
 
@@ -78,7 +91,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutSubmit() {
-        setSubmitStage()
+        setStage(.submit)
         handler.fire(.optOutSubmit(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
@@ -91,7 +104,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutValidate() {
-        setValidateStage()
+        setStage(.validate)
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
@@ -100,46 +113,14 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutFailure() {
-        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime(), stage: stage ?? "other"))
+        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime(), stage: stage.rawValue))
     }
 
     // Helper methods to set the stage that is about to run. This help us
     // identifying the stage so we can know which one was the one that failed.
 
-    func setStartStage() {
-        stage = "start"
-    }
-
-    func setEmailGenerateStage() {
-        stage = "email-generate"
-    }
-
-    func setCaptchaParseStage() {
-        stage = "captcha-parse"
-    }
-
-    func setCaptchaSendStage() {
-        stage = "captcha-send"
-    }
-
-    func setCaptchaSolveStage() {
-        stage = "captcha-solve"
-    }
-
-    func setSubmitStage() {
-        stage = "submit"
-    }
-
-    func setEmailReceiveStage() {
-        stage = "email-receive"
-    }
-
-    func setEmailConfirmStage() {
-        stage = "email-confirm"
-    }
-
-    func setValidateStage() {
-        stage = "validate"
+    func setStage(_ stage: Stage) {
+        self.stage = stage
     }
 }
 

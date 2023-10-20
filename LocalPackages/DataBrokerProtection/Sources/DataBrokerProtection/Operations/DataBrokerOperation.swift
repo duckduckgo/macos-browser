@@ -84,7 +84,7 @@ extension DataBrokerOperation {
 
         if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
             actionsHandler?.captchaTransactionId = nil
-            stageCalculator?.setCaptchaSolveStage()
+            stageCalculator?.setStage(.captchaSolve)
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
                 stageCalculator?.fireOptOutCaptchaSolve()
@@ -98,7 +98,7 @@ extension DataBrokerOperation {
 
         if action.needsEmail {
             do {
-                stageCalculator?.setEmailGenerateStage()
+                stageCalculator?.setStage(.emailGenerate)
                 extractedProfile?.email = try await emailService.getEmail()
                 stageCalculator?.fireOptOutEmailGenerate()
             } catch {
@@ -114,7 +114,7 @@ extension DataBrokerOperation {
             //
             // https://app.asana.com/0/1203581873609357/1205476538384291/f
             retriesCountOnError = 3
-            stageCalculator?.setCaptchaParseStage()
+            stageCalculator?.setStage(.captchaParse)
         }
 
         if let extractedProfile = self.extractedProfile {
@@ -126,7 +126,7 @@ extension DataBrokerOperation {
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
         if let email = extractedProfile?.email {
-            stageCalculator?.setEmailReceiveStage()
+            stageCalculator?.setStage(.emailReceive)
             let url =  try await emailService.getConfirmationLink(
                 from: email,
                 numberOfRetries: 100, // Move to constant
@@ -134,7 +134,7 @@ extension DataBrokerOperation {
                 shouldRunNextStep: shouldRunNextStep
             )
             stageCalculator?.fireOptOutEmailReceive()
-            stageCalculator?.setEmailConfirmStage()
+            stageCalculator?.setStage(.emailReceive)
             try? await webViewHandler?.load(url: url)
             stageCalculator?.fireOptOutEmailConfirm()
         } else {
@@ -183,7 +183,7 @@ extension DataBrokerOperation {
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
         do {
             stageCalculator?.fireOptOutCaptchaParse()
-            stageCalculator?.setCaptchaSendStage()
+            stageCalculator?.setStage(.captchaSend)
             actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
                                                                                                      shouldRunNextStep: shouldRunNextStep)
             stageCalculator?.fireOptOutCaptchaSend()
