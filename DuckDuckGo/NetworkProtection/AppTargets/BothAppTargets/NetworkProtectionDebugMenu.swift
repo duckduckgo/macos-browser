@@ -538,7 +538,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
-        // TODO: reimplement this probably getting the routes data from elsewhere
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
         /*
         if menu === exclusionsMenu {
             let controller = NetworkProtectionTunnelController()
