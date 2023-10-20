@@ -49,8 +49,8 @@ PRODUCT_NAME[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID)
 PRODUCT_NAME[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID)
 
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP System Extension - Release
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP System Extension - Review
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP VPN SysEx - Release (XPC)
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP VPN SysEx - Review (XPC)
 
 SDKROOT = macosx
 SKIP_INSTALL = YES

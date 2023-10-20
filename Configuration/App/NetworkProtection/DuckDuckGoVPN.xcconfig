@@ -45,8 +45,8 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS Network Protection Agent App Product Review
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection Agent App (Distribution)
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP VPN App - Review (XPC)
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP VPN App - Release (XPC)
 
 FEATURE_FLAGS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
