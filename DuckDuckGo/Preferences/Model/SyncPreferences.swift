@@ -38,6 +38,10 @@ extension SyncDevice {
 
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
+    struct Consts {
+        static let syncPausedStateChanged = Notification.Name("com.duckduckgo.app.SyncPausedStateChanged")
+    }
+
     var isSyncEnabled: Bool {
         syncService.account != nil
     }
@@ -65,6 +69,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
         }
     }
+
+    @Published var isSyncBookmarksPaused: Bool
+
+    @Published var isSyncCredentialsPaused: Bool
+
     private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
 
     var recoveryCode: String? {
@@ -113,10 +122,25 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         }
     }
 
+    @MainActor
+    func manageBookmarks() {
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.showManageBookmarks(self)
+    }
+
+    @MainActor
+    func manageLogins() {
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
+    }
+
     init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
         self.syncService = syncService
 
         self.isUnifiedFavoritesEnabled = apperancePreferences.favoritesDisplayMode.isDisplayUnified
+        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
 
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
@@ -156,6 +180,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .asVoid()
             .sink { [weak self] _ in
                 self?.onEndFlow()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
             }
             .store(in: &cancellables)
     }
