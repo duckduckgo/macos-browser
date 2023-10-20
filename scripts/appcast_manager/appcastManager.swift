@@ -168,12 +168,15 @@ case .releaseToPublicChannel:
 
 func performCommonChecksAndOperations() {
     // Check if generate_appcast is recent
-    if !checkGenerateAppcastRecency() {
+    guard checkSparkleToolRecency(toolName: "generate_appcast"),
+          checkSparkleToolRecency(toolName: "generate_keys"),
+          checkSparkleToolRecency(toolName: "sign_update"),
+          checkSparkleToolRecency(toolName: "BinaryDelta") else {
         exit(1)
     }
 
     // Verify signing keys
-    if !verifySigningKeys() {
+    guard verifySigningKeys() else {
         exit(1)
     }
 
@@ -187,34 +190,33 @@ func getDmgFilename(for version: String) -> String {
 
 // MARK: - Checking the recency of Sparkle tools
 
-func checkGenerateAppcastRecency() -> Bool {
-    // Get the path to the binary using the shell function
-    let binaryPath = shell("which", "generate_appcast").trimmingCharacters(in: .whitespacesAndNewlines)
+func checkSparkleToolRecency(toolName: String) -> Bool {
+    let binaryPath = shell("which", toolName).trimmingCharacters(in: .whitespacesAndNewlines)
 
     if binaryPath.isEmpty {
-        print("Failed to find the path for generate_appcast.")
+        print("Failed to find the path for \(toolName).")
         return false
     }
 
     guard let binaryAttributes = try? FileManager.default.attributesOfItem(atPath: binaryPath),
           let modificationDate = binaryAttributes[.modificationDate] as? Date else {
-        print("Failed to get the modification date for generate_appcast.")
+        print("Failed to get the modification date for \(toolName).")
         return false
     }
 
     // Get the current script's path and navigate to the root folder to get the release date file
     let currentScriptPath = URL(fileURLWithPath: #file)
     let rootDirectory = currentScriptPath.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-    let releaseDateFilePath = rootDirectory.appendingPathComponent(".generate_appcast_release_date")
+    let releaseDateFilePath = rootDirectory.appendingPathComponent(".sparkle_tools_release_date")
 
     guard let releaseDateString = try? String(contentsOf: releaseDateFilePath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
           let releaseDate = DateFormatter.yyyyMMdd.date(from: releaseDateString) else {
-        print("Failed to get the release date from .generate_appcast_release_date.")
+        print("Failed to get the release date from .sparkle_tools_release_date.")
         return false
     }
 
     if modificationDate < releaseDate {
-        print("Sparkle binary utilities are outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
+        print("\(toolName) from Sparkle binary utilities is outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
         return false
     }
 
