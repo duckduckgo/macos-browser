@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1697463996538,
+    "version": 1697802863205,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -100,7 +100,6 @@
                 ],
                 "keywords": [
                     "=amp",
-                    "amp=",
                     "&amp",
                     "amp&",
                     "/amp",
@@ -115,7 +114,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "87198c8b0bc8c044f0773599845fa371"
+            "hash": "cf1e1726876b6f6510eae65e2bc37047"
         },
         "autoconsent": {
             "exceptions": [
@@ -1205,6 +1204,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1377"
                 },
                 {
+                    "domain": "ads.google.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1401"
+                },
+                {
                     "domain": "earth.google.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1099"
                 },
@@ -1221,7 +1224,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1085"
                 }
             ],
-            "hash": "f43e0ec67d1177139fe5cfc603cbd8a3"
+            "hash": "f94b331bc97d678adbd90ed74feb40b2"
         },
         "cookie": {
             "settings": {
@@ -1466,7 +1469,7 @@
                 }
             ],
             "settings": {
-                "useStrictHideStyleTag": false,
+                "useStrictHideStyleTag": true,
                 "rules": [
                     {
                         "selector": "[id*='gpt-']",
@@ -1853,13 +1856,16 @@
                     300,
                     500,
                     1000,
+                    1500,
                     2000,
-                    3000
+                    3000,
+                    5000
                 ],
                 "unhideTimeouts": [
                     1250,
                     2250,
-                    3000
+                    3250,
+                    5250
                 ],
                 "mediaAndFormSelectors": "video,canvas,embed,object,audio,map,form,input,textarea,select,option",
                 "adLabelStrings": [
@@ -1915,6 +1921,15 @@
                             {
                                 "selector": ".proper-dynamic-insertion",
                                 "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "avito.ru",
+                        "rules": [
+                            {
+                                "selector": "[class*='advert-mimicry-block']",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -3139,6 +3154,15 @@
                         ]
                     },
                     {
+                        "domain": "whitakerfuneralhome.com",
+                        "rules": [
+                            {
+                                "selector": ".top-banner",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "winnipegfreepress.com",
                         "rules": [
                             {
@@ -3305,7 +3329,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "f96871e64bd20051f80ede6d2b7cd205"
+            "hash": "5c92278b92b084940cc99a794908039f"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3741,6 +3765,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/644"
                 },
                 {
+                    "domain": "crunchyroll.com",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1422"
+                },
+                {
                     "domain": "eventbrite.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/700"
                 },
@@ -3782,7 +3810,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "402a82434b6f2b8a5321d9f004a7c33f"
+            "hash": "5c43f4f38bad7596fa34ac88305f444a"
         },
         "harmfulApis": {
             "settings": {
@@ -4019,6 +4047,9 @@
                             },
                             {
                                 "percent": 50
+                            },
+                            {
+                                "percent": 75
                             }
                         ]
                     }
@@ -4026,7 +4057,7 @@
             },
             "exceptions": [],
             "minSupportedVersion": "1.57.1",
-            "hash": "349bde069925bc3b372e188803829b66"
+            "hash": "8d9f72bb3b8264979cbef85febb5215e"
         },
         "newTabContinueSetUp": {
             "exceptions": [],
@@ -5338,7 +5369,7 @@
                             {
                                 "rule": "geoip-js.com/js/apis/geoip2/v2.1/geoip2.js",
                                 "domains": [
-                                    "yourrewardcard.com"
+                                    "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1288"
                             }
@@ -6209,6 +6240,13 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/529"
+                            },
+                            {
+                                "rule": "cmp.osano.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1398"
                             }
                         ]
                     },
@@ -6682,6 +6720,17 @@
                             }
                         ]
                     },
+                    "succeedscene.com": {
+                        "rules": [
+                            {
+                                "rule": "succeedscene.com",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1396"
+                            }
+                        ]
+                    },
                     "tealiumiq.com": {
                         "rules": [
                             {
@@ -6723,6 +6772,17 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1107"
+                            }
+                        ]
+                    },
+                    "tiktok.com": {
+                        "rules": [
+                            {
+                                "rule": "www.tiktok.com/embed",
+                                "domains": [
+                                    "<all>"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1412"
                             }
                         ]
                     },
@@ -6999,7 +7059,7 @@
                     "zopim.com": {
                         "rules": [
                             {
-                                "rule": "widget-mediator.zopim.com",
+                                "rule": "zopim.com",
                                 "domains": [
                                     "<all>"
                                 ],
@@ -7100,7 +7160,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1085"
                 }
             ],
-            "hash": "3867301c33f846fd03bd951cd54a240c"
+            "hash": "cbcff4a76b22444e895247ccf73a0950"
         },
         "trackingCookies1p": {
             "settings": {

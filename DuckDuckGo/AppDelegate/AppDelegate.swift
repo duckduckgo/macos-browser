@@ -55,13 +55,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #else
     private let keyStore = EncryptionKeyStore()
 #endif
-    private var fileStore: FileStore!
+
+    private let fileStore: FileStore
 
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
     private let crashReporter = CrashReporter()
-    private(set) var internalUserDecider: InternalUserDecider?
-    private(set) var featureFlagger: FeatureFlagger!
+    let internalUserDecider: InternalUserDecider
+    let featureFlagger: FeatureFlagger
     private var appIconChanger: AppIconChanger!
 
     private(set) var syncDataProviders: SyncDataProviders!
@@ -78,11 +79,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
     // swiftlint:disable:next function_body_length
-    func applicationWillFinishLaunching(_ notification: Notification) {
-        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
-        Configuration.setURLProvider(AppConfigurationURLProvider())
+    override init() {
+        do {
+            let encryptionKey = NSApplication.runType.requiresEnvironment ? try keyStore.readKey() : nil
+            fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
+        } catch {
+            os_log("App Encryption Key could not be read: %s", "\(error)")
+            fileStore = EncryptedFileStore()
+        }
 
-        if !NSApp.isRunningUnitTests {
+        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
+        internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
+
+        if NSApplication.runType.requiresEnvironment {
 #if DEBUG
             Pixel.setUp(dryRun: true)
 #else
@@ -124,34 +133,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
         }
 
-        do {
-            let encryptionKey = NSApp.isRunningUnitTests ? nil : try keyStore.readKey()
-            fileStore = EncryptedFileStore(encryptionKey: encryptionKey)
-        } catch {
-            os_log("App Encryption Key could not be read: %s", "\(error)")
-            fileStore = EncryptedFileStore()
-        }
-        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
-
-        let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
-        let internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
-        self.internalUserDecider = internalUserDecider
-
 #if DEBUG
-        func mock<T>(_ className: String) -> T {
-            ((NSClassFromString(className) as? NSObject.Type)!.init() as? T)!
-        }
-        AppPrivacyFeatures.shared = NSApp.isRunningUnitTests
-            // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
-            ? AppPrivacyFeatures(contentBlocking: mock("ContentBlockingMock"), httpsUpgradeStore: mock("HTTPSUpgradeStoreMock"))
-            : AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+        AppPrivacyFeatures.shared = NSApplication.runType.requiresEnvironment
+        // runtime mock-replacement for Unit Tests, to be redone when we‘ll be doing Dependency Injection
+        ? AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
+        : AppPrivacyFeatures(contentBlocking: ContentBlockingMock(), httpsUpgradeStore: HTTPSUpgradeStoreMock())
 #else
         AppPrivacyFeatures.shared = AppPrivacyFeatures(contentBlocking: AppContentBlocking(internalUserDecider: internalUserDecider), database: Database.shared)
 #endif
 
         featureFlagger = DefaultFeatureFlagger(internalUserDecider: internalUserDecider,
                                                privacyConfig: AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig)
-        NSApp.mainMenuTyped.setup(with: featureFlagger)
+    }
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
+        Configuration.setURLProvider(AppConfigurationURLProvider())
+
+        stateRestorationManager = AppStateRestorationManager(fileStore: fileStore)
 
 #if SPARKLE
         updateController = UpdateController(internalUserDecider: internalUserDecider)
@@ -162,7 +161,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
         defer {
             didFinishLaunching = true
         }
@@ -188,7 +187,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             // MARK: perform first time launch logic here
         }
 
-        let statisticsLoader = (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
+        let statisticsLoader = NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil
         statisticsLoader?.load()
 
         startupSync()
@@ -268,7 +267,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if WindowControllersManager.shared.mainWindowControllers.isEmpty {
+        if WindowControllersManager.shared.mainWindowControllers.isEmpty,
+           case .normal = sender.runType {
             WindowsManager.openNewWindow()
             return true
         }
@@ -276,10 +276,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        guard let internalUserDecider else {
-            return nil
-        }
-
         return ApplicationDockMenu(internalUserDecider: internalUserDecider)
     }
 

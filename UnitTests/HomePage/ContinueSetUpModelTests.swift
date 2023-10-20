@@ -48,7 +48,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     var duckPlayerPreferences: DuckPlayerPreferencesPersistor!
     var delegate: CapturingSetUpVewModelDelegate!
     var privacyConfigManager: MockPrivacyConfigurationManager!
-    let userDefaults = UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
+    let userDefaults = UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
 
     @MainActor override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
