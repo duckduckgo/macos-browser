@@ -135,7 +135,7 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
             .optOutFinish(dataBroker: "a", attemptId: UUID(), duration: 5),
             .optOutSubmitSuccess(dataBroker: "a", attemptId: UUID(), duration: 5),
             .optOutSuccess(dataBroker: "a", attemptId: UUID(), duration: 5),
-            .optOutFailure(dataBroker: "a", attemptId: UUID(), duration: 5)
+            .optOutFailure(dataBroker: "a", attemptId: UUID(), duration: 5, stage: "some")
         ]
 
         for event in eventsToTest {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1430"
+   LastUpgradeVersion = "1500"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
-               BuildableName = "DuckDuckGo Agent.app"
-               BlueprintName = "DuckDuckGoAgent"
+               BlueprintIdentifier = "4B2D06682A13318400DE1F49"
+               BuildableName = "DuckDuckGo VPN App Store.app"
+               BlueprintName = "DuckDuckGoVPNAppStore"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -43,9 +43,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
-            BuildableName = "DuckDuckGo Agent.app"
-            BlueprintName = "DuckDuckGoAgent"
+            BlueprintIdentifier = "4B2D06682A13318400DE1F49"
+            BuildableName = "DuckDuckGo VPN App Store.app"
+            BlueprintName = "DuckDuckGoVPNAppStore"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -60,9 +60,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4B2D06382A11CFBA00DE1F49"
-            BuildableName = "DuckDuckGo Agent.app"
-            BlueprintName = "DuckDuckGoAgent"
+            BlueprintIdentifier = "4B2D06682A13318400DE1F49"
+            BuildableName = "DuckDuckGo VPN App Store.app"
+            BlueprintName = "DuckDuckGoVPNAppStore"
             ReferencedContainer = "container:DuckDuckGo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

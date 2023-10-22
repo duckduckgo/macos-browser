@@ -160,6 +160,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Tunnel Settings
+
+    private let settings = TunnelSettings(defaults: .shared)
+
     // MARK: - Debug Logic
 
     private let debugUtilities = NetworkProtectionDebugUtilities()
@@ -224,7 +228,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func setSelectedServer(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedServer: SelectedNetworkProtectionServer
+        let selectedServer: TunnelSettings.SelectedServer
 
         if title == "Automatic" {
             selectedServer = .automatic
@@ -233,7 +237,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             selectedServer = .endpoint(titleComponents.first!)
         }
 
-        debugUtilities.setSelectedServer(selectedServer: selectedServer)
+        settings.selectedServer = selectedServer
     }
 
     /// Expires the registration key immediately.
@@ -247,34 +251,39 @@ final class NetworkProtectionDebugMenu: NSMenu {
     /// Sets the registration key validity.
     ///
     @objc func setRegistrationKeyValidity(_ menuItem: NSMenuItem) {
-        // nil means automatic
-        let validity = menuItem.representedObject as? TimeInterval
+        guard let timeInterval = menuItem.representedObject as? TimeInterval else {
+            settings.registrationKeyValidity = .automatic
+            return
+        }
 
-        debugUtilities.registrationKeyValidity = validity
+        settings.registrationKeyValidity = .custom(timeInterval)
     }
 
     @objc func toggleEnforceRoutesAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
+        settings.enforceRoutes.toggle()
     }
 
     @objc func toggleIncludeAllNetworks(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldIncludeAllNetworks()
+        settings.includeAllNetworks.toggle()
     }
 
     @objc func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldExcludeLocalRoutes()
+        settings.excludeLocalNetworks.toggle()
     }
 
     @objc func toggleConnectOnLogInAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
     }
 
     @objc func toggleExclusionAction(_ sender: NSMenuItem) {
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        /*
         guard let addressRange = sender.representedObject as? String else {
             assertionFailure("Unexpected representedObject")
             return
         }
-        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)
+
+        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)*/
     }
 
     @objc func openAppContainerInFinder(_ sender: Any?) {
@@ -347,7 +356,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateExclusionsMenuItems() {
         exclusionsMenu.removeAllItems()
 
-        for item in NetworkProtectionTunnelController.exclusionList {
+        for item in settings.exclusionList {
             let menuItem: NSMenuItem
             switch item {
             case .section(let title):
@@ -379,58 +388,53 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func updatePreferredServerMenu() {
-        let selectedServerName = debugUtilities.selectedServerName()
+        let selectedServer = settings.selectedServer
 
-        if selectedServerName == nil {
+        switch selectedServer {
+        case .automatic:
             preferredServerMenu.items.first?.state = .on
-        } else {
+        case .endpoint(let selectedServerName):
             preferredServerMenu.items.first?.state = .off
-        }
 
-        // We're skipping the first two items because they're the automatic menu item and
-        // the separator line.
-        let serverItems = preferredServerMenu.items.dropFirst(2)
+            // We're skipping the first two items because they're the automatic menu item and
+            // the separator line.
+            let serverItems = preferredServerMenu.items.dropFirst(2)
 
-        for item in serverItems {
-            if let selectedServerName,
-               item.title.hasPrefix(selectedServerName) {
-                item.state = .on
-            } else {
-                item.state = .off
+            for item in serverItems {
+                if item.title.hasPrefix(selectedServerName) {
+                    item.state = .on
+                } else {
+                    item.state = .off
+                }
             }
         }
     }
 
     private func updateRekeyValidityMenu() {
-        let selectedValidity = debugUtilities.registrationKeyValidity
-
-        if selectedValidity == nil {
+        switch settings.registrationKeyValidity {
+        case .automatic:
             registrationKeyValidityMenu.items.first?.state = .on
-        } else {
+        case .custom(let timeInterval):
             registrationKeyValidityMenu.items.first?.state = .off
-        }
 
-        // We're skipping the first two items because they're the automatic menu item and
-        // the separator line.
-        let serverItems = registrationKeyValidityMenu.items.dropFirst(2)
+            // We're skipping the first two items because they're the automatic menu item and
+            // the separator line.
+            let serverItems = registrationKeyValidityMenu.items.dropFirst(2)
 
-        for item in serverItems {
-            if item.representedObject as? TimeInterval == selectedValidity {
-                item.state = .on
-            } else {
-                item.state = .off
+            for item in serverItems {
+                if item.representedObject as? TimeInterval == timeInterval {
+                    item.state = .on
+                } else {
+                    item.state = .off
+                }
             }
         }
     }
 
     private func updateNetworkProtectionMenuItemsState() {
-        let controller = NetworkProtectionTunnelController()
-
-        shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
-        shouldIncludeAllNetworksMenuItem.state = controller.shouldIncludeAllNetworks ? .on : .off
-        connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
-
-        excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
+        shouldEnforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
+        shouldIncludeAllNetworksMenuItem.state = settings.includeAllNetworks ? .on : .off
+        excludeLocalNetworksMenuItem.state = settings.excludeLocalNetworks ? .on : .off
     }
 
     private func updateNetworkProtectionItems() {
@@ -529,11 +533,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return ""
         }
     }
-
 }
+
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        /*
         if menu === exclusionsMenu {
             let controller = NetworkProtectionTunnelController()
             for item in menu.items {
@@ -543,8 +549,8 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
                 item.isEnabled = !(controller.shouldEnforceRoutes && route == "10.0.0.0/8")
             }
         }
+         */
     }
-
 }
 
 #if DEBUG

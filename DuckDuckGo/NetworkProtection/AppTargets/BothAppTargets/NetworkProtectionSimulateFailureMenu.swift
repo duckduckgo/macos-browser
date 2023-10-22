@@ -52,7 +52,8 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     }
 
     private var simulationOptions: NetworkProtectionSimulationOptions {
-        NetworkProtectionTunnelController.simulationOptions
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        NetworkProtectionSimulationOptions()
     }
 
     /// Simulates a controller failure the next time Network Protection is started.
@@ -64,17 +65,20 @@ final class NetworkProtectionSimulateFailureMenu: NSMenu {
     /// Simulates a tunnel failure the next time Network Protection is started.
     ///
     @objc func simulateTunnelFailure(_ menuItem: NSMenuItem) {
-        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFailure)
     }
 
     /// Simulates a fatal error on the tunnel the next time Network Protection is started.
     ///
     @objc func simulateTunnelCrash(_ menuItem: NSMenuItem) {
-        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateTunnelFatalError)
     }
 
     @objc func simulateConnectionInterruption(_ menuItem: NSMenuItem) {
-        simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateConnectionInterruption)
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        // simulateFailure(NetworkProtectionTunnelController().toggleShouldSimulateConnectionInterruption)
     }
 
     private func simulateFailure(_ simulationFunction: @escaping () async throws -> Void) {

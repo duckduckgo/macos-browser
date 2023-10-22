@@ -22,6 +22,7 @@ import AppKit
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 
 /// Model for managing the NetP button in the Nav Bar.
@@ -30,8 +31,14 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
     private var status: NetworkProtection.ConnectionStatus = .disconnected
-    private let popovers: NavigationBarPopovers
+    private let popoverManager: NetworkProtectionNavBarPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
+
+    // MARK: - IPC
+
+    public var ipcClient: TunnelControllerIPCClient {
+        popoverManager.ipcClient
+    }
 
     // MARK: - Subscriptions
 
@@ -67,26 +74,25 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    init(popovers: NavigationBarPopovers,
+    init(popoverManager: NetworkProtectionNavBarPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
          statusReporter: NetworkProtectionStatusReporter? = nil,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
-        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: statusObserver,
-            serverInfoObserver: statusInfoObserver,
-            connectionErrorObserver: connectionErrorObserver,
-            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+        let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
+        self.popoverManager = popoverManager
+
+        let ipcClient = popoverManager.ipcClient
+
+        self.networkProtectionStatusReporter = statusReporter
+            ?? DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.connectionStatusObserver,
+                serverInfoObserver: ipcClient.serverInfoObserver,
+                connectionErrorObserver: ipcClient.connectionErrorObserver,
+                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
-        self.popovers = popovers
         self.pinningManager = pinningManager
         isPinned = pinningManager.isPinned(.networkProtection)
 
@@ -185,7 +191,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         }
 
         guard !isPinned,
-              !popovers.isNetworkProtectionPopoverShown else {
+              !popoverManager.isShown else {
             showButton = true
             return
         }

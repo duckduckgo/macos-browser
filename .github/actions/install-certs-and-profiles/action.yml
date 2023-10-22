@@ -40,15 +40,6 @@ inputs:
   NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
     required: true
     type: string
-  NETP_START_VPN_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_STOP_VPN_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
   access-token:
     description: "Asana access token"
     required: true
@@ -78,9 +69,6 @@ runs:
         NETP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/netp_agent_review_pp.provisionprofile
         NETP_NOTIFICATIONS_RELEASE_PP_PATH=$RUNNER_TEMP/netp_notifications_release_pp.provisionprofile
         NETP_NOTIFICATIONS_REVIEW_PP_PATH=$RUNNER_TEMP/netp_notifications_review_pp.provisionprofile
-        NETP_START_VPN_PP_PATH=$RUNNER_TEMP/netp_start_vpn_pp.provisionprofile
-        NETP_STOP_VPN_PP_PATH=$RUNNER_TEMP/netp_stop_vpn_pp.provisionprofile
-        NETP_ENABLE_ON_DEMAND_PP_PATH=$RUNNER_TEMP/netp_enable_on_demand_pp.provisionprofile
 
         # import certificate from secrets
         echo -n "${{ inputs.BUILD_CERTIFICATE_BASE64 }}" | base64 --decode -o $CERTIFICATE_PATH
@@ -94,9 +82,6 @@ runs:
         echo -n "${{ inputs.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_REVIEW_PP_PATH
         echo -n "${{ inputs.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_RELEASE_PP_PATH
         echo -n "${{ inputs.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_REVIEW_PP_PATH
-        echo -n "${{ inputs.NETP_START_VPN_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_START_VPN_PP_PATH
-        echo -n "${{ inputs.NETP_STOP_VPN_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_STOP_VPN_PP_PATH
-        echo -n "${{ inputs.NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_ENABLE_ON_DEMAND_PP_PATH
 
         # create temporary keychain
         security create-keychain -p "${{ inputs.KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
@@ -119,8 +104,5 @@ runs:
             $NETP_AGENT_REVIEW_PP_PATH \
             $NETP_NOTIFICATIONS_RELEASE_PP_PATH \
             $NETP_NOTIFICATIONS_REVIEW_PP_PATH \
-            $NETP_START_VPN_PP_PATH \
-            $NETP_STOP_VPN_PP_PATH \
-            $NETP_ENABLE_ON_DEMAND_PP_PATH \
             ~/Library/MobileDevice/Provisioning\ Profiles
       shell: bash

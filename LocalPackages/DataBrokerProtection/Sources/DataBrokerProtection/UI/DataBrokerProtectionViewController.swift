@@ -23,166 +23,33 @@ import WebKit
 import Combine
 
 final public class DataBrokerProtectionViewController: NSViewController {
-    private let navigationViewModel: ContainerNavigationViewModel
-    private let profileViewModel: ProfileViewModel
-    private let dataManager: DataBrokerProtectionDataManaging
-    private let resultsViewModel: ResultsViewModel
-    private let containerViewModel: ContainerViewModel
-    private let scheduler: DataBrokerProtectionScheduler
-    private let notificationCenter: NotificationCenter
 
+    private enum Constants {
+        static let dbpUiUrl = "https://duckduckgo.com/dbp"
+    }
+
+    private let dataManager: DataBrokerProtectionDataManaging
+    private let scheduler: DataBrokerProtectionScheduler
     private var webView: WKWebView?
 
     private let webUIViewModel: DBPUIViewModel
 
-    private let debugPage: String = """
-    <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Document</title>
-        </head>
-        <body>
-            <form>
-                <input type="button" value="Add Name" onclick="addName()">
-                <input type="button" value="Add Address" onclick="addAddress()">
-                <input type="button" value="Set Birth Year" onclick="setBirthYear()">
-                <input type="button" value="Set State" onclick="handshake()">
-                <input type="button" value="Get Profile" onclick="getProfile()">
-                <input type="button" value="Start Scan" onclick="startScan()">
-                <input type="button" value="Initial Scan Data" onclick="initialScanStatus()">
-                <input type="button" value="Remove All Data" onclick="removeAllData()">
-            </form>
-
-            <p id="output"></p>
-
-            <script type="text/javascript">
-                function addName() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "addNameToCurrentUserProfile",
-                        "id": "abc123",
-                        "params": {
-                            "first": "Bradley",
-                            "middle": "Curtis",
-                            "last": "Slayter"
-                        }
-                    })
-                }
-
-                function addAddress() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "addAddressToCurrentUserProfile",
-                        "id": "abc123",
-                        "params": {
-                            "street": "3003 Lake Ridge Dr",
-                            "city": "Sanger",
-                            "state": "TX"
-                        }
-                    })
-                }
-
-                function setBirthYear() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "setBirthYearForCurrentUserProfile",
-                        "params": {
-                            "year": 1993
-                        }
-                    })
-                }
-
-                function startScan() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "startScanAndOptOut"
-                    })
-                }
-
-                function removeAllData() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "deleteUserProfileData"
-                    })
-                }
-
-                function handshake() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "setState",
-                        "id": "abc123",
-                        "params": {
-                            "state": "ProfileReview"
-                        }
-                    })
-                }
-
-                function handshake() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "setState",
-                        "id": "abc123",
-                        "params": {
-                            "state": "ProfileReview"
-                        }
-                    })
-                }
-
-                function getProfile() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "getCurrentUserProfile",
-                        "id": "abc123",
-                    }).then(data => {
-                        document.getElementById('output').textContent = JSON.stringify(data, null, 4)
-                    })
-                }
-
-                function initialScanStatus() {
-                    window.webkit.messageHandlers.dbpui.postMessage({
-                        "context": "dbpui",
-                        "featureName": "dbpuiCommunication",
-                        "method": "initialScanStatus",
-                        "id": "abc123",
-                    }).then(data => {
-                        document.getElementById('output').textContent = JSON.stringify(data, null, 4)
-                    })
-                }
-            </script>
-        </body>
-        </html>
-    """
+    private let openURLHandler: (URL?) -> Void
 
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
-                notificationCenter: NotificationCenter = .default,
-                privacyConfig: PrivacyConfigurationManaging? = nil, prefs: ContentScopeProperties? = nil) {
+                privacyConfig: PrivacyConfigurationManaging? = nil,
+                prefs: ContentScopeProperties? = nil,
+                openURLHandler: @escaping (URL?) -> Void) {
         self.scheduler = scheduler
         self.dataManager = dataManager
-        self.notificationCenter = notificationCenter
+        self.openURLHandler = openURLHandler
 
         self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
 
-        navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
-        profileViewModel = ProfileViewModel(dataManager: dataManager)
-
-        resultsViewModel = ResultsViewModel(dataManager: dataManager,
-                                            notificationCenter: notificationCenter)
-
-        containerViewModel = ContainerViewModel(scheduler: scheduler,
-                                                dataManager: dataManager)
-
-        dataManager.fetchProfile(ignoresCache: true)
+        Task {
+            _ = dataManager.fetchProfile(ignoresCache: true)
+        }
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -192,24 +59,19 @@ final public class DataBrokerProtectionViewController: NSViewController {
     }
 
     override public func loadView() {
-        let containerView = DataBrokerProtectionContainerView(
-            containerViewModel: containerViewModel,
-            navigationViewModel: navigationViewModel,
-            profileViewModel: profileViewModel,
-            resultsViewModel: resultsViewModel)
+        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
-        let hostingController = NSHostingController(rootView: containerView)
-        view = hostingController.view
+        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
+        webView?.uiDelegate = self
+        view = webView!
 
-//        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
-//
-//        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
-//        view = webView!
+        webView?.load(URL(string: Constants.dbpUiUrl)!)
+    }
+}
 
-        // FOR LOCAL WEB UI DEVELOPMENT:
-        // Comment this line 👇
-//        webView?.loadHTMLString(debugPage, baseURL: nil)
-        // Uncomment this line and add your dev URL 👇
-//        webView?.load(URL(string: "https://<your url>")!)
+extension DataBrokerProtectionViewController: WKUIDelegate {
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        openURLHandler(navigationAction.request.url)
+        return nil
     }
 }

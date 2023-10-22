@@ -24,7 +24,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 
-INFOPLIST_FILE = DuckDuckGoAgent/Info.plist
+INFOPLIST_FILE = DuckDuckGoVPN/Info.plist
 GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_KEY_LSUIElement = YES
 INFOPLIST_KEY_NSPrincipalClass = Application
@@ -33,10 +33,10 @@ INFOPLIST_KEY_NSPrincipalClass = Application
 //CODE_SIGN_STYLE[config=Debug][sdk=*] = Manual
 //CODE_SIGN_STYLE[config=Release][sdk=*] = Manual
 
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
-CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgent.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPN.entitlements
+CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPN.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPNDebug.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPN.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
@@ -45,13 +45,13 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS Network Protection Agent App Product Review
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS Network Protection Agent App (Distribution)
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS NetP VPN App - Review (XPC)
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP VPN App - Release (XPC)
 
-FEATURE_FLAGS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION
-FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION
-FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION
-FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION
+FEATURE_FLAGS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
 
 SWIFT_OBJC_BRIDGING_HEADER =
 SKIP_INSTALL = YES

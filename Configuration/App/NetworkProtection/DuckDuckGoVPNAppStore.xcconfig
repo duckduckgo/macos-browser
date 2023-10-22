@@ -24,7 +24,7 @@ PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).deb
 PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review
 
-INFOPLIST_FILE = DuckDuckGoAgent/Info-AppStore.plist
+INFOPLIST_FILE = DuckDuckGoVPN/Info-AppStore.plist
 GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_KEY_LSUIElement = YES
 INFOPLIST_KEY_NSPrincipalClass = Application
@@ -36,8 +36,8 @@ INFOPLIST_KEY_NSPrincipalClass = Application
 // Left empty intentionally as we currently only support debug and release builds
 CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
-CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgentAppStore.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoAgent/DuckDuckGoAgentAppStore.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPNAppStore.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPNAppStore.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
 CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] = Developer ID Application

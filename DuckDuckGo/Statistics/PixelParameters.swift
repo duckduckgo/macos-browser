@@ -78,7 +78,6 @@ extension Pixel.Event {
              .watchInDuckPlayerInitial,
              .importDataInitial,
              .newTabInitial,
-             .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,

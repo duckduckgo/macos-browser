@@ -123,8 +123,6 @@ extension Pixel {
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
-        case networkProtectionSystemExtensionUnknownActivationResult
-
         case debug(event: Debug, error: Error? = nil)
 
         // Activation Points
@@ -272,18 +270,6 @@ extension Pixel {
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
 
-            case networkProtectionClientFailedToEncodeRedeemRequest
-            case networkProtectionClientInvalidInviteCode
-            case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
-            case networkProtectionClientFailedToParseRedeemResponse(error: Error)
-            case networkProtectionClientInvalidAuthToken
-            case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
-            case networkProtectionKeychainReadError(field: String, status: Int32)
-            case networkProtectionKeychainWriteError(field: String, status: Int32)
-            case networkProtectionKeychainDeleteError(status: Int32)
-            case networkProtectionNoAuthTokenFoundError
-            case networkProtectionUnhandledError(function: String, line: Int, error: Error)
-
             case faviconDecryptionFailedUnique
             case downloadListItemDecryptionFailedUnique
             case historyEntryDecryptionFailedUnique
@@ -412,8 +398,6 @@ extension Pixel.Event {
             return "m_mac.import-data.initial"
         case .newTabInitial:
             return "m_mac.new-tab-opened.initial"
-        case .networkProtectionSystemExtensionUnknownActivationResult:
-            return "m_mac_netp_system_extension_unknown_activation_result"
         case .favoriteSectionHidden:
             return "m_mac.favorite-section-hidden"
         case .recentActivitySectionHidden:
@@ -676,29 +660,6 @@ extension Pixel.Event.Debug {
             return "user_selected_to_install_update"
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
-
-        case .networkProtectionClientFailedToEncodeRedeemRequest:
-            return "netp_backend_api_error_encoding_redeem_request_body_failed"
-        case .networkProtectionClientInvalidInviteCode:
-            return "netp_backend_api_error_invalid_invite_code"
-        case .networkProtectionClientFailedToRedeemInviteCode:
-            return "netp_backend_api_error_failed_to_redeem_invite_code"
-        case .networkProtectionClientFailedToParseRedeemResponse:
-            return "netp_backend_api_error_parsing_redeem_response_failed"
-        case .networkProtectionClientInvalidAuthToken:
-            return "netp_backend_api_error_invalid_auth_token"
-        case .networkProtectionKeychainErrorFailedToCastKeychainValueToData:
-            return "netp_keychain_error_failed_to_cast_keychain_value_to_data"
-        case .networkProtectionKeychainReadError:
-            return "netp_keychain_error_read_failed"
-        case .networkProtectionKeychainWriteError:
-            return "netp_keychain_error_write_failed"
-        case .networkProtectionKeychainDeleteError:
-            return "netp_keychain_error_delete_failed"
-        case .networkProtectionNoAuthTokenFoundError:
-            return "netp_no_auth_token_found_error"
-        case .networkProtectionUnhandledError:
-            return "netp_unhandled_error"
 
         case .faviconDecryptionFailedUnique:
             return "favicon_decryption_failed_unique"

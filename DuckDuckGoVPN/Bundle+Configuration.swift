@@ -1,5 +1,5 @@
 //
-//  Main.swift
+//  Bundle+Configuration.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,8 +18,14 @@
 
 import Foundation
 
-@main
-final class AppMain {
-    static func main() throws {
+extension Bundle {
+    private static let networkExtensionBundleIDKey = "SYSEX_BUNDLE_ID"
+
+    var networkExtensionBundleID: String {
+        guard let bundleID = object(forInfoDictionaryKey: Self.networkExtensionBundleIDKey) as? String else {
+            fatalError("Info.plist is missing \(Self.networkExtensionBundleIDKey)")
+        }
+
+        return bundleID
     }
 }

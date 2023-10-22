@@ -1,3 +1,6 @@
+//
+//  DuckDuckGoUserAgent.swift
+//
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,11 +16,15 @@
 //  limitations under the License.
 //
 
-#include "NetworkProtectionVPNHelpersBase.xcconfig"
+import Foundation
+import Common
 
-PRODUCT_BUNDLE_IDENTIFIER=com.duckduckgo.macos.browser.network-protection.start-vpn
+enum UserAgent {
 
-PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = MacOS Browser NetP - Start VPN
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser NetP - Start VPN
+    static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
+                                    appID: String = AppVersion.shared.identifier,
+                                    systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
+        return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
+    }
+
+}

@@ -1,5 +1,5 @@
-# XPC
+# XPCHelper
 
-XPC library.
+XPC helpers library.
 
-- Offers XPC Communication convenience classes.
+- Offers XPC Communication helper code
