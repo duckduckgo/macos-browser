@@ -47,14 +47,17 @@ public final class DataBrokerProtectionIPCScheduler: DataBrokerProtectionSchedul
     }
 
     public func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+        let completion = completion ?? { error in }
         ipcClient.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+        let completion = completion ?? { error in }
         ipcClient.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
+        let completion = completion ?? { error in }
         ipcClient.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 

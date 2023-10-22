@@ -93,27 +93,27 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-    public func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    public func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         xpc.execute(call: { server in
             server.optOutAllBrokers(showWebView: showWebView, completion: completion)
         }, xpcReplyErrorHandler: { error in
-            completion?(error)
+            completion(error)
         })
     }
 
-    public func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    public func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         xpc.execute(call: { server in
             server.scanAllBrokers(showWebView: showWebView, completion: completion)
         }, xpcReplyErrorHandler: { error in
-            completion?(error)
+            completion(error)
         })
     }
 
-    public func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    public func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         xpc.execute(call: { server in
             server.runQueuedOperations(showWebView: showWebView, completion: completion)
         }, xpcReplyErrorHandler: { error in
-            completion?(error)
+            completion(error)
         })
     }
 

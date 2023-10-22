@@ -65,15 +65,15 @@ extension IPCServiceManager: IPCServerInterface {
         scheduler.stopScheduler()
     }
 
-    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         scheduler.optOutAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
     }
 
-    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?) {
+    func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         scheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 
