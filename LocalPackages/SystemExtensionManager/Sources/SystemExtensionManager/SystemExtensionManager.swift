@@ -21,30 +21,30 @@ import Cocoa
 import Combine
 @preconcurrency import SystemExtensions
 
-struct SystemExtensionManager {
+public enum SystemExtensionRequestError: Error {
+    case unknownRequestResult
+    case willActivateAfterReboot
+}
 
-    enum ActivationRequestEvent {
-        case waitingForUserApproval
-        case activated
-        case willActivateAfterReboot
-    }
+public struct SystemExtensionManager {
 
     private static let systemSettingsSecurityURL = "x-apple.systempreferences:com.apple.preference.security?Security"
 
-    private let bundleID: String
+    private let extensionBundleID: String
     private let manager: OSSystemExtensionManager
     private let workspace: NSWorkspace
 
-    init(bundleID: String = NetworkProtectionBundle.extensionBundle().bundleIdentifier!,
-         manager: OSSystemExtensionManager = .shared,
-         workspace: NSWorkspace = .shared) {
+    public init(
+        extensionBundleID: String,
+        manager: OSSystemExtensionManager = .shared,
+        workspace: NSWorkspace = .shared) {
 
-        self.bundleID = bundleID
+        self.extensionBundleID = extensionBundleID
         self.manager = manager
         self.workspace = workspace
     }
 
-    func activate() -> AsyncThrowingStream<ActivationRequestEvent, Error> {
+    public func activate(waitingForUserApproval: @escaping () -> Void) async throws {
         /// Documenting a workaround for the issue discussed in https://app.asana.com/0/0/1205275221447702/f
         ///     Background: For a lot of users, the system won't show the system-extension-blocked alert if there's a previous request
         ///         to activate the extension.  You can see active requests in your console using command `systemextensionsctl list`.
@@ -62,11 +62,18 @@ struct SystemExtensionManager {
             openSystemSettingsSecurity()
         }
 
-        return SystemExtensionRequest.activationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit()
+        return try await SystemExtensionRequest.activationRequest(
+            forExtensionWithIdentifier: extensionBundleID,
+            manager: manager,
+            waitingForUserApproval: waitingForUserApproval)
+        .submit()
     }
 
-    func deactivate() async throws {
-        for try await _ in SystemExtensionRequest.deactivationRequest(forExtensionWithIdentifier: bundleID, manager: manager).submit() {}
+    public func deactivate() async throws {
+        try await SystemExtensionRequest.deactivationRequest(
+            forExtensionWithIdentifier: extensionBundleID,
+            manager: manager)
+        .submit()
     }
 
     // MARK: - Activation: Checking if there are pending requests
@@ -84,7 +91,7 @@ struct SystemExtensionManager {
 
         task.standardOutput = pipe
         task.launchPath = "/bin/bash" // Specify the shell to use
-        task.arguments = ["-c", "$(which systemextensionsctl) list | $(which egrep) -c '(?:\(bundleID)).+(?:activated waiting for user)+'"]
+        task.arguments = ["-c", "$(which systemextensionsctl) list | $(which egrep) -c '(?:\(extensionBundleID)).+(?:activated waiting for user)+'"]
 
         task.launch()
         task.waitUntilExit()
@@ -102,42 +109,39 @@ struct SystemExtensionManager {
 }
 
 final class SystemExtensionRequest: NSObject {
-    typealias Event = SystemExtensionManager.ActivationRequestEvent
 
     private let request: OSSystemExtensionRequest
     private let manager: OSSystemExtensionManager
+    private let waitingForUserApproval: (() -> Void)?
 
-    private var continuation: AsyncThrowingStream<Event, Error>.Continuation?
+    private var continuation: CheckedContinuation<Void, Error>?
 
-    private init(request: OSSystemExtensionRequest, manager: OSSystemExtensionManager) {
+    private init(request: OSSystemExtensionRequest, manager: OSSystemExtensionManager, waitingForUserApproval: (() -> Void)? = nil) {
         self.manager = manager
         self.request = request
+        self.waitingForUserApproval = waitingForUserApproval
 
         super.init()
     }
 
-    static func activationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
-        self.init(request: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
+    static func activationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager, waitingForUserApproval: (() -> Void)?) -> Self {
+        self.init(request: .activationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager, waitingForUserApproval: waitingForUserApproval)
     }
 
     static func deactivationRequest(forExtensionWithIdentifier bundleId: String, manager: OSSystemExtensionManager) -> Self {
         self.init(request: .deactivationRequest(forExtensionWithIdentifier: bundleId, queue: .global()), manager: manager)
     }
 
-    /// submitting the request returns an Async Iterator providing the OSSystemExtensionRequest state change events
-    /// until an Event is received.
-    func submit() -> AsyncThrowingStream<Event, Error> {
+    /// Submit the request
+    ///
+    func submit() async throws {
         assert(continuation == nil, "Request can only be submitted once")
 
-        defer {
+        try await withCheckedThrowingContinuation { continuation in
+            self.continuation = continuation
+
             request.delegate = self
             manager.submitRequest(request)
-        }
-        return AsyncThrowingStream { [self /* keep the request delegate alive */] continuation in
-            continuation.onTermination = { _ in
-                withExtendedLifetime(self) {}
-            }
-            self.continuation = continuation
         }
     }
 }
@@ -150,26 +154,26 @@ extension SystemExtensionRequest: OSSystemExtensionRequestDelegate {
     }
 
     func requestNeedsUserApproval(_ request: OSSystemExtensionRequest) {
-        continuation?.yield(.waitingForUserApproval)
+        waitingForUserApproval?()
     }
 
     func request(_ request: OSSystemExtensionRequest, didFinishWithResult result: OSSystemExtensionRequest.Result) {
         switch result {
         case .completed:
-            continuation?.yield(.activated)
+            continuation?.resume()
         case .willCompleteAfterReboot:
-            continuation?.yield(.willActivateAfterReboot)
+            continuation?.resume(throwing: SystemExtensionRequestError.willActivateAfterReboot)
+            return
         @unknown default:
-            // Not much we can do about this, so let's assume it's a good result and not show any errors
-            continuation?.yield(.activated)
-            Pixel.fire(.networkProtectionSystemExtensionUnknownActivationResult)
+            // Not much we can do about this, so we just let the owning app decide
+            // what to do about this.
+            continuation?.resume(throwing: SystemExtensionRequestError.unknownRequestResult)
+            return
         }
-
-        continuation?.finish()
     }
 
     func request(_ request: OSSystemExtensionRequest, didFailWithError error: Error) {
-        continuation?.finish(throwing: error)
+        continuation?.resume(throwing: error)
     }
 
 }

@@ -209,7 +209,6 @@ struct NetworkProtectionWaitlist: Waitlist {
                             NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                             completion(nil)
                         } catch {
-                            assertionFailure("Failed to redeem invite code")
                             completion(.failure(error))
                         }
                     }

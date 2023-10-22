@@ -18,7 +18,7 @@
 
 import Foundation
 import NetworkProtection
-import XPC
+import XPCHelper
 
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
@@ -78,6 +78,18 @@ extension TunnelControllerIPCClient: IPCServerInterface {
 
     public func stop() {
         try? xpc.server().stop()
+    }
+
+    public func resetAll(uninstallSystemExtension: Bool) async {
+        try? await xpc.server().resetAll(uninstallSystemExtension: uninstallSystemExtension)
+    }
+
+    public func debugCommand(_ command: DebugCommand) async {
+        guard let payload = try? JSONEncoder().encode(command) else {
+            return
+        }
+
+        try? await xpc.server().debugCommand(payload)
     }
 }
 
