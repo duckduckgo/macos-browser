@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "shane/form-updates",
-        "revision" : "10298bbd53fb60d865b2b0f8738994eadc1697a7"
+        "revision" : "551ca5660aaae481ab770f892a742c70cfc0583c"
       }
     },
     {
@@ -77,7 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "f505d33c24568af44b770aaa60d64ff1564de9dc"
+        "revision" : "b4ac92a444e79d5651930482623b9f6dc9265667",
+        "version" : "2.0.0"
       }
     },
     {
@@ -128,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
