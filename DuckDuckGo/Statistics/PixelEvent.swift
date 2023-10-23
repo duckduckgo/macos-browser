@@ -153,6 +153,10 @@ extension Pixel {
         case duckPlayerSettingNever
         case duckPlayerSettingBackToDefault
 
+        // Dashboard
+        case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
+        case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
+
         // Network Protection Waitlist
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
@@ -429,6 +433,11 @@ extension Pixel.Event {
             return "m_mac_duck-player_setting_never"
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
+
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            return "m_mac_mp_wla"
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            return "m_mac_mp_wlr"
 
         case .launchInitial:
             return "m.mac.first-launch"

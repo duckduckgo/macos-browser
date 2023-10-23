@@ -52,6 +52,14 @@ extension Pixel.Event {
         case .dailyPixel(let pixel, isFirst: _):
             return pixel.parameters
 
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,
