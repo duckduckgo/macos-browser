@@ -96,7 +96,7 @@ final class NavigationBarViewController: NSViewController {
     private var networkProtectionCancellable: AnyCancellable?
     private var networkProtectionInterruptionCancellable: AnyCancellable?
 
-    @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .left)
+    @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
     static private var homeButtonPosition: HomeButtonPosition
     static private let homeButtonTag = 3
     static private let homeButtonLeftPosition = 0
