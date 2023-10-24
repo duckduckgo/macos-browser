@@ -632,10 +632,10 @@ final class NavigationBarViewController: NSViewController {
         if LocalPinningManager.shared.isPinned(.homeButton) {
             homeButton.isHidden = false
 
-            if let homeButtonView = navigationButtons.arrangedSubviews.first(where: { $0.tag == 3 }) {
+            if let homeButtonView = navigationButtons.arrangedSubviews.first(where: { $0.tag == Self.homeButtonTag }) {
                 navigationButtons.removeArrangedSubview(homeButtonView)
                 if Self.homeButtonPosition == .left {
-                    navigationButtons.insertArrangedSubview(homeButtonView, at: 0)
+                    navigationButtons.insertArrangedSubview(homeButtonView, at: Self.homeButtonLeftPosition)
                 } else {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
                 }
