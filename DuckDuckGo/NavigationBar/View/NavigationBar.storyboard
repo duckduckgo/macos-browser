@@ -49,7 +49,7 @@
                                             <action selector="goBackAction:" target="o2v-eH-jTI" id="gEk-2Z-80d"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="LongPressButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                    <button tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="mdE-u0-Ei5" customClass="LongPressButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                         <rect key="frame" x="32" y="0.0" width="28" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Forward" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="ePU-hF-DNf">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -75,7 +75,7 @@
                                             <action selector="goForwardAction:" target="o2v-eH-jTI" id="aht-fm-Fhd"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="B2U-XM-Vo0" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                    <button tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="B2U-XM-Vo0" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                         <rect key="frame" x="64" y="0.0" width="28" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Refresh" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="T7v-4A-Zm2">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -101,7 +101,7 @@
                                             <action selector="refreshOrStopAction:" target="o2v-eH-jTI" id="r58-Y3-DNb"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="s7D-YB-p00" userLabel="Home Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                    <button tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="s7D-YB-p00" userLabel="Home Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                         <rect key="frame" x="96" y="0.0" width="28" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Home-16" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="uD1-p4-VJv">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

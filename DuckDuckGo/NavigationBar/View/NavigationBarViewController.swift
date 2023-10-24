@@ -47,7 +47,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var homeButton: MouseOverButton!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var networkProtectionButton: MouseOverButton!
-    @IBOutlet weak var navigationButtons: NSView!
+    @IBOutlet weak var navigationButtons: NSStackView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
@@ -95,6 +95,11 @@ final class NavigationBarViewController: NSViewController {
     private var downloadsCancellables = Set<AnyCancellable>()
     private var networkProtectionCancellable: AnyCancellable?
     private var networkProtectionInterruptionCancellable: AnyCancellable?
+
+    @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .left)
+    static private var homeButtonPosition: HomeButtonPosition
+    static private let homeButtonTag = 3
+    static private let homeButtonLeftPosition = 0
 
 #if NETWORK_PROTECTION
     private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
@@ -626,6 +631,15 @@ final class NavigationBarViewController: NSViewController {
 
         if LocalPinningManager.shared.isPinned(.homeButton) {
             homeButton.isHidden = false
+
+            if let homeButtonView = navigationButtons.arrangedSubviews.first(where: { $0.tag == 3 }) {
+                navigationButtons.removeArrangedSubview(homeButtonView)
+                if Self.homeButtonPosition == .left {
+                    navigationButtons.insertArrangedSubview(homeButtonView, at: 0)
+                } else {
+                    navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
+                }
+            }
         } else {
             homeButton.isHidden = true
         }
