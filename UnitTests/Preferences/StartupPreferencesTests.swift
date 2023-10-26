@@ -25,10 +25,11 @@ struct StartupPreferencesPersistorMock: StartupPreferencesPersistor {
     var customHomePageURL: String
     var restorePreviousSession: Bool
 
-    init(launchToCustomHomePage: Bool, customHomePageURL: String, restorePreviousSession: Bool = false) {
+    init(launchToCustomHomePage: Bool, customHomePageURL: String, restorePreviousSession: Bool = false, appearancePrefs: AppearancePreferences = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())) {
         self.customHomePageURL = customHomePageURL
         self.launchToCustomHomePage = launchToCustomHomePage
         self.restorePreviousSession = restorePreviousSession
+        self.appearancePrefs = appearancePrefs
     }
 }
 
