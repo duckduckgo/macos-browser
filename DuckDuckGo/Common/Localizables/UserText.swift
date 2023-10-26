@@ -136,7 +136,7 @@ struct UserText {
         case .left:
             return NSLocalizedString("First icon on left", comment: "Main Menu > View > Home Button > left position item")
         case .right:
-            return NSLocalizedString("First icon on right", comment: "Main Menu > View > Home Button > right position item")
+            return NSLocalizedString("Last icon on left", comment: "Main Menu > View > Home Button > right position item")
         }
     }
     

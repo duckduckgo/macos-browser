@@ -74,9 +74,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 }
 
 enum HomeButtonPosition: String, CaseIterable {
-    case hidden = "hidden"
-    case left = "left"
-    case right = "right"
+    case hidden
+    case left
+    case right
 }
 
 enum DefaultZoomValue: CGFloat, CaseIterable {

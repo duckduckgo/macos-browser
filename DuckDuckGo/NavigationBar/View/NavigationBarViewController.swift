@@ -45,6 +45,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
     @IBOutlet weak var homeButton: MouseOverButton!
+    @IBOutlet weak var homeButtonSeparator: NSBox!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var networkProtectionButton: MouseOverButton!
     @IBOutlet weak var navigationButtons: NSStackView!
@@ -188,6 +189,7 @@ final class NavigationBarViewController: NSViewController {
             refreshOrStopButton.isHidden = true
             optionsButton.isHidden = true
             homeButton.isHidden = true
+            homeButtonSeparator.isHidden = true
             addressBarTopConstraint.constant = 0
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
@@ -636,12 +638,15 @@ final class NavigationBarViewController: NSViewController {
                 navigationButtons.removeArrangedSubview(homeButtonView)
                 if Self.homeButtonPosition == .left {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: Self.homeButtonLeftPosition)
+                    homeButtonSeparator.isHidden = false
                 } else {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
+                    homeButtonSeparator.isHidden = true
                 }
             }
         } else {
             homeButton.isHidden = true
+            homeButtonSeparator.isHidden = true
         }
     }
 
