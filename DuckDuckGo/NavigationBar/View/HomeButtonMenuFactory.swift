@@ -42,6 +42,7 @@ struct HomeButtonMenuFactory {
         let buttonPosition = AppearancePreferences.shared.homeButtonposition
 
         let hiddenItem: NSMenuItem = BlockMenuItem(title: UserText.mainMenuHomeButton(for: .hidden), isChecked: !isButtonVisible, block: {
+            AppearancePreferences.shared.homeButtonposition = .hidden
             LocalPinningManager.shared.unpin(.homeButton)
         })
         let leftItem: NSMenuItem = BlockMenuItem(title: UserText.mainMenuHomeButton(for: .left), isChecked: isButtonVisible && buttonPosition == .left, block: {

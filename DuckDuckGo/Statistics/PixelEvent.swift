@@ -171,9 +171,9 @@ extension Pixel {
         case networkProtectionRemoteMessageOpened(messageID: String)
 
         // 28-day Home Button
-        case enableHomeButton
-        case disableHomeButton
-        case setnewHomePage
+        case homeButtonHidden
+        case homeButtonLeft
+        case homeButtonRight
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -470,12 +470,12 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_opened_\(messageID)"
 
         // 28-day Home Button
-        case .enableHomeButton:
-            return "m_mac_enable_home_button"
-        case .disableHomeButton:
-            return "m_mac_disable_home_button"
-        case .setnewHomePage:
-            return "m_mac_set_new_homepage"
+        case .homeButtonHidden:
+            return "m_mac_home_button_hidden"
+        case .homeButtonLeft:
+            return "m_mac_home_button_left"
+        case .homeButtonRight:
+            return "m_mac_home_button_right"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")

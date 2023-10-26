@@ -626,7 +626,6 @@ final class NavigationBarViewController: NSViewController {
     private func updateHomeButton() {
         let menu = NSMenu()
         let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
-        menu.addItem(withTitle: title, action: #selector(toggleHomeButtonPinning), keyEquivalent: "")
 
         homeButton.menu = menu
         homeButton.toolTip = UserText.homeButtonTooltip
@@ -852,16 +851,6 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
-    }
-
-    @objc
-    private func toggleHomeButtonPinning(_ sender: NSMenuItem) {
-        LocalPinningManager.shared.togglePinning(for: .homeButton)
-        if LocalPinningManager.shared.isPinned(.homeButton) {
-            Pixel.fire(.enableHomeButton)
-        } else {
-            Pixel.fire(.disableHomeButton)
-        }
     }
 
     // MARK: - Network Protection
