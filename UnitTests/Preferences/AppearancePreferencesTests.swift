@@ -20,6 +20,7 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
+    var homeButtonPosition: HomeButtonPosition
     var isFavoriteVisible: Bool
     var isContinueSetUpVisible: Bool
     var isRecentActivityVisible: Bool
