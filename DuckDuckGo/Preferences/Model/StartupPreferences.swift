@@ -76,10 +76,7 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
-    @Published var homeButtonPosition: HomeButtonPosition = .hidden {
-        didSet {
-        }
-    }
+    @Published var homeButtonPosition: HomeButtonPosition = .hidden
 
     var formattedCustomHomePageURL: String {
         let trimmedURL = customHomePageURL.trimmingWhitespace()
