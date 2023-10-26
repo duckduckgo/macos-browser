@@ -20,12 +20,14 @@ import Foundation
 import Combine
 
 protocol StartupPreferencesPersistor {
+    var appearancePrefs: AppearancePreferences { get set }
     var restorePreviousSession: Bool { get set }
     var launchToCustomHomePage: Bool { get set }
     var customHomePageURL: String { get set }
 }
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
+    var appearancePrefs: AppearancePreferences
 
     @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
@@ -46,14 +48,13 @@ final class StartupPreferences: ObservableObject {
     private var pinnedViewsNotificationCancellable: AnyCancellable?
 
     init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
-         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()) {
+         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared)) {
         self.pinningManager = pinningManager
         self.persistor = persistor
-        self.isHomeButtonVisible = pinningManager.isPinned(.homeButton)
         restorePreviousSession = persistor.restorePreviousSession
         launchToCustomHomePage = persistor.launchToCustomHomePage
         customHomePageURL = persistor.customHomePageURL
-        updateHomeButtonCheckbox()
+        updateHomeButtonState()
         listenToPinningManagerNotifications()
     }
 
@@ -75,7 +76,10 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
-    @Published var isHomeButtonVisible: Bool
+    @Published var homeButtonPosition: HomeButtonPosition = .hidden {
+        didSet {
+        }
+    }
 
     var formattedCustomHomePageURL: String {
         let trimmedURL = customHomePageURL.trimmingWhitespace()
@@ -100,12 +104,18 @@ final class StartupPreferences: ObservableObject {
         return !text.isEmpty && url.isValid
     }
 
-    func toggleHomeButton() {
-        pinningManager.togglePinning(for: .homeButton)
+    func updateHomeButton() {
+        persistor.appearancePrefs.homeButtonposition = homeButtonPosition
+        if homeButtonPosition != .hidden {
+            pinningManager.unpin(.homeButton)
+            pinningManager.pin(.homeButton)
+        } else {
+            pinningManager.unpin(.homeButton)
+        }
     }
 
-    private func updateHomeButtonCheckbox() {
-        isHomeButtonVisible = pinningManager.isPinned(.homeButton)
+    private func updateHomeButtonState() {
+        homeButtonPosition = pinningManager.isPinned(.homeButton) ? persistor.appearancePrefs.homeButtonposition : .hidden
     }
 
     private func listenToPinningManagerNotifications() {
@@ -113,7 +123,7 @@ final class StartupPreferences: ObservableObject {
             guard let self = self else {
                 return
             }
-            self.updateHomeButtonCheckbox()
+            self.updateHomeButtonState()
         }
     }
 

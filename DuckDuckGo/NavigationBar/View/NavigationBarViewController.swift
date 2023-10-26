@@ -808,8 +808,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let homeTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
-        menu.addItem(withTitle: homeTitle, action: #selector(toggleHomeButtonPinning), keyEquivalent: "Y")
+        HomeButtonMenuFactory.addToMenu(menu)
 
         let autofillTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         menu.addItem(withTitle: autofillTitle, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "A")
@@ -858,7 +857,6 @@ extension NavigationBarViewController: NSMenuDelegate {
         } else {
             Pixel.fire(.disableHomeButton)
         }
-
     }
 
     // MARK: - Network Protection
