@@ -132,17 +132,13 @@ struct UserText {
     static func mainMenuHomeButton(for position: HomeButtonPosition) -> String {
         switch position {
         case .hidden:
-            return NSLocalizedString("None", comment: "Main Menu > View > Home Button > None item")
+            return NSLocalizedString("Hide", comment: "Main Menu > View > Home Button > None item")
         case .left:
-            return NSLocalizedString("First icon on left", comment: "Main Menu > View > Home Button > left position item")
+            return NSLocalizedString("Show left of the back button", comment: "Main Menu > View > Home Button > left position item")
         case .right:
-            return NSLocalizedString("Last icon on left", comment: "Main Menu > View > Home Button > right position item")
+            return NSLocalizedString("Show right of the reload button", comment: "Main Menu > View > Home Button > right position item")
         }
     }
-    
-    static let mainMenuHomeButtonNone = NSLocalizedString("None", comment: "Main Menu > View > Home Button > None item")
-    static let mainMenuHomeButtonLeft = NSLocalizedString("First icon on left", comment: "Main Menu > View > Home Button > left position item")
-    static let mainMenuHomeButtonRight = NSLocalizedString("First icon on right", comment: "Main Menu > View > Home Button > right position item")
     
     static let mainMenuViewShowAutofillShortcut = NSLocalizedString("Show Autofill Shortcut", comment: "Main Menu View item")
     static let mainMenuViewShowBookmarksShortcut = NSLocalizedString("Show Bookmarks Shortcut", comment: "Main Menu View item")
