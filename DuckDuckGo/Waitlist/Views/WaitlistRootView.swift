@@ -21,25 +21,24 @@
 import SwiftUI
 
 struct WaitlistRootView: View {
-    @EnvironmentObject var model: WaitlistViewModel
+    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
 
     var body: some View {
         Group {
             switch model.viewState {
             case .notOnWaitlist, .joiningWaitlist:
-                JoinWaitlistView()
+                JoinWaitlistView(viewData: NetworkProtectionJoinWaitlistViewData())
             case .joinedWaitlist(let state):
-                if state == .notificationAllowed {
-                    JoinedWaitlistView(notificationsAllowed: true)
-                } else {
-                    JoinedWaitlistView(notificationsAllowed: false)
-                }
+                JoinedWaitlistView(viewData: NetworkProtectionJoinedWaitlistViewData(),
+                                   notificationsAllowed: state == .notificationAllowed)
             case .invited:
-                InvitedToWaitlistView()
+                InvitedToWaitlistView(viewData: NetworkProtectionInvitedToWaitlistViewData())
             case .termsAndConditions:
-                NetworkProtectionTermsAndConditionsView()
+                WaitlistTermsAndConditionsView(viewData: NetworkProtectionWaitlistTermsAndConditionsViewData()) {
+                    NetworkProtectionTermsAndConditionsContentView()
+                }
             case .readyToEnable:
-                EnableNetworkProtectionView()
+                EnableWaitlistFeatureView(viewData: EnableNetworkProtectionViewData())
             }
         }
         .environmentObject(model)

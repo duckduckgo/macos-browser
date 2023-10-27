@@ -22,6 +22,9 @@ extension Pixel.Event {
 
     var parameters: [String: String]? {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.parameters
+
         case .debug(event: let debugEvent, error: let error):
 
             var params = error?.pixelParameters ?? [:]
@@ -49,6 +52,14 @@ extension Pixel.Event {
         case .dailyPixel(let pixel, isFirst: _):
             return pixel.parameters
 
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,
@@ -75,7 +86,6 @@ extension Pixel.Event {
              .watchInDuckPlayerInitial,
              .importDataInitial,
              .newTabInitial,
-             .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
@@ -105,23 +115,6 @@ extension Pixel.Event {
              .disableHomeButton,
              .setnewHomePage:
             return nil
-#if DBP
-        case .optOutStart,
-            .optOutEmailGenerate,
-            .optOutCaptchaParse,
-            .optOutCaptchaSend,
-            .optOutCaptchaSolve,
-            .optOutSubmit,
-            .optOutEmailReceive,
-            .optOutEmailConfirm,
-            .optOutValidate,
-            .optOutFinish,
-            .optOutSubmitSuccess,
-            .optOutSuccess,
-            .optOutFailure,
-            .parentChildMatches:
-          return nil
-#endif
         }
     }
 

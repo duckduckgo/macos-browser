@@ -23,6 +23,7 @@ import BrowserServicesKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 #endif
 
@@ -78,7 +79,8 @@ final class NavigationBarViewController: NSViewController {
     private let goForwardButtonMenuDelegate: NavigationButtonMenuDelegate
     // swiftlint:enable weak_delegate
 
-    private var popovers = NavigationBarPopovers()
+    private var popovers: NavigationBarPopovers
+
     var isDownloadsPopoverShown: Bool {
         popovers.isDownloadsPopoverShown
     }
@@ -105,8 +107,16 @@ final class NavigationBarViewController: NSViewController {
 
 #if NETWORK_PROTECTION
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore()) {
+
+        let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
+        let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
+        ipcClient.register()
+
+        let networkProtectionPopoverManager = NetworkProtectionNavBarPopoverManager(ipcClient: ipcClient)
+
+        self.popovers = NavigationBarPopovers(networkProtectionPopoverManager: networkProtectionPopoverManager)
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popovers: popovers)
+        self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager)
         self.isBurner = isBurner
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
@@ -115,6 +125,7 @@ final class NavigationBarViewController: NSViewController {
     }
 #else
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+        self.popovers = NavigationBarPopovers()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = isBurner
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
@@ -254,15 +265,8 @@ final class NavigationBarViewController: NSViewController {
         selectedTabViewModel.tab.openHomePage()
     }
 
-    // swiftlint:disable force_cast
     @IBAction func optionsButtonAction(_ sender: NSButton) {
-
-        guard let internalUserDecider = (NSApp.delegate as! AppDelegate).internalUserDecider else {
-            assertionFailure("\(className): internalUserDecider is nil")
-            os_log("%s: internalUserDecider is nil", type: .error, className)
-            return
-        }
-
+        let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         let menu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                    passwordManagerCoordinator: PasswordManagerCoordinator.shared,
                                    internalUserDecider: internalUserDecider)
@@ -270,7 +274,6 @@ final class NavigationBarViewController: NSViewController {
         let location = NSPoint(x: -menu.size.width + sender.bounds.width, y: sender.bounds.height + 4)
         menu.popUp(positioning: nil, at: location, in: sender)
     }
-    // swiftlint:enable force_cast
 
     @IBAction func bookmarksButtonAction(_ sender: NSButton) {
         popovers.bookmarksButtonPressed(anchorView: bookmarkListButton,
@@ -851,7 +854,7 @@ extension NavigationBarViewController: NSMenuDelegate {
         let featureVisibility = DefaultNetworkProtectionVisibility()
 
         if featureVisibility.isNetworkProtectionVisible() {
-            popovers.showNetworkProtectionPopover(usingView: networkProtectionButton,
+            popovers.showNetworkProtectionPopover(positionedBelow: networkProtectionButton,
                                                   withDelegate: networkProtectionButtonModel)
         } else {
             featureVisibility.disableForWaitlistUsers()
