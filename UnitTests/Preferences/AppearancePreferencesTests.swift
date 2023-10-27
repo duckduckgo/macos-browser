@@ -79,7 +79,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, true)
         XCTAssertEqual(model.isContinueSetUpVisible, true)
         XCTAssertEqual(model.isRecentActivityVisible, true)
-        XCTAssertEqual(model.homeButtonposition, .left)
+        XCTAssertEqual(model.homeButtonPosition, .left)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -100,7 +100,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, false)
         XCTAssertEqual(model.isContinueSetUpVisible, false)
         XCTAssertEqual(model.isRecentActivityVisible, false)
-        XCTAssertEqual(model.homeButtonposition, .left)
+        XCTAssertEqual(model.homeButtonPosition, .left)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {

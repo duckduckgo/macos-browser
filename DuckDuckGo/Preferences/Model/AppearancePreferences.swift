@@ -214,10 +214,10 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var homeButtonposition: HomeButtonPosition {
+    @Published var homeButtonPosition: HomeButtonPosition {
         didSet {
-            persistor.homeButtonPosition = homeButtonposition
-            switch homeButtonposition {
+            persistor.homeButtonPosition = homeButtonPosition
+            switch homeButtonPosition {
             case .hidden:
                 Pixel.fire(.homeButtonHidden)
             case .left:
@@ -248,7 +248,7 @@ final class AppearancePreferences: ObservableObject {
         defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
-        homeButtonposition = persistor.homeButtonPosition
+        homeButtonPosition = persistor.homeButtonPosition
     }
 
     private var persistor: AppearancePreferencesPersistor

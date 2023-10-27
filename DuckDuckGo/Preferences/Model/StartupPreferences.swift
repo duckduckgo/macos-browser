@@ -105,7 +105,7 @@ final class StartupPreferences: ObservableObject {
     }
 
     func updateHomeButton() {
-        persistor.appearancePrefs.homeButtonposition = homeButtonPosition
+        persistor.appearancePrefs.homeButtonPosition = homeButtonPosition
         if homeButtonPosition != .hidden {
             pinningManager.unpin(.homeButton)
             pinningManager.pin(.homeButton)
@@ -115,7 +115,7 @@ final class StartupPreferences: ObservableObject {
     }
 
     private func updateHomeButtonState() {
-        homeButtonPosition = pinningManager.isPinned(.homeButton) ? persistor.appearancePrefs.homeButtonposition : .hidden
+        homeButtonPosition = pinningManager.isPinned(.homeButton) ? persistor.appearancePrefs.homeButtonPosition : .hidden
     }
 
     private func listenToPinningManagerNotifications() {
