@@ -72,6 +72,9 @@ final class StartupPreferences: ObservableObject {
 
     @Published var customHomePageURL: String {
         didSet {
+            if !customHomePageURL.starts(with: "http") {
+                customHomePageURL = "https://" + customHomePageURL
+            }
             persistor.customHomePageURL = customHomePageURL
         }
     }
