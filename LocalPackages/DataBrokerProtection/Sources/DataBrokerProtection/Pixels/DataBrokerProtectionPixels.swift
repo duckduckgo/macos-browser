@@ -19,14 +19,29 @@
 import Foundation
 import Common
 import BrowserServicesKit
+import PixelKit
 
 final class DataBrokerProtectionStageDurationCalculator {
+
+    enum Stage: String {
+        case start
+        case emailGenerate = "email-generate"
+        case captchaParse = "captcha-parse"
+        case captchaSend = "captcha-send"
+        case captchaSolve = "captcha-solve"
+        case submit
+        case emailReceive = "email-receive"
+        case emailConfirm = "email-confirm"
+        case validate
+        case other
+    }
 
     let handler: EventMapping<DataBrokerProtectionPixels>
     let attemptId: UUID
     let dataBroker: String
     let startTime: Date
     var lastStateTime: Date
+    var stage: Stage = .other
 
     init(attemptId: UUID = UUID(),
          startTime: Date = Date(),
@@ -55,6 +70,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutStart() {
+        setStage(.start)
         handler.fire(.optOutStart(dataBroker: dataBroker, attemptId: attemptId))
     }
 
@@ -75,6 +91,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutSubmit() {
+        setStage(.submit)
         handler.fire(.optOutSubmit(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
@@ -87,6 +104,7 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutValidate() {
+        setStage(.validate)
         handler.fire(.optOutValidate(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceLastStage()))
     }
 
@@ -95,7 +113,14 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 
     func fireOptOutFailure() {
-        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime()))
+        handler.fire(.optOutFailure(dataBroker: dataBroker, attemptId: attemptId, duration: durationSinceStartTime(), stage: stage.rawValue))
+    }
+
+    // Helper methods to set the stage that is about to run. This help us
+    // identifying the stage so we can know which one was the one that failed.
+
+    func setStage(_ stage: Stage) {
+        self.stage = stage
     }
 }
 
@@ -105,6 +130,7 @@ public enum DataBrokerProtectionPixels: Equatable {
         static let appVersionParamKey = "app_version"
         static let attemptIdParamKey = "attempt_id"
         static let durationParamKey = "duration"
+        static let stageKey = "stage"
     }
 
     case error(error: DataBrokerProtectionError, dataBroker: String)
@@ -125,12 +151,41 @@ public enum DataBrokerProtectionPixels: Equatable {
     // Process Pixels
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
-    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double)
+    case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String)
 }
 
-public extension DataBrokerProtectionPixels {
+extension DataBrokerProtectionPixels: PixelKitEvent {
+    public var name: String {
+        switch self {
+        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
+            // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
+            // Stage Pixels
+        case .optOutStart: return "dbp_macos_optout_stage_start"
+        case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"
+        case .optOutCaptchaParse: return "dbp_macos_optout_stage_captcha-parse"
+        case .optOutCaptchaSend: return "dbp_macos_optout_stage_captcha-send"
+        case .optOutCaptchaSolve: return "dbp_macos_optout_stage_captcha-solve"
+        case .optOutSubmit: return "dbp_macos_optout_stage_submit"
+        case .optOutEmailReceive: return "dbp_macos_optout_stage_email-receive"
+        case .optOutEmailConfirm: return "dbp_macos_optout_stage_email-confirm"
+        case .optOutValidate: return "dbp_macos_optout_stage_validate"
+        case .optOutFinish: return "dbp_macos_optout_stage_finish"
 
-    var params: [String: String] {
+            // Process Pixels
+        case .optOutSubmitSuccess: return "dbp_macos_optout_process_submit-success"
+        case .optOutSuccess: return "dbp_macos_optout_process_success"
+        case .optOutFailure: return "dbp_macos_optout_process_failure"
+
+            // Debug Pixels
+        case .error: return "data_broker_error"
+        }
+    }
+
+    public var params: [String: String]? {
+        parameters
+    }
+
+    public var parameters: [String: String]? {
         switch self {
         case .error(let error, let dataBroker):
             if case let .actionFailed(actionID, message) = error {
@@ -167,8 +222,8 @@ public extension DataBrokerProtectionPixels {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutSuccess(let dataBroker, let attemptId, let duration):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
-        case .optOutFailure(let dataBroker, let attemptId, let duration):
-            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
+        case .optOutFailure(let dataBroker, let attemptId, let duration, let stage):
+            return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage]
         }
     }
 }

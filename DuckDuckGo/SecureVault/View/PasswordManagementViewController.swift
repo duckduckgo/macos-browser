@@ -181,7 +181,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {
-        (NSApp.delegate as? AppDelegate)?.syncDataProviders?.credentialsAdapter.syncDidCompletePublisher
+        NSApp.delegateTyped.syncDataProviders?.credentialsAdapter.syncDidCompletePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshData()
@@ -970,7 +970,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func requestSync() {
-        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+        guard let syncService = NSApp.delegateTyped.syncService else {
             return
         }
         os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")

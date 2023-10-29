@@ -1,6 +1,6 @@
 {
   "name": "centeda.com",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "parent": "verecor.com",
   "addedDatetime": 1677733200000,
   "steps": [
@@ -10,8 +10,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "ef932ac1-61d8-4a6b-8577-d407aed69b6e",
-          "url": "https://centeda.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${ageRange}",
+          "id": "25990359-3d58-45de-bdfd-d524b1946e57",
+          "url": "https://centeda.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
             "31-40",
@@ -24,7 +24,7 @@
         },
         {
           "actionType": "extract",
-          "id": "c21af767-a34d-43d8-aca6-e3eae7298ef4",
+          "id": "7108af78-dbbf-47ec-8bb9-e44be505993e",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -41,6 +41,9 @@
             "addressCityStateList": {
               "selector": ".//div[@class='col-sm-24 col-md-8 lived-in']//li",
               "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 related-to']//li"
             },
             "profileUrl": {
               "selector": ".get-report-btn"

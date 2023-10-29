@@ -233,7 +233,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             return
         }
 
-        if NSApp.isRunningUnitTests {
+        guard case .normal = NSApp.runType else {
             return
         }
 

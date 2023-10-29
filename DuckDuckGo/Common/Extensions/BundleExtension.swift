@@ -36,11 +36,6 @@ extension Bundle {
         static let appGroup = "NETP_APP_GROUP"
     }
 
-    var displayName: String? {
-        object(forInfoDictionaryKey: Keys.displayName) as? String ??
-            object(forInfoDictionaryKey: Keys.name) as? String
-    }
-
     var versionNumber: String? {
         object(forInfoDictionaryKey: Keys.versionNumber) as? String
     }

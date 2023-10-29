@@ -134,7 +134,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             }
-            Pixel.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+
+            PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
         }
     }
 
@@ -143,13 +144,23 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     // MARK: - PacketTunnelProvider.Event reporting
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
+
         switch event {
         case .userBecameActive:
-            Pixel.fire(.networkProtectionActiveUser, frequency: .dailyOnly, includeAppVersionParameter: true)
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionActiveUser,
+                frequency: .dailyOnly,
+                includeAppVersionParameter: true)
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            Pixel.fire(.networkProtectionLatency(ms: ms, server: server, networkType: networkType), frequency: .standard)
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionLatency(ms: ms, server: server, networkType: networkType),
+                frequency: .standard,
+                includeAppVersionParameter: true)
         case .rekeyCompleted:
-            Pixel.fire(.networkProtectionRekeyCompleted, frequency: .dailyAndContinuous, includeAppVersionParameter: true)
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
+                frequency: .dailyAndContinuous,
+                includeAppVersionParameter: true)
         }
     }
 
@@ -317,13 +328,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         dryRun = false
 #endif
 
-        Pixel.setUp(dryRun: dryRun,
-                    appVersion: AppVersion.shared.versionNumber,
-                    defaultHeaders: defaultHeaders,
-                    log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+        PixelKit.setUp(dryRun: dryRun,
+                       appVersion: AppVersion.shared.versionNumber,
+                       defaultHeaders: defaultHeaders,
+                       log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
-            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
             let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
             let request = APIRequest(configuration: configuration)
 
