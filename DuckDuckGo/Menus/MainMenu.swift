@@ -557,6 +557,9 @@ import Subscription
                 NSMenuItem(title: "Set custom configuration URL…", action: #selector(MainViewController.setCustomConfigurationURL))
                 NSMenuItem(title: "Reset configuration to default", action: #selector(MainViewController.resetConfigurationToDefault))
             }
+            NSMenuItem(title: "User Scripts") {
+                NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
+            }
             NSMenuItem(title: "Sync")
                 .submenu(SyncDebugMenu())
 

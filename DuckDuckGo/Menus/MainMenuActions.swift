@@ -734,6 +734,12 @@ extension MainViewController {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
 
+    @objc func removeUserScripts(_ sender: Any?) {
+        tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
+        tabCollectionViewModel.selectedTab?.reload()
+        os_log("User scripts removed from the current tab", type: .info)
+    }
+
     @objc func reloadConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.forceRefresh()
     }
