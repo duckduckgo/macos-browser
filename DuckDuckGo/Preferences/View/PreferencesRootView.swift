@@ -122,7 +122,7 @@ extension Preferences {
 struct SyncView: View {
 
     var body: some View {
-        if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
+        if let syncService = NSApp.delegateTyped.syncService {
             SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")
