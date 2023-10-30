@@ -111,7 +111,11 @@ final class PixelKitTests: XCTestCase {
             XCTAssertEqual(firedHeaders[PixelKit.Header.moreInfo], "See \(PixelKit.duckDuckGoMorePrivacyInfo)")
 
             XCTAssertEqual(parameters[PixelKit.Parameters.appVersion], appVersion)
+#if DEBUG
             XCTAssertEqual(parameters[PixelKit.Parameters.test], PixelKit.Values.test)
+#else
+            XCTAssertNil(parameters[PixelKit.Parameters.test])
+#endif
         }
 
         // Run test
@@ -153,7 +157,11 @@ final class PixelKitTests: XCTestCase {
 
             XCTAssertEqual(firedHeaders[PixelKit.Header.moreInfo], expectedMoreInfoString)
             XCTAssertEqual(parameters[PixelKit.Parameters.appVersion], appVersion)
+#if DEBUG
             XCTAssertEqual(parameters[PixelKit.Parameters.test], PixelKit.Values.test)
+#else
+            XCTAssertNil(parameters[PixelKit.Parameters.test])
+#endif
         }
 
         // Run test
@@ -197,7 +205,11 @@ final class PixelKitTests: XCTestCase {
 
             XCTAssertEqual(firedHeaders[PixelKit.Header.moreInfo], expectedMoreInfoString)
             XCTAssertEqual(parameters[PixelKit.Parameters.appVersion], appVersion)
+#if DEBUG
             XCTAssertEqual(parameters[PixelKit.Parameters.test], PixelKit.Values.test)
+#else
+            XCTAssertNil(parameters[PixelKit.Parameters.test])
+#endif
         }
 
         // Run test
