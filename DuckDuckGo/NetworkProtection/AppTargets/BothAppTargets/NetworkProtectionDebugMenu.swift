@@ -29,6 +29,8 @@ import SwiftUI
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
 
+    private let environmentMenu = NSMenu()
+
     private let preferredServerMenu: NSMenu
     private let preferredServerAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setSelectedServer))
 
@@ -86,6 +88,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "Onboarding")
                 .submenu(NetworkProtectionOnboardingMenu())
+
+            NSMenuItem(title: "Environment")
+                .submenu(environmentMenu)
 
             NSMenuItem(title: "Preferred Server").submenu(preferredServerMenu)
 
@@ -148,6 +153,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
 
         preferredServerMenu.autoenablesItems = false
+        populateNetworkProtectionEnvironmentListMenuItems()
         populateNetworkProtectionServerListMenuItems()
         populateNetworkProtectionRegistrationKeyValidityMenuItems()
 
@@ -293,6 +299,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: Populating Menu Items
 
+    private func populateNetworkProtectionEnvironmentListMenuItems() {
+        environmentMenu.items = [
+            NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+        ]
+    }
+
     private func populateNetworkProtectionServerListMenuItems() {
         let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
         let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
@@ -381,10 +394,24 @@ final class NetworkProtectionDebugMenu: NSMenu {
     // MARK: - Menu State Update
 
     override func update() {
+        updateEnvironmentMenu()
         updatePreferredServerMenu()
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
         updateNetworkProtectionItems()
+    }
+
+    private func updateEnvironmentMenu() {
+        let selectedEnvironment = settings.selectedEnvironment
+
+        switch selectedEnvironment {
+        case .production:
+            environmentMenu.items.first?.state = .on
+            environmentMenu.items.last?.state = .off
+        case .staging:
+            environmentMenu.items.first?.state = .off
+            environmentMenu.items.last?.state = .on
+        }
     }
 
     private func updatePreferredServerMenu() {
@@ -532,6 +559,20 @@ final class NetworkProtectionDebugMenu: NSMenu {
         } else {
             return ""
         }
+    }
+
+    // MARK: Environment
+    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
+        let title = menuItem.title
+        let selectedEnvironment: TunnelSettings.SelectedEnvironment
+
+        if title == "Staging" {
+            selectedEnvironment = .staging
+        } else {
+            selectedEnvironment = .production
+        }
+
+        settings.selectedEnvironment = selectedEnvironment
     }
 }
 
