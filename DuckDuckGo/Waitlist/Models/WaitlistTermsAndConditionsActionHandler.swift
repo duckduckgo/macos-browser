@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import UserNotifications
 
@@ -41,3 +43,5 @@ struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAn
         DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount, includeAppVersionParameter: true)
     }
 }
+
+#endif

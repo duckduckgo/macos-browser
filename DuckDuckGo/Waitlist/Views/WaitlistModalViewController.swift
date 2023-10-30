@@ -43,7 +43,8 @@ final class WaitlistModalViewController: NSViewController {
     init(notificationPermissionState: NetworkProtectionWaitlistViewModel.NotificationPermissionState) {
         self.model = NetworkProtectionWaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
                                                         notificationPermissionState: notificationPermissionState,
-                                                        termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler())
+                                                        termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
+                                                        featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
         super.init(nibName: nil, bundle: nil)
     }
 
