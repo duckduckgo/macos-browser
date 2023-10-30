@@ -133,6 +133,7 @@ public struct UserDefaultsWrapper<T> {
         case loggingCategories = "logging.categories"
 
         case firstLaunchDate = "first.app.launch.date"
+        case customConfigurationUrl = "custom.configuration.url"
 
         // Network Protection
 

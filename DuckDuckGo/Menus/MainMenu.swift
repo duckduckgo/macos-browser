@@ -546,7 +546,9 @@ import Subscription
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
             }
             NSMenuItem(title: "Remote Configuration") {
-                NSMenuItem(title: "Fetch Configuration Now", action: #selector(MainViewController.fetchConfigurationNow))
+                NSMenuItem(title: "Reload Configuration Now", action: #selector(MainViewController.reloadConfigurationNow))
+                NSMenuItem(title: "Set custom configuration URL…", action: #selector(MainViewController.setCustomConfigurationURL))
+                NSMenuItem(title: "Reset configuration to default", action: #selector(MainViewController.resetConfigurationToDefault))
             }
             NSMenuItem(title: "Sync")
                 .submenu(SyncDebugMenu())

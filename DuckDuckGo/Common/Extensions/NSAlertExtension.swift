@@ -201,6 +201,16 @@ extension NSAlert {
         return alert
     }
 
+    static func customConfigurationAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Set custom configuration URL:"
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.cancel)
+        alert.accessoryView = NSTextField(frame: NSRect(x: 0, y: 0, width: 300, height: 24))
+        alert.window.initialFirstResponder = alert.accessoryView
+        return alert
+    }
+
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in

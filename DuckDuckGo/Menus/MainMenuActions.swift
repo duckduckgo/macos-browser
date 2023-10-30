@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
+import Configuration
 
 // Actions are sent to objects of responder chain
 
@@ -733,8 +734,39 @@ extension MainViewController {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
 
-    @objc func fetchConfigurationNow(_ sender: Any?) {
+    @objc func reloadConfigurationNow(_ sender: Any?) {
         ConfigurationManager.shared.forceRefresh()
+    }
+
+    private func setConfigurationUrl(_ configurationUrl: URL?) {
+        var configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: configurationUrl)
+        if configurationUrl == nil {
+            configurationProvider.resetToDefaultConfigurationUrl()
+        }
+        Configuration.setURLProvider(configurationProvider)
+        ConfigurationManager.shared.forceRefresh()
+        if let configurationUrl {
+            os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
+        } else {
+            os_log("New configuration URL reset to default", type: .info)
+        }
+    }
+
+    @objc func setCustomConfigurationURL(_ sender: Any?) {
+        let alert = NSAlert.customConfigurationAlert()
+        if alert.runModal() != .cancel {
+            guard let textField = alert.accessoryView as? NSTextField,
+                  let newConfigurationUrl = URL(string: textField.stringValue) else {
+                os_log("Failed to set custom configuration URL", type: .error)
+                return
+            }
+
+            setConfigurationUrl(newConfigurationUrl)
+        }
+    }
+
+    @objc func resetConfigurationToDefault(_ sender: Any?) {
+        setConfigurationUrl(nil)
     }
 
     // MARK: - Developer Tools
