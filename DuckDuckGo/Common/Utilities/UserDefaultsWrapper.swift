@@ -136,18 +136,7 @@ public struct UserDefaultsWrapper<T> {
 
         // Network Protection
 
-        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
-        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
-
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-        case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
-        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
-
-        case networkProtectionConnectOnLogIn = "netp.connect-on-login"
-
-        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
-
-        case netpMenuAgentLaunchTime = "netp.agent.launch-time"
 
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
 
@@ -171,12 +160,21 @@ public struct UserDefaultsWrapper<T> {
 
         case syncEnvironment = "sync.environment"
         case favoritesDisplayMode = "sync.favorites-display-mode"
+        case syncBookmarksPaused = "sync.bookmarks-paused"
+        case syncCredentialsPaused = "sync.credentials-paused"
     }
 
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
         case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
         case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
+
+        // NetP removed keys
+        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
+        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
+        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
+        case networkProtectionShouldExcludeLocalNetworks = "netp.exclude-local-routes"
+        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
     }
 
     private let key: Key
@@ -194,7 +192,7 @@ public struct UserDefaultsWrapper<T> {
         if case .normal = NSApplication.runType {
             return .standard
         } else {
-            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApplication.runType.description)!
+            return UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
         }
 #else
         return .standard

@@ -34,6 +34,10 @@ final class StatusBarMenuTests: XCTestCase {
         func stop() async {
             // no-op
         }
+
+        var isConnected: Bool {
+            true
+        }
     }
 
     @MainActor

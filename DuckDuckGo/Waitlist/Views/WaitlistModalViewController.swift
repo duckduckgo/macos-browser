@@ -36,12 +36,12 @@ final class WaitlistModalViewController: NSViewController {
     }
 
     private let defaultSize = CGSize(width: 360, height: 650)
-    private let model: WaitlistViewModel
+    private let model: NetworkProtectionWaitlistViewModel
 
     private var heightConstraint: NSLayoutConstraint?
 
-    init(notificationPermissionState: WaitlistViewModel.NotificationPermissionState) {
-        self.model = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(), notificationPermissionState: notificationPermissionState)
+    init(notificationPermissionState: NetworkProtectionWaitlistViewModel.NotificationPermissionState) {
+        self.model = NetworkProtectionWaitlistViewModel(waitlist: NetworkProtectionWaitlist(), notificationPermissionState: notificationPermissionState)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -94,7 +94,7 @@ final class WaitlistModalViewController: NSViewController {
         // preventing any state changing from occurring.
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             let status = settings.authorizationStatus
-            let state = WaitlistViewModel.NotificationPermissionState.from(status)
+            let state = NetworkProtectionWaitlistViewModel.NotificationPermissionState.from(status)
 
             DispatchQueue.main.async {
                 let viewController = WaitlistModalViewController(notificationPermissionState: state)

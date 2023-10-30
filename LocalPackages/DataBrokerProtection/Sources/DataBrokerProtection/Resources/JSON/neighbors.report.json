@@ -1,6 +1,6 @@
 {
   "name": "neighbor.report",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "addedDatetime": 1692590400000,
   "steps": [
     {
@@ -9,12 +9,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "762a26ed-5b41-4f68-88d2-6149f61d0752",
-          "url": "https://neighbor.report/${firstName}-${lastName}/${stateFullHyphenated}/${cityHyphenated}"
+          "id": "a3e625f2-f82e-435e-963a-f4b158bf7b3d",
+          "url": "https://neighbor.report/${firstName}-${lastName}/${state|stateFull|hyphenated}/${city|hyphenated}"
         },
         {
           "actionType": "extract",
-          "id": "eaf8bf52-1336-4f3e-9dc3-237d98f71a32",
+          "id": "58817d0e-26f6-45d7-81ce-3f5d34b3f818",
           "selector": ".lstd",
           "profile": {
             "name": {
@@ -50,12 +50,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "057fcd2d-cd54-4cad-919d-35fdb5b33842",
+          "id": "951d0377-eee5-4571-b772-7ccdb7cf7f3b",
           "url": "https://neighbor.report/remove"
         },
         {
           "actionType": "fillForm",
-          "id": "b12bface-f263-46e6-88b5-3306d288fb58",
+          "id": "913bd774-6892-4cf1-95ec-6981956c5642",
           "selector": ".form-horizontal",
           "elements": [
             {
@@ -74,17 +74,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "6dad4f78-26a2-48fa-9c96-19e38ad62053",
+          "id": "85728ef5-b9a0-4576-b5c5-a1e22c358024",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "f94b2c54-37bc-48cd-aaf8-c4f1cc3074b5",
+          "id": "bead8189-0c3a-460a-ae59-0b14a568bb72",
           "selector": ".recaptcha-div"
         },
         {
           "actionType": "click",
-          "id": "cfa554fc-5d9b-42ed-ae87-b20448074bdb",
+          "id": "7fcd3d16-1247-47a6-8ecc-d7aee62e041c",
           "elements": [
             {
               "type": "button",
@@ -94,7 +94,7 @@
         },
         {
           "actionType": "click",
-          "id": "35cee2ee-d5c6-4ffe-9a4c-cf50ef49d872",
+          "id": "9d26074d-dc8d-416e-8635-b27e5c60c234",
           "elements": [
             {
               "type": "button",
@@ -103,18 +103,8 @@
           ]
         },
         {
-            "actionType": "click",
-            "id": "0799cab9-7e76-4502-812d-4e94add0038a",
-            "elements": [
-              {
-                "type": "button",
-                "selector": ".btn-success"
-              }
-            ]
-          },
-        {
           "actionType": "expectation",
-          "id": "9064235e-b469-4f0a-bd8a-a651bb1e1a51",
+          "id": "a448448b-e529-4d7d-917c-d0147adc5de2",
           "expectations": [
             {
               "type": "text",

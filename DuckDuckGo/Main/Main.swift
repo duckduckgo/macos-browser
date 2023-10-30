@@ -38,57 +38,6 @@ final class AppMain {
     }
 
     static func main() {
-#if NETWORK_PROTECTION
-
-        // If the app is sandboxed, attempt to use the symlink approach for determining launch command:
-        if let launchPath = (CommandLine.arguments.first as NSString?)?.lastPathComponent {
-            switch launchPath {
-            case AppLaunchCommand.startVPN.rawValue:
-                swizzleMainBundle()
-
-                Task {
-                    await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                    exit(0)
-                }
-
-                dispatchMain()
-
-            case AppLaunchCommand.stopVPN.rawValue:
-                swizzleMainBundle()
-
-                Task {
-                    await NetworkProtectionTunnelController().stop()
-                    exit(0)
-                }
-
-                dispatchMain()
-            default: break
-            }
-        }
-
-        // If the app is not sandboxed, read the process arguments to determine launch command:
-        if ProcessInfo.processInfo.arguments.contains(AppLaunchCommand.startVPN.rawValue) {
-            swizzleMainBundle()
-
-            Task {
-                await NetworkProtectionTunnelController().start(enableLoginItems: false)
-                exit(0)
-            }
-
-            dispatchMain()
-        } else if ProcessInfo.processInfo.arguments.contains(AppLaunchCommand.stopVPN.rawValue) {
-            swizzleMainBundle()
-
-            Task {
-                await NetworkProtectionTunnelController().stop()
-                exit(0)
-            }
-
-            dispatchMain()
-        }
-
-#endif
-
 #if !APPSTORE && !DEBUG && !DBP
         PFMoveToApplicationsFolderIfNecessary()
 #endif

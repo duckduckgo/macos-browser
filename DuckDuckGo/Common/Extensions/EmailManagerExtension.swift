@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import PixelKit
 
 extension EmailManager {
 
@@ -35,10 +36,10 @@ extension EmailManager {
         var pixelParameters: [String: String] = [:]
 
         if let cohort = self.cohort {
-            pixelParameters[Pixel.Parameters.emailCohort] = cohort
+            pixelParameters[PixelKit.Parameters.emailCohort] = cohort
         }
 
-        pixelParameters[Pixel.Parameters.emailLastUsed] = self.lastUseDate
+        pixelParameters[PixelKit.Parameters.emailLastUsed] = self.lastUseDate
 
         return pixelParameters
     }

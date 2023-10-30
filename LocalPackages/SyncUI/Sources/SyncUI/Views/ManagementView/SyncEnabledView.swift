@@ -23,6 +23,16 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if model.isSyncBookmarksPaused {
+                syncPaused(for: .bookmarks)
+            }
+            if model.isSyncCredentialsPaused {
+                syncPaused(for: .credentials)
+            }
+        }
+        .padding(.top, 20)
+
         PreferencePaneSection(vericalPadding: 12) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
@@ -93,5 +103,52 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             }
             .padding(16)
         }
+    }
+
+    @ViewBuilder
+    func syncPaused(for itemType: LimitedItemType) -> some View {
+        var description: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.bookmarksLimitExceededDescription
+            case .credentials:
+                return UserText.credentialsLimitExceededDescription
+            }
+        }
+        var actionTitle: String {
+            switch itemType {
+            case .bookmarks:
+                return UserText.bookmarksLimitExceededAction
+            case .credentials:
+                return UserText.credentialsLimitExceededAction
+            }
+        }
+        PreferencePaneSection(vericalPadding: 16) {
+            HStack(alignment: .top, spacing: 8) {
+                Text("⚠️")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(UserText.syncLimitExceededTitle)
+                        .bold()
+                    Text(description)
+                    Button(actionTitle) {
+                        switch itemType {
+                        case .bookmarks:
+                            model.manageBookmarks()
+                        case .credentials:
+                            model.manageLogins()
+                        }
+                    }
+                    .padding(.top, 8)
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+        .frame(width: 512, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
+    }
+
+    enum LimitedItemType {
+        case bookmarks
+        case credentials
     }
 }

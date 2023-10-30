@@ -376,12 +376,7 @@ final class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let backMenuItem = NSApplication.shared.mainMenuTyped.backMenuItem else {
-            assertionFailure("MainViewController: Failed to get reference to back menu item")
-            return
-        }
-
-        backMenuItem.isEnabled = selectedTabViewModel.canGoBack
+        NSApp.mainMenuTyped.backMenuItem.isEnabled = selectedTabViewModel.canGoBack
     }
 
     private func updateForwardMenuItem() {
@@ -390,12 +385,7 @@ final class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let forwardMenuItem = NSApplication.shared.mainMenuTyped.forwardMenuItem else {
-            assertionFailure("MainViewController: Failed to get reference to Forward menu item")
-            return
-        }
-
-        forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
+        NSApp.mainMenuTyped.forwardMenuItem.isEnabled = selectedTabViewModel.canGoForward
     }
 
     private func updateReloadMenuItem() {
@@ -404,12 +394,7 @@ final class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let reloadMenuItem =  NSApplication.shared.mainMenuTyped.reloadMenuItem else {
-            assertionFailure("MainViewController: Failed to get reference to Reload menu item")
-            return
-        }
-
-        reloadMenuItem.isEnabled = selectedTabViewModel.canReload
+        NSApp.mainMenuTyped.reloadMenuItem.isEnabled = selectedTabViewModel.canReload
     }
 
     private func updateStopMenuItem() {
@@ -418,12 +403,7 @@ final class MainViewController: NSViewController {
             os_log("MainViewController: No tab view model selected", type: .error)
             return
         }
-        guard let stopMenuItem =  NSApplication.shared.mainMenuTyped.stopMenuItem else {
-            assertionFailure("MainViewController: Failed to get reference to Stop menu item")
-            return
-        }
-
-        stopMenuItem.isEnabled = selectedTabViewModel.isLoading
+        NSApp.mainMenuTyped.stopMenuItem.isEnabled = selectedTabViewModel.isLoading
     }
 
 #if NETWORK_PROTECTION

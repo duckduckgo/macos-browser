@@ -29,6 +29,13 @@ final class SyncCredentialsAdapter {
     let databaseCleaner: CredentialsDatabaseCleaner
     let syncDidCompletePublisher: AnyPublisher<Void, Never>
 
+    @UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false)
+    private var isSyncCredentialsPaused: Bool {
+        didSet {
+            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
+        }
+    }
+
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
         databaseCleaner = CredentialsDatabaseCleaner(
@@ -60,14 +67,26 @@ final class SyncCredentialsAdapter {
                 metadataStore: metadataStore,
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
+                    self?.isSyncCredentialsPaused = false
                 }
             )
 
             syncErrorCancellable = provider.syncErrorPublisher
-                .sink { error in
+                .sink { [weak self] error in
                     switch error {
                     case let syncError as SyncError:
                         Pixel.fire(.debug(event: .syncCredentialsFailed, error: syncError))
+                        Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
+                        // If credentials count limit has been exceeded
+                        if syncError == .unexpectedStatusCode(409) {
+                            self?.isSyncCredentialsPaused = true
+                            Pixel.fire(.syncCredentialsCountLimitExceededDaily, limitTo: .dailyFirst)
+                        }
+                        // If credentials request size limit has been exceeded
+                        if syncError == .unexpectedStatusCode(413) {
+                            self?.isSyncCredentialsPaused = true
+                            Pixel.fire(.syncCredentialsRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                        }
                     default:
                         let nsError = error as NSError
                         if nsError.domain != NSURLErrorDomain {
