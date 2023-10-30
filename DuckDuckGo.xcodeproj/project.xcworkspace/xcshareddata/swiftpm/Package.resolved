@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/sync-favicons-fetching",
-        "revision" : "b679cc248edb8b353c602a7267a1ba36b0d2f849"
+        "revision" : "271fb39ee68db552069c60a58a38f0d0612a1c5d"
       }
     },
     {

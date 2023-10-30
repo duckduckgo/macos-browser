@@ -79,11 +79,13 @@ final class SyncBookmarksAdapter {
             metadataStore: metadataStore,
             syncDidUpdateData: { [weak self] changes in
                 faviconsFetcher.startFetching(
-                    with: changes[BookmarksProvider.ChangesKey.modified] ?? [],
-                    deletedBookmarkIDs: changes[BookmarksProvider.ChangesKey.deleted] ?? []
+                    with: changes?[BookmarksProvider.ChangesKey.modified] ?? [],
+                    deletedBookmarkIDs: changes?[BookmarksProvider.ChangesKey.deleted] ?? []
                 )
-                LocalBookmarkManager.shared.loadBookmarks()
-                self?.isSyncBookmarksPaused = false
+                if changes != nil {
+                    LocalBookmarkManager.shared.loadBookmarks()
+                    self?.isSyncBookmarksPaused = false
+                }
             }
         )
 

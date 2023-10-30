@@ -48,8 +48,10 @@ final class SyncSettingsAdapter {
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
             settingsHandlers: [FavoritesDisplayModeSyncHandler(), EmailProtectionSyncHandler(emailManager: emailManager)],
-            syncDidUpdateData: { [weak self] _ in
-                self?.syncDidCompleteSubject.send()
+            syncDidUpdateData: { [weak self] changes in
+                if changes != nil {
+                    self?.syncDidCompleteSubject.send()
+                }
             }
         )
 

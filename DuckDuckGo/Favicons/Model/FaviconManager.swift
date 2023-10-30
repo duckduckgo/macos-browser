@@ -363,6 +363,9 @@ extension FaviconManager: Bookmarks.FaviconStoring {
             // Fetch favicons if needed
             let newFavicons = [favicon]
 
+            // Insert new favicons to cache
+            self.imageCache.insert(newFavicons)
+
             // Pick most suitable favicons
             let weekAgo = Date.weekAgo
 
@@ -371,8 +374,6 @@ extension FaviconManager: Bookmarks.FaviconStoring {
                     favicon.dateCreated > weekAgo
                 }
 
-            // Insert new favicons to cache
-            self.imageCache.insert(newFavicons)
             self.handleFaviconReferenceCacheInsertion(documentURL: documentURL, cachedFavicons: cachedFavicons ?? [], newFavicons: newFavicons)
         }
     }
