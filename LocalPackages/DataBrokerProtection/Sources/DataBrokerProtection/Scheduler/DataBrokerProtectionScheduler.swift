@@ -51,7 +51,7 @@ extension DataBrokerProtectionScheduler {
     }
 
     public func scanAllBrokers() {
-        scanAllBrokers(showWebView: true, completion: nil)
+        scanAllBrokers(showWebView: false, completion: nil)
     }
 }
 
