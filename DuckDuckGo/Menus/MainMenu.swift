@@ -23,6 +23,7 @@ import Combine
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SwiftUI
 import WebKit
+import Configuration
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -92,6 +93,8 @@ import Subscription
     // MARK: - Debug
 
     private var loggingMenu: NSMenu?
+    let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: #selector(MainViewController.reloadConfigurationNow))
+    let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: #selector(MainViewController.reloadConfigurationNow))
 
     // MARK: - Help
 
@@ -378,6 +381,7 @@ import Subscription
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateRemoteConfigurationInfo()
     }
 
     // MARK: - Bookmarks
@@ -546,6 +550,9 @@ import Subscription
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
             }
             NSMenuItem(title: "Remote Configuration") {
+                customConfigurationUrlMenuItem
+                configurationDateAndTimeMenuItem
+                NSMenuItem.separator()
                 NSMenuItem(title: "Reload Configuration Now", action: #selector(MainViewController.reloadConfigurationNow))
                 NSMenuItem(title: "Set custom configuration URL…", action: #selector(MainViewController.setCustomConfigurationURL))
                 NSMenuItem(title: "Reset configuration to default", action: #selector(MainViewController.resetConfigurationToDefault))
@@ -607,6 +614,12 @@ import Subscription
 
             item.state = enabledCategories.contains(category) ? .on : .off
         }
+    }
+
+    private func updateRemoteConfigurationInfo() {
+        let dateString = DateFormatter.localizedString(from: ConfigurationManager.shared.lastUpdateTime, dateStyle: .short, timeStyle: .medium)
+        configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
     }
 
     @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {
