@@ -29,7 +29,7 @@ final class WaitlistViewModelTests: XCTestCase {
     func testWhenTimestampIsNotPresent_ThenStateIsNotJoinedQueue() async {
         let request = MockWaitlistRequest.failure()
         let storage = MockWaitlistStorage.init()
-        let viewModel = NetworkProtectionWaitlistViewModel(waitlistRequest: request,
+        let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: MockNotificationService(),
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
@@ -47,7 +47,7 @@ final class WaitlistViewModelTests: XCTestCase {
         storage.store(waitlistTimestamp: 12345)
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
-        let viewModel = NetworkProtectionWaitlistViewModel(waitlistRequest: request,
+        let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
@@ -67,7 +67,7 @@ final class WaitlistViewModelTests: XCTestCase {
         storage.store(inviteCode: "ABCD1234")
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
-        let viewModel = NetworkProtectionWaitlistViewModel(waitlistRequest: request,
+        let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
@@ -86,13 +86,13 @@ final class WaitlistViewModelTests: XCTestCase {
         let storage = MockWaitlistStorage()
         var notificationService = MockNotificationService()
         notificationService.authorizationStatus = .notDetermined
-        let viewModel = NetworkProtectionWaitlistViewModel(waitlistRequest: request,
+        let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
                                                            featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
-        var stateUpdates: [NetworkProtectionWaitlistViewModel.ViewState] = []
+        var stateUpdates: [WaitlistViewModel.ViewState] = []
         let cancellable = viewModel.$viewState.sink { stateUpdates.append($0) }
 
         await viewModel.perform(action: .joinQueue)
@@ -110,7 +110,7 @@ final class WaitlistViewModelTests: XCTestCase {
         storage.store(inviteCode: "ABCD1234")
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
-        let viewModel = NetworkProtectionWaitlistViewModel(waitlistRequest: request,
+        let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),

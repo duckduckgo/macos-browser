@@ -31,7 +31,7 @@ protocol EnableWaitlistFeatureViewData {
 
 struct EnableWaitlistFeatureView: View {
     var viewData: EnableWaitlistFeatureViewData
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {

@@ -33,7 +33,7 @@ protocol JoinWaitlistViewViewData {
 
 struct JoinWaitlistView: View {
     let viewData: JoinWaitlistViewViewData
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {

@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionWaitlistViewModel.swift
+//  WaitlistViewModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -27,7 +27,7 @@ protocol WaitlistViewModelDelegate: AnyObject {
     func viewHeightChanged(newHeight: CGFloat)
 }
 
-final class NetworkProtectionWaitlistViewModel: ObservableObject {
+final class WaitlistViewModel: ObservableObject {
 
     enum ViewState: Equatable {
         case notOnWaitlist
