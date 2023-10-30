@@ -77,12 +77,9 @@ final class SyncBookmarksAdapter {
         let provider = BookmarksProvider(
             database: database,
             metadataStore: metadataStore,
-            syncDidUpdateData: { [weak self] changes in
-                faviconsFetcher.startFetching(
-                    with: changes?[BookmarksProvider.ChangesKey.modified] ?? [],
-                    deletedBookmarkIDs: changes?[BookmarksProvider.ChangesKey.deleted] ?? []
-                )
-                if changes != nil {
+            syncDidFinish: { [weak self] result in
+                faviconsFetcher.startFetching(with: result.modifiedIds, deletedBookmarkIDs: result.deletedIds)
+                if result.hasNewData {
                     LocalBookmarkManager.shared.loadBookmarks()
                     self?.isSyncBookmarksPaused = false
                 }
