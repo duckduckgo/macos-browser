@@ -16,10 +16,15 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
 struct MockWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
     func confirmFeature() {
 
     }
 }
+
+#endif

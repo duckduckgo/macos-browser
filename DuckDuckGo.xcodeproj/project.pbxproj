@@ -115,6 +115,10 @@
 		3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */; };
 		3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6B9288984D00068632A /* BadgeAnimationView.swift */; };
 		3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */; };
+		317295D22AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D02AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift */; };
+		317295D32AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D02AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift */; };
+		317295D42AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */; };
+		317295D52AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */; };
 		318115E42A8A4F1C00129796 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
 		318115E52A8A4F3300129796 /* CredentialsCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */; };
 		3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */; };
@@ -3857,6 +3861,8 @@
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
 		3171D6B9288984D00068632A /* BadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeAnimationView.swift; sourceTree = "<group>"; };
 		3171D6DA2889B64D0068632A /* CookieManagedNotificationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationContainerView.swift; sourceTree = "<group>"; };
+		317295D02AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWaitlistTermsAndConditionsActionHandler.swift; sourceTree = "<group>"; };
+		317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockWaitlistFeatureSetupHandler.swift; sourceTree = "<group>"; };
 		3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeNotificationAnimationModel.swift; sourceTree = "<group>"; };
 		3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieNotificationAnimationModel.swift; sourceTree = "<group>"; };
 		3192A26E2A4C4CFF0084EA89 /* DuckDuckGoDBP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoDBP.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -6184,6 +6190,8 @@
 		4B9DB04E2A983B55000927DB /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
+				317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */,
+				317295D02AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift */,
 				4B9DB04F2A983B55000927DB /* MockWaitlistStorage.swift */,
 				4B9DB0502A983B55000927DB /* MockNotificationService.swift */,
 				4B9DB0512A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift */,
@@ -11268,6 +11276,7 @@
 				3706FE33293F661700E42796 /* FireTests.swift in Sources */,
 				B60C6F8229B1B4AD007BFAA8 /* TestRunHelper.swift in Sources */,
 				567DA94029E8045D008AC5EE /* MockEmailStorage.swift in Sources */,
+				317295D32AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				3706FE34293F661700E42796 /* PermissionStoreTests.swift in Sources */,
 				3706FE35293F661700E42796 /* ThirdPartyBrowserTests.swift in Sources */,
 				1DFAB5232A8983E100A0F7F6 /* SetExtensionTests.swift in Sources */,
@@ -11291,6 +11300,7 @@
 				3706FE46293F661700E42796 /* EncryptedValueTransformerTests.swift in Sources */,
 				3706FE47293F661700E42796 /* URLExtensionTests.swift in Sources */,
 				1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
+				317295D52AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */,
 				3706FE48293F661700E42796 /* PixelTests.swift in Sources */,
 				3706FE49293F661700E42796 /* BookmarkNodePathTests.swift in Sources */,
 				1DE03425298BC7F000CAB3D7 /* InternalUserDeciderStoreMock.swift in Sources */,
@@ -13054,6 +13064,7 @@
 				4B4F72EC266B2ED300814C60 /* CollectionExtension.swift in Sources */,
 				AAE39D1B24F44885008EF28B /* TabCollectionViewModelDelegateMock.swift in Sources */,
 				373A1AAA283ED86C00586521 /* BookmarksHTMLReaderTests.swift in Sources */,
+				317295D42AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */,
 				AA9C363025518CA9004B1BA3 /* FireTests.swift in Sources */,
 				B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */,
 				4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */,
@@ -13152,6 +13163,7 @@
 				B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */,
 				B6C0B24626E9CB190031CB7F /* RunLoopExtensionTests.swift in Sources */,
 				56D145F129E6F06D00E3488A /* MockBookmarkManager.swift in Sources */,
+				317295D22AF058D3002C3206 /* MockWaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				B693956326F1C2A40015B914 /* FileDownloadManagerMock.swift in Sources */,
 				B6C2C9EF276081AB005B7F0A /* DeallocationTests.swift in Sources */,
 				B63ED0D826AE729600A9DAD1 /* PermissionModelTests.swift in Sources */,

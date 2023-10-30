@@ -16,7 +16,10 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
+@testable import DuckDuckGo_Privacy_Browser
 
 struct MockWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
     var acceptedTermsAndConditions: Bool = false
@@ -29,3 +32,5 @@ struct MockWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsAc
 
     }
 }
+
+#endif
