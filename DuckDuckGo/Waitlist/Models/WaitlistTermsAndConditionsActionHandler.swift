@@ -22,13 +22,12 @@ import Foundation
 import UserNotifications
 
 protocol WaitlistTermsAndConditionsActionHandler {
-    var acceptedTermsAndConditions: Bool { get set}
+    var acceptedTermsAndConditions: Bool { get }
     func didShow()
-    func didAccept()
+    mutating func didAccept()
 }
 
 struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
-
     @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)
     var acceptedTermsAndConditions: Bool
 
@@ -36,7 +35,8 @@ struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAn
         DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
     }
 
-    func didAccept() {
+    mutating func didAccept() {
+        acceptedTermsAndConditions = true
         // Remove delivered NetP notifications in case the user didn't click them.
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
 

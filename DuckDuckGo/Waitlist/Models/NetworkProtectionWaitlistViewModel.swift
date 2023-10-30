@@ -190,7 +190,6 @@ final class NetworkProtectionWaitlistViewModel: ObservableObject {
     }
 
     private func acceptTermsAndConditions() {
-        termsAndConditionActionHandler.acceptedTermsAndConditions = true
         viewState = .readyToEnable
         termsAndConditionActionHandler.didAccept()
     }
