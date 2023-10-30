@@ -53,7 +53,7 @@ struct EnableWaitlistFeatureView: View {
         } buttons: {
             Button(viewData.buttonConfirmLabel) {
                 Task {
-                    await model.perform(action: .closeAndPinNetworkProtection)
+                    await model.perform(action: .closeAndConfirmFeature)
                 }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))

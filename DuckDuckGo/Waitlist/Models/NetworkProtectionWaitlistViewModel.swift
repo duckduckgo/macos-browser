@@ -44,7 +44,7 @@ final class NetworkProtectionWaitlistViewModel: ObservableObject {
         case showTermsAndConditions
         case acceptTermsAndConditions
         case close
-        case closeAndPinNetworkProtection
+        case closeAndConfirmFeature
     }
 
     enum NotificationPermissionState {
@@ -63,22 +63,22 @@ final class NetworkProtectionWaitlistViewModel: ObservableObject {
 
     @Published var viewState: ViewState
 
-    @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)
-    var acceptedNetworkProtectionTermsAndConditions: Bool
-
     weak var delegate: WaitlistViewModelDelegate?
 
     private let waitlistRequest: WaitlistRequest
     private let waitlistStorage: WaitlistStorage
     private let notificationService: NotificationService
+    private var termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler
 
     init(waitlistRequest: WaitlistRequest,
          waitlistStorage: WaitlistStorage,
          notificationService: NotificationService,
-         notificationPermissionState: NotificationPermissionState = .notDetermined) {
+         notificationPermissionState: NotificationPermissionState = .notDetermined,
+         termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler) {
         self.waitlistRequest = waitlistRequest
         self.waitlistStorage = waitlistStorage
         self.notificationService = notificationService
+        self.termsAndConditionActionHandler = termsAndConditionActionHandler
 
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
             viewState = .joinedWaitlist(notificationPermissionState)
@@ -93,13 +93,16 @@ final class NetworkProtectionWaitlistViewModel: ObservableObject {
         }
     }
 
-    convenience init(waitlist: Waitlist, notificationPermissionState: NotificationPermissionState = .notDetermined) {
+    convenience init(waitlist: Waitlist,
+                     notificationPermissionState: NotificationPermissionState = .notDetermined,
+                     termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler) {
         let waitlistType = type(of: waitlist)
         self.init(
             waitlistRequest: ProductWaitlistRequest(productName: waitlistType.apiProductName),
             waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier),
             notificationService: UNUserNotificationCenter.current(),
-            notificationPermissionState: notificationPermissionState
+            notificationPermissionState: notificationPermissionState,
+            termsAndConditionActionHandler: termsAndConditionActionHandler
         )
     }
 
@@ -114,9 +117,9 @@ final class NetworkProtectionWaitlistViewModel: ObservableObject {
         case .showTermsAndConditions: showTermsAndConditions()
         case .acceptTermsAndConditions: acceptTermsAndConditions()
         case .close: close()
-        case .closeAndPinNetworkProtection:
+        case .closeAndConfirmFeature:
             close()
-
+//TODO: HERE
             LocalPinningManager.shared.pin(.networkProtection)
             NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         }
@@ -181,20 +184,14 @@ final class NetworkProtectionWaitlistViewModel: ObservableObject {
 
     private func showTermsAndConditions() {
         viewState = .termsAndConditions
-
-        DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        termsAndConditionActionHandler.didShow()
     }
 
     private func acceptTermsAndConditions() {
-        acceptedNetworkProtectionTermsAndConditions = true
+        termsAndConditionActionHandler.acceptedTermsAndConditions = true
         viewState = .readyToEnable
-
-        // Remove delivered NetP notifications in case the user didn't click them.
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
-
-        DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        termsAndConditionActionHandler.didAccept()
     }
-
 }
 
 #endif

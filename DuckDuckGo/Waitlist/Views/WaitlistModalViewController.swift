@@ -41,7 +41,9 @@ final class WaitlistModalViewController: NSViewController {
     private var heightConstraint: NSLayoutConstraint?
 
     init(notificationPermissionState: NetworkProtectionWaitlistViewModel.NotificationPermissionState) {
-        self.model = NetworkProtectionWaitlistViewModel(waitlist: NetworkProtectionWaitlist(), notificationPermissionState: notificationPermissionState)
+        self.model = NetworkProtectionWaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
+                                                        notificationPermissionState: notificationPermissionState,
+                                                        termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler())
         super.init(nibName: nil, bundle: nil)
     }
 

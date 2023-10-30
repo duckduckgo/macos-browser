@@ -823,6 +823,10 @@
 		31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */; };
 		31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */; };
 		31F28C5328C8EECA00119F70 /* DuckPlayerSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F28C5228C8EECA00119F70 /* DuckPlayerSchemeHandler.swift */; };
+		31F2D1FF2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */; };
+		31F2D2002AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */; };
+		31F2D2012AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */; };
+		31F2D2022AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */; };
 		31F7F2A6288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */; };
 		3701C9CE29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
 		3701C9CF29BD040C00305B15 /* FirefoxBerkeleyDatabaseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */; };
@@ -3870,6 +3874,7 @@
 		31F28C4C28C8EEC500119F70 /* YoutubePlayerUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubePlayerUserScript.swift; sourceTree = "<group>"; };
 		31F28C4E28C8EEC500119F70 /* YoutubeOverlayUserScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YoutubeOverlayUserScript.swift; sourceTree = "<group>"; };
 		31F28C5228C8EECA00119F70 /* DuckPlayerSchemeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckPlayerSchemeHandler.swift; sourceTree = "<group>"; };
+		31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistTermsAndConditionsActionHandler.swift; sourceTree = "<group>"; };
 		31F7F2A5288AD2CA001C0D64 /* NavigationBarBadgeAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimationView.swift; sourceTree = "<group>"; };
 		336B39E22726B4B700C417D3 /* LocalUnprotectedDomains.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalUnprotectedDomains.swift; sourceTree = "<group>"; };
 		3701C9CD29BD040900305B15 /* FirefoxBerkeleyDatabaseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxBerkeleyDatabaseReader.swift; sourceTree = "<group>"; };
@@ -6115,6 +6120,7 @@
 			isa = PBXGroup;
 			children = (
 				4B9DB00C2A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift */,
+				31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -10134,6 +10140,7 @@
 				3192A0CB2A4C4CFF0084EA89 /* ContinueSetUpView.swift in Sources */,
 				3192A0CC2A4C4CFF0084EA89 /* PasswordManagementListSection.swift in Sources */,
 				3192A0CD2A4C4CFF0084EA89 /* FaviconReferenceCache.swift in Sources */,
+				31F2D2012AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				4B9DB0372A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				3192A0CE2A4C4CFF0084EA89 /* BookmarkTreeController.swift in Sources */,
 				3192A0CF2A4C4CFF0084EA89 /* FirefoxEncryptionKeyReader.swift in Sources */,
@@ -10608,6 +10615,7 @@
 				37197EA32942441D00394917 /* UserDialogRequest.swift in Sources */,
 				3706FAF1293F65D500E42796 /* PreferencesAboutView.swift in Sources */,
 				3706FAF2293F65D500E42796 /* ContentBlocking.swift in Sources */,
+				31F2D2002AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				3706FAF3293F65D500E42796 /* LocalAuthenticationService.swift in Sources */,
 				1D36E659298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
 				3706FEBC293F6EFF00E42796 /* BWResponse.swift in Sources */,
@@ -11923,6 +11931,7 @@
 				4B957AA92AC7AE700062CA31 /* ContentOverlayPopover.swift in Sources */,
 				4B957AAA2AC7AE700062CA31 /* TabShadowView.swift in Sources */,
 				4B957AAB2AC7AE700062CA31 /* BWMessageIdGenerator.swift in Sources */,
+				31F2D2022AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				4B957AAC2AC7AE700062CA31 /* EncryptedValueTransformer.swift in Sources */,
 				4B957AAD2AC7AE700062CA31 /* Tab+Dialogs.swift in Sources */,
 				4B957AAE2AC7AE700062CA31 /* PasteboardBookmark.swift in Sources */,
@@ -12582,6 +12591,7 @@
 				4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */,
 				4B4D60C22A0C849000BCD287 /* EventMapping+NetworkProtectionError.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
+				31F2D1FF2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				B6B140882ABDBCC1004F8E85 /* HoverTrackingArea.swift in Sources */,
 				3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */,
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,
