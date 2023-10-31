@@ -274,6 +274,19 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testUrlBarSpoofingWithLongLoadingNavigations() async throws {
+        let tab = Tab(content: .none)
+        window = WindowsManager.openNewWindow(with: tab)!
+        let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
+        let url = URL(string: "https://privacy-test-pages.site/security/spoof-js-page-rewrite-simple.html")!
+        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
+        _=try await tab.webView.evaluateJavaScript("(function() { run(); return true; })()")
+        try await Task.sleep(nanoseconds: UInt64(0.5 * Double(NSEC_PER_SEC)))
+        // Address Bar should not be updated this early
+        XCTAssertNotEqual(tabViewModel.addressBarString, "https://duckduckgo.com:8443/")
+    }
+
 }
 
 private extension Tab {
