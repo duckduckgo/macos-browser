@@ -81,7 +81,10 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
 
     var featureName = "useSubscription"
 
-    var messageOriginPolicy: MessageOriginPolicy = .all
+    var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
+        .exact(hostname: "duckduckgo.com"),
+        .exact(hostname: "abrown.duckduckgo.com")
+    ])
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
