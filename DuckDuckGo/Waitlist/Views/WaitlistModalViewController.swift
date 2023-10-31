@@ -22,11 +22,7 @@ import AppKit
 import SwiftUI
 import UserNotifications
 
-extension Notification.Name {
-    static let waitlistModalViewControllerShouldDismiss = Notification.Name(rawValue: "waitlistModalViewControllerShouldDismiss")
-}
-
-final class WaitlistModalViewController<ContentView: View>: NSViewController {
+struct WaitlistModalDismisser {
 
     // Small hack to force the waitlist modal view controller to dismiss all instances of itself whenever the user opens a link from the T&C view.
     static func dismissWaitlistModalViewControllerIfNecessary(_ url: URL) {
@@ -34,6 +30,13 @@ final class WaitlistModalViewController<ContentView: View>: NSViewController {
             NotificationCenter.default.post(name: .waitlistModalViewControllerShouldDismiss, object: nil)
         }
     }
+}
+
+extension Notification.Name {
+    static let waitlistModalViewControllerShouldDismiss = Notification.Name(rawValue: "waitlistModalViewControllerShouldDismiss")
+}
+
+final class WaitlistModalViewController<ContentView: View>: NSViewController {
 
     private let defaultSize = CGSize(width: 360, height: 650)
     private let model: WaitlistViewModel
