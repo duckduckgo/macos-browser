@@ -98,6 +98,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
+        XCTAssertEqual(queryItems[valueFor: "protectionsState"], "1")
         XCTAssertEqual(queryItems[valueFor: "manufacturer"], "IBM")
         XCTAssertEqual(queryItems[valueFor: "os"], "12")
         XCTAssertEqual(queryItems[valueFor: "gpc"], "true")
