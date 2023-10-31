@@ -341,6 +341,13 @@ import Bookmarks
 
 extension FaviconManager: Bookmarks.FaviconStoring {
 
+    func hasFavicon(for domain: String) -> Bool {
+        guard let url = domain.url, let faviconURL = self.referenceCache.getFaviconUrl(for: url, sizeCategory: .small) else {
+            return false
+        }
+        return self.imageCache.get(faviconUrl: faviconURL) != nil
+    }
+
     func storeFavicon(_ imageData: Data, for documentURL: URL) throws {
 
         Task {
