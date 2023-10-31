@@ -35,6 +35,9 @@ final class SyncBookmarksAdapter {
         }
     }
 
+    @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
+    private var wasSyncBookmarksErrorDisplayed: Bool
+
     init(
         database: CoreDataDatabase,
         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
@@ -70,6 +73,7 @@ final class SyncBookmarksAdapter {
             metadataStore: metadataStore) { [weak self] in
                 LocalBookmarkManager.shared.loadBookmarks()
                 self?.isSyncBookmarksPaused = false
+                self?.wasSyncBookmarksErrorDisplayed = false
             }
 
         syncErrorCancellable = provider.syncErrorPublisher
@@ -81,11 +85,13 @@ final class SyncBookmarksAdapter {
                     if syncError == .unexpectedStatusCode(409) {
                         self?.isSyncBookmarksPaused = true
                         Pixel.fire(.syncBookmarksCountLimitExceededDaily, limitTo: .dailyFirst)
+                        self?.showSyncPausedAlert()
                     }
                     // If bookmarks request size limit has been exceeded
                     if syncError == .unexpectedStatusCode(413) {
                         self?.isSyncBookmarksPaused = true
                         Pixel.fire(.syncBookmarksRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                        self?.showSyncPausedAlert()
                     }
                 default:
                     let nsError = error as NSError
@@ -99,6 +105,25 @@ final class SyncBookmarksAdapter {
             }
 
         self.provider = provider
+    }
+
+    private func showSyncPausedAlert() {
+        guard !wasSyncBookmarksErrorDisplayed else { return }
+        Task {
+            await MainActor.run {
+                let alert = NSAlert.syncBookmarksPaused()
+                let response = alert.runModal()
+                wasSyncBookmarksErrorDisplayed = true
+
+                switch response {
+                case .alertSecondButtonReturn:
+                    alert.window.sheetParent?.endSheet(alert.window)
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                default:
+                    break
+                }
+            }
+        }
     }
 
     private func handleFavoritesAfterDisablingSync() {

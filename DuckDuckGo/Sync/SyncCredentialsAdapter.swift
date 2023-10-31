@@ -36,6 +36,9 @@ final class SyncCredentialsAdapter {
         }
     }
 
+    @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
+    private var wasSyncCredentialsErrorDisplayed: Bool
+
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
         databaseCleaner = CredentialsDatabaseCleaner(
@@ -68,6 +71,7 @@ final class SyncCredentialsAdapter {
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
                     self?.isSyncCredentialsPaused = false
+                    self?.wasSyncCredentialsErrorDisplayed = false
                 }
             )
 
@@ -81,11 +85,13 @@ final class SyncCredentialsAdapter {
                         if syncError == .unexpectedStatusCode(409) {
                             self?.isSyncCredentialsPaused = true
                             Pixel.fire(.syncCredentialsCountLimitExceededDaily, limitTo: .dailyFirst)
+                            self?.showSyncPausedAlert()
                         }
                         // If credentials request size limit has been exceeded
                         if syncError == .unexpectedStatusCode(413) {
                             self?.isSyncCredentialsPaused = true
                             Pixel.fire(.syncCredentialsRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                            self?.showSyncPausedAlert()
                         }
                     default:
                         let nsError = error as NSError
@@ -104,6 +110,25 @@ final class SyncCredentialsAdapter {
             let processedErrors = CoreDataErrorsParser.parse(error: error)
             let params = processedErrors.errorPixelParameters
             Pixel.fire(.debug(event: .syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
+        }
+    }
+
+    private func showSyncPausedAlert() {
+        guard !wasSyncCredentialsErrorDisplayed else { return }
+        Task {
+            await MainActor.run {
+                let alert = NSAlert.syncCredentialsPaused()
+                let response = alert.runModal()
+                wasSyncCredentialsErrorDisplayed = true
+
+                switch response {
+                case .alertSecondButtonReturn:
+                    alert.window.sheetParent?.endSheet(alert.window)
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                default:
+                    break
+                }
+            }
         }
     }
 

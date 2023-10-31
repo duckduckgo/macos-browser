@@ -201,6 +201,26 @@ extension NSAlert {
         return alert
     }
 
+    static func syncBookmarksPaused() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Sync Bookmark Limit Exceeded"
+        alert.informativeText = "Delete some to resume sync"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.learnMore)
+        return alert
+    }
+
+    static func syncCredentialsPaused() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Sync Credentials Limit Exceeded"
+        alert.informativeText = "Delete some to resume sync"
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        alert.addButton(withTitle: UserText.learnMore)
+        return alert
+    }
+
     @discardableResult
     func runModal() async -> NSApplication.ModalResponse {
         await withCheckedContinuation { continuation in
