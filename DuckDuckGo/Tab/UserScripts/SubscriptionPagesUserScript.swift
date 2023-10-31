@@ -108,17 +108,6 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         let token: String
     }
 
-    struct EmailProtectionValues: Codable {
-        enum CodingKeys: String, CodingKey {
-            case token
-            case user
-            case cohort
-        }
-        let token: String
-        let user: String
-        let cohort: String
-    }
-
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let token = AccountManager().authToken ?? ""
         let subscription = Subscription(token: token)
