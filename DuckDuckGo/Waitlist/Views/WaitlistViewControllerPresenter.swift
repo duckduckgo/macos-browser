@@ -19,7 +19,7 @@
 import Foundation
 import UserNotifications
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 protocol WaitlistViewControllerPresenter {
     static func show(completion: (() -> Void)?)
@@ -30,6 +30,10 @@ extension WaitlistViewControllerPresenter {
         Self.show(completion: nil)
     }
 }
+
+#endif
+
+#if NETWORK_PROTECTION
 
 struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
 
@@ -49,11 +53,46 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
 
             DispatchQueue.main.async {
                 let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
-                                              notificationPermissionState: state,
-                                              termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
-                                              featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
+                                                  notificationPermissionState: state,
+                                                  termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
+                                                  featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
 
-                let viewController = WaitlistModalViewController(viewModel: viewModel)
+                let viewController = WaitlistModalViewController(viewModel: viewModel, contentView: NetworkProtectionWaitlistRootView())
+                windowController.mainViewController.beginSheet(viewController) { _ in
+                    completion?()
+                }
+            }
+        }
+    }
+}
+
+#endif
+
+#if DBP
+
+struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
+
+    @MainActor
+    static func show(completion: (() -> Void)? = nil) {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              windowController.window?.isKeyWindow == true else {
+            return
+        }
+
+        // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
+        // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
+        // preventing any state changing from occurring.
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let status = settings.authorizationStatus
+            let state = WaitlistViewModel.NotificationPermissionState.from(status)
+
+            DispatchQueue.main.async {
+                let viewModel = WaitlistViewModel(waitlist: DataBrokerProtectionWaitlist(),
+                                                  notificationPermissionState: state,
+                                                  termsAndConditionActionHandler: DataBrokerProtectionWaitlistTermsAndConditionsActionHandler(),
+                                                  featureSetupHandler: DataBrokerProtectionWaitlistFeatureSetupHandler())
+
+                let viewController = WaitlistModalViewController(viewModel: viewModel, contentView: DataBrokerProtectionWaitlistRootView())
                 windowController.mainViewController.beginSheet(viewController) { _ in
                     completion?()
                 }

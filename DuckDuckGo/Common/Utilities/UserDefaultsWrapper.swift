@@ -134,6 +134,10 @@ public struct UserDefaultsWrapper<T> {
 
         case firstLaunchDate = "first.app.launch.date"
 
+        // Data Broker Protection
+
+        case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"

@@ -26,7 +26,7 @@ extension Notification.Name {
     static let waitlistModalViewControllerShouldDismiss = Notification.Name(rawValue: "waitlistModalViewControllerShouldDismiss")
 }
 
-final class WaitlistModalViewController: NSViewController {
+final class WaitlistModalViewController<ContentView: View>: NSViewController {
 
     // Small hack to force the waitlist modal view controller to dismiss all instances of itself whenever the user opens a link from the T&C view.
     static func dismissWaitlistModalViewControllerIfNecessary(_ url: URL) {
@@ -37,12 +37,13 @@ final class WaitlistModalViewController: NSViewController {
 
     private let defaultSize = CGSize(width: 360, height: 650)
     private let model: WaitlistViewModel
+    private let contentView: ContentView
 
     private var heightConstraint: NSLayoutConstraint?
 
-    init(viewModel: WaitlistViewModel) {
+    init(viewModel: WaitlistViewModel, contentView: ContentView) {
         self.model = viewModel
-
+        self.contentView = contentView
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -59,9 +60,7 @@ final class WaitlistModalViewController: NSViewController {
 
         self.model.delegate = self
 
-        let waitlistRootView = WaitlistRootView()
-
-        let hostingView = NSHostingView(rootView: waitlistRootView.environmentObject(self.model))
+        let hostingView = NSHostingView(rootView: contentView.environmentObject(self.model))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(hostingView)
 
@@ -77,7 +76,9 @@ final class WaitlistModalViewController: NSViewController {
             hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
 
-        NotificationCenter.default.addObserver(self, selector: #selector(dismissModal), name: .waitlistModalViewControllerShouldDismiss, object: nil)
+        NotificationCenter.default.addObserver(forName: .waitlistModalViewControllerShouldDismiss, object: nil, queue: .main) { [weak self] _ in
+            self?.dismissModal()
+        }
     }
 
     private func updateViewHeight(height: CGFloat) {
@@ -87,7 +88,6 @@ final class WaitlistModalViewController: NSViewController {
 
 extension WaitlistModalViewController: WaitlistViewModelDelegate {
 
-    @objc
     func dismissModal() {
         self.dismiss()
     }

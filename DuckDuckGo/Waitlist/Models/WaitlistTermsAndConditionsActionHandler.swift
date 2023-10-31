@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 import Foundation
 import UserNotifications
@@ -27,12 +27,38 @@ protocol WaitlistTermsAndConditionsActionHandler {
     mutating func didAccept()
 }
 
+#endif
+
+#if NETWORK_PROTECTION
+
 struct NetworkProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
     @UserDefaultsWrapper(key: .networkProtectionTermsAndConditionsAccepted, defaultValue: false)
     var acceptedTermsAndConditions: Bool
 
     func didShow() {
         DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+    }
+
+    mutating func didAccept() {
+        acceptedTermsAndConditions = true
+        // Remove delivered NetP notifications in case the user didn't click them.
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
+
+        DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount, includeAppVersionParameter: true)
+    }
+}
+
+#endif
+
+#if DBP
+
+struct DataBrokerProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTermsAndConditionsActionHandler {
+    @UserDefaultsWrapper(key: .dataBrokerProtectionTermsAndConditionsAccepted, defaultValue: false)
+    var acceptedTermsAndConditions: Bool
+
+    func didShow() {
+        //TODO: Fire DBP Pixel
+        print("Did show")
     }
 
     mutating func didAccept() {

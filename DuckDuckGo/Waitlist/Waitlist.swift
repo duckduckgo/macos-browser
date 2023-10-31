@@ -237,3 +237,45 @@ struct NetworkProtectionWaitlist: Waitlist {
 }
 
 #endif
+
+#if DBP
+// MARK: - DataBroker Protection Waitlist
+
+struct DataBrokerProtectionWaitlist: Waitlist {
+
+    static let identifier: String = "databrokerprotection"
+    static let apiProductName: String = "databrokerprotection_macos"
+
+    static let notificationIdentifier = "com.duckduckgo.macos.browser.data-broker-protection.invite-code-available"
+    static let inviteAvailableNotificationTitle = UserText.networkProtectionWaitlistNotificationTitle
+    static let inviteAvailableNotificationBody = UserText.networkProtectionWaitlistNotificationText
+
+    let waitlistStorage: WaitlistStorage
+    let waitlistRequest: WaitlistRequest
+
+    init() {
+        self.init(
+            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
+            request: ProductWaitlistRequest(productName: Self.apiProductName)
+        )
+    }
+
+    init(store: WaitlistStorage, request: WaitlistRequest) {
+        self.waitlistStorage = store
+        self.waitlistRequest = request
+    }
+
+    func fetchInviteCodeIfAvailable() async -> WaitlistInviteCodeFetchError? {
+        return nil
+    }
+
+    func fetchInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
+
+    }
+
+    func sendInviteCodeAvailableNotification() {
+
+    }
+}
+
+#endif
