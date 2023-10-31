@@ -104,6 +104,10 @@
 		313AEDA1287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */; };
 		313B6A4F2A6EB19C00601B75 /* TabCleanupPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D36F4232A3B85C50052B527 /* TabCleanupPreparer.swift */; };
 		313B6A502A6EB1B900601B75 /* HTTPCookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */; };
+		31487E182AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */; };
+		31487E192AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */; };
+		31487E1A2AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */; };
+		31487E1B2AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
 		316C7A832A7E9BEE00AA3BAE /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
@@ -3856,6 +3860,7 @@
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionManager.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
+		31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistViewControllerPresenter.swift; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
 		315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerNavigationHandler.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
@@ -6154,6 +6159,7 @@
 				4B9DB0182A983B24000927DB /* WaitlistDialogView.swift */,
 				4B9DB0192A983B24000927DB /* WaitlistModalViewController.swift */,
 				4B9DB01A2A983B24000927DB /* WaitlistRootView.swift */,
+				31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -10335,6 +10341,7 @@
 				3192A16F2A4C4CFF0084EA89 /* BookmarksBarViewController.swift in Sources */,
 				3192A1702A4C4CFF0084EA89 /* PreferencesAutofillView.swift in Sources */,
 				3192A1712A4C4CFF0084EA89 /* BurnerHomePageView.swift in Sources */,
+				31487E1A2AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */,
 				4B6785492AA8DE6A008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */,
 				3192A1722A4C4CFF0084EA89 /* UserText+PasswordManager.swift in Sources */,
 				3192A1732A4C4CFF0084EA89 /* ProgressView.swift in Sources */,
@@ -10735,6 +10742,7 @@
 				3706FB46293F65D500E42796 /* FirePopoverWrapperViewController.swift in Sources */,
 				3706FB47293F65D500E42796 /* NSPasteboardItemExtension.swift in Sources */,
 				3706FB48293F65D500E42796 /* AutofillPreferencesModel.swift in Sources */,
+				31487E192AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */,
 				3706FB49293F65D500E42796 /* NSException+Catch.swift in Sources */,
 				3706FB4A293F65D500E42796 /* PasswordManagementNoteModel.swift in Sources */,
 				3706FB4B293F65D500E42796 /* CookieNotificationAnimationModel.swift in Sources */,
@@ -12175,6 +12183,7 @@
 				4B957B892AC7AE700062CA31 /* ToggleableScrollView.swift in Sources */,
 				4B957B8A2AC7AE700062CA31 /* TabCleanupPreparer.swift in Sources */,
 				4B957B8B2AC7AE700062CA31 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
+				31487E1B2AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */,
 				1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */,
 				4B957B8C2AC7AE700062CA31 /* UserScripts.swift in Sources */,
 				4B957B8D2AC7AE700062CA31 /* NSWorkspaceExtension.swift in Sources */,
@@ -12637,6 +12646,7 @@
 				B687B7CC2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift in Sources */,
 				B65536AE2685E17200085A79 /* GeolocationService.swift in Sources */,
 				4B02198925E05FAC00ED7DEA /* FireproofingURLExtensions.swift in Sources */,
+				31487E182AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */,
 				7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */,
 				3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */,
 				1D43EB3C292B664A0065E5D6 /* BWMessageIdGenerator.swift in Sources */,

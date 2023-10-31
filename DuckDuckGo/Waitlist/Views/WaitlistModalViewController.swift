@@ -40,11 +40,9 @@ final class WaitlistModalViewController: NSViewController {
 
     private var heightConstraint: NSLayoutConstraint?
 
-    init(notificationPermissionState: WaitlistViewModel.NotificationPermissionState) {
-        self.model = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
-                                                        notificationPermissionState: notificationPermissionState,
-                                                        termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
-                                                        featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
+    init(viewModel: WaitlistViewModel) {
+        self.model = viewModel
+
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -85,29 +83,6 @@ final class WaitlistModalViewController: NSViewController {
     private func updateViewHeight(height: CGFloat) {
         heightConstraint?.constant = height
     }
-
-    static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            return
-        }
-
-        // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
-        // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
-        // preventing any state changing from occurring.
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let status = settings.authorizationStatus
-            let state = WaitlistViewModel.NotificationPermissionState.from(status)
-
-            DispatchQueue.main.async {
-                let viewController = WaitlistModalViewController(notificationPermissionState: state)
-                windowController.mainViewController.beginSheet(viewController) { _ in
-                    completion?()
-                }
-            }
-        }
-    }
-
 }
 
 extension WaitlistModalViewController: WaitlistViewModelDelegate {

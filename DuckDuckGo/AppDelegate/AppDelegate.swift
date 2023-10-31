@@ -396,7 +396,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                     DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
-                    WaitlistModalViewController.show()
+                    NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }
         }
