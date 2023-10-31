@@ -52,7 +52,10 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo DBP": nonSandboxedExtraInputFiles.union([
         .init("DBPHomeViewController.swift", .source),
-        .init("DataBrokerProtectionManager.swift", .source)
+        .init("DataBrokerProtectionManager.swift", .source),
+        .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
+        .init("LoginItem+DataBrokerProtection.swift", .source),
+        .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
     ]),
 
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,

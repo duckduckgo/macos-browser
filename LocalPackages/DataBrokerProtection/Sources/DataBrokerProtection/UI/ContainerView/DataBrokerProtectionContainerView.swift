@@ -104,8 +104,6 @@ struct DataBrokerProtectionContainerView: View {
     @ViewBuilder
     private func debugUI() -> some View {
         VStack(alignment: .leading) {
-            Text("Scheduler status: \(containerViewModel.schedulerStatus)")
-
             Toggle("Use Fake Broker", isOn: $containerViewModel.useFakeBroker)
 
             Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
@@ -164,7 +162,6 @@ struct DataBrokerProtectionContainerView: View {
                     shouldShowDebugUI.toggle()
                 },
                                     editProfileClicked: {
-                    containerViewModel.stopAllOperations()
                     navigationViewModel.updateNavigation(.createProfile)
                 })
                 .frame(height: 300)
@@ -190,7 +187,7 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
         let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         let profileViewModel = ProfileViewModel(dataManager: dataManager)
         let resultsViewModel = ResultsViewModel(dataManager: dataManager)
-        let containerViewModel = ContainerViewModel(scheduler: PreviewScheduler(), dataManager: dataManager)
+        let containerViewModel = ContainerViewModel(scheduler: DataBrokerProtectionNoOpScheduler(), dataManager: dataManager)
 
         DataBrokerProtectionContainerView(containerViewModel: containerViewModel,
                                           navigationViewModel: navigationViewModel,

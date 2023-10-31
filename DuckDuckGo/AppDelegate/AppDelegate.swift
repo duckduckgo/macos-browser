@@ -218,12 +218,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 #endif
-
-#if DBP
-        DispatchQueue.global(qos: .background).async {
-            DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
-        }
-#endif
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
