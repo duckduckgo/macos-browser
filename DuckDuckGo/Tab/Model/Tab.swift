@@ -248,11 +248,11 @@ protocol NewWindowPolicyDecisionMaker {
     ) {
 
         let duckPlayer = duckPlayer
-            ?? (NSApp.isRunningUnitTests ? DuckPlayer.mock(withMode: .enabled) : DuckPlayer.shared)
+            ?? (NSApp.runType.requiresEnvironment ? DuckPlayer.shared : DuckPlayer.mock(withMode: .enabled))
         let statisticsLoader = statisticsLoader
-            ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
+            ?? (NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
-        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
+        let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         var faviconManager = faviconManagement
         if burnerMode.isBurner {
             faviconManager = FaviconManager(cacheType: .inMemory)
@@ -529,7 +529,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     @discardableResult
-    func setContent(_ newContent: TabContent) -> Task<ExpectedNavigation?, Never>? {
+    func setContent(_ newContent: TabContent) -> ExpectedNavigation? {
         guard contentChangeEnabled else { return nil }
 
         let oldContent = self.content
@@ -554,13 +554,11 @@ protocol NewWindowPolicyDecisionMaker {
             self.title = title
         }
 
-        return Task {
-            await reloadIfNeeded(shouldLoadInBackground: true)
-        }
+        return reloadIfNeeded(shouldLoadInBackground: true)
     }
 
     @discardableResult
-    func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
+    func setUrl(_ url: URL?, userEntered: String?) -> ExpectedNavigation? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -697,7 +695,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         let canGoBack = webView.canGoBack || self.error != nil
         let canGoForward = webView.canGoForward && self.error == nil
-        let canReload = (self.content.urlForWebView?.scheme ?? URL.NavigationalScheme.about.rawValue) != URL.NavigationalScheme.about.rawValue
+        let canReload = self.content.userEditableUrl != nil
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
@@ -763,26 +761,18 @@ protocol NewWindowPolicyDecisionMaker {
 
         if webView.url == nil, content.isUrl {
             // load from cache or interactionStateData when called by lazy loader
-            Task { @MainActor [weak self] in
-                await self?.reloadIfNeeded(shouldLoadInBackground: true)
-            }
+            reloadIfNeeded(shouldLoadInBackground: true)
         } else {
             webView.reload()
         }
     }
 
-    @MainActor
+    @MainActor(unsafe)
     @discardableResult
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async -> ExpectedNavigation? {
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {
+        guard case .url(let url, credential: _, userEntered: let userEntered) = content, url.scheme != "about" else { return nil }
 
-        let content = self.content
-        guard let url = content.urlForWebView,
-              url.scheme.map(URL.NavigationalScheme.init) != .about else { return nil }
-
-        var userForcedReload = false
-        if case .url(let url, _, let userEntered) = content, url.absoluteString == userEntered {
-            userForcedReload = shouldLoadInBackground
-        }
+        let userForcedReload = (url.absoluteString == userEntered) ? shouldLoadInBackground : false
 
         if userForcedReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
@@ -867,7 +857,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private func addHomePageToWebViewIfNeeded() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
         if content == .homePage && webView.url == nil {
             webView.load(URLRequest(url: .homePage))
         }
@@ -902,9 +892,7 @@ protocol NewWindowPolicyDecisionMaker {
         webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
-                Task { @MainActor [weak self] in
-                    await self?.reloadIfNeeded()
-                }
+                self?.reloadIfNeeded()
             }
         }.store(in: &webViewCancellables)
 
@@ -942,10 +930,10 @@ protocol NewWindowPolicyDecisionMaker {
         }.store(in: &webViewCancellables)
 
         // background tab loading should start immediately
-        Task { @MainActor in
-            await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+        DispatchQueue.main.async {
+            self.reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
             if !shouldLoadInBackground {
-                addHomePageToWebViewIfNeeded()
+                self.addHomePageToWebViewIfNeeded()
             }
         }
     }

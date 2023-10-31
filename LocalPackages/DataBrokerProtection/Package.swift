@@ -22,7 +22,7 @@ import PackageDescription
 
 let package = Package(
     name: "DataBrokerProtection",
-    platforms: [ .macOS(.v11) ],
+    platforms: [ .macOS("11.4") ],
     products: [
         .library(
             name: "DataBrokerProtection",
@@ -30,14 +30,18 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "f2a5d102da34842b3ef02c876a1a539648bd5930"),
-        .package(path: "../SwiftUIExtensions")
+        .package(path: "../PixelKit"),
+        .package(path: "../SwiftUIExtensions"),
+        .package(path: "../XPCHelper")
     ],
     targets: [
         .target(
             name: "DataBrokerProtection",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+                .product(name: "PixelKit", package: "PixelKit"),
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+                .byName(name: "XPCHelper")
             ],
             resources: [.process("Resources")]
         ),

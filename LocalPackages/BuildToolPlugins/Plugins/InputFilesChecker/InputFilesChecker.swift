@@ -25,15 +25,13 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
     .init("UpdateController.swift", .source),
-    .init("SystemExtensionManager.swift", .source),
-    .init("DuckDuckGo Agent.app", .unknown),
+    .init("DuckDuckGo VPN.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),
-    .init("startVPN.app", .unknown),
-    .init("stopVPN.app", .unknown),
-    .init("enableOnDemand.app", .unknown),
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionBundle.swift", .source),
     .init("NetworkProtectionAppEvents.swift", .source),
+    .init("NetworkProtectionIPCTunnelController.swift", .source),
+    .init("NetworkProtectionNavBarPopoverManager.swift", .source),
     .init("KeychainType+ClientDefault.swift", .source)
 ]
 
@@ -54,7 +52,10 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo DBP": nonSandboxedExtraInputFiles.union([
         .init("DBPHomeViewController.swift", .source),
-        .init("DataBrokerProtectionManager.swift", .source)
+        .init("DataBrokerProtectionManager.swift", .source),
+        .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
+        .init("LoginItem+DataBrokerProtection.swift", .source),
+        .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
     ]),
 
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,

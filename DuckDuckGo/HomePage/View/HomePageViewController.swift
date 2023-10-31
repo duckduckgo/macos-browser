@@ -129,7 +129,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func refreshModels() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()

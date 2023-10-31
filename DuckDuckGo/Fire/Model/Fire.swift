@@ -109,17 +109,15 @@ final class Fire {
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
-        self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
-        self.syncDataProviders = syncDataProviders ?? (NSApp.delegate as? AppDelegate)?.syncDataProviders
+        self.syncService = syncService ?? NSApp.delegateTyped.syncService
+        self.syncDataProviders = syncDataProviders ?? NSApp.delegateTyped.syncDataProviders
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
         self.autoconsentManagement = autoconsentManagement ?? AutoconsentManagement.shared
         if let stateRestorationManager = stateRestorationManager {
             self.stateRestorationManager = stateRestorationManager
-        } else if let appDelegate = NSApp.delegate as? AppDelegate {
-            self.stateRestorationManager = appDelegate.stateRestorationManager
         } else {
-            self.stateRestorationManager = nil
+            self.stateRestorationManager = NSApp.delegateTyped.stateRestorationManager
         }
     }
 
@@ -306,7 +304,7 @@ final class Fire {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             if self.windowControllerManager.mainWindowControllers.count == 0 {
-                (NSApp.delegate as? AppDelegate)?.newWindow(self)
+                NSApp.delegateTyped.newWindow(self)
             }
         }
     }

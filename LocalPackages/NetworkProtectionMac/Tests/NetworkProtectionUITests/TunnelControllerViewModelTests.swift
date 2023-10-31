@@ -79,7 +79,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         var startCallback: (() -> Void)?
         var stopCallback: (() -> Void)?
 
-        func isConnected() async -> Bool {
+        var isConnected: Bool {
             connected
         }
 

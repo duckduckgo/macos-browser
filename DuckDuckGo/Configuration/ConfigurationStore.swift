@@ -94,7 +94,7 @@ final class ConfigurationStore: ConfigurationStoring {
         do {
             return try Data(contentsOf: file)
         } catch {
-            guard !NSApp.isRunningUnitTests else { return nil }
+            guard NSApp.runType.requiresEnvironment else { return nil }
 
             let nserror = error as NSError
 

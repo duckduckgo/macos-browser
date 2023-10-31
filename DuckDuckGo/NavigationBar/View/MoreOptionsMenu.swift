@@ -542,18 +542,18 @@ final class ZoomSubMenu: NSMenu {
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
-        let fullScreenItem = (NSApplication.shared.mainMenuTyped.toggleFullscreenMenuItem?.copy() as? NSMenuItem)!
+        let fullScreenItem = (NSApp.mainMenuTyped.toggleFullscreenMenuItem.copy() as? NSMenuItem)!
         addItem(fullScreenItem)
 
         addItem(.separator())
 
-        let zoomInItem = (NSApplication.shared.mainMenuTyped.zoomInMenuItem?.copy() as? NSMenuItem)!
+        let zoomInItem = (NSApp.mainMenuTyped.zoomInMenuItem.copy() as? NSMenuItem)!
         addItem(zoomInItem)
 
-        let zoomOutItem = (NSApplication.shared.mainMenuTyped.zoomOutMenuItem?.copy() as? NSMenuItem)!
+        let zoomOutItem = (NSApp.mainMenuTyped.zoomOutMenuItem.copy() as? NSMenuItem)!
         addItem(zoomOutItem)
 
-        let actualSizeItem = (NSApplication.shared.mainMenuTyped.actualSizeMenuItem?.copy() as? NSMenuItem)!
+        let actualSizeItem = (NSApp.mainMenuTyped.actualSizeMenuItem.copy() as? NSMenuItem)!
         addItem(actualSizeItem)
 
         addItem(.separator())
@@ -701,34 +701,6 @@ final class LoginsSubMenu: NSMenu {
         addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openAutofillWithCreditCards), keyEquivalent: "")
             .targetting(target)
             .withImage(NSImage(named: "CreditCardGlyph"))
-    }
-
-}
-
-extension NSMenuItem {
-
-    @discardableResult
-    func withImage(_ image: NSImage?) -> NSMenuItem {
-        self.image = image
-        return self
-    }
-
-    @discardableResult
-    func targetting(_ target: AnyObject) -> NSMenuItem {
-        self.target = target
-        return self
-    }
-
-    @discardableResult
-    func withSubmenu(_ submenu: NSMenu) -> NSMenuItem {
-        self.submenu = submenu
-        return self
-    }
-
-    @discardableResult
-    func withModifierMask(_ mask: NSEvent.ModifierFlags) -> NSMenuItem {
-        self.keyEquivalentModifierMask = mask
-        return self
     }
 
 }

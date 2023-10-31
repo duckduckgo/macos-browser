@@ -34,6 +34,12 @@ struct Logging {
 
     fileprivate static let errorsLoggingEnabled = true
     fileprivate static let error: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Errors")
+
+    fileprivate static let backgroundAgentLoggingEnabled = true
+    fileprivate static let backgroundAgent: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Background Agent")
+
+    fileprivate static let backgroundAgentMemoryManagementLoggingEnabled = true
+    fileprivate static let backgroundAgentMemoryManagement: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Background Agent Memory Management")
 }
 
 extension OSLog {
@@ -52,5 +58,13 @@ extension OSLog {
 
     public static var error: OSLog {
         Logging.errorsLoggingEnabled ? Logging.error : .disabled
+    }
+
+    public static var dbpBackgroundAgent: OSLog {
+        Logging.backgroundAgentLoggingEnabled ? Logging.backgroundAgent : .disabled
+    }
+
+    public static var dbpBackgroundAgentMemoryManagement: OSLog {
+        Logging.backgroundAgentMemoryManagementLoggingEnabled ? Logging.backgroundAgentMemoryManagement : .disabled
     }
 }
