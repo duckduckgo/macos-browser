@@ -335,6 +335,10 @@ final class MoreOptionsMenu: NSMenu {
             regionCode = Locale.current.regionCode
         }
 
+        #if DEBUG // Always assume US for debug builds
+        regionCode = "US"
+        #endif
+
         // Only show Private Information Removal (DBP) for US based users
         if (regionCode ?? "US") == "US" {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
