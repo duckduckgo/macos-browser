@@ -265,12 +265,10 @@ struct DataBrokerProtectionWaitlist: Waitlist {
         self.waitlistRequest = request
     }
 
-    func fetchInviteCodeIfAvailable() async -> WaitlistInviteCodeFetchError? {
-        return nil
-    }
-
-    func fetchInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
-
+    func fetchDataBrokerProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
+        self.fetchInviteCodeIfAvailable { error in
+            print("ERROR \(error)")
+        }
     }
 }
 

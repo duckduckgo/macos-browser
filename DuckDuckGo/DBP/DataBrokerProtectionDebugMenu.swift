@@ -40,7 +40,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Reset T&C Acceptance", action: #selector(DataBrokerProtectionDebugMenu.resetTermsAndConditionsAcceptance))
                     .targetting(self)
 
-                NSMenuItem(title: "Send Waitlist Notification", action: #selector(DataBrokerProtectionDebugMenu.sendWaitlistAvailableNotification))
+                NSMenuItem(title: "Send Notification", action: #selector(DataBrokerProtectionDebugMenu.sendWaitlistAvailableNotification))
+                    .targetting(self)
+
+                NSMenuItem(title: "Fetch Invite Code", action: #selector(DataBrokerProtectionDebugMenu.fetchInviteCode))
                     .targetting(self)
                 NSMenuItem.separator()
 
@@ -81,6 +84,14 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         DataBrokerProtectionWaitlist().sendInviteCodeAvailableNotification()
 
         os_log("DBP waitlist notification sent", log: .dataBrokerProtection)
+    }
+
+    @objc private func fetchInviteCode() {
+        os_log("Fetching invite code...", log: .dataBrokerProtection)
+
+        DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable { _ in
+            // Do nothing when code fetching fails, as the app will try again later
+        }
     }
 
     // MARK: - Utility Functions

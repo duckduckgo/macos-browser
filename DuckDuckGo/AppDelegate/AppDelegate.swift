@@ -223,6 +223,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         DispatchQueue.global(qos: .background).async {
             DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
         }
+
+        DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable { _ in
+            // Do nothing when code fetching fails, as the app will try again later
+        }
 #endif
     }
 
