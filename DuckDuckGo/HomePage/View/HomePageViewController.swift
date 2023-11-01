@@ -31,6 +31,7 @@ final class HomePageViewController: NSViewController {
     private weak var host: NSView?
 
     var favoritesModel: HomePage.Models.FavoritesModel!
+    var syncTabsModel: HomePage.Models.SyncTabsModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
@@ -64,6 +65,7 @@ final class HomePageViewController: NSViewController {
         refreshModelsOnAppBecomingActive()
 
         favoritesModel = createFavoritesModel()
+        syncTabsModel = createSyncTabsModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
@@ -77,6 +79,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
             .environmentObject(appearancePreferences)
+            .environmentObject(syncTabsModel)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -178,6 +181,12 @@ final class HomePageViewController: NSViewController {
         }, moveFavorite: { [weak self] (bookmark, index) in
             self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
         })
+    }
+
+    func createSyncTabsModel() -> HomePage.Models.SyncTabsModel {
+        return .init { [weak self] url, target in
+            self?.openUrl(url, target: target)
+        }
     }
 
     func refreshFavoritesModel() {

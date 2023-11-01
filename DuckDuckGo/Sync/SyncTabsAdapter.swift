@@ -55,6 +55,7 @@ final class CurrentDeviceTabs: CurrentDeviceTabsSource {
 final class SyncTabsAdapter {
 
     private(set) var provider: TabsProvider?
+    private(set) var tabsStore: DeviceTabsStore?
     var deviceId: String?
 
     init() {}
@@ -77,6 +78,7 @@ final class SyncTabsAdapter {
             }
 
         self.provider = provider
+        self.tabsStore = tabsStore
     }
 
     private var syncErrorCancellable: AnyCancellable?

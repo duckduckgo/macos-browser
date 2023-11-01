@@ -31,6 +31,7 @@ extension HomePage.Views {
         @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
+        @EnvironmentObject var syncTabsModel: HomePage.Models.SyncTabsModel
 
         @State private var isHomeContentPopoverVisible = false
 
@@ -64,6 +65,9 @@ extension HomePage.Views {
                                     .padding(.top, 64)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
                             }
+
+                            SyncTabs()
+                                .padding(.top, 24)
 
                             Favorites()
                                 .padding(.top, 24)
