@@ -54,11 +54,15 @@ final class CurrentDeviceTabs: CurrentDeviceTabsSource {
 
 final class SyncTabsAdapter {
 
+    let syncDidCompletePublisher: AnyPublisher<Void, Never>
+
     private(set) var provider: TabsProvider?
     private(set) var tabsStore: DeviceTabsStore?
     var deviceId: String?
 
-    init() {}
+    init() {
+        syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
+    }
 
     func setUpProviderIfNeeded(metadataStore: SyncMetadataStore) {
         guard provider == nil else {
@@ -70,7 +74,9 @@ final class SyncTabsAdapter {
             currentDeviceTabsSource: CurrentDeviceTabs(deviceId: { [weak self] in self?.deviceId ?? "" }())
         )
 
-        let provider = TabsProvider(tabsStore: tabsStore, metadataStore: metadataStore) {}
+        let provider = TabsProvider(tabsStore: tabsStore, metadataStore: metadataStore, syncDidUpdateData: { [weak self] in
+            self?.syncDidCompleteSubject.send()
+        })
 
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { error in
@@ -81,5 +87,6 @@ final class SyncTabsAdapter {
         self.tabsStore = tabsStore
     }
 
+    private var syncDidCompleteSubject = PassthroughSubject<Void, Never>()
     private var syncErrorCancellable: AnyCancellable?
 }

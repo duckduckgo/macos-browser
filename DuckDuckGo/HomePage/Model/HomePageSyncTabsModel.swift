@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import SyncDataProviders
 
@@ -42,11 +43,17 @@ extension HomePage.Models {
         @MainActor
         init(open: @escaping (URL, FavoritesModel.OpenTarget) -> Void) {
             self.open = open
+            syncDidUpdateTabsCancellable = NSApp.delegateTyped.syncDataProviders.tabsAdapter.syncDidCompletePublisher
+                .sink { [weak self] _ in
+                    self?.reloadDeviceTabs()
+                }
+
             reloadDeviceTabs()
         }
 
         @MainActor
         func reloadDeviceTabs() {
+
             Task { @MainActor in
                 let deviceTabs = (try? NSApp.delegateTyped.syncDataProviders.tabsAdapter.tabsStore?.getDeviceTabs()) ?? []
                 print("loaded \(deviceTabs.count) device tabs")
@@ -73,6 +80,8 @@ extension HomePage.Models {
         func open(_ url: URL) {
             open(url, .current)
         }
+
+        private var syncDidUpdateTabsCancellable: AnyCancellable?
     }
 
 }

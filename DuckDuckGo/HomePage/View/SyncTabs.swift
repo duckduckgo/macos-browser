@@ -45,9 +45,6 @@ struct SyncTabs: View {
             }
             .frame(minHeight: 200)
         }
-        .onAppear {
-            model.reloadDeviceTabs()
-        }
     }
 }
 
