@@ -62,7 +62,7 @@ enum DBPUISendableMethodName: String {
 struct DBPUICommunicationLayer: Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .all
     var featureName: String = "dbpuiCommunication"
-    var broker: UserScriptMessageBroker?
+    weak var broker: UserScriptMessageBroker?
 
     weak var delegate: DBPUICommunicationDelegate?
 
