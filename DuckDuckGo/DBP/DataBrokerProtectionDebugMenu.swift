@@ -1,0 +1,67 @@
+//
+//  DataBrokerProtectionDebugMenu.swift
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+import AppKit
+import Common
+
+#if DBP
+
+@MainActor
+final class DataBrokerProtectionDebugMenu: NSMenu {
+
+    init() {
+        super.init(title: "Personal Information Removal")
+
+        buildItems {
+            NSMenuItem(title: "Waitlist") {
+                NSMenuItem(title: "Reset Waitlist State", action: #selector(DataBrokerProtectionDebugMenu.resetWaitlistState))
+                    .targetting(self)
+                NSMenuItem(title: "Reset T&C Acceptance", action: #selector(DataBrokerProtectionDebugMenu.resetTermsAndConditionsAcceptance))
+                    .targetting(self)
+
+                NSMenuItem(title: "Send Waitlist Notification", action: #selector(DataBrokerProtectionDebugMenu.sendWaitlistAvailableNotification))
+                    .targetting(self)
+                NSMenuItem.separator()
+            }
+        }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    @objc private func resetWaitlistState() {
+        DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
+        os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)
+    }
+
+    @objc private func resetTermsAndConditionsAcceptance() {
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
+        os_log("DBP waitlist terms and conditions cleaned", log: .dataBrokerProtection)
+    }
+
+    @objc private func sendWaitlistAvailableNotification() {
+        os_log("DBP waitlist notification sent", log: .dataBrokerProtection)
+    }
+}
+
+#endif

@@ -551,6 +551,11 @@ import Subscription
             NSMenuItem(title: "Sync")
                 .submenu(SyncDebugMenu())
 
+#if DBP
+            NSMenuItem(title: "Personal Information Removal")
+                .submenu(DataBrokerProtectionDebugMenu())
+#endif
+
 #if NETWORK_PROTECTION
             NSMenuItem(title: "Network Protection")
                 .submenu(NetworkProtectionDebugMenu())

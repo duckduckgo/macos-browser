@@ -108,6 +108,10 @@
 		31487E192AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */; };
 		31487E1A2AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */; };
 		31487E1B2AF18207000E69E1 /* WaitlistViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */; };
+		31487E1D2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E1C2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift */; };
+		31487E1E2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E1C2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift */; };
+		31487E1F2AF2AB1F000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E1C2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift */; };
+		31487E202AF2AB20000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31487E1C2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift */; };
 		3154FD1428E6011A00909769 /* TabShadowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154FD1328E6011A00909769 /* TabShadowView.swift */; };
 		315AA07028CA5CC800200030 /* YoutubePlayerNavigationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */; };
 		316C7A832A7E9BEE00AA3BAE /* BookmarksBarAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850E8DFA2A6FEC5E00691187 /* BookmarksBarAppearance.swift */; };
@@ -3861,6 +3865,7 @@
 		3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionManager.swift; sourceTree = "<group>"; };
 		313AEDA0287CAD1D00E1E8F4 /* CookieConsentUserPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionView.swift; sourceTree = "<group>"; };
 		31487E172AF18207000E69E1 /* WaitlistViewControllerPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistViewControllerPresenter.swift; sourceTree = "<group>"; };
+		31487E1C2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionDebugMenu.swift; sourceTree = "<group>"; };
 		3154FD1328E6011A00909769 /* TabShadowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowView.swift; sourceTree = "<group>"; };
 		315AA06F28CA5CC800200030 /* YoutubePlayerNavigationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubePlayerNavigationHandler.swift; sourceTree = "<group>"; };
 		3171D6B72889849F0068632A /* CookieManagedNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieManagedNotificationView.swift; sourceTree = "<group>"; };
@@ -5318,6 +5323,7 @@
 			children = (
 				3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */,
 				3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */,
+				31487E1C2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift */,
 			);
 			path = DBP;
 			sourceTree = "<group>";
@@ -10085,6 +10091,7 @@
 				3192A0852A4C4CFF0084EA89 /* CookieNotificationAnimationModel.swift in Sources */,
 				3192A0862A4C4CFF0084EA89 /* SharingMenu.swift in Sources */,
 				3192A0872A4C4CFF0084EA89 /* GrammarFeaturesManager.swift in Sources */,
+				31487E1D2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */,
 				3192A0882A4C4CFF0084EA89 /* WKMenuItemIdentifier.swift in Sources */,
 				3192A0892A4C4CFF0084EA89 /* SafariFaviconsReader.swift in Sources */,
 				3192A08A2A4C4CFF0084EA89 /* NSScreenExtension.swift in Sources */,
@@ -10551,6 +10558,7 @@
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
 				3707C727294B5D2900682A9F /* WKWebView+SessionState.swift in Sources */,
 				3706FAA3293F65D500E42796 /* CrashReportPromptViewController.swift in Sources */,
+				31487E202AF2AB20000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */,
 				3706FAA4293F65D500E42796 /* ContextMenuManager.swift in Sources */,
 				3706FAA5293F65D500E42796 /* GradientView.swift in Sources */,
 				3706FAA6293F65D500E42796 /* PreferencesSidebar.swift in Sources */,
@@ -12187,6 +12195,7 @@
 				1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */,
 				4B957B8C2AC7AE700062CA31 /* UserScripts.swift in Sources */,
 				4B957B8D2AC7AE700062CA31 /* NSWorkspaceExtension.swift in Sources */,
+				31487E1E2AF2AB13000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */,
 				4B957B8E2AC7AE700062CA31 /* AutofillTabExtension.swift in Sources */,
 				4B957B8F2AC7AE700062CA31 /* Assertions.swift in Sources */,
 				4B957B902AC7AE700062CA31 /* BookmarkViewModel.swift in Sources */,
@@ -12732,6 +12741,7 @@
 				85CC1D7B26A05ECF0062F04E /* PasswordManagementItemListModel.swift in Sources */,
 				AABEE6A924AB4B910043105B /* SuggestionTableCellView.swift in Sources */,
 				AA6820F125503DA9005ED0D5 /* FireViewModel.swift in Sources */,
+				31487E1F2AF2AB1F000E69E1 /* DataBrokerProtectionDebugMenu.swift in Sources */,
 				372BC2A12A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */,
 				AAA0CC6A253CC43C0079BC96 /* WKUserContentControllerExtension.swift in Sources */,
 				4BE65479271FCD41008D1D63 /* EditableTextView.swift in Sources */,

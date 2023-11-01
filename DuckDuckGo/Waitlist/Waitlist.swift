@@ -63,7 +63,7 @@ enum WaitlistInviteCodeFetchError: Error, Equatable {
 extension Notification.Name {
 
     static let networkProtectionWaitlistAccessChanged = Notification.Name(rawValue: "networkProtectionWaitlistAccessChanged")
-
+    static let dataBrokerProtectionWaitlistAccessChanged = Notification.Name(rawValue: "dataBrokerProtectionWaitlistAccessChanged")
 }
 
 extension Waitlist {
@@ -244,7 +244,7 @@ struct NetworkProtectionWaitlist: Waitlist {
 struct DataBrokerProtectionWaitlist: Waitlist {
 
     static let identifier: String = "databrokerprotection"
-    static let apiProductName: String = "databrokerprotection_macos"
+    static let apiProductName: String = "dbp"
 
     static let notificationIdentifier = "com.duckduckgo.macos.browser.data-broker-protection.invite-code-available"
     static let inviteAvailableNotificationTitle = UserText.networkProtectionWaitlistNotificationTitle
