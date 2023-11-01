@@ -81,7 +81,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func sendWaitlistAvailableNotification() {
-        DataBrokerProtectionWaitlist().sendInviteCodeAvailableNotification()
+        DataBrokerProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
 
         os_log("DBP waitlist notification sent", log: .dataBrokerProtection)
     }
@@ -90,7 +90,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("Fetching invite code...", log: .dataBrokerProtection)
 
         Task {
-            await try? DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable()
+            try? await DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable()
         }
     }
 
