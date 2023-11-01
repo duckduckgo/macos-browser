@@ -27,6 +27,7 @@ final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
     public let credentialsAdapter: SyncCredentialsAdapter
     public let settingsAdapter: SyncSettingsAdapter
+    public let tabsAdapter: SyncTabsAdapter
 
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
@@ -35,14 +36,16 @@ final class SyncDataProviders: DataProvidersSource {
             return []
         }
 
-        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
-        credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
-        settingsAdapter.setUpProviderIfNeeded(metadataDatabase: syncMetadataDatabase.db, metadataStore: syncMetadata)
+//        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
+//        credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
+//        settingsAdapter.setUpProviderIfNeeded(metadataDatabase: syncMetadataDatabase.db, metadataStore: syncMetadata)
+        tabsAdapter.setUpProviderIfNeeded(metadataStore: syncMetadata)
 
         let providers: [Any] = [
-            bookmarksAdapter.provider as Any,
-            credentialsAdapter.provider as Any,
-            settingsAdapter.provider as Any
+//            bookmarksAdapter.provider as Any,
+//            credentialsAdapter.provider as Any,
+//            settingsAdapter.provider as Any,
+            tabsAdapter.provider as Any
         ]
 
         return providers.compactMap { $0 as? DataProviding }
@@ -73,6 +76,15 @@ final class SyncDataProviders: DataProvidersSource {
             bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
             credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
         }
+
+        let deviceIdPublisher = syncService.authStatePublisher
+            .compactMap { [weak syncService] _ in syncService?.account?.deviceId }
+            .removeDuplicates()
+
+        syncDeviceNameCancellable = deviceIdPublisher
+            .sink { [weak self] deviceId in
+                self?.tabsAdapter.deviceId = deviceId
+            }
     }
 
     init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
@@ -81,6 +93,7 @@ final class SyncDataProviders: DataProvidersSource {
         bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase)
         credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
         settingsAdapter = SyncSettingsAdapter()
+        tabsAdapter = SyncTabsAdapter()
     }
 
     private func initializeMetadataDatabaseIfNeeded() {
@@ -107,6 +120,7 @@ final class SyncDataProviders: DataProvidersSource {
     private var isSyncMetadaDatabaseLoaded: Bool = false
     private var syncMetadata: SyncMetadataStore?
     private var syncAuthStateDidChangeCancellable: AnyCancellable?
+    private var syncDeviceNameCancellable: AnyCancellable?
 
     private let syncMetadataDatabase: SyncMetadataDatabase = SyncMetadataDatabase()
     private let bookmarksDatabase: CoreDataDatabase

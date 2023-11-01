@@ -1660,6 +1660,10 @@
 		3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776582E27F82E62009A6B35 /* AutofillPreferences.swift */; };
 		3776583127F8325B009A6B35 /* AutofillPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */; };
 		3778183D2AD6F86D00533759 /* FavoritesDisplayModeSyncHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D801B2AB47FBB002AF251 /* FavoritesDisplayModeSyncHandler.swift */; };
+		377A27E32AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A27E22AF1BCE900899C03 /* SyncTabsAdapter.swift */; };
+		377A27E42AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A27E22AF1BCE900899C03 /* SyncTabsAdapter.swift */; };
+		377A27E52AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A27E22AF1BCE900899C03 /* SyncTabsAdapter.swift */; };
+		377A27E62AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377A27E22AF1BCE900899C03 /* SyncTabsAdapter.swift */; };
 		377D801C2AB47FBB002AF251 /* FavoritesDisplayModeSyncHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D801B2AB47FBB002AF251 /* FavoritesDisplayModeSyncHandler.swift */; };
 		377D801E2AB48189002AF251 /* FavoritesDisplayModeSyncHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D801B2AB47FBB002AF251 /* FavoritesDisplayModeSyncHandler.swift */; };
 		377D801F2AB48191002AF251 /* FavoritesDisplayModeSyncHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D801B2AB47FBB002AF251 /* FavoritesDisplayModeSyncHandler.swift */; };
@@ -3916,6 +3920,8 @@
 		3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReportTests.swift; sourceTree = "<group>"; };
 		3776582E27F82E62009A6B35 /* AutofillPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillPreferences.swift; sourceTree = "<group>"; };
 		3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPreferencesTests.swift; sourceTree = "<group>"; };
+		377A27E12AF1A34300899C03 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
+		377A27E22AF1BCE900899C03 /* SyncTabsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTabsAdapter.swift; sourceTree = "<group>"; };
 		377D801B2AB47FBB002AF251 /* FavoritesDisplayModeSyncHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesDisplayModeSyncHandler.swift; sourceTree = "<group>"; };
 		377E54382937B7C400780A0A /* DuckDuckGoAppStoreCI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoAppStoreCI.entitlements; sourceTree = "<group>"; };
 		378205F52837CBA800D1D4AA /* SavedStateMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedStateMock.swift; sourceTree = "<group>"; };
@@ -5392,6 +5398,7 @@
 				37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */,
 				372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */,
 				37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */,
+				377A27E22AF1BCE900899C03 /* SyncTabsAdapter.swift */,
 				37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */,
 				37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */,
 			);
@@ -6956,6 +6963,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				377A27E12AF1A34300899C03 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -10128,6 +10136,7 @@
 				3192A0AD2A4C4CFF0084EA89 /* BookmarkListViewController.swift in Sources */,
 				3192A0AE2A4C4CFF0084EA89 /* SecureVaultLoginImporter.swift in Sources */,
 				3192A0AF2A4C4CFF0084EA89 /* WKProcessPoolExtension.swift in Sources */,
+				377A27E52AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */,
 				7BFE955B2A9DF5210081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */,
 				3192A0B02A4C4CFF0084EA89 /* AddBookmarkModalViewController.swift in Sources */,
 				3192A0B12A4C4CFF0084EA89 /* DuckPlayerTabExtension.swift in Sources */,
@@ -11025,6 +11034,7 @@
 				3706FC2A293F65D500E42796 /* DuckPlayerPreferences.swift in Sources */,
 				3706FC2B293F65D500E42796 /* DownloadViewModel.swift in Sources */,
 				4B9DB0272A983B24000927DB /* NetworkProtectionWaitlistViewModel.swift in Sources */,
+				377A27E42AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */,
 				4B9DB03F2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
 				987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
@@ -11654,6 +11664,7 @@
 				4B9579862AC7AE700062CA31 /* NSPopUpButtonExtension.swift in Sources */,
 				4B9579872AC7AE700062CA31 /* ConfigurationManager.swift in Sources */,
 				4B9579882AC7AE700062CA31 /* YoutubePlayerUserScript.swift in Sources */,
+				377A27E62AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */,
 				4B9579892AC7AE700062CA31 /* PixelParameters.swift in Sources */,
 				4B95798B2AC7AE700062CA31 /* FaviconImageCache.swift in Sources */,
 				4B95798C2AC7AE700062CA31 /* TabBarViewController.swift in Sources */,
@@ -12788,6 +12799,7 @@
 				B693954E26F04BEB0015B914 /* ProgressView.swift in Sources */,
 				B69B503C2726A12500758A2B /* StatisticsStore.swift in Sources */,
 				4BBDEE9128FC14760092FAA6 /* BWInstallationService.swift in Sources */,
+				377A27E32AF1BCE900899C03 /* SyncTabsAdapter.swift in Sources */,
 				859F30642A72A7BB00C20372 /* BookmarksBarPromptPopover.swift in Sources */,
 				4B4D60CA2A0C849600BCD287 /* NetworkProtectionInvitePresenter.swift in Sources */,
 				B693955426F04BEC0015B914 /* ColorView.swift in Sources */,
