@@ -37,9 +37,9 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
 
     private let isFakeBroker: Bool
     private let webViewConfiguration: WKWebViewConfiguration
-    private let userContentController: DataBrokerUserContentController?
+    private var userContentController: DataBrokerUserContentController?
 
-    private var webView: WKWebView?
+    private var webView: WebView?
     private var window: NSWindow?
 
     init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate, isFakeBroker: Bool = false) {
@@ -56,7 +56,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     }
 
     func initializeWebView(showWebView: Bool) async {
-        webView = WKWebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: webViewConfiguration)
+        webView = WebView(frame: CGRect(origin: .zero, size: CGSize(width: 1024, height: 1024)), configuration: webViewConfiguration)
         webView?.navigationDelegate = self
 
         if showWebView {
@@ -80,8 +80,17 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
 
     func finish() {
         os_log("WebViewHandler finished", log: .action)
+
         webView?.stopLoading()
+        userContentController?.cleanUpBeforeClosing()
+
+        userContentController = nil
+        webView?.navigationDelegate = nil
         webView = nil
+    }
+
+    deinit {
+        print("WebViewHandler Deinit")
     }
 
     func waitForWebViewLoad(timeoutInSeconds: Int = 0) async throws {
@@ -103,7 +112,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     func execute(action: Action, data: CCFRequestData) {
         os_log("Executing action: %{public}@", log: .action, String(describing: action.actionType.rawValue))
 
-        userContentController?.dataBrokerUserScripts.dataBrokerFeature.pushAction(
+        userContentController?.dataBrokerUserScripts?.dataBrokerFeature.pushAction(
             method: .onActionReceived,
             webView: self.webView!,
             params: Params(state: ActionRequest(action: action, data: data))
@@ -157,5 +166,13 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
         } else {
             completionHandler(.cancelAuthenticationChallenge, nil)
         }
+    }
+}
+
+private class WebView: WKWebView {
+
+    deinit {
+        configuration.userContentController.removeAllUserScripts()
+        os_log("DBP WebView Deinit", log: .action)
     }
 }
