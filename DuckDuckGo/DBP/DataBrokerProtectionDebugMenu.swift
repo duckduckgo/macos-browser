@@ -25,6 +25,11 @@ import Common
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
 
+    private let waitlistTokenItem = NSMenuItem(title: "Waitlist Token:")
+    private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
+    private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
+    private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
+
     init() {
         super.init(title: "Personal Information Removal")
 
@@ -38,6 +43,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 NSMenuItem(title: "Send Waitlist Notification", action: #selector(DataBrokerProtectionDebugMenu.sendWaitlistAvailableNotification))
                     .targetting(self)
                 NSMenuItem.separator()
+
+                waitlistTokenItem
+                waitlistTimestampItem
+                waitlistInviteCodeItem
+                waitlistTermsAndConditionsAcceptedItem
             }
         }
     }
@@ -45,6 +55,14 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Menu State Update
+
+    override func update() {
+        updateWaitlistItems()
+    }
+
+    // MARK: - Menu functions
 
     @objc private func resetWaitlistState() {
         DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
@@ -60,7 +78,26 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func sendWaitlistAvailableNotification() {
+        DataBrokerProtectionWaitlist().sendInviteCodeAvailableNotification()
+
         os_log("DBP waitlist notification sent", log: .dataBrokerProtection)
+    }
+
+    // MARK: - Utility Functions
+
+    private func updateWaitlistItems() {
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: DataBrokerProtectionWaitlist.identifier)
+        waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
+        waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
+
+        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
+            waitlistTimestampItem.title = "Waitlist Timestamp: \(String(describing: timestamp))"
+        } else {
+            waitlistTimestampItem.title = "Waitlist Timestamp: N/A"
+        }
+
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
+        waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
     }
 }
 
