@@ -89,8 +89,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     @objc private func fetchInviteCode() {
         os_log("Fetching invite code...", log: .dataBrokerProtection)
 
-        DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable { _ in
-            // Do nothing when code fetching fails, as the app will try again later
+        Task {
+            await try? DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable()
         }
     }
 

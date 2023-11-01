@@ -241,6 +241,8 @@ struct NetworkProtectionWaitlist: Waitlist {
 #if DBP
 // MARK: - DataBroker Protection Waitlist
 
+import DataBrokerProtection
+
 struct DataBrokerProtectionWaitlist: Waitlist {
 
     static let identifier: String = "databrokerprotection"
@@ -265,9 +267,16 @@ struct DataBrokerProtectionWaitlist: Waitlist {
         self.waitlistRequest = request
     }
 
-    func fetchDataBrokerProtectionInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void) {
-        self.fetchInviteCodeIfAvailable { error in
+    func fetchDataBrokerProtectionInviteCodeIfAvailable() async throws {
+        do {
+            await fetchInviteCodeIfAvailable()
+
+            if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
+                try await RedeemUseCase().redeem(inviteCode: inviteCode)
+            }
+        } catch {
             print("ERROR \(error)")
+            throw error
         }
     }
 }
