@@ -125,6 +125,13 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
         let icon = icon ?? iconPublisher.icon
 
+        let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+        let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+
+        if !isWaitlistUser && !hasAuthToken {
+            return NSImage(named: "NetworkProtectionAvailableButton")!
+        }
+
         if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
             return NSImage(named: "NetworkProtectionAvailableButton")!
         }
@@ -182,12 +189,24 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
         let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
-        if networkProtectionVisibility.isNetworkProtectionVisible(), NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
-                            frequency: .dailyOnly,
-                            includeAppVersionParameter: true)
-            showButton = true
-            return
+        if networkProtectionVisibility.isNetworkProtectionVisible() {
+            if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+                DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
+                                frequency: .dailyOnly,
+                                includeAppVersionParameter: true)
+                showButton = true
+                return
+            }
+
+            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+            
+            // If the user hasn't signed up to the waitlist or doesn't have an auth token through some other method, then show them the badged icon
+            // to get their attention and encourage them to sign up.
+            if !isWaitlistUser && !hasAuthToken {
+                showButton = true
+                return
+            }
         }
 
         guard !isPinned,
