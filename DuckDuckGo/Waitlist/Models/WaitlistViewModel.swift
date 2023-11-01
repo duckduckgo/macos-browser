@@ -88,7 +88,7 @@ final class WaitlistViewModel: ObservableObject {
             Task { @MainActor in
                 await checkNotificationPermissions()
             }
-        } else if waitlistStorage.getWaitlistInviteCode() != nil {
+        } else if waitlistStorage.getWaitlistToken() != nil {
             viewState = .invited
         } else {
             viewState = .notOnWaitlist
