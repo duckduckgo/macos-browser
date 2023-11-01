@@ -242,6 +242,7 @@ struct NetworkProtectionWaitlist: Waitlist {
 #endif
 
 #if DBP
+
 // MARK: - DataBroker Protection Waitlist
 
 import DataBrokerProtection
@@ -276,6 +277,10 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
     func fetchDataBrokerProtectionInviteCodeIfAvailable() async throws {
         do {
+            guard waitlistStorage.getWaitlistToken() == nil else {
+                os_log("DBP token already exists, returning...", log: .default)
+                return
+            }
             let inviteCode = try await fetchInviteCode()
             try await redeemInviteCode(inviteCode)
 
