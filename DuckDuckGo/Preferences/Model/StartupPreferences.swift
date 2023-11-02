@@ -90,8 +90,7 @@ final class StartupPreferences: ObservableObject {
     }
 
     var friendlyURL: String {
-        let regexPattern = "https?://"
-        var friendlyURL = customHomePageURL.replacingOccurrences(of: regexPattern, with: "", options: .regularExpression)
+        var friendlyURL = customHomePageURL
         if friendlyURL.count > 30 {
             let index = friendlyURL.index(friendlyURL.startIndex, offsetBy: 27)
             friendlyURL = String(friendlyURL[..<index]) + "..."
