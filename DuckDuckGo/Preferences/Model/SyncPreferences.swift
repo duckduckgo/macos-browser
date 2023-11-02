@@ -116,6 +116,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 errorMessage = String(describing: error)
             }
@@ -275,6 +277,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             managementDialogModel.endFlow()
             do {
                 try await syncService.deleteAccount()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)m
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
