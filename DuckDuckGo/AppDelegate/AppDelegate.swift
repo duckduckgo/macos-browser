@@ -221,7 +221,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if DBP
         Task {
-            await try? DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable()
+            await try? DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
 #endif
     }

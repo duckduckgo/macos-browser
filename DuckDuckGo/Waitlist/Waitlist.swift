@@ -260,29 +260,51 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     let waitlistRequest: WaitlistRequest
 
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let redeemAuthenticationRepository: AuthenticationRepository
 
     init() {
         self.init(
             store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
             request: ProductWaitlistRequest(productName: Self.apiProductName),
-            redeemUseCase: RedeemUseCase()
+            redeemUseCase: RedeemUseCase(),
+            redeemAuthenticationRepository: UserDefaultsAuthenticationData()
         )
     }
 
-    init(store: WaitlistStorage, request: WaitlistRequest, redeemUseCase: DataBrokerProtectionRedeemUseCase) {
+    init(store: WaitlistStorage, request: WaitlistRequest,
+         redeemUseCase: DataBrokerProtectionRedeemUseCase,
+         redeemAuthenticationRepository: AuthenticationRepository) {
         self.waitlistStorage = store
         self.waitlistRequest = request
         self.redeemUseCase = redeemUseCase
+        self.redeemAuthenticationRepository = redeemAuthenticationRepository
     }
 
-    func fetchDataBrokerProtectionInviteCodeIfAvailable() async throws {
+    func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
         do {
-            guard waitlistStorage.getWaitlistToken() == nil else {
-                os_log("DBP token already exists, returning...", log: .default)
+            guard waitlistStorage.getWaitlistToken() != nil else {
+                os_log("User not in DBP waitlist, returning...", log: .default)
                 return
             }
-            let inviteCode = try await fetchInviteCode()
-            try await redeemInviteCode(inviteCode)
+
+            guard redeemAuthenticationRepository.getAccessToken() == nil else {
+                os_log("Invite code already redeemed, returning...", log: .default)
+                return
+            }
+
+            var inviteCode = waitlistStorage.getWaitlistInviteCode()
+
+            if inviteCode == nil {
+                os_log("No DBP invite code found, fetching...", log: .default)
+                inviteCode = try await fetchInviteCode()
+            }
+
+            if let code = inviteCode {
+                try await redeemInviteCode(code)
+            } else {
+                os_log("No DBP invite code available")
+                throw WaitlistInviteCodeFetchError.noCodeAvailable
+            }
 
         } catch {
             os_log("DBP Invite code error: %{public}@", log: .error, error.localizedDescription)
@@ -309,8 +331,12 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     }
 
     private func redeemInviteCode(_ inviteCode: String) async throws {
+        os_log("Redeeming DBP invite code...", log: .dataBrokerProtection)
+
         try await redeemUseCase.redeem(inviteCode: inviteCode)
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
+
+        os_log("DBP invite code redeemed", log: .dataBrokerProtection)
         sendInviteCodeAvailableNotification {
             // DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }

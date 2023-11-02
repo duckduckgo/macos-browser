@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
+#if DBP
+
+import DataBrokerProtection
 import Foundation
 import AppKit
 import Common
-
-#if DBP
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
@@ -69,6 +70,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     @objc private func resetWaitlistState() {
         DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        UserDefaultsAuthenticationData().reset()
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
         os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)
@@ -90,7 +92,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         os_log("Fetching invite code...", log: .dataBrokerProtection)
 
         Task {
-            try? await DataBrokerProtectionWaitlist().fetchDataBrokerProtectionInviteCodeIfAvailable()
+            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
     }
 
