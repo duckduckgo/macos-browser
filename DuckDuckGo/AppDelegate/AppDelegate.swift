@@ -393,17 +393,24 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+
+#if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                     DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
                     NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
-            } else if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
+            }
+#endif
+
+#if DBP
+            if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
                 if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
                     // DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
                     DataBrokerProtectionWaitlistViewControllerPresenter.show()
                 }
             }
+#endif
         }
 
         completionHandler()
