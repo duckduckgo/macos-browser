@@ -262,6 +262,11 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let redeemAuthenticationRepository: AuthenticationRepository
 
+    var readyToAcceptTermsAndConditions: Bool {
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
+        return waitlistStorage.isInvited && !accepted
+    }
+
     init() {
         self.init(
             store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
