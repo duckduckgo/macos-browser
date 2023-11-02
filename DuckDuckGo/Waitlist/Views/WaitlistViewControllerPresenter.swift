@@ -74,18 +74,15 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
 
     @MainActor
     static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             return
         }
-
         // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
         // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
         // preventing any state changing from occurring.
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             let status = settings.authorizationStatus
             let state = WaitlistViewModel.NotificationPermissionState.from(status)
-
             DispatchQueue.main.async {
                 let viewModel = WaitlistViewModel(waitlist: DataBrokerProtectionWaitlist(),
                                                   notificationPermissionState: state,
