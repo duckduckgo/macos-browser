@@ -41,6 +41,7 @@ extension Tab: NavigationResponder {
     func setupNavigationDelegate() {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
+            .weak(nullable: self.onboarding),
 
             .weak(self),
 

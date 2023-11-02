@@ -43,6 +43,9 @@ extension WKWebViewConfiguration {
             if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
                 setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
             }
+            if urlSchemeHandler(forURLScheme: OnboardingManager.urlScheme) == nil {
+                setURLSchemeHandler(OnboardingSchemeHandler(), forURLScheme: OnboardingManager.urlScheme)
+            }
         }
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,

@@ -67,6 +67,19 @@
 		1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */; };
 		1DB9618229F67F6100CF5568 /* FaviconNullStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */; };
 		1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */; };
+		1DC776322AF436C7002DF07B /* OnboardingSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */; };
+		1DC776332AF43812002DF07B /* OnboardingSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */; };
+		1DC776342AF4381E002DF07B /* OnboardingSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */; };
+		1DC776352AF43855002DF07B /* OnboardingSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */; };
+		1DC776362AF43879002DF07B /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
+		1DC776382AF4416A002DF07B /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */; };
+		1DC7763A2AF44255002DF07B /* OnboardingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776392AF44255002DF07B /* OnboardingManager.swift */; };
+		1DC7763B2AF445BD002DF07B /* OnboardingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776392AF44255002DF07B /* OnboardingManager.swift */; };
+		1DC7763C2AF445BE002DF07B /* OnboardingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776392AF44255002DF07B /* OnboardingManager.swift */; };
+		1DC7763D2AF445C0002DF07B /* OnboardingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776392AF44255002DF07B /* OnboardingManager.swift */; };
+		1DC7763F2AF445CA002DF07B /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */; };
+		1DC776402AF445CB002DF07B /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */; };
+		1DC776412AF445CD002DF07B /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */; };
 		1DCFBC8A29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DCFBC8B29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
@@ -475,7 +488,6 @@
 		3192A10A2A4C4CFF0084EA89 /* StartupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */; };
 		3192A10B2A4C4CFF0084EA89 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4BBA3A25C58FA200C4FB0F /* MainMenu.swift */; };
 		3192A10C2A4C4CFF0084EA89 /* EdgeDataImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93226B3B06300879451 /* EdgeDataImporter.swift */; };
-		3192A10D2A4C4CFF0084EA89 /* BrowserTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */; };
 		3192A10E2A4C4CFF0084EA89 /* CallToAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85707F21276A32B600DC0649 /* CallToAction.swift */; };
 		3192A10F2A4C4CFF0084EA89 /* MouseOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953D26F04BE70015B914 /* MouseOverView.swift */; };
 		3192A1102A4C4CFF0084EA89 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527B263B056C00B973F8 /* HistoryStore.swift */; };
@@ -3859,6 +3871,9 @@
 		1DA6D0FF2A1FF9DC00540406 /* HTTPCookieTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPCookieTests.swift; sourceTree = "<group>"; };
 		1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderMock.swift; sourceTree = "<group>"; };
 		1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconNullStore.swift; sourceTree = "<group>"; };
+		1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSchemeHandler.swift; sourceTree = "<group>"; };
+		1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabExtension.swift; sourceTree = "<group>"; };
+		1DC776392AF44255002DF07B /* OnboardingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingManager.swift; sourceTree = "<group>"; };
 		1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerHomePageView.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
 		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
@@ -6776,6 +6791,8 @@
 			children = (
 				85707F2F276A7DB000DC0649 /* ViewModel */,
 				85B7184827677A9200B4277F /* View */,
+				1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */,
+				1DC776392AF44255002DF07B /* OnboardingManager.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -8246,6 +8263,7 @@
 				B66260E529ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift */,
 				B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */,
 				B626A76C29928B1600053070 /* TestsClosureNavigationResponder.swift */,
+				1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */,
 			);
 			path = TabExtensions;
 			sourceTree = "<group>";
@@ -10078,6 +10096,7 @@
 				31929FDD2A4C4CFF0084EA89 /* FaviconImageCache.swift in Sources */,
 				31929FDE2A4C4CFF0084EA89 /* TabBarViewController.swift in Sources */,
 				31929FDF2A4C4CFF0084EA89 /* BookmarkOutlineViewDataSource.swift in Sources */,
+				1DC776342AF4381E002DF07B /* OnboardingSchemeHandler.swift in Sources */,
 				31929FE02A4C4CFF0084EA89 /* DataImportStatusProviding.swift in Sources */,
 				31929FE12A4C4CFF0084EA89 /* PasswordManagementBitwardenItemView.swift in Sources */,
 				31929FE22A4C4CFF0084EA89 /* CookieConsentPopover.swift in Sources */,
@@ -10399,7 +10418,6 @@
 				3192A10A2A4C4CFF0084EA89 /* StartupPreferences.swift in Sources */,
 				3192A10B2A4C4CFF0084EA89 /* MainMenu.swift in Sources */,
 				3192A10C2A4C4CFF0084EA89 /* EdgeDataImporter.swift in Sources */,
-				3192A10D2A4C4CFF0084EA89 /* BrowserTabViewController.swift in Sources */,
 				3192A10E2A4C4CFF0084EA89 /* CallToAction.swift in Sources */,
 				3192A10F2A4C4CFF0084EA89 /* MouseOverView.swift in Sources */,
 				3192A1102A4C4CFF0084EA89 /* HistoryStore.swift in Sources */,
@@ -10526,6 +10544,7 @@
 				3192A17B2A4C4CFF0084EA89 /* LegacyBookmarksStoreMigration.swift in Sources */,
 				3192A17C2A4C4CFF0084EA89 /* QuartzIdleStateProvider.swift in Sources */,
 				3192A17D2A4C4CFF0084EA89 /* DuckPlayerPreferences.swift in Sources */,
+				1DC7763C2AF445BE002DF07B /* OnboardingManager.swift in Sources */,
 				3192A17E2A4C4CFF0084EA89 /* DownloadViewModel.swift in Sources */,
 				3192A17F2A4C4CFF0084EA89 /* BookmarkHTMLReader.swift in Sources */,
 				3192A1802A4C4CFF0084EA89 /* Tab+NSSecureCoding.swift in Sources */,
@@ -10543,6 +10562,7 @@
 				3192A18B2A4C4CFF0084EA89 /* NSOpenPanelExtensions.swift in Sources */,
 				3192A18C2A4C4CFF0084EA89 /* FirePopover.swift in Sources */,
 				3192A18D2A4C4CFF0084EA89 /* HistoryCoordinator.swift in Sources */,
+				1DC776362AF43879002DF07B /* BrowserTabViewController.swift in Sources */,
 				3192A18E2A4C4CFF0084EA89 /* VariantManager.swift in Sources */,
 				3192A18F2A4C4CFF0084EA89 /* ApplicationDockMenu.swift in Sources */,
 				3192A1902A4C4CFF0084EA89 /* SaveIdentityViewController.swift in Sources */,
@@ -10671,6 +10691,7 @@
 				3192A1FD2A4C4CFF0084EA89 /* NSMenuItemExtension.swift in Sources */,
 				3192A1FE2A4C4CFF0084EA89 /* ContiguousBytesExtension.swift in Sources */,
 				3192A1FF2A4C4CFF0084EA89 /* AdjacentItemEnumerator.swift in Sources */,
+				1DC7763F2AF445CA002DF07B /* OnboardingTabExtension.swift in Sources */,
 				3192A2002A4C4CFF0084EA89 /* BookmarkDatabase.swift in Sources */,
 				3192A2012A4C4CFF0084EA89 /* ChromiumKeychainPrompt.swift in Sources */,
 				3192A2022A4C4CFF0084EA89 /* WKProcessPool+GeolocationProvider.swift in Sources */,
@@ -10755,6 +10776,7 @@
 				3706FAC0293F65D500E42796 /* DataTaskProviding.swift in Sources */,
 				3706FAC1293F65D500E42796 /* FeedbackViewController.swift in Sources */,
 				3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */,
+				1DC7763B2AF445BD002DF07B /* OnboardingManager.swift in Sources */,
 				3706FAC3293F65D500E42796 /* AddEditFavoriteViewController.swift in Sources */,
 				B696AFFC2AC5924800C93203 /* FileLineError.swift in Sources */,
 				B6E1491129A5C30A00AAFBE8 /* FBProtectionTabExtension.swift in Sources */,
@@ -10811,6 +10833,7 @@
 				31F2D2002AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
 				3706FAF3293F65D500E42796 /* LocalAuthenticationService.swift in Sources */,
 				1D36E659298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
+				1DC776332AF43812002DF07B /* OnboardingSchemeHandler.swift in Sources */,
 				3706FEBC293F6EFF00E42796 /* BWResponse.swift in Sources */,
 				3706FAF4293F65D500E42796 /* SafariBookmarksReader.swift in Sources */,
 				31C9ADE62AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */,
@@ -11133,6 +11156,7 @@
 				3706FBF3293F65D500E42796 /* PseudoFolder.swift in Sources */,
 				3706FBF4293F65D500E42796 /* Visit.swift in Sources */,
 				3706FBF5293F65D500E42796 /* PixelDataStore.swift in Sources */,
+				1DC776402AF445CB002DF07B /* OnboardingTabExtension.swift in Sources */,
 				3706FBF6293F65D500E42796 /* Pixel.swift in Sources */,
 				3706FBF7293F65D500E42796 /* PixelEvent.swift in Sources */,
 				3706FBF8293F65D500E42796 /* TabBarFooter.swift in Sources */,
@@ -11770,6 +11794,7 @@
 				4B95794A2AC7AE700062CA31 /* TabIndex.swift in Sources */,
 				4B95794B2AC7AE700062CA31 /* SavePanelAccessoryView.swift in Sources */,
 				4B95794C2AC7AE700062CA31 /* TabLazyLoaderDataSource.swift in Sources */,
+				1DC776352AF43855002DF07B /* OnboardingSchemeHandler.swift in Sources */,
 				4B95794D2AC7AE700062CA31 /* LoginImport.swift in Sources */,
 				4B95794E2AC7AE700062CA31 /* JoinWaitlistView.swift in Sources */,
 				4B95794F2AC7AE700062CA31 /* LazyLoadable.swift in Sources */,
@@ -12319,6 +12344,7 @@
 				4B957B662AC7AE700062CA31 /* CookieConsentUserPermissionView.swift in Sources */,
 				4B957B672AC7AE700062CA31 /* AtbAndVariantCleanup.swift in Sources */,
 				4B957B682AC7AE700062CA31 /* NibLoadable.swift in Sources */,
+				1DC776412AF445CD002DF07B /* OnboardingTabExtension.swift in Sources */,
 				4B957B692AC7AE700062CA31 /* FeedbackWindow.swift in Sources */,
 				4B957B6A2AC7AE700062CA31 /* WorkspaceProtocol.swift in Sources */,
 				4B957B6B2AC7AE700062CA31 /* RecentlyVisitedView.swift in Sources */,
@@ -12350,6 +12376,7 @@
 				4B957B842AC7AE700062CA31 /* SuggestionContainer.swift in Sources */,
 				4B957B852AC7AE700062CA31 /* FindInPageTabExtension.swift in Sources */,
 				4B957B862AC7AE700062CA31 /* HomePageViewController.swift in Sources */,
+				1DC7763D2AF445C0002DF07B /* OnboardingManager.swift in Sources */,
 				4B957B872AC7AE700062CA31 /* BraveDataImporter.swift in Sources */,
 				4B957B882AC7AE700062CA31 /* OperatingSystemVersionExtension.swift in Sources */,
 				4B957B892AC7AE700062CA31 /* ToggleableScrollView.swift in Sources */,
@@ -12724,6 +12751,7 @@
 				37CD54CA27F2FDD100F1F7B9 /* AutofillPreferencesModel.swift in Sources */,
 				7BBD45B12A691AB500C83CA9 /* NetworkProtectionDebugUtilities.swift in Sources */,
 				B657841F25FA497600D8DB33 /* NSException+Catch.swift in Sources */,
+				1DC776382AF4416A002DF07B /* OnboardingTabExtension.swift in Sources */,
 				4BE65481271FCD4D008D1D63 /* PasswordManagementNoteModel.swift in Sources */,
 				3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */,
 				4B9DB0382A983B24000927DB /* JoinedWaitlistView.swift in Sources */,
@@ -13050,6 +13078,7 @@
 				AAC5E4E425D6BA9C007F5990 /* NSSizeExtension.swift in Sources */,
 				AA6820EB25503D6A005ED0D5 /* Fire.swift in Sources */,
 				37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */,
+				1DC776322AF436C7002DF07B /* OnboardingSchemeHandler.swift in Sources */,
 				B6AAAC3E26048F690029438D /* RandomAccessCollectionExtension.swift in Sources */,
 				4B9292AF26670F5300AD2C21 /* NSOutlineViewExtensions.swift in Sources */,
 				AA585D82248FD31100E9A3E2 /* AppDelegate.swift in Sources */,
@@ -13067,6 +13096,7 @@
 				B65E6B9E26D9EC0800095F96 /* CircularProgressView.swift in Sources */,
 				AABEE69C24A902BB0043105B /* SuggestionContainer.swift in Sources */,
 				B6C00ECD292F89D9009C73A6 /* FindInPageTabExtension.swift in Sources */,
+				1DC7763A2AF44255002DF07B /* OnboardingManager.swift in Sources */,
 				85589E8327BBB8630038AD11 /* HomePageViewController.swift in Sources */,
 				4B59024126B35F3600489384 /* BraveDataImporter.swift in Sources */,
 				B6A9E46B2614618A0067D1B9 /* OperatingSystemVersionExtension.swift in Sources */,

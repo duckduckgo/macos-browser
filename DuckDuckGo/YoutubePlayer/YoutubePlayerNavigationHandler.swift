@@ -22,7 +22,7 @@ import ContentScopeScripts
 struct YoutubePlayerNavigationHandler {
 
     static var htmlTemplatePath: String {
-        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/duckplayer") else {
+        guard let file = ContentScopeScripts.Bundle.path(forResource: "index", ofType: "html", inDirectory: "pages/onboarding") else {
             assertionFailure("YouTube Private Player HTML template not found")
             return ""
         }

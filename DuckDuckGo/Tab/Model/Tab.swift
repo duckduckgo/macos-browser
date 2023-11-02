@@ -191,6 +191,7 @@ protocol NewWindowPolicyDecisionMaker {
         var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?
         let duckPlayer: DuckPlayer
         var downloadManager: FileDownloadManagerProtocol
+        let onboardingManager: OnboardingManager
     }
 
     fileprivate weak var delegate: TabDelegate?
@@ -228,6 +229,7 @@ protocol NewWindowPolicyDecisionMaker {
                      workspace: Workspace = NSWorkspace.shared,
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
+                     onboardingManager: OnboardingManager? = nil,
                      downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
                      permissionManager: PermissionManagerProtocol = PermissionManager.shared,
                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
@@ -251,12 +253,14 @@ protocol NewWindowPolicyDecisionMaker {
             ?? (NSApp.runType.requiresEnvironment ? DuckPlayer.shared : DuckPlayer.mock(withMode: .enabled))
         let statisticsLoader = statisticsLoader
             ?? (NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil)
+        let onboardingManager: OnboardingManager = onboardingManager ?? OnboardingManager()
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         var faviconManager = faviconManagement
         if burnerMode.isBurner {
             faviconManager = FaviconManager(cacheType: .inMemory)
         }
+
 
         self.init(content: content,
                   faviconManagement: faviconManager,
@@ -267,6 +271,7 @@ protocol NewWindowPolicyDecisionMaker {
                   workspace: workspace,
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
+                  onboardingManager: onboardingManager,
                   downloadManager: downloadManager,
                   permissionManager: permissionManager,
                   geolocationService: geolocationService,
@@ -298,6 +303,7 @@ protocol NewWindowPolicyDecisionMaker {
          workspace: Workspace,
          privacyFeatures: AnyPrivacyFeatures,
          duckPlayer: DuckPlayer,
+         onboardingManager: OnboardingManager,
          downloadManager: FileDownloadManagerProtocol,
          permissionManager: PermissionManagerProtocol,
          geolocationService: GeolocationServiceProtocol,
@@ -371,7 +377,8 @@ protocol NewWindowPolicyDecisionMaker {
                                                        workspace: workspace,
                                                        cbaTimeReporter: cbaTimeReporter,
                                                        duckPlayer: duckPlayer,
-                                                       downloadManager: downloadManager))
+                                                       downloadManager: downloadManager,
+                                                       onboardingManager: onboardingManager))
 
         super.init()
         tabGetter = { [weak self] in self }
