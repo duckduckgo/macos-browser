@@ -31,17 +31,20 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         defaults.removePersistentDomain(forName: testGroupName)
     }
 
-    func testWhenFetchingRemoteMessages_AndTheUserDidNotSignUpViaWaitlist_ThenMessagesAreNotFetched() {
+    func testWhenFetchingRemoteMessages_AndTheUserDidNotSignUpViaWaitlist_ThenMessagesAreFetched() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
+        request.result = .success([])
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: true)
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -56,15 +59,17 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
 
-        XCTAssertFalse(request.didFetchMessages)
+        XCTAssertTrue(request.didFetchMessages)
     }
 
-    func testWhenFetchingRemoteMessages_AndTheUserDidSignUpViaWaitlist_ButUserHasNotActivatedNetP_ThenMessagesAreNotFetched() {
+    func testWhenFetchingRemoteMessages_AndTheUserDidSignUpViaWaitlist_ButUserHasNotActivatedNetP_ThenMessagesAreFetched() {
         let request = MockNetworkProtectionRemoteMessagingRequest()
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: true)
 
+        request.result = .success([])
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
         waitlistStorage.store(inviteCode: "ABCD1234")
@@ -74,6 +79,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -89,7 +95,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
 
-        XCTAssertFalse(request.didFetchMessages)
+        XCTAssertTrue(request.didFetchMessages)
     }
 
     func testWhenFetchingRemoteMessages_AndWaitlistUserHasActivatedNetP_ThenMessagesAreFetched_AndMessagesAreStored() {
@@ -97,6 +103,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: true)
 
         let messages = [mockMessage(id: "123")]
 
@@ -111,6 +118,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -136,6 +144,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: true)
 
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
@@ -149,6 +158,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
             minimumRefreshInterval: .days(7), // Use a large number to hit the refresh check
             userDefaults: defaults
         )
@@ -173,6 +183,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: true)
 
         let dismissedMessage = mockMessage(id: "123")
         let activeMessage = mockMessage(id: "456")
@@ -184,6 +195,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -200,6 +212,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         let storage = MockNetworkProtectionRemoteMessagingStorage()
         let waitlistStorage = MockWaitlistStorage()
         let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: true)
 
         let hiddenMessage = mockMessage(id: "123", daysSinceNetworkProtectionEnabled: 10)
         let activeMessage = mockMessage(id: "456")
@@ -211,6 +224,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             messageStorage: storage,
             waitlistStorage: waitlistStorage,
             waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
             minimumRefreshInterval: 0,
             userDefaults: defaults
         )
@@ -219,7 +233,58 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         XCTAssertEqual(presentableMessagesAfter, [activeMessage])
     }
 
-    private func mockMessage(id: String, daysSinceNetworkProtectionEnabled: Int = 0) -> NetworkProtectionRemoteMessage {
+    func testWhenStoredMessagesExist_AndSomeMessagesNetPVisibility_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
+        let request = MockNetworkProtectionRemoteMessagingRequest()
+        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let waitlistStorage = MockWaitlistStorage()
+        let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: false)
+
+        let hiddenMessage = mockMessage(id: "123", requiresNetPAccess: true)
+        try? storage.store(messages: [hiddenMessage])
+
+        let messaging = DefaultNetworkProtectionRemoteMessaging(
+            messageRequest: request,
+            messageStorage: storage,
+            waitlistStorage: waitlistStorage,
+            waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
+            minimumRefreshInterval: 0,
+            userDefaults: defaults
+        )
+
+        let presentableMessages = messaging.presentableRemoteMessages()
+        XCTAssertEqual(presentableMessages, [])
+    }
+
+    func testWhenStoredMessagesExist_AndSomeMessagesRequireNetPUsage_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
+        let request = MockNetworkProtectionRemoteMessagingRequest()
+        let storage = MockNetworkProtectionRemoteMessagingStorage()
+        let waitlistStorage = MockWaitlistStorage()
+        let activationDateStorage = MockWaitlistActivationDateStore()
+        let visibility = NetworkProtectionVisibilityMock(visible: true)
+
+        let message = mockMessage(id: "123", requiresNetPUsage: false, requiresNetPAccess: true)
+        try? storage.store(messages: [message])
+
+        let messaging = DefaultNetworkProtectionRemoteMessaging(
+            messageRequest: request,
+            messageStorage: storage,
+            waitlistStorage: waitlistStorage,
+            waitlistActivationDateStore: activationDateStorage,
+            networkProtectionVisibility: visibility,
+            minimumRefreshInterval: 0,
+            userDefaults: defaults
+        )
+
+        let presentableMessages = messaging.presentableRemoteMessages()
+        XCTAssertEqual(presentableMessages, [message])
+    }
+
+    private func mockMessage(id: String,
+                             daysSinceNetworkProtectionEnabled: Int = 0,
+                             requiresNetPUsage: Bool = true,
+                             requiresNetPAccess: Bool = true) -> NetworkProtectionRemoteMessage {
         let remoteMessageJSON = """
         {
             "id": "\(id)",
@@ -227,8 +292,8 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             "cardTitle": "Title",
             "cardDescription": "Description",
             "surveyURL": "https://duckduckgo.com/",
-            "requiresNetworkProtectionUsage": true,
-            "requiresNetworkProtectionAccess": true,
+            "requiresNetworkProtectionUsage": \(String(describing: requiresNetPUsage)),
+            "requiresNetworkProtectionAccess": \(String(describing: requiresNetPAccess)),
             "action": {
                 "actionTitle": "Action"
             }
