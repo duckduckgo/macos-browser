@@ -65,6 +65,8 @@ extension Notification.Name {
 
     static let networkProtectionWaitlistAccessChanged = Notification.Name(rawValue: "networkProtectionWaitlistAccessChanged")
     static let dataBrokerProtectionWaitlistAccessChanged = Notification.Name(rawValue: "dataBrokerProtectionWaitlistAccessChanged")
+    static let dataBrokerProtectionUserPressedOnGetStartedOnWaitlist = Notification.Name(rawValue: "dataBrokerProtectionUserPressedOnGetStartedOnWaitlist")
+
 }
 
 extension Waitlist {

@@ -72,6 +72,14 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
 
 struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControllerPresenter {
 
+    static func shouldPresentWaitlist() -> Bool {
+        let waitlist = DataBrokerProtectionWaitlist()
+
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
+
+        return !(waitlist.waitlistStorage.isInvited && accepted)
+    }
+
     @MainActor
     static func show(completion: (() -> Void)? = nil) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {

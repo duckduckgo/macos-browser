@@ -6174,6 +6174,8 @@
 			children = (
 				7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */,
 				4B6785432AA8DE1F008A5004 /* NetworkProtectionFeatureDisabler.swift */,
+				31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */,
+				31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */,
 				4B9DB0072A983B23000927DB /* Waitlist.swift */,
 				4B9DB0082A983B23000927DB /* Networking */,
 				4B9DB00B2A983B24000927DB /* Models */,
@@ -6197,8 +6199,6 @@
 			isa = PBXGroup;
 			children = (
 				4B9DB00C2A983B24000927DB /* WaitlistViewModel.swift */,
-				31F2D1FE2AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift */,
-				31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";

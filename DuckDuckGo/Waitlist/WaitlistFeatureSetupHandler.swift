@@ -41,7 +41,8 @@ struct NetworkProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler
 
 struct DataBrokerProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
     func confirmFeature() {
-       print("Confirm DBP list")
+        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
+        NotificationCenter.default.post(name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist, object: nil)
     }
 }
 
