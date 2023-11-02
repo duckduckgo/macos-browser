@@ -389,17 +389,27 @@ extension HomePage.Models {
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
-            if let surveyURL = remoteMessage.presentableSurveyURL() {
-                let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
-                Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
-            } else {
+            guard let actionType = remoteMessage.action.actionType else {
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                refreshFeaturesMatrix()
+                return
             }
 
-            // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
-            networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
-            refreshFeaturesMatrix()
+            switch actionType {
+            case .openNetworkProtection:
+                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+            case .openSurveyURL, .openURL:
+                if let surveyURL = remoteMessage.presentableSurveyURL() {
+                    let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
+                    tabCollectionViewModel.append(tab: tab)
+                    Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+
+                    // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
+                    networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                    refreshFeaturesMatrix()
+                }
+            }
         }
     }
 

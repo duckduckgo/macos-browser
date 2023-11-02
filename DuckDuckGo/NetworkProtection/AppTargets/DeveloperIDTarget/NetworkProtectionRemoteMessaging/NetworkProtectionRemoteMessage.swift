@@ -61,7 +61,7 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
         hardwareModel: String? = HardwareModel.model
     ) -> URL? {
         // First check whether the action type dictates that the URL should not have survey parameters appended
-        if let actionType = action.actionType, actionType == .openURL, let url = action.actionTitle.url {
+        if let actionType = action.actionType, actionType == .openURL, let urlString = action.actionURL, let url = URL(string: urlString) {
             return url
         }
 
