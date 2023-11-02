@@ -45,9 +45,10 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
     @IBOutlet weak var homeButton: MouseOverButton!
+    @IBOutlet weak var homeButtonSeparator: NSBox!
     @IBOutlet weak var downloadsButton: MouseOverButton!
     @IBOutlet weak var networkProtectionButton: MouseOverButton!
-    @IBOutlet weak var navigationButtons: NSView!
+    @IBOutlet weak var navigationButtons: NSStackView!
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
@@ -95,6 +96,11 @@ final class NavigationBarViewController: NSViewController {
     private var downloadsCancellables = Set<AnyCancellable>()
     private var networkProtectionCancellable: AnyCancellable?
     private var networkProtectionInterruptionCancellable: AnyCancellable?
+
+    @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
+    static private var homeButtonPosition: HomeButtonPosition
+    static private let homeButtonTag = 3
+    static private let homeButtonLeftPosition = 0
 
 #if NETWORK_PROTECTION
     private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
@@ -183,6 +189,7 @@ final class NavigationBarViewController: NSViewController {
             refreshOrStopButton.isHidden = true
             optionsButton.isHidden = true
             homeButton.isHidden = true
+            homeButtonSeparator.isHidden = true
             addressBarTopConstraint.constant = 0
             addressBarBottomConstraint.constant = 0
             addressBarLeftToNavButtonsConstraint.isActive = false
@@ -619,15 +626,26 @@ final class NavigationBarViewController: NSViewController {
     private func updateHomeButton() {
         let menu = NSMenu()
         let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
-        menu.addItem(withTitle: title, action: #selector(toggleHomeButtonPinning), keyEquivalent: "")
 
         homeButton.menu = menu
         homeButton.toolTip = UserText.homeButtonTooltip
 
         if LocalPinningManager.shared.isPinned(.homeButton) {
             homeButton.isHidden = false
+
+            if let homeButtonView = navigationButtons.arrangedSubviews.first(where: { $0.tag == Self.homeButtonTag }) {
+                navigationButtons.removeArrangedSubview(homeButtonView)
+                if Self.homeButtonPosition == .left {
+                    navigationButtons.insertArrangedSubview(homeButtonView, at: Self.homeButtonLeftPosition)
+                    homeButtonSeparator.isHidden = false
+                } else {
+                    navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
+                    homeButtonSeparator.isHidden = true
+                }
+            }
         } else {
             homeButton.isHidden = true
+            homeButtonSeparator.isHidden = true
         }
     }
 
@@ -794,8 +812,7 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let homeTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
-        menu.addItem(withTitle: homeTitle, action: #selector(toggleHomeButtonPinning), keyEquivalent: "Y")
+        HomeButtonMenuFactory.addToMenu(menu)
 
         let autofillTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         menu.addItem(withTitle: autofillTitle, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "A")
@@ -834,17 +851,6 @@ extension NavigationBarViewController: NSMenuDelegate {
     @objc
     private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
-    }
-
-    @objc
-    private func toggleHomeButtonPinning(_ sender: NSMenuItem) {
-        LocalPinningManager.shared.togglePinning(for: .homeButton)
-        if LocalPinningManager.shared.isPinned(.homeButton) {
-            Pixel.fire(.enableHomeButton)
-        } else {
-            Pixel.fire(.disableHomeButton)
-        }
-
     }
 
     // MARK: - Network Protection

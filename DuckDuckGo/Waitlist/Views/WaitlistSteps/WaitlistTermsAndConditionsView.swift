@@ -30,7 +30,7 @@ protocol WaitlistTermsAndConditionsViewData {
 struct WaitlistTermsAndConditionsView<Content: View>: View {
     let viewData: WaitlistTermsAndConditionsViewData
     let content: Content
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     init(viewData: WaitlistTermsAndConditionsViewData, @ViewBuilder content: () -> Content) {
         self.viewData = viewData

@@ -34,7 +34,7 @@ protocol JoinedWaitlistViewData {
 
 struct JoinedWaitlistView: View {
     let viewData: JoinedWaitlistViewData
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     let notificationsAllowed: Bool
 

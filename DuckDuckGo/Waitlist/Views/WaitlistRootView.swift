@@ -21,7 +21,7 @@
 import SwiftUI
 
 struct WaitlistRootView: View {
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         Group {

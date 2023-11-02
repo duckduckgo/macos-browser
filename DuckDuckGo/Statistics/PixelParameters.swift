@@ -111,9 +111,9 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
-             .enableHomeButton,
-             .disableHomeButton,
-             .setnewHomePage:
+             .homeButtonLeft,
+             .homeButtonRight,
+             .homeButtonHidden:
             return nil
         }
     }
