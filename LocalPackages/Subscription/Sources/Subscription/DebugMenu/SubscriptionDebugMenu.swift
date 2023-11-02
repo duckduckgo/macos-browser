@@ -61,7 +61,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         if #available(macOS 12.0, *) {
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
         }
-
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Error message #1", action: #selector(testError1), target: self))
+        menu.addItem(NSMenuItem(title: "Error message #2", action: #selector(testError2), target: self))
         return menu
     }()
 
@@ -126,6 +128,29 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func restorePurchases(_ sender: Any?) {
         accountManager.signInByRestoringPastPurchases()
+    }
+
+    @objc
+    func testError1(_ sender: Any?) {
+        Task { @MainActor in
+            let alert = NSAlert.init()
+            alert.messageText = "Something Went Wrong"
+            alert.informativeText = "The App Store was not able to process your purchase. Please try again later."
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+        }
+    }
+
+    @objc
+    func testError2(_ sender: Any?) {
+        Task { @MainActor in
+            let alert = NSAlert.init()
+            alert.messageText = "Subscription Not Found"
+            alert.informativeText = "The subscription associated with this Apple ID is no longer active."
+            alert.addButton(withTitle: "View Plans")
+            alert.addButton(withTitle: "Cancel")
+            alert.runModal()
+        }
     }
 
     @IBAction func showPurchaseView(_ sender: Any?) {
