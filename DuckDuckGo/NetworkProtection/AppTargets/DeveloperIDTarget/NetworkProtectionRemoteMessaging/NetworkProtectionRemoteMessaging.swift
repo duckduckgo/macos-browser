@@ -19,6 +19,8 @@
 import Foundation
 import Networking
 
+#if NETWORK_PROTECTION
+
 protocol NetworkProtectionRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
@@ -68,7 +70,6 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-#if NETWORK_PROTECTION
 
         if let lastRefreshDate = lastRefreshDate(), lastRefreshDate.addingTimeInterval(minimumRefreshInterval) > Date() {
             fetchCompletion?()
@@ -101,12 +102,10 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
         }
 
-#endif
     }
 
     /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
-#if NETWORK_PROTECTION
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
         let possibleMessages = messageStorage.storedMessages()
 
@@ -145,15 +144,10 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         }
 
         return filteredMessages
-#else
-        return []
-#endif
     }
 
     func dismiss(message: NetworkProtectionRemoteMessage) {
-#if NETWORK_PROTECTION
         messageStorage.dismissRemoteMessage(with: message.id)
-#endif
     }
 
     func resetLastRefreshTimestamp() {
@@ -181,3 +175,5 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
 }
+
+#endif
