@@ -26,25 +26,22 @@ struct SyncTabs: View {
     @EnvironmentObject var model: HomePage.Models.SyncTabsModel
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("Tabs from other devices")
-            List {
-                ForEach(model.deviceTabs) { deviceTabs in
-                    Section(header: Text(deviceTabs.deviceId)) {
-                        ForEach(deviceTabs.deviceTabs) { tabInfo in
-                            Button {
-                                model.open(tabInfo.url)
-                            } label: {
-                                Text(tabInfo.title.isEmpty ? tabInfo.url.absoluteString : tabInfo.title)
-                                    .lineLimit(1)
-                            }
-                            .buttonStyle(.plain)
+        List {
+            ForEach(model.deviceTabs) { deviceTabs in
+                Section(header: Text(deviceTabs.deviceId)) {
+                    ForEach(deviceTabs.deviceTabs) { tabInfo in
+                        Button {
+                            model.open(tabInfo.url)
+                        } label: {
+                            Text(tabInfo.title.isEmpty ? tabInfo.url.absoluteString : tabInfo.title)
+                                .lineLimit(1)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
-            .frame(minHeight: 200)
         }
+        .frame(minHeight: 200)
     }
 }
 

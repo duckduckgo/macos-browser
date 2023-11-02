@@ -67,6 +67,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
+    let tabDidFinishLoadingSubject = PassthroughSubject<Void, Never>()
+    private var tabDidFinishLoadingSyncTriggerCancellable: AnyCancellable?
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
@@ -230,7 +232,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         guard didFinishLaunching else { return }
 
         syncService?.initializeIfNeeded()
-        syncService?.scheduler.notifyAppLifecycleEvent()
+        syncService?.scheduler.notifyDataChanged()
 
 #if NETWORK_PROTECTION
         NetworkProtectionWaitlist().fetchNetworkProtectionInviteCodeIfAvailable { _ in
@@ -327,6 +329,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
+
+        tabDidFinishLoadingSyncTriggerCancellable = tabDidFinishLoadingSubject
+            .throttle(for: .seconds(2), scheduler: DispatchQueue.main, latest: true)
+            .sink { [syncService] _ in
+                syncService.scheduler.requestSyncImmediately()
+            }
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {

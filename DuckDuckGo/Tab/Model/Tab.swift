@@ -1112,6 +1112,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+        NSApp.delegateTyped.tabDidFinishLoadingSubject.send()
     }
 
     @MainActor

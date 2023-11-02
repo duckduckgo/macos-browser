@@ -60,9 +60,9 @@ extension HomePage.Models {
                 let devices = try await NSApp.delegateTyped.syncService?.fetchDevices()
                 self.deviceTabs = deviceTabs
                     .filter { !$0.deviceTabs.isEmpty }
-                    .map { object in
+                    .compactMap { object in
                         guard let deviceName = devices?.first(where: { $0.id == object.deviceId })?.name else {
-                            return object
+                            return nil
                         }
                         return DeviceTabsInfo(deviceId: deviceName, deviceTabs: object.deviceTabs)
                     }
