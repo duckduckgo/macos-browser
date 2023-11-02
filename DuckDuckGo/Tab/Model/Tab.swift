@@ -236,6 +236,7 @@ protocol NewWindowPolicyDecisionMaker {
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      title: String? = nil,
                      favicon: NSImage? = nil,
+                     snapshot: NSImage? = nil,
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
@@ -276,6 +277,7 @@ protocol NewWindowPolicyDecisionMaker {
                   internalUserDecider: internalUserDecider,
                   title: title,
                   favicon: favicon,
+                  snapshot: snapshot,
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
@@ -307,6 +309,7 @@ protocol NewWindowPolicyDecisionMaker {
          internalUserDecider: InternalUserDecider?,
          title: String?,
          favicon: NSImage?,
+         snapshot: NSImage?,
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
@@ -325,6 +328,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.internalUserDecider = internalUserDecider
         self.title = title
         self.favicon = favicon
+        self.snapshot = snapshot
         self.parentTab = parentTab
         self.burnerMode = burnerMode
         self._canBeClosedWithBack = canBeClosedWithBack
@@ -521,6 +525,7 @@ protocol NewWindowPolicyDecisionMaker {
             }
             handleFavicon(oldValue: oldValue)
             invalidateInteractionStateData()
+            clearSnapshot()
             if navigationDelegate.currentNavigation == nil {
                 updateCanGoBackForward(withCurrentNavigation: nil)
             }
@@ -974,6 +979,18 @@ protocol NewWindowPolicyDecisionMaker {
             // If the domain matches the previous value, just keep the same favicon
             favicon = nil
         }
+    }
+
+    // MARK: - Webview Snapshot
+
+    private(set) var snapshot: NSImage?
+
+    func setSnapshot(_ snapshot: NSImage) {
+        self.snapshot = snapshot
+    }
+
+    func clearSnapshot() {
+        snapshot = nil
     }
 
 }

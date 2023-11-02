@@ -23,6 +23,8 @@ final class TabPreviewViewController: NSViewController {
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var urlTextField: NSTextField!
     @IBOutlet weak var faviconImageView: NSImageView!
+    @IBOutlet weak var screenshotImageView: NSImageView!
+    @IBOutlet weak var screenshotImageViewHeightConstraint: NSLayoutConstraint!
 
 }
 
@@ -39,7 +41,7 @@ extension TabPreviewViewController {
         setupGradients()
     }
 
-    func display(tabViewModel: TabViewModel) {
+    func display(tabViewModel: TabViewModel, isSelected: Bool) {
         titleTextField.stringValue = tabViewModel.title
 
         // Search queries can match valid URL formats, so prevent creating a URL object from the address bar string if on a search page.
@@ -51,6 +53,14 @@ extension TabPreviewViewController {
             urlTextField.stringValue = tabViewModel.addressBarString
         }
         faviconImageView.image = tabViewModel.favicon
+
+        if isSelected {
+            screenshotImageView.image = nil
+            screenshotImageViewHeightConstraint.constant = 0
+        } else {
+            screenshotImageView.image = tabViewModel.tab.snapshot
+            screenshotImageViewHeightConstraint.constant = getHeight(for: tabViewModel.tab.snapshot)
+        }
     }
 
     private func setupGradients() {
@@ -60,6 +70,15 @@ extension TabPreviewViewController {
         urlTextField.wantsLayer = true
         urlTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
                               trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
+    }
+
+    private func getHeight(for image: NSImage?) -> CGFloat {
+        guard let image else { return 0 }
+
+        let aspectRatio = image.size.width / image.size.height
+        let width = TabPreviewWindowController.Size.width.rawValue
+        let height = width / aspectRatio
+        return height
     }
 
 }

@@ -586,7 +586,9 @@ final class TabBarViewController: NSViewController {
         from xPosition: CGFloat,
         after interval: TabPreviewWindowController.TimerInterval
     ) {
-        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel)
+        let isSelected = tabCollectionViewModel.selectedTabViewModel === tabViewModel
+        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel,
+                                                                    isSelected: isSelected)
 
         guard let window = view.window else {
             os_log("TabBarViewController: Showing tab preview window failed", type: .error)
@@ -984,7 +986,8 @@ extension TabBarViewController: TabBarViewItemDelegate {
                 showTabPreview(for: tabBarViewItem)
             }
         } else {
-            tabPreviewWindowController.scheduleHiding()
+//            tabPreviewWindowController.scheduleHiding()
+            tabPreviewWindowController.hide()
         }
     }
 

@@ -21,14 +21,18 @@ import Common
 
 final class TabPreviewWindowController: NSWindowController {
 
+    enum Size: CGFloat {
+        case width = 280
+    }
+
     enum VerticalSpace: CGFloat {
         case padding = 2
     }
 
     enum TimerInterval: TimeInterval {
-        case short = 0.66
-        case medium = 1
-        case long = 3
+        case short = 0.11
+        case medium = 0.12
+        case long = 0.13
     }
 
     private var showingTimer: Timer?
@@ -57,7 +61,7 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     func scheduleShowing(parentWindow: NSWindow, timerInterval: TimerInterval, topLeftPointInWindow: CGPoint) {
-        if isHiding { return }
+//        if isHiding { return }
 
         guard let childWindows = parentWindow.childWindows,
               let tabPreviewWindow = self.window else {
@@ -65,38 +69,39 @@ final class TabPreviewWindowController: NSWindowController {
             return
         }
 
-        hidingTimer?.invalidate()
+//        hidingTimer?.invalidate()
 
         if childWindows.contains(tabPreviewWindow) {
             layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
             return
         }
 
-        showingTimer?.invalidate()
-        showingTimer = Timer.scheduledTimer(withTimeInterval: timerInterval.rawValue, repeats: false, block: { [weak self] _ in
+//        showingTimer?.invalidate()
+//        showingTimer = Timer.scheduledTimer(withTimeInterval: timerInterval.rawValue, repeats: false, block: { [weak self] _ in
             parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
-            self?.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
-        })
+            self.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
+//        })
     }
 
-    func scheduleHiding() {
-        showingTimer?.invalidate()
-
-        guard let window = window else {
-            os_log("TabPreviewWindowController: Window not available", type: .error)
-            return
-        }
-
-        if !window.isVisible || hidingTimer?.isValid ?? false { return }
-
-        hidingTimer = Timer.scheduledTimer(withTimeInterval: 1/4, repeats: false, block: { [weak self] _ in
-            self?.hide()
-        })
-    }
+//    func scheduleHiding() {
+//        hide()
+//        showingTimer?.invalidate()
+//
+//        guard let window = window else {
+//            os_log("TabPreviewWindowController: Window not available", type: .error)
+//            return
+//        }
+//
+//        if !window.isVisible || hidingTimer?.isValid ?? false { return }
+//
+//        hidingTimer = Timer.scheduledTimer(withTimeInterval: 1/4, repeats: false, block: { [weak self] _ in
+//            self?.hide()
+//        })
+//    }
 
     func hide() {
-        showingTimer?.invalidate()
-        hidingTimer?.invalidate()
+//        showingTimer?.invalidate()
+//        hidingTimer?.invalidate()
 
         guard let window = window, window.isVisible else {
             return
@@ -109,9 +114,9 @@ final class TabPreviewWindowController: NSWindowController {
         isHiding = true
         parentWindow.removeChildWindow(window)
         (window).orderOut(nil)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1/4) { [weak self] in
-            if self?.isHiding ?? false { self?.isHiding = false }
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1/4) { [weak self] in
+//            if self?.isHiding ?? false { self?.isHiding = false }
+//        }
     }
 
     private func layout(topLeftPoint: NSPoint) {

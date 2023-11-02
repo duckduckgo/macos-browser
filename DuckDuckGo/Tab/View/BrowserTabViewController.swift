@@ -195,6 +195,7 @@ final class BrowserTabViewController: NSViewController {
             .sink { [weak self] selectedTabViewModel in
 
                 guard let self = self else { return }
+                self.makeWebViewSnapshot(forPinnedTab: false)
                 self.tabViewModel = selectedTabViewModel
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
@@ -987,29 +988,35 @@ extension BrowserTabViewController {
 
     private func handleTabSelectedInKeyWindow(_ tabIndex: TabIndex) {
         if tabIndex.isPinnedTab, tabIndex == tabCollectionViewModel.selectionIndex, webViewSnapshot == nil {
-            makeWebViewSnapshot()
+            makeWebViewSnapshot(forPinnedTab: true)
         } else {
             hideWebViewSnapshotIfNeeded()
         }
     }
 
-    private func makeWebViewSnapshot() {
+    private func makeWebViewSnapshot(forPinnedTab: Bool) {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard let webView = webView else {
-            os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+        guard let webView, let tabViewModel, tabViewModel.tab.webView == webView else {
             return
         }
 
         let config = WKSnapshotConfiguration()
         config.afterScreenUpdates = false
+        if !forPinnedTab {
+            config.snapshotWidth = NSNumber(floatLiteral: TabPreviewWindowController.Size.width.rawValue)
+        }
 
         webView.takeSnapshot(with: config) { [weak self] image, _ in
             guard let image = image else {
                 os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
                 return
             }
-            self?.showWebViewSnapshot(with: image)
+            if forPinnedTab {
+                self?.showWebViewSnapshot(with: image)
+            } else {
+                tabViewModel.tab.setSnapshot(image)
+            }
         }
     }
 

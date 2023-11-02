@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="GTz-0g-VxF">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="GTz-0g-VxF">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10,7 +9,7 @@
         <!--Window Controller-->
         <scene sceneID="cJZ-12-S32">
             <objects>
-                <windowController storyboardIdentifier="TabPreviewWindowController" id="GTz-0g-VxF" customClass="TabPreviewWindowController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <windowController storyboardIdentifier="TabPreviewWindowController" id="GTz-0g-VxF" customClass="TabPreviewWindowController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="Z5X-4B-XL2">
                         <windowStyleMask key="styleMask" titled="YES" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -35,23 +34,18 @@
         <!--Tab Preview View Controller-->
         <scene sceneID="1HA-hR-h3O">
             <objects>
-                <viewController id="NbB-oo-Ow8" customClass="TabPreviewViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="bqc-XW-5Ht">
+                <viewController id="NbB-oo-Ow8" customClass="TabPreviewViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" misplaced="YES" id="bqc-XW-5Ht">
                         <rect key="frame" x="0.0" y="0.0" width="280" height="58"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <visualEffectView blendingMode="behindWindow" material="sheet" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="Sph-39-HMA">
                                 <rect key="frame" x="0.0" y="0.0" width="280" height="58"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="58" id="0H2-N3-xyB"/>
+                                </constraints>
                             </visualEffectView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="Eaa-5j-mWT" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="280" height="58"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="TabPreviewBackgroundColor"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lWf-Z2-vYW">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lWf-Z2-vYW">
                                 <rect key="frame" x="14" y="31" width="260" height="17"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="256" id="tMT-xB-AW4"/>
@@ -62,7 +56,7 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jLi-sz-Wfx">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jLi-sz-Wfx">
                                 <rect key="frame" x="36" y="12" width="238" height="15"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="9YQ-IO-IWw">
                                     <font key="font" metaFont="cellTitle"/>
@@ -78,41 +72,46 @@
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="dtp-zW-aN9"/>
                             </imageView>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="K3E-VN-I4d">
+                                <rect key="frame" x="0.0" y="58" width="280" height="0.0"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" id="EEs-7i-SUi"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="CKC-CF-5gf"/>
+                            </imageView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="Eaa-5j-mWT" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" id="1Ro-62-Hmc"/>
-                            <constraint firstAttribute="trailing" secondItem="Eaa-5j-mWT" secondAttribute="trailing" id="6c7-Xz-mN3"/>
+                            <constraint firstAttribute="bottom" secondItem="BBd-BB-c2m" secondAttribute="bottom" constant="11" id="4Va-mj-PLv"/>
                             <constraint firstItem="BBd-BB-c2m" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" constant="16" id="AnE-Cs-byU"/>
-                            <constraint firstItem="lWf-Z2-vYW" firstAttribute="centerY" secondItem="bqc-XW-5Ht" secondAttribute="centerY" constant="-10.5" id="DDQ-vZ-YOf"/>
-                            <constraint firstItem="jLi-sz-Wfx" firstAttribute="centerY" secondItem="bqc-XW-5Ht" secondAttribute="centerY" constant="10" id="Htx-gu-13g"/>
-                            <constraint firstItem="Eaa-5j-mWT" firstAttribute="top" secondItem="bqc-XW-5Ht" secondAttribute="top" id="NUR-lt-eXk"/>
+                            <constraint firstAttribute="trailing" secondItem="K3E-VN-I4d" secondAttribute="trailing" id="GhA-NJ-WTR"/>
+                            <constraint firstItem="Sph-39-HMA" firstAttribute="top" secondItem="K3E-VN-I4d" secondAttribute="bottom" id="Qgi-Hz-OAE"/>
                             <constraint firstAttribute="trailing" secondItem="Sph-39-HMA" secondAttribute="trailing" id="WH4-h1-r0Y"/>
-                            <constraint firstItem="Sph-39-HMA" firstAttribute="top" secondItem="bqc-XW-5Ht" secondAttribute="top" id="Xyg-Ts-mLM"/>
+                            <constraint firstItem="K3E-VN-I4d" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" id="Xyt-z8-yFB"/>
+                            <constraint firstItem="BBd-BB-c2m" firstAttribute="top" secondItem="lWf-Z2-vYW" secondAttribute="bottom" constant="4" id="aXV-mK-GKe"/>
                             <constraint firstItem="lWf-Z2-vYW" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" constant="16" id="byj-C9-Ptu"/>
                             <constraint firstItem="Sph-39-HMA" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" id="d2F-1I-J5H"/>
                             <constraint firstAttribute="bottom" secondItem="Sph-39-HMA" secondAttribute="bottom" id="ge2-Fs-d8R"/>
                             <constraint firstItem="jLi-sz-Wfx" firstAttribute="leading" secondItem="BBd-BB-c2m" secondAttribute="trailing" constant="6" id="gea-lD-P9g"/>
-                            <constraint firstAttribute="bottom" secondItem="Eaa-5j-mWT" secondAttribute="bottom" id="qHy-Gh-Nml"/>
+                            <constraint firstAttribute="bottom" secondItem="jLi-sz-Wfx" secondAttribute="bottom" constant="12" id="kXC-Fq-Uah"/>
+                            <constraint firstItem="K3E-VN-I4d" firstAttribute="top" secondItem="bqc-XW-5Ht" secondAttribute="top" id="qkB-Om-Llg"/>
                             <constraint firstAttribute="trailing" secondItem="jLi-sz-Wfx" secondAttribute="trailing" constant="8" id="ulB-9g-zeK"/>
                             <constraint firstAttribute="trailing" secondItem="lWf-Z2-vYW" secondAttribute="trailing" constant="8" id="vRu-jU-Vtz"/>
-                            <constraint firstItem="BBd-BB-c2m" firstAttribute="centerY" secondItem="bqc-XW-5Ht" secondAttribute="centerY" constant="10" id="xJL-X3-jpf"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="faviconImageView" destination="BBd-BB-c2m" id="WBe-FS-tkE"/>
+                        <outlet property="screenshotImageView" destination="K3E-VN-I4d" id="TOZ-BA-GZr"/>
+                        <outlet property="screenshotImageViewHeightConstraint" destination="EEs-7i-SUi" id="tZj-Dj-YMw"/>
                         <outlet property="titleTextField" destination="lWf-Z2-vYW" id="kQC-OK-4cw"/>
                         <outlet property="urlTextField" destination="jLi-sz-Wfx" id="aEV-ev-OCG"/>
                     </connections>
                 </viewController>
                 <customObject id="YuT-Mv-9zJ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-423" y="279"/>
+            <point key="canvasLocation" x="-423" y="419.5"/>
         </scene>
     </scenes>
     <resources>
-        <namedColor name="TabPreviewBackgroundColor">
-            <color red="0.97254901960784312" green="0.97254901960784312" blue="0.97254901960784312" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <namedColor name="TabPreviewSecondaryTintColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="0.60000002384185791" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
