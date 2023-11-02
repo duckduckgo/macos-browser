@@ -19,6 +19,18 @@
 import Foundation
 import Common
 
+struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
+    enum Action: String, Codable {
+        case openNetworkProtection
+        case openSurveyURL
+        case openURL
+    }
+
+    let actionTitle: String
+    let actionType: Action?
+    let actionURL: String?
+}
+
 struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
 
     enum SurveyURLParameters: String, CaseIterable {
@@ -34,9 +46,11 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
     let id: String
     let cardTitle: String
     let cardDescription: String
-    let cardAction: String
+    /// If this is set, the message won't be displayed if NetP hasn't been used, even if the usage and access booleans are false
     let daysSinceNetworkProtectionEnabled: Int?
-    private let surveyURL: String?
+    let requiresNetworkProtectionUsage: Bool
+    let requiresNetworkProtectionAccess: Bool
+    let action: NetworkProtectionRemoteMessageAction
 
     // swiftlint:disable:next cyclomatic_complexity
     func presentableSurveyURL(
@@ -46,7 +60,7 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model
     ) -> URL? {
-        guard let surveyURL else {
+        guard let surveyURL = action.actionURL else {
             return nil
         }
 

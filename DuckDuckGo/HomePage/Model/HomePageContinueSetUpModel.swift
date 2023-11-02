@@ -481,7 +481,7 @@ extension HomePage.Models {
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Action
             case .networkProtectionRemoteMessage(let message):
-                return message.cardAction
+                return message.action.actionTitle
             }
         }
 
