@@ -82,6 +82,8 @@ public struct UserDefaultsWrapper<T> {
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
+        case homeButtonPosition = "preferences.appeareance.home-button-position"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
