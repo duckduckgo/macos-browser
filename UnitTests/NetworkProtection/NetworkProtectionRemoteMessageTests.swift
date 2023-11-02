@@ -104,7 +104,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
             "cardTitle": "Title",
             "cardDescription": "Description",
             "requiresNetworkProtectionAccess": true,
-            "requiresNetworkProtectionUsage": false,
+            "requiresNetworkProtectionUsage": true,
             "action": {
                 "actionTitle": "Action",
                 "actionURL": "https://duckduckgo.com/"
@@ -113,7 +113,13 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         """
 
         let decoder = JSONDecoder()
-        let message = try! decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
+        let message: NetworkProtectionRemoteMessage
+        do {
+            message = try decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
+        } catch {
+            XCTFail("Failed to decode with error: \(error.localizedDescription)")
+            return
+        }
 
         let mockStatisticsStore = MockStatisticsStore()
         mockStatisticsStore.atb = "atb-123"

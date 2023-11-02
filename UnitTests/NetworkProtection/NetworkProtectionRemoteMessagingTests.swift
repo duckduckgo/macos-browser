@@ -226,8 +226,12 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
             "daysSinceNetworkProtectionEnabled": \(daysSinceNetworkProtectionEnabled),
             "cardTitle": "Title",
             "cardDescription": "Description",
-            "cardAction": "Action",
-            "surveyURL": "https://duckduckgo.com/"
+            "surveyURL": "https://duckduckgo.com/",
+            "requiresNetworkProtectionUsage": true,
+            "requiresNetworkProtectionAccess": true,
+            "action": {
+                "actionTitle": "Action"
+            }
         }
         """
 
