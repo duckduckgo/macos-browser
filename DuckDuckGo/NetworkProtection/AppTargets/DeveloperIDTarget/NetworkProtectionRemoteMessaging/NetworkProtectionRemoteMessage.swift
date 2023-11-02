@@ -60,7 +60,12 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model
     ) -> URL? {
-        guard let surveyURL = action.actionURL else {
+        // First check whether the action type dictates that the URL should not have survey parameters appended
+        if let actionType = action.actionType, actionType == .openURL, let url = action.actionTitle.url {
+            return url
+        }
+
+        guard let actionType = action.actionType, actionType == .openSurveyURL, let surveyURL = action.actionURL else {
             return nil
         }
 
