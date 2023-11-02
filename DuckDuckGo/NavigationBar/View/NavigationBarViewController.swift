@@ -153,7 +153,9 @@ final class NavigationBarViewController: NSViewController {
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
+#if NETWORK_PROTECTION
         listenToVPNToggleNotifications()
+#endif
         listenToPasswordManagerNotifications()
         listenToPinningManagerNotifications()
         listenToMessageNotifications()
@@ -336,6 +338,7 @@ final class NavigationBarViewController: NSViewController {
         super.mouseDown(with: event)
     }
 
+#if NETWORK_PROTECTION
     func listenToVPNToggleNotifications() {
         vpnToggleCancellable = NotificationCenter.default.publisher(for: .ToggleNetworkProtectionInMainWindow).sink { [weak self] _ in
             guard self?.view.window?.isKeyWindow == true else {
@@ -345,6 +348,7 @@ final class NavigationBarViewController: NSViewController {
             self?.toggleNetworkProtectionPopover()
         }
     }
+#endif
 
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in

@@ -389,6 +389,7 @@ extension HomePage.Models {
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
+#if NETWORK_PROTECTION
             guard let actionType = remoteMessage.action.actionType else {
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
                 networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
@@ -410,6 +411,7 @@ extension HomePage.Models {
                     refreshFeaturesMatrix()
                 }
             }
+#endif
         }
     }
 
