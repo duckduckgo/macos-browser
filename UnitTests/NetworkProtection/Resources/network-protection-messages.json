@@ -29,6 +29,7 @@
         "requiresNetworkProtectionUsage": true,
         "action": {
             "actionTitle": "Action 3",
+            "actionType": "openSurveyURL",
             "actionURL": "https://duckduckgo.com/"
         }
 

@@ -107,6 +107,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
             "requiresNetworkProtectionUsage": true,
             "action": {
                 "actionTitle": "Action",
+                "actionType": "openSurveyURL",
                 "actionURL": "https://duckduckgo.com/"
             }
         }
