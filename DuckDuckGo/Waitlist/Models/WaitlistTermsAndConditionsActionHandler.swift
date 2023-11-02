@@ -57,8 +57,7 @@ struct DataBrokerProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTerm
     var acceptedTermsAndConditions: Bool
 
     func didShow() {
-        //TODO: Fire DBP Pixel
-        print("Did show")
+        // DailyPixel.fire(pixel: .networkProtectionWaitlistTermsAndConditionsDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
     }
 
     mutating func didAccept() {
