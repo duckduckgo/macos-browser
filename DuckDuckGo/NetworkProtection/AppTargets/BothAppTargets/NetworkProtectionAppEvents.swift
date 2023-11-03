@@ -21,6 +21,7 @@ import Common
 import Foundation
 import LoginItems
 import NetworkProtection
+import NetworkProtectionUI
 import NetworkProtectionIPC
 import NetworkExtension
 
@@ -178,6 +179,8 @@ final class NetworkProtectionAppEvents {
         guard let tunnel else {
             return
         }
+
+        UserDefaults.shared.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 
         try? await tunnel.removeFromPreferences()
     }
