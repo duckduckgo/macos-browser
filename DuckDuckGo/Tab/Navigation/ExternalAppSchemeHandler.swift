@@ -30,7 +30,12 @@ final class ExternalAppSchemeHandler {
     private let workspace: Workspace
     private let permissionModel: PermissionModelProtocol
 
-    private var externalSchemeOpenedPerPageLoad = false
+    // Tab will be closed when opening an external app if:
+    // - Currently loaded page is the first navigation of the Tab (back history is empty) or there‘s no page loaded
+    // - The page is open in a new tab (link clicked on another Tab or NSApp opened a URL) and not triggered by a user entering a URL in a new Tab
+    // - External Scheme Navigation Action was not initiated by user (URL is not user-entered)
+    // The flag is true by default and reset when non-initial navigation is performed
+    private var shouldCloseTabOnExternalAppOpen = true
 
     private var lastUserEnteredValue: String?
     private var cancellable: AnyCancellable?
@@ -40,9 +45,7 @@ final class ExternalAppSchemeHandler {
         self.permissionModel = permissionModel
 
         cancellable = contentPublisher.sink { [weak self] tabContent in
-            if case .url(_, credential: .none, userEntered: .some(let userEnteredValue)) = tabContent {
-                self?.lastUserEnteredValue = userEnteredValue
-            }
+            self?.lastUserEnteredValue = if case .url(_, credential: .none, userEntered: .some(let userEnteredValue)) = tabContent { userEnteredValue } else { nil }
         }
     }
 
@@ -53,7 +56,27 @@ extension ExternalAppSchemeHandler: NavigationResponder {
     @MainActor
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let externalUrl = navigationAction.url
-        guard externalUrl.isExternalSchemeLink, let scheme = externalUrl.scheme else { return .next }
+        // only proceed with non-external-scheme navigations
+        guard externalUrl.isExternalSchemeLink,
+              let scheme = externalUrl.scheme else {
+            // is it the first navigation?
+            if navigationAction.fromHistoryItemIdentity != nil {
+                // don‘t close tab when opening an app for non-initial navigations
+                shouldCloseTabOnExternalAppOpen = false
+            }
+            // proceed with regular navigation
+            return .next
+        }
+
+        // don‘t close tab for user-entered URLs
+        if navigationAction.isUserEnteredUrl {
+            shouldCloseTabOnExternalAppOpen = false
+        }
+        // only close tab when "Always Open" is on (so the callback would be called synchronously)
+        defer {
+            shouldCloseTabOnExternalAppOpen = false
+        }
+
         // prevent opening twice for session restoration/tab reopening requests
         guard navigationAction.request.cachePolicy != .returnCacheDataElseLoad else {
             return .cancel
@@ -88,17 +111,18 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         let permissionType = PermissionType.externalScheme(scheme: scheme)
         // use domain from the url for user-entered app schemes, otherwise use current website domain
         let domain = navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host
-        permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace] isGranted in
+        permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace, weak self] isGranted in
             if isGranted {
                 workspace.open(externalUrl)
+
+                // if "Always allow" is set and this is the only navigation in the tab: close the tab
+                if self?.shouldCloseTabOnExternalAppOpen == true, let webView = navigationAction.targetFrame?.webView {
+                    webView.close()
+                }
             }
         }
 
         return .cancel
-    }
-
-    func willStart(_ navigation: Navigation) {
-        externalSchemeOpenedPerPageLoad = false
     }
 
     func navigationDidFinish(_ navigation: Navigation) {
