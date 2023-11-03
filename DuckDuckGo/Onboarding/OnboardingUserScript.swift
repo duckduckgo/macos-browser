@@ -45,6 +45,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
         case requestSetAsDefault
         case dismiss
         case dismissToSettings
+        case dismissToAddressBar
     }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
@@ -61,6 +62,10 @@ final class OnboardingUserScript: NSObject, Subfeature {
             return requestImport
         case .requestSetAsDefault:
             return requestSetAsDefault
+        case .setBlockCookiePopups:
+            return setBlockCookiePopups
+        case .dismissToAddressBar:
+            return dismissToAddressBar
         default:
             print(methodName)
             //            assertionFailure("PrivacyConfigurationEditUserScript: Failed to parse User Script message: \(methodName)")
@@ -68,26 +73,59 @@ final class OnboardingUserScript: NSObject, Subfeature {
         }
     }
 
+    struct Params: Codable {
+        let value: Bool
+    }
+
+    func parse(params: Any) -> Params? {
+        guard let data = try? JSONSerialization.data(withJSONObject: params),
+                let result = try? JSONDecoder().decode(Params.self, from: data) else {
+            return nil
+        }
+        return result
+    }
+
     @MainActor
     func setDuckPlayer(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let params = parse(params: params)
+        guard params?.value == true else { return nil }
+
         DuckPlayerPreferences.shared.duckPlayerMode = .enabled
         return nil
     }
 
     @MainActor
     func setBookmarksBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let params = parse(params: params)
+        guard params?.value == true else { return nil }
+
         AppearancePreferences.shared.showBookmarksBar = true
         return nil
     }
 
     @MainActor
     func setSessionRestore(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let params = parse(params: params)
+        guard params?.value == true else { return nil }
+
         StartupPreferences.shared.restorePreviousSession = true
         return nil
     }
 
     @MainActor
+    func setBlockCookiePopups(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let params = parse(params: params)
+        guard params?.value == true else { return nil }
+
+        PrivacySecurityPreferences.shared.autoconsentEnabled = true
+        return nil
+    }
+
+    @MainActor
     func setShowHome(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let params = parse(params: params)
+        guard params?.value == true else { return nil }
+
         StartupPreferences.shared.homeButtonPosition = .left
         StartupPreferences.shared.updateHomeButton()
         return nil
@@ -114,7 +152,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
             return Response()
         }
 
-        let response: Response = try await withCheckedThrowingContinuation { continuation in
+        let response: Response = try await withCheckedThrowingContinuation { continuation in    
             defaultBrowserPreferences.becomeDefault { _ in
                 _ = defaultBrowserPreferences
                 let response = Response()
@@ -122,6 +160,14 @@ final class OnboardingUserScript: NSObject, Subfeature {
             }
         }
         return response
+    }
+
+    @MainActor
+    func dismissToAddressBar(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return nil }
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.stringValue = ""
+        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
+        return nil
     }
 
 }

@@ -37,6 +37,11 @@ final class OnboardingSchemeHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, stop urlSchemeTask: WKURLSchemeTask) {}
 
     func response(for url: URL) -> (URLResponse, Data)? {
+        if url.absoluteString != "onboarding://" {
+            var directoryURL = URL(fileURLWithPath: "/pages/onboarding/assets")
+        } else {
+            var directoryURL = URL(fileURLWithPath: "/pages/onboarding")
+        }
         var fileName = "index"
         var fileExtension = "html"
         var directoryURL = URL(fileURLWithPath: "/pages/onboarding")
