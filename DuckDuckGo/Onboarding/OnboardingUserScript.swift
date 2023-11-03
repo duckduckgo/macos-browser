@@ -95,25 +95,33 @@ final class OnboardingUserScript: NSObject, Subfeature {
 
     @MainActor
     func requestImport(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        DataImportViewController.show()
-        return nil
+        let response: Response = try await withCheckedThrowingContinuation { continuation in
+            DataImportViewController.show {
+                let response = Response()
+                continuation.resume(returning: response)
+            }
+        }
+        return response
+    }
+
+    struct Response: Encodable {
     }
 
     @MainActor
     func requestSetAsDefault(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let defaultBrowserPreferences = DefaultBrowserPreferences()
         if defaultBrowserPreferences.isDefault {
-            //                completion()
-            //                return
+            return Response()
         }
 
-        defaultBrowserPreferences.becomeDefault { _ in
-            _ = defaultBrowserPreferences
-            //                withAnimation {
-            //                    completion()
-            //                }
+        let response: Response = try await withCheckedThrowingContinuation { continuation in
+            defaultBrowserPreferences.becomeDefault { _ in
+                _ = defaultBrowserPreferences
+                let response = Response()
+                continuation.resume(returning: response)
+            }
         }
-        return nil
+        return response
     }
 
 }
