@@ -60,6 +60,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private(set) var favoritesDisplayMode: FavoritesDisplayMode
+    private(set) var didMigrateToFormFactorSpecificFavorites: Bool = false
 
     private let contextProvider: () -> NSManagedObjectContext
 
@@ -215,6 +216,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 if context.hasChanges {
                     try context.save(onErrorFire: .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders)
+                    didMigrateToFormFactorSpecificFavorites = true
                 }
             } catch {
                 Thread.sleep(forTimeInterval: 1)
