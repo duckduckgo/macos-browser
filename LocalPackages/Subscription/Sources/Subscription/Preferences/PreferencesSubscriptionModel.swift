@@ -18,6 +18,7 @@
 
 import Foundation
 import Account
+import Combine
 
 extension URL {
 
@@ -35,11 +36,16 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var isSignedIn: Bool = false
     var sheetModel: SubscriptionAccessModel
 
+    private let notificationCenter: NotificationCenter
+
     private let accountManager: AccountManager
     private var actionHandler: PreferencesSubscriptionActionHandlers
     private let sheetActionHandler: SubscriptionAccessActionHandlers
+    private var cancellables = Set<AnyCancellable>()
 
-    public init(accountManager: AccountManager = AccountManager(), actionHandler: PreferencesSubscriptionActionHandlers, sheetActionHandler: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManager = AccountManager(), actionHandler: PreferencesSubscriptionActionHandlers, sheetActionHandler: SubscriptionAccessActionHandlers, notificationCenter: NotificationCenter = .default) {
+
+        self.notificationCenter = notificationCenter
         self.accountManager = accountManager
         self.actionHandler = actionHandler
         self.sheetActionHandler = sheetActionHandler
@@ -48,13 +54,19 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.isSignedIn = isSignedIn
         sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
 
-        NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
-            self.updateSignInState(true)
-        }
+        notificationCenter.publisher(for: .accountDidSignIn)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateSignInState(true)
+            }
+            .store(in: &cancellables)
 
-        NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { _ in
-            self.updateSignInState(false)
-        }
+        notificationCenter.publisher(for: .accountDidSignOut)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateSignInState(false)
+            }
+            .store(in: &cancellables)
     }
 
     private func updateSignInState(_ isSignedIn: Bool) {
