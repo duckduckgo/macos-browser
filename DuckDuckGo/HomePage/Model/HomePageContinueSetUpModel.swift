@@ -34,8 +34,11 @@ extension HomePage.Models {
         let itemsRowCountWhenCollapsed = HomePage.featureRowCountWhenCollapsed
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
-        let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
         let privacyConfigurationManager: PrivacyConfigurationManaging
+
+#if NETWORK_PROTECTION
+        let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
+#endif
 
         var isDay0SurveyEnabled: Bool {
             let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
@@ -130,6 +133,7 @@ extension HomePage.Models {
 
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
+#if NETWORK_PROTECTION
         init(defaultBrowserProvider: DefaultBrowserProvider,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
@@ -152,6 +156,28 @@ extension HomePage.Models {
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
         }
+#else
+        init(defaultBrowserProvider: DefaultBrowserProvider,
+             dataImportProvider: DataImportStatusProviding,
+             tabCollectionViewModel: TabCollectionViewModel,
+             emailManager: EmailManager = EmailManager(),
+             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
+             cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
+            self.defaultBrowserProvider = defaultBrowserProvider
+            self.dataImportProvider = dataImportProvider
+            self.tabCollectionViewModel = tabCollectionViewModel
+            self.emailManager = emailManager
+            self.privacyPreferences = privacyPreferences
+            self.cookieConsentPopoverManager = cookieConsentPopoverManager
+            self.duckPlayerPreferences = duckPlayerPreferences
+            self.privacyConfigurationManager = privacyConfigurationManager
+            refreshFeaturesMatrix()
+            NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
+        }
+#endif
 
         // swiftlint:disable cyclomatic_complexity
         @MainActor func performAction(for featureType: FeatureType) {
@@ -211,8 +237,10 @@ extension HomePage.Models {
             case .surveyDay7:
                 shouldShowSurveyDay7 = false
             case .networkProtectionRemoteMessage(let message):
+#if NETWORK_PROTECTION
                 networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
+#endif
             }
             refreshFeaturesMatrix()
         }
@@ -221,6 +249,7 @@ extension HomePage.Models {
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 
+#if NETWORK_PROTECTION
             for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
                 DailyPixel.fire(
@@ -229,6 +258,7 @@ extension HomePage.Models {
                     includeAppVersionParameter: true
                 )
             }
+#endif
 
             for feature in listOfFeatures {
                 switch feature {
@@ -389,17 +419,29 @@ extension HomePage.Models {
         }
 
         @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
-            if let surveyURL = remoteMessage.presentableSurveyURL() {
-                let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
-                tabCollectionViewModel.append(tab: tab)
-                Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
-            } else {
+#if NETWORK_PROTECTION
+            guard let actionType = remoteMessage.action.actionType else {
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                refreshFeaturesMatrix()
+                return
             }
 
-            // Dismiss the message after the user opens the survey, even if they just close the tab immediately afterwards.
-            networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
-            refreshFeaturesMatrix()
+            switch actionType {
+            case .openNetworkProtection:
+                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+            case .openSurveyURL, .openURL:
+                if let surveyURL = remoteMessage.presentableSurveyURL() {
+                    let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
+                    tabCollectionViewModel.append(tab: tab)
+                    Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+
+                    // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
+                    networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                    refreshFeaturesMatrix()
+                }
+            }
+#endif
         }
     }
 
@@ -481,7 +523,7 @@ extension HomePage.Models {
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Action
             case .networkProtectionRemoteMessage(let message):
-                return message.cardAction
+                return message.action.actionTitle
             }
         }
 

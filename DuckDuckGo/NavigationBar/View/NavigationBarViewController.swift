@@ -89,6 +89,7 @@ final class NavigationBarViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
+    private var vpnToggleCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
@@ -146,6 +147,9 @@ final class NavigationBarViewController: NSViewController {
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
+#if NETWORK_PROTECTION
+        listenToVPNToggleNotifications()
+#endif
         listenToPasswordManagerNotifications()
         listenToPinningManagerNotifications()
         listenToMessageNotifications()
@@ -326,6 +330,18 @@ final class NavigationBarViewController: NSViewController {
 
         super.mouseDown(with: event)
     }
+
+#if NETWORK_PROTECTION
+    func listenToVPNToggleNotifications() {
+        vpnToggleCancellable = NotificationCenter.default.publisher(for: .ToggleNetworkProtectionInMainWindow).sink { [weak self] _ in
+            guard self?.view.window?.isKeyWindow == true else {
+                return
+            }
+
+            self?.toggleNetworkProtectionPopover()
+        }
+    }
+#endif
 
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
@@ -1022,5 +1038,11 @@ extension NavigationBarViewController {
                                         withDelegate: self)
     }
 
+}
+#endif
+
+#if NETWORK_PROTECTION
+extension Notification.Name {
+    static let ToggleNetworkProtectionInMainWindow = Notification.Name("com.duckduckgo.vpn.toggle-popover-in-main-window")
 }
 #endif
