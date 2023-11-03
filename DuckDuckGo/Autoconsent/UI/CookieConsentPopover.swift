@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 
 private enum AnimationConsts {
     static let yAnimationOffset: CGFloat = 65
@@ -33,6 +34,8 @@ public final class CookieConsentPopover {
     public var windowController: NSWindowController
     private var resizeObserver: Any?
     let type: CookieConsentPopoverType
+
+    private var cancellables = Set<AnyCancellable>()
 
     public init(type: CookieConsentPopoverType = .site) {
         self.type = type
@@ -91,12 +94,13 @@ public final class CookieConsentPopover {
     }
 
     private func addObserverForWindowResize(_ window: NSWindow) {
-        resizeObserver = NotificationCenter.default.addObserver(forName: NSWindow.didResizeNotification,
-                                                                object: window,
-                                                                queue: .main) { [weak self] notification in
-            guard let parent = notification.object as? NSWindow else { return }
-            self?.windowDidResize(parent)
-        }
+        NotificationCenter.default.publisher(for: NSWindow.didResizeNotification)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                guard let parent = notification.object as? NSWindow else { return }
+                self?.windowDidResize(parent)
+            }
+            .store(in: &cancellables)
     }
 
     public func show(on currentTabView: NSView, animated: Bool) {

@@ -96,6 +96,7 @@ final class NavigationBarViewController: NSViewController {
     private var downloadsCancellables = Set<AnyCancellable>()
     private var networkProtectionCancellable: AnyCancellable?
     private var networkProtectionInterruptionCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
 #if NETWORK_PROTECTION
     private let networkProtectionButtonModel: NetworkProtectionNavBarButtonModel
@@ -1010,13 +1011,19 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 extension NavigationBarViewController {
 
     fileprivate func addDebugNotificationListeners() {
-        NotificationCenter.default.addObserver(forName: .ShowSaveCredentialsPopover, object: nil, queue: .main) { [weak self] _ in
-            self?.showMockSaveCredentialsPopover()
-        }
+        NotificationCenter.default.publisher(for: .ShowSaveCredentialsPopover)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.showMockSaveCredentialsPopover()
+            }
+            .store(in: &cancellables)
 
-        NotificationCenter.default.addObserver(forName: .ShowCredentialsSavedPopover, object: nil, queue: .main) { [weak self] _ in
-            self?.showMockCredentialsSavedPopover()
-        }
+        NotificationCenter.default.publisher(for: .ShowCredentialsSavedPopover)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.showMockCredentialsSavedPopover()
+            }
+            .store(in: &cancellables)
     }
 
     fileprivate func showMockSaveCredentialsPopover() {

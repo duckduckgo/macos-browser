@@ -42,8 +42,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Subscriptions
 
-    private var statusChangeCancellable: AnyCancellable?
-    private var interruptionCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - NetP Icon publisher
 
@@ -144,7 +143,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupStatusSubscription() {
-        statusChangeCancellable = networkProtectionStatusReporter.statusObserver.publisher.sink { [weak self] status in
+        networkProtectionStatusReporter.statusObserver.publisher.sink { [weak self] status in
             guard let self = self else {
                 return
             }
@@ -160,11 +159,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 self.status = status
                 self.updateVisibility()
             }
-        }
+        }.store(in: &cancellables)
     }
 
     private func setupInterruptionSubscription() {
-        interruptionCancellable = networkProtectionStatusReporter.connectivityIssuesObserver.publisher.sink { [weak self] isHavingConnectivityIssues in
+        networkProtectionStatusReporter.connectivityIssuesObserver.publisher.sink { [weak self] isHavingConnectivityIssues in
             guard let self = self else {
                 return
             }
@@ -173,16 +172,22 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 self.isHavingConnectivityIssues = isHavingConnectivityIssues
                 self.updateVisibility()
             }
-        }
+        }.store(in: &cancellables)
     }
 
     private func setupWaitlistAvailabilitySubscription() {
-        NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistAccessChanged, object: nil, queue: .main) { _ in
-            Task { @MainActor in
+        NotificationCenter.default.publisher(for: .networkProtectionWaitlistAccessChanged)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+
                 self.buttonImage = self.buttonImageFromWaitlistState(icon: nil)
-                self.updateVisibility()
+
+                Task { @MainActor in
+                    self.updateVisibility()
+                }
             }
-        }
+            .store(in: &cancellables)
     }
 
     @MainActor
