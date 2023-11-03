@@ -60,7 +60,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         guard externalUrl.isExternalSchemeLink,
               let scheme = externalUrl.scheme else {
             // is it the first navigation?
-            if navigationAction.fromHistoryItemIdentity != nil {
+            if navigationAction.isForMainFrame, navigationAction.fromHistoryItemIdentity != nil {
                 // don‘t close tab when opening an app for non-initial navigations
                 shouldCloseTabOnExternalAppOpen = false
             }
@@ -69,12 +69,14 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         }
 
         // don‘t close tab for user-entered URLs
-        if navigationAction.isUserEnteredUrl {
+        if navigationAction.isForMainFrame, navigationAction.isUserEnteredUrl {
             shouldCloseTabOnExternalAppOpen = false
         }
         // only close tab when "Always Open" is on (so the callback would be called synchronously)
         defer {
-            shouldCloseTabOnExternalAppOpen = false
+            if navigationAction.isForMainFrame {
+                shouldCloseTabOnExternalAppOpen = false
+            }
         }
 
         // prevent opening twice for session restoration/tab reopening requests
