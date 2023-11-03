@@ -21,6 +21,7 @@ import BrowserServicesKit
 import Common
 import Foundation
 import NetworkProtection
+import NetworkProtectionUI
 
 extension HomePage.Models {
 
@@ -261,7 +262,9 @@ extension HomePage.Models {
 
             // Only show the upgrade card to users who have used the VPN before:
             let activationStore = DefaultWaitlistActivationDateStore()
-            if shouldShowNetworkProtectionSystemExtensionUpgradePrompt, activationStore.daysSinceActivation() != nil {
+            if shouldShowNetworkProtectionSystemExtensionUpgradePrompt,
+               UserDefaults.shared.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
+               activationStore.daysSinceActivation() != nil {
                 features.append(.networkProtectionSystemExtensionUpgrade)
             }
 
