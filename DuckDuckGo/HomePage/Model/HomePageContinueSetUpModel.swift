@@ -314,7 +314,7 @@ extension HomePage.Models {
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
-        // swiftlint:enable cyclomatic_complexity
+        // swiftlint:enable cyclomatic_complexity function_body_length
 
         // Helper Functions
         @objc private func newTabOpenNotification(_ notification: Notification) {
