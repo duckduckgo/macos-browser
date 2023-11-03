@@ -140,6 +140,8 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
 
+        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
+
         // Network Protection: Shared Defaults
         // ---
         // Please note that shared defaults MUST have a name that matches exactly their value,
