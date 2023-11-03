@@ -20,6 +20,7 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
+import NetworkProtection
 
 extension HomePage.Models {
 
@@ -112,6 +113,9 @@ extension HomePage.Models {
 
         @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
         private var firstLaunchDate: Date
+
+        @UserDefaultsWrapper(key: .shouldShowNetworkProtectionSystemExtensionUpgradePrompt, defaultValue: true)
+        private var shouldShowNetworkProtectionSystemExtensionUpgradePrompt: Bool
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -216,6 +220,8 @@ extension HomePage.Models {
                 visitSurvey(day: .day7)
             case .networkProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
+            case .networkProtectionSystemExtensionUpgrade:
+                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
             }
         }
         // swiftlint:enable cyclomatic_complexity
@@ -241,6 +247,8 @@ extension HomePage.Models {
                 networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
 #endif
+            case .networkProtectionSystemExtensionUpgrade:
+                shouldShowNetworkProtectionSystemExtensionUpgradePrompt = false
             }
             refreshFeaturesMatrix()
         }
@@ -250,6 +258,13 @@ extension HomePage.Models {
             var features: [FeatureType] = []
 
 #if NETWORK_PROTECTION
+
+            // Only show the upgrade card to users who have used the VPN before:
+            let activationStore = DefaultWaitlistActivationDateStore()
+            if shouldShowNetworkProtectionSystemExtensionUpgradePrompt, activationStore.daysSinceActivation() != nil {
+                features.append(.networkProtectionSystemExtensionUpgrade)
+            }
+
             for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
                 DailyPixel.fire(
@@ -290,7 +305,7 @@ extension HomePage.Models {
                     if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
-                case .networkProtectionRemoteMessage:
+                case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                     break // Do nothing, NetP remote messages get appended first
                 }
             }
@@ -463,6 +478,7 @@ extension HomePage.Models {
         case surveyDay0
         case surveyDay7
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
+        case networkProtectionSystemExtensionUpgrade
 
         var title: String {
             switch self {
@@ -482,6 +498,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7CardTitle
             case .networkProtectionRemoteMessage(let message):
                 return message.cardTitle
+            case .networkProtectionSystemExtensionUpgrade:
+                return "VPN Update Available"
             }
         }
 
@@ -503,6 +521,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7Summary
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
+            case .networkProtectionSystemExtensionUpgrade:
+                return "Allow VPN system software again to continue testing Network Protection."
             }
         }
 
@@ -524,6 +544,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7Action
             case .networkProtectionRemoteMessage(let message):
                 return message.action.actionTitle
+            case .networkProtectionSystemExtensionUpgrade:
+                return "Update VPN"
             }
         }
 
@@ -545,7 +567,7 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .surveyDay7:
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
-            case .networkProtectionRemoteMessage:
+            case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
             }
         }
