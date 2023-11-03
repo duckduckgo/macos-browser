@@ -27,6 +27,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showAutocompleteSuggestions: Bool
     var currentThemeName: String
     var defaultPageZoom: CGFloat
+    var zoomPerWebsite: [String: CGFloat]
     var showBookmarksBar: Bool
     var bookmarksBarAppearance: BookmarksBarAppearance
 
@@ -35,6 +36,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         showAutocompleteSuggestions: Bool = true,
         currentThemeName: String = ThemeName.systemDefault.rawValue,
         defaultPageZoom: CGFloat = DefaultZoomValue.percent100.rawValue,
+        zoomPerWebsite: [String: CGFloat] = [:],
         isContinueSetUpVisible: Bool = true,
         isFavoriteVisible: Bool = true,
         isRecentActivityVisible: Bool = true,
@@ -45,6 +47,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.showAutocompleteSuggestions = showAutocompleteSuggestions
         self.currentThemeName = currentThemeName
         self.defaultPageZoom = defaultPageZoom
+        self.zoomPerWebsite = zoomPerWebsite
         self.isContinueSetUpVisible = isContinueSetUpVisible
         self.isFavoriteVisible = isFavoriteVisible
         self.isRecentActivityVisible = isRecentActivityVisible
@@ -56,12 +59,14 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
 final class AppearancePreferencesTests: XCTestCase {
 
     func testWhenInitializedThenItLoadsPersistedValues() throws {
+        let zoomDictionary: [String: DefaultZoomValue] = ["bbc.co.uk": DefaultZoomValue.percent150, "duckduckgo.com": DefaultZoomValue.percent75]
         var model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: false,
                 showAutocompleteSuggestions: true,
                 currentThemeName: ThemeName.systemDefault.rawValue,
                 defaultPageZoom: DefaultZoomValue.percent100.rawValue,
+                zoomPerWebsite: zoomDictionary.mapValues { $0.rawValue },
                 isContinueSetUpVisible: true,
                 isFavoriteVisible: true,
                 isRecentActivityVisible: true
@@ -72,6 +77,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.showAutocompleteSuggestions, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
         XCTAssertEqual(model.defaultPageZoom, DefaultZoomValue.percent100)
+        XCTAssertEqual(model.zoomPerWebsite, zoomDictionary)
         XCTAssertEqual(model.isFavoriteVisible, true)
         XCTAssertEqual(model.isContinueSetUpVisible, true)
         XCTAssertEqual(model.isRecentActivityVisible, true)
@@ -138,6 +144,33 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(persister.defaultPageZoom, randomZoomLevel.rawValue)
         let savedZoomValue = UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue).wrappedValue
         XCTAssertEqual(savedZoomValue, randomZoomLevel.rawValue)
+    }
+
+    func testWhenZoomLevelPerWebsiteChangedInAppearancePreferencesThenThePersisterAndUserDefaultsZoomPerWebsiteValuesAreUpdated() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let zoomDictionary: [String: DefaultZoomValue] = ["bbc.co.uk": DefaultZoomValue.percent150, "duckduckgo.com": DefaultZoomValue.percent75]
+        let persister = AppearancePreferencesUserDefaultsPersistor()
+        let model = AppearancePreferences(persistor: persister)
+        model.zoomPerWebsite = zoomDictionary
+
+        XCTAssertEqual(persister.zoomPerWebsite, zoomDictionary.mapValues { $0.rawValue })
+        let savedZoomPerWebsiteValues = UserDefaultsWrapper(key: .websitePageZoom, defaultValue: [:]).wrappedValue as? [String: CGFloat]
+        XCTAssertEqual(savedZoomPerWebsiteValues, zoomDictionary.mapValues { $0.rawValue })
+    }
+
+    func testWhenUpdatingZoomPerWebsiteThenThePersisterAndUserDefaultsZoomPerWebsiteValuesAreUpdated() {
+        UserDefaultsWrapper<Any>.clearAll()
+        var zoomDictionary: [String: DefaultZoomValue] = ["provola.co.uk": DefaultZoomValue.percent200, "affumicata.it": DefaultZoomValue.percent50]
+        let persister = AppearancePreferencesUserDefaultsPersistor()
+        let model = AppearancePreferences(persistor: persister)
+        model.zoomPerWebsite = zoomDictionary
+
+        model.updateZoomPerWebsite(zoomLevel: .percent125, website: "test.com")
+        zoomDictionary.updateValue(.percent125, forKey: "test.com")
+
+        XCTAssertEqual(persister.zoomPerWebsite, zoomDictionary.mapValues { $0.rawValue })
+        let savedZoomPerWebsiteValues = UserDefaultsWrapper(key: .websitePageZoom, defaultValue: [:]).wrappedValue as? [String: CGFloat]
+        XCTAssertEqual(savedZoomPerWebsiteValues, zoomDictionary.mapValues { $0.rawValue })
     }
 
     func testWhenNewTabPreferencesAreUpdatedThenPersistedValuesAreUpdated() throws {

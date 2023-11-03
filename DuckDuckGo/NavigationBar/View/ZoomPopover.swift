@@ -24,7 +24,7 @@ struct ZoomPopoverContentView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
-            Text("\(Int(viewModel.zoomLevel.rawValue * 100))%")
+            Text(viewModel.zoomLevel.displayString)
                 .frame(width: 96, height: 28)
             Spacer()
             Text("Reset")
@@ -80,7 +80,7 @@ final class ZoomPopoverViewModel: ObservableObject {
         zoomLevel = appearancePreferences.zoomPerWebsite[hostURLString] ?? appearancePreferences.defaultPageZoom
         appearancePreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
-            if appearancePreferences.zoomPerWebsite[hostURLString] != nil {
+            if appearancePreferences.zoomPerWebsite[hostURLString] == nil {
                 zoomLevel = newValue
             }
         }.store(in: &cancellables)
@@ -93,22 +93,14 @@ final class ZoomPopoverViewModel: ObservableObject {
 
     func zoomIn() {
         tabViewModel.tab.webView.zoomIn()
-//        guard zoomLevel.index < DefaultZoomValue.allCases.count - 1 else { return }
-//        zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
-//        appearancePreferences.updateZoomPerWebsite(zoomLevel: zoomLevel, website: hostURLString)
     }
 
     func zoomOut() {
         tabViewModel.tab.webView.zoomOut()
-//        guard zoomLevel.index > 0 else { return }
-//        zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
-//        appearancePreferences.updateZoomPerWebsite(zoomLevel: zoomLevel, website: hostURLString)
     }
 
     func reset() {
         tabViewModel.tab.webView.resetZoomLevel()
-//        zoomLevel = appearancePreferences.defaultPageZoom
-//        appearancePreferences.updateZoomPerWebsite(zoomLevel: zoomLevel, website: hostURLString)
     }
 
 }

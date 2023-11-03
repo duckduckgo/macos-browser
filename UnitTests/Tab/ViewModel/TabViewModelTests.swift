@@ -172,6 +172,19 @@ final class TabViewModelTests: XCTestCase {
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
     }
 
+    func testWhenAppearancePreferencesZoomLevelIsSetAndThereIsAZoomLevelForWebsiteThenTabsWebViewZoomLevelIsNotUpdated() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        AppearancePreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, website: hostURL)
+        let tab = Tab(url: url)
+        let tabVM = TabViewModel(tab: tab)
+        AppearancePreferences.shared.defaultPageZoom = .percent50
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
     func testWhenAppearancePreferencesZoomLevelIsSetAndANewTabIsOpenThenItsWebViewHasTheLatestValueOfZoomLevel() {
         UserDefaultsWrapper<Any>.clearAll()
         let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
@@ -180,6 +193,44 @@ final class TabViewModelTests: XCTestCase {
         let tabVM = TabViewModel(tab: Tab(), appearancePreferences: AppearancePreferences())
 
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
+    func testWhenAppearancePreferencesZoomPerWebsiteLevelIsSetAndANewTabIsOpenThenItsWebViewHasTheLatestValueOfZoomLevel() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        AppearancePreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, website: hostURL)
+        let tab = Tab(url: url)
+        let tabVM = TabViewModel(tab: tab, appearancePreferences: AppearancePreferences())
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
+    func testWhenAppearancePreferencesZoomPerWebsiteLevelIsSetThenTabsWebViewZoomLevelIsUpdated() {
+        UserDefaultsWrapper<Any>.clearAll()
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        let tab = Tab(url: url)
+        let tabVM = TabViewModel(tab: tab)
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        AppearancePreferences.shared.updateZoomPerWebsite(zoomLevel: randomZoomLevel, website: hostURL)
+
+        XCTAssertEqual(tabVM.tab.webView.zoomLevel, randomZoomLevel)
+    }
+
+    func testWhenZoomWasSetIsCalledThenAppearancePreferencesPerWebsiteZoomIsSet() {
+        let url = URL(string: "https://app.asana.com/0/1")!
+        let hostURL = "https://app.asana.com/"
+        UserDefaultsWrapper<Any>.clearAll()
+        let tab = Tab(url: url)
+        let tabVM = TabViewModel(tab: tab)
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+
+        tabVM.zoomWasSet(to: randomZoomLevel)
+
+        let expectedZoomPerWebsite = [hostURL: randomZoomLevel]
+        XCTAssertEqual(AppearancePreferences.shared.zoomPerWebsite, expectedZoomPerWebsite)
     }
 
 }

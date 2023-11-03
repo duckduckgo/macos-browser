@@ -26,14 +26,17 @@ final class WebViewTests: XCTestCase {
 
     let window = NSWindow()
     var webView: WebView!
+    var capturingZoomLevelDelegate: CapturingZoomLevelDelegate!
 
     override func setUp() {
         webView = .init(frame: .zero)
         window.contentView?.addSubview(webView)
+        capturingZoomLevelDelegate = CapturingZoomLevelDelegate()
     }
 
     override func tearDown() {
         webView = nil
+        capturingZoomLevelDelegate = nil
     }
 
     func testInitialZoomLevelAndMagnification() {
@@ -140,5 +143,44 @@ final class WebViewTests: XCTestCase {
         // Set new default zoom
         AppearancePreferences.shared.defaultPageZoom = .percent75
         XCTAssertEqual(tabVM.tab.webView.zoomLevel, .percent75)
+    }
+
+    func testWhenZoomingInThenZoomDelegateZoomWasSetIsCalled() {
+        var increasableDefaultValue = DefaultZoomValue.allCases
+        increasableDefaultValue.removeLast()
+        let randomZoomLevel = increasableDefaultValue.randomElement()!
+        webView.zoomLevel = randomZoomLevel
+        webView.zoomLevelDelegate = capturingZoomLevelDelegate
+
+        webView.zoomIn()
+        XCTAssertEqual(capturingZoomLevelDelegate.setLevel, DefaultZoomValue.allCases[randomZoomLevel.index + 1])
+    }
+
+    func testWhenZoomingOutThenZoomDelegateZoomWasSetIsCalled() {
+        var decreasableDefaultValue = DefaultZoomValue.allCases
+        decreasableDefaultValue.removeFirst()
+        let randomZoomLevel = decreasableDefaultValue.randomElement()!
+        webView.zoomLevel = randomZoomLevel
+        webView.zoomLevelDelegate = capturingZoomLevelDelegate
+
+        webView.zoomOut()
+        XCTAssertEqual(capturingZoomLevelDelegate.setLevel, DefaultZoomValue.allCases[randomZoomLevel.index - 1])
+    }
+
+    func testWhenResettingZoomThenZoomDelegateZoomWasSetIsCalled() {
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        webView.zoomLevel = randomZoomLevel
+        webView.zoomLevelDelegate = capturingZoomLevelDelegate
+
+        webView.resetZoomLevel()
+        XCTAssertEqual(capturingZoomLevelDelegate.setLevel, .percent100)
+    }
+}
+
+class CapturingZoomLevelDelegate: WebViewZoomLevelDelegate {
+    var setLevel: DefaultZoomValue?
+
+    func zoomWasSet(to level: DefaultZoomValue) {
+        setLevel = level
     }
 }

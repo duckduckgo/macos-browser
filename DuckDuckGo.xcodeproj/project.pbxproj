@@ -2853,6 +2853,8 @@
 		56B9C4D72AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */; };
 		56B9C4D82AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */; };
 		56B9C4D92AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */; };
+		56B9C4DC2AF50D9200E468E8 /* ZoomPopoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4DA2AF50D9200E468E8 /* ZoomPopoverViewModelTests.swift */; };
+		56B9C4DD2AF50EF000E468E8 /* ZoomPopoverViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4DA2AF50D9200E468E8 /* ZoomPopoverViewModelTests.swift */; };
 		56D145E829E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */; };
 		56D145E929E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */; };
 		56D145EB29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */; };
@@ -4284,6 +4286,7 @@
 		569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModelTests.swift; sourceTree = "<group>"; };
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
 		56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomPopover.swift; sourceTree = "<group>"; };
+		56B9C4DA2AF50D9200E468E8 /* ZoomPopoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomPopoverViewModelTests.swift; sourceTree = "<group>"; };
 		56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDataImportProvider.swift; sourceTree = "<group>"; };
 		56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportStatusProviding.swift; sourceTree = "<group>"; };
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
@@ -7597,6 +7600,7 @@
 			isa = PBXGroup;
 			children = (
 				AAC9C01B24CB594C00AD1325 /* TabViewModelTests.swift */,
+				56B9C4DA2AF50D9200E468E8 /* ZoomPopoverViewModelTests.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -11325,6 +11329,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3706FDDA293F661700E42796 /* EmbeddedTrackerDataTests.swift in Sources */,
+				56B9C4DC2AF50D9200E468E8 /* ZoomPopoverViewModelTests.swift in Sources */,
 				3706FDDB293F661700E42796 /* AutofillPreferencesTests.swift in Sources */,
 				3706FDDC293F661700E42796 /* FileManagerExtensionTests.swift in Sources */,
 				3706FDDD293F661700E42796 /* StatisticsLoaderTests.swift in Sources */,
@@ -13242,6 +13247,7 @@
 				B6106BB126A7D8720013B453 /* PermissionStoreTests.swift in Sources */,
 				4BF4951826C08395000547B8 /* ThirdPartyBrowserTests.swift in Sources */,
 				4B98D27C28D960DD003C2B6F /* FirefoxFaviconsReaderTests.swift in Sources */,
+				56B9C4DD2AF50EF000E468E8 /* ZoomPopoverViewModelTests.swift in Sources */,
 				B60C6F7E29B1B41D007BFAA8 /* TestRunHelperInitializer.m in Sources */,
 				37479F152891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift in Sources */,
 				AA63745424C9BF9A00AB2AC4 /* SuggestionContainerTests.swift in Sources */,
