@@ -43,6 +43,7 @@ final class UserScripts: UserScriptsProvider {
     let autoconsentUserScript: UserScriptWithAutoconsent?
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
+    let onboardingUserScript = OnboardingUserScript()
 
     init(with sourceProvider: ScriptSourceProviding) {
         clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
@@ -77,6 +78,10 @@ final class UserScripts: UserScriptsProvider {
         }
         if let youtubeOverlayScript = youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
+        }
+
+        if let specialPages {
+            specialPages.registerSubfeature(delegate: onboardingUserScript)
         }
 
         if let youtubePlayerUserScript = youtubePlayerUserScript {

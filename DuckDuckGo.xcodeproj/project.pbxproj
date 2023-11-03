@@ -80,6 +80,10 @@
 		1DC7763F2AF445CA002DF07B /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */; };
 		1DC776402AF445CB002DF07B /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */; };
 		1DC776412AF445CD002DF07B /* OnboardingTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */; };
+		1DC776452AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776442AF4F1C6002DF07B /* OnboardingUserScript.swift */; };
+		1DC776462AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776442AF4F1C6002DF07B /* OnboardingUserScript.swift */; };
+		1DC776472AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776442AF4F1C6002DF07B /* OnboardingUserScript.swift */; };
+		1DC776482AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DC776442AF4F1C6002DF07B /* OnboardingUserScript.swift */; };
 		1DCFBC8A29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DCFBC8B29ADF32B00313531 /* BurnerHomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */; };
 		1DDF076328F815AD00EDFBE3 /* BWCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */; };
@@ -3874,6 +3878,7 @@
 		1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSchemeHandler.swift; sourceTree = "<group>"; };
 		1DC776372AF4416A002DF07B /* OnboardingTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTabExtension.swift; sourceTree = "<group>"; };
 		1DC776392AF44255002DF07B /* OnboardingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingManager.swift; sourceTree = "<group>"; };
+		1DC776442AF4F1C6002DF07B /* OnboardingUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingUserScript.swift; sourceTree = "<group>"; };
 		1DCFBC8929ADF32B00313531 /* BurnerHomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurnerHomePageView.swift; sourceTree = "<group>"; };
 		1DDF075C28F815AD00EDFBE3 /* BWCredential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCredential.swift; sourceTree = "<group>"; };
 		1DDF075D28F815AD00EDFBE3 /* BWCommunicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BWCommunicator.swift; sourceTree = "<group>"; };
@@ -6793,6 +6798,7 @@
 				85B7184827677A9200B4277F /* View */,
 				1DC776312AF436C7002DF07B /* OnboardingSchemeHandler.swift */,
 				1DC776392AF44255002DF07B /* OnboardingManager.swift */,
+				1DC776442AF4F1C6002DF07B /* OnboardingUserScript.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -10190,6 +10196,7 @@
 				3192A03B2A4C4CFF0084EA89 /* AppIconChanger.swift in Sources */,
 				3192A03C2A4C4CFF0084EA89 /* Main.swift in Sources */,
 				3192A03D2A4C4CFF0084EA89 /* Bookmark.xcdatamodeld in Sources */,
+				1DC776472AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */,
 				3192A03E2A4C4CFF0084EA89 /* DefaultBrowserPromptView.swift in Sources */,
 				3192A03F2A4C4CFF0084EA89 /* BrowserImportSummaryViewController.swift in Sources */,
 				3192A0402A4C4CFF0084EA89 /* FaviconManager.swift in Sources */,
@@ -10848,6 +10855,7 @@
 				3706FAFA293F65D500E42796 /* CleanThisHistoryMenuItem.swift in Sources */,
 				1DA6D0FE2A1FF9A100540406 /* HTTPCookie.swift in Sources */,
 				3706FAFC293F65D500E42796 /* DownloadListItem.swift in Sources */,
+				1DC776462AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */,
 				3706FAFD293F65D500E42796 /* DownloadsPopover.swift in Sources */,
 				3706FAFE293F65D500E42796 /* SpacerNode.swift in Sources */,
 				3706FB00293F65D500E42796 /* PasswordManagementCreditCardModel.swift in Sources */,
@@ -12433,6 +12441,7 @@
 				4B957BB92AC7AE700062CA31 /* SyncErrorHandler.swift in Sources */,
 				4BF0E50A2AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B957BBA2AC7AE700062CA31 /* URLExtension.swift in Sources */,
+				1DC776482AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */,
 				4B957BBB2AC7AE700062CA31 /* Tab+UIDelegate.swift in Sources */,
 				1E2AE4C92ACB217800684E0A /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
 				4B957BBC2AC7AE700062CA31 /* CookieConsentAnimationView.swift in Sources */,
@@ -12935,6 +12944,7 @@
 				B64C853026943BC10048FEBE /* Permissions.xcdatamodeld in Sources */,
 				EE339228291BDEFD009F62C1 /* JSAlertController.swift in Sources */,
 				4B9DB04A2A983B24000927DB /* NotificationService.swift in Sources */,
+				1DC776452AF4F1C6002DF07B /* OnboardingUserScript.swift in Sources */,
 				3775912D29AAC72700E26367 /* SyncPreferences.swift in Sources */,
 				1DB9618329F67F6200CF5568 /* FaviconNullStore.swift in Sources */,
 				B693954F26F04BEB0015B914 /* PaddedImageButton.swift in Sources */,

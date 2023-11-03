@@ -65,6 +65,10 @@ final class OnboardingSchemeHandler: NSObject, WKURLSchemeHandler {
             case "html": return "text/html"
             case "css": return "text/css"
             case "js": return "text/javascript"
+            case "png": return "image/png"
+            case "jpg", "jpeg": return "image/jpeg"
+            case "gif": return "image/gif"
+            case "svg": return "image/svg+xml"
             default: return nil
             }
         }()
