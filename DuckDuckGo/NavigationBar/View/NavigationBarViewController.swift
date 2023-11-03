@@ -1013,14 +1013,14 @@ extension NavigationBarViewController {
     fileprivate func addDebugNotificationListeners() {
         NotificationCenter.default.publisher(for: .ShowSaveCredentialsPopover)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
+            .sink { [weak self] _ in
                 self?.showMockSaveCredentialsPopover()
             }
             .store(in: &cancellables)
 
         NotificationCenter.default.publisher(for: .ShowCredentialsSavedPopover)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
+            .sink { [weak self] _ in
                 self?.showMockCredentialsSavedPopover()
             }
             .store(in: &cancellables)
