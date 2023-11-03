@@ -302,7 +302,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if DEBUG
         let defaultEnvironment = ServerEnvironment.development
 #else
-        let defaultEnvironment = ServerEnvironment.production
+        let defaultEnvironment = ServerEnvironment.development
 #endif
 
 #if DEBUG || REVIEW
