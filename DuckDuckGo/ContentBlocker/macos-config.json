@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1698678672457,
+    "version": 1699039046694,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -75,6 +75,10 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/812"
                 },
                 {
+                    "domain": "thehustle.co",
+                    "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1460"
+                },
+                {
                     "domain": "earth.google.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1099"
                 },
@@ -110,7 +114,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "c4367cb8ce342c06a089afa2bf8a7b84"
+            "hash": "48bf6443f9705855b37e0d51cf04a121"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -280,6 +284,10 @@
                     "reason": "https://github.com/duckduckgo/autoconsent/issues/259"
                 },
                 {
+                    "domain": "capital.fr",
+                    "reason": "https://github.com/duckduckgo/autoconsent/issues/66"
+                },
+                {
                     "domain": "earth.google.com",
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1099"
                 },
@@ -298,7 +306,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "faab10f2de9c911fe8632c12dcfd52f5"
+            "hash": "cf2a79fce3e58615af938e9cd0ca03d1"
         },
         "autofill": {
             "exceptions": [
@@ -1725,6 +1733,50 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": "[class*='container--ads']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='l-ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='page-ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='module__ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='advertising']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='AdvertisingSlot']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='AdSlot']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='werbung']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "[class*='am-bazaar-ad']",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adBanner",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".adModule",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": "[class^='Display_displayAd']",
                         "type": "hide-empty"
                     },
@@ -1869,6 +1921,7 @@
                     "advertising\nskip ad",
                     "advertising\nskip ad\nskip ad\nskip ad",
                     "ad feedback",
+                    "annonse",
                     "anzeige",
                     "close ad",
                     "close this ad",
@@ -1877,14 +1930,17 @@
                     "sponsorisé",
                     "story continues below advertisement",
                     "story continues below advertisementadvertisement",
+                    "oglas",
                     "publicité",
                     "publicidade",
+                    "- publicidade -",
                     "reklama",
                     "skip ad",
                     "sponsored news",
                     "continue reading the main story",
                     "this advertisement has not loaded yet, but your article continues below.",
-                    "story continues below\nthis advertisement has not loaded yet, but your article continues below."
+                    "story continues below\nthis advertisement has not loaded yet, but your article continues below.",
+                    "upgrade to flickr pro to hide these ads"
                 ],
                 "domains": [
                     {
@@ -1892,6 +1948,19 @@
                         "rules": [
                             {
                                 "selector": ".voc-advertising",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "acidadeon.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='mrf-adv']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[class*='td-block']",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2131,6 +2200,19 @@
                         ]
                     },
                     {
+                        "domain": "examiner.com.au",
+                        "rules": [
+                            {
+                                "selector": "[class*='flex items']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".hidden",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "express.de",
                         "rules": [
                             {
@@ -2169,6 +2251,15 @@
                         "rules": [
                             {
                                 "selector": ".top-ads-container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "flickr.com",
+                        "rules": [
+                            {
+                                "selector": ".feed-b",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2401,6 +2492,15 @@
                         ]
                     },
                     {
+                        "domain": "ilfattoquotidiano.it",
+                        "rules": [
+                            {
+                                "selector": "[class*='adv']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "indeed.com",
                         "rules": [
                             {
@@ -2462,6 +2562,19 @@
                             {
                                 "selector": "#contentFor_kbbAdsSimplifiedNativeAd",
                                 "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "komputerswiat.pl",
+                        "rules": [
+                            {
+                                "selector": "[class*='extraList']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[class*='placeholder']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -2544,6 +2657,15 @@
                             },
                             {
                                 "selector": ".AtFxB",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "n1info.si",
+                        "rules": [
+                            {
+                                "selector": "[class*='banner-placeholder']",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2879,6 +3001,15 @@
                         ]
                     },
                     {
+                        "domain": "sfchronicle.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='belowMastheadWrapper']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "si.com",
                         "rules": [
                             {
@@ -2958,6 +3089,15 @@
                         "rules": [
                             {
                                 "selector": "[class*='ArticleInjector']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "thehour.com",
+                        "rules": [
+                            {
+                                "selector": ".belowMastheadWrapper",
                                 "type": "hide-empty"
                             }
                         ]
@@ -3070,6 +3210,15 @@
                             {
                                 "selector": ".mxEhR",
                                 "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "tvtropes.org",
+                        "rules": [
+                            {
+                                "selector": "[class*='-fad-unit']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -3193,6 +3342,10 @@
                             {
                                 "selector": "[data-content='Advertisement']",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='default']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -3310,7 +3463,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "85a5ba7d6cc46070dc9b86eba667d143"
+            "hash": "ef7354397c9490df71d590618737aa44"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4235,6 +4388,18 @@
                             }
                         ]
                     },
+                    "addtoany.com": {
+                        "rules": [
+                            {
+                                "rule": "static.addtoany.com/menu/page.js",
+                                "domains": [
+                                    "frankspeech.com",
+                                    "x22report.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
+                            }
+                        ]
+                    },
                     "adform.net": {
                         "rules": [
                             {
@@ -4321,6 +4486,18 @@
                                     "<all>"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/447"
+                            }
+                        ]
+                    },
+                    "aimbase.com": {
+                        "rules": [
+                            {
+                                "rule": "ws.aimbase.com/Scripts/awa.js",
+                                "domains": [
+                                    "chriscraft.com",
+                                    "regulatormarine.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
                             }
                         ]
                     },
@@ -4555,6 +4732,17 @@
                                     "aternos.org"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/328"
+                            }
+                        ]
+                    },
+                    "cdn.trackjs.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.trackjs.com/agent/v3/latest/t.js",
+                                "domains": [
+                                    "delta.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1445"
                             }
                         ]
                     },
@@ -5158,6 +5346,13 @@
                                 "reason": "bandsintown.com - Ticket page renders blank. With this exception the page redirects to ticketspice.com.,nextdoor.co.uk, nextdoor.com - Facebook login option appears greyed out and cannot be clicked.; mytrackman.com - https://github.com/duckduckgo/privacy-configuration/issues/1426,nextdoor.com - https://github.com/duckduckgo/privacy-configuration/issues/1190"
                             },
                             {
+                                "rule": "connect.facebook.net/en_US/all.js",
+                                "domains": [
+                                    "nordicwellness.se"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
+                            },
+                            {
                                 "rule": "facebook.net",
                                 "domains": [
                                     "nextdoor.com"
@@ -5725,6 +5920,17 @@
                             }
                         ]
                     },
+                    "hubspot.com": {
+                        "rules": [
+                            {
+                                "rule": "api.hubspot.com/livechat-public/v1/message/public",
+                                "domains": [
+                                    "pippintitle.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
+                            }
+                        ]
+                    },
                     "iesnare.com": {
                         "rules": [
                             {
@@ -5842,6 +6048,13 @@
                     "kampyle.com": {
                         "rules": [
                             {
+                                "rule": "nebula-cdn.kampyle.com/wu/392339/onsite/embed.js",
+                                "domains": [
+                                    "lowes.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
+                            },
+                            {
                                 "rule": "kampyle.com",
                                 "domains": [
                                     "basspro.com"
@@ -5892,6 +6105,13 @@
                                     "urbanebikes.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1277"
+                            },
+                            {
+                                "rule": "a.klaviyo.com/media/js/onsite/onsite.js",
+                                "domains": [
+                                    "tanglefree.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
                             },
                             {
                                 "rule": "klaviyo.com/",
@@ -6051,6 +6271,17 @@
                             }
                         ]
                     },
+                    "myfonts.net": {
+                        "rules": [
+                            {
+                                "rule": "hello.myfonts.net/count/3f4e3a",
+                                "domains": [
+                                    "ottolenghi.co.uk"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
+                            }
+                        ]
+                    },
                     "nc0.co": {
                         "rules": [
                             {
@@ -6081,6 +6312,17 @@
                                     "nintendo.com"
                                 ],
                                 "reason": "Accounts page renders blank. Download buttons show loading stars and never finish loading. Pricing information doesn't load. Note that cdn.accounts.nintendo.com CNAMEs to star.accounts.nintendo.com.edgekey.net at the time of mitigation."
+                            }
+                        ]
+                    },
+                    "nosto.com": {
+                        "rules": [
+                            {
+                                "rule": "connect.nosto.com/script/shopify/nosto.js",
+                                "domains": [
+                                    "oneill.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1465"
                             }
                         ]
                     },
@@ -6170,9 +6412,10 @@
                                 "rule": "secure.widget.cloud.opta.net/v3/v3.opta-widgets.js",
                                 "domains": [
                                     "abc.net.au",
-                                    "emol.com"
+                                    "emol.com",
+                                    "oufc.co.uk"
                                 ],
-                                "reason": "abc.net.au - Error message displays in place of scoreboard (scoreboard does not show).,emol.com - Scoreboard does not render."
+                                "reason": "abc.net.au - Error message displays in place of scoreboard (scoreboard does not show).,emol.com - Scoreboard does not render.,https://github.com/duckduckgo/privacy-configuration/issues/1453"
                             }
                         ]
                     },
@@ -6986,6 +7229,13 @@
                                     "scheels.com"
                                 ],
                                 "reason": "https://github.com/duckduckgo/privacy-configuration/issues/492"
+                            },
+                            {
+                                "rule": "rapid-cdn.yottaa.com/rapid/lib/3ZzYwky2C-3YQw.js",
+                                "domains": [
+                                    "fashionnova.com"
+                                ],
+                                "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1453"
                             }
                         ]
                     },
@@ -7122,7 +7372,7 @@
                     "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1194"
                 }
             ],
-            "hash": "48a390506fe4d8e0243732f91a45af2e"
+            "hash": "c00b5f532b2948d03f40cc91dccf3be9"
         },
         "trackingCookies1p": {
             "settings": {
