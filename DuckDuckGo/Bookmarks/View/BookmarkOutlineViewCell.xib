@@ -28,7 +28,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="M23-Dz-CJb">
+                <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="M23-Dz-CJb">
                     <rect key="frame" x="182" y="6" width="21" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="42" id="4ds-BN-z5t">
                         <font key="font" textStyle="body" name=".SFNS-Regular"/>
