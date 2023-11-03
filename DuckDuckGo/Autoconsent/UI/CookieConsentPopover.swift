@@ -94,7 +94,7 @@ public final class CookieConsentPopover {
     }
 
     private func addObserverForWindowResize(_ window: NSWindow) {
-        NotificationCenter.default.publisher(for: NSWindow.didResizeNotification)
+        NotificationCenter.default.publisher(for: NSWindow.didResizeNotification, object: window)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let parent = notification.object as? NSWindow else { return }
