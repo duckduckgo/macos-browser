@@ -26,22 +26,51 @@ struct SyncTabs: View {
     @EnvironmentObject var model: HomePage.Models.SyncTabsModel
 
     var body: some View {
-        List {
+        VStack(alignment: .leading, spacing: 0) {
             ForEach(model.deviceTabs) { deviceTabs in
-                Section(header: Text(deviceTabs.deviceId)) {
-                    ForEach(deviceTabs.deviceTabs) { tabInfo in
-                        Button {
-                            model.open(tabInfo.url)
-                        } label: {
-                            Text(tabInfo.title.isEmpty ? tabInfo.url.absoluteString : tabInfo.title)
-                                .lineLimit(1)
-                        }
-                        .buttonStyle(.plain)
+                Text(deviceTabs.deviceId)
+                    .font(.system(size: 12).bold())
+                    .foregroundColor(.secondary)
+                    .padding(.bottom, 2)
+                Rectangle()
+                    .foregroundColor(Color("BlackWhite10"))
+                    .frame(maxWidth: .infinity, idealHeight: 1)
+                    .padding(.bottom, 12)
+                ForEach(deviceTabs.deviceTabs) { tabInfo in
+                    Button {
+                        model.open(tabInfo.url)
+                    } label: {
+                        Text(tabInfo.title.isEmpty ? tabInfo.url.absoluteString : tabInfo.title)
+                            .lineLimit(1)
+                            .padding(.leading, 12)
+                            .font(.system(size: 12))
                     }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 2)
+                    Rectangle()
+                        .foregroundColor(Color("BlackWhite10"))
+                        .frame(maxWidth: .infinity, idealHeight: 1)
+                        .padding(.leading, 12)
+                        .padding(.bottom, 6)
                 }
             }
         }
-        .frame(minHeight: 200)
+//        List {
+//            ForEach(model.deviceTabs) { deviceTabs in
+//                Section(header: Text(deviceTabs.deviceId)) {
+//                    ForEach(deviceTabs.deviceTabs) { tabInfo in
+//                        Button {
+//                            model.open(tabInfo.url)
+//                        } label: {
+//                            Text(tabInfo.title.isEmpty ? tabInfo.url.absoluteString : tabInfo.title)
+//                                .lineLimit(1)
+//                        }
+//                        .buttonStyle(.plain)
+//                    }
+//                }
+//            }
+//        }
+//        .frame(minHeight: 200)
     }
 }
 

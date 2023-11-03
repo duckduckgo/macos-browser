@@ -361,7 +361,11 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Removal
 
+    @MainActor
     func remove(at index: TabIndex, published: Bool = true, forceChange: Bool = false) {
+        defer {
+            NSApp.delegateTyped.tabDidFinishLoadingSubject.send()
+        }
         switch index {
         case .unpinned(let i):
             return removeUnpinnedTab(at: i, published: published, forceChange: forceChange)

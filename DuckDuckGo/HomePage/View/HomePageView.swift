@@ -66,8 +66,10 @@ extension HomePage.Views {
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
                             }
 
-                            SyncTabs()
-                                .padding(.top, 24)
+                            if !syncTabsModel.deviceTabs.isEmpty {
+                                SyncTabs()
+                                    .padding(.top, 24)
+                            }
 
                             Favorites()
                                 .padding(.top, 24)
