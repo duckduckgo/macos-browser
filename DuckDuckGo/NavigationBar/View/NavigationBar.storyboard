@@ -836,18 +836,43 @@
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OOY-mc-NaN" userLabel="Zoom Button" customClass="AddressBarButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                <rect key="frame" x="519" y="1.5" width="26.5" height="32"/>
+                                <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="plus.magnifyingglass" catalog="system" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="dRi-MG-f16">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <color key="contentTintColor" name="ClearButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="26" id="LGV-sy-qvy"/>
+                                    <constraint firstAttribute="width" constant="26" id="Wbx-5c-sqi"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
+                                        <color key="value" name="ButtonMouseOverColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="mouseDownColor">
+                                        <color key="value" name="ButtonMouseDownColor"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="zoomButtonPressed:" target="mcr-nj-GmC" id="9jt-wc-Ixg"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="taC-vG-1fV" secondAttribute="trailing" constant="1" id="26X-xU-JjT"/>
                             <constraint firstItem="lYD-6T-NGB" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="6Ie-01-AzV"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="BRs-q1-MOh"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="Cl5-vM-wFc"/>
+                            <constraint firstItem="taC-vG-1fV" firstAttribute="leading" secondItem="OOY-mc-NaN" secondAttribute="trailing" id="GDX-DN-VUs"/>
                             <constraint firstItem="1qw-sL-vFK" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" constant="2" id="IGR-F0-d7K"/>
                             <constraint firstItem="HEu-ro-RSA" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="JJu-Ej-iFq"/>
                             <constraint firstItem="kRc-0m-oqe" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="T0S-fo-y1J"/>
                             <constraint firstAttribute="trailing" secondItem="kRc-0m-oqe" secondAttribute="trailing" constant="6" id="WeU-Fb-omO"/>
                             <constraint firstItem="lYD-6T-NGB" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="fCA-Av-xw2"/>
                             <constraint firstItem="taC-vG-1fV" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="j0x-vX-dys"/>
+                            <constraint firstItem="OOY-mc-NaN" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="nLV-yu-3BL"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="centerY" secondItem="Bhg-sv-n5J" secondAttribute="centerY" id="rBY-us-BMz"/>
                             <constraint firstItem="hdY-An-3W8" firstAttribute="leading" secondItem="Bhg-sv-n5J" secondAttribute="leading" id="xv6-0t-7td"/>
                         </constraints>
@@ -868,6 +893,7 @@
                         <outlet property="popupsButton" destination="qqY-h9-UQ7" id="1QY-I6-oNC"/>
                         <outlet property="privacyDashboardPositioningView" destination="lYD-6T-NGB" id="y2g-pX-zea"/>
                         <outlet property="privacyEntryPointButton" destination="nOW-iY-XmO" id="r0A-EO-srN"/>
+                        <outlet property="zoomButton" destination="OOY-mc-NaN" id="DhR-Qr-bF1"/>
                     </connections>
                 </viewController>
                 <customObject id="PAh-HG-vQt" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -897,6 +923,7 @@
         <image name="Refresh" width="16" height="16"/>
         <image name="Search" width="14" height="14"/>
         <image name="Settings" width="16" height="16"/>
+        <image name="plus.magnifyingglass" catalog="system" width="16" height="15"/>
         <namedColor name="AddressBarBackgroundColor">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
         </namedColor>

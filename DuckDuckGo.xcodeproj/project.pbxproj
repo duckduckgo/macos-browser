@@ -2849,6 +2849,10 @@
 		569277C529DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */; };
 		56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
 		56B234C02A84EFD800F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */; };
+		56B9C4D62AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */; };
+		56B9C4D72AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */; };
+		56B9C4D82AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */; };
+		56B9C4D92AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */; };
 		56D145E829E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */; };
 		56D145E929E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */; };
 		56D145EB29E6C99B00E3488A /* DataImportStatusProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */; };
@@ -4279,6 +4283,7 @@
 		569277C029DDCBB500B633EF /* HomePageContinueSetUpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageContinueSetUpModel.swift; sourceTree = "<group>"; };
 		569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModelTests.swift; sourceTree = "<group>"; };
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
+		56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomPopover.swift; sourceTree = "<group>"; };
 		56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDataImportProvider.swift; sourceTree = "<group>"; };
 		56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportStatusProviding.swift; sourceTree = "<group>"; };
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
@@ -7486,6 +7491,7 @@
 				AAA0CC32252F181A0079BC96 /* NavigationButtonMenuDelegate.swift */,
 				85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */,
 				AA68C3D22490ED62001B8783 /* NavigationBarViewController.swift */,
+				56B9C4D52AF3BB1B00E468E8 /* ZoomPopover.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -10306,6 +10312,7 @@
 				3192A0CD2A4C4CFF0084EA89 /* FaviconReferenceCache.swift in Sources */,
 				4B9DB0372A983B24000927DB /* WaitlistTermsAndConditionsView.swift in Sources */,
 				3192A0CE2A4C4CFF0084EA89 /* BookmarkTreeController.swift in Sources */,
+				56B9C4D82AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */,
 				3192A0CF2A4C4CFF0084EA89 /* FirefoxEncryptionKeyReader.swift in Sources */,
 				3192A0D02A4C4CFF0084EA89 /* EventMapping+NetworkProtectionError.swift in Sources */,
 				3192A0D12A4C4CFF0084EA89 /* BookmarkManagementSplitViewController.swift in Sources */,
@@ -11098,6 +11105,7 @@
 				3706FBEF293F65D500E42796 /* EmailUrlExtensions.swift in Sources */,
 				3706FBF0293F65D500E42796 /* PasswordManagementItemModel.swift in Sources */,
 				3706FBF2293F65D500E42796 /* FindInPageModel.swift in Sources */,
+				56B9C4D72AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */,
 				3706FBF3293F65D500E42796 /* PseudoFolder.swift in Sources */,
 				3706FBF4293F65D500E42796 /* Visit.swift in Sources */,
 				3706FBF5293F65D500E42796 /* PixelDataStore.swift in Sources */,
@@ -12272,6 +12280,7 @@
 				4B957B5B2AC7AE700062CA31 /* PixelArguments.swift in Sources */,
 				4B957B5C2AC7AE700062CA31 /* PinnedTabsViewModel.swift in Sources */,
 				4B957B5D2AC7AE700062CA31 /* BookmarkList.swift in Sources */,
+				56B9C4D92AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */,
 				4B957B5E2AC7AE700062CA31 /* NEOnDemandRuleExtension.swift in Sources */,
 				4B957B5F2AC7AE700062CA31 /* BookmarkTableRowView.swift in Sources */,
 				4B957B602AC7AE700062CA31 /* FavoritesView.swift in Sources */,
@@ -12775,6 +12784,7 @@
 				4B9292A126670D2A00AD2C21 /* BookmarkTreeController.swift in Sources */,
 				4B29759728281F0900187C4E /* FirefoxEncryptionKeyReader.swift in Sources */,
 				4B4D60C22A0C849000BCD287 /* EventMapping+NetworkProtectionError.swift in Sources */,
+				56B9C4D62AF3BB1B00E468E8 /* ZoomPopover.swift in Sources */,
 				4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */,
 				B6B140882ABDBCC1004F8E85 /* HoverTrackingArea.swift in Sources */,
 				3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */,

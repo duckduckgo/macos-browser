@@ -24,6 +24,7 @@ protocol AppearancePreferencesPersistor {
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
     var defaultPageZoom: CGFloat { get set }
+    var zoomPerWebsite: [String: CGFloat] { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
@@ -43,6 +44,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
+
+    @UserDefaultsWrapper(key: .websitePageZoom, defaultValue: [:])
+    var zoomPerWebsite: [String: CGFloat]
 
     @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
     var isFavoriteVisible: Bool
@@ -162,6 +166,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var zoomPerWebsite: [ String: DefaultZoomValue] {
+        didSet {
+            persistor.zoomPerWebsite = zoomPerWebsite.mapValues { $0.rawValue }
+        }
+    }
+
     @Published var isFavoriteVisible: Bool {
         didSet {
             persistor.isFavoriteVisible = isFavoriteVisible
@@ -213,6 +223,10 @@ final class AppearancePreferences: ObservableObject {
         NSApp.appearance = currentThemeName.appearance
     }
 
+    func updateZoomPerWebsite(zoomLevel: DefaultZoomValue, website: String) {
+        zoomPerWebsite[website] = zoomLevel
+    }
+
     init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
@@ -222,6 +236,7 @@ final class AppearancePreferences: ObservableObject {
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
         defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
+        zoomPerWebsite = persistor.zoomPerWebsite.compactMapValues { DefaultZoomValue(rawValue: $0) }
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
     }
