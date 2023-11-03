@@ -20,8 +20,11 @@ import AppKit
 import BrowserServicesKit
 import Common
 import Foundation
+
+#if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionUI
+#endif
 
 extension HomePage.Models {
 
@@ -222,7 +225,9 @@ extension HomePage.Models {
             case .networkProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
             case .networkProtectionSystemExtensionUpgrade:
+#if NETWORK_PROTECTION
                 NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+#endif
             }
         }
         // swiftlint:enable cyclomatic_complexity
