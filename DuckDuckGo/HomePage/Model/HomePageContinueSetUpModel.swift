@@ -254,7 +254,7 @@ extension HomePage.Models {
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable cyclomatic_complexity
+        // swiftlint:disable cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 
