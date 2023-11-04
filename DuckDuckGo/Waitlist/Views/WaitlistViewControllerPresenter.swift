@@ -85,6 +85,8 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             return
         }
+        DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+
         // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
         // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
         // preventing any state changing from occurring.

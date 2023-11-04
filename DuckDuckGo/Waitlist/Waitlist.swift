@@ -345,7 +345,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
         os_log("DBP invite code redeemed", log: .dataBrokerProtection)
         sendInviteCodeAvailableNotification {
-            // DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }
     }
 }
