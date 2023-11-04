@@ -139,6 +139,10 @@ final class MainViewController: NSViewController {
         sendActiveNetworkProtectionWaitlistUserPixel()
         refreshNetworkProtectionMessages()
 #endif
+
+#if DBP
+        sendActiveDataBrokerProtectionWaitlistUserPixel()
+#endif
     }
 
     func windowDidResignKey() {
