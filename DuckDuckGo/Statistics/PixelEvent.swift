@@ -170,7 +170,6 @@ extension Pixel {
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
 
-#if DBP
         // DataBroker Protection Waitlist
         case dataBrokerProtectionWaitlistUserActive
         case dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed
@@ -179,8 +178,6 @@ extension Pixel {
         case dataBrokerProtectionWaitlistNotificationTapped
         case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
         case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
-
-#endif
 
         // 28-day Home Button
         case homeButtonHidden
