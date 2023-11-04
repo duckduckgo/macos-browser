@@ -113,7 +113,9 @@ final class WaitlistViewModel: ObservableObject {
     @MainActor
     func perform(action: ViewAction) async {
         switch action {
-        case .joinQueue: await joinWaitlist()
+        case .joinQueue:
+            await joinWaitlist()
+            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         case .requestNotificationPermission:
             Task {
                 await requestNotificationPermission()
