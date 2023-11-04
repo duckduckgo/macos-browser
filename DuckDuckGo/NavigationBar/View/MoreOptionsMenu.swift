@@ -332,26 +332,15 @@ final class MoreOptionsMenu: NSMenu {
 #endif // NETWORK_PROTECTION
 
 #if DBP
-        var regionCode: String?
-        if #available(macOS 13, *) {
-            regionCode = Locale.current.region?.identifier
-        } else {
-            regionCode = Locale.current.regionCode
-        }
-
-        #if DEBUG // Always assume US for debug builds
-        regionCode = "US"
-        #endif
-
-        // Only show Private Information Removal (DBP) for US based users
-        if (regionCode ?? "US") == "US" {
+        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
+                .withImage(NSImage(named: "DBP-Icon"))
             items.append(dataBrokerProtectionItem)
         }
+
 #endif // DBP
 
 #if SUBSCRIPTION
