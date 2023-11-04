@@ -406,7 +406,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
                 if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
-                    // DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                     DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
                     DataBrokerProtectionWaitlistViewControllerPresenter.show()
                 }
             }

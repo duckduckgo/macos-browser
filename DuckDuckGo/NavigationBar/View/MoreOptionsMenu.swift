@@ -339,6 +339,9 @@ final class MoreOptionsMenu: NSMenu {
                 .targetting(self)
                 .withImage(NSImage(named: "DBP-Icon"))
             items.append(dataBrokerProtectionItem)
+
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+
         }
 
 #endif // DBP

@@ -60,4 +60,10 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         // We should check for the feature flag
         return true
     }
+
+    var isWaitlistEnabled: Bool {
+        // We should check for the privacy config waitlist flag
+
+       return true
+    }
 }
