@@ -477,8 +477,6 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_dismissed_\(messageID)"
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
-
-#if DBP
         case .dataBrokerProtectionWaitlistUserActive:
             return "m_mac_dbp_waitlist_user_active"
         case .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed:
@@ -493,8 +491,6 @@ extension Pixel.Event {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-#endif
-
             // 28-day Home Button
         case .homeButtonHidden:
             return "m_mac_home_button_hidden"
