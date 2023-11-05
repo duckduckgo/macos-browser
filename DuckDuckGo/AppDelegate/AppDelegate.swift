@@ -239,7 +239,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
 #endif
-        
+
 #if DBP
         Task {
             try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
