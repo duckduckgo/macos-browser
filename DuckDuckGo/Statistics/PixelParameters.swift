@@ -111,6 +111,13 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
+             .dataBrokerProtectionWaitlistUserActive,
+             .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed,
+             .dataBrokerProtectionWaitlistIntroDisplayed,
+             .dataBrokerProtectionWaitlistNotificationShown,
+             .dataBrokerProtectionWaitlistNotificationTapped,
+             .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
+             .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
              .homeButtonLeft,
              .homeButtonRight,
              .homeButtonHidden:

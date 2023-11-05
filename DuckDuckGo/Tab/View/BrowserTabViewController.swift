@@ -121,6 +121,11 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseDataBrokerProtection),
                                                name: .dbpDidClose,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDataBrokerWaitlistGetStartedPressedByUser),
+                                               name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist,
+                                               object: nil)
+
 #endif
 
 #if SUBSCRIPTION
@@ -162,6 +167,7 @@ final class BrowserTabViewController: NSViewController {
         self.previouslySelectedTab = nil
     }
 
+#if DBP
     @objc
     private func onCloseDataBrokerProtection(_ notification: Notification) {
         guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
@@ -174,6 +180,13 @@ final class BrowserTabViewController: NSViewController {
             self.previouslySelectedTab = nil
         }
     }
+
+    @objc
+    private func onDataBrokerWaitlistGetStartedPressedByUser(_ notification: Notification) {
+        WindowControllersManager.shared.showDataBrokerProtectionTab()
+    }
+
+#endif
 
 #if SUBSCRIPTION
     @objc

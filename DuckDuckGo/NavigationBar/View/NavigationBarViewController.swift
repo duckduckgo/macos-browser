@@ -315,12 +315,12 @@ final class NavigationBarViewController: NSViewController {
         // 3. If the user has no state of any kind, show the waitlist screen.
 
         if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
-            WaitlistModalViewController.show()
+            NetworkProtectionWaitlistViewControllerPresenter.show()
             DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
-            WaitlistModalViewController.show()
+            NetworkProtectionWaitlistViewControllerPresenter.show()
             DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }
     }
