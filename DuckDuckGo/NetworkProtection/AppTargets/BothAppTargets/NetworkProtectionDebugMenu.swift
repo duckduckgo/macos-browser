@@ -573,6 +573,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
 
         settings.selectedEnvironment = selectedEnvironment
+
+        Task {
+            _ = try await NetworkProtectionDeviceManager.create().refreshServerList()
+            await MainActor.run {
+                populateNetworkProtectionServerListMenuItems()
+            }
+            settings.selectedServer = .automatic
+        }
     }
 }
 
