@@ -63,7 +63,7 @@ struct DataBrokerProtectionWaitlistTermsAndConditionsActionHandler: WaitlistTerm
     mutating func didAccept() {
         acceptedTermsAndConditions = true
         // Remove delivered NetP notifications in case the user didn't click them.
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [NetworkProtectionWaitlist.notificationIdentifier])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [DataBrokerProtectionWaitlist.notificationIdentifier])
 
         DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistTermsAndConditionsAccepted, frequency: .dailyAndCount, includeAppVersionParameter: true)
     }
