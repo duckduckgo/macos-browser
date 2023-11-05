@@ -31,14 +31,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     func isFeatureVisible() -> Bool {
-        isMinimumSystemVersionMet && isUserLocaleAllowed && isFeatureEnabled
-    }
-
-    private var isMinimumSystemVersionMet: Bool {
-        if #available(macOS 11.4, *) {
-            return true
-        }
-        return false
+        isUserLocaleAllowed && isFeatureEnabled
     }
 
     private var isUserLocaleAllowed: Bool {
