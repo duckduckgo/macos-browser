@@ -348,7 +348,7 @@ extension FaviconManager: Bookmarks.FaviconStoring {
         return self.imageCache.get(faviconUrl: faviconURL) != nil
     }
 
-    func storeFavicon(_ imageData: Data, for documentURL: URL) throws {
+    func storeFavicon(_ imageData: Data, with url: URL?, for documentURL: URL) async throws {
 
         Task {
             guard let image = NSImage(data: imageData) else {
@@ -357,8 +357,7 @@ extension FaviconManager: Bookmarks.FaviconStoring {
 
             await self.awaitFaviconsLoaded()
 
-            let faviconIdentifier = "sync-favicon.ico"
-            let faviconURL = documentURL.appendingPathComponent(faviconIdentifier)
+            let faviconURL = url ?? documentURL.appendingPathComponent("sync-favicon.ico")
 
             let favicon = Favicon(identifier: UUID(),
                                   url: faviconURL,
