@@ -214,7 +214,7 @@ extension NSAlert {
     static func syncCredentialsPaused() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.syncCredentialsPausedAlertTitle
-        alert.informativeText = UserText.syncBookmarkPausedAlertDescription
+        alert.informativeText = UserText.syncCredentialsPausedAlertDescription
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.learnMore)
