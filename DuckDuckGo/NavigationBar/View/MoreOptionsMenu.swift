@@ -342,6 +342,8 @@ final class MoreOptionsMenu: NSMenu {
 
             DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
 
+        } else {
+            DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
         }
 
 #endif // DBP

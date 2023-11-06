@@ -21,6 +21,8 @@ import BrowserServicesKit
 
 protocol DataBrokerProtectionFeatureVisibility {
     func isFeatureVisible() -> Bool
+    func disableAndDeleteForAllUsers()
+    func disableAndDeleteForWaitlistUsers()
 }
 
 struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeatureVisibility {
@@ -68,11 +70,11 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         DataBrokerProtectionWaitlist().waitlistStorage.isWaitlistUser
     }
 
-    func disableForAllUsers() {
+    func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
     }
 
-    func disableForWaitlistUsers() {
+    func disableAndDeleteForWaitlistUsers() {
         guard isWaitlistUser else {
             return
         }

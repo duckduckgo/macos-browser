@@ -21,12 +21,26 @@ import Foundation
 struct DataBrokerProtectionAppEvents {
 
     func applicationDidFinishLaunching() {
+        let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
+
+        guard featureVisibility.isFeatureVisible() else {
+            featureVisibility.disableAndDeleteForWaitlistUsers()
+            return
+        }
+
         Task {
             try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
     }
 
     func applicationDidBecomeActive() {
+        let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
+
+        guard featureVisibility.isFeatureVisible() else {
+            featureVisibility.disableAndDeleteForWaitlistUsers()
+            return
+        }
+
         Task {
             try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
@@ -35,7 +49,9 @@ struct DataBrokerProtectionAppEvents {
     @MainActor
     func handleNotification() {
         if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
-             DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped,
+                            frequency: .dailyAndCount,
+                            includeAppVersionParameter: true)
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         }
     }
@@ -46,7 +62,9 @@ struct DataBrokerProtectionAppEvents {
 
     private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
         if DefaultDataBrokerProtectionFeatureVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistUserActive,
+                            frequency: .dailyOnly,
+                            includeAppVersionParameter: true)
         }
     }
 }
