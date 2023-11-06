@@ -36,7 +36,7 @@ final class SyncCredentialsAdapter {
         }
     }
 
-    @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
+    @UserDefaultsWrapper(key: .syncCredentialsPausedErrorDisplayed, defaultValue: false)
     private var wasSyncCredentialsErrorDisplayed: Bool
 
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
