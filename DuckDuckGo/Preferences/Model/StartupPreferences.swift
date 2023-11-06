@@ -46,7 +46,7 @@ final class StartupPreferences: ObservableObject {
     private let pinningManager: LocalPinningManager
     private var persistor: StartupPreferencesPersistor
     private var pinnedViewsNotificationCancellable: AnyCancellable?
-    
+
     private enum Constants {
         static let protocolPattern = "^(http|https)://"
         static let httpsProtocol = "https://"
@@ -86,7 +86,7 @@ final class StartupPreferences: ObservableObject {
     }
 
     @Published var homeButtonPosition: HomeButtonPosition = .hidden
-    
+
     var formattedCustomHomePageURL: String {
         let trimmedURL = customHomePageURL.trimmingWhitespace()
         guard let url = URL(trimmedAddressBarString: trimmedURL) else {
@@ -131,7 +131,7 @@ final class StartupPreferences: ObservableObject {
             self.updateHomeButtonState()
         }
     }
-    
+
     private func ensureProtocol(_ url: String) -> String {
         let pattern = Constants.protocolPattern
         if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
