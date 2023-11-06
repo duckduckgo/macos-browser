@@ -1,6 +1,6 @@
 {
   "name": "veriforia.com",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "parent": "verecor.com",
   "addedDatetime": 1677733200000,
   "steps": [
@@ -10,8 +10,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "fed79efb-bfcd-461a-8721-1c79f4d732a1",
-          "url": "https://veriforia.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${ageRange}",
+          "id": "ffb30e97-b03f-4157-a511-09ad8ffb8b54",
+          "url": "https://veriforia.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
             "31-40",
@@ -24,7 +24,7 @@
         },
         {
           "actionType": "extract",
-          "id": "7e2cf1d4-39dc-45ad-ba47-a6eff875958a",
+          "id": "1d8d9c20-9897-4386-8bc1-bd591abe7c81",
           "selector": ".search-item",
           "profile": {
             "name": {

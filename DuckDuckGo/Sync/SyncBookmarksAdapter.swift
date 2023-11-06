@@ -27,6 +27,11 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
+    var shouldResetBookmarksSyncTimestamp: Bool = false {
+        willSet {
+            assert(provider == nil, "Setting this value has no effect after provider has been instantiated")
+        }
+    }
 
     @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
     private var isSyncBookmarksPaused: Bool {
@@ -75,13 +80,15 @@ final class SyncBookmarksAdapter {
                 self?.isSyncBookmarksPaused = false
                 self?.wasSyncBookmarksErrorDisplayed = false
             }
+        if shouldResetBookmarksSyncTimestamp {
+            provider.lastSyncTimestamp = nil
+        }
 
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in
                 switch error {
                 case let syncError as SyncError:
                     Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
-                    // If bookmarks count limit has been exceeded
                     switch syncError {
                     case .unexpectedStatusCode(409):
                         // If bookmarks count limit has been exceeded

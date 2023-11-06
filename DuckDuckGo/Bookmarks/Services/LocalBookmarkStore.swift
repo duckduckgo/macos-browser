@@ -24,6 +24,7 @@ import DDGSync
 import Bookmarks
 import Cocoa
 import Persistence
+import PixelKit
 
 // swiftlint:disable:next type_body_length
 final class LocalBookmarkStore: BookmarkStore {
@@ -59,6 +60,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private(set) var favoritesDisplayMode: FavoritesDisplayMode
+    private(set) var didMigrateToFormFactorSpecificFavorites: Bool = false
 
     private let contextProvider: () -> NSManagedObjectContext
 
@@ -178,7 +180,7 @@ final class LocalBookmarkStore: BookmarkStore {
     }
 
     private func commonOnSaveErrorHandler(_ error: Error, source: String = #function) {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         assertionFailure("LocalBookmarkStore: Saving of context failed")
 
@@ -187,19 +189,19 @@ final class LocalBookmarkStore: BookmarkStore {
                 let processedErrors = CoreDataErrorsParser.parse(error: innerError as NSError)
 
                 var params = processedErrors.errorPixelParameters
-                params[Pixel.Parameters.errorSource] = source
+                params[PixelKit.Parameters.errorSource] = source
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
                            withAdditionalParameters: params)
             } else {
                 Pixel.fire(.debug(event: .bookmarksSaveFailed, error: localError),
-                           withAdditionalParameters: [Pixel.Parameters.errorSource: source])
+                           withAdditionalParameters: [PixelKit.Parameters.errorSource: source])
             }
         } else {
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
             var params = processedErrors.errorPixelParameters
-            params[Pixel.Parameters.errorSource] = source
+            params[PixelKit.Parameters.errorSource] = source
             Pixel.fire(.debug(event: .bookmarksSaveFailed, error: error),
                        withAdditionalParameters: params)
         }
@@ -214,6 +216,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 if context.hasChanges {
                     try context.save(onErrorFire: .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders)
+                    didMigrateToFormFactorSpecificFavorites = true
                 }
             } catch {
                 Thread.sleep(forTimeInterval: 1)
@@ -287,7 +290,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     private func reportOrphanedBookmarksIfNeeded() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService, syncService.authState == .inactive else {
+            guard let syncService = NSApp.delegateTyped.syncService, syncService.authState == .inactive else {
                 return
             }
             Pixel.fire(.debug(event: .orphanedBookmarksPresent))
@@ -731,7 +734,7 @@ final class LocalBookmarkStore: BookmarkStore {
             let error = error as NSError
             let processedErrors = CoreDataErrorsParser.parse(error: error)
 
-            if !NSApp.isRunningUnitTests {
+            if NSApp.runType.requiresEnvironment {
                 Pixel.fire(.debug(event: .bookmarksSaveFailedOnImport, error: error),
                            withAdditionalParameters: processedErrors.errorPixelParameters)
                 assertionFailure("LocalBookmarkStore: Saving of context failed, error: \(error.localizedDescription)")

@@ -112,6 +112,7 @@ public protocol InMemoryDataCacheDelegate: AnyObject {
 public final class InMemoryDataCache {
     var profile: DataBrokerProtectionProfile?
     var brokerProfileQueryData = [BrokerProfileQueryData]()
+    private let mapper = MapperToUI()
 
     weak var delegate: InMemoryDataCacheDelegate?
     weak var scanDelegate: DBPUIScanOps?
@@ -127,12 +128,9 @@ public final class InMemoryDataCache {
 }
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
-    func setState() {
+    func setState() async {
         // other set state tasks
-
-        Task {
-            await delegate?.flushCache(profile: profile)
-        }
+        await delegate?.flushCache(profile: profile)
     }
 
     private func indexForName(matching name: DBPUIUserProfileName, in profile: DataBrokerProtectionProfile) -> Int? {
@@ -268,5 +266,17 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
 
     func startScanAndOptOut() -> Bool {
         return scanDelegate?.startScan() ?? false
+    }
+
+    func getInitialScanState() async -> DBPUIInitialScanState {
+        await scanDelegate?.updateCacheWithCurrentScans()
+
+        return mapper.initialScanState(brokerProfileQueryData)
+    }
+
+    func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState {
+        await scanDelegate?.updateCacheWithCurrentScans()
+
+        return mapper.maintenanceScanState(brokerProfileQueryData)
     }
 }

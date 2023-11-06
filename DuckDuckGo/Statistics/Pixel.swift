@@ -19,6 +19,7 @@
 import Foundation
 import Networking
 import Common
+import PixelKit
 
 final class Pixel {
 
@@ -79,7 +80,13 @@ final class Pixel {
         }
     }
 
-    init(store: @escaping @autoclosure () -> PixelDataStore, requestSender: @escaping RequestSender) {
+    private let appVersion: String
+
+    init(appVersion: String = AppVersion.shared.versionNumber,
+         store: @escaping @autoclosure () -> PixelDataStore,
+         requestSender: @escaping RequestSender) {
+
+        self.appVersion = appVersion
         self.store = store
         self.sendRequest = requestSender
     }
@@ -123,10 +130,10 @@ final class Pixel {
         }
 
         if includeAppVersionParameter {
-            newParams[Parameters.appVersion] = AppVersion.shared.versionNumber
+            newParams[PixelKit.Parameters.appVersion] = appVersion
         }
 #if DEBUG
-        newParams[Parameters.test] = Values.test
+        newParams[PixelKit.Parameters.test] = PixelKit.Values.test
 #endif
 
         sendRequest(event, newParams, allowedQueryReservedCharacters, headers, onComplete)

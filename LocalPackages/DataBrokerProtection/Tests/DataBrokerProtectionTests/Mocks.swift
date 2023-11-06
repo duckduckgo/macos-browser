@@ -25,16 +25,26 @@ import GRDB
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
-    static func mock(with steps: [Step] = [Step]()) -> BrokerProfileQueryData {
+    static func mock(with steps: [Step] = [Step](),
+                     dataBrokerName: String = "test",
+                     lastRunDate: Date? = nil,
+                     preferredRunDate: Date? = nil,
+                     extractedProfile: ExtractedProfile? = nil,
+                     scanHistoryEvents: [HistoryEvent] = [HistoryEvent]()) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
-                name: "test",
+                name: dataBrokerName,
                 steps: steps,
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
-            scanOperationData: ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
+            scanOperationData: ScanOperationData(brokerId: 1,
+                                                 profileQueryId: 1,
+                                                 preferredRunDate: preferredRunDate,
+                                                 historyEvents: scanHistoryEvents,
+                                                 lastRunDate: lastRunDate),
+            optOutOperationsData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutOperationData]()
         )
     }
 }
@@ -673,6 +683,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData? {
         wasBrokerProfileQueryDataCalled = true
 
+        if !brokerProfileQueryDataToReturn.isEmpty {
+            return brokerProfileQueryDataToReturn.first
+        }
+
         if let lastHistoryEventToReturn = self.lastHistoryEventToReturn {
             let scanOperationData = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
 
@@ -718,7 +732,9 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent? {
         wasFetchLastHistoryEventCalled = true
-
+        if let event = brokerProfileQueryDataToReturn.first?.events.last {
+            return event
+        }
         return lastHistoryEventToReturn
     }
 

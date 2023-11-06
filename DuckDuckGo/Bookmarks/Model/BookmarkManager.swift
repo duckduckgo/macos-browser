@@ -46,6 +46,7 @@ protocol BookmarkManager: AnyObject {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     func handleFavoritesAfterDisablingSync()
+    var didMigrateToFormFactorSpecificFavorites: Bool { get }
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -80,6 +81,10 @@ final class LocalBookmarkManager: BookmarkManager {
 
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
+
+    var didMigrateToFormFactorSpecificFavorites: Bool {
+        bookmarkStore.didMigrateToFormFactorSpecificFavorites
+    }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
@@ -327,7 +332,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func requestSync() {
         Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+            guard let syncService = NSApp.delegateTyped.syncService else {
                 return
             }
             os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")

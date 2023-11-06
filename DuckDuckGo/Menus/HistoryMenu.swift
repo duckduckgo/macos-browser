@@ -23,23 +23,44 @@ import Common
 @MainActor
 final class HistoryMenu: NSMenu {
 
-    @IBOutlet weak var recentlyClosedMenuItem: NSMenuItem?
-    @IBOutlet weak var reopenLastClosedMenuItem: NSMenuItem? {
-        didSet {
-            reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
-        }
-    }
-    @IBOutlet weak var reopenAllWindowsFromLastSessionMenuItem: NSMenuItem? {
-        didSet {
-            reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
-        }
-    }
-    @IBOutlet weak var clearAllHistoryMenuItem: NSMenuItem?
+    let backMenuItem = NSMenuItem(title: UserText.navigateBack, action: #selector(MainViewController.back), keyEquivalent: "[")
+    let forwardMenuItem = NSMenuItem(title: UserText.navigateForward, action: #selector(MainViewController.forward), keyEquivalent: "]")
+
+    private let recentlyClosedMenuItem = NSMenuItem(title: UserText.mainMenuHistoryRecentlyClosed)
+    private let reopenLastClosedMenuItem = NSMenuItem(title: UserText.reopenLastClosedTab, action: #selector(AppDelegate.reopenLastClosedTab))
+    private let reopenAllWindowsFromLastSessionMenuItem = NSMenuItem(title: UserText.reopenAllWindowsFromLastSession,
+                                                                     action: #selector(AppDelegate.reopenAllWindowsFromLastSession))
+    private let clearAllHistoryMenuItem = NSMenuItem(title: UserText.mainMenuHistoryClearAllHistory,
+                                                     action: #selector(MainViewController.clearAllHistory),
+                                                     keyEquivalent: [.command, .shift, .backspace])
     private let clearAllHistorySeparator = NSMenuItem.separator()
 
-    private let historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared
-    private var recentlyClosedMenu: RecentlyClosedMenu?
+    private let historyCoordinator: HistoryCoordinating
     private let reopenMenuItemKeyEquivalentManager = ReopenMenuItemKeyEquivalentManager()
+
+    init(historyCoordinator: HistoryCoordinating = HistoryCoordinator.shared) {
+        self.historyCoordinator = historyCoordinator
+
+        super.init(title: UserText.mainMenuHistory)
+
+        self.buildItems {
+            backMenuItem
+            forwardMenuItem
+            NSMenuItem.separator()
+
+            reopenLastClosedMenuItem
+            recentlyClosedMenuItem
+            reopenAllWindowsFromLastSessionMenuItem
+            NSMenuItem.separator()
+        }
+
+        reopenMenuItemKeyEquivalentManager.reopenLastClosedMenuItem = reopenLastClosedMenuItem
+        reopenMenuItemKeyEquivalentManager.lastSessionMenuItem = reopenAllWindowsFromLastSessionMenuItem
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func update() {
         super.update()
@@ -66,17 +87,17 @@ final class HistoryMenu: NSMenu {
     private func updateReopenLastClosedMenuItem() {
         switch RecentlyClosedCoordinator.shared.cache.last {
         case is RecentlyClosedWindow:
-            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedWindow
+            reopenLastClosedMenuItem.title = UserText.reopenLastClosedWindow
         default:
-            reopenLastClosedMenuItem?.title = UserText.reopenLastClosedTab
+            reopenLastClosedMenuItem.title = UserText.reopenLastClosedTab
         }
 
     }
 
     private func updateRecentlyClosedMenu() {
-        recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
-        recentlyClosedMenuItem?.submenu = recentlyClosedMenu
-        recentlyClosedMenuItem?.isEnabled = !(recentlyClosedMenu?.items ?? [] ).isEmpty
+        let recentlyClosedMenu = RecentlyClosedMenu(recentlyClosedCoordinator: RecentlyClosedCoordinator.shared)
+        recentlyClosedMenuItem.submenu = recentlyClosedMenu
+        recentlyClosedMenuItem.isEnabled = !recentlyClosedMenu.items.isEmpty
     }
 
     // MARK: - Recently Visited
@@ -87,7 +108,7 @@ final class HistoryMenu: NSMenu {
         return item
     }
 
-    var recentlyVisitedMenuItems = [NSMenuItem]()
+    private var recentlyVisitedMenuItems = [NSMenuItem]()
 
     private func addRecentlyVisited() {
         recentlyVisitedMenuItems = [recentlyVisitedHeaderMenuItem]
@@ -108,7 +129,7 @@ final class HistoryMenu: NSMenu {
         let visits: [Visit]
     }
 
-    var historyGroupingsMenuItems = [NSMenuItem]()
+    private var historyGroupingsMenuItems = [NSMenuItem]()
 
     private func addHistoryGroupings() {
         let groupings = historyCoordinator.getVisitGroupings()
@@ -208,17 +229,15 @@ final class HistoryMenu: NSMenu {
                                                   action: #selector(AppDelegate.clearThisHistory(_:)),
                                                   keyEquivalent: "")
         headerItem.setDateString(dateString)
-        return [headerItem,
-                NSMenuItem.separator()]
+        return [
+            headerItem,
+            .separator()
+        ]
     }
 
     // MARK: - Clear All History
 
     private func addClearAllHistoryOnTheBottom() {
-        guard let clearAllHistoryMenuItem else {
-            return
-        }
-
         if clearAllHistorySeparator.menu != nil {
             removeItem(clearAllHistorySeparator)
         }
@@ -285,7 +304,7 @@ extension HistoryMenu {
 private extension NSApplication {
 
     var canRestoreLastSessionState: Bool {
-        (delegate as? AppDelegate)?.stateRestorationManager?.canRestoreLastSessionState ?? false
+        delegateTyped.stateRestorationManager?.canRestoreLastSessionState ?? false
     }
 
 }
