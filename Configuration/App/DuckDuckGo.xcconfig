@@ -20,10 +20,12 @@ PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
 CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGo.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Debug][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoDebug.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Debug VPN][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoDebug.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoCI.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
+CODE_SIGN_IDENTITY[config=Debug VPN][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION SPARKLE
@@ -37,16 +39,18 @@ PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = MacOS Browser Produ
 GCC_PREPROCESSOR_DEFINITIONS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION=1
 GCC_PREPROCESSOR_DEFINITIONS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION=1 DEBUG=1 CI=1 $(inherited)
 GCC_PREPROCESSOR_DEFINITIONS[config=Debug][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION=1 DEBUG=1 $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[config=Debug VPN][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION=1 DEBUG=1 $(inherited)
 GCC_PREPROCESSOR_DEFINITIONS[config=Review][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION=1 REVIEW=1 $(inherited)
 
 SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION $(FEATURE_FLAGS)
 SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION DEBUG CI $(FEATURE_FLAGS)
 SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Debug][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION DEBUG $(FEATURE_FLAGS)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Debug VPN][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION DEBUG $(FEATURE_FLAGS)
 SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Review][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION REVIEW $(FEATURE_FLAGS)
 
 // Install Developer ID build to /Applications/DEBUG/
-DEPLOYMENT_LOCATION[config=Debug] = YES;
-DSTROOT[config=Debug] = ${BUILT_PRODUCTS_DIR}
-INSTALL_PATH[config=Debug] = Applications/DEBUG
+DEPLOYMENT_LOCATION[config=Debug VPN] = YES;
+DSTROOT[config=Debug VPN] = ${BUILT_PRODUCTS_DIR}
+INSTALL_PATH[config=Debug VPN] = Applications/DEBUG
 
 #include? "../../LocalOverrides.xcconfig"

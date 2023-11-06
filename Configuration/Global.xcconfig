@@ -48,10 +48,12 @@ COPY_PHASE_STRIP = NO
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 DEBUG_INFORMATION_FORMAT[config=CI][arch=*][sdk=*] = dwarf
 DEBUG_INFORMATION_FORMAT[config=Debug][arch=*][sdk=*] = dwarf
+DEBUG_INFORMATION_FORMAT[config=Debug VPN][arch=*][sdk=*] = dwarf
 
 ENABLE_NS_ASSERTIONS = NO
 ENABLE_NS_ASSERTIONS[config=CI][arch=*][sdk=*] = YES
 ENABLE_NS_ASSERTIONS[config=Debug][arch=*][sdk=*] = YES
+ENABLE_NS_ASSERTIONS[config=Debug VPN][arch=*][sdk=*] = YES
 
 ENABLE_STRICT_OBJC_MSGSEND = YES
 ENABLE_TESTABILITY = NO
@@ -72,11 +74,13 @@ GCC_WARN_UNUSED_VARIABLE = YES
 MTL_ENABLE_DEBUG_INFO = NO
 MTL_ENABLE_DEBUG_INFO[config=CI][arch=*][sdk=*] = INCLUDE_SOURCE
 MTL_ENABLE_DEBUG_INFO[config=Debug][arch=*][sdk=*] = INCLUDE_SOURCE
+MTL_ENABLE_DEBUG_INFO[config=Debug VPN][arch=*][sdk=*] = INCLUDE_SOURCE
 
 MTL_FAST_MATH = YES
 
 ONLY_ACTIVE_ARCH = NO
 ONLY_ACTIVE_ARCH[config=Debug][arch=*][sdk=*] = YES
+ONLY_ACTIVE_ARCH[config=Debug VPN][arch=*][sdk=*] = YES
 ONLY_ACTIVE_ARCH[config=CI][arch=*][sdk=*] = YES
 
 SDKROOT = macosx
@@ -86,10 +90,12 @@ SWIFT_VERSION = 5.0
 SWIFT_OPTIMIZATION_LEVEL = -O
 SWIFT_OPTIMIZATION_LEVEL[config=CI][arch=*][sdk=*] = -Onone
 SWIFT_OPTIMIZATION_LEVEL[config=Debug][arch=*][sdk=*] = -Onone
+SWIFT_OPTIMIZATION_LEVEL[config=Debug VPN][arch=*][sdk=*] = -Onone
 
 SWIFT_COMPILATION_MODE = wholemodule
 SWIFT_COMPILATION_MODE[config=CI][arch=*][sdk=*] =
 SWIFT_COMPILATION_MODE[config=Debug][arch=*][sdk=*] =
+SWIFT_COMPILATION_MODE[config=Debug VPN][arch=*][sdk=*] =
 
 // This is temporarily set back to its default value, as a part of merging Network Protection. There are a small number of warnings introduced in
 // that feature, and more time is needed to address them. To avoid bothering other developers, this is being disabled and a task to fix it will be
@@ -100,4 +106,5 @@ DDG_SLOW_COMPILE_CHECK_THRESHOLD = 100
 DDG_SLOW_COMPILE_CHECK_THRESHOLD[config=CI] = 250
 DDG_SLOW_COMPILE_CHECK = -Xfrontend -warn-long-expression-type-checking=$(DDG_SLOW_COMPILE_CHECK_THRESHOLD) -Xfrontend -warn-long-function-bodies=$(DDG_SLOW_COMPILE_CHECK_THRESHOLD)
 OTHER_SWIFT_FLAGS[config=Debug][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
+OTHER_SWIFT_FLAGS[config=Debug VPN][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
 OTHER_SWIFT_FLAGS[config=CI][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CHECK)
