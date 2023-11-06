@@ -55,8 +55,6 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         return (regionCode ?? "US") == "US"
     }
 
-    /// If we want to prevent new users from joining the waitlist while still allowing waitlist users to continue using it,
-    /// we should set isWaitlistEnabled to false and isWaitlistBetaActive to true.
     private var isWaitlistBetaActive: Bool {
         // Check privacy config
         true
@@ -86,6 +84,9 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         featureDisabler.disableAndDelete()
     }
 
+    /// If we want to prevent new users from joining the waitlist while still allowing waitlist users to continue using it,
+    /// we should set isWaitlistEnabled to false and isWaitlistBetaActive to true.
+    /// To remove it from everyone, isWaitlistBetaActive should be set to false
     func isFeatureVisible() -> Bool {
         if isWaitlistUser {
             return isWaitlistBetaActive && isUserLocaleAllowed
