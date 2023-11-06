@@ -203,8 +203,8 @@ extension NSAlert {
 
     static func syncBookmarksPaused() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Sync Bookmark Limit Exceeded"
-        alert.informativeText = "Delete some to resume sync"
+        alert.messageText = UserText.syncBookmarkPausedAlertTitle
+        alert.informativeText = UserText.syncBookmarkPausedAlertDescription
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.learnMore)
@@ -213,8 +213,8 @@ extension NSAlert {
 
     static func syncCredentialsPaused() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Sync Credentials Limit Exceeded"
-        alert.informativeText = "Delete some to resume sync"
+        alert.messageText = UserText.syncCredentialsPausedAlertTitle
+        alert.informativeText = UserText.syncBookmarkPausedAlertDescription
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
         alert.addButton(withTitle: UserText.learnMore)

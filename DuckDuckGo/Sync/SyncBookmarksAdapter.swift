@@ -82,16 +82,19 @@ final class SyncBookmarksAdapter {
                 case let syncError as SyncError:
                     Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
                     // If bookmarks count limit has been exceeded
-                    if syncError == .unexpectedStatusCode(409) {
+                    switch syncError {
+                    case .unexpectedStatusCode(409):
+                        // If bookmarks count limit has been exceeded
                         self?.isSyncBookmarksPaused = true
                         Pixel.fire(.syncBookmarksCountLimitExceededDaily, limitTo: .dailyFirst)
                         self?.showSyncPausedAlert()
-                    }
-                    // If bookmarks request size limit has been exceeded
-                    if syncError == .unexpectedStatusCode(413) {
+                    case .unexpectedStatusCode(413):
+                        // If bookmarks request size limit has been exceeded
                         self?.isSyncBookmarksPaused = true
                         Pixel.fire(.syncBookmarksRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
                         self?.showSyncPausedAlert()
+                    default:
+                        break
                     }
                 default:
                     let nsError = error as NSError
