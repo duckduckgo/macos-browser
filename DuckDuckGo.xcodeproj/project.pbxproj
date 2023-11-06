@@ -5490,8 +5490,8 @@
 				378F44E229B4B7B600899924 /* SwiftUIExtensions */,
 				37BA812B29B3CB8A0053F1A3 /* SyncUI */,
 				1E862A882A9FC01200F84D4B /* Subscription */,
-				7B76E6852AD5D77600186A84 /* XPCHelper */,
 				7BEC182D2AD5D89C00D30536 /* SystemExtensionManager */,
+				7B76E6852AD5D77600186A84 /* XPCHelper */,
 			);
 			path = LocalPackages;
 			sourceTree = "<group>";
