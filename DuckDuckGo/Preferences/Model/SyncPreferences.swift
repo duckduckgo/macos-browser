@@ -56,6 +56,15 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @Published var isCreatingAccount: Bool = false
 
+    @Published var isFaviconsFetchingEnabled: Bool {
+        didSet {
+            syncBookmarksAdapter.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+            if isFaviconsFetchingEnabled {
+                syncService.scheduler.notifyDataChanged()
+            }
+        }
+    }
+
     @Published var isUnifiedFavoritesEnabled: Bool {
         didSet {
             AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
@@ -135,16 +144,34 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
     }
 
-    init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
+    init(syncService: DDGSyncing, syncBookmarksAdapter: SyncBookmarksAdapter, appearancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
         self.syncService = syncService
+        self.syncBookmarksAdapter = syncBookmarksAdapter
+        self.appearancePreferences = appearancePreferences
 
-        self.isUnifiedFavoritesEnabled = apperancePreferences.favoritesDisplayMode.isDisplayUnified
+        self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
+        self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
         isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
         isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
 
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
         self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+
+        setUpObservables(apperancePreferences: appearancePreferences)
+    }
+
+    private func setUpObservables(apperancePreferences: AppearancePreferences) {
+        syncBookmarksAdapter.$isFaviconsFetchingEnabled
+            .sink { [weak self] isFaviconsFetchingEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isFaviconsFetchingEnabled != isFaviconsFetchingEnabled {
+                    self.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+                }
+            }
+            .store(in: &cancellables)
 
         apperancePreferences.$favoritesDisplayMode
             .map(\.isDisplayUnified)
@@ -264,6 +291,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private var onEndFlow: () -> Void = {}
 
     private let syncService: DDGSyncing
+    private let syncBookmarksAdapter: SyncBookmarksAdapter
+    private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
 }

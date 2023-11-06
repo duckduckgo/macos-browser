@@ -123,8 +123,8 @@ extension Preferences {
 struct SyncView: View {
 
     var body: some View {
-        if let syncService = NSApp.delegateTyped.syncService {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        if let syncService = NSApp.delegateTyped.syncService, let syncDataProviders = NSApp.delegateTyped.syncDataProviders {
+            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService, syncBookmarksAdapter: syncDataProviders.bookmarksAdapter))
                 .onAppear {
                     requestSync()
                 }

@@ -28,10 +28,14 @@ final class SyncBookmarksAdapter {
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
 
-    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
-    private var isSyncBookmarksPaused: Bool {
+    @Published
+    var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncAutomaticallyFetchFavicons, defaultValue: false).wrappedValue {
         didSet {
-            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
+            var udWrapper = UserDefaultsWrapper(key: .syncAutomaticallyFetchFavicons, defaultValue: false)
+            udWrapper.wrappedValue = isFaviconsFetchingEnabled
+            if !isFaviconsFetchingEnabled {
+                faviconsFetcher?.cancelOngoingFetchingIfNeeded()
+            }
         }
     }
 
@@ -55,6 +59,7 @@ final class SyncBookmarksAdapter {
         if shouldEnable {
             databaseCleaner.scheduleRegularCleaning()
             handleFavoritesAfterDisablingSync()
+            isFaviconsFetchingEnabled = false
         } else {
             databaseCleaner.cancelCleaningSchedule()
         }
@@ -78,7 +83,10 @@ final class SyncBookmarksAdapter {
             database: database,
             metadataStore: metadataStore,
             syncDidFinish: { [weak self] result in
-                faviconsFetcher.startFetching(with: result.modifiedIds, deletedBookmarkIDs: result.deletedIds)
+                faviconsFetcher.updateBookmarkIDs(modified: result.modifiedIds, deleted: result.deletedIds)
+                if self?.isFaviconsFetchingEnabled == true {
+                    faviconsFetcher.startFetching()
+                }
                 if result.hasNewData {
                     LocalBookmarkManager.shared.loadBookmarks()
                     self?.isSyncBookmarksPaused = false
@@ -113,6 +121,7 @@ final class SyncBookmarksAdapter {
             }
 
         self.provider = provider
+        self.faviconsFetcher = faviconsFetcher
     }
 
     private func handleFavoritesAfterDisablingSync() {
@@ -122,8 +131,16 @@ final class SyncBookmarksAdapter {
         }
     }
 
+    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
+    private var isSyncBookmarksPaused: Bool {
+        didSet {
+            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
+        }
+    }
+
     private var syncErrorCancellable: AnyCancellable?
     private let bookmarkManager: BookmarkManager
     private let database: CoreDataDatabase
     private let appearancePreferences: AppearancePreferences
+    private var faviconsFetcher: BookmarksFaviconsFetcher?
 }
