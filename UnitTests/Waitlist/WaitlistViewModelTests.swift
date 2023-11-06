@@ -30,8 +30,10 @@ final class WaitlistViewModelTests: XCTestCase {
         let request = MockWaitlistRequest.failure()
         let storage = MockWaitlistStorage.init()
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: MockNotificationService())
+                                                           waitlistStorage: storage,
+                                                           notificationService: MockNotificationService(),
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
 
@@ -46,8 +48,10 @@ final class WaitlistViewModelTests: XCTestCase {
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
 
@@ -64,8 +68,10 @@ final class WaitlistViewModelTests: XCTestCase {
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
 
@@ -81,8 +87,10 @@ final class WaitlistViewModelTests: XCTestCase {
         var notificationService = MockNotificationService()
         notificationService.authorizationStatus = .notDetermined
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         var stateUpdates: [WaitlistViewModel.ViewState] = []
         let cancellable = viewModel.$viewState.sink { stateUpdates.append($0) }
@@ -103,8 +111,10 @@ final class WaitlistViewModelTests: XCTestCase {
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
         let viewModel = WaitlistViewModel(waitlistRequest: request,
-                                          waitlistStorage: storage,
-                                          notificationService: notificationService)
+                                                           waitlistStorage: storage,
+                                                           notificationService: notificationService,
+                                                           termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
+                                                           featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
         await viewModel.updateViewState()
         XCTAssertEqual(viewModel.viewState, .invited)

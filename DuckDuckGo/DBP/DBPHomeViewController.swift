@@ -49,11 +49,14 @@ final class DBPHomeViewController: NSViewController {
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 
-        return DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
-                                           dataManager: dataBrokerProtectionManager.dataManager,
-                                           notificationCenter: NotificationCenter.default,
-                                           privacyConfig: privacyConfigurationManager,
-                                           prefs: prefs)
+        return DataBrokerProtectionViewController(
+            scheduler: dataBrokerProtectionManager.scheduler,
+            dataManager: dataBrokerProtectionManager.dataManager,
+            privacyConfig: privacyConfigurationManager,
+            prefs: prefs,
+            openURLHandler: { url in
+                WindowControllersManager.shared.show(url: url, newTab: true)
+            })
     }()
 
     init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
@@ -128,40 +131,26 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
 
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
-    // swiftlint:disable:next cyclomatic_complexity
     public init() {
         super.init { event, _, _, _ in
             switch event {
             case .error(let error, _):
-                Pixel.fire(.debug(event: .dataBrokerProtectionError, error: error), withAdditionalParameters: event.params)
-            case .parentChildMatches:
-                Pixel.fire(.parentChildMatches, withAdditionalParameters: event.params)
-            case .optOutStart:
-                Pixel.fire(.optOutStart, withAdditionalParameters: event.params)
-            case .optOutEmailGenerate:
-                Pixel.fire(.optOutEmailGenerate, withAdditionalParameters: event.params)
-            case .optOutCaptchaParse:
-                Pixel.fire(.optOutCaptchaParse, withAdditionalParameters: event.params)
-            case .optOutCaptchaSend:
-                Pixel.fire(.optOutCaptchaSend, withAdditionalParameters: event.params)
-            case .optOutCaptchaSolve:
-                Pixel.fire(.optOutCaptchaSolve, withAdditionalParameters: event.params)
-            case .optOutSubmit:
-                Pixel.fire(.optOutSubmit, withAdditionalParameters: event.params)
-            case .optOutEmailReceive:
-                Pixel.fire(.optOutEmailReceive, withAdditionalParameters: event.params)
-            case .optOutEmailConfirm:
-                Pixel.fire(.optOutEmailConfirm, withAdditionalParameters: event.params)
-            case .optOutValidate:
-                Pixel.fire(.optOutValidate, withAdditionalParameters: event.params)
-            case .optOutFinish:
-                Pixel.fire(.optOutFinish, withAdditionalParameters: event.params)
-            case .optOutSubmitSuccess:
-                Pixel.fire(.optOutSubmitSuccess, withAdditionalParameters: event.params)
-            case .optOutSuccess:
-                Pixel.fire(.optOutSuccess, withAdditionalParameters: event.params)
-            case .optOutFailure:
-                Pixel.fire(.optOutFailure, withAdditionalParameters: event.params)
+                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+            case .parentChildMatches,
+                    .optOutStart,
+                    .optOutEmailGenerate,
+                    .optOutCaptchaParse,
+                    .optOutCaptchaSend,
+                    .optOutCaptchaSolve,
+                    .optOutSubmit,
+                    .optOutEmailReceive,
+                    .optOutEmailConfirm,
+                    .optOutValidate,
+                    .optOutFinish,
+                    .optOutSubmitSuccess,
+                    .optOutSuccess,
+                    .optOutFailure:
+                Pixel.fire(.pixelKitEvent(event))
             }
         }
     }

@@ -103,6 +103,7 @@ final class PasswordManagementViewController: NSViewController {
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
     var reloadDataAfterSyncCancellable: AnyCancellable?
+    var cancellables = Set<AnyCancellable>()
 
     var domain: String?
     var isEditing = false
@@ -171,17 +172,23 @@ final class PasswordManagementViewController: NSViewController {
 
         exportLoginItem.title = UserText.exportLogins
 
-        NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
-            self?.displayLockScreen()
-        }
+        NotificationCenter.default.publisher(for: .deviceBecameLocked)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.displayLockScreen()
+            }
+            .store(in: &cancellables)
 
-        NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
-            self?.refreshData()
-        }
+        NotificationCenter.default.publisher(for: .dataImportComplete)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshData()
+            }
+            .store(in: &cancellables)
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {
-        (NSApp.delegate as? AppDelegate)?.syncDataProviders?.credentialsAdapter.syncDidCompletePublisher
+        NSApp.delegateTyped.syncDataProviders?.credentialsAdapter.syncDidCompletePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshData()
@@ -970,7 +977,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     private func requestSync() {
-        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+        guard let syncService = NSApp.delegateTyped.syncService else {
             return
         }
         os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
