@@ -84,6 +84,10 @@ public struct PreferencesSubscriptionView: View {
                         }
                         .fixedSize()
                     }
+                    .onAppear {
+                        model.fetchEntitlements()
+                    }
+
                 } else {
                     UniversalHeaderView {
                         Image("subscription-inactive-icon", bundle: .module)
@@ -108,7 +112,8 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.vpnServiceTitle,
                             description: UserText.vpnServiceDescription,
                             buttonName: model.isSignedIn ? "Manage" : nil,
-                            buttonAction: { model.openVPN() })
+                            buttonAction: { model.openVPN() },
+                            enabled: model.hasEntitlements)
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -117,7 +122,8 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.personalInformationRemovalServiceTitle,
                             description: UserText.personalInformationRemovalServiceDescription,
                             buttonName: model.isSignedIn ? "View" : nil,
-                            buttonAction: { model.openPersonalInformationRemoval() })
+                            buttonAction: { model.openPersonalInformationRemoval() },
+                            enabled: model.hasEntitlements)
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -126,7 +132,8 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.identityTheftRestorationServiceTitle,
                             description: UserText.identityTheftRestorationServiceDescription,
                             buttonName: model.isSignedIn ? "View" : nil,
-                            buttonAction: { model.openIdentityTheftRestoration() })
+                            buttonAction: { model.openIdentityTheftRestoration() },
+                            enabled: model.hasEntitlements)
             }
             .padding(10)
             .roundedBorder()
@@ -177,13 +184,15 @@ public struct SectionView: View {
     public var description: String
     public var buttonName: String?
     public var buttonAction: (() -> Void)?
+    public var enabled: Bool
 
-    public init(iconName: String, title: String, description: String, buttonName: String? = nil, buttonAction: (() -> Void)? = nil) {
+    public init(iconName: String, title: String, description: String, buttonName: String? = nil, buttonAction: (() -> Void)? = nil, enabled: Bool = true) {
         self.iconName = iconName
         self.title = title
         self.description = description
         self.buttonName = buttonName
         self.buttonAction = buttonAction
+        self.enabled = enabled
     }
 
     public var body: some View {
@@ -215,6 +224,8 @@ public struct SectionView: View {
             }
         }
         .padding(.vertical, 7)
+        .disabled(!enabled)
+        .opacity(enabled ? 1.0 : 0.6)
     }
 }
 

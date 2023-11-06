@@ -33,6 +33,7 @@ extension URL {
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isSignedIn: Bool = false
+    @Published var hasEntitlements: Bool = false
     var sheetModel: SubscriptionAccessModel
 
     private let accountManager: AccountManager
@@ -95,6 +96,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @MainActor
     func openFAQ() {
         actionHandler.openURL(.subscriptionFAQ)
+    }
+
+    @MainActor
+    func fetchEntitlements() {
+        print("Entitlements!")
+        Task {
+            self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
+        }
     }
 }
 
