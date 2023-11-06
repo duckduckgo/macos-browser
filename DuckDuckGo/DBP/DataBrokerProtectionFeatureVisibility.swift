@@ -25,13 +25,16 @@ protocol DataBrokerProtectionFeatureVisibility {
 
 struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeatureVisibility {
     private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager) {
+    init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.privacyConfigurationManager = privacyConfigurationManager
+        self.featureDisabler = featureDisabler
     }
 
-    func isFeatureVisible() -> Bool {
-        isUserLocaleAllowed && isFeatureEnabled
+    var waitlistIsOngoing: Bool {
+        isWaitlistEnabled && isWaitlistBetaActive
     }
 
     private var isUserLocaleAllowed: Bool {
@@ -49,14 +52,39 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         return (regionCode ?? "US") == "US"
     }
 
-    private var isFeatureEnabled: Bool {
-        // We should check for the feature flag
-        return true
+    /// If we want to prevent new users from joining the waitlist while still allowing waitlist users to continue using it,
+    /// we should set isWaitlistEnabled to false and isWaitlistBetaActive to true.
+    private var isWaitlistBetaActive: Bool {
+        // Check privacy config
+        true
     }
 
-    var isWaitlistEnabled: Bool {
-        // We should check for the privacy config waitlist flag
+    private var isWaitlistEnabled: Bool {
+        // Check privacy config
+        true
+    }
 
-       return true
+    private var isWaitlistUser: Bool {
+        DataBrokerProtectionWaitlist().waitlistStorage.isWaitlistUser
+    }
+
+    func disableForAllUsers() {
+        featureDisabler.disableAndDelete()
+    }
+
+    func disableForWaitlistUsers() {
+        guard isWaitlistUser else {
+            return
+        }
+
+        featureDisabler.disableAndDelete()
+    }
+
+    func isFeatureVisible() -> Bool {
+        if isWaitlistUser {
+            return isWaitlistBetaActive && isUserLocaleAllowed
+        } else {
+            return isWaitlistEnabled && isWaitlistBetaActive && isUserLocaleAllowed
+        }
     }
 }
