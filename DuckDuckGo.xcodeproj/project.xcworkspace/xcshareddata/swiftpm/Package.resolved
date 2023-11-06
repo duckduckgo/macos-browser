@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "browserserviceskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
+      "state" : {
+        "branch" : "dominik/sync-tabs",
+        "revision" : "2ca4bd1be6904310606036540272017f5195a836"
+      }
+    },
+    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",

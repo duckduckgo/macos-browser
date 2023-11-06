@@ -3928,7 +3928,6 @@
 		3776582C27F71652009A6B35 /* WebsiteBreakageReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReportTests.swift; sourceTree = "<group>"; };
 		3776582E27F82E62009A6B35 /* AutofillPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillPreferences.swift; sourceTree = "<group>"; };
 		3776583027F8325B009A6B35 /* AutofillPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillPreferencesTests.swift; sourceTree = "<group>"; };
-		377A27E12AF1A34300899C03 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		377A27E22AF1BCE900899C03 /* SyncTabsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTabsAdapter.swift; sourceTree = "<group>"; };
 		377A27E72AF2360000899C03 /* SyncTabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTabs.swift; sourceTree = "<group>"; };
 		377A27EC2AF2363800899C03 /* HomePageSyncTabsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageSyncTabsModel.swift; sourceTree = "<group>"; };
@@ -6974,7 +6973,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				377A27E12AF1A34300899C03 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -14130,7 +14128,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = "dominik/sync-ffs-favorites";
+				branch = "dominik/sync-tabs";
 				kind = branch;
 			};
 		};
