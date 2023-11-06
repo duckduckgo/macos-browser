@@ -18,6 +18,7 @@
 
 import Foundation
 import BrowserServicesKit
+import Common
 
 protocol DataBrokerProtectionFeatureVisibility {
     func isFeatureVisible() -> Bool
@@ -72,6 +73,8 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
 
     func disableAndDeleteForAllUsers() {
         featureDisabler.disableAndDelete()
+
+        os_log("Disabling and removing DBP for all users", log: .dataBrokerProtection)
     }
 
     func disableAndDeleteForWaitlistUsers() {
@@ -79,6 +82,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
             return
         }
 
+        os_log("Disabling and removing DBP for waitlist users", log: .dataBrokerProtection)
         featureDisabler.disableAndDelete()
     }
 
