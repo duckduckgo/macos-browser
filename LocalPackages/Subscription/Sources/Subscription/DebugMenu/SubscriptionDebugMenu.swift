@@ -31,6 +31,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         if _purchaseManager == nil {
             _purchaseManager = PurchaseManager()
         }
+        // swiftlint:disable:next force_cast
         return _purchaseManager as! PurchaseManager
     }
 
@@ -53,6 +54,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
         menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
+        menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionInfo), target: self))
         if #available(macOS 12.0, *) {
             menu.addItem(NSMenuItem(title: "Check Purchase Products Availability", action: #selector(checkProductsAvailability), target: self))
         }
@@ -112,6 +114,19 @@ public final class SubscriptionDebugMenu: NSMenuItem {
             }
 
             showAlert(title: "Check Entitlements", message: results.joined(separator: "\n"))
+        }
+    }
+
+    @objc
+    func getSubscriptionInfo() {
+        Task {
+            guard let token = accountManager.accessToken else { return }
+            switch await SubscriptionService.getSubscriptionInfo(token: token) {
+            case .success(let response):
+                showAlert(title: "Subscription info", message: "\(response)")
+            case .failure(let error):
+                showAlert(title: "Subscription info", message: "\(error)")
+            }
         }
     }
 

@@ -29,6 +29,9 @@ struct Logging {
     fileprivate static let authServiceLoggingEnabled = true
     fileprivate static let authService: OSLog = OSLog(subsystem: subsystem, category: "Account : AuthService")
 
+    fileprivate static let subscriptionServiceLoggingEnabled = true
+    fileprivate static let subscriptionService: OSLog = OSLog(subsystem: subsystem, category: "Account : SubscriptionService")
+
     fileprivate static let errorsLoggingEnabled = true
     fileprivate static let error: OSLog = OSLog(subsystem: subsystem, category: "Account : Errors")
 }
@@ -41,6 +44,10 @@ extension OSLog {
 
     public static var authService: OSLog {
         Logging.authServiceLoggingEnabled ? Logging.authService : .disabled
+    }
+
+    public static var subscriptionService: OSLog {
+        Logging.subscriptionServiceLoggingEnabled ? Logging.subscriptionService : .disabled
     }
 
     public static var error: OSLog {
