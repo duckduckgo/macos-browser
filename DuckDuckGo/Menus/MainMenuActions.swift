@@ -759,7 +759,8 @@ extension MainViewController {
     }
 
     @objc func setCustomConfigurationURL(_ sender: Any?) {
-        let alert = NSAlert.customConfigurationAlert()
+        let currentConfigurationURL = AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString
+        let alert = NSAlert.customConfigurationAlert(configurationUrl: currentConfigurationURL)
         if alert.runModal() != .cancel {
             guard let textField = alert.accessoryView as? NSTextField,
                   let newConfigurationUrl = URL(string: textField.stringValue) else {
