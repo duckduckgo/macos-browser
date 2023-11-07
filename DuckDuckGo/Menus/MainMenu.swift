@@ -534,6 +534,7 @@ import Subscription
 
     // MARK: - Debug
 
+    // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Reset Data") {
