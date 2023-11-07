@@ -158,34 +158,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.managementDialogModel.delegate = self
         self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
 
-        setUpObservables(apperancePreferences: appearancePreferences)
+        setUpObservables()
+        setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
     }
 
-    private func setUpObservables(apperancePreferences: AppearancePreferences) {
-        syncBookmarksAdapter.$isFaviconsFetchingEnabled
-            .sink { [weak self] isFaviconsFetchingEnabled in
-                guard let self else {
-                    return
-                }
-                if self.isFaviconsFetchingEnabled != isFaviconsFetchingEnabled {
-                    self.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
-                }
-            }
-            .store(in: &cancellables)
-
-        apperancePreferences.$favoritesDisplayMode
-            .map(\.isDisplayUnified)
-            .sink { [weak self] isUnifiedFavoritesEnabled in
-                guard let self else {
-                    return
-                }
-                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
-                    self.shouldRequestSyncOnFavoritesOptionChange = false
-                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
-                }
-            }
-            .store(in: &cancellables)
-
+    private func setUpObservables() {
         syncService.authStatePublisher
             .removeDuplicates()
             .asVoid()
@@ -215,6 +192,33 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .sink { [weak self] _ in
                 self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
                 self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setUpSyncOptionsObservables(apperancePreferences: AppearancePreferences) {
+        syncBookmarksAdapter.$isFaviconsFetchingEnabled
+            .removeDuplicates()
+            .sink { [weak self] isFaviconsFetchingEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isFaviconsFetchingEnabled != isFaviconsFetchingEnabled {
+                    self.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+                }
+            }
+            .store(in: &cancellables)
+
+        apperancePreferences.$favoritesDisplayMode
+            .map(\.isDisplayUnified)
+            .sink { [weak self] isUnifiedFavoritesEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                    self.shouldRequestSyncOnFavoritesOptionChange = false
+                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+                }
             }
             .store(in: &cancellables)
     }
