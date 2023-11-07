@@ -68,7 +68,7 @@ final class ZoomPopoverViewModelTests: XCTestCase {
 
         zoomPopover.reset()
 
-        XCTAssertEqual(DefaultZoomValue.percent100, tabVM.tab.webView.zoomLevel)
+        XCTAssertEqual(appearancePreferences.defaultPageZoom, tabVM.tab.webView.zoomLevel)
     }
 
     @MainActor
