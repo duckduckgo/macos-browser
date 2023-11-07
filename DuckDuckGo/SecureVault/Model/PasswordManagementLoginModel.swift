@@ -315,4 +315,8 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
 }
 
-extension PasswordManagementLoginModel: EmailManagerRequestDelegate {}
+extension PasswordManagementLoginModel: EmailManagerRequestDelegate {
+    func emailManagerKeychainAccessFailed(_ emailManager: BrowserServicesKit.EmailManager, accessType: BrowserServicesKit.EmailKeychainAccessType, error: BrowserServicesKit.EmailKeychainAccessError) {
+        // no-op
+    }
+}

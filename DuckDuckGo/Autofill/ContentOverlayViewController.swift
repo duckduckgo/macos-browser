@@ -208,6 +208,11 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
         self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
     }
+
+    nonisolated public func emailManagerKeychainAccessFailed(_ emailManager: BrowserServicesKit.EmailManager, accessType: BrowserServicesKit.EmailKeychainAccessType, error: BrowserServicesKit.EmailKeychainAccessError) {
+        // no-op
+    }
+
 }
 
 extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDelegate {
