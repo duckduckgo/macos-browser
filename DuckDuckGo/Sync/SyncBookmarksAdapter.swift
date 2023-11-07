@@ -27,6 +27,11 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
+    var shouldResetBookmarksSyncTimestamp: Bool = false {
+        willSet {
+            assert(provider == nil, "Setting this value has no effect after provider has been instantiated")
+        }
+    }
 
     @Published
     var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncAutomaticallyFetchFavicons, defaultValue: false).wrappedValue {
@@ -93,6 +98,10 @@ final class SyncBookmarksAdapter {
                 }
             }
         )
+
+        if shouldResetBookmarksSyncTimestamp {
+            provider.lastSyncTimestamp = nil
+        }
 
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in

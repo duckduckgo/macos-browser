@@ -34,7 +34,7 @@ protocol InvitedToWaitlistViewData {
 
 struct InvitedToWaitlistView: View {
     let viewData: InvitedToWaitlistViewData
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {

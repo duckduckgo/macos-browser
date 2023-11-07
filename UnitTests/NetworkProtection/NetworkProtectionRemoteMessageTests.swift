@@ -53,7 +53,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
 
         XCTAssertEqual(firstMessage.cardTitle, "Title 1")
         XCTAssertEqual(firstMessage.cardDescription, "Description 1")
-        XCTAssertEqual(firstMessage.cardAction, "Action 1")
+        XCTAssertEqual(firstMessage.action.actionTitle, "Action 1")
         XCTAssertNil(firstMessagePresentableSurveyURL)
         XCTAssertNil(firstMessage.daysSinceNetworkProtectionEnabled)
 
@@ -73,7 +73,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         XCTAssertEqual(secondMessage.daysSinceNetworkProtectionEnabled, 1)
         XCTAssertEqual(secondMessage.cardTitle, "Title 2")
         XCTAssertEqual(secondMessage.cardDescription, "Description 2")
-        XCTAssertEqual(secondMessage.cardAction, "Action 2")
+        XCTAssertEqual(secondMessage.action.actionTitle, "Action 2")
         XCTAssertNil(secondMessagePresentableSurveyURL)
 
         guard let thirdMessage = decodedMessages.first(where: { $0.id == "789"}) else {
@@ -92,7 +92,7 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
         XCTAssertEqual(thirdMessage.daysSinceNetworkProtectionEnabled, 5)
         XCTAssertEqual(thirdMessage.cardTitle, "Title 3")
         XCTAssertEqual(thirdMessage.cardDescription, "Description 3")
-        XCTAssertEqual(thirdMessage.cardAction, "Action 3")
+        XCTAssertEqual(thirdMessage.action.actionTitle, "Action 3")
         XCTAssertTrue(thirdMessagePresentableSurveyURL!.absoluteString.hasPrefix("https://duckduckgo.com/"))
     }
 
@@ -103,13 +103,24 @@ final class NetworkProtectionRemoteMessageTests: XCTestCase {
             "daysSinceNetworkProtectionEnabled": 0,
             "cardTitle": "Title",
             "cardDescription": "Description",
-            "cardAction": "Action",
-            "surveyURL": "https://duckduckgo.com/"
+            "requiresNetworkProtectionAccess": true,
+            "requiresNetworkProtectionUsage": true,
+            "action": {
+                "actionTitle": "Action",
+                "actionType": "openSurveyURL",
+                "actionURL": "https://duckduckgo.com/"
+            }
         }
         """
 
         let decoder = JSONDecoder()
-        let message = try! decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
+        let message: NetworkProtectionRemoteMessage
+        do {
+            message = try decoder.decode(NetworkProtectionRemoteMessage.self, from: remoteMessageJSON.data(using: .utf8)!)
+        } catch {
+            XCTFail("Failed to decode with error: \(error.localizedDescription)")
+            return
+        }
 
         let mockStatisticsStore = MockStatisticsStore()
         mockStatisticsStore.atb = "atb-123"

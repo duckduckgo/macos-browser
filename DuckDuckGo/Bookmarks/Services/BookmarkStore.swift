@@ -60,4 +60,5 @@ protocol BookmarkStore {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     func handleFavoritesAfterDisablingSync()
+    var didMigrateToFormFactorSpecificFavorites: Bool { get }
 }

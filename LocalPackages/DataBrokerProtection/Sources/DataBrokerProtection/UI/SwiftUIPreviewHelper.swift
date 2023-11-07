@@ -18,21 +18,6 @@
 
 import Foundation
 
-final class PreviewScheduler: DataBrokerProtectionScheduler {
-    @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
-    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
-
-    internal init() {
-        self.status = .idle
-    }
-    func startScheduler(showWebView: Bool) { }
-    func stopScheduler() { }
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?) { }
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?) { }
-    func runAllOperations(showWebView: Bool) { }
-}
-
 final class PreviewDataManager: DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate?
 
