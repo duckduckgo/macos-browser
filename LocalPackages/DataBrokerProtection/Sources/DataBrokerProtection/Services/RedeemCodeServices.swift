@@ -46,6 +46,7 @@ public protocol AuthenticationRepository {
 
     func save(accessToken: String)
     func save(inviteCode: String)
+    func reset()
 }
 
 public protocol DataBrokerProtectionAuthenticationService {
@@ -120,6 +121,11 @@ public final class UserDefaultsAuthenticationData: AuthenticationRepository {
     public func save(inviteCode: String) {
         UserDefaults.standard.set(inviteCode, forKey: Keys.inviteCodeKey)
     }
+
+    public func reset() {
+        UserDefaults.standard.removeObject(forKey: Keys.inviteCodeKey)
+        UserDefaults.standard.removeObject(forKey: Keys.accessTokenKey)
+    }
 }
 
 public enum AuthenticationError: Error, Equatable {
@@ -140,7 +146,11 @@ struct RedeemResponse: Codable {
 
 public struct AuthenticationService: DataBrokerProtectionAuthenticationService {
     private struct Constants {
+#if DEBUG
+        static let redeemURL = "https://dbp-staging.duckduckgo.com/dbp/redeem?"
+#else
         static let redeemURL = "https://dbp.duckduckgo.com/dbp/redeem?"
+#endif
     }
 
     private let urlSession: URLSession

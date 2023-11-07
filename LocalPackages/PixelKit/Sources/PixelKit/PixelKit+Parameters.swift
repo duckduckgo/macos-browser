@@ -54,6 +54,9 @@ public extension PixelKit {
 
         // Pixel experiments
         public static let experimentCohort = "cohort"
+
+        // Dashboard
+        public static let dashboardTriggerOrigin = "trigger_origin"
     }
 
     enum Values {

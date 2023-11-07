@@ -25,6 +25,7 @@ import Common
 protocol FaviconManagement: AnyObject {
 
     var areFaviconsLoaded: Bool { get }
+    var faviconsLoadedPublisher: Published<Bool>.Publisher { get }
 
     func loadFavicons()
 
@@ -85,6 +86,7 @@ final class FaviconManager: FaviconManagement {
     private let faviconURLSession = URLSession(configuration: .ephemeral)
 
     @Published private(set) var faviconsLoaded = false
+    var faviconsLoadedPublisher: Published<Bool>.Publisher { $faviconsLoaded }
 
     nonisolated func loadFavicons() {
         imageCache.loadFavicons { _ in

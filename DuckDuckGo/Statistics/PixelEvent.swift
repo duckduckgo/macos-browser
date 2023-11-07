@@ -125,8 +125,6 @@ extension Pixel {
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
-        case networkProtectionSystemExtensionUnknownActivationResult
-
         case debug(event: Debug, error: Error? = nil)
 
         // Activation Points
@@ -157,6 +155,10 @@ extension Pixel {
         case duckPlayerSettingNever
         case duckPlayerSettingBackToDefault
 
+        // Dashboard
+        case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
+        case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
+
         // Network Protection Waitlist
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
@@ -170,10 +172,19 @@ extension Pixel {
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
 
+        // DataBroker Protection Waitlist
+        case dataBrokerProtectionWaitlistUserActive
+        case dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed
+        case dataBrokerProtectionWaitlistIntroDisplayed
+        case dataBrokerProtectionWaitlistNotificationShown
+        case dataBrokerProtectionWaitlistNotificationTapped
+        case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
+        case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
+
         // 28-day Home Button
-        case enableHomeButton
-        case disableHomeButton
-        case setnewHomePage
+        case homeButtonHidden
+        case homeButtonLeft
+        case homeButtonRight
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -273,18 +284,6 @@ extension Pixel {
             case userSelectedToSkipUpdate
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
-
-            case networkProtectionClientFailedToEncodeRedeemRequest
-            case networkProtectionClientInvalidInviteCode
-            case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
-            case networkProtectionClientFailedToParseRedeemResponse(error: Error)
-            case networkProtectionClientInvalidAuthToken
-            case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
-            case networkProtectionKeychainReadError(field: String, status: Int32)
-            case networkProtectionKeychainWriteError(field: String, status: Int32)
-            case networkProtectionKeychainDeleteError(status: Int32)
-            case networkProtectionNoAuthTokenFoundError
-            case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
             case faviconDecryptionFailedUnique
             case downloadListItemDecryptionFailedUnique
@@ -417,8 +416,6 @@ extension Pixel.Event {
             return "m_mac.import-data.initial"
         case .newTabInitial:
             return "m_mac.new-tab-opened.initial"
-        case .networkProtectionSystemExtensionUnknownActivationResult:
-            return "m_mac_netp_system_extension_unknown_activation_result"
         case .favoriteSectionHidden:
             return "m_mac.favorite-section-hidden"
         case .recentActivitySectionHidden:
@@ -451,6 +448,11 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            return "m_mac_mp_wla"
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            return "m_mac_mp_wlr"
+
         case .launchInitial:
             return "m.mac.first-launch"
         case .serpInitial:
@@ -480,14 +482,27 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_dismissed_\(messageID)"
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
-
-        // 28-day Home Button
-        case .enableHomeButton:
-            return "m_mac_enable_home_button"
-        case .disableHomeButton:
-            return "m_mac_disable_home_button"
-        case .setnewHomePage:
-            return "m_mac_set_new_homepage"
+        case .dataBrokerProtectionWaitlistUserActive:
+            return "m_mac_dbp_waitlist_user_active"
+        case .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed:
+            return "m_mac_dbp_imp_settings_entry_menu_item"
+        case .dataBrokerProtectionWaitlistIntroDisplayed:
+            return "m_mac_dbp_imp_intro_screen"
+        case .dataBrokerProtectionWaitlistNotificationShown:
+            return "m_mac_dbp_ev_waitlist_notification_shown"
+        case .dataBrokerProtectionWaitlistNotificationTapped:
+            return "m_mac_dbp_ev_waitlist_notification_launched"
+        case .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed:
+            return "m_mac_dbp_imp_terms"
+        case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
+            return "m_mac_dbp_ev_terms_accepted"
+            // 28-day Home Button
+        case .homeButtonHidden:
+            return "m_mac_home_button_hidden"
+        case .homeButtonLeft:
+            return "m_mac_home_button_left"
+        case .homeButtonRight:
+            return "m_mac_home_button_right"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
@@ -681,29 +696,6 @@ extension Pixel.Event.Debug {
             return "user_selected_to_install_update"
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
-
-        case .networkProtectionClientFailedToEncodeRedeemRequest:
-            return "netp_backend_api_error_encoding_redeem_request_body_failed"
-        case .networkProtectionClientInvalidInviteCode:
-            return "netp_backend_api_error_invalid_invite_code"
-        case .networkProtectionClientFailedToRedeemInviteCode:
-            return "netp_backend_api_error_failed_to_redeem_invite_code"
-        case .networkProtectionClientFailedToParseRedeemResponse:
-            return "netp_backend_api_error_parsing_redeem_response_failed"
-        case .networkProtectionClientInvalidAuthToken:
-            return "netp_backend_api_error_invalid_auth_token"
-        case .networkProtectionKeychainErrorFailedToCastKeychainValueToData:
-            return "netp_keychain_error_failed_to_cast_keychain_value_to_data"
-        case .networkProtectionKeychainReadError:
-            return "netp_keychain_error_read_failed"
-        case .networkProtectionKeychainWriteError:
-            return "netp_keychain_error_write_failed"
-        case .networkProtectionKeychainDeleteError:
-            return "netp_keychain_error_delete_failed"
-        case .networkProtectionNoAuthTokenFoundError:
-            return "netp_no_auth_token_found_error"
-        case .networkProtectionUnhandledError:
-            return "netp_unhandled_error"
 
         case .faviconDecryptionFailedUnique:
             return "favicon_decryption_failed_unique"

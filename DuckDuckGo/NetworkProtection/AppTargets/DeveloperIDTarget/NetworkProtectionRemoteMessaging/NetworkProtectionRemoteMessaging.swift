@@ -19,6 +19,8 @@
 import Foundation
 import Networking
 
+#if NETWORK_PROTECTION
+
 protocol NetworkProtectionRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
@@ -37,6 +39,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     private let messageStorage: NetworkProtectionRemoteMessagingStorage
     private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
+    private let networkProtectionVisibility: NetworkProtectionFeatureVisibility
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
@@ -53,6 +56,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection"),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
+        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {
@@ -60,18 +64,12 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         self.messageStorage = messageStorage
         self.waitlistStorage = waitlistStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
+        self.networkProtectionVisibility = networkProtectionVisibility
         self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
     }
 
     func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-#if NETWORK_PROTECTION
-
-        // Don't fetch messages if the user hasn't used NetP or didn't sign up via the waitlist
-        guard waitlistStorage.isWaitlistUser, waitlistActivationDateStore.daysSinceActivation() != nil else {
-            fetchCompletion?()
-            return
-        }
 
         if let lastRefreshDate = lastRefreshDate(), lastRefreshDate.addingTimeInterval(minimumRefreshInterval) > Date() {
             fetchCompletion?()
@@ -104,47 +102,52 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
         }
 
-#endif
     }
 
     /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
-#if NETWORK_PROTECTION
-        guard let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() else {
-            return []
-        }
-
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
         let possibleMessages = messageStorage.storedMessages()
 
         // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
         // has used Network Protection for.
         let filteredMessages = possibleMessages.filter { message in
+
+            // Don't show messages that have already been dismissed. If you need to show the same message to a user again,
+            // it should get a new message ID.
             if dismissedMessageIDs.contains(message.id) {
                 return false
             }
 
-            if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled {
+            // First, check messages that require a number of days of NetP usage
+            if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled,
+               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {
                     return true
                 } else {
                     return false
                 }
-            } else {
-                return true
             }
+
+            // Next, check if the message requires access to NetP but it's not visible:
+            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() {
+                return false
+            }
+
+            // Finally, check if the message requires NetP usage, and check if the user has used it at all:
+            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
+                return false
+            }
+
+            return true
+
         }
 
         return filteredMessages
-#else
-        return []
-#endif
     }
 
     func dismiss(message: NetworkProtectionRemoteMessage) {
-#if NETWORK_PROTECTION
         messageStorage.dismissRemoteMessage(with: message.id)
-#endif
     }
 
     func resetLastRefreshTimestamp() {
@@ -172,3 +175,5 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
 }
+
+#endif

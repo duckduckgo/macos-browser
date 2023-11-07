@@ -683,6 +683,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData? {
         wasBrokerProfileQueryDataCalled = true
 
+        if !brokerProfileQueryDataToReturn.isEmpty {
+            return brokerProfileQueryDataToReturn.first
+        }
+
         if let lastHistoryEventToReturn = self.lastHistoryEventToReturn {
             let scanOperationData = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
 
@@ -728,7 +732,9 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent? {
         wasFetchLastHistoryEventCalled = true
-
+        if let event = brokerProfileQueryDataToReturn.first?.events.last {
+            return event
+        }
         return lastHistoryEventToReturn
     }
 

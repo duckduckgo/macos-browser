@@ -23,6 +23,7 @@ import Networking
 import UserNotifications
 import NetworkProtection
 import BrowserServicesKit
+import Common
 
 protocol WaitlistConstants {
     static var identifier: String { get }
@@ -40,7 +41,7 @@ protocol Waitlist: WaitlistConstants {
 
     func fetchInviteCodeIfAvailable() async -> WaitlistInviteCodeFetchError?
     func fetchInviteCodeIfAvailable(completion: @escaping (WaitlistInviteCodeFetchError?) -> Void)
-    func sendInviteCodeAvailableNotification()
+    func sendInviteCodeAvailableNotification(completion: (() -> Void)?)
 }
 
 enum WaitlistInviteCodeFetchError: Error, Equatable {
@@ -63,6 +64,8 @@ enum WaitlistInviteCodeFetchError: Error, Equatable {
 extension Notification.Name {
 
     static let networkProtectionWaitlistAccessChanged = Notification.Name(rawValue: "networkProtectionWaitlistAccessChanged")
+    static let dataBrokerProtectionWaitlistAccessChanged = Notification.Name(rawValue: "dataBrokerProtectionWaitlistAccessChanged")
+    static let dataBrokerProtectionUserPressedOnGetStartedOnWaitlist = Notification.Name(rawValue: "dataBrokerProtectionUserPressedOnGetStartedOnWaitlist")
 
 }
 
@@ -111,7 +114,7 @@ extension Waitlist {
         }
     }
 
-    func sendInviteCodeAvailableNotification() {
+    func sendInviteCodeAvailableNotification(completion: (() -> Void)?) {
         let notificationContent = UNMutableNotificationContent()
 
         notificationContent.title = Self.inviteAvailableNotificationTitle
@@ -122,7 +125,7 @@ extension Waitlist {
 
         UNUserNotificationCenter.current().add(request) { error in
             if error == nil {
-                DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+               completion?()
             }
         }
     }
@@ -209,7 +212,6 @@ struct NetworkProtectionWaitlist: Waitlist {
                             NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
                             completion(nil)
                         } catch {
-                            assertionFailure("Failed to redeem invite code")
                             completion(.failure(error))
                         }
                     }
@@ -221,7 +223,9 @@ struct NetworkProtectionWaitlist: Waitlist {
                     do {
                         try await networkProtectionCodeRedemption.redeem(inviteCode)
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-                        sendInviteCodeAvailableNotification()
+                        sendInviteCodeAvailableNotification {
+                            DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                        }
                         completion(nil)
                     } catch {
                         assertionFailure("Failed to redeem invite code")
@@ -235,6 +239,115 @@ struct NetworkProtectionWaitlist: Waitlist {
         }
     }
 
+}
+
+#endif
+
+#if DBP
+
+// MARK: - DataBroker Protection Waitlist
+
+import DataBrokerProtection
+
+struct DataBrokerProtectionWaitlist: Waitlist {
+
+    static let identifier: String = "databrokerprotection"
+    static let apiProductName: String = "dbp"
+
+    static let notificationIdentifier = "com.duckduckgo.macos.browser.data-broker-protection.invite-code-available"
+    static let inviteAvailableNotificationTitle = UserText.dataBrokerProtectionWaitlistNotificationTitle
+    static let inviteAvailableNotificationBody = UserText.dataBrokerProtectionWaitlistNotificationText
+
+    let waitlistStorage: WaitlistStorage
+    let waitlistRequest: WaitlistRequest
+
+    private let redeemUseCase: DataBrokerProtectionRedeemUseCase
+    private let redeemAuthenticationRepository: AuthenticationRepository
+
+    var readyToAcceptTermsAndConditions: Bool {
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
+        return waitlistStorage.isInvited && !accepted
+    }
+
+    init() {
+        self.init(
+            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
+            request: ProductWaitlistRequest(productName: Self.apiProductName),
+            redeemUseCase: RedeemUseCase(),
+            redeemAuthenticationRepository: UserDefaultsAuthenticationData()
+        )
+    }
+
+    init(store: WaitlistStorage, request: WaitlistRequest,
+         redeemUseCase: DataBrokerProtectionRedeemUseCase,
+         redeemAuthenticationRepository: AuthenticationRepository) {
+        self.waitlistStorage = store
+        self.waitlistRequest = request
+        self.redeemUseCase = redeemUseCase
+        self.redeemAuthenticationRepository = redeemAuthenticationRepository
+    }
+
+    func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
+        do {
+            guard waitlistStorage.getWaitlistToken() != nil else {
+                os_log("User not in DBP waitlist, returning...", log: .default)
+                return
+            }
+
+            guard redeemAuthenticationRepository.getAccessToken() == nil else {
+                os_log("Invite code already redeemed, returning...", log: .default)
+                return
+            }
+
+            var inviteCode = waitlistStorage.getWaitlistInviteCode()
+
+            if inviteCode == nil {
+                os_log("No DBP invite code found, fetching...", log: .default)
+                inviteCode = try await fetchInviteCode()
+            }
+
+            if let code = inviteCode {
+                try await redeemInviteCode(code)
+            } else {
+                os_log("No DBP invite code available")
+                throw WaitlistInviteCodeFetchError.noCodeAvailable
+            }
+
+        } catch {
+            os_log("DBP Invite code error: %{public}@", log: .error, error.localizedDescription)
+            throw error
+        }
+    }
+
+    private func fetchInviteCode() async throws -> String {
+
+        // First check if we have it stored locally
+        if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
+            return inviteCode
+        }
+
+        // If not, then try to fetch it remotely
+        _ = await fetchInviteCodeIfAvailable()
+
+        // Try to fetch it from storage again
+        if let inviteCode = waitlistStorage.getWaitlistInviteCode() {
+            return inviteCode
+        } else {
+            throw WaitlistInviteCodeFetchError.noCodeAvailable
+        }
+    }
+
+    private func redeemInviteCode(_ inviteCode: String) async throws {
+        os_log("Redeeming DBP invite code...", log: .dataBrokerProtection)
+
+        try await redeemUseCase.redeem(inviteCode: inviteCode)
+        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
+
+        os_log("DBP invite code redeemed", log: .dataBrokerProtection)
+        sendInviteCodeAvailableNotification {
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        }
+    }
 }
 
 #endif

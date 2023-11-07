@@ -55,6 +55,14 @@ extension Pixel.Event {
         case .dailyOsVersionCounter:
             return [PixelKit.Parameters.osMajorVersion: "\(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)"]
 
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,
@@ -81,7 +89,6 @@ extension Pixel.Event {
              .watchInDuckPlayerInitial,
              .importDataInitial,
              .newTabInitial,
-             .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
@@ -107,9 +114,16 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
-             .enableHomeButton,
-             .disableHomeButton,
-             .setnewHomePage:
+             .dataBrokerProtectionWaitlistUserActive,
+             .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed,
+             .dataBrokerProtectionWaitlistIntroDisplayed,
+             .dataBrokerProtectionWaitlistNotificationShown,
+             .dataBrokerProtectionWaitlistNotificationTapped,
+             .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
+             .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
+             .homeButtonLeft,
+             .homeButtonRight,
+             .homeButtonHidden:
             return nil
         }
     }
