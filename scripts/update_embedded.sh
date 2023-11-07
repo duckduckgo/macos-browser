@@ -9,7 +9,7 @@ CONFIG_URL="https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-con
 
 # If -c is passed, then check the URLs in the Configuration files are correct.
 if [ "$1" == "-c" ]; then
-	grep http DuckDuckGo/AppDelegate/AppConfigurationURLProvider.swift | while read -r line
+	grep http DuckDuckGo/Application/AppConfigurationURLProvider.swift | while read -r line
 	do
 		# if trimmed line begins with "case" then check the url in the line and ensure
 		# it matches the expected url.
