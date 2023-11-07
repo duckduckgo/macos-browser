@@ -41,6 +41,10 @@ final class WebsiteBreakageReporter {
         let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
         let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
 
+        // current domain's protection status
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        let protected = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab?.content.url?.host)
+
         let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
                                               description: description,
                                               siteUrlString: currentURL,
@@ -52,6 +56,7 @@ final class WebsiteBreakageReporter {
                                               isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                               ampURL: ampURL,
                                               urlParametersRemoved: urlParametersRemoved,
+                                              protected: protected,
                                               reportFlow: reportFlow)
         return websiteBreakage
     }

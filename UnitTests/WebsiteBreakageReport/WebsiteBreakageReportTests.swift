@@ -39,7 +39,8 @@ class WebsiteBreakageReportTests: XCTestCase {
             ],
             isGPCEnabled: true,
             ampURL: "https://example.test",
-            urlParametersRemoved: false
+            urlParametersRemoved: false,
+            protected: true
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -57,6 +58,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
+        XCTAssertEqual(queryItems[valueFor: "protectionsState"], "1")
     }
 
     func testThatNativeAppSpecificFieldsAreReported() throws {
@@ -77,6 +79,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             isGPCEnabled: true,
             ampURL: "https://example.test",
             urlParametersRemoved: false,
+            protected: true,
             manufacturer: "IBM"
         )
 
@@ -95,6 +98,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
+        XCTAssertEqual(queryItems[valueFor: "protectionsState"], "1")
         XCTAssertEqual(queryItems[valueFor: "manufacturer"], "IBM")
         XCTAssertEqual(queryItems[valueFor: "os"], "12")
         XCTAssertEqual(queryItems[valueFor: "gpc"], "true")

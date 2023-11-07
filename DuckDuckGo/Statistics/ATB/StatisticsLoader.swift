@@ -56,6 +56,7 @@ final class StatisticsLoader {
                 PixelExperiment.fireDay21To27SerpPixel()
                 PixelExperiment.fireFirstSerpPixel()
                 Pixel.fire(.serp)
+                self.fireDailyOsVersionCounterPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
                 self.refreshAppRetentionAtb(completion: completion)
             } else {
@@ -209,6 +210,17 @@ final class StatisticsLoader {
 
         if let updateVersion = atb.updateVersion {
             statisticsStore.atb = updateVersion
+        }
+    }
+
+    private func fireDailyOsVersionCounterPixel() {
+        // To avoid temporal correlation attacks, add a randomized delay of 0.5-5 seconds
+        let randomDelay = Double.random(in: 0.5...5)
+
+        DispatchQueue.global().asyncAfter(deadline: .now() + randomDelay) {
+            Pixel.fire(.dailyOsVersionCounter,
+                       limitTo: .dailyFirst,
+                       includeAppVersionParameter: false)
         }
     }
 

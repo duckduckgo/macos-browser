@@ -717,4 +717,4 @@ final class LoginsSubMenu: NSMenu {
 
 }
 
-extension MoreOptionsMenu: EmailManagerRequestDelegate { }
+extension MoreOptionsMenu: EmailManagerRequestDelegate {}
