@@ -63,6 +63,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            isGPCEnabled: test.gpcEnabled ?? false,
                                            ampURL: "",
                                            urlParametersRemoved: false,
+                                           protected: true,
                                            manufacturer: test.manufacturer ?? "")
 
             let request = makeURLRequest(with: breakage.requestParameters)

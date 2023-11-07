@@ -82,6 +82,8 @@ public struct UserDefaultsWrapper<T> {
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
+        case homeButtonPosition = "preferences.appeareance.home-button-position"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
@@ -134,11 +136,17 @@ public struct UserDefaultsWrapper<T> {
 
         case firstLaunchDate = "first.app.launch.date"
 
+        // Data Broker Protection
+
+        case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
 
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
+
+        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
 
         // Network Protection: Shared Defaults
         // ---

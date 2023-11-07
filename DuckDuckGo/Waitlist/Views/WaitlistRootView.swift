@@ -1,5 +1,5 @@
 //
-//  WaitlistRootView.swift
+//  NetworkProtectionWaitlistRootView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -20,8 +20,8 @@
 
 import SwiftUI
 
-struct WaitlistRootView: View {
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+struct NetworkProtectionWaitlistRootView: View {
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         Group {
@@ -39,6 +39,37 @@ struct WaitlistRootView: View {
                 }
             case .readyToEnable:
                 EnableWaitlistFeatureView(viewData: EnableNetworkProtectionViewData())
+            }
+        }
+        .environmentObject(model)
+    }
+}
+
+#endif
+
+#if DBP
+
+import SwiftUI
+
+struct DataBrokerProtectionWaitlistRootView: View {
+    @EnvironmentObject var model: WaitlistViewModel
+
+    var body: some View {
+        Group {
+            switch model.viewState {
+            case .notOnWaitlist, .joiningWaitlist:
+                JoinWaitlistView(viewData: DataBrokerProtectionJoinWaitlistViewData())
+            case .joinedWaitlist(let state):
+                JoinedWaitlistView(viewData: DataBrokerProtectionJoinedWaitlistViewData(),
+                                   notificationsAllowed: state == .notificationAllowed)
+            case .invited:
+                InvitedToWaitlistView(viewData: DataBrokerProtectionInvitedToWaitlistViewData())
+            case .termsAndConditions:
+                WaitlistTermsAndConditionsView(viewData: DataBrokerProtectionWaitlistTermsAndConditionsViewData()) {
+                    DataBrokerProtectionTermsAndConditionsContentView()
+                }
+            case .readyToEnable:
+                EnableWaitlistFeatureView(viewData: EnableDataBrokerProtectionViewData())
             }
         }
         .environmentObject(model)
