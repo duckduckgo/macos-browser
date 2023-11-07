@@ -383,15 +383,6 @@ extension MainViewController {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
     }
 
-    @objc func toggleHomeButton(_ sender: Any) {
-        LocalPinningManager.shared.togglePinning(for: .homeButton)
-        if LocalPinningManager.shared.isPinned(.homeButton) {
-            Pixel.fire(.enableHomeButton)
-        } else {
-            Pixel.fire(.disableHomeButton)
-        }
-    }
-
     // MARK: - History
 
     @objc func back(_ sender: Any?) {

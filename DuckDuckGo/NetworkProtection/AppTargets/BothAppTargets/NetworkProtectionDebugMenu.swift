@@ -455,7 +455,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     // MARK: Waitlist
 
     @objc func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
-        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification()
+        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
     }
 
     @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {

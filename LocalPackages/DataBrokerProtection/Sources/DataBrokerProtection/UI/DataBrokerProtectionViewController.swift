@@ -67,7 +67,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
 
         webView?.load(URL(string: Constants.dbpUiUrl)!)
     }
-
 }
 
 extension DataBrokerProtectionViewController: WKUIDelegate {

@@ -69,19 +69,41 @@ public final class TunnelControllerIPCClient {
 
 extension TunnelControllerIPCClient: IPCServerInterface {
     public func register() {
-        try? xpc.server().register()
+        xpc.execute(call: { server in
+            server.register()
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func start() {
-        try? xpc.server().start()
+        xpc.execute(call: { server in
+            server.start()
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func stop() {
-        try? xpc.server().stop()
+        xpc.execute(call: { server in
+            server.stop()
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func resetAll(uninstallSystemExtension: Bool) async {
-        try? await xpc.server().resetAll(uninstallSystemExtension: uninstallSystemExtension)
+        xpc.execute(call: { server in
+            Task {
+                await server.resetAll(uninstallSystemExtension: uninstallSystemExtension)
+            }
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func debugCommand(_ command: DebugCommand) async {
@@ -89,7 +111,14 @@ extension TunnelControllerIPCClient: IPCServerInterface {
             return
         }
 
-        try? await xpc.server().debugCommand(payload)
+        xpc.execute(call: { server in
+            Task {
+                await server.debugCommand(payload)
+            }
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 }
 

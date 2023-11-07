@@ -78,7 +78,8 @@ import Subscription
     let favoritesMenu = NSMenu(title: UserText.favorites)
 
     private var toggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
-    let toggleHomeButtonMenuItem = NSMenuItem(title: UserText.mainMenuViewShowHomeShortcut, action: #selector(MainViewController.toggleHomeButton), keyEquivalent: "Y")
+
+    var homeButtonMenuItem = NSMenuItem(title: "HomeButtonPlaceholder")
     let toggleAutofillShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowAutofillShortcut, action: #selector(MainViewController.toggleAutofillShortcut), keyEquivalent: "A")
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
@@ -243,7 +244,7 @@ import Subscription
                 NSMenuItem(title: UserText.openDownloads, action: #selector(MainViewController.toggleDownloads), keyEquivalent: "j")
                 NSMenuItem.separator()
 
-                toggleHomeButtonMenuItem
+                homeButtonMenuItem
                 toggleAutofillShortcutMenuItem
                 toggleBookmarksShortcutMenuItem
                 toggleDownloadsShortcutMenuItem
@@ -378,6 +379,7 @@ import Subscription
         toggleNetworkProtectionShortcutMenuItem.isHidden = true
 #endif
 
+        updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
@@ -500,6 +502,14 @@ import Subscription
         self.bookmarksMenuToggleBookmarksBarMenuItem = bookmarksMenuToggleBookmarksBarMenuItem
     }
 
+    private func updateHomeButtonMenuItem() {
+        guard let homeButtonMenuItem = HomeButtonMenuFactory.replace(homeButtonMenuItem) else {
+            assertionFailure("Could not replace HomeButtonMenuItem")
+            return
+        }
+        self.homeButtonMenuItem = homeButtonMenuItem
+    }
+
     @MainActor
     @objc
     private func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -511,7 +521,6 @@ import Subscription
         toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
-        toggleHomeButtonMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
 
 #if NETWORK_PROTECTION
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
@@ -562,6 +571,11 @@ import Subscription
             }
             NSMenuItem(title: "Sync")
                 .submenu(SyncDebugMenu())
+
+#if DBP
+            NSMenuItem(title: "Personal Information Removal")
+                .submenu(DataBrokerProtectionDebugMenu())
+#endif
 
 #if NETWORK_PROTECTION
             NSMenuItem(title: "Network Protection")

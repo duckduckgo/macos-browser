@@ -149,7 +149,11 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+        if DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
+            DataBrokerProtectionWaitlistViewControllerPresenter.show()
+        } else {
+            actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+        }
     }
 #endif // DBP
 
@@ -328,12 +332,18 @@ final class MoreOptionsMenu: NSMenu {
 #endif // NETWORK_PROTECTION
 
 #if DBP
-        let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
-                                                  action: #selector(openDataBrokerProtection),
-                                                  keyEquivalent: "")
-            .targetting(self)
-            .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
-        items.append(dataBrokerProtectionItem)
+        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() {
+            let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
+                                                      action: #selector(openDataBrokerProtection),
+                                                      keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "DBP-Icon"))
+            items.append(dataBrokerProtectionItem)
+
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+
+        }
+
 #endif // DBP
 
 #if SUBSCRIPTION

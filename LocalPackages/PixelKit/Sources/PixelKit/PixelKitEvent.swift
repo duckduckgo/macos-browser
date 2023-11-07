@@ -41,6 +41,11 @@ public final class DebugEvent: PixelKitEvent {
         self.error = error
     }
 
+    public init(_ event: PixelKitEvent, error: Error? = nil) {
+        self.eventType = .custom(event)
+        self.error = error
+    }
+
     public var name: String {
         switch eventType {
         case .assertionFailure:

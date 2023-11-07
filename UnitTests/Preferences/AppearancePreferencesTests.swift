@@ -29,6 +29,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var defaultPageZoom: CGFloat
     var showBookmarksBar: Bool
     var bookmarksBarAppearance: BookmarksBarAppearance
+    var homeButtonPosition: HomeButtonPosition
 
     init(
         showFullURL: Bool = false,
@@ -39,7 +40,8 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         isFavoriteVisible: Bool = true,
         isRecentActivityVisible: Bool = true,
         showBookmarksBar: Bool = true,
-        bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn
+        bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn,
+        homeButtonPosition: HomeButtonPosition = .right
     ) {
         self.showFullURL = showFullURL
         self.showAutocompleteSuggestions = showAutocompleteSuggestions
@@ -50,6 +52,7 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
         self.isRecentActivityVisible = isRecentActivityVisible
         self.showBookmarksBar = showBookmarksBar
         self.bookmarksBarAppearance = bookmarksBarAppearance
+        self.homeButtonPosition = homeButtonPosition
     }
 }
 
@@ -64,7 +67,8 @@ final class AppearancePreferencesTests: XCTestCase {
                 defaultPageZoom: DefaultZoomValue.percent100.rawValue,
                 isContinueSetUpVisible: true,
                 isFavoriteVisible: true,
-                isRecentActivityVisible: true
+                isRecentActivityVisible: true,
+                homeButtonPosition: .left
             )
         )
 
@@ -75,6 +79,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, true)
         XCTAssertEqual(model.isContinueSetUpVisible, true)
         XCTAssertEqual(model.isRecentActivityVisible, true)
+        XCTAssertEqual(model.homeButtonPosition, .left)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
@@ -84,7 +89,8 @@ final class AppearancePreferencesTests: XCTestCase {
                 defaultPageZoom: DefaultZoomValue.percent50.rawValue,
                 isContinueSetUpVisible: false,
                 isFavoriteVisible: false,
-                isRecentActivityVisible: false
+                isRecentActivityVisible: false,
+                homeButtonPosition: .left
             )
         )
         XCTAssertEqual(model.showFullURL, true)
@@ -94,6 +100,7 @@ final class AppearancePreferencesTests: XCTestCase {
         XCTAssertEqual(model.isFavoriteVisible, false)
         XCTAssertEqual(model.isContinueSetUpVisible, false)
         XCTAssertEqual(model.isRecentActivityVisible, false)
+        XCTAssertEqual(model.homeButtonPosition, .left)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {

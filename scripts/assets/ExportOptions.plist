@@ -18,6 +18,10 @@
 		<string>Sandbox MacOS Browser Release</string>
 		<key>com.duckduckgo.mobile.ios.review</key>
 		<string>Sandbox MacOS Browser Product Review</string>
+		<key>com.duckduckgo.macos.DBP.backgroundAgent</key>
+		<string>macOS DBP Agent - Release</string>
+		<key>com.duckduckgo.macos.DBP.backgroundAgent.review</key>
+		<string>macOS DBP Agent - Review</string>
 		<key>com.duckduckgo.macos.vpn.network-extension</key>
 		<string>macOS NetP VPN SysEx - Release (XPC)</string>
 		<key>com.duckduckgo.macos.vpn.network-extension.review</key>
