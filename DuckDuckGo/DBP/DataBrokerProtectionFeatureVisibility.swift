@@ -57,11 +57,13 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
 
     private var isWaitlistBetaActive: Bool {
         // Check privacy config
+        // return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
         true
     }
 
     private var isWaitlistEnabled: Bool {
         // Check privacy config
+        // return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
         true
     }
 
@@ -88,10 +90,12 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     /// we should set isWaitlistEnabled to false and isWaitlistBetaActive to true.
     /// To remove it from everyone, isWaitlistBetaActive should be set to false
     func isFeatureVisible() -> Bool {
+        guard isUserLocaleAllowed else { return false }
+
         if isWaitlistUser {
-            return isWaitlistBetaActive && isUserLocaleAllowed
+            return isWaitlistBetaActive
         } else {
-            return isWaitlistEnabled && isWaitlistBetaActive && isUserLocaleAllowed
+            return isWaitlistEnabled && isWaitlistBetaActive
         }
     }
 }
