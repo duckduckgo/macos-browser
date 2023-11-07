@@ -30,6 +30,7 @@ protocol AppearancePreferencesPersistor {
     var isRecentActivityVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
+    var homeButtonPosition: HomeButtonPosition { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -71,6 +72,15 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
             bookmarksBarValue = newValue.rawValue
         }
     }
+
+    @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
+    var homeButtonPosition: HomeButtonPosition
+}
+
+enum HomeButtonPosition: String, CaseIterable {
+    case hidden
+    case left
+    case right
 }
 
 enum DefaultZoomValue: CGFloat, CaseIterable {
@@ -214,6 +224,20 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var homeButtonPosition: HomeButtonPosition {
+        didSet {
+            persistor.homeButtonPosition = homeButtonPosition
+            switch homeButtonPosition {
+            case .hidden:
+                Pixel.fire(.homeButtonHidden)
+            case .left:
+                Pixel.fire(.homeButtonLeft)
+            case .right:
+                Pixel.fire(.homeButtonRight)
+            }
+        }
+    }
+
     var isContinueSetUpAvailable: Bool {
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp)
@@ -239,6 +263,7 @@ final class AppearancePreferences: ObservableObject {
         zoomPerWebsite = persistor.zoomPerWebsite.compactMapValues { DefaultZoomValue(rawValue: $0) }
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
+        homeButtonPosition = persistor.homeButtonPosition
     }
 
     private var persistor: AppearancePreferencesPersistor

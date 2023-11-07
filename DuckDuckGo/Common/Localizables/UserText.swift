@@ -127,7 +127,19 @@ struct UserText {
     static let mainMenuViewStop = NSLocalizedString("Stop", comment: "Main Menu View item")
     static let mainMenuViewReloadPage = NSLocalizedString("Reload Page", comment: "Main Menu View item")
     static let mainMenuViewHome = NSLocalizedString("Home", comment: "Main Menu View item")
-    static let mainMenuViewShowHomeShortcut = NSLocalizedString("Show Home Shortcut", comment: "Main Menu View item")
+    static let mainMenuHomeButton = NSLocalizedString("Home Button", comment: "Main Menu > View > Home Button item")
+        
+    static func mainMenuHomeButton(for position: HomeButtonPosition) -> String {
+        switch position {
+        case .hidden:
+            return NSLocalizedString("Hide", comment: "Main Menu > View > Home Button > None item")
+        case .left:
+            return NSLocalizedString("Show left of the back button", comment: "Main Menu > View > Home Button > left position item")
+        case .right:
+            return NSLocalizedString("Show right of the reload button", comment: "Main Menu > View > Home Button > right position item")
+        }
+    }
+    
     static let mainMenuViewShowAutofillShortcut = NSLocalizedString("Show Autofill Shortcut", comment: "Main Menu View item")
     static let mainMenuViewShowBookmarksShortcut = NSLocalizedString("Show Bookmarks Shortcut", comment: "Main Menu View item")
     static let mainMenuViewShowDownloadsShortcut = NSLocalizedString("Show Downloads Shortcut", comment: "Main Menu View item")
