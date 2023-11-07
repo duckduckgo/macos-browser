@@ -27,6 +27,13 @@ FEATURE_FLAGS = FEEDBACK DBP NETWORK_PROTECTION
 
 PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
+DBP_BACKGROUND_AGENT_BUNDLE_ID[sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Debug][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=CI][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Review][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.review
+
+DBP_BACKGROUND_AGENT_PRODUCT_NAME = DuckDuckGoDBPBackgroundAgent
+
 PRODUCT_NAME_PREFIX = DuckDuckGoDBP
 
 CODE_SIGN_STYLE[sdk=*] = Automatic

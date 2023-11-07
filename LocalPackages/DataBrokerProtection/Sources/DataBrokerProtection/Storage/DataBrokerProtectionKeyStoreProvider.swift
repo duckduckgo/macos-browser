@@ -53,8 +53,9 @@ final class DataBrokerProtectionKeyStoreProvider: SecureStorageKeyStoreProvider 
     func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
         return [
             kSecClass: kSecClassGenericPassword,
-            kSecUseDataProtectionKeychain: false,
+            kSecUseDataProtectionKeychain: true,
             kSecAttrSynchronizable: false,
+            kSecAttrAccessGroup: Bundle.main.appGroupName,
             kSecAttrAccount: named
         ] as [String: Any]
     }

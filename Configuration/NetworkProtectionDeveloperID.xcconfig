@@ -33,6 +33,7 @@ SYSEX_BUNDLE_ID[config=Review][sdk=*] = $(SYSEX_BUNDLE_ID_BASE).review
 SYSEX_BUNDLE_ID[config=Release][sdk=*] = $(SYSEX_BUNDLE_ID_BASE)
 
 DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE = $(SYSEX_BUNDLE_ID_BASE)
+
 DISTRIBUTED_NOTIFICATIONS_PREFIX[config=CI][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).ci
 DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Review][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).review
 DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Debug][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).debug
@@ -54,13 +55,18 @@ NOTIFICATIONS_AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.
 NOTIFICATIONS_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications.debug
 NOTIFICATIONS_AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications.debug
 NOTIFICATIONS_AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.notifications.review
+NOTIFICATIONS_AGENT_PRODUCT_NAME = DuckDuckGo Notifications
 
 AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.macos.vpn
+
+DBP_AGENT_BUNDLE_ID[sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent
+DBP_AGENT_BUNDLE_ID[config=Debug][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.debug
+DBP_AGENT_BUNDLE_ID[config=CI][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.debug
+DBP_AGENT_BUNDLE_ID[config=Review][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.review
+DBP_AGENT_PRODUCT_NAME = DuckDuckGoDBPBackgroundAgent
 
 AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
 AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
-
 AGENT_PRODUCT_NAME = DuckDuckGo VPN
-NOTIFICATIONS_AGENT_PRODUCT_NAME = DuckDuckGo Notifications

@@ -16,6 +16,12 @@ inputs:
   RELEASE_PROVISION_PROFILE_BASE64:
     required: true
     type: string
+  DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
   NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64:
     required: true
     type: string
@@ -55,6 +61,8 @@ runs:
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
         REVIEW_PP_PATH=$RUNNER_TEMP/review_pp.provisionprofile
         RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
+        DBP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/dbp_agent_release_pp.provisionprofile
+        DBP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/dbp_agent_review_pp.provisionprofile
         NETP_SYSEX_RELEASE_PP_PATH=$RUNNER_TEMP/netp_sysex_release_pp.provisionprofile
         NETP_SYSEX_REVIEW_PP_PATH=$RUNNER_TEMP/netp_sysex_review_pp.provisionprofile
         NETP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/netp_agent_release_pp.provisionprofile
@@ -66,6 +74,8 @@ runs:
         echo -n "${{ inputs.BUILD_CERTIFICATE_BASE64 }}" | base64 --decode -o $CERTIFICATE_PATH
         echo -n "${{ inputs.REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $REVIEW_PP_PATH
         echo -n "${{ inputs.RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $RELEASE_PP_PATH
+        echo -n "${{ inputs.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_RELEASE_PP_PATH
+        echo -n "${{ inputs.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_REVIEW_PP_PATH
         echo -n "${{ inputs.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_RELEASE_PP_PATH
         echo -n "${{ inputs.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_REVIEW_PP_PATH
         echo -n "${{ inputs.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_RELEASE_PP_PATH
@@ -86,6 +96,8 @@ runs:
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         cp $REVIEW_PP_PATH \
             $RELEASE_PP_PATH \
+            $DBP_AGENT_RELEASE_PP_PATH \
+            $DBP_AGENT_REVIEW_PP_PATH \
             $NETP_SYSEX_RELEASE_PP_PATH \
             $NETP_SYSEX_REVIEW_PP_PATH \
             $NETP_AGENT_RELEASE_PP_PATH \

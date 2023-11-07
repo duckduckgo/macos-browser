@@ -43,7 +43,7 @@ enum CCFReceivedMethodName: String {
 struct DataBrokerProtectionFeature: Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .all
     var featureName: String = "brokerProtection"
-    var broker: UserScriptMessageBroker? // This broker is not related to DBP brokers. It's just a name we inherit from Subfeature
+    weak var broker: UserScriptMessageBroker? // This broker is not related to DBP brokers. It's just a name we inherit from Subfeature
 
     weak var delegate: CCFCommunicationDelegate?
 

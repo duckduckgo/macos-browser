@@ -127,7 +127,19 @@ struct UserText {
     static let mainMenuViewStop = NSLocalizedString("Stop", comment: "Main Menu View item")
     static let mainMenuViewReloadPage = NSLocalizedString("Reload Page", comment: "Main Menu View item")
     static let mainMenuViewHome = NSLocalizedString("Home", comment: "Main Menu View item")
-    static let mainMenuViewShowHomeShortcut = NSLocalizedString("Show Home Shortcut", comment: "Main Menu View item")
+    static let mainMenuHomeButton = NSLocalizedString("Home Button", comment: "Main Menu > View > Home Button item")
+        
+    static func mainMenuHomeButton(for position: HomeButtonPosition) -> String {
+        switch position {
+        case .hidden:
+            return NSLocalizedString("Hide", comment: "Main Menu > View > Home Button > None item")
+        case .left:
+            return NSLocalizedString("Show left of the back button", comment: "Main Menu > View > Home Button > left position item")
+        case .right:
+            return NSLocalizedString("Show right of the reload button", comment: "Main Menu > View > Home Button > right position item")
+        }
+    }
+    
     static let mainMenuViewShowAutofillShortcut = NSLocalizedString("Show Autofill Shortcut", comment: "Main Menu View item")
     static let mainMenuViewShowBookmarksShortcut = NSLocalizedString("Show Bookmarks Shortcut", comment: "Main Menu View item")
     static let mainMenuViewShowDownloadsShortcut = NSLocalizedString("Show Downloads Shortcut", comment: "Main Menu View item")
@@ -666,7 +678,11 @@ struct UserText {
     static let onboardingSetDefaultButton = NSLocalizedString("onboarding.setdefault.button", value: "Let's Do It!", comment: "Launch the set default UI")
     static let onboardingNotNowButton = NSLocalizedString("onboarding.notnow.button", value: "Maybe Later", comment: "Skip a step of the onboarding flow")
 
-    static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: "You'll be asked to enter your Keychain password.\n\nDuckDuckGo won’t see your Keychain password, but macOS needs it to access and import passwords into DuckDuckGo.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Chromium")
+    static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: """
+    If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.
+
+    Imported passwords are stored securely using encryption.
+    """, comment: "More info when importing from Chromium")
 
     static let importFromFirefoxMoreInfo = NSLocalizedString("import.from.firefox.info", value: "You'll be asked to enter your Primary Password for Firefox.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Firefox")
 

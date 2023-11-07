@@ -28,7 +28,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
         case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
         case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
-        case .privacyConfiguration: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-config.json")!
+        case .privacyConfiguration: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
         case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")!
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)

@@ -149,12 +149,14 @@ final class DataBrokerOperationsCollection: Operation {
                     guard let self = self else { return false }
                     return !self.isCancelled
                 })
-                os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
 
                 if let sleepInterval = intervalBetweenOperations {
                     os_log("Waiting...: %{public}f", log: .dataBrokerProtection, sleepInterval)
                     try await Task.sleep(nanoseconds: UInt64(sleepInterval) * 1_000_000_000)
                 }
+
+                finish()
+
             } catch {
                 os_log("Error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
                 if let error = error as? DataBrokerProtectionError,
@@ -177,5 +179,7 @@ final class DataBrokerOperationsCollection: Operation {
 
         didChangeValue(forKey: #keyPath(isExecuting))
         didChangeValue(forKey: #keyPath(isFinished))
+
+        os_log("Finished operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
     }
 }
