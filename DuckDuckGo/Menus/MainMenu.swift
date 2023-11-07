@@ -93,8 +93,8 @@ import Subscription
     // MARK: - Debug
 
     private var loggingMenu: NSMenu?
-    let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: #selector(MainViewController.reloadConfigurationNow))
-    let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: #selector(MainViewController.reloadConfigurationNow))
+    let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
+    let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
 
     // MARK: - Help
 
