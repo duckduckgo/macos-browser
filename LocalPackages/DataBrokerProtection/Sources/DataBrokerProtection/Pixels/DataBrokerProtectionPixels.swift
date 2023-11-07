@@ -155,6 +155,7 @@ public enum DataBrokerProtectionPixels: Equatable {
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
+
     public var name: String {
         switch self {
         case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
@@ -225,5 +226,36 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .optOutFailure(let dataBroker, let attemptId, let duration, let stage):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage]
         }
+    }
+}
+
+public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    public init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .error(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .parentChildMatches,
+                    .optOutStart,
+                    .optOutEmailGenerate,
+                    .optOutCaptchaParse,
+                    .optOutCaptchaSend,
+                    .optOutCaptchaSolve,
+                    .optOutSubmit,
+                    .optOutEmailReceive,
+                    .optOutEmailConfirm,
+                    .optOutValidate,
+                    .optOutFinish,
+                    .optOutSubmitSuccess,
+                    .optOutSuccess,
+                    .optOutFailure:
+                PixelKit.fire(event)
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
+        fatalError("Use init()")
     }
 }

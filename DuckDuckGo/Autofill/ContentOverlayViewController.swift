@@ -168,7 +168,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }
 
     nonisolated
-    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+    public func emailManagerKeychainAccessFailed(_ emailManager: EmailManager, accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription
@@ -189,7 +189,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
             parameters["keychain_operation"] = "save"
         }
 
-        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+        Pixel.fire(.debug(event: .emailAutofillKeychainError, error: error), withAdditionalParameters: parameters)
     }
 
     private enum Constants {
@@ -208,6 +208,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
         self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
     }
+
 }
 
 extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDelegate {

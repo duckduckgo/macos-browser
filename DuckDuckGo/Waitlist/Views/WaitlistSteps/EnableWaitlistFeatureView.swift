@@ -31,7 +31,7 @@ protocol EnableWaitlistFeatureViewData {
 
 struct EnableWaitlistFeatureView: View {
     var viewData: EnableWaitlistFeatureViewData
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {
@@ -53,7 +53,7 @@ struct EnableWaitlistFeatureView: View {
         } buttons: {
             Button(viewData.buttonConfirmLabel) {
                 Task {
-                    await model.perform(action: .closeAndPinNetworkProtection)
+                    await model.perform(action: .closeAndConfirmFeature)
                 }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))

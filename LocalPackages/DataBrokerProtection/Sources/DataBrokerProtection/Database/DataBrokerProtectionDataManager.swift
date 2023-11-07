@@ -42,6 +42,7 @@ extension DataBrokerProtectionDataManaging {
 
 public protocol DataBrokerProtectionDataManagerDelegate: AnyObject {
     func dataBrokerProtectionDataManagerDidUpdateData()
+    func dataBrokerProtectionDataManagerDidDeleteData()
 }
 
 public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
@@ -53,6 +54,7 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 
     required public init(fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()) {
         self.database = DataBrokerProtectionDatabase(fakeBrokerFlag: fakeBrokerFlag)
+
         cache.delegate = self
     }
 
@@ -97,10 +99,14 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
     public func flushCache(profile: DataBrokerProtectionProfile?) async {
         guard let profile = profile else { return }
         await saveProfile(profile)
+
+        delegate?.dataBrokerProtectionDataManagerDidUpdateData()
     }
 
     public func removeAllData() {
         database.deleteProfileData()
+
+        delegate?.dataBrokerProtectionDataManagerDidDeleteData()
     }
 }
 
