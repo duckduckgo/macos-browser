@@ -190,11 +190,7 @@ extension AutofillType {
     }
 }
 
-extension AutofillTabExtension: EmailManagerRequestDelegate {
-    func emailManagerKeychainAccessFailed(_ emailManager: BrowserServicesKit.EmailManager, accessType: BrowserServicesKit.EmailKeychainAccessType, error: BrowserServicesKit.EmailKeychainAccessError) {
-        // no-op
-    }
-}
+extension AutofillTabExtension: EmailManagerRequestDelegate { }
 
 protocol AutofillProtocol {
     func setDelegate(_: ContentOverlayUserScriptDelegate?)

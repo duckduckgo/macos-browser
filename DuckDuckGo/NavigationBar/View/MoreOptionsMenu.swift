@@ -715,8 +715,4 @@ final class LoginsSubMenu: NSMenu {
 
 }
 
-extension MoreOptionsMenu: EmailManagerRequestDelegate {
-    func emailManagerKeychainAccessFailed(_ emailManager: BrowserServicesKit.EmailManager, accessType: BrowserServicesKit.EmailKeychainAccessType, error: BrowserServicesKit.EmailKeychainAccessError) {
-        // no-op        
-    }
-}
+extension MoreOptionsMenu: EmailManagerRequestDelegate {}
