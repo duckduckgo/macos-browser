@@ -386,6 +386,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
         options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
+        options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as? NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
         if case .custom(let keyValidity) = settings.registrationKeyValidity {
