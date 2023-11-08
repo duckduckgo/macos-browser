@@ -21,6 +21,14 @@ import Foundation
 import Navigation
 import UniformTypeIdentifiers
 import WebKit
+import BrowserServicesKit
+import Combine
+import Common
+import ContentBlocking
+import Foundation
+import Navigation
+import UserScript
+import WebKit
 
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
@@ -148,15 +156,36 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
     private func createWebView(from webView: WKWebView, with configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, of kind: NewWindowPolicy) -> WKWebView? {
         guard let delegate else { return nil }
 
-        let tab = Tab(content: .none,
-                      webViewConfiguration: configuration,
-                      parentTab: self,
-                      burnerMode: burnerMode,
-                      canBeClosedWithBack: kind.isSelectedTab,
-                      webViewSize: webView.superview?.bounds.size ?? .zero)
-        delegate.tab(self, createdChild: tab, of: kind)
+//        let tab = Tab(content: .none,
+//                      webViewConfiguration: configuration,
+//                      parentTab: self,
+//                      burnerMode: burnerMode,
+//                      canBeClosedWithBack: kind.isSelectedTab,
+//                      webViewSize: webView.superview?.bounds.size ?? .zero)
+//        delegate.tab(self, createdChild: tab, of: kind)
+//
+//        let webView = tab.webView
 
-        let webView = tab.webView
+        final class EasyVC: NSViewController {
+            override func loadView() {
+                self.view = NSView(frame: .zero)
+            }
+        }
+
+        let cb = AppPrivacyFeatures.shared.contentBlocking
+        configuration.applyStandardConfiguration(contentBlocking: cb, burnerMode: .regular)
+        (configuration.userContentController as? UserContentController)?.delegate = self
+        let webView = WKWebView(frame: .init(x: 0, y: 0, width: 800, height: 600), configuration: configuration)
+
+        let controller = EasyVC()
+        controller.view.frame = webView.frame
+        controller.view.addSubview(webView)
+
+        let window = NSWindow(contentViewController: controller)
+        window.center()
+        window.makeKeyAndOrderFront(window)
+        let wc = NSWindowController(window: window)
+        wc.showWindow(self)
 
         // WebKit automatically loads the request in the returned web view.
         return webView
