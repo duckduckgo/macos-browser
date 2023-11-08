@@ -70,7 +70,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     @objc private func resetWaitlistState() {
         DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        UserDefaultsAuthenticationData().reset()
+        KeychainAuthenticationData().reset()
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
         os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)
