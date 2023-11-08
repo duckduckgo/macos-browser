@@ -107,11 +107,24 @@ extension TunnelControllerIPCService: IPCServerInterface {
         try? await networkExtensionController.deactivateSystemExtension()
     }
 
-    func debugCommand(_ command: DebugCommand) async {
+    func debugCommand(_ command: NetworkProtection.DebugCommand) async {
         guard let activeSession = try? await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID) else {
             return
         }
 
+        // First give a chance to the extension to process the command, since some commands
+        // may remove the VPN configuration or deactivate the extension.
         try? await activeSession.sendProviderRequest(.debugCommand(command))
+
+        switch command {
+        case .deactivateSystemExtension:
+            try? await networkExtensionController.deactivateSystemExtension()
+        case .expireRegistrationKey: fallthrough
+        case .sendTestNotification:
+            // Intentional no-op: handled by the extension
+            break
+        case .removeVPNConfiguration:
+            await VPNConfigurationManager().removeVPNConfiguration()
+        }
     }
 }

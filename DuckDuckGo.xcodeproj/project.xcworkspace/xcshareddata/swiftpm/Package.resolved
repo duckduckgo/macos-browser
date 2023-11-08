@@ -10,15 +10,6 @@
       }
     },
     {
-      "identity" : "browserserviceskit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/BrowserServicesKit",
-      "state" : {
-        "revision" : "86e4aba326ce06585b842ab13023ce08f86ac424",
-        "version" : "82.2.0"
-      }
-    },
-    {
       "identity" : "content-scope-scripts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",

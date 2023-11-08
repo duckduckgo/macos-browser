@@ -67,15 +67,14 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
                 await resetAllStateForVPNApp(uninstallSystemExtension: uninstallSystemExtension)
             }
 
-            disableLoginItems()
-
+            await removeVPNConfiguration()
             await resetNetworkExtensionState()
 
-            // ☝️ Take care of resetting all state within the extension first, and wait half a second
+            // We want to give some time for the login item to reset state before disabling it
             try? await Task.sleep(interval: 0.5)
-            // 👇 And only afterwards turn off the tunnel and remove it from preferences
 
-            await stopTunnel()
+            disableLoginItems()
+
             resetUserDefaults()
 
             if !keepAuthToken {
@@ -89,7 +88,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     }
 
     func resetAllStateForVPNApp(uninstallSystemExtension: Bool) async {
-        await ipcClient.resetAll(uninstallSystemExtension: uninstallSystemExtension)
+        if uninstallSystemExtension {
+            await ipcClient.debugCommand(.deactivateSystemExtension)
+        }
 
 #if NETP_SYSTEM_EXTENSION
         userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
@@ -112,9 +113,13 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         }
     }
 
-    private func stopTunnel() async {
-        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+    private func removeVPNConfiguration() async {
+        // Remove the agent VPN configuration
+        await ipcClient.debugCommand(.removeVPNConfiguration)
 
+        // Remove the legacy (local) configuration
+        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+        
         if let tunnels = tunnels {
             for tunnel in tunnels {
                 tunnel.connection.stopVPNTunnel()
