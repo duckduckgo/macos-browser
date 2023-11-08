@@ -37,10 +37,6 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func stop()
 
-    /// Resets all of Network Protection's state that's handled by the server
-    ///
-    func resetAll(uninstallSystemExtension: Bool) async
-
     /// Debug commands
     ///
     func debugCommand(_ command: DebugCommand) async
@@ -67,13 +63,9 @@ protocol XPCServerInterface {
     ///
     func stop()
 
-    /// Resets all of Network Protection's state that's handled by the server
-    ///
-    func resetAll(uninstallSystemExtension: Bool) async
-
     /// Debug commands
     ///
-    func debugCommand(_ payload: Data) async
+    func debugCommand(_ payload: Data, completion: @escaping () -> Void)
 }
 
 public final class TunnelControllerIPCServer {
@@ -156,15 +148,14 @@ extension TunnelControllerIPCServer: XPCServerInterface {
         serverDelegate?.stop()
     }
 
-    func resetAll(uninstallSystemExtension: Bool) async {
-        await serverDelegate?.resetAll(uninstallSystemExtension: uninstallSystemExtension)
-    }
-
-    func debugCommand(_ payload: Data) async {
+    func debugCommand(_ payload: Data, completion: @escaping () -> Void) {
         guard let command = try? JSONDecoder().decode(DebugCommand.self, from: payload) else {
             return
         }
 
-        await serverDelegate?.debugCommand(command)
+        Task {
+            await serverDelegate?.debugCommand(command)
+            completion()
+        }
     }
 }

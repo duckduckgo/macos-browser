@@ -95,30 +95,22 @@ extension TunnelControllerIPCClient: IPCServerInterface {
         })
     }
 
-    public func resetAll(uninstallSystemExtension: Bool) async {
-        xpc.execute(call: { server in
-            Task {
-                await server.resetAll(uninstallSystemExtension: uninstallSystemExtension)
-            }
-        }, xpcReplyErrorHandler: { _ in
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
-    }
-
     public func debugCommand(_ command: DebugCommand) async {
         guard let payload = try? JSONEncoder().encode(command) else {
             return
         }
 
-        xpc.execute(call: { server in
-            Task {
-                await server.debugCommand(payload)
-            }
-        }, xpcReplyErrorHandler: { _ in
-            // Intentional no-op as there's no completion block
-            // If you add a completion block, please remember to call it here too!
-        })
+        await withCheckedContinuation { continuation in
+            xpc.execute(call: { server in
+                server.debugCommand(payload) {
+                    continuation.resume()
+                }
+            }, xpcReplyErrorHandler: { _ in
+                // Intentional no-op as there's no completion block
+                // If you add a completion block, please remember to call it here too!
+                continuation.resume()
+            })
+        }
     }
 }
 
