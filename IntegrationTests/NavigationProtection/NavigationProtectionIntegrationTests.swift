@@ -279,7 +279,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let tab = Tab(content: .none)
         window = WindowsManager.openNewWindow(with: tab)!
         let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
-        let url = URL(string: "https://privacy-test-pages.site/security/spoof-js-page-rewrite-simple.html")!
+        let url = URL(string: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html")!
         _=try await tab.setUrl(url, userEntered: nil)?.result.get()
         _=try await tab.webView.evaluateJavaScript("(function() { run(); return true; })()")
         try await Task.sleep(nanoseconds: UInt64(0.5 * Double(NSEC_PER_SEC)))
