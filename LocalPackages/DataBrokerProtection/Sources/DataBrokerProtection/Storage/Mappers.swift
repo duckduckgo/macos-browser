@@ -172,7 +172,8 @@ struct MapperToModel {
             steps: decodedBroker.steps,
             version: decodedBroker.version,
             schedulingConfig: decodedBroker.schedulingConfig,
-            parent: decodedBroker.parent
+            parent: decodedBroker.parent,
+            mirrorSites: decodedBroker.mirrorSites
         )
     }
 

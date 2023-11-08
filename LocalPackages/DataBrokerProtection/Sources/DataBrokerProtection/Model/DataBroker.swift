@@ -30,6 +30,12 @@ extension Int {
     }
 }
 
+struct MirrorSite: Codable, Sendable {
+    let name: String
+    let addedAt: Date
+    let removedAt: Date?
+}
+
 struct DataBroker: Codable, Sendable {
     let id: Int64?
     let name: String
@@ -37,6 +43,7 @@ struct DataBroker: Codable, Sendable {
     let version: String
     let schedulingConfig: DataBrokerScheduleConfig
     let parent: String?
+    let mirrorSites: [MirrorSite]
 
     var isFakeBroker: Bool {
         name.contains("fake") // A future improvement will be to add a property in the JSON file.
@@ -55,7 +62,8 @@ struct DataBroker: Codable, Sendable {
          steps: [Step],
          version: String,
          schedulingConfig: DataBrokerScheduleConfig,
-         parent: String? = nil
+         parent: String? = nil,
+         mirrorSites: [MirrorSite] = [MirrorSite]()
     ) {
         self.id = id
         self.name = name
@@ -63,6 +71,7 @@ struct DataBroker: Codable, Sendable {
         self.version = version
         self.schedulingConfig = schedulingConfig
         self.parent = parent
+        self.mirrorSites = mirrorSites
     }
 
     init(from decoder: Decoder) throws {
