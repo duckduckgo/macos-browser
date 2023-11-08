@@ -61,14 +61,13 @@ final class ZoomPopoverViewModelTests: XCTestCase {
 
     @MainActor
     func testWhenResetZoomFromPopoverThenWebViewIsReset() {
-        var decreasableDefaultValue = DefaultZoomValue.allCases
-        decreasableDefaultValue.removeFirst()
-        let randomZoomLevel = decreasableDefaultValue.randomElement()!
+        let randomZoomLevel = DefaultZoomValue.allCases.randomElement()!
+        tabVM.tab.webView.defaultZoomValue = .percent100
         tabVM.tab.webView.zoomLevel = randomZoomLevel
 
         zoomPopover.reset()
 
-        XCTAssertEqual(appearancePreferences.defaultPageZoom, tabVM.tab.webView.zoomLevel)
+        XCTAssertEqual(.percent100, tabVM.tab.webView.zoomLevel)
     }
 
     @MainActor
