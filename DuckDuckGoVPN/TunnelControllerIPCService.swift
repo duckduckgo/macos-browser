@@ -107,7 +107,7 @@ extension TunnelControllerIPCService: IPCServerInterface {
         try? await networkExtensionController.deactivateSystemExtension()
     }
 
-    func debugCommand(_ command: NetworkProtection.DebugCommand) async {
+    func debugCommand(_ command: DebugCommand) async {
         guard let activeSession = try? await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID) else {
             return
         }
