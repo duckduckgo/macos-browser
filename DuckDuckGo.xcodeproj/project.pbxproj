@@ -3904,8 +3904,6 @@
 		3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBP.xcconfig; sourceTree = "<group>"; };
 		3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPHomeViewController.swift; sourceTree = "<group>"; };
 		3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureDisabler.swift; sourceTree = "<group>"; };
-		3199C6FA2AF96F7C002A7BA1 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../DBP/BrowserServicesKit; sourceTree = "<group>"; };
-		3199C6FB2AF97037002A7BA1 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../DBP/content-scope-scripts"; sourceTree = "<group>"; };
 		3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionAppEvents.swift; sourceTree = "<group>"; };
 		31A031A5288191230090F792 /* CookieConsentAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationView.swift; sourceTree = "<group>"; };
 		31A031A828819D920090F792 /* CookieConsentAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationModel.swift; sourceTree = "<group>"; };
@@ -7061,8 +7059,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				3199C6FB2AF97037002A7BA1 /* content-scope-scripts */,
-				3199C6FA2AF96F7C002A7BA1 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
