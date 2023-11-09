@@ -2,7 +2,7 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop, "release/**", "dominik/gha-dependabot-pr-checks" ]
+    branches: [ develop, "release/**" ]
   pull_request:
 
 
@@ -207,7 +207,9 @@ jobs:
   release-build:
 
     name: Make Release Build
-    if: github.actor != 'ayoy'
+
+    # Dependabot doesn't have access to all secrets, so we skip this job
+    if: github.actor != 'dependabot[bot]'
 
     strategy:
       matrix:
