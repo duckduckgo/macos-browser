@@ -382,7 +382,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isHovering ? mouseOverColor : backgroundColor)
 
-            FaviconView(url: site.url, size: 22)
+            FaviconView(url: site.url, size: 22).environmentObject(MissingFaviconHandler.noOp)
         }
         .link {
             self.isHovering = $0
@@ -404,7 +404,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(backgroundColor)
 
-            FaviconView(url: site.url, size: 22)
+            FaviconView(url: site.url, size: 22).environmentObject(MissingFaviconHandler.noOp)
         }
         .frame(width: 32, height: 32)
     }

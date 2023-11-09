@@ -109,4 +109,9 @@ enum UserText {
     static let credentialsLimitExceededDescription = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-description", value: "Logins limit exceeded. Delete some to resume syncing.", comment: "Description for sync credentials limits exceeded warning")
     static let bookmarksLimitExceededAction = NSLocalizedString("prefrences.sync.bookmarks-limit-exceeded-action", value: "Manage Bookmarks", comment: "Button title for sync bookmarks limits exceeded warning to manage bookmarks")
     static let credentialsLimitExceededAction = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-action", value: "Manage Logins", comment: "Button title for sync credentials limits exceeded warning to manage logins")
+
+    static let fetchFaviconsOnboardingTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-title", value: "Find Missing Icons?", comment: "Title for fetch favicons onboarding dialog")
+    static let fetchFaviconsOnboardingMessage = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-message", value: "Would you like DuckDuckGo to find and download icons for your bookmarks?", comment: "Text for fetch favicons onboarding dialog")
+    static let fetchFaviconsOnboardingOptionTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-option-title", value: "Keep Icons Updated", comment: "Title for fetch favicons option in the onboarding dialog")
+    static let fetchFaviconsOnboardingOptionCaption = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-option-caption", value: "Have this device automatically download icons for synced bookmarks.", comment: "Text for fetch favicons option in the onboarding dialog")
 }

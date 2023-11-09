@@ -254,6 +254,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
     }
 
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 }
 
 // MARK: - Modal Delegates
@@ -325,6 +332,10 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             if let bookmark = entity as? Bookmark {
                 cell.update(from: bookmark)
                 cell.editing = bookmark.id == editingBookmarkIndex?.uuid
+
+                if bookmark.favicon(.small) == nil {
+                    faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
+                }
             } else if let folder = entity as? BookmarkFolder {
                 cell.update(from: folder)
                 cell.editing = folder.id == editingBookmarkIndex?.uuid
@@ -490,7 +501,6 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
         tabCollection.append(tabs: tabs)
     }
-
 }
 
 // MARK: - BookmarkTableCellViewDelegate

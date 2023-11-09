@@ -170,7 +170,9 @@ public struct UserDefaultsWrapper<T> {
         case favoritesDisplayMode = "sync.favorites-display-mode"
         case syncBookmarksPaused = "sync.bookmarks-paused"
         case syncCredentialsPaused = "sync.credentials-paused"
-        case syncAutomaticallyFetchFavicons = "sync.automatically-fetch-favicons"
+        case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
+        case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
+        case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
     }
 
     enum RemovedKeys: String, CaseIterable {

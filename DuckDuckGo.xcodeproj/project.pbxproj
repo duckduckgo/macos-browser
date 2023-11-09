@@ -1695,6 +1695,14 @@
 		379E877729E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */; };
 		37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */; };
 		37A5E2F0298AA1B20047046B /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 37A5E2EF298AA1B20047046B /* Persistence */; };
+		37A6A8F12AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */; };
+		37A6A8F22AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */; };
+		37A6A8F32AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */; };
+		37A6A8F42AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */; };
+		37A6A8F62AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
+		37A6A8F72AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
+		37A6A8F82AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
+		37A6A8F92AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */; };
 		37A803DB27FD69D300052F4C /* DataImportResources in Resources */ = {isa = PBXBuildFile; fileRef = 37A803DA27FD69D300052F4C /* DataImportResources */; };
 		37AFCE8127DA2CA600471A10 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */; };
 		37AFCE8527DA2D3900471A10 /* PreferencesSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */; };
@@ -3985,6 +3993,8 @@
 		379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesAutofillView.swift; sourceTree = "<group>"; };
 		379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksCleanupErrorHandling.swift; sourceTree = "<group>"; };
 		37A4CEB9282E992F00D75B89 /* StartupPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupPreferences.swift; sourceTree = "<group>"; };
+		37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboarding.swift; sourceTree = "<group>"; };
+		37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconsFetcherOnboardingViewController.swift; sourceTree = "<group>"; };
 		37A803DA27FD69D300052F4C /* DataImportResources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DataImportResources; sourceTree = "<group>"; };
 		37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesSidebar.swift; sourceTree = "<group>"; };
@@ -5483,6 +5493,8 @@
 				37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */,
 				37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */,
 				37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */,
+				37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */,
+				37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -10542,6 +10554,7 @@
 				3192A16E2A4C4CFF0084EA89 /* ApplicationVersionReader.swift in Sources */,
 				3192A16F2A4C4CFF0084EA89 /* BookmarksBarViewController.swift in Sources */,
 				3192A1702A4C4CFF0084EA89 /* PreferencesAutofillView.swift in Sources */,
+				37A6A8F82AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */,
 				3192A1712A4C4CFF0084EA89 /* BurnerHomePageView.swift in Sources */,
 				4B6785492AA8DE6A008A5004 /* NetworkProtectionFeatureDisabler.swift in Sources */,
 				3192A1722A4C4CFF0084EA89 /* UserText+PasswordManager.swift in Sources */,
@@ -10622,6 +10635,7 @@
 				3192A1B32A4C4CFF0084EA89 /* TabBarCollectionView.swift in Sources */,
 				3192A1B42A4C4CFF0084EA89 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				3192A1B52A4C4CFF0084EA89 /* NavigationActionExtension.swift in Sources */,
+				37A6A8F32AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
 				4B9DB02E2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */,
 				3192A1B62A4C4CFF0084EA89 /* NSAlertExtension.swift in Sources */,
 				3192A1B72A4C4CFF0084EA89 /* ThirdPartyBrowser.swift in Sources */,
@@ -10749,6 +10763,7 @@
 				3706FA9D293F65D500E42796 /* PermissionState.swift in Sources */,
 				3707C724294B5D2900682A9F /* StringExtension.swift in Sources */,
 				3706FA9F293F65D500E42796 /* FeedbackPresenter.swift in Sources */,
+				37A6A8F22AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
 				859F30652A72A9FA00C20372 /* BookmarksBarPromptPopover.swift in Sources */,
 				37197EA22942441900394917 /* Tab+Dialogs.swift in Sources */,
 				3706FAA0293F65D500E42796 /* UserAgent.swift in Sources */,
@@ -11238,6 +11253,7 @@
 				4B9DB0272A983B24000927DB /* WaitlistViewModel.swift in Sources */,
 				4B9DB03F2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
 				987799F22999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
+				37A6A8F72AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */,
 				3706FC2C293F65D500E42796 /* BookmarkHTMLReader.swift in Sources */,
 				3706FC2D293F65D500E42796 /* Tab+NSSecureCoding.swift in Sources */,
 				3706FC2E293F65D500E42796 /* NSNotificationName+EmailManager.swift in Sources */,
@@ -11950,6 +11966,7 @@
 				4B9579D92AC7AE700062CA31 /* DownloadListItem.swift in Sources */,
 				4B9579DA2AC7AE700062CA31 /* WaitlistRequest.swift in Sources */,
 				4B9579DB2AC7AE700062CA31 /* DownloadsPopover.swift in Sources */,
+				37A6A8F92AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */,
 				4B9579DC2AC7AE700062CA31 /* BookmarksBarMenuFactory.swift in Sources */,
 				4B9579DD2AC7AE700062CA31 /* SpacerNode.swift in Sources */,
 				B62B483C2ADE46FC000DECE5 /* Application.swift in Sources */,
@@ -12462,6 +12479,7 @@
 				4B957BC82AC7AE700062CA31 /* WebViewContainerView.swift in Sources */,
 				4B957BC92AC7AE700062CA31 /* BookmarkStore.swift in Sources */,
 				4B957BCA2AC7AE700062CA31 /* PrivacyDashboardViewController.swift in Sources */,
+				37A6A8F42AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
 				4B957BCB2AC7AE700062CA31 /* PreferencesAppearanceView.swift in Sources */,
 				4B957BCC2AC7AE700062CA31 /* NSMenuItemExtension.swift in Sources */,
 				4B957BCD2AC7AE700062CA31 /* ContiguousBytesExtension.swift in Sources */,
@@ -12622,6 +12640,7 @@
 				AA7E919F287872EA00AB6B62 /* VisitViewModel.swift in Sources */,
 				B6676BE12AA986A700525A21 /* AddressBarTextEditor.swift in Sources */,
 				B69B503B2726A12500758A2B /* Atb.swift in Sources */,
+				37A6A8F12AFCC988008580A3 /* FaviconsFetcherOnboarding.swift in Sources */,
 				B6C0BB6A29AF1C7000AE8E3C /* BrowserTabView.swift in Sources */,
 				B6B1E88026D5DA9B0062C350 /* DownloadsViewController.swift in Sources */,
 				85AC3AF725D5DBFD00C7D2AA /* DataExtension.swift in Sources */,
@@ -13002,6 +13021,7 @@
 				4BB99D0026FE191E001E4761 /* CoreDataBookmarkImporter.swift in Sources */,
 				4BCF15D72ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift in Sources */,
 				D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */,
+				37A6A8F62AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,
 				4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */,

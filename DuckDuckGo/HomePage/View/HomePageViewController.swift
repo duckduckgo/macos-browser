@@ -28,6 +28,14 @@ final class HomePageViewController: NSViewController {
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
 
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
+
     private weak var host: NSView?
 
     var favoritesModel: HomePage.Models.FavoritesModel!
@@ -71,12 +79,17 @@ final class HomePageViewController: NSViewController {
 
         refreshModels()
 
+        let missingFaviconHandler = MissingFaviconHandler { [weak self] _ in
+            self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
+        }
+
         let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
             .environmentObject(appearancePreferences)
+            .environmentObject(missingFaviconHandler)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()

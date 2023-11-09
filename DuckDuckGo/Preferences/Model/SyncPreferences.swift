@@ -49,7 +49,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var codeToDisplay: String?
     let managementDialogModel: ManagementDialogModel
 
-    @Published var devices: [SyncDevice] = []
+    @Published var devices: [SyncDevice] = [] {
+        didSet {
+            syncBookmarksAdapter.isEligibleForFaviconsFetcherOnboarding = devices.count > 1
+        }
+    }
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
