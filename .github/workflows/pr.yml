@@ -2,7 +2,7 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop, "release/**" ]
+    branches: [ develop, "release/**", "dominik/gha-dependabot-pr-checks" ]
   pull_request:
 
 
