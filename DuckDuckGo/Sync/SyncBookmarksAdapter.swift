@@ -41,7 +41,7 @@ final class SyncBookmarksAdapter {
     }
 
     @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
-    private var wasSyncBookmarksErrorDisplayed: Bool
+    private var didShowBookmarksSyncPausedError: Bool
 
     init(
         database: CoreDataDatabase,
@@ -78,7 +78,7 @@ final class SyncBookmarksAdapter {
             metadataStore: metadataStore) { [weak self] in
                 LocalBookmarkManager.shared.loadBookmarks()
                 self?.isSyncBookmarksPaused = false
-                self?.wasSyncBookmarksErrorDisplayed = false
+                self?.didShowBookmarksSyncPausedError = false
             }
         if shouldResetBookmarksSyncTimestamp {
             provider.lastSyncTimestamp = nil
@@ -118,12 +118,12 @@ final class SyncBookmarksAdapter {
     }
 
     private func showSyncPausedAlert() {
-        guard !wasSyncBookmarksErrorDisplayed else { return }
+        guard !didShowBookmarksSyncPausedError else { return }
         Task {
             await MainActor.run {
                 let alert = NSAlert.syncBookmarksPaused()
                 let response = alert.runModal()
-                wasSyncBookmarksErrorDisplayed = true
+                didShowBookmarksSyncPausedError = true
 
                 switch response {
                 case .alertSecondButtonReturn:

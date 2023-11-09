@@ -37,7 +37,7 @@ final class SyncCredentialsAdapter {
     }
 
     @UserDefaultsWrapper(key: .syncCredentialsPausedErrorDisplayed, defaultValue: false)
-    private var wasSyncCredentialsErrorDisplayed: Bool
+    private var didShowCredentialsSyncPausedError: Bool
 
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
@@ -71,7 +71,7 @@ final class SyncCredentialsAdapter {
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
                     self?.isSyncCredentialsPaused = false
-                    self?.wasSyncCredentialsErrorDisplayed = false
+                    self?.didShowCredentialsSyncPausedError = false
                 }
             )
 
@@ -115,12 +115,12 @@ final class SyncCredentialsAdapter {
     }
 
     private func showSyncPausedAlert() {
-        guard !wasSyncCredentialsErrorDisplayed else { return }
+        guard !didShowCredentialsSyncPausedError else { return }
         Task {
             await MainActor.run {
                 let alert = NSAlert.syncCredentialsPaused()
                 let response = alert.runModal()
-                wasSyncCredentialsErrorDisplayed = true
+                didShowCredentialsSyncPausedError = true
 
                 switch response {
                 case .alertSecondButtonReturn:
