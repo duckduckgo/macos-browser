@@ -21,7 +21,7 @@ BUNDLE_IDENTIFIER_PREFIX = $(AGENT_BUNDLE_ID)
 // Override AppTargetsBase.xcconfig until we resolve bundle IDs.
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug VPN][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
+PRODUCT_BUNDLE_IDENTIFIER[config=DebugVPN][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
 
@@ -37,12 +37,12 @@ INFOPLIST_KEY_NSPrincipalClass = Application
 CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPN.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPN.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPNDebug.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Debug VPN][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPNDebug.entitlements
+CODE_SIGN_ENTITLEMENTS[config=DebugVPN][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPNDebug.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoVPN/DuckDuckGoVPN.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
-CODE_SIGN_IDENTITY[config=Debug VPN][sdk=macosx*] = Apple Development
+CODE_SIGN_IDENTITY[config=DebugVPN][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
@@ -54,7 +54,7 @@ PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS NetP VPN App
 FEATURE_FLAGS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
-FEATURE_FLAGS[config=Debug VPN][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
+FEATURE_FLAGS[config=DebugVPN][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION NETWORK_PROTECTION
 
 SWIFT_OBJC_BRIDGING_HEADER =

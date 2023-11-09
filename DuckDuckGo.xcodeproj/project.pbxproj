@@ -9971,7 +9971,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ \"${CONFIGURATION}\" != \"Debug VPN\" ]]; then\n    # run only for Debug VPN builds\n    exit 0\nfi\n\n# if Xcode created real Applications directory inside BUILT_PRODUCTS_DIR \nif [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # we only get here on clean build, remove an existing app in /Applications/DEBUG on clean build\n    echo \"rm -rf /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # create /Applications/DEBUG dir\n    echo \"mkdir -p /${INSTALL_PATH}\"\n    mkdir -p \"/${INSTALL_PATH}\"\n\n    # move the app bundle to /Applications/DEBUG\n    echo \"mv ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    mv \"${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\" \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"rm -rf ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf \"${BUILT_PRODUCTS_DIR}/Applications\"\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    echo \"ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\"\n    ln -s /Applications \"${BUILT_PRODUCTS_DIR}/Applications\"\nfi\n";
+			shellScript = "if [[ \"${CONFIGURATION}\" != \"DebugVPN\" ]]; then\n    # run only for Debug VPN builds\n    exit 0\nfi\n\n# if Xcode created real Applications directory inside BUILT_PRODUCTS_DIR \nif [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # we only get here on clean build, remove an existing app in /Applications/DEBUG on clean build\n    echo \"rm -rf /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # create /Applications/DEBUG dir\n    echo \"mkdir -p /${INSTALL_PATH}\"\n    mkdir -p \"/${INSTALL_PATH}\"\n\n    # move the app bundle to /Applications/DEBUG\n    echo \"mv ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    mv \"${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\" \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"rm -rf ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf \"${BUILT_PRODUCTS_DIR}/Applications\"\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    echo \"ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\"\n    ln -s /Applications \"${BUILT_PRODUCTS_DIR}/Applications\"\nfi\n";
 		};
 		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -13851,138 +13851,138 @@
 			};
 			name = Review;
 		};
-		4BE36CA62AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CA62AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37717E66296B5A20002FAEDF /* Global.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CA72AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CA72AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4BE36CB92AF95F0A0088B7EE /* DuckDuckGoVPNDebugging.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CA82AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CA82AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CA92AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CA92AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588D295CF447002C0CC0 /* UnitTests.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CAA2AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CAA2AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CAB2AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CAB2AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CAC2AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CAC2AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75733296F4F0500E1C162 /* UnitTestsAppStore.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CAD2AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CAD2AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CAE2AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CAE2AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B6EC37FA29B6447F001ACE79 /* TestsServer.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CAF2AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CAF2AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB02AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB02AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB12AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB12AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB22AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB22AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB32AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB32AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB42AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB42AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB52AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB52AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB62AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB62AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB72AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB72AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
-		4BE36CB82AF95E740088B7EE /* Debug VPN */ = {
+		4BE36CB82AF95E740088B7EE /* DebugVPN */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug VPN";
+			name = DebugVPN;
 		};
 		7B4CE8E126F02108009134B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -14201,7 +14201,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3192A26A2A4C4CFF0084EA89 /* Debug */,
-				4BE36CB42AF95E740088B7EE /* Debug VPN */,
+				4BE36CB42AF95E740088B7EE /* DebugVPN */,
 				3192A26B2A4C4CFF0084EA89 /* CI */,
 				3192A26C2A4C4CFF0084EA89 /* Release */,
 				3192A26D2A4C4CFF0084EA89 /* Review */,
@@ -14213,7 +14213,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3706FCFB293F65D500E42796 /* Debug */,
-				4BE36CAB2AF95E740088B7EE /* Debug VPN */,
+				4BE36CAB2AF95E740088B7EE /* DebugVPN */,
 				3706FCFE293F65D500E42796 /* CI */,
 				3706FCFF293F65D500E42796 /* Release */,
 				3706FD02293F65D500E42796 /* Review */,
@@ -14225,7 +14225,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3706FE93293F661700E42796 /* Debug */,
-				4BE36CAC2AF95E740088B7EE /* Debug VPN */,
+				4BE36CAC2AF95E740088B7EE /* DebugVPN */,
 				3706FE94293F661700E42796 /* CI */,
 				3706FE95293F661700E42796 /* Release */,
 				3706FE97293F661700E42796 /* Review */,
@@ -14237,7 +14237,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3706FEAC293F662100E42796 /* Debug */,
-				4BE36CAD2AF95E740088B7EE /* Debug VPN */,
+				4BE36CAD2AF95E740088B7EE /* DebugVPN */,
 				3706FEAD293F662100E42796 /* CI */,
 				3706FEAE293F662100E42796 /* Release */,
 				3706FEB0293F662100E42796 /* Review */,
@@ -14249,7 +14249,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B1AD8A425FC27E200261379 /* Debug */,
-				4BE36CAA2AF95E740088B7EE /* Debug VPN */,
+				4BE36CAA2AF95E740088B7EE /* DebugVPN */,
 				4B1AD8B325FC322600261379 /* CI */,
 				4B1AD8A525FC27E200261379 /* Release */,
 				AAE814AE2716DFE8009D3531 /* Review */,
@@ -14261,7 +14261,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B2537672A11BE7700610219 /* Debug */,
-				4BE36CB02AF95E740088B7EE /* Debug VPN */,
+				4BE36CB02AF95E740088B7EE /* DebugVPN */,
 				4B2537682A11BE7700610219 /* CI */,
 				4B2537692A11BE7700610219 /* Release */,
 				4B25376A2A11BE7700610219 /* Review */,
@@ -14273,7 +14273,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B2D06462A11CFBE00DE1F49 /* Debug */,
-				4BE36CB22AF95E740088B7EE /* Debug VPN */,
+				4BE36CB22AF95E740088B7EE /* DebugVPN */,
 				4B2D06472A11CFBE00DE1F49 /* CI */,
 				4B2D06482A11CFBE00DE1F49 /* Release */,
 				4B2D06492A11CFBE00DE1F49 /* Review */,
@@ -14285,7 +14285,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B2D06762A13318600DE1F49 /* Debug */,
-				4BE36CB32AF95E740088B7EE /* Debug VPN */,
+				4BE36CB32AF95E740088B7EE /* DebugVPN */,
 				4B2D06772A13318600DE1F49 /* CI */,
 				4B2D06782A13318600DE1F49 /* Release */,
 				4B2D06792A13318600DE1F49 /* Review */,
@@ -14297,7 +14297,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B4BEC2D2A11B4E3001D9AC5 /* Debug */,
-				4BE36CB12AF95E740088B7EE /* Debug VPN */,
+				4BE36CB12AF95E740088B7EE /* DebugVPN */,
 				4B4BEC2E2A11B4E3001D9AC5 /* CI */,
 				4B4BEC2F2A11B4E3001D9AC5 /* Release */,
 				4B4BEC302A11B4E3001D9AC5 /* Review */,
@@ -14309,7 +14309,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B4D60492A0B290300BCD287 /* Debug */,
-				4BE36CAF2AF95E740088B7EE /* Debug VPN */,
+				4BE36CAF2AF95E740088B7EE /* DebugVPN */,
 				4B4D604A2A0B290300BCD287 /* CI */,
 				4B4D604B2A0B290300BCD287 /* Release */,
 				4B4D604C2A0B290300BCD287 /* Review */,
@@ -14321,7 +14321,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B957C3D2AC7AE700062CA31 /* Debug */,
-				4BE36CB82AF95E740088B7EE /* Debug VPN */,
+				4BE36CB82AF95E740088B7EE /* DebugVPN */,
 				4B957C3E2AC7AE700062CA31 /* CI */,
 				4B957C3F2AC7AE700062CA31 /* Release */,
 				4B957C402AC7AE700062CA31 /* Review */,
@@ -14333,7 +14333,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B4CE8E126F02108009134B1 /* Debug */,
-				4BE36CA82AF95E740088B7EE /* Debug VPN */,
+				4BE36CA82AF95E740088B7EE /* DebugVPN */,
 				7B4CE8E226F02108009134B1 /* CI */,
 				7B4CE8E326F02108009134B1 /* Release */,
 				AAE814AF2716DFE8009D3531 /* Review */,
@@ -14345,7 +14345,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B96D0D62ADFDA7F007E02C8 /* Debug */,
-				4BE36CB52AF95E740088B7EE /* Debug VPN */,
+				4BE36CB52AF95E740088B7EE /* DebugVPN */,
 				7B96D0D72ADFDA7F007E02C8 /* CI */,
 				7B96D0D82ADFDA7F007E02C8 /* Release */,
 				7B96D0D92ADFDA7F007E02C8 /* Review */,
@@ -14357,7 +14357,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9D9AE8CD2AAA39A70026E7DC /* Debug */,
-				4BE36CB62AF95E740088B7EE /* Debug VPN */,
+				4BE36CB62AF95E740088B7EE /* DebugVPN */,
 				9D9AE8CE2AAA39A70026E7DC /* CI */,
 				9D9AE8CF2AAA39A70026E7DC /* Release */,
 				9D9AE8D02AAA39A70026E7DC /* Review */,
@@ -14369,7 +14369,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9D9AE8EE2AAA39D30026E7DC /* Debug */,
-				4BE36CB72AF95E740088B7EE /* Debug VPN */,
+				4BE36CB72AF95E740088B7EE /* DebugVPN */,
 				9D9AE8EF2AAA39D30026E7DC /* CI */,
 				9D9AE8F02AAA39D30026E7DC /* Release */,
 				9D9AE8F12AAA39D30026E7DC /* Review */,
@@ -14381,7 +14381,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA585DA2248FD31500E9A3E2 /* Debug */,
-				4BE36CA62AF95E740088B7EE /* Debug VPN */,
+				4BE36CA62AF95E740088B7EE /* DebugVPN */,
 				4B1AD8B025FC322600261379 /* CI */,
 				AA585DA3248FD31500E9A3E2 /* Release */,
 				AAE814AB2716DFE8009D3531 /* Review */,
@@ -14393,7 +14393,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA585DA5248FD31500E9A3E2 /* Debug */,
-				4BE36CA72AF95E740088B7EE /* Debug VPN */,
+				4BE36CA72AF95E740088B7EE /* DebugVPN */,
 				4B1AD8B125FC322600261379 /* CI */,
 				AA585DA6248FD31500E9A3E2 /* Release */,
 				AAE814AC2716DFE8009D3531 /* Review */,
@@ -14405,7 +14405,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA585DA8248FD31500E9A3E2 /* Debug */,
-				4BE36CA92AF95E740088B7EE /* Debug VPN */,
+				4BE36CA92AF95E740088B7EE /* DebugVPN */,
 				4B1AD8B225FC322600261379 /* CI */,
 				AA585DA9248FD31500E9A3E2 /* Release */,
 				AAE814AD2716DFE8009D3531 /* Review */,
@@ -14417,7 +14417,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B6EC37ED29B5DA2A001ACE79 /* Debug */,
-				4BE36CAE2AF95E740088B7EE /* Debug VPN */,
+				4BE36CAE2AF95E740088B7EE /* DebugVPN */,
 				B6EC37EE29B5DA2A001ACE79 /* CI */,
 				B6EC37EF29B5DA2A001ACE79 /* Release */,
 				B6EC37F029B5DA2A001ACE79 /* Review */,
