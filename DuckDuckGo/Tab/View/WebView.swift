@@ -24,9 +24,14 @@ protocol WebViewContextMenuDelegate: AnyObject {
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?)
 }
 
+protocol WebViewZoomLevelDelegate: AnyObject {
+    func zoomWasSet(to level: DefaultZoomValue)
+}
+
 final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
+    weak var zoomLevelDelegate: WebViewZoomLevelDelegate?
 
     override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
@@ -79,16 +84,19 @@ final class WebView: WKWebView {
 
     func resetZoomLevel() {
         zoomLevel = defaultZoomValue
+        zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     func zoomIn() {
         guard canZoomIn else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index + 1]
+        zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     func zoomOut() {
         guard canZoomOut else { return }
         zoomLevel = DefaultZoomValue.allCases[self.zoomLevel.index - 1]
+        zoomLevelDelegate?.zoomWasSet(to: zoomLevel)
     }
 
     // MARK: - Menu

@@ -41,6 +41,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
+    private var zoomPopover: ZoomPopover?
+
     private var bookmarkPopover: BookmarkPopover?
     private func bookmarkPopoverCreatingIfNeeded() -> BookmarkPopover {
         return bookmarkPopover ?? {
@@ -83,6 +85,7 @@ final class AddressBarButtonsViewController: NSViewController {
     @IBOutlet weak var privacyDashboardPositioningView: NSView!
 
     @IBOutlet weak var privacyEntryPointButton: MouseOverAnimationButton!
+    @IBOutlet weak var zoomButton: NSButton!
     @IBOutlet weak var bookmarkButton: AddressBarButton!
     @IBOutlet weak var imageButtonWrapper: NSView!
     @IBOutlet weak var imageButton: NSButton!
@@ -157,6 +160,7 @@ final class AddressBarButtonsViewController: NSViewController {
     var isMouseOverNavigationBar = false {
         didSet {
             updateBookmarkButtonVisibility()
+            updateZoomButtonVisibility()
         }
     }
 
@@ -196,6 +200,7 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        updateZoomButtonVisibility()
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
     }
@@ -251,6 +256,16 @@ final class AddressBarButtonsViewController: NSViewController {
         openBookmarkPopover(setFavorite: false, accessPoint: .button)
     }
 
+    @IBAction func zoomButtonPressed(_ sender: Any) {
+        NotificationCenter.default.removeObserver(self, name: NSPopover.willCloseNotification, object: zoomPopover)
+        guard let tabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
+        zoomPopover = ZoomPopover(tabViewModel: tabViewModel)
+        zoomPopover!.show(positionedBelow: zoomButton)
+        NotificationCenter.default.addObserver(forName: NSPopover.didCloseNotification, object: zoomPopover, queue: .main) { _ in
+            self.updateZoomButtonVisibility()
+        }
+    }
+
     @IBAction func clearButtonAction(_ sender: Any) {
         delegate?.addressBarButtonsViewControllerClearButtonClicked(self)
     }
@@ -275,6 +290,15 @@ final class AddressBarButtonsViewController: NSViewController {
         let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
 
         bookmarkButton.isHidden = !showBookmarkButton
+    }
+
+    private func updateZoomButtonVisibility() {
+        guard view.window?.isPopUpWindow == false else { return }
+
+        let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
+        let showZoomButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || zoomPopover?.isShown == true)
+
+        zoomButton.isHidden = !showZoomButton
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
@@ -381,6 +405,7 @@ final class AddressBarButtonsViewController: NSViewController {
         updateImageButton()
         updatePermissionButtons()
         updateBookmarkButtonVisibility()
+        updateZoomButtonVisibility()
     }
 
     @IBAction func cameraButtonAction(_ sender: NSButton) {
@@ -590,6 +615,7 @@ final class AddressBarButtonsViewController: NSViewController {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             updateBookmarkButtonImage()
             updateBookmarkButtonVisibility()
+            updateZoomButtonVisibility()
             return
         }
 
@@ -597,6 +623,7 @@ final class AddressBarButtonsViewController: NSViewController {
             self?.stopAnimations()
             self?.updateBookmarkButtonImage()
             self?.updateBookmarkButtonVisibility()
+            self?.updateZoomButtonVisibility()
         }
     }
 

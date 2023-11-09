@@ -107,9 +107,11 @@ final class TabViewModel {
 
     private func subscribeToUrl() {
         tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateAddressBarStrings()
-            self?.updateCanBeBookmarked()
-            self?.updateFavicon()
+            guard let self else { return }
+            self.updateAddressBarStrings()
+            self.updateCanBeBookmarked()
+            self.updateFavicon()
+            self.updateZoomForWebsite(zoomLevels: appearancePreferences.zoomPerWebsite)
         } .store(in: &cancellables)
     }
 
@@ -175,6 +177,7 @@ final class TabViewModel {
     }
 
     private func subscribeToAppearancePreferences() {
+        self.tab.webView.zoomLevelDelegate = self
         appearancePreferences.$showFullURL.dropFirst().sink { [weak self] newValue in
             guard let self = self, let url = self.tabURL, let host = self.tabHostURL else { return }
             self.updatePassiveAddressBarString(showURL: newValue, url: url, hostURL: host)
@@ -182,13 +185,33 @@ final class TabViewModel {
         appearancePreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
             self.tab.webView.defaultZoomValue = newValue
-            self.tab.webView.zoomLevel = newValue
+            if !isThereZoomPerWebsite {
+                self.tab.webView.zoomLevel = newValue
+            }
         }.store(in: &cancellables)
+        appearancePreferences.$zoomPerWebsite.sink { [weak self] newValue in
+            guard let self = self else { return }
+            updateZoomForWebsite(zoomLevels: newValue)
+        }.store(in: &cancellables)
+    }
+
+    private var isThereZoomPerWebsite: Bool {
+        guard let hostString = tabHostURL?.absoluteString else { return false }
+        return appearancePreferences.zoomPerWebsite[hostString] != nil
+    }
+
+    private func updateZoomForWebsite(zoomLevels: [String: DefaultZoomValue]) {
+        guard let hostString = tabHostURL?.absoluteString else { return }
+        guard let zoomToApply = zoomLevels[hostString] else { return }
+        if self.tab.webView.zoomLevel != zoomToApply {
+            self.tab.webView.zoomLevel = zoomToApply
+        }
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
         tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
-            self?.sendAnimationTrigger()
+            guard let self = self else { return }
+            self.sendAnimationTrigger()
         }.store(in: &cancellables)
     }
 
@@ -200,7 +223,7 @@ final class TabViewModel {
         return tab.content.url
     }
 
-    private var tabHostURL: URL? {
+    var tabHostURL: URL? {
         return tabURL?.root
     }
 
@@ -369,4 +392,11 @@ extension TabViewModel: TabDataClearing {
         tab.prepareForDataClearing(caller: caller)
     }
 
+}
+
+extension TabViewModel: WebViewZoomLevelDelegate {
+    func zoomWasSet(to level: DefaultZoomValue) {
+        guard let hostString = tabHostURL?.absoluteString else { return }
+        appearancePreferences.updateZoomPerWebsite(zoomLevel: level, website: hostString)
+    }
 }
