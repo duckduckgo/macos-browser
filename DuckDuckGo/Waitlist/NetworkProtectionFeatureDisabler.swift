@@ -61,14 +61,20 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     ///
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) {
         Task {
+            // To disable NetP we need the login item to be running
+            // This should be fine though as we'll disable them further down below
+            enableLoginItems()
+
+            // Allow some time for the login items to fully launch
+            try? await Task.sleep(interval: 0.5)
+
             unpinNetworkProtection()
 
             if uninstallSystemExtension {
-                await resetAllStateForVPNApp(uninstallSystemExtension: uninstallSystemExtension)
+                await removeSystemExtension()
             }
 
             await removeVPNConfiguration()
-            await resetNetworkExtensionState()
 
             // We want to give some time for the login item to reset state before disabling it
             try? await Task.sleep(interval: 0.5)
@@ -83,14 +89,16 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         }
     }
 
+    private func enableLoginItems() {
+        loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
+    }
+
     func disableLoginItems() {
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
-    func resetAllStateForVPNApp(uninstallSystemExtension: Bool) async {
-        if uninstallSystemExtension {
-            await ipcClient.debugCommand(.deactivateSystemExtension)
-        }
+    func removeSystemExtension() async {
+        await ipcClient.debugCommand(.removeSystemExtension)
 
 #if NETP_SYSTEM_EXTENSION
         userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
@@ -103,14 +111,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func removeAppAuthToken() throws {
         try NetworkProtectionKeychainTokenStore().deleteToken()
-    }
-
-    private func resetNetworkExtensionState() async {
-        if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
-            try? activeSession.sendProviderMessage(.resetAllState) {
-                os_log("Status was reset in the extension", log: self.log)
-            }
-        }
     }
 
     private func removeVPNConfiguration() async {
