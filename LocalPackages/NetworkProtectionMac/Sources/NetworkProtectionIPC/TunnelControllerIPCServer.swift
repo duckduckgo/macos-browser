@@ -150,6 +150,7 @@ extension TunnelControllerIPCServer: XPCServerInterface {
 
     func debugCommand(_ payload: Data, completion: @escaping () -> Void) {
         guard let command = try? JSONDecoder().decode(DebugCommand.self, from: payload) else {
+            completion()
             return
         }
 
