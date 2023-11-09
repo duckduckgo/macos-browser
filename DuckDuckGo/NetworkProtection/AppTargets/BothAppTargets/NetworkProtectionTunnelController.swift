@@ -163,7 +163,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         case .setExcludeLocalNetworks(let excludeLocalNetworks):
             try await handleSetExcludeLocalNetworks(excludeLocalNetworks)
         case .setRegistrationKeyValidity,
-                .setSelectedServer:
+                .setSelectedServer,
+                .setSelectedLocation:
             // Intentional no-op as this is handled by the extension
             break
         }
