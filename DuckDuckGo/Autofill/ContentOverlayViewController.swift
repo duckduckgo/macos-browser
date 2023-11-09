@@ -339,4 +339,8 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
             autofillPreferencesModel.showAutofillPopover(.logins)
         }
     }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        completionHandler(nil)
+    }
 }
