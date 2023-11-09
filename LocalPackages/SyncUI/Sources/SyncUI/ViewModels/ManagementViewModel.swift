@@ -48,4 +48,15 @@ public protocol ManagementViewModel: ObservableObject {
 
     func manageBookmarks()
     func manageLogins()
+
+
+
+    // NEW UI METHODS
+
+    func syncWithAnotherDevicePressed()
+    func syncWithServerPressed()
+    func recoverDataPressed()
+    func downloadDDGPressed()
+    func endDialogFlow()
+    func recoveryCodePasted(_ code: String)
 }

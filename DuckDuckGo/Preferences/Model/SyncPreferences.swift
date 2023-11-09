@@ -303,6 +303,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let device = deviceInfo()
         let knownDevices = Set(self.devices.map { $0.id })
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
+        onEndFlow()
         mapDevices(devices)
         let syncedDevices = self.devices.filter { !knownDevices.contains($0.id) && !$0.isCurrent }
         let isSecondDevice = syncedDevices.count == 1
@@ -332,6 +333,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 self.connector = try syncService.remoteConnect()
                 self.codeToDisplay = connector?.code
+                self.presentDialog(type: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
                     try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: false)
                 } else {
@@ -380,7 +382,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                                 syncedDevices.append(device)
                             }
 
-                            self.managementDialogModel.endFlow()
+                            self.onEndFlow()
                             presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: devices.count == 2))
                         }.store(in: &cancellables)
 
@@ -448,6 +450,94 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
+    }
+
+}
+
+
+
+// NEW UI Method
+extension SyncPreferences {
+    @MainActor 
+    func syncWithAnotherDevicePressed() {
+        self.startPollingForRecoveryKey()
+//        presentDialog(type: .syncWithAnotherDevice)
+    }
+
+    @MainActor
+    func syncWithServerPressed() {
+
+    }
+
+@MainActor
+    func recoverDataPressed() {
+
+    }
+
+    @MainActor
+    func downloadDDGPressed() {
+
+    }
+
+    @MainActor
+    private func presentDialog(type: DialogType) {
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Sync: Failed to present SyncManagementDialogViewController")
+            return
+        }
+        var viewController: NSViewController
+
+        switch type {
+        case .syncWithAnotherDevice(let code):
+            viewController = SyncDialogViewController(
+                view: SyncWithAnotherDeviceView<SyncPreferences>(code: code)
+                    .environmentObject(self)
+                    .environmentObject(RecoveryCodeViewModel()))
+        }
+
+        guard let dialogWindow = viewController.wrappedInWindowController().window else { return }
+        parentWindowController.window?.beginSheet(dialogWindow)
+
+        onEndFlow = {
+            guard let sheetParent = dialogWindow.sheetParent else {
+                assertionFailure("window or sheet parent not present")
+                return
+            }
+            sheetParent.endSheet(dialogWindow)
+            self.stopPollingForRecoveryKey()
+        }
+    }
+
+    enum DialogType {
+        case syncWithAnotherDevice(code: String)
+    }
+
+    func endDialogFlow() {
+        onEndFlow()
+    }
+
+    func recoveryCodePasted(_ code: String) {
+
+    }
+
+}
+
+final class SyncDialogViewController<ConcreteView: View>: NSViewController {
+
+    init(view: ConcreteView) {
+        self.dialogView = view
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    let dialogView: ConcreteView
+
+    override func loadView() {
+        view = NSHostingView(rootView: dialogView)
     }
 
 }

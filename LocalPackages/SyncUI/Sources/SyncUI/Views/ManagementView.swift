@@ -54,8 +54,8 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(UserText.sync)
-                    .font(Const.Fonts.preferencePaneTitle)
-                    .padding(.horizontal, 16)
+                    .font(.system(size: 17))
+                    .bold()
 
                 if model.isSyncEnabled {
                     SyncEnabledView<ViewModel>()

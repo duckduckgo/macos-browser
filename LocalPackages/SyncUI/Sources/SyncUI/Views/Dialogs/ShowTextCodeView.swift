@@ -19,12 +19,16 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct ShowTextCodeView: View {
+public struct ShowTextCodeView: View {
     @EnvironmentObject var model: ManagementDialogModel
     @State private var shareButtonFrame: CGRect = .zero // Store the frame of the share button
     let code: String
 
-    var body: some View {
+    public init(code: String) {
+        self.code = code
+    }
+
+    public var body: some View {
         SyncDialog(spacing: 20.0) {
             Text(UserText.showTextCodeTitle)
                 .font(.system(size: 17, weight: .bold))

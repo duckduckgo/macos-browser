@@ -22,37 +22,100 @@ import SwiftUIExtensions
 struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
+    fileprivate func syncWithAnotherDeviceView() -> some View {
+        return VStack(alignment: .center, spacing: 16) {
+            Image("Sync-Pair-96x96")
+            VStack(alignment: .center, spacing: 8) {
+                Text("Begin Sync")
+                    .bold()
+                    .font(.system(size: 17))
+                Text("Safely synchronize your bookmarks and logins between your devices via DuckDuckGo's secure server.")
+                    .foregroundColor(Color("BlackWhite60"))
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.bottom, 16)
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color("LinkBlueColor"))
+                    .frame(width: 220, height: 32)
+                Text("Sync with Another Device")
+                    .foregroundColor(.white)
+                    .bold()
+            }
+            .onTapGesture {
+                model.syncWithAnotherDevicePressed()
+            }
+        }
+        .frame(width: 512, height: 254)
+        .roundedBorder()
+        .padding(.top, 20)
+    }
+
     var body: some View {
-        Text(UserText.syncSetupExplanation)
-            .fixMultilineScrollableText()
-            .padding(.horizontal, 16)
-        PreferencePaneSection {
+        VStack(alignment: .leading, spacing: 24) {
+            syncWithAnotherDeviceView()
             VStack(alignment: .leading, spacing: 12) {
-                Group {
-                    if model.isCreatingAccount {
-                        ProgressView()
-                    } else {
-                        VStack(alignment: .leading, spacing: 24) {
-                            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.codeToDisplay ?? "")
-                                .environmentObject(model)
-                                .onAppear {
-                                    model.startPollingForRecoveryKey()
-                                }
-                                .onDisappear {
-                                    model.stopPollingForRecoveryKey()
-                                }
-                            SyncSetupStartCardView()
-                            SyncSetupRecoverCardView()
-                            Text(UserText.syncSetUpFooter)
-                                .font(.system(size: 11))
-                                .foregroundColor(Color("GreyTextColor"))
-                                .padding(.horizontal, 16)
+                Text("Other Options")
+                    .font(
+                        .system(size: 17)
+                        .weight(.semibold)
+                    )
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Sync with Server to Back Up")
+                        .foregroundColor(Color("LinkBlueColor"))
+                        .onTapGesture {
+                            model.syncWithServerPressed()
                         }
-                    }
-                }.frame(minWidth: 100)
+                    Text("Recover Data")
+                        .foregroundColor(Color("LinkBlueColor"))
+                        .onTapGesture {
+                            model.recoverDataPressed()
+                        }
+                }
+            }
+            HStack {
+                Image("DownloadsPreferences")
+                Text("DuckDuckGo for Other Platforms")
+                    .foregroundColor(Color("LinkBlueColor"))
+            }
+            .padding(.top, 12)
+            .onTapGesture {
+                model.downloadDDGPressed()
             }
         }
     }
+
+//    var body: some View {
+//        Text(UserText.syncSetupExplanation)
+//            .fixMultilineScrollableText()
+//            .padding(.horizontal, 16)
+//        PreferencePaneSection {
+//            VStack(alignment: .leading, spacing: 12) {
+//                Group {
+//                    if model.isCreatingAccount {
+//                        ProgressView()
+//                    } else {
+//                        VStack(alignment: .leading, spacing: 24) {
+//                            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.codeToDisplay ?? "")
+//                                .environmentObject(model)
+//                                .onAppear {
+//                                    model.startPollingForRecoveryKey()
+//                                }
+//                                .onDisappear {
+//                                    model.stopPollingForRecoveryKey()
+//                                }
+//                            SyncSetupStartCardView()
+//                            SyncSetupRecoverCardView()
+//                            Text(UserText.syncSetUpFooter)
+//                                .font(.system(size: 11))
+//                                .foregroundColor(Color("GreyTextColor"))
+//                                .padding(.horizontal, 16)
+//                        }
+//                    }
+//                }.frame(minWidth: 100)
+//            }
+//        }
+//    }
 
 }
 
