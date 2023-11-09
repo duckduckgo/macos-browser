@@ -119,7 +119,9 @@ extension TunnelControllerIPCService: IPCServerInterface {
         case .removeSystemExtension:
             await VPNConfigurationManager().removeVPNConfiguration()
             try? await networkExtensionController.deactivateSystemExtension()
-        case .expireRegistrationKey: fallthrough
+        case .expireRegistrationKey:
+            // Intentional no-op: handled by the extension
+            break
         case .sendTestNotification:
             // Intentional no-op: handled by the extension
             break
