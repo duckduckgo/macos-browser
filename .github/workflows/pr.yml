@@ -207,6 +207,7 @@ jobs:
   release-build:
 
     name: Make Release Build
+    if: github.actor != 'ayoy'
 
     strategy:
       matrix:
