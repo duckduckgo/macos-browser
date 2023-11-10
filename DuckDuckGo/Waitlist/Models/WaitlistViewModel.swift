@@ -113,11 +113,11 @@ final class WaitlistViewModel: ObservableObject {
     @MainActor
     func perform(action: ViewAction) async {
         switch action {
-        case .joinQueue: await joinWaitlist()
+        case .joinQueue:
+            await joinWaitlist()
+            NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
         case .requestNotificationPermission:
-            Task {
-                await requestNotificationPermission()
-            }
+            requestNotificationPermission()
         case .showTermsAndConditions: showTermsAndConditions()
         case .acceptTermsAndConditions: acceptTermsAndConditions()
         case .close: close()
@@ -170,18 +170,17 @@ final class WaitlistViewModel: ObservableObject {
     }
 
     @MainActor
-    private func requestNotificationPermission() async {
-        do {
-            let permissionGranted = try await notificationService.requestAuthorization(options: [.alert])
-
-            if permissionGranted {
-                self.viewState = .joinedWaitlist(.notificationAllowed)
-            } else {
-                self.viewState = .joinedWaitlist(.notificationsDisabled)
+    private func requestNotificationPermission() {
+        Task {
+            do {
+                let permissionGranted = try await notificationService.requestAuthorization(options: [.alert])
+                self.viewState = .joinedWaitlist(permissionGranted ? .notificationAllowed : .notificationsDisabled)
+            } catch {
+                await checkNotificationPermissions()
             }
-        } catch {
-            await checkNotificationPermissions()
         }
+
+        self.viewState = .joinedWaitlist(.notificationAllowed)
     }
 
     private func showTermsAndConditions() {

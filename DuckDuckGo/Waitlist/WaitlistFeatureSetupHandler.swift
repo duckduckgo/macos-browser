@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 import Foundation
 
@@ -24,10 +24,25 @@ protocol WaitlistFeatureSetupHandler {
     func confirmFeature()
 }
 
+#endif
+
+#if NETWORK_PROTECTION
+
 struct NetworkProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
     func confirmFeature() {
         LocalPinningManager.shared.pin(.networkProtection)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+    }
+}
+
+#endif
+
+#if DBP
+
+struct DataBrokerProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHandler {
+    func confirmFeature() {
+        NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
+        NotificationCenter.default.post(name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist, object: nil)
     }
 }
 

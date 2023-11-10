@@ -52,6 +52,9 @@ extension Pixel.Event {
         case .dailyPixel(let pixel, isFirst: _):
             return pixel.parameters
 
+        case .dailyOsVersionCounter:
+            return [PixelKit.Parameters.osMajorVersion: "\(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)"]
+
         case .dashboardProtectionAllowlistAdd(let triggerOrigin):
             guard let trigger = triggerOrigin else { return nil }
             return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
@@ -111,6 +114,13 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
+             .dataBrokerProtectionWaitlistUserActive,
+             .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed,
+             .dataBrokerProtectionWaitlistIntroDisplayed,
+             .dataBrokerProtectionWaitlistNotificationShown,
+             .dataBrokerProtectionWaitlistNotificationTapped,
+             .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
+             .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
              .homeButtonLeft,
              .homeButtonRight,
              .homeButtonHidden:

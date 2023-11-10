@@ -90,12 +90,14 @@ final class NavigationBarViewController: NSViewController {
     private var urlCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var credentialsToSaveCancellable: AnyCancellable?
+    private var vpnToggleCancellable: AnyCancellable?
     private var passwordManagerNotificationCancellable: AnyCancellable?
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
     private var networkProtectionCancellable: AnyCancellable?
     private var networkProtectionInterruptionCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
     static private var homeButtonPosition: HomeButtonPosition
@@ -152,6 +154,9 @@ final class NavigationBarViewController: NSViewController {
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
+#if NETWORK_PROTECTION
+        listenToVPNToggleNotifications()
+#endif
         listenToPasswordManagerNotifications()
         listenToPinningManagerNotifications()
         listenToMessageNotifications()
@@ -310,12 +315,12 @@ final class NavigationBarViewController: NSViewController {
         // 3. If the user has no state of any kind, show the waitlist screen.
 
         if NetworkProtectionWaitlist().shouldShowWaitlistViewController {
-            WaitlistModalViewController.show()
+            NetworkProtectionWaitlistViewControllerPresenter.show()
             DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         } else if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             popovers.toggleNetworkProtectionPopover(usingView: networkProtectionButton, withDelegate: networkProtectionButtonModel)
         } else {
-            WaitlistModalViewController.show()
+            NetworkProtectionWaitlistViewControllerPresenter.show()
             DailyPixel.fire(pixel: .networkProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }
     }
@@ -333,6 +338,18 @@ final class NavigationBarViewController: NSViewController {
 
         super.mouseDown(with: event)
     }
+
+#if NETWORK_PROTECTION
+    func listenToVPNToggleNotifications() {
+        vpnToggleCancellable = NotificationCenter.default.publisher(for: .ToggleNetworkProtectionInMainWindow).sink { [weak self] _ in
+            guard self?.view.window?.isKeyWindow == true else {
+                return
+            }
+
+            self?.toggleNetworkProtectionPopover()
+        }
+    }
+#endif
 
     func listenToPasswordManagerNotifications() {
         passwordManagerNotificationCancellable = NotificationCenter.default.publisher(for: .PasswordManagerChanged).sink { [weak self] _ in
@@ -1000,13 +1017,19 @@ extension NavigationBarViewController: DownloadsViewControllerDelegate {
 extension NavigationBarViewController {
 
     fileprivate func addDebugNotificationListeners() {
-        NotificationCenter.default.addObserver(forName: .ShowSaveCredentialsPopover, object: nil, queue: .main) { [weak self] _ in
-            self?.showMockSaveCredentialsPopover()
-        }
+        NotificationCenter.default.publisher(for: .ShowSaveCredentialsPopover)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showMockSaveCredentialsPopover()
+            }
+            .store(in: &cancellables)
 
-        NotificationCenter.default.addObserver(forName: .ShowCredentialsSavedPopover, object: nil, queue: .main) { [weak self] _ in
-            self?.showMockCredentialsSavedPopover()
-        }
+        NotificationCenter.default.publisher(for: .ShowCredentialsSavedPopover)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.showMockCredentialsSavedPopover()
+            }
+            .store(in: &cancellables)
     }
 
     fileprivate func showMockSaveCredentialsPopover() {
@@ -1028,5 +1051,11 @@ extension NavigationBarViewController {
                                         withDelegate: self)
     }
 
+}
+#endif
+
+#if NETWORK_PROTECTION
+extension Notification.Name {
+    static let ToggleNetworkProtectionInMainWindow = Notification.Name("com.duckduckgo.vpn.toggle-popover-in-main-window")
 }
 #endif

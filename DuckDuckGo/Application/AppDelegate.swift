@@ -218,6 +218,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 #endif
+
+#if DBP
+        DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
+#endif
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -232,6 +236,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
+#endif
+
+#if DBP
+        DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
     }
 
@@ -373,7 +381,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 }
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
@@ -387,12 +395,21 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+
+#if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                     DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
-                    WaitlistModalViewController.show()
+                    NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }
+#endif
+
+#if DBP
+            if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
+                DataBrokerProtectionAppEvents().handleNotification()
+            }
+#endif
         }
 
         completionHandler()
