@@ -68,6 +68,38 @@ public struct DefaultActionButtonStyle: ButtonStyle {
     }
 }
 
+public struct DismissActionButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+
+    public init() {}
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+        let backgroundColor = configuration.isPressed ? Color(NSColor.windowBackgroundColor) : Color(NSColor.controlColor)
+        let labelColor = Color.primary
+        let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
+
+        configuration.label
+            .lineLimit(1)
+            .font(.custom("SFProText-Regular", size: 13))
+            .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
+            .padding(.top, 2.5)
+            .padding(.bottom, 3)
+            .padding(.horizontal, 7.5)
+            .background(
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .fill(backgroundColor)
+                    .shadow(color: .black.opacity(0.1), radius: 0.1, x: 0, y: 1)
+                    .shadow(color: .primary.opacity(outerShadowOpacity), radius: 0.1, x: 0, y: -0.6)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
+            )
+            .foregroundColor(labelColor)
+
+    }
+}
+
 public struct DestructiveActionButtonStyle: ButtonStyle {
 
     public let enabled: Bool

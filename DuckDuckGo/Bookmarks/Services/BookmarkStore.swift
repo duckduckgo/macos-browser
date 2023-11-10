@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import Foundation
 
 enum BookmarkStoreFetchPredicateType {
@@ -43,6 +44,8 @@ struct BookmarkImportResult: Equatable {
 
 protocol BookmarkStore {
 
+    func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode)
+
     func loadAll(type: BookmarkStoreFetchPredicateType, completion: @escaping ([BaseBookmarkEntity]?, Error?) -> Void)
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void)
     func save(folder: BookmarkFolder, parent: BookmarkFolder?, completion: @escaping (Bool, Error?) -> Void)
@@ -56,4 +59,6 @@ protocol BookmarkStore {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
+    func handleFavoritesAfterDisablingSync()
+    var didMigrateToFormFactorSpecificFavorites: Bool { get }
 }
