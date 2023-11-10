@@ -274,7 +274,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
             store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
             request: ProductWaitlistRequest(productName: Self.apiProductName),
             redeemUseCase: RedeemUseCase(),
-            redeemAuthenticationRepository: UserDefaultsAuthenticationData()
+            redeemAuthenticationRepository: KeychainAuthenticationData()
         )
     }
 

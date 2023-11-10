@@ -816,6 +816,8 @@
 		3192A2622A4C4CFF0084EA89 /* DuckDuckGo Notifications.app in Embed Login Items */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3192EC882A4DCF21001E97A5 /* DBPHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */; };
 		3198FCAC2A5D8A3C002EF5F8 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
+		3199C6F92AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */; };
+		3199C6FD2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */; };
 		31A031A6288191230090F792 /* CookieConsentAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A031A5288191230090F792 /* CookieConsentAnimationView.swift */; };
 		31A031A928819D920090F792 /* CookieConsentAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A031A828819D920090F792 /* CookieConsentAnimationModel.swift */; };
 		31A93F512A5D8AF0008BB88D /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 31A93F502A5D8AF0008BB88D /* DataBrokerProtection */; };
@@ -3907,6 +3909,8 @@
 		3192A2702A4C4E330084EA89 /* DataBrokerProtection */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DataBrokerProtection; sourceTree = "<group>"; };
 		3192A2712A4CBD3A0084EA89 /* DuckDuckGoDBP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoDBP.xcconfig; sourceTree = "<group>"; };
 		3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPHomeViewController.swift; sourceTree = "<group>"; };
+		3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureDisabler.swift; sourceTree = "<group>"; };
+		3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionAppEvents.swift; sourceTree = "<group>"; };
 		31A031A5288191230090F792 /* CookieConsentAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationView.swift; sourceTree = "<group>"; };
 		31A031A828819D920090F792 /* CookieConsentAnimationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentAnimationModel.swift; sourceTree = "<group>"; };
 		31B4AF522901A4F20013585E /* NSEventExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSEventExtension.swift; sourceTree = "<group>"; };
@@ -5394,6 +5398,8 @@
 				7B6D98662ADEB4B000CD35FE /* DataBrokerProtectionLoginItemScheduler.swift */,
 				9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */,
 				31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureVisibility.swift */,
+				3199C6F82AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift */,
+				3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */,
 			);
 			path = DBP;
 			sourceTree = "<group>";
@@ -10054,6 +10060,7 @@
 				4B9DB0222A983B24000927DB /* ProductWaitlistRequest.swift in Sources */,
 				31929FAA2A4C4CFF0084EA89 /* AppStateChangedPublisher.swift in Sources */,
 				31929FAB2A4C4CFF0084EA89 /* BookmarkTableCellView.swift in Sources */,
+				3199C6F92AF94F5B002A7BA1 /* DataBrokerProtectionFeatureDisabler.swift in Sources */,
 				31929FAC2A4C4CFF0084EA89 /* BookmarkManagementSidebarViewController.swift in Sources */,
 				31929FAD2A4C4CFF0084EA89 /* NSStackViewExtension.swift in Sources */,
 				31929FAF2A4C4CFF0084EA89 /* OptionalExtension.swift in Sources */,
@@ -10520,6 +10527,7 @@
 				3192A15C2A4C4CFF0084EA89 /* NSAttributedStringExtension.swift in Sources */,
 				3192A15D2A4C4CFF0084EA89 /* AnimationView.swift in Sources */,
 				3192A15E2A4C4CFF0084EA89 /* NSRectExtension.swift in Sources */,
+				3199C6FD2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift in Sources */,
 				3192A15F2A4C4CFF0084EA89 /* YoutubeOverlayUserScript.swift in Sources */,
 				3192A1602A4C4CFF0084EA89 /* DictionaryExtension.swift in Sources */,
 				3192A1612A4C4CFF0084EA89 /* Publishers.NestedObjectChanges.swift in Sources */,
