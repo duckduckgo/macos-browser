@@ -220,8 +220,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-        DispatchQueue.global(qos: .background).async {
-            DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
+        Task {
+            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
 #endif
     }
@@ -238,6 +238,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
 
         NetworkProtectionAppEvents().applicationDidBecomeActive()
+#endif
+
+#if DBP
+        Task {
+            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
+        }
 #endif
     }
 
@@ -382,7 +388,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 }
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
@@ -396,12 +402,24 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+
+#if NETWORK_PROTECTION
             if response.notification.request.identifier == NetworkProtectionWaitlist.notificationIdentifier {
                 if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
                     DailyPixel.fire(pixel: .networkProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
-                    WaitlistModalViewController.show()
+                    NetworkProtectionWaitlistViewControllerPresenter.show()
                 }
             }
+#endif
+
+#if DBP
+            if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
+                if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
+                     DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
+                    DataBrokerProtectionWaitlistViewControllerPresenter.show()
+                }
+            }
+#endif
         }
 
         completionHandler()

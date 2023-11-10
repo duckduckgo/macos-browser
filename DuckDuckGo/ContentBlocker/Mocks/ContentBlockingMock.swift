@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BloomFilterWrapper
 import BrowserServicesKit
 import Combine
 import Common
