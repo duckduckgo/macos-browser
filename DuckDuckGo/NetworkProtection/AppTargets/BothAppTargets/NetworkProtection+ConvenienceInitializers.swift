@@ -25,9 +25,11 @@ import Common
 extension NetworkProtectionDeviceManager {
 
     static func create() -> NetworkProtectionDeviceManager {
+        let settings = TunnelSettings(defaults: .shared)
+        let networkClient = NetworkProtectionBackendClient(environment: settings.selectedEnvironment)
         let keyStore = NetworkProtectionKeychainKeyStore()
         let tokenStore = NetworkProtectionKeychainTokenStore()
-        return NetworkProtectionDeviceManager(tokenStore: tokenStore, keyStore: keyStore, errorEvents: .networkProtectionAppDebugEvents)
+        return NetworkProtectionDeviceManager(networkClient: networkClient, tokenStore: tokenStore, keyStore: keyStore, errorEvents: .networkProtectionAppDebugEvents)
     }
 }
 

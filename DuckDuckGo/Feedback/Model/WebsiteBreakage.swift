@@ -37,11 +37,6 @@ struct WebsiteBreakage {
         case privacyDashboard = "dashboard"
     }
 
-    enum ProtectionsState: String {
-        case enabled = "1"
-        case disabled = "0"
-    }
-
     let category: Category?
     let description: String?
     let siteUrlString: String
@@ -55,7 +50,7 @@ struct WebsiteBreakage {
     let urlParametersRemoved: Bool
     let manufacturer: String
     let reportFlow: ReportFlow
-    let protectionsState: ProtectionsState
+    let protectionsState: Bool
 
     init(
         category: Category?,
@@ -69,7 +64,7 @@ struct WebsiteBreakage {
         isGPCEnabled: Bool,
         ampURL: String,
         urlParametersRemoved: Bool,
-        protected: Bool,
+        protectionsState: Bool,
         manufacturer: String = "Apple",
         reportFlow: ReportFlow = .native
     ) {
@@ -83,7 +78,7 @@ struct WebsiteBreakage {
         self.installedSurrogates = installedSurrogates
         self.isGPCEnabled = isGPCEnabled
         self.ampURL = ampURL
-        self.protectionsState = protected ? .enabled : .disabled
+        self.protectionsState = protectionsState
         self.urlParametersRemoved = urlParametersRemoved
         self.manufacturer = manufacturer
         self.reportFlow = reportFlow
@@ -104,7 +99,7 @@ struct WebsiteBreakage {
             "os": osVersion,
             "manufacturer": manufacturer,
             "reportFlow": reportFlow.rawValue,
-            "protectionsState": protectionsState.rawValue
+            "protectionsState": protectionsState ? "true" : "false"
         ]
     }
 }
