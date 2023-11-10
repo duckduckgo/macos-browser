@@ -40,7 +40,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             isGPCEnabled: true,
             ampURL: "https://example.test",
             urlParametersRemoved: false,
-            protected: true
+            protectionsState: true
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -79,7 +79,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             isGPCEnabled: true,
             ampURL: "https://example.test",
             urlParametersRemoved: false,
-            protected: true,
+            protectionsState: true,
             manufacturer: "IBM"
         )
 
