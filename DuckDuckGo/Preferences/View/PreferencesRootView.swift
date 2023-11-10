@@ -58,6 +58,8 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+                            case .vpn:
+                                VPNView(model: VPNPreferencesModel())
 #if SUBSCRIPTION
                             case .subscription:
                                 makeSubscriptionView()

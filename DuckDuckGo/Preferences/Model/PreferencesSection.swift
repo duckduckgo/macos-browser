@@ -27,7 +27,7 @@ struct PreferencesSection: Hashable, Identifiable {
     static func defaultSections(includingDuckPlayer: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
 #if SUBSCRIPTION
-            var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
+            var panes: [PreferencePaneIdentifier] = [.privacy, .vpn, .subscription, .general, .appearance, .autofill, .downloads]
 
             if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 if let generalIndex = panes.firstIndex(of: .general) {
@@ -35,7 +35,7 @@ struct PreferencesSection: Hashable, Identifiable {
                 }
             }
 #else
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
+            var panes: [PreferencePaneIdentifier] = [.vpn, .general, .appearance, .privacy, .autofill, .downloads]
 
             if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 panes.insert(.sync, at: 1)
@@ -65,6 +65,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case sync
     case appearance
     case privacy
+    case vpn
 #if SUBSCRIPTION
     case subscription
 #endif
@@ -93,6 +94,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.appearance
         case .privacy:
             return UserText.privacy
+        case .vpn:
+            return UserText.vpn
 #if SUBSCRIPTION
         case .subscription:
             return UserText.subscription
@@ -118,6 +121,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .privacy:
             return "Privacy"
+        case .vpn:
+            return "VPN"
 #if SUBSCRIPTION
         case .subscription:
             return "Privacy"

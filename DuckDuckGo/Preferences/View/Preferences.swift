@@ -75,6 +75,9 @@ enum Preferences {
         var body: some View {
             Toggle(title, isOn: isOn)
                 .fixMultilineScrollableText()
+                // When the checkbox is disabled we want it to not affect the label color
+                // Ref: https://app.asana.com/0/0/1205884607941634/f
+                .foregroundColor(Color.primary)
                 .toggleStyle(.checkbox)
         }
     }

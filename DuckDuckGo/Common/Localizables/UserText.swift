@@ -299,6 +299,9 @@ struct UserText {
     static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Automatically handle cookie pop-ups", comment: "Autoconsent settings checkbox title")
     static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
 
+    static let manageVPNSettingsTitle = NSLocalizedString("manage.vpn.settings.title", value: "Manage VPN", comment: "Manage VPN section title in VPN settings")
+    static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "VPN Notifications", comment: "VPN Notifications section title in VPN settings")
+
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
     static let duckPlayerAlwaysOpenInPlayer = NSLocalizedString("duck-player.always-open-in-player", value: "Always open YouTube videos in Duck Player", comment: "Private YouTube Player option")
     static let duckPlayerShowPlayerButtons = NSLocalizedString("duck-player.show-buttons", value: "Show option to use Duck Player over YouTube previews on hover", comment: "Private YouTube Player option")
@@ -430,6 +433,7 @@ struct UserText {
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
+    static let vpn = NSLocalizedString("preferences.vpn", value: "VPN", comment: "Show VPN preferences")
     static let duckPlayer = NSLocalizedString("preferences.duck-player", value: "Duck Player", comment: "Show Duck Player browser preferences")
     static let about = NSLocalizedString("preferences.about", value: "About", comment: "Show about screen")
 
