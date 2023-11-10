@@ -122,36 +122,24 @@ final class BWCommunicator: BWCommunication {
 
     // MARK: - Receiving Messages
 
+    private let realisticMessageLength = 200000
+    private var accumulatedData = Data()
+
     func receiveData(_ fileHandle: FileHandle) {
+        accumulatedData.append(fileHandle.availableData) // Append new data to accumulated data
 
-        func readMessage(availableData: Data) -> (messageData: Data?, availableData: Data) {
-            guard availableData.count > 0 else { return (nil, availableData: availableData) }
+        processAccumulatedData()
+    }
 
-            // First 4 bytes of the message contain the message length
-            let dataPrefix = availableData.prefix(4)
-            guard dataPrefix.count == 4 else {
-                assertionFailure("Wrong format of the message")
-                return (nil, availableData)
-            }
-
-            let dataPrefixArray = [UInt8](dataPrefix)
-            let messageLength = fromByteArray(dataPrefixArray, UInt32.self)
-
-            let dataPostfix = availableData.dropFirst(4)
-            let messageData = dataPostfix.prefix(Int(messageLength))
-            let availableData = dataPostfix.dropFirst(Int(messageLength))
-            return (messageData: messageData, availableData: availableData)
-        }
-
-        var availableData = fileHandle.availableData
+    private func processAccumulatedData() {
         repeat {
-            let (messageData, nextAvailableData) = readMessage(availableData: availableData)
-            availableData = nextAvailableData
+            let (messageData, remainingData) = readMessage(availableData: accumulatedData)
+            accumulatedData = remainingData
 
             guard let messageData = messageData else {
-                if availableData.count >= 2 {
-                    assertionFailure("Wrong format of the message")
-                }
+//                if accumulatedData.count >= 2 {
+//                    assertionFailure("Wrong format of the message")
+//                }
                 return
             }
 
@@ -160,7 +148,35 @@ final class BWCommunicator: BWCommunication {
 
                 self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
             }
-        } while availableData.count >= 2 /*EOF*/
+        } while accumulatedData.count >= 2 /*EOF*/
+    }
+
+    func readMessage(availableData: Data) -> (messageData: Data?, availableData: Data) {
+        guard availableData.count > 0 else { return (nil, availableData: availableData) }
+
+        // First 4 bytes of the message contain the message length
+        let dataPrefix = availableData.prefix(4)
+        guard dataPrefix.count == 4 else {
+            assertionFailure("Wrong format of the message")
+            return (nil, availableData)
+        }
+
+        let dataPrefixArray = [UInt8](dataPrefix)
+        let messageLength = fromByteArray(dataPrefixArray, UInt32.self)
+
+        let dataPostfix = availableData.dropFirst(4)
+
+        if messageLength > dataPostfix.count {
+            if messageLength > realisticMessageLength {
+                self.accumulatedData = Data()
+                return (nil, Data())
+            }
+            return (nil, availableData)
+        }
+
+        let messageData = dataPostfix.prefix(Int(messageLength))
+        let availableData = dataPostfix.dropFirst(Int(messageLength))
+        return (messageData: messageData, availableData: availableData)
     }
 
     private func fromByteArray<T>(_ value: [UInt8], _: T.Type) -> T {
