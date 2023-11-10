@@ -25,6 +25,7 @@ struct MapperToDB {
 
     init(mechanism: @escaping (Data) throws -> Data) {
         self.mechanism = mechanism
+        jsonEncoder.dateEncodingStrategy = .millisecondsSince1970
     }
 
     func mapToDB(id: Int64? = nil, profile: DataBrokerProtectionProfile) throws -> ProfileDB {
@@ -128,6 +129,7 @@ struct MapperToModel {
 
     init(mechanism: @escaping (Data) throws -> Data) {
         self.mechanism = mechanism
+        self.jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
     }
 
     func mapToModel(_ profile: FullProfileDB) throws -> DataBrokerProtectionProfile {

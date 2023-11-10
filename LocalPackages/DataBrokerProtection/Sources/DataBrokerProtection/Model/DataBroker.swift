@@ -55,6 +55,7 @@ struct DataBroker: Codable, Sendable {
         case version
         case schedulingConfig
         case parent
+        case mirrorSites
     }
 
     init(id: Int64? = nil,
@@ -81,6 +82,14 @@ struct DataBroker: Codable, Sendable {
         steps = try container.decode([Step].self, forKey: .steps)
         schedulingConfig = try container.decode(DataBrokerScheduleConfig.self, forKey: .schedulingConfig)
         parent = try? container.decode(String.self, forKey: .parent)
+
+        do {
+            let mirrorSitesDecoding = try container.decode([MirrorSite].self, forKey: .mirrorSites)
+            mirrorSites = mirrorSitesDecoding
+        } catch {
+            mirrorSites = [MirrorSite]()
+        }
+
         id = nil
     }
 
@@ -110,8 +119,11 @@ struct DataBroker: Codable, Sendable {
     static func initFromResource(_ url: URL) -> DataBroker {
         // swiftlint:disable:next force_try
         let data = try! Data(contentsOf: url)
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
         // swiftlint:disable:next force_try
-        return try! JSONDecoder().decode(DataBroker.self, from: data)
+        let broker = try! jsonDecoder.decode(DataBroker.self, from: data)
+        return broker
     }
 }
 
