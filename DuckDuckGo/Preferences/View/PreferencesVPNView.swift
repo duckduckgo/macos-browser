@@ -36,7 +36,7 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.manageVPNSettingsTitle)
 
-                    ToggleMenuItem(title: "Connect on Login", isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: "Connect on Login", isOn: $model.connectOnLogin)
                     TextMenuItemCaption(text: "Automatically connect to the VPN service when you login")
 
                     ToggleMenuItem(title: "Show VPN in menu bar", isOn: $model.isAutoconsentEnabled)

@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import LoginItems
 import Networking
 import NetworkExtension
 import NetworkProtection
@@ -65,10 +66,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
 #endif
 
+    private lazy var tunnelSettings = TunnelSettings(defaults: .shared)
+
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,
         networkExtensionController: networkExtensionController,
-        settings: .init(defaults: .shared))
+        settings: tunnelSettings)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -160,6 +163,20 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
             request.fetch { _, error in
                 onComplete(error)
+            }
+        }
+
+        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .shared)
+        let launchedOnStartup = launchInformation.wasLaunchedByStartup
+        launchInformation.update()
+
+        if launchedOnStartup {
+            Task {
+                let isConnected = await tunnelController.isConnected
+
+                if !isConnected && tunnelSettings.connectOnLogin {
+                    await tunnelController.start()
+                }
             }
         }
     }

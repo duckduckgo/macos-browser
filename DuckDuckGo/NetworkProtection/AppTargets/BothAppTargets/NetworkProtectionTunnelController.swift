@@ -150,7 +150,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             .store(in: &cancellables)
     }
 
-    /// This is where the tunnel has a chance to handle the settings change locally.
+    /// This is where the tunnel owner has a chance to handle the settings change locally.
     ///
     /// The extension can also handle these changes so not everything needs to be handled here.
     ///
@@ -162,7 +162,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             try await handleSetEnforceRoutes(enforceRoutes)
         case .setExcludeLocalNetworks(let excludeLocalNetworks):
             try await handleSetExcludeLocalNetworks(excludeLocalNetworks)
-        case .setRegistrationKeyValidity,
+        case .setConnectOnLogin,
+                .setRegistrationKeyValidity,
                 .setSelectedServer,
                 .setSelectedEnvironment:
             // Intentional no-op as this is handled by the extension

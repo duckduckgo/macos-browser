@@ -17,9 +17,16 @@
 //
 
 import Foundation
+import NetworkProtection
 
 final class VPNPreferencesModel: ObservableObject {
     @Published var isAutoconsentEnabled: Bool = true
+
+    @Published var connectOnLogin: Bool {
+        didSet {
+            tunnelSettings.connectOnLogin = connectOnLogin
+        }
+    }
 
 /*
     @Published
@@ -70,6 +77,11 @@ final class VPNPreferencesModel: ObservableObject {
 
     private let privacySecurityPreferences: PrivacySecurityPreferences*/
 
-    init() {
+    private let tunnelSettings: TunnelSettings
+
+    init(tunnelSettings: TunnelSettings = .init(defaults: .shared)) {
+        self.tunnelSettings = tunnelSettings
+
+        connectOnLogin = tunnelSettings.connectOnLogin
     }
 }
