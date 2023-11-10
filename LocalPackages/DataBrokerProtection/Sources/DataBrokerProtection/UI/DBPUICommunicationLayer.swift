@@ -60,7 +60,10 @@ enum DBPUISendableMethodName: String {
 }
 
 struct DBPUICommunicationLayer: Subfeature {
-    var messageOriginPolicy: MessageOriginPolicy = .all
+    var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
+        .exact(hostname: "use-devtesting18.duckduckgo.com"),
+        .exact(hostname: "duckduckgo.com")
+    ])
     var featureName: String = "dbpuiCommunication"
     weak var broker: UserScriptMessageBroker?
 
