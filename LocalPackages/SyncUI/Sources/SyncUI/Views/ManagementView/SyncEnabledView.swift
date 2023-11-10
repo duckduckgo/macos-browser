@@ -81,7 +81,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                     HStack {
                         IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text(UserText.shareFavoritesOptionTitle)
                                 .font(Const.Fonts.preferencePaneOptionTitle)
                             Text(UserText.shareFavoritesOptionCaption)

@@ -71,7 +71,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @Published var isUnifiedFavoritesEnabled: Bool {
         didSet {
-            AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
+            appearancePreferences.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
             if shouldRequestSyncOnFavoritesOptionChange {
                 syncService.scheduler.notifyDataChanged()
             } else {
@@ -129,6 +129,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 errorMessage = String(describing: error)
             }
@@ -209,6 +211,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 }
                 if self.isFaviconsFetchingEnabled != isFaviconsFetchingEnabled {
                     self.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+                }
+            }
+            .store(in: &cancellables)
+        apperancePreferences.$favoritesDisplayMode
+            .map(\.isDisplayUnified)
+            .sink { [weak self] isUnifiedFavoritesEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                    self.shouldRequestSyncOnFavoritesOptionChange = false
+                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
                 }
             }
             .store(in: &cancellables)
@@ -312,6 +326,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             managementDialogModel.endFlow()
             do {
                 try await syncService.deleteAccount()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }

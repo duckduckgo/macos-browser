@@ -27,7 +27,6 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
-
     var shouldResetBookmarksSyncTimestamp: Bool = false {
         willSet {
             assert(provider == nil, "Setting this value has no effect after provider has been instantiated")
@@ -49,6 +48,16 @@ final class SyncBookmarksAdapter {
 
     @UserDefaultsWrapper(key: .syncIsEligibleForFaviconsFetcherOnboarding, defaultValue: false)
     var isEligibleForFaviconsFetcherOnboarding: Bool
+
+    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
+    private var isSyncBookmarksPaused: Bool {
+        didSet {
+            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
+        }
+    }
+
+    @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
+    private var didShowBookmarksSyncPausedError: Bool
 
     init(
         database: CoreDataDatabase,
@@ -96,6 +105,7 @@ final class SyncBookmarksAdapter {
             syncDidUpdateData: { [weak self] in
                 LocalBookmarkManager.shared.loadBookmarks()
                 self?.isSyncBookmarksPaused = false
+                self?.didShowBookmarksSyncPausedError = false
             },
             syncDidFinish: { [weak self] faviconsFetcherInput in
                 if self?.isFaviconsFetchingEnabled == true {
@@ -114,20 +124,31 @@ final class SyncBookmarksAdapter {
             provider.lastSyncTimestamp = nil
         }
 
+        bindSyncErrorPublisher(provider)
+
+        self.provider = provider
+        self.faviconsFetcher = faviconsFetcher
+    }
+
+    private func bindSyncErrorPublisher(_ provider: BookmarksProvider) {
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in
                 switch error {
                 case let syncError as SyncError:
                     Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
-                    // If bookmarks count limit has been exceeded
-                    if syncError == .unexpectedStatusCode(409) {
+                    switch syncError {
+                    case .unexpectedStatusCode(409):
+                        // If bookmarks count limit has been exceeded
                         self?.isSyncBookmarksPaused = true
                         Pixel.fire(.syncBookmarksCountLimitExceededDaily, limitTo: .dailyFirst)
-                    }
-                    // If bookmarks request size limit has been exceeded
-                    if syncError == .unexpectedStatusCode(413) {
+                        self?.showSyncPausedAlert()
+                    case .unexpectedStatusCode(413):
+                        // If bookmarks request size limit has been exceeded
                         self?.isSyncBookmarksPaused = true
                         Pixel.fire(.syncBookmarksRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                        self?.showSyncPausedAlert()
+                    default:
+                        break
                     }
                 default:
                     let nsError = error as NSError
@@ -139,9 +160,6 @@ final class SyncBookmarksAdapter {
                 }
                 os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
             }
-
-        self.provider = provider
-        self.faviconsFetcher = faviconsFetcher
     }
 
     private func handleFavoritesAfterDisablingSync() {
@@ -151,10 +169,22 @@ final class SyncBookmarksAdapter {
         }
     }
 
-    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
-    private var isSyncBookmarksPaused: Bool {
-        didSet {
-            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
+    private func showSyncPausedAlert() {
+        guard !didShowBookmarksSyncPausedError else { return }
+        Task {
+            await MainActor.run {
+                let alert = NSAlert.syncBookmarksPaused()
+                let response = alert.runModal()
+                didShowBookmarksSyncPausedError = true
+
+                switch response {
+                case .alertSecondButtonReturn:
+                    alert.window.sheetParent?.endSheet(alert.window)
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                default:
+                    break
+                }
+            }
         }
     }
 

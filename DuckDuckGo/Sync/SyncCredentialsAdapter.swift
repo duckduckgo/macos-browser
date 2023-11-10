@@ -36,6 +36,9 @@ final class SyncCredentialsAdapter {
         }
     }
 
+    @UserDefaultsWrapper(key: .syncCredentialsPausedErrorDisplayed, defaultValue: false)
+    private var didShowCredentialsSyncPausedError: Bool
+
     init(secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
         databaseCleaner = CredentialsDatabaseCleaner(
@@ -68,6 +71,7 @@ final class SyncCredentialsAdapter {
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
                     self?.isSyncCredentialsPaused = false
+                    self?.didShowCredentialsSyncPausedError = false
                 }
             )
 
@@ -76,16 +80,19 @@ final class SyncCredentialsAdapter {
                     switch error {
                     case let syncError as SyncError:
                         Pixel.fire(.debug(event: .syncCredentialsFailed, error: syncError))
-                        Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
-                        // If credentials count limit has been exceeded
-                        if syncError == .unexpectedStatusCode(409) {
+                        switch syncError {
+                        case .unexpectedStatusCode(409):
+                            // If credentials count limit has been exceeded
                             self?.isSyncCredentialsPaused = true
                             Pixel.fire(.syncCredentialsCountLimitExceededDaily, limitTo: .dailyFirst)
-                        }
-                        // If credentials request size limit has been exceeded
-                        if syncError == .unexpectedStatusCode(413) {
+                            self?.showSyncPausedAlert()
+                        case .unexpectedStatusCode(413):
+                            // If credentials request size limit has been exceeded
                             self?.isSyncCredentialsPaused = true
                             Pixel.fire(.syncCredentialsRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                            self?.showSyncPausedAlert()
+                        default:
+                            break
                         }
                     default:
                         let nsError = error as NSError
@@ -104,6 +111,25 @@ final class SyncCredentialsAdapter {
             let processedErrors = CoreDataErrorsParser.parse(error: error)
             let params = processedErrors.errorPixelParameters
             Pixel.fire(.debug(event: .syncCredentialsProviderInitializationFailed, error: error), withAdditionalParameters: params)
+        }
+    }
+
+    private func showSyncPausedAlert() {
+        guard !didShowCredentialsSyncPausedError else { return }
+        Task {
+            await MainActor.run {
+                let alert = NSAlert.syncCredentialsPaused()
+                let response = alert.runModal()
+                didShowCredentialsSyncPausedError = true
+
+                switch response {
+                case .alertSecondButtonReturn:
+                    alert.window.sheetParent?.endSheet(alert.window)
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                default:
+                    break
+                }
+            }
         }
     }
 

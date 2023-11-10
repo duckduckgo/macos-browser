@@ -220,9 +220,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
-        }
+        DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
 #endif
     }
 
@@ -241,9 +239,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
-        }
+        DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
     }
 
@@ -414,10 +410,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
-                     DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
-                    DataBrokerProtectionWaitlistViewControllerPresenter.show()
-                }
+                DataBrokerProtectionAppEvents().handleNotification()
             }
 #endif
         }
