@@ -34,10 +34,12 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
     }
 
     func disableAndDelete() {
-        scheduler.stopScheduler()
+        if !DefaultDataBrokerProtectionFeatureVisibility.shouldUseRedeemOnlyFlow {
+            scheduler.stopScheduler()
 
-        scheduler.disableLoginItem()
+            scheduler.disableLoginItem()
 
-        dataManager.removeAllData()
+            dataManager.removeAllData()
+        }
     }
 }

@@ -288,6 +288,10 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     }
 
     func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
+        if DefaultDataBrokerProtectionFeatureVisibility.shouldUseRedeemOnlyFlow {
+            return
+        }
+        
         do {
             guard waitlistStorage.getWaitlistToken() != nil else {
                 os_log("User not in DBP waitlist, returning...", log: .default)
