@@ -149,8 +149,8 @@ extension UserText {
     static let networkProtectionTermsOfServiceSection7Title = NSLocalizedString("network-protection.terms-of-service.section.7.title", value: "We are continually updating the service.", comment: "Terms of Service title for Network Protection")
     static let networkProtectionTermsOfServiceSection7List = NSLocalizedString("network-protection.terms-of-service.section.7.list", value: "The service is in beta, and we are regularly changing it.\n\nService coverage, speed, server locations, and quality may vary without warning.", comment: "Terms of Service list for Network Protection")
 
-    static let networkProtectionTermsOfServiceSection8Title = NSLocalizedString("network-protection.terms-of-service.section.7.title", value: "We need your feedback.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection8List = NSLocalizedString("network-protection.terms-of-service.section.7.list", value: "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.", comment: "Terms of Service list for Network Protection")
+    static let networkProtectionTermsOfServiceSection8Title = NSLocalizedString("network-protection.terms-of-service.section.8.title", value: "We need your feedback.", comment: "Terms of Service title for Network Protection")
+    static let networkProtectionTermsOfServiceSection8List = NSLocalizedString("network-protection.terms-of-service.section.8.list", value: "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.", comment: "Terms of Service list for Network Protection")
 
 }
 
