@@ -23,7 +23,6 @@ import PackageDescription
 let package = Package(
     name: "NetworkProtectionMac",
     platforms: [
-        .iOS("14.0"),
         .macOS("11.4")
     ],
     products: [
