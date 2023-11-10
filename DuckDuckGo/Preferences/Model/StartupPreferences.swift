@@ -47,11 +47,6 @@ final class StartupPreferences: ObservableObject {
     private var persistor: StartupPreferencesPersistor
     private var pinnedViewsNotificationCancellable: AnyCancellable?
 
-    private enum Constants {
-        static let protocolPattern = "^(http|https)://"
-        static let httpsProtocol = "https://"
-    }
-
     init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
          persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared)) {
         self.pinningManager = pinningManager
@@ -77,9 +72,11 @@ final class StartupPreferences: ObservableObject {
 
     @Published var customHomePageURL: String {
         didSet {
-            let urlWithProtocol = ensureProtocol(customHomePageURL)
-            if customHomePageURL != urlWithProtocol {
-                customHomePageURL = urlWithProtocol
+            guard let urlWithScheme = urlWithScheme(customHomePageURL) else {
+                return
+            }
+            if customHomePageURL != urlWithScheme {
+                customHomePageURL = urlWithScheme
             }
             persistor.customHomePageURL = customHomePageURL
         }
@@ -132,15 +129,15 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
-    private func ensureProtocol(_ url: String) -> String {
-        let pattern = Constants.protocolPattern
-        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-            let range = NSRange(location: 0, length: url.utf16.count)
-            if regex.firstMatch(in: url, options: [], range: range) == nil {
-                return Constants.httpsProtocol + url
-            }
+    private func urlWithScheme(_ urlString: String) -> String? {
+        guard var urlWithScheme = urlString.url else {
+            return nil
         }
-        return url
+        // Force 'https' if 'http' not explicitly set by user
+        if urlWithScheme.isHttp && !urlString.starts(with: URL.NavigationalScheme.http.rawValue) {
+            urlWithScheme = urlWithScheme.toHttps() ?? urlWithScheme
+        }
+        return urlWithScheme.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
     }
 
 }
