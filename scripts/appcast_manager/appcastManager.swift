@@ -142,15 +142,16 @@ case .releaseToPublicChannel:
 
     performCommonChecksAndOperations()
 
-    // Verify version
-    if !verifyVersion(version: version, atDirectory: specificDir) {
+    guard let dmgFileName = findDMG(for: version, in: specificDir) else {
+        print("Version \(version) does not exist in the downloaded appcast items.")
         exit(1)
     }
+    print("Verified: Version \(version) exists in the downloaded appcast items: \(dmgFileName)")
 
     // Handle release notes if provided
     if let releaseNotesPath = arguments.parameters["--release-notes"] {
         print("Release Notes Path: \(releaseNotesPath)")
-        let dmgURLForPublic = specificDir.appendingPathComponent(getDmgFilename(for: version))
+        let dmgURLForPublic = specificDir.appendingPathComponent(dmgFileName)
         handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURLForPublic)
     } else {
         print("No new release notes provided. Keeping existing release notes.")
@@ -182,10 +183,6 @@ func performCommonChecksAndOperations() {
 
     // Download appcast and update files
     AppcastDownloader().download()
-}
-
-func getDmgFilename(for version: String) -> String {
-    return "duckduckgo-\(version).dmg"
 }
 
 // MARK: - Checking the recency of Sparkle tools
@@ -439,8 +436,11 @@ func getVersionFromDMGFileName(dmgURL: URL) -> String {
     }
     let versionWithExtension = components[1]
     let versionComponents = versionWithExtension.components(separatedBy: ".dmg")
-    let versions = versionComponents[0]
-    return versions
+    let versionSubcomponents = versionComponents[0].split(separator: ".").map(String.init)
+    if versionSubcomponents.count > 3 {
+        return String(versionSubcomponents[3])
+    }
+    return String(versionComponents[0])
 }
 
 // MARK: - Handling of DMG Files
@@ -462,16 +462,13 @@ func handleDMGFile(dmgPath: String, updatesDirectoryURL: URL) -> URL? {
     }
 }
 
-func verifyVersion(version: String, atDirectory dir: URL) -> Bool {
-    let expectedDMGFileName = getDmgFilename(for: version)
-    let expectedDMGFilePath = dir.appendingPathComponent(expectedDMGFileName).path
-    if FileManager.default.fileExists(atPath: expectedDMGFilePath) {
-        print("Verified: Version \(version) exists in the downloaded appcast items.")
-        return true
-    } else {
-        print("Version \(version) does not exist in the downloaded appcast items.")
-        return false
+func findDMG(for version: String, in dir: URL) -> String? {
+    let regex = try! Regex(#"^duckduckgo-\d+\.\d+\.\d+\.\#(version)\.dmg$"#)
+    let contents = (try? FileManager.default.contentsOfDirectory(atPath: dir.path)) ?? []
+    guard let fileName = contents.first(where: { $0.firstMatch(of: regex) != nil }) else {
+        return nil
     }
+    return fileName
 }
 
 // MARK: - Processing of Appcast
@@ -495,7 +492,7 @@ func readAppcastContent(from filePath: URL) -> String? {
 }
 
 func removeVersionFromAppcast(_ version: String, appcastContent: String) -> String? {
-    let pattern = "(<item>\\s*<title>\\s*\(version)\\s*</title>.*?</item>)"
+    let pattern = "(<item>.*?<sparkle:version>\(version)</sparkle:version>.*?</item>)"
 
     guard let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators),
           let startMatch = regex.firstMatch(in: appcastContent, range: NSRange(appcastContent.startIndex..., in: appcastContent)),
@@ -584,7 +581,7 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
     }
 
     // Get and save the diff
-    let diffResult = shell("diff", backupAppcastFilePath, appcastFilePath.path)
+    let diffResult = shell("diff", "-u", backupAppcastFilePath, appcastFilePath.path)
     let diffFilePath = specificDir.appendingPathComponent("appcast_diff.txt").path
     do {
         try diffResult.write(toFile: diffFilePath, atomically: true, encoding: .utf8)
