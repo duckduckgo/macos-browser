@@ -30,6 +30,9 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
+    /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
+    static let shouldUseRedeemOnlyFlow = false
+
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.privacyConfigurationManager = privacyConfigurationManager
