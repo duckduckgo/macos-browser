@@ -45,6 +45,7 @@ struct DeleteAccountView: View {
             Button(UserText.cancel) {
                 model.endFlow()
             }
+            .buttonStyle(DismissActionButtonStyle())
             Button(UserText.deleteAccountButton) {
                 model.delegate?.deleteAccount()
             }
