@@ -23,6 +23,19 @@ import DDGSync
 import Persistence
 import SyncDataProviders
 
+public class BookmarksFaviconsFetcherErrorHandler: EventMapping<BookmarksFaviconsFetcherError> {
+
+    public init() {
+        super.init { event, _, _, _ in
+            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherFailed, error: event))
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<BookmarksFaviconsFetcherError>.Mapping) {
+        fatalError("Use init()")
+    }
+}
+
 final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
@@ -91,11 +104,22 @@ final class SyncBookmarksAdapter {
             return
         }
 
+        let stateStore: BookmarkFaviconsFetcherStateStore
+        do {
+            stateStore = try BookmarkFaviconsFetcherStateStore(applicationSupportURL: .sandboxApplicationSupportURL)
+        } catch {
+            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
+
+            Thread.sleep(forTimeInterval: 1)
+            fatalError("Could not create BookmarkFaviconsFetcherStateStore: \(error.localizedDescription)")
+        }
+
         let faviconsFetcher = BookmarksFaviconsFetcher(
             database: database,
-            stateStore: BookmarkFaviconsFetcherStateStore(applicationSupportURL: .sandboxApplicationSupportURL),
+            stateStore: stateStore,
             fetcher: FaviconFetcher(),
             store: FaviconManager.shared,
+            errorEvents: BookmarksFaviconsFetcherErrorHandler(),
             log: .sync
         )
 
