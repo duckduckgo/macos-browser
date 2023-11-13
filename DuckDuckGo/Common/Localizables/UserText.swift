@@ -37,6 +37,7 @@ struct UserText {
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
     static let removeFavorite = NSLocalizedString("remove-favorite", value: "Remove Favorite", comment: "Remove Favorite button")
     static let quit = NSLocalizedString("quit", value: "Quit", comment: "Quit button")
+    static let uninstall = NSLocalizedString("uninstall", value: "Uninstall", comment: "Uninstall button")
     static let dontQuit = NSLocalizedString("dont.quit", value: "Don’t Quit", comment: "Don’t Quit button")
     static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
     static let pasteAndGo = NSLocalizedString("paste.and.go", value: "Paste & Go", comment: "Paste & Go button")
@@ -299,8 +300,72 @@ struct UserText {
     static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Automatically handle cookie pop-ups", comment: "Autoconsent settings checkbox title")
     static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
 
+    // VPN Setting Titles
+
     static let manageVPNSettingsTitle = NSLocalizedString("manage.vpn.settings.title", value: "Manage VPN", comment: "Manage VPN section title in VPN settings")
     static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "VPN Notifications", comment: "VPN Notifications section title in VPN settings")
+    static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced Settings", comment: "VPN Advanced section title in VPN settings")
+
+    // VPN Settings
+
+    static let vpnConnectOnLoginSettingTitle = NSLocalizedString(
+        "vpn.setting.title.connect.on.login",
+        value: "Connect on Login",
+        comment: "Connect on Login setting title")
+    static let vpnConnectOnLoginSettingDescription = NSLocalizedString(
+        "vpn.setting.description.connect.on.login",
+        value: "Automatically connect to the VPN service when you login",
+        comment: "Connect on Login setting description")
+    static let vpnShowInMenuBarSettingTitle = NSLocalizedString(
+        "vpn.setting.title.connect.on.login",
+        value: "Show VPN in menu bar",
+        comment: "Show VPN in menu bar setting title")
+    static let vpnShowInMenuBarSettingDescription = NSLocalizedString(
+        "vpn.setting.description.connect.on.login",
+        value: "Display VPN status in menu bar, next to the Wi-Fi and Battery",
+        comment: "Show VPN in menu bar setting description")
+    static let vpnAlwaysONSettingTitle = NSLocalizedString(
+        "vpn.setting.title.always.on",
+        value: "Always ON",
+        comment: "Always ON setting title")
+    static let vpnAlwaysOnSettingDescription = NSLocalizedString(
+        "vpn.setting.description.always.on",
+        value: "Display VPN status in menu bar, next to the Wi-Fi and Battery",
+        comment: "Always ON setting description")
+    static let vpnExcludeLocalNetworksSettingTitle = NSLocalizedString(
+        "vpn.setting.title.exclude.local.networks",
+        value: "Exclude Local Networks",
+        comment: "Exclude Local Networks setting title")
+    static let vpnExcludeLocalNetworksSettingDescription = NSLocalizedString(
+        "vpn.setting.description.exclude.local.networks",
+        value: "Let local traffic bypass the VPN and connect to devices on your local network, like a printer",
+        comment: "Exclude Local Networks setting description")
+    static let vpnSecureDNSSettingTitle = NSLocalizedString(
+        "vpn.setting.title.secure.dns",
+        value: "Secure DNS",
+        comment: "Secure DNS setting title")
+    static let vpnSecureDNSSettingDescription = NSLocalizedString(
+        "vpn.setting.description.secure.dns",
+        value: "Prevents DNS leaks to your Internet service provider by routing DNS queries through the VPN tunnel to our own resolver. For your security, this feature cannot be disabled.",
+        comment: "Secure DNS setting description")
+    static let vpnStatusChangeNotificationSettingTitle = NSLocalizedString(
+        "vpn.setting.title.status.change.notification",
+        value: "Get notified if your connection drops or VPN status changes",
+        comment: "Status Change Notification setting title")
+    static let uninstallVPNButtonTitle = NSLocalizedString(
+        "vpn.button.title.uninstall.vpn",
+        value: "Uninstall VPN",
+        comment: "Uninstall VPN button title")
+
+    // VPN Settings Alerts
+
+    static let uninstallVPNAlertTitle = NSLocalizedString("vpn.uninstall.alert.title", value: "Are you sure you want to uninstall our VPN?", comment: "Alert title when the user selects to uninstall our VPN")
+    static let uninstallVPNInformativeText = NSLocalizedString(
+        "vpn.uninstall.alert.informative.text",
+        value: "Uninstalling our VPN will remove it from your system and disconnect any active VPN connections.",
+        comment: "Informative text for the alert that comes up when the user decides to uninstall our VPN")
+
+    // Misc
 
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
     static let duckPlayerAlwaysOpenInPlayer = NSLocalizedString("duck-player.always-open-in-player", value: "Always open YouTube videos in Duck Player", comment: "Private YouTube Player option")

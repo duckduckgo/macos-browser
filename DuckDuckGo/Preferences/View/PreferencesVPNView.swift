@@ -36,25 +36,22 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.manageVPNSettingsTitle)
 
-                    ToggleMenuItem(title: "Connect on Login", isOn: $model.connectOnLogin)
-                    TextMenuItemCaption(text: "Automatically connect to the VPN service when you login")
+                    ToggleMenuItem(title: UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
+                    TextMenuItemCaption(text: UserText.vpnConnectOnLoginSettingDescription)
 
-                    ToggleMenuItem(title: "Show VPN in menu bar", isOn: $model.showInMenuBar)
-                    TextMenuItemCaption(text: "Display VPN status in menu bar, next to the Wi-Fi and Battery")
+                    ToggleMenuItem(title: UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
+                    TextMenuItemCaption(text: UserText.vpnShowInMenuBarSettingDescription)
 
-                    ToggleMenuItem(title: "Always ON", isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: UserText.vpnAlwaysONSettingTitle, isOn: $model.isAutoconsentEnabled)
                         .disabled(true)
-                    TextMenuItemCaption(text: "Display VPN status in menu bar, next to the Wi-Fi and Battery")
+                    TextMenuItemCaption(text: UserText.vpnAlwaysOnSettingDescription)
 
-                    //ToggleMenuItem(title: "Killswitch", isOn: $model.isAutoconsentEnabled)
-                    //TextMenuItemCaption(text: "Display VPN status in menu bar, next to the Wi-Fi and Battery")
+                    ToggleMenuItem(title: UserText.vpnExcludeLocalNetworksSettingTitle, isOn: $model.excludeLocalNetworks)
+                    TextMenuItemCaption(text: UserText.vpnExcludeLocalNetworksSettingDescription)
 
-                    ToggleMenuItem(title: "Exclude Local Networks", isOn: $model.isAutoconsentEnabled)
-                    TextMenuItemCaption(text: "Let local traffic bypass the VPN and connect to devices on your local network, like a printer")
-
-                    ToggleMenuItem(title: "Secure DNS", isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: UserText.vpnSecureDNSSettingTitle, isOn: $model.isAutoconsentEnabled)
                         .disabled(true)
-                    TextMenuItemCaption(text: "Prevents DNS leaks to your Internet service provider by routing DNS queries through the VPN tunnel to our own resolver. For your security, this feature cannot be disabled.")
+                    TextMenuItemCaption(text: UserText.vpnSecureDNSSettingDescription)
                 }
 
                 // SECTION: VPN Notifications
@@ -62,7 +59,18 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.vpnNotificationsSettingsTitle)
 
-                    ToggleMenuItem(title: "Get notified if your connection drops or VPN status changes", isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: UserText.vpnStatusChangeNotificationSettingTitle, isOn: $model.isAutoconsentEnabled)
+                }
+
+                // SECTION: Uninstall
+
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.vpnAdvancedSettingsTitle)
+
+                    Button(UserText.uninstallVPNButtonTitle) {
+                        model.uninstallVPN()
+                    }
+                    .buttonStyle(DestructiveActionButtonStyle(enabled: true))
                 }
             }
         }

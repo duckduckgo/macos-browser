@@ -18,6 +18,7 @@
 
 import Foundation
 import NetworkProtection
+import AppKit
 
 final class VPNPreferencesModel: ObservableObject {
     @Published var isAutoconsentEnabled: Bool = true
@@ -48,5 +49,38 @@ final class VPNPreferencesModel: ObservableObject {
         connectOnLogin = tunnelSettings.connectOnLogin
         excludeLocalNetworks = tunnelSettings.excludeLocalNetworks
         showInMenuBar = tunnelSettings.showInMenuBar
+    }
+
+    func uninstallVPN() {
+        Task { @MainActor in
+            let response = await uninstallVPNConfirmationAlert().runModal()
+
+            switch response {
+            case .OK:
+                NetworkProtectionFeatureDisabler().disable(keepAuthToken: true, uninstallSystemExtension: true)
+            case .cancel:
+                // intentional no-op
+                break
+            default:
+                // intentional no-op
+                break
+            }
+        }
+    }
+
+    @MainActor
+    func uninstallVPNConfirmationAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.uninstallVPNAlertTitle
+        alert.informativeText = UserText.uninstallVPNInformativeText
+        let uninstallButton = alert.addButton(withTitle: UserText.uninstall)
+        uninstallButton.tag = NSApplication.ModalResponse.OK.rawValue
+        uninstallButton.keyEquivalent = ""
+
+        let cancelButton = alert.addButton(withTitle: UserText.cancel)
+        cancelButton.tag = NSApplication.ModalResponse.cancel.rawValue
+        cancelButton.keyEquivalent = "\r"
+
+        return alert
     }
 }
