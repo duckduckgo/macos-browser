@@ -18,6 +18,7 @@
 
 import Foundation
 import AppKit
+import Common
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
@@ -151,6 +152,8 @@ final class AppearancePreferences: ObservableObject {
 
     static let shared = AppearancePreferences()
 
+    public static let zoomPerWebsiteUpdated = Notification.Name("com.duckduckgo.app.ZoomPerWebsiteUpdated")
+
     @Published var currentThemeName: ThemeName {
         didSet {
             persistor.currentThemeName = currentThemeName.rawValue
@@ -176,9 +179,10 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var zoomPerWebsite: [ String: DefaultZoomValue] {
+    private var zoomPerWebsite: [ String: DefaultZoomValue] {
         didSet {
             persistor.zoomPerWebsite = zoomPerWebsite.mapValues { $0.rawValue }
+            NotificationCenter.default.post(name: AppearancePreferences.zoomPerWebsiteUpdated, object: nil)
         }
     }
 
@@ -247,8 +251,28 @@ final class AppearancePreferences: ObservableObject {
         NSApp.appearance = currentThemeName.appearance
     }
 
-    func updateZoomPerWebsite(zoomLevel: DefaultZoomValue, website: String) {
-        zoomPerWebsite[website] = zoomLevel
+    func zoomPerWebsite(url: String) -> DefaultZoomValue? {
+        guard let domain = TLD().eTLDplus1(forStringURL: url) else { return nil }
+        return zoomPerWebsite[domain]
+    }
+
+    func updateZoomPerWebsite(zoomLevel: DefaultZoomValue, url: String) {
+        print("zoom before: \(zoomPerWebsite)")
+        guard let domain = TLD().eTLDplus1(forStringURL: url) else { return }
+        zoomPerWebsite[domain] = zoomLevel
+        print("zoom after: \(zoomPerWebsite)")
+    }
+
+    func burnZoomLevels(except fireproofDomains: FireproofDomains) {
+        zoomPerWebsite = zoomPerWebsite.filter {
+            fireproofDomains.isFireproof(fireproofDomain: $0.key)
+        }
+    }
+
+    func burnPermissions(of baseDomains: Set<String>) {
+        for website in zoomPerWebsite.keys where baseDomains.contains(website) {
+            zoomPerWebsite[website] = nil
+        }
     }
 
     init(persistor: AppearancePreferencesPersistor = AppearancePreferencesUserDefaultsPersistor()) {

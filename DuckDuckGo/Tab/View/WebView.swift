@@ -66,6 +66,9 @@ final class WebView: WKWebView {
             return DefaultZoomValue(rawValue: pageZoom) ?? .percent100
         }
         set {
+            if pageZoom == newValue.rawValue {
+                pageZoom = 1
+            }
             pageZoom = newValue.rawValue
         }
     }

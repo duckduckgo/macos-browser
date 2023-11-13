@@ -111,7 +111,7 @@ final class TabViewModel {
             self.updateAddressBarStrings()
             self.updateCanBeBookmarked()
             self.updateFavicon()
-            self.updateZoomForWebsite(zoomLevels: appearancePreferences.zoomPerWebsite)
+            self.updateZoomForWebsite()
         } .store(in: &cancellables)
     }
 
@@ -189,29 +189,29 @@ final class TabViewModel {
                 self.tab.webView.zoomLevel = newValue
             }
         }.store(in: &cancellables)
-        appearancePreferences.$zoomPerWebsite.sink { [weak self] newValue in
-            guard let self = self else { return }
-            updateZoomForWebsite(zoomLevels: newValue)
-        }.store(in: &cancellables)
+        NotificationCenter.default.publisher(for: AppearancePreferences.zoomPerWebsiteUpdated)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateZoomForWebsite()
+            }.store(in: &cancellables)
     }
 
     private var isThereZoomPerWebsite: Bool {
-        guard let hostString = tabHostURL?.absoluteString else { return false }
-        return appearancePreferences.zoomPerWebsite[hostString] != nil
+        guard let urlString = tab.url?.absoluteString else { return false }
+        return appearancePreferences.zoomPerWebsite(url: urlString) != nil
     }
 
-    private func updateZoomForWebsite(zoomLevels: [String: DefaultZoomValue]) {
-        guard let hostString = tabHostURL?.absoluteString else { return }
-        guard let zoomToApply = zoomLevels[hostString] else { return }
-        if self.tab.webView.zoomLevel != zoomToApply {
-            self.tab.webView.zoomLevel = zoomToApply
-        }
+    private func updateZoomForWebsite() {
+        guard let urlString = tab.url?.absoluteString else { return }
+        guard let zoomToApply = appearancePreferences.zoomPerWebsite(url: urlString) else { return }
+        self.tab.webView.zoomLevel = zoomToApply
     }
 
     private func subscribeToWebViewDidFinishNavigation() {
         tab.webViewDidFinishNavigationPublisher.sink { [weak self] in
             guard let self = self else { return }
             self.sendAnimationTrigger()
+            self.updateZoomForWebsite()
         }.store(in: &cancellables)
     }
 
@@ -396,7 +396,7 @@ extension TabViewModel: TabDataClearing {
 
 extension TabViewModel: WebViewZoomLevelDelegate {
     func zoomWasSet(to level: DefaultZoomValue) {
-        guard let hostString = tabHostURL?.absoluteString else { return }
-        appearancePreferences.updateZoomPerWebsite(zoomLevel: level, website: hostString)
+        guard let urlString = tab.url?.absoluteString else { return }
+        appearancePreferences.updateZoomPerWebsite(zoomLevel: level, url: urlString)
     }
 }

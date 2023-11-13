@@ -76,18 +76,20 @@ final class ZoomPopoverViewModel: ObservableObject {
     init(appearancePreferences: AppearancePreferences, tabViewModel: TabViewModel) {
         self.appearancePreferences = appearancePreferences
         self.tabViewModel = tabViewModel
-        guard let hostURLString = tabViewModel.tabHostURL?.absoluteString else { return }
-        zoomLevel = appearancePreferences.zoomPerWebsite[hostURLString] ?? appearancePreferences.defaultPageZoom
+        guard let urlString = tabViewModel.tab.url?.absoluteString else { return }
+        zoomLevel = appearancePreferences.zoomPerWebsite(url: urlString) ?? .percent100
+        NotificationCenter.default.publisher(for: AppearancePreferences.zoomPerWebsiteUpdated)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                if let newZoomLevel = appearancePreferences.zoomPerWebsite(url: urlString) {
+                    self?.zoomLevel = newZoomLevel
+                }
+            }.store(in: &cancellables)
         appearancePreferences.$defaultPageZoom.sink { [weak self] newValue in
             guard let self = self else { return }
-            if appearancePreferences.zoomPerWebsite[hostURLString] == nil {
+            if appearancePreferences.zoomPerWebsite(url: urlString) == nil {
                 zoomLevel = newValue
             }
-        }.store(in: &cancellables)
-        appearancePreferences.$zoomPerWebsite.sink { [weak self] newValue in
-            guard let self = self else { return }
-            guard let zoomApplied = newValue[hostURLString] else { return }
-            zoomLevel = zoomApplied
         }.store(in: &cancellables)
     }
 
