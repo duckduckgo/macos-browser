@@ -42,8 +42,12 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
             }
             .frame(width: 172, height: 28)
             .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(selectedSegment == 0 ? Color.white : Color("BlackWhite1"))
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(selectedSegment == 0 ? Color("BlackWhite10") : .clear, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(selectedSegment == 0 ? Color.white : Color("BlackWhite1"))
+                }
             )
             HStack {
                 Image("Keyboard-16D")
@@ -54,8 +58,12 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
             }
             .frame(width: 172, height: 28)
             .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(selectedSegment == 1 ? Color.white : Color("BlackWhite1"))
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(selectedSegment == 1 ? Color("BlackWhite10") : .clear, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(selectedSegment == 1 ? Color.white : Color("BlackWhite1"))
+                }
             )
         }
         .frame(width: 348, height: 32)

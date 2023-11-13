@@ -335,6 +335,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 self.codeToDisplay = connector?.code
                 self.presentDialog(type: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
+                    onEndFlow()
+                    presentDialog(type: .prepareToSync)
                     try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: false)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
@@ -494,6 +496,11 @@ extension SyncPreferences {
                 view: SyncWithAnotherDeviceView<SyncPreferences>(code: code)
                     .environmentObject(self)
                     .environmentObject(RecoveryCodeViewModel()))
+        case .prepareToSync:
+            viewController = SyncDialogViewController(
+                view: PreparingToSyncView()
+            )
+
         }
 
         guard let dialogWindow = viewController.wrappedInWindowController().window else { return }
@@ -511,6 +518,7 @@ extension SyncPreferences {
 
     enum DialogType {
         case syncWithAnotherDevice(code: String)
+        case prepareToSync
     }
 
     func endDialogFlow() {
