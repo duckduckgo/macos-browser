@@ -125,11 +125,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         #endif
 
         let menuItems = [
+            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
+                await self?.appLauncher.launchApp(withCommand: .showSettings)
+            }),
             StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
                 await self?.appLauncher.launchApp(withCommand: .shareFeedback)
-            }),
-            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                await self?.appLauncher.launchApp(withCommand: .justOpen)
             })
         ]
 
