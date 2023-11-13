@@ -124,31 +124,33 @@ final class BWCommunicator: BWCommunication {
 
     private let realisticMessageLength = 200000
     private var accumulatedData = Data()
+    private let dataQueue = DispatchQueue(label: "BWCommunicator.queue")
 
     func receiveData(_ fileHandle: FileHandle) {
-        accumulatedData.append(fileHandle.availableData) // Append new data to accumulated data
-
-        processAccumulatedData()
+        let newData = fileHandle.availableData
+        dataQueue.async {
+            self.accumulatedData.append(newData)
+            self.processAccumulatedData()
+        }
     }
 
     private func processAccumulatedData() {
-        repeat {
-            let (messageData, remainingData) = readMessage(availableData: accumulatedData)
-            accumulatedData = remainingData
+        dataQueue.async {
+            repeat {
+                let (messageData, remainingData) = self.readMessage(availableData: self.accumulatedData)
+                self.accumulatedData = remainingData
 
-            guard let messageData = messageData else {
-//                if accumulatedData.count >= 2 {
-//                    assertionFailure("Wrong format of the message")
-//                }
-                return
-            }
+                guard let messageData = messageData else {
+                    return
+                }
 
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
 
-                self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
-            }
-        } while accumulatedData.count >= 2 /*EOF*/
+                    self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
+                }
+            } while self.accumulatedData.count >= 2 /*EOF*/
+        }
     }
 
     func readMessage(availableData: Data) -> (messageData: Data?, availableData: Data) {
