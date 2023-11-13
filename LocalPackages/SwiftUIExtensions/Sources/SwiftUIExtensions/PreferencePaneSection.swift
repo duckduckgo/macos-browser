@@ -21,15 +21,17 @@ import SwiftUI
 public struct PreferencePaneSection<Content>: View where Content: View {
 
     public let spacing: CGFloat
+    public let verticalPadding: CGFloat
     @ViewBuilder public let content: () -> Content
 
-    public init(spacing: CGFloat = 12, @ViewBuilder content: @escaping () -> Content) {
+    public init(spacing: CGFloat = 12, vericalPadding: CGFloat = 20, @ViewBuilder content: @escaping () -> Content) {
         self.spacing = spacing
+        self.verticalPadding = vericalPadding
         self.content = content
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: spacing, content: content)
-            .padding(.vertical, 20)
+            .padding(.vertical, verticalPadding)
     }
 }
