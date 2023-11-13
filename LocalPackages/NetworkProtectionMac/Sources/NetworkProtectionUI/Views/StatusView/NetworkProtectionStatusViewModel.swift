@@ -125,7 +125,7 @@ extension NetworkProtectionStatusView {
 
         private func subscribeToStatusChanges() {
             statusReporter.statusObserver.publisher
-                .subscribe(on: DispatchQueue.main)
+                .receive(on: DispatchQueue.main)
                 .sink { [weak self] status in
                     self?.connectionStatus = status
             }
