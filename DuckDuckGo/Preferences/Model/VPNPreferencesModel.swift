@@ -28,54 +28,17 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-/*
-    @Published
-    var isLoginDetectionEnabled: Bool {
+    @Published var excludeLocalNetworks: Bool {
         didSet {
-            privacySecurityPreferences.loginDetectionEnabled = isLoginDetectionEnabled
+            tunnelSettings.excludeLocalNetworks = excludeLocalNetworks
         }
     }
 
-    @Published
-    var isGPCEnabled: Bool {
+    @Published var showInMenuBar: Bool {
         didSet {
-            privacySecurityPreferences.gpcEnabled = isGPCEnabled
+            tunnelSettings.showInMenuBar = showInMenuBar
         }
     }
-
-    @Published var isAutoconsentEnabled: Bool {
-        didSet {
-            privacySecurityPreferences.autoconsentEnabled = isAutoconsentEnabled
-        }
-    }
-
-    @MainActor
-    func presentManageFireproofSitesDialog() {
-        let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
-
-        guard let fireproofDomainsWindow = fireproofDomainsWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Privacy Preferences: Failed to present FireproofDomainsViewController")
-            return
-        }
-
-        parentWindowController.window?.beginSheet(fireproofDomainsWindow)
-    }
-
-    @MainActor
-    func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
-    }
-
-    init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
-        self.privacySecurityPreferences = privacySecurityPreferences
-        isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-        isGPCEnabled = privacySecurityPreferences.gpcEnabled
-        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
-    }
-
-    private let privacySecurityPreferences: PrivacySecurityPreferences*/
 
     private let tunnelSettings: TunnelSettings
 
@@ -83,5 +46,7 @@ final class VPNPreferencesModel: ObservableObject {
         self.tunnelSettings = tunnelSettings
 
         connectOnLogin = tunnelSettings.connectOnLogin
+        excludeLocalNetworks = tunnelSettings.excludeLocalNetworks
+        showInMenuBar = tunnelSettings.showInMenuBar
     }
 }

@@ -58,6 +58,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let appLauncher = AppLauncher()
     private let bouncer = NetworkProtectionBouncer()
 
+    private var cancellables = Set<AnyCancellable>()
+
     var networkExtensionBundleID: String {
         Bundle.main.networkExtensionBundleID
     }
@@ -143,11 +145,13 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             menuItems: menuItems)
     }()
 
+    @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
-        networkProtectionMenu.show()
+
+        setupMenuVisibility()
 
         bouncer.requireAuthTokenOrKillApp()
 
@@ -179,6 +183,25 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+
+    @MainActor
+    private func setupMenuVisibility() {
+        if tunnelSettings.showInMenuBar {
+            networkProtectionMenu.show()
+        } else {
+            networkProtectionMenu.hide()
+        }
+
+        tunnelSettings.showInMenuBarPublisher.sink { [weak self] showInMenuBar in
+            Task { @MainActor in
+                if showInMenuBar {
+                    self?.networkProtectionMenu.show()
+                } else {
+                    self?.networkProtectionMenu.hide()
+                }
+            }
+        }.store(in: &cancellables)
     }
 }
 

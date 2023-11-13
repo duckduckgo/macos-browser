@@ -39,7 +39,7 @@ extension Preferences {
                     ToggleMenuItem(title: "Connect on Login", isOn: $model.connectOnLogin)
                     TextMenuItemCaption(text: "Automatically connect to the VPN service when you login")
 
-                    ToggleMenuItem(title: "Show VPN in menu bar", isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: "Show VPN in menu bar", isOn: $model.showInMenuBar)
                     TextMenuItemCaption(text: "Display VPN status in menu bar, next to the Wi-Fi and Battery")
 
                     ToggleMenuItem(title: "Always ON", isOn: $model.isAutoconsentEnabled)
@@ -51,7 +51,6 @@ extension Preferences {
 
                     ToggleMenuItem(title: "Exclude Local Networks", isOn: $model.isAutoconsentEnabled)
                     TextMenuItemCaption(text: "Let local traffic bypass the VPN and connect to devices on your local network, like a printer")
-
 
                     ToggleMenuItem(title: "Secure DNS", isOn: $model.isAutoconsentEnabled)
                         .disabled(true)
