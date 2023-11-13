@@ -210,10 +210,13 @@ func checkSparkleToolRecency(toolName: String) -> Bool {
     let releaseDateFilePath = rootDirectory.appendingPathComponent(".sparkle_tools_release_date")
 
     guard let releaseDateString = try? String(contentsOf: releaseDateFilePath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
-          let releaseDate = DateFormatter.yyyyMMdd.date(from: releaseDateString) else {
+          let releaseDate = DateFormatter.yyyyMMddUTC.date(from: releaseDateString) else {
         print("Failed to get the release date from .sparkle_tools_release_date.")
         return false
     }
+
+print ("modification Date \(modificationDate)")
+print ("release Date \(releaseDate)")
 
     if modificationDate < releaseDate {
         print("\(toolName) from Sparkle binary utilities is outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
@@ -224,9 +227,10 @@ func checkSparkleToolRecency(toolName: String) -> Bool {
 }
 
 extension DateFormatter {
-    static let yyyyMMdd: DateFormatter = {
+    static let yyyyMMddUTC: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "UTC")
         return formatter
     }()
 }
