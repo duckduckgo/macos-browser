@@ -81,7 +81,6 @@ extension NetworkProtectionStatusView {
         // MARK: - Dispatch Queues
 
         private static let statusDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.statusDispatchQueue", qos: .userInteractive)
-        private static let connectivityIssuesDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.connectivityIssuesDispatchQueue", qos: .userInteractive)
         private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
         private static let tunnelErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.tunnelErrorDispatchQueue", qos: .userInteractive)
         private static let controllerErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.controllerErrorDispatchQueue", qos: .userInteractive)
@@ -132,7 +131,7 @@ extension NetworkProtectionStatusView {
 
         private func subscribeToConnectivityIssues() {
             statusReporter.connectivityIssuesObserver.publisher
-                .subscribe(on: Self.connectivityIssuesDispatchQueue)
+                .receive(on: DispatchQueue.main)
                 .assign(to: \.isHavingConnectivityIssues, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
