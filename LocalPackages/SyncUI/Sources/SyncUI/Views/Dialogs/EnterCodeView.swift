@@ -31,6 +31,8 @@ struct EnterCodeView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text(instructions)
+                .frame(width: 400)
+                .fixedSize()
                 .multilineTextAlignment(.center)
 
             SyncKeyView(text: recoveryCodeModel.recoveryCode)
