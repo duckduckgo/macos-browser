@@ -74,9 +74,9 @@ struct MapperToUI {
                         return nil
                     }
                     profiles.append(contentsOf: mirrorSitesMatches)
-
-                    return profiles
                 }
+
+                return profiles
             }
 
             return nil
