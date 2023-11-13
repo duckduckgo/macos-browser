@@ -126,25 +126,15 @@ extension NetworkProtectionStatusView {
         private func subscribeToStatusChanges() {
             statusReporter.statusObserver.publisher
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] status in
-                    self?.connectionStatus = status
-            }
+                .assign(to: \.connectionStatus, onWeaklyHeld: self)
                 .store(in: &cancellables)
         }
 
         private func subscribeToConnectivityIssues() {
             statusReporter.connectivityIssuesObserver.publisher
                 .subscribe(on: Self.connectivityIssuesDispatchQueue)
-                .sink { [weak self] isHavingConnectivityIssues in
-
-                guard let self else {
-                    return
-                }
-
-                Task { @MainActor in
-                    self.isHavingConnectivityIssues = isHavingConnectivityIssues
-                }
-            }.store(in: &cancellables)
+                .assign(to: \.isHavingConnectivityIssues, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         private func subscribeToTunnelErrorMessages() {
