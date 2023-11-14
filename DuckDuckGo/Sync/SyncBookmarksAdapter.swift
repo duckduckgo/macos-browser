@@ -27,7 +27,7 @@ public class BookmarksFaviconsFetcherErrorHandler: EventMapping<BookmarksFavicon
 
     public init() {
         super.init { event, _, _, _ in
-            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherFailed, error: event))
+            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherFailed, error: event.underlyingError))
         }
     }
 
@@ -104,9 +104,9 @@ final class SyncBookmarksAdapter {
             return
         }
 
-        let stateStore: BookmarkFaviconsFetcherStateStore
+        let stateStore: BookmarksFaviconsFetcherStateStore
         do {
-            stateStore = try BookmarkFaviconsFetcherStateStore(applicationSupportURL: .sandboxApplicationSupportURL)
+            stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: .sandboxApplicationSupportURL)
         } catch {
             Pixel.fire(.debug(event: .bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
 
@@ -118,7 +118,7 @@ final class SyncBookmarksAdapter {
             database: database,
             stateStore: stateStore,
             fetcher: FaviconFetcher(),
-            store: FaviconManager.shared,
+            faviconStore: FaviconManager.shared,
             errorEvents: BookmarksFaviconsFetcherErrorHandler(),
             log: .sync
         )
