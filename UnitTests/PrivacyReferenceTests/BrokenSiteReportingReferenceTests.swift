@@ -65,7 +65,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            isGPCEnabled: test.gpcEnabled ?? false,
                                            ampURL: "",
                                            urlParametersRemoved: false,
-                                           protected: true,
+                                           protectionsState: test.protectionsEnabled,
                                            manufacturer: test.manufacturer ?? "")
 
             let request = makeURLRequest(with: breakage.requestParameters)
@@ -126,6 +126,7 @@ private struct Test: Codable {
     let exceptPlatforms: [String]
     let manufacturer, model, os: String?
     let gpcEnabled: Bool?
+    let protectionsEnabled: Bool
 }
 
 // MARK: - ExpectReportURLParam

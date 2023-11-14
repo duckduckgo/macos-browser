@@ -45,6 +45,9 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
+    func handleFavoritesAfterDisablingSync()
+    var didMigrateToFormFactorSpecificFavorites: Bool { get }
+
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
@@ -55,18 +58,39 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {}
+    private init() {
+        self.subscribeToFavoritesDisplayMode()
+    }
 
     init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
         self.faviconManagement = faviconManagement
+        self.subscribeToFavoritesDisplayMode()
+    }
+
+    private func subscribeToFavoritesDisplayMode() {
+        favoritesDisplayMode = AppearancePreferences.shared.favoritesDisplayMode
+        favoritesDisplayModeCancellable = AppearancePreferences.shared.$favoritesDisplayMode
+            .dropFirst()
+            .sink { [weak self] displayMode in
+                self?.favoritesDisplayMode = displayMode
+                self?.bookmarkStore.applyFavoritesDisplayMode(displayMode)
+                self?.loadBookmarks()
+            }
     }
 
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
+    var didMigrateToFormFactorSpecificFavorites: Bool {
+        bookmarkStore.didMigrateToFormFactorSpecificFavorites
+    }
+
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+
+    private var favoritesDisplayMode: FavoritesDisplayMode = .displayNative(.desktop)
+    private var favoritesDisplayModeCancellable: AnyCancellable?
 
     // MARK: - Bookmarks
 
@@ -300,6 +324,22 @@ final class LocalBookmarkManager: BookmarkManager {
         return results
     }
 
+    // MARK: - Sync
+
+    func handleFavoritesAfterDisablingSync() {
+        bookmarkStore.handleFavoritesAfterDisablingSync()
+    }
+
+    func requestSync() {
+        Task { @MainActor in
+            guard let syncService = NSApp.delegateTyped.syncService else {
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            syncService.scheduler.notifyDataChanged()
+        }
+    }
+
     // MARK: - Debugging
 
     func resetBookmarks() {
@@ -310,16 +350,6 @@ final class LocalBookmarkManager: BookmarkManager {
         store.resetBookmarks { [self] _ in
             self.loadBookmarks()
             self.requestSync()
-        }
-    }
-
-    func requestSync() {
-        Task { @MainActor in
-            guard let syncService = NSApp.delegateTyped.syncService else {
-                return
-            }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-            syncService.scheduler.notifyDataChanged()
         }
     }
 }

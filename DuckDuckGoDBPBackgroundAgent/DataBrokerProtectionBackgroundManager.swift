@@ -26,7 +26,7 @@ public final class DataBrokerProtectionBackgroundManager {
 
     static let shared = DataBrokerProtectionBackgroundManager()
 
-    private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
+    private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()

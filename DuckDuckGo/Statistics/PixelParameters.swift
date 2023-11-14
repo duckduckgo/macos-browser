@@ -47,6 +47,7 @@ extension Pixel.Event {
         case .serpDay21to27(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
         case .setAsDefaultInitial(let cohort):
+            guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .dailyPixel(let pixel, isFirst: _):
@@ -114,6 +115,10 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
+             .syncBookmarksCountLimitExceededDaily,
+             .syncCredentialsCountLimitExceededDaily,
+             .syncBookmarksRequestSizeLimitExceededDaily,
+             .syncCredentialsRequestSizeLimitExceededDaily,
              .dataBrokerProtectionWaitlistUserActive,
              .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed,
              .dataBrokerProtectionWaitlistIntroDisplayed,

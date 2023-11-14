@@ -208,6 +208,9 @@ jobs:
 
     name: Make Release Build
 
+    # Dependabot doesn't have access to all secrets, so we skip this job
+    if: github.actor != 'dependabot[bot]'
+
     strategy:
       matrix:
         scheme: [ "DuckDuckGo Privacy Browser", "DuckDuckGo Privacy Pro" ]
