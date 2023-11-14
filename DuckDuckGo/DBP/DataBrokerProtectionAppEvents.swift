@@ -17,10 +17,12 @@
 //
 
 import Foundation
+import LoginItems
 
 struct DataBrokerProtectionAppEvents {
 
     func applicationDidFinishLaunching() {
+        let loginItemsManager = LoginItemsManager()
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
 
         guard featureVisibility.isFeatureVisible() else {
@@ -31,6 +33,8 @@ struct DataBrokerProtectionAppEvents {
         Task {
             try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
+
+        restartBackgroundAgent(loginItemsManager: loginItemsManager)
     }
 
     func applicationDidBecomeActive() {
@@ -66,5 +70,9 @@ struct DataBrokerProtectionAppEvents {
                             frequency: .dailyOnly,
                             includeAppVersionParameter: true)
         }
+    }
+
+    private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
+        loginItemsManager.restartLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
     }
 }

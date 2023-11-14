@@ -132,7 +132,7 @@ extension Pixel {
         case emailEnabledInitial
         case cookieManagementEnabledInitial
         case watchInDuckPlayerInitial
-        case setAsDefaultInitial(cohort: String)
+        case setAsDefaultInitial(cohort: String? = nil)
         case importDataInitial
 
         // New Tab section removed

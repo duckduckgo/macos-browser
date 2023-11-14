@@ -212,7 +212,7 @@ struct MockRemoteConnecting: RemoteConnecting {
 
 struct MockPersistor: AppearancePreferencesPersistor {
     var homeButtonPosition: HomeButtonPosition = .hidden
-    
+
     var showFullURL: Bool = false
 
     var showAutocompleteSuggestions: Bool = false
