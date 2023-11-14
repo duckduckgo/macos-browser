@@ -59,4 +59,6 @@ public protocol ManagementViewModel: ObservableObject {
     func downloadDDGPressed()
     func endDialogFlow()
     func recoveryCodePasted(_ code: String)
+    func copyRecoveryCode()
+    func recoveryCodeNextPressed()
 }

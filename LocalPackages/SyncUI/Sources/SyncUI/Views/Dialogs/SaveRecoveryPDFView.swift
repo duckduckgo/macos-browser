@@ -19,30 +19,66 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct SaveRecoveryPDFView: View {
-    @EnvironmentObject var model: ManagementDialogModel
+public struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: ManagementViewModel {
+    @EnvironmentObject var viewModel: ViewModel
+    let code: String
 
-    var body: some View {
+    public init(code: String) {
+        self.code = code
+    }
+
+    public var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRecoveryPDF")
                 Text(UserText.saveRecoveryPDF)
                     .font(.system(size: 17, weight: .bold))
-                Text(UserText.recoveryPDFExplanation1)
+                Text(UserText.recoveryPDFExplanation)
                     .multilineTextAlignment(.center)
-                Text(UserText.recoveryPDFExplanation2)
-                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            VStack(alignment: .leading, spacing: 20) {
+                HStack {
+                    QRCode(string: code, size: CGSize(width: 56, height: 56))
+                    Text(code)
+                        .kerning(2)
+                        .multilineTextAlignment(.leading)
+                        .lineSpacing(5)
+                        .lineLimit(3)
+                        .font(Font.custom("SF Mono", size: 12))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(width: 340)
+                HStack {
+                    Button {
+                        viewModel.copyRecoveryCode()
+                    } label: {
+                        Text("Copy Code")
+                            .frame(width: 155, height: 28)
+                    }
+                    Button {
+                        viewModel.saveRecoveryPDF()
+                    } label: {
+                        Text("Save PDF")
+                            .frame(width: 155, height: 28)
+                    }
+                }
+                .frame(width: 340)
+            }
+            .padding(20)
+            .roundedBorder()
+            .padding(20)
+
+            Text("Anyone with access to this code can access your synced data, so please keep it in a safe place.")
+                .foregroundColor(Color("BlackWhite60"))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         } buttons: {
-            Button(UserText.notNow) {
-                model.endFlow()
-            }
-            Button(UserText.saveRecoveryPDF) {
-                model.delegate?.saveRecoveryPDF()
-                model.endFlow()
+            Button(UserText.next) {
+                viewModel.recoveryCodeNextPressed()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .frame(height: 314)
+        .frame(width: 420)
     }
 }

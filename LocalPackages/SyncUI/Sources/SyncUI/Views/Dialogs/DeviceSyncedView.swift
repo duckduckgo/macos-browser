@@ -17,20 +17,19 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
-struct DeviceSyncedView: View {
-    @EnvironmentObject var model: ManagementDialogModel
+public struct DeviceSyncedView<ViewModel>: View where ViewModel: ManagementViewModel {
+    @EnvironmentObject var model: ViewModel
 
     let devices: [SyncDevice]
-    let shouldShowOptions: Bool
     let isSingleDevice: Bool
-    var height: CGFloat {
-        if shouldShowOptions {
-            return 400
-        } else {
-            return 250
-        }
+
+    public init(devices: [SyncDevice], isSingleDevice: Bool) {
+        self.devices = devices
+        self.isSingleDevice = isSingleDevice
     }
+
     var title: String {
         if isSingleDevice {
             return UserText.allSetDialogTitle
@@ -38,7 +37,7 @@ struct DeviceSyncedView: View {
         return UserText.deviceSynced
     }
 
-    var body: some View {
+    public var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-setup-success")
@@ -51,28 +50,20 @@ struct DeviceSyncedView: View {
                         NewDeviceSyncedView(devices: devices)
                     }
                 }
-                if shouldShowOptions {
-                    OptionsView()
-                }
             }
             .frame(width: 320)
         } buttons: {
-            Button(UserText.next) {
-                if isSingleDevice {
-                    model.delegate?.presentSaveRecoveryPDF()
-                } else {
-                    model.endFlow()
-                }
+            Button(UserText.done) {
+                model.endDialogFlow()
             }
+            .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .padding(.vertical, 20)
-        .frame(width: 360,
-               height: height)
+        .frame(width: 360)
     }
 
     struct SingleDeviceSetTextView: View {
         var body: some View {
-            Text(UserText.allSetDialogCaption)
+            Text(UserText.deviceSyncedExplanation)
                 .frame(width: 320, alignment: .center)
                 .multilineTextAlignment(.center)
                 .fixedSize()
@@ -85,53 +76,61 @@ struct DeviceSyncedView: View {
             if devices.count > 1 {
                 VStack(alignment: .center) {
                     Text(UserText.multipleDeviceSyncedExplanation)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text("\(devices.count + 1) ")
                         .fontWeight(.bold)
                     +
-                    Text(UserText.devicesWord)
+                    Text(UserText.otherDevices)
                         .fontWeight(.bold)
+                    +
+                    Text(" via DuckDuckGo's secure server.")
                 }
             } else {
                 VStack(alignment: .center) {
-                    Text(UserText.deviceSyncedExplanation)
+                    Text(UserText.multipleDeviceSyncedExplanation)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text("\(devices[0].name)")
                         .fontWeight(.bold)
+                    +
+                    Text(" via DuckDuckGo's secure server.")
                 }
             }
         }
     }
 
-    struct OptionsView: View {
-        @EnvironmentObject var model: ManagementDialogModel
-        var body: some View {
-            VStack(spacing: 8) {
-                Text(UserText.optionsSectionDialogTitle)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color("BlackWhite60"))
-                VStack {
-                    Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(UserText.shareFavoritesOptionTitle)
-                                .font(.system(size: 13))
-                                .foregroundColor(Color("BlackWhite80"))
-                            Text(UserText.shareFavoritesOptionCaption)
-                                .font(.system(size: 11))
-                                .foregroundColor(Color("BlackWhite60"))
-                                .frame(width: 254)
-                                .fixedSize()
-                        }
-                        .frame(width: 254)
-                    }
-                    .padding(.bottom, 13)
-                    .padding(.top, 7)
-                    .padding(.horizontal, 16)
-                    .frame(height: 65)
-                    .toggleStyle(.switch)
-                    .roundedBorder()
-                }
-                .frame(width: 320)
-            }
-            .padding(.top, 32)
-        }
-    }
+//    struct OptionsView: View {
+//        @EnvironmentObject var model: ManagementDialogModel
+//        var body: some View {
+//            VStack(spacing: 8) {
+//                Text(UserText.optionsSectionDialogTitle)
+//                    .font(.system(size: 11))
+//                    .foregroundColor(Color("BlackWhite60"))
+//                VStack {
+//                    Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
+//                        VStack(alignment: .leading, spacing: 2) {
+//                            Text(UserText.shareFavoritesOptionTitle)
+//                                .font(.system(size: 13))
+//                                .foregroundColor(Color("BlackWhite80"))
+//                            Text(UserText.shareFavoritesOptionCaption)
+//                                .font(.system(size: 11))
+//                                .foregroundColor(Color("BlackWhite60"))
+//                                .frame(width: 254)
+//                                .fixedSize()
+//                        }
+//                        .frame(width: 254)
+//                    }
+//                    .padding(.bottom, 13)
+//                    .padding(.top, 7)
+//                    .padding(.horizontal, 16)
+//                    .frame(height: 65)
+//                    .toggleStyle(.switch)
+//                    .roundedBorder()
+//                }
+//                .frame(width: 320)
+//            }
+//            .padding(.top, 32)
+//        }
+//    }
 }

@@ -94,14 +94,19 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
                     .frame(alignment: .center)
                 } else {
                     Text("Enter the text code in the field below to connect")
-                    SyncKeyView(text: recoveryCodeModel.recoveryCode)
-                        .frame(width: 284, height: 210)
-                        .background(ZStack {
+                    if recoveryCodeModel.recoveryCode.isEmpty {
+                        ZStack {
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(.white)
-                        })
+                        }
+                        .frame(width: 284, height: 210)
+                    } else {
+                        Text(recoveryCodeModel.recoveryCode)
+                            .multilineTextAlignment(.center)
+                            .frame(width: 284, height: 210)
+                    }
 
                     Button {
                         recoveryCodeModel.paste()

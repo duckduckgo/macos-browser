@@ -68,26 +68,25 @@ enum UserText {
 
     static let recovery = NSLocalizedString("prefrences.sync.recovery", value: "Recovery", comment: "Sync settings section title")
     static let recoveryInstructions = NSLocalizedString("prefrences.sync.recovery-instructions", value: "If you lose your device, you will need this recovery code to restore your synced data.", comment: "Instructions on how to restore synced data")
-    static let saveRecoveryPDF = NSLocalizedString("prefrences.sync.save-recovery-pdf", value: "Save Recovery PDF", comment: "Caption for a button to save Sync recovery PDF")
+    static let saveRecoveryPDF = NSLocalizedString("prefrences.sync.save-recovery-pdf", value: "Save Your Recovery Code", comment: "Caption for a button to save Sync recovery PDF")
 
     static let showTextCodeTitle = NSLocalizedString("prefrences.sync.show-text-code-dialog-title", value: "Text Code", comment: "Title for show text code dialog")
     static let showTextCodeCaption = NSLocalizedString("prefrences.sync.show-text-code-dialog-caption", value: "Use this code after choosing \"Enter Text Code\" during sync setup on another device", comment: "Caption for show text code dialog")
 
     static let allSetDialogTitle = NSLocalizedString("prefrences.sync.all-set-dyalog-title", value: "All Set!", comment: "Title for all set dialog title")
-    static let allSetDialogCaption = NSLocalizedString("prefrences.all-set-dyalog-caption", value: "You can sync this device’s bookmarks and Logins with additional devices at any time from the\n Sync & Back Up menu in Settings.", comment: "Caption for all set dialog")
+    static let allSetDialogCaption = NSLocalizedString("prefrences.all-set-dyalog-caption", value: "Your bookmarks and logins will now be safely stored on DuckDuckGo's secure server.", comment: "Caption for all set dialog")
 
     static let recoverSyncedDataTitle = NSLocalizedString("preferences.sync.recover-synced-data", value: "Enter Recovery Code", comment: "Recover Sync data dialog title")
     static let recoverSyncedDataExplanation = NSLocalizedString("preferences.sync.recover-synced-data-explanation", value: "Enter the code from your Recovery PDF.", comment: "Recover Sync data dialog content")
     static let manuallyEnterCodeTitle = NSLocalizedString("preferences.sync.manually-enter-code-title", value: "Enter Text Code", comment: "Sync manually enter codee dialog title")
     static let manuallyEnterCodeExplanation = NSLocalizedString("preferences.sync.manually-enter-code-explanation", value: "Enter the code found in Settings > Sync & Back Up > Show Text Code on another synced device, to sync this device.", comment: "Sync manually enter codee dialog content")
 
-    static let deviceSynced = NSLocalizedString("prefrences.sync.device-synced", value: "Device Synced!", comment: "Sync setup dialog title")
-    static let deviceSyncedExplanation = NSLocalizedString("prefrences.sync.device-synced-explanation", value: "Your bookmarks and Logins are now syncing with", comment: "Sync setup completion confirmation")
-    static let multipleDeviceSyncedExplanation = NSLocalizedString("prefrences.sync.multiple-device-synced-explanation", value: "Your bookmarks and Logins are now syncing on", comment: "Sync setup completion confirmation")
-    static let devicesWord = NSLocalizedString("prefrences.sync.multiple-device-synced-explanation-device word", value: "devices", comment: "Sync setup completion confirmation device word")
+    static let deviceSynced = NSLocalizedString("prefrences.sync.device-synced", value: "You are Now Syncing!", comment: "Sync setup dialog title")
+    static let deviceSyncedExplanation = NSLocalizedString("prefrences.sync.device-synced-explanation", value: "Your bookmarks and logins will now be safely stored on DuckDuckGo's secure server.", comment: "Sync setup completion confirmation")
+    static let multipleDeviceSyncedExplanation = NSLocalizedString("prefrences.sync.multiple-device-synced-explanation", value: "Your bookmarks and logins will now be shared with", comment: "Sync setup completion confirmation")
+    static let otherDevices = NSLocalizedString("prefrences.sync.multiple-device-synced-explanation-device word", value: "Other Devices", comment: "Sync setup completion confirmation device word")
 
-    static let recoveryPDFExplanation1 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation1", value: "If you lose access to your devices, you will need this code to recover your synced data. You can save this code to your device as a PDF.", comment: "Sync recovery PDF explanation 2")
-    static let recoveryPDFExplanation2 = NSLocalizedString("prefrences.sync.recovery-pdf-explanation2", value: "Anyone with access to this code can access your synced data, so please keep it in a safe place.", comment: "Sync recovery PDF explanation")
+    static let recoveryPDFExplanation = NSLocalizedString("prefrences.sync.recovery-pdf-explanation", value: "If you lose access to your devices, you will need this code to recover your synced data. You can save this code to your device as a PDF.", comment: "Sync recovery PDF explanation 2")
 
     static let deviceDetailsTitle = NSLocalizedString("prefrences.sync.device-details.title", value: "Device Details", comment: "The title of the device details dialog")
     static let deviceDetailsLabel = NSLocalizedString("prefrences.sync.device-details.label", value: "Name", comment: "The text entry label")
