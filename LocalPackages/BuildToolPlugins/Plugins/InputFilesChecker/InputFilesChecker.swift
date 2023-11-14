@@ -55,6 +55,10 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("DataBrokerProtectionManager.swift", .source),
         .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
         .init("LoginItem+DataBrokerProtection.swift", .source),
+        .init("DataBrokerProtectionDebugMenu.swift", .source),
+        .init("DataBrokerProtectionFeatureVisibility.swift", .source),
+        .init("DataBrokerProtectionFeatureDisabler.swift", .source),
+        .init("DataBrokerProtectionAppEvents.swift", .source),
         .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
     ]),
 

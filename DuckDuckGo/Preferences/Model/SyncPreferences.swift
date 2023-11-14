@@ -38,10 +38,15 @@ extension SyncDevice {
 
 final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
+    struct Consts {
+        static let syncPausedStateChanged = Notification.Name("com.duckduckgo.app.SyncPausedStateChanged")
+    }
+
     var isSyncEnabled: Bool {
         syncService.account != nil
     }
 
+    @Published var codeToDisplay: String?
     let managementDialogModel: ManagementDialogModel
 
     @Published var devices: [SyncDevice] = []
@@ -51,13 +56,28 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @Published var isCreatingAccount: Bool = false
 
-    var recoveryCode: String? {
-        syncService.account?.recoveryCode
+    @Published var isUnifiedFavoritesEnabled: Bool {
+        didSet {
+            AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
+            if shouldRequestSyncOnFavoritesOptionChange {
+                syncService.scheduler.notifyDataChanged()
+            } else {
+                shouldRequestSyncOnFavoritesOptionChange = true
+            }
+            if managementDialogModel.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+            }
+        }
     }
 
-    @MainActor
-    func presentEnableSyncDialog() {
-        presentDialog(for: .enableSync)
+    @Published var isSyncBookmarksPaused: Bool
+
+    @Published var isSyncCredentialsPaused: Bool
+
+    private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
+
+    var recoveryCode: String? {
+        syncService.account?.recoveryCode
     }
 
     @MainActor
@@ -66,24 +86,19 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     @MainActor
-    func presentTurnOffSyncConfirmDialog() {
-        presentDialog(for: .turnOffSync)
+    func presentManuallyEnterCodeDialog() {
+        presentDialog(for: .manuallyEnterCode)
     }
 
     @MainActor
-    func presentShowOrEnterCodeDialog() {
-        Task { @MainActor in
-            self.$devices
-                .removeDuplicates()
-                .dropFirst()
-                .prefix(1)
-                .sink { [weak self] value in
-                    self?.presentDialog(for: .deviceSynced(value.filter { !$0.isCurrent }))
-                    self?.objectWillChange.send()
-                }.store(in: &cancellables)
-            managementDialogModel.codeToDisplay = syncService.account?.recoveryCode
-            presentDialog(for: .syncAnotherDevice)
-        }
+    func presentShowTextCodeDialog() {
+        let code: String = recoveryCode ?? codeToDisplay ?? ""
+        presentDialog(for: .showTextCode(code))
+    }
+
+    @MainActor
+    func presentTurnOffSyncConfirmDialog() {
+        presentDialog(for: .turnOffSync)
     }
 
     @MainActor
@@ -101,16 +116,50 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 errorMessage = String(describing: error)
             }
         }
     }
 
-    init(syncService: DDGSyncing) {
+    @MainActor
+    func manageBookmarks() {
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.showManageBookmarks(self)
+    }
+
+    @MainActor
+    func manageLogins() {
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
+    }
+
+    init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
         self.syncService = syncService
-        self.managementDialogModel = ManagementDialogModel()
+
+        self.isUnifiedFavoritesEnabled = apperancePreferences.favoritesDisplayMode.isDisplayUnified
+        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+
+        self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
+        self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+
+        apperancePreferences.$favoritesDisplayMode
+            .map(\.isDisplayUnified)
+            .sink { [weak self] isUnifiedFavoritesEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                    self.shouldRequestSyncOnFavoritesOptionChange = false
+                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+                }
+            }
+            .store(in: &cancellables)
 
         syncService.authStatePublisher
             .removeDuplicates()
@@ -133,6 +182,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .asVoid()
             .sink { [weak self] _ in
                 self?.onEndFlow()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
             }
             .store(in: &cancellables)
     }
@@ -178,6 +235,10 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             return
         }
 
+        guard case .normal = NSApp.runType else {
+            return
+        }
+
         let syncViewController = SyncManagementDialogViewController(managementDialogModel)
         let syncWindowController = syncViewController.wrappedInWindowController()
 
@@ -216,6 +277,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             managementDialogModel.endFlow()
             do {
                 try await syncService.deleteAccount()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -240,23 +303,19 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey) async throws {
+    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey, isActiveDevice: Bool) async throws {
         let device = deviceInfo()
         let knownDevices = Set(self.devices.map { $0.id })
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
         let syncedDevices = self.devices.filter { !knownDevices.contains($0.id) && !$0.isCurrent }
+        let isSecondDevice = syncedDevices.count == 1
 
         managementDialogModel.endFlow()
-        presentDialog(for: .deviceSynced(syncedDevices))
+        presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: isActiveDevice && isSecondDevice))
     }
 
-    @MainActor
     func turnOnSync() {
-        presentDialog(for: .askToSyncAnotherDevice)
-    }
-
-    func dontSyncAnotherDeviceNow() {
         Task { @MainActor in
             isCreatingAccount = true
             defer {
@@ -272,7 +331,31 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
     }
 
-    func recoverDevice(using recoveryCode: String) {
+    func startPollingForRecoveryKey() {
+        Task { @MainActor in
+            do {
+                self.connector = try syncService.remoteConnect()
+                self.codeToDisplay = connector?.code
+                if let recoveryKey = try await connector?.pollForRecoveryKey() {
+                    try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: false)
+                } else {
+                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
+                    return
+                }
+            } catch {
+                if syncService.account == nil {
+                    managementDialogModel.errorMessage = String(describing: error)
+                }
+            }
+        }
+    }
+
+    func stopPollingForRecoveryKey() {
+        self.connector?.stopPolling()
+        self.connector = nil
+    }
+
+    func recoverDevice(using recoveryCode: String, isActiveDevice: Bool) {
         Task { @MainActor in
             do {
                 guard let syncCode = try? SyncCode.decodeBase64String(recoveryCode) else {
@@ -281,7 +364,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
                 if let recoveryKey = syncCode.recovery {
                     // This will error if the account already exists, we don't have good UI for this just now
-                    try await loginAndShowPresentedDialog(recoveryKey)
+                    try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: isActiveDevice)
                 } else if let connectKey = syncCode.connect {
                     if syncService.account == nil {
                         let device = deviceInfo()
@@ -289,28 +372,25 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     }
 
                     try await syncService.transmitRecoveryKey(connectKey)
+                    self.$devices
+                        .removeDuplicates()
+                        .dropFirst()
+                        .prefix(1)
+                        .sink { [weak self] devices in
+                            guard let self else { return }
+                            let thisDeviceName = deviceInfo().name
+                            var syncedDevices: [SyncDevice] = []
+                            for device in devices where device.name != thisDeviceName {
+                                syncedDevices.append(device)
+                            }
+
+                            self.managementDialogModel.endFlow()
+                            presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: devices.count == 2))
+                        }.store(in: &cancellables)
 
                     // The UI will update when the devices list changes.
                 } else {
                     managementDialogModel.errorMessage = "Invalid code"
-                    return
-                }
-            } catch {
-                managementDialogModel.errorMessage = String(describing: error)
-            }
-        }
-    }
-
-    func presentSyncAnotherDeviceDialog() {
-        Task { @MainActor in
-            do {
-                self.connector = try syncService.remoteConnect()
-                managementDialogModel.codeToDisplay = connector?.code
-                presentDialog(for: .syncAnotherDevice)
-                if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    try await loginAndShowPresentedDialog(recoveryKey)
-                } else {
-                    // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
                 }
             } catch {
@@ -326,6 +406,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     @MainActor
     func confirmSetupComplete() {
+        presentDialog(for: .firstDeviceSetup)
+    }
+
+    @MainActor
+    func presentSaveRecoveryPDF() {
         presentDialog(for: .saveRecoveryPDF)
     }
 

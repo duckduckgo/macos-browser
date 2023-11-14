@@ -27,8 +27,30 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
+    var shouldResetBookmarksSyncTimestamp: Bool = false {
+        willSet {
+            assert(provider == nil, "Setting this value has no effect after provider has been instantiated")
+        }
+    }
 
-    init(database: CoreDataDatabase) {
+    @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
+    private var isSyncBookmarksPaused: Bool {
+        didSet {
+            NotificationCenter.default.post(name: SyncPreferences.Consts.syncPausedStateChanged, object: nil)
+        }
+    }
+
+    @UserDefaultsWrapper(key: .syncBookmarksPausedErrorDisplayed, defaultValue: false)
+    private var didShowBookmarksSyncPausedError: Bool
+
+    init(
+        database: CoreDataDatabase,
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        appearancePreferences: AppearancePreferences = .shared
+    ) {
+        self.database = database
+        self.bookmarkManager = bookmarkManager
+        self.appearancePreferences = appearancePreferences
         databaseCleaner = BookmarkDatabaseCleaner(
             bookmarkDatabase: database,
             errorEvents: BookmarksCleanupErrorHandling(),
@@ -40,6 +62,7 @@ final class SyncBookmarksAdapter {
         databaseCleaner.cleanUpDatabaseNow()
         if shouldEnable {
             databaseCleaner.scheduleRegularCleaning()
+            handleFavoritesAfterDisablingSync()
         } else {
             databaseCleaner.cancelCleaningSchedule()
         }
@@ -52,15 +75,34 @@ final class SyncBookmarksAdapter {
 
         let provider = BookmarksProvider(
             database: database,
-            metadataStore: metadataStore,
-            syncDidUpdateData: LocalBookmarkManager.shared.loadBookmarks
-        )
+            metadataStore: metadataStore) { [weak self] in
+                LocalBookmarkManager.shared.loadBookmarks()
+                self?.isSyncBookmarksPaused = false
+                self?.didShowBookmarksSyncPausedError = false
+            }
+        if shouldResetBookmarksSyncTimestamp {
+            provider.lastSyncTimestamp = nil
+        }
 
         syncErrorCancellable = provider.syncErrorPublisher
-            .sink { error in
+            .sink { [weak self] error in
                 switch error {
                 case let syncError as SyncError:
                     Pixel.fire(.debug(event: .syncBookmarksFailed, error: syncError))
+                    switch syncError {
+                    case .unexpectedStatusCode(409):
+                        // If bookmarks count limit has been exceeded
+                        self?.isSyncBookmarksPaused = true
+                        Pixel.fire(.syncBookmarksCountLimitExceededDaily, limitTo: .dailyFirst)
+                        self?.showSyncPausedAlert()
+                    case .unexpectedStatusCode(413):
+                        // If bookmarks request size limit has been exceeded
+                        self?.isSyncBookmarksPaused = true
+                        Pixel.fire(.syncBookmarksRequestSizeLimitExceededDaily, limitTo: .dailyFirst)
+                        self?.showSyncPausedAlert()
+                    default:
+                        break
+                    }
                 default:
                     let nsError = error as NSError
                     if nsError.domain != NSURLErrorDomain {
@@ -75,5 +117,34 @@ final class SyncBookmarksAdapter {
         self.provider = provider
     }
 
+    private func showSyncPausedAlert() {
+        guard !didShowBookmarksSyncPausedError else { return }
+        Task {
+            await MainActor.run {
+                let alert = NSAlert.syncBookmarksPaused()
+                let response = alert.runModal()
+                didShowBookmarksSyncPausedError = true
+
+                switch response {
+                case .alertSecondButtonReturn:
+                    alert.window.sheetParent?.endSheet(alert.window)
+                    WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                default:
+                    break
+                }
+            }
+        }
+    }
+
+    private func handleFavoritesAfterDisablingSync() {
+        bookmarkManager.handleFavoritesAfterDisablingSync()
+        if appearancePreferences.favoritesDisplayMode.isDisplayUnified {
+            appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
+        }
+    }
+
     private var syncErrorCancellable: AnyCancellable?
+    private let bookmarkManager: BookmarkManager
+    private let database: CoreDataDatabase
+    private let appearancePreferences: AppearancePreferences
 }

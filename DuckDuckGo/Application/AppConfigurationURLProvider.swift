@@ -21,6 +21,32 @@ import Configuration
 
 struct AppConfigurationURLProvider: ConfigurationURLProviding {
 
+    // MARK: - Debug
+
+    internal init(customPrivacyConfiguration: URL? = nil) {
+        if let customPrivacyConfiguration {
+            // Overwrite custom privacy configuration if provided
+            self.customPrivacyConfiguration = customPrivacyConfiguration.absoluteString
+        }
+        // Otherwise use the default or already stored custom configuration
+    }
+
+    @UserDefaultsWrapper(key: .customConfigurationUrl, defaultValue: nil)
+    private var customPrivacyConfiguration: String?
+
+    private var customPrivacyConfigurationUrl: URL? {
+        if let customPrivacyConfiguration {
+            return URL(string: customPrivacyConfiguration)
+        }
+        return nil
+    }
+
+    mutating func resetToDefaultConfigurationUrl() {
+        self.customPrivacyConfiguration = nil
+    }
+
+    // MARK: - Main
+
     func url(for configuration: Configuration) -> URL {
         // URLs for privacyConfiguration and trackerDataSet shall match the ones in update_embedded.sh. 
         // Danger checks that the URLs match on every PR. If the code changes, the regex that Danger uses may need an update.
@@ -28,7 +54,7 @@ struct AppConfigurationURLProvider: ConfigurationURLProviding {
         case .bloomFilterBinary: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")!
         case .bloomFilterSpec: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")!
         case .bloomFilterExcludedDomains: return URL(string: "https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")!
-        case .privacyConfiguration: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v3/macos-config.json")!
+        case .privacyConfiguration: return customPrivacyConfigurationUrl ?? URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/macos-config.json")!
         case .surrogates: return URL(string: "https://staticcdn.duckduckgo.com/surrogates.txt")!
         case .trackerDataSet: return URL(string: "https://staticcdn.duckduckgo.com/trackerblocking/v5/current/macos-tds.json")!
         // In archived repo, to be refactored shortly (https://staticcdn.duckduckgo.com/useragents/social_ctp_configuration.json)
