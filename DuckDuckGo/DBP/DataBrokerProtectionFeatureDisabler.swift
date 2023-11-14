@@ -34,7 +34,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
     }
 
     func disableAndDelete() {
-        if !DefaultDataBrokerProtectionFeatureVisibility.shouldUseRedeemOnlyFlow {
+        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
             scheduler.stopScheduler()
 
             scheduler.disableLoginItem()

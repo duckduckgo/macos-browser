@@ -288,7 +288,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     }
 
     func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
-        if DefaultDataBrokerProtectionFeatureVisibility.shouldUseRedeemOnlyFlow {
+        if DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
             return
         }
         

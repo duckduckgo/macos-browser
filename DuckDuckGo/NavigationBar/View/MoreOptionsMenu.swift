@@ -149,7 +149,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        if !DefaultDataBrokerProtectionFeatureVisibility.shouldUseRedeemOnlyFlow &&  DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist(){
+        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist &&  DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
