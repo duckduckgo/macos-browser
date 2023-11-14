@@ -215,9 +215,6 @@ func checkSparkleToolRecency(toolName: String) -> Bool {
         return false
     }
 
-print ("modification Date \(modificationDate)")
-print ("release Date \(releaseDate)")
-
     if modificationDate < releaseDate {
         print("\(toolName) from Sparkle binary utilities is outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
         return false
