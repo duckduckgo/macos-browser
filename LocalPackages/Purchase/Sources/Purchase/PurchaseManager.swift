@@ -67,22 +67,20 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    func restorePurchases() {
-        Task {
-            do {
-                purchaseQueue.removeAll()
+    public func restorePurchases() async {
+        do {
+            purchaseQueue.removeAll()
 
-                print("Before AppStore.sync()")
+            print("Before AppStore.sync()")
 
-                try await AppStore.sync()
+            try await AppStore.sync()
 
-                print("After AppStore.sync()")
+            print("After AppStore.sync()")
 
-                await updatePurchasedProducts()
-                await updateAvailableProducts()
-            } catch {
-                print("AppStore.sync error: \(error)")
-            }
+            await updatePurchasedProducts()
+            await updateAvailableProducts()
+        } catch {
+            print("AppStore.sync error: \(error)")
         }
     }
 

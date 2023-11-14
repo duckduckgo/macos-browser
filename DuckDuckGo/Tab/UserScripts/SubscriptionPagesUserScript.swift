@@ -74,10 +74,10 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 }
 
 ///
-/// Use Email sub-feature
+/// Use Subscription sub-feature
 ///
-struct SubscriptionPagesUseEmailFeature: Subfeature {
-    weak var broker: UserScriptMessageBroker?
+final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
+    var broker: UserScriptMessageBroker?
 
     var featureName = "useSubscription"
 
@@ -86,11 +86,19 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         .exact(hostname: "abrown.duckduckgo.com")
     ])
 
+    func with(broker: UserScriptMessageBroker) {
+        self.broker = broker
+    }
+
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case "getSubscription": return getSubscription
         case "setSubscription": return setSubscription
         case "backToSettings": return backToSettings
+        case "getSubscriptionOptions": return getSubscriptionOptions
+        case "subscriptionSelected": return subscriptionSelected
+        case "activateSubscription": return activateSubscription
+        case "featureSelected": return featureSelected
         default:
             return nil
         }
@@ -131,6 +139,112 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
 
         return nil
     }
+
+    func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        struct SubscriptionOptions: Encodable {
+            let platform: String
+            let options: [SubscriptionOption]
+            let features: [SubscriptionFeature]
+        }
+
+        struct SubscriptionOption: Encodable {
+            let id: String
+            let cost: SubscriptionCost
+
+            struct SubscriptionCost: Encodable {
+                let displayPrice: String
+                let recurrence: String
+            }
+        }
+
+        enum SubscriptionFeatureName: String, CaseIterable {
+            case privateBrowsing = "private-browsing"
+            case privateSearch = "private-search"
+            case emailProtection = "email-protection"
+            case appTrackingProtection = "app-tracking-protection"
+            case vpn = "vpn"
+            case personalInformationRemoval = "personal-information-removal"
+            case identityTheftRestoration = "identity-theft-restoration"
+        }
+
+        struct SubscriptionFeature: Encodable {
+            let name: String
+        }
+
+        let subscriptionOptions = [SubscriptionOption(id: "bundle_1", cost: .init(displayPrice: "$9.99", recurrence: "monthly")),
+                                   SubscriptionOption(id: "bundle_2", cost: .init(displayPrice: "$99.99", recurrence: "yearly"))]
+
+        let message = SubscriptionOptions(platform: "macos",
+                                          options: subscriptionOptions,
+                                          features: SubscriptionFeatureName.allCases.map { SubscriptionFeature(name: $0.rawValue) })
+
+        return message
+    }
+
+    func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        struct SubscriptionSelection: Decodable {
+            let id: String
+        }
+
+        struct PurchaseUpdate: Codable {
+            let type: String
+        }
+
+        let message = original
+
+        guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
+            assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
+            return nil
+        }
+
+        print("Selected: \(subscriptionSelection.id)")
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            guard let webview = message.webView else {
+                print("No WebView")
+                return
+            }
+
+//            self.broker?.push(method: "onPurchaseUpdate", params: PurchaseUpdate(type: "completed"), for: self, into: webview)
+
+            print("Completed!")
+            self.pushAction(method: .onPurchaseUpdate, webView: original.webView!, params: PurchaseUpdate(type: "completed"))
+
+        }
+
+        return nil
+    }
+
+    func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        print(">>> Selected to activate a subscription -- show the activation settings screen")
+        return nil
+    }
+    
+    func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        struct FeatureSelection: Codable {
+            let feature: String
+        }
+        
+        guard let featureSelection: FeatureSelection = DecodableHelper.decode(from: params) else {
+            assertionFailure("SubscriptionPagesUserScript: expected JSON representation of FeatureSelection")
+            return nil
+        }
+        
+        print(">>> Selected a feature -- show the corresponding UI", featureSelection)
+        return nil
+    }
+    
+    enum SubscribeActionName: String {
+        case onPurchaseUpdate
+    }
+
+    func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
+        let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
+
+        print(">>> Pushing into WebView:", method.rawValue, String(describing: params))
+        broker.push(method: method.rawValue, params: params, for: self, into: webView)
+    }
+
 }
 
 #endif

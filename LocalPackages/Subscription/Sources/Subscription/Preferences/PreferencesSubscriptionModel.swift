@@ -22,7 +22,7 @@ import Account
 extension URL {
 
     static var purchaseSubscription: URL {
-        URL(string: "https://duckduckgo.com/about")!
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/welcome")!
     }
 
     static var subscriptionFAQ: URL {
