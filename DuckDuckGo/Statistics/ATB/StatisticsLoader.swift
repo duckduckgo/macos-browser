@@ -210,6 +210,7 @@ final class StatisticsLoader {
 
         if let updateVersion = atb.updateVersion {
             statisticsStore.atb = updateVersion
+            statisticsStore.variant = nil
         }
     }
 
