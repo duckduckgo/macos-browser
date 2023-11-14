@@ -134,7 +134,7 @@ final class StartupPreferences: ObservableObject {
             return nil
         }
         // Force 'https' if 'http' not explicitly set by user
-        if urlWithScheme.isHttp && !urlString.starts(with: URL.NavigationalScheme.http.rawValue) {
+        if urlWithScheme.isHttp && !urlString.hasPrefix(URL.NavigationalScheme.http.separated()) {
             urlWithScheme = urlWithScheme.toHttps() ?? urlWithScheme
         }
         return urlWithScheme.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
