@@ -381,6 +381,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="addFolder:" target="vCQ-b9-yaB" id="ORd-09-yPN"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                     <constraints>
@@ -971,7 +974,7 @@ Gw
         <!--Bookmark Add Folder Popover View Controller-->
         <scene sceneID="3YF-3W-2Ph">
             <objects>
-                <viewController storyboardIdentifier="BookmarkAddFolderPopoverViewController" id="pTx-lh-HJH" customClass="BookmarkAddFolderPopoverViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkAddFolderPopoverViewController" id="pTx-lh-HJH" customClass="BookmarkAddFolderPopoverViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="rpa-zP-EkD">
                         <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1065,7 +1068,7 @@ Gw
 </string>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="removeButtonAction:" target="pTx-lh-HJH" id="Qrg-Na-8Ii"/>
+                                    <action selector="cancel:" target="pTx-lh-HJH" id="oOv-wy-LPC"/>
                                 </connections>
                             </button>
                         </subviews>

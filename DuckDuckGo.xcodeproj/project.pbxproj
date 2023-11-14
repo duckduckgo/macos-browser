@@ -2899,6 +2899,10 @@
 		7B3618C22ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */; };
 		7B3618C42ADE77D2000D6154 /* NetworkProtectionNavBarPopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */; };
 		7B3618C52ADE77D3000D6154 /* NetworkProtectionNavBarPopoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */; };
+		7B42682E2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B42682D2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift */; };
+		7B42682F2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B42682D2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift */; };
+		7B4268302B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B42682D2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift */; };
+		7B4268312B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B42682D2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift */; };
 		7B430EA12A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B430EA22A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */; };
 		7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B4CE8E626F02134009134B1 /* TabBarTests.swift */; };
@@ -4333,6 +4337,7 @@
 		7B2DDCF72A93A8BB0039D884 /* NetworkProtectionAppEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAppEvents.swift; sourceTree = "<group>"; };
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
 		7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNavBarPopoverManager.swift; sourceTree = "<group>"; };
+		7B42682D2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkAddFolderPopoverViewController.swift; sourceTree = "<group>"; };
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
 		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -7816,6 +7821,7 @@
 				AAC5E4C425D6A6E8007F5990 /* BookmarkPopover.swift */,
 				AAC5E4C525D6A6E8007F5990 /* BookmarkPopoverViewController.swift */,
 				4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */,
+				7B42682D2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -10145,6 +10151,7 @@
 				31929FFB2A4C4CFF0084EA89 /* VisitViewModel.swift in Sources */,
 				31929FFC2A4C4CFF0084EA89 /* Atb.swift in Sources */,
 				31929FFD2A4C4CFF0084EA89 /* BrowserTabView.swift in Sources */,
+				7B4268302B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */,
 				31929FFE2A4C4CFF0084EA89 /* DownloadsViewController.swift in Sources */,
 				31929FFF2A4C4CFF0084EA89 /* DataExtension.swift in Sources */,
 				3192A0002A4C4CFF0084EA89 /* ConfigurationStore.swift in Sources */,
@@ -11275,6 +11282,7 @@
 				3706FC43293F65D500E42796 /* PinnedTabsViewModel.swift in Sources */,
 				B6685E4329A61C470043D2EE /* DownloadsTabExtension.swift in Sources */,
 				3706FC44293F65D500E42796 /* BookmarkList.swift in Sources */,
+				7B42682F2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */,
 				3706FC45293F65D500E42796 /* BookmarkTableRowView.swift in Sources */,
 				3706FC47293F65D500E42796 /* FavoritesView.swift in Sources */,
 				3706FC48293F65D500E42796 /* HomePage.swift in Sources */,
@@ -11947,6 +11955,7 @@
 				4B9579CD2AC7AE700062CA31 /* LocalAuthenticationService.swift in Sources */,
 				4B9579CE2AC7AE700062CA31 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				4B9579CF2AC7AE700062CA31 /* SafariBookmarksReader.swift in Sources */,
+				7B4268312B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */,
 				4B9579D02AC7AE700062CA31 /* HTTPCookie.swift in Sources */,
 				4B9579D12AC7AE700062CA31 /* SafariVersionReader.swift in Sources */,
 				4B9579D22AC7AE700062CA31 /* LoginFaviconView.swift in Sources */,
@@ -13020,6 +13029,7 @@
 				31F28C5128C8EEC500119F70 /* YoutubeOverlayUserScript.swift in Sources */,
 				B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */,
 				B684592725C93C0500DC17B6 /* Publishers.NestedObjectChanges.swift in Sources */,
+				7B42682E2B03E145007FD0EE /* BookmarkAddFolderPopoverViewController.swift in Sources */,
 				B6DA06E62913F39400225DE2 /* MenuItemSelectors.swift in Sources */,
 				85589E9A27BFE3C30038AD11 /* FaviconView.swift in Sources */,
 				85707F2C276A364E00DC0649 /* OnboardingFlow.swift in Sources */,

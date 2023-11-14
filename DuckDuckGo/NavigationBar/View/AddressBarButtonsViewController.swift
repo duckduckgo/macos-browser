@@ -288,7 +288,7 @@ final class AddressBarButtonsViewController: NSViewController {
         if !bookmarkPopover.isShown {
             bookmarkButton.isHidden = false
             bookmarkPopover.isNew = result.isNew
-            bookmarkPopover.viewController.bookmark = bookmark
+            bookmarkPopover.bookmark = bookmark
             bookmarkPopover.show(positionedBelow: bookmarkButton)
         } else {
             updateBookmarkButtonVisibility()

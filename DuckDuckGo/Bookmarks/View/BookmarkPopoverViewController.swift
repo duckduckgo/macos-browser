@@ -19,18 +19,13 @@
 import Cocoa
 import Combine
 
-protocol BookmarkPopoverViewControllerDelegate: AnyObject {
-
-    func popoverShouldClose(_ bookmarkPopoverViewController: BookmarkPopoverViewController)
-
-}
-
 final class BookmarkPopoverViewController: NSViewController {
 
     static let favoriteImage = NSImage(named: "Favorite")
     static let favoriteFilledImage = NSImage(named: "FavoriteFilled")
 
-    weak var delegate: BookmarkPopoverViewControllerDelegate?
+    var container: BookmarkPopoverContainer?
+    weak var popover: BookmarkPopover?
 
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var favoriteButton: NSButton!
@@ -38,9 +33,21 @@ final class BookmarkPopoverViewController: NSViewController {
 
     private var folderPickerSelectionCancellable: AnyCancellable?
 
-    let bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    var bookmarkManager: BookmarkManager {
+        guard let container else {
+            assertionFailure("The container has does not have a BookmarkManager Instance, defaulting to the shared instance ")
+            return LocalBookmarkManager.shared
+
+        }
+        return container.bookmarkManager
+    }
+
     var bookmark: Bookmark? {
-        didSet {
+        get {
+            container?.bookmark
+        }
+        set {
+            container?.bookmark = newValue
             if isViewLoaded {
                 updateSubviews()
             }
@@ -73,11 +80,11 @@ final class BookmarkPopoverViewController: NSViewController {
         guard let bookmark = bookmark else { return }
         bookmarkManager.remove(bookmark: bookmark)
 
-        delegate?.popoverShouldClose(self)
+        container?.popoverShouldClose()
     }
 
     @IBAction func doneButtonAction(_ sender: NSButton) {
-        delegate?.popoverShouldClose(self)
+        container?.popoverShouldClose()
     }
 
     @IBAction func favoritesButtonAction(_ sender: Any) {
@@ -86,6 +93,10 @@ final class BookmarkPopoverViewController: NSViewController {
         self.bookmark = bookmark
 
         bookmarkManager.update(bookmark: bookmark)
+    }
+
+    @IBAction func addFolder(_ sender: Any) {
+        container?.showFolderAddView()
     }
 
     private func updateSubviews() {
@@ -105,24 +116,12 @@ final class BookmarkPopoverViewController: NSViewController {
     }
 
     private func refreshFolderPicker() {
-        guard let list = bookmarkManager.list else {
-            assertionFailure("Tried to refresh bookmark folder picker, but couldn't get bookmark list")
+        guard let menuItems = container?.bookmarksMenuItems else {
             return
         }
+        folderPickerPopUpButton.menu?.items = menuItems
 
-        let bookmarksMenuItem = NSMenuItem(title: "Bookmarks", action: nil, target: nil, keyEquivalent: "")
-        bookmarksMenuItem.image = NSImage(named: "Folder")
-
-        let topLevelFolders = list.topLevelEntities.compactMap { $0 as? BookmarkFolder }
-        var folderMenuItems = [NSMenuItem]()
-
-        folderMenuItems.append(bookmarksMenuItem)
-        folderMenuItems.append(.separator())
-        folderMenuItems.append(contentsOf: createMenuItems(for: topLevelFolders))
-
-        folderPickerPopUpButton.menu?.items = folderMenuItems
-
-        let selectedFolderMenuItem = folderMenuItems.first(where: { menuItem in
+        let selectedFolderMenuItem = menuItems.first(where: { menuItem in
             guard let folder = menuItem.representedObject as? BookmarkFolder else {
                 return false
             }
@@ -130,25 +129,7 @@ final class BookmarkPopoverViewController: NSViewController {
             return folder.id == bookmark?.parentFolderUUID
         })
 
-        folderPickerPopUpButton.select(selectedFolderMenuItem ?? bookmarksMenuItem)
-    }
-
-    private func createMenuItems(for bookmarkFolders: [BookmarkFolder], level: Int = 0) -> [NSMenuItem] {
-        let viewModels = bookmarkFolders.map(BookmarkViewModel.init(entity:))
-        var menuItems = [NSMenuItem]()
-
-        for viewModel in viewModels {
-            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
-            menuItem.indentationLevel = level
-            menuItems.append(menuItem)
-
-            if let folder = viewModel.entity as? BookmarkFolder, !folder.children.isEmpty {
-                let childFolders = folder.children.compactMap { $0 as? BookmarkFolder }
-                menuItems.append(contentsOf: createMenuItems(for: childFolders, level: level + 1))
-            }
-        }
-
-        return menuItems
+        folderPickerPopUpButton.select(selectedFolderMenuItem ?? menuItems.first)
     }
 
 }

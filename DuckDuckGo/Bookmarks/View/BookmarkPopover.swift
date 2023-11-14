@@ -18,11 +18,33 @@
 
 import Cocoa
 
+protocol BookmarkPopoverContainer: AnyObject {
+    var bookmarkFolder: BookmarkFolder? { get set }
+    var bookmark: Bookmark? { get set }
+    var bookmarkManager: BookmarkManager { get }
+    var bookmarksMenuItems: [NSMenuItem] { get }
+
+    func showBookmarkAddView()
+    func showFolderAddView()
+    func popoverShouldClose()
+
+}
+
 final class BookmarkPopover: NSPopover {
 
     var isNew = false
+    var bookmark: Bookmark?
+    var bookmarkFolder: BookmarkFolder?
 
     private weak var addressBar: NSView?
+
+    private enum Constants {
+        static let storyboard = NSStoryboard(name: "Bookmarks", bundle: nil)
+        static let bookmarkAddPopoverID = "BookmarkPopoverViewController"
+        static let folderAddPopoverID = "BookmarkAddFolderPopoverViewController"
+    }
+
+    private var bookmarkPopover = "BookmarkPopoverViewController"
 
     /// prefferred bounding box for the popover positioning
     override var boundingFrame: NSRect {
@@ -40,7 +62,7 @@ final class BookmarkPopover: NSPopover {
 
         self.animates = false
         self.behavior = .transient
-        setupContentController()
+        setupBookmarkAddController()
     }
 
     required init?(coder: NSCoder) {
@@ -48,14 +70,15 @@ final class BookmarkPopover: NSPopover {
     }
 
     // swiftlint:disable force_cast
-    var viewController: BookmarkPopoverViewController { contentViewController as! BookmarkPopoverViewController }
-    // swiftlint:enable force_cast
+    private func setupBookmarkAddController() {
+        let controller = Constants.storyboard.instantiateController(withIdentifier: Constants.bookmarkAddPopoverID) as! BookmarkPopoverViewController
+        controller.container = self
+        contentViewController = controller
+    }
 
-    // swiftlint:disable force_cast
-    private func setupContentController() {
-        let storyboard = NSStoryboard(name: "Bookmarks", bundle: nil)
-        let controller = storyboard.instantiateController(withIdentifier: "BookmarkPopoverViewController") as! BookmarkPopoverViewController
-        controller.delegate = self
+    private func setupFolderAddController() {
+        let controller = Constants.storyboard.instantiateController(withIdentifier: Constants.folderAddPopoverID) as! BookmarkAddFolderPopoverViewController
+        controller.container = self
         contentViewController = controller
     }
     // swiftlint:enable force_cast
@@ -65,11 +88,60 @@ final class BookmarkPopover: NSPopover {
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
 
+    private func createMenuItems(for bookmarkFolders: [BookmarkFolder], level: Int = 0) -> [NSMenuItem] {
+        let viewModels = bookmarkFolders.map(BookmarkViewModel.init(entity:))
+        var menuItems = [NSMenuItem]()
+
+        for viewModel in viewModels {
+            let menuItem = NSMenuItem(bookmarkViewModel: viewModel)
+            menuItem.indentationLevel = level
+            menuItems.append(menuItem)
+
+            if let folder = viewModel.entity as? BookmarkFolder, !folder.children.isEmpty {
+                let childFolders = folder.children.compactMap { $0 as? BookmarkFolder }
+                menuItems.append(contentsOf: createMenuItems(for: childFolders, level: level + 1))
+            }
+        }
+
+        return menuItems
+    }
+
 }
 
-extension BookmarkPopover: BookmarkPopoverViewControllerDelegate {
+extension BookmarkPopover: BookmarkPopoverContainer {
 
-    func popoverShouldClose(_ bookmarkPopoverViewController: BookmarkPopoverViewController) {
+    var bookmarksMenuItems: [NSMenuItem] {
+        guard let list = bookmarkManager.list else {
+            assertionFailure("Tried to refresh bookmark folder picker, but couldn't get bookmark list")
+            return []
+        }
+
+        let rootFolder = NSMenuItem(title: "Bookmarks", action: nil, target: nil, keyEquivalent: "")
+        rootFolder.image = NSImage(named: "Folder")
+
+        let topLevelFolders = list.topLevelEntities.compactMap { $0 as? BookmarkFolder }
+        var folderMenuItems = [NSMenuItem]()
+
+        folderMenuItems.append(rootFolder)
+        folderMenuItems.append(.separator())
+        folderMenuItems.append(contentsOf: createMenuItems(for: topLevelFolders))
+
+        return folderMenuItems
+    }
+
+    var bookmarkManager: BookmarkManager {
+        LocalBookmarkManager.shared
+    }
+
+    func showBookmarkAddView() {
+        setupBookmarkAddController()
+    }
+
+    func showFolderAddView() {
+        setupFolderAddController()
+    }
+
+    func popoverShouldClose() {
         close()
     }
 
