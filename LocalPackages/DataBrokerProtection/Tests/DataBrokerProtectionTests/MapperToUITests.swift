@@ -186,7 +186,6 @@ final class MapperToUITests: XCTestCase {
         XCTAssertEqual(result.resultsFound.count, 1)
     }
 
-
     func testMirrorSites_areCorrectlyMappedToInProgressOptOuts() {
         let scanHistoryEventsWithMatchesFound: [HistoryEvent] = [.init(brokerId: 1, profileQueryId: 1, type: .matchesFound(count: 1), date: Date())]
         let mirrorSiteNotRemoved = MirrorSite(name: "mirror #1", addedAt: Date.distantPast, removedAt: nil)
