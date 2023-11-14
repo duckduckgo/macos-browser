@@ -106,7 +106,8 @@ final class SyncBookmarksAdapter {
 
         let stateStore: BookmarksFaviconsFetcherStateStore
         do {
-            stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: .sandboxApplicationSupportURL)
+            let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: url)
         } catch {
             Pixel.fire(.debug(event: .bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
 
