@@ -49,7 +49,7 @@ struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
         }
         .padding(.top, spacing)
         .padding(.bottom, 16.0)
-        .frame(minWidth: 360, minHeight: 298, idealHeight: 314)
+        .frame(minWidth: 360, idealHeight: 314)
 
     }
 }

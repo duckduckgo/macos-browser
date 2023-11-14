@@ -44,7 +44,7 @@ struct RemoveDeviceView: View {
             Button(UserText.cancel) {
                 model.endFlow()
             }
-
+            .buttonStyle(DismissActionButtonStyle())
             Button(UserText.removeDeviceConfirmButton) {
                 model.delegate?.removeDevice(device)
             }

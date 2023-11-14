@@ -20,10 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
-
-#if NETWORK_PROTECTION
-import NetworkProtection
-#endif
+import Configuration
 
 // Actions are sent to objects of responder chain
 
@@ -33,7 +30,7 @@ extension AppDelegate {
 
     // MARK: - DuckDuckGo
 
-    @IBAction func checkForUpdates(_ sender: Any?) {
+    @objc func checkForUpdates(_ sender: Any?) {
 #if SPARKLE
         updateController.checkForUpdates(sender)
 #endif
@@ -41,33 +38,33 @@ extension AppDelegate {
 
     // MARK: - File
 
-    @IBAction func newWindow(_ sender: Any?) {
+    @objc func newWindow(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
 
-    @IBAction func newBurnerWindow(_ sender: Any?) {
+    @objc func newBurnerWindow(_ sender: Any?) {
         WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
     }
 
-    @IBAction func newTab(_ sender: Any?) {
+    @objc func newTab(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
 
-    @IBAction func openLocation(_ sender: Any?) {
+    @objc func openLocation(_ sender: Any?) {
         WindowsManager.openNewWindow()
     }
 
-    @IBAction func closeAllWindows(_ sender: Any?) {
+    @objc func closeAllWindows(_ sender: Any?) {
         WindowsManager.closeWindows()
     }
 
     // MARK: - History
 
-    @IBAction func reopenLastClosedTab(_ sender: Any?) {
+    @objc func reopenLastClosedTab(_ sender: Any?) {
         RecentlyClosedCoordinator.shared.reopenItem()
     }
 
-    @IBAction func recentlyClosedAction(_ sender: Any?) {
+    @objc func recentlyClosedAction(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem,
               let cacheItem = menuItem.representedObject as? RecentlyClosedCacheItem else {
                   assertionFailure("Wrong represented object for recentlyClosedAction()")
@@ -87,7 +84,7 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
     }
 
-    @IBAction func clearAllHistory(_ sender: NSMenuItem) {
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
         guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
@@ -109,7 +106,7 @@ extension AppDelegate {
 
     // MARK: - Window
 
-    @IBAction func reopenAllWindowsFromLastSession(_ sender: Any?) {
+    @objc func reopenAllWindowsFromLastSession(_ sender: Any?) {
         stateRestorationManager.restoreLastSessionState(interactive: true)
     }
 
@@ -117,13 +114,13 @@ extension AppDelegate {
 
     #if FEEDBACK
 
-    @IBAction func openFeedback(_ sender: Any?) {
+    @objc func openFeedback(_ sender: Any?) {
         FeedbackPresenter.presentFeedbackForm()
     }
 
     #endif
 
-    @IBAction func navigateToBookmark(_ sender: Any?) {
+    @objc func navigateToBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("AppDelegate: Casting to menu item failed", type: .error)
             return
@@ -139,20 +136,20 @@ extension AppDelegate {
         WindowsManager.openNewWindow(with: tab)
     }
 
-    @IBAction func showManageBookmarks(_ sender: Any?) {
+    @objc func showManageBookmarks(_ sender: Any?) {
         let tabCollection = TabCollection(tabs: [Tab(content: .bookmarks)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
 
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
-    @IBAction func openPreferences(_ sender: Any?) {
+    @objc func openPreferences(_ sender: Any?) {
         let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
 
-    @IBAction func openAbout(_ sender: Any?) {
+    @objc func openAbout(_ sender: Any?) {
 #if APPSTORE
         let options = [NSApplication.AboutPanelOptionKey.applicationName: UserText.duckDuckGoForMacAppStore]
 #else
@@ -161,11 +158,11 @@ extension AppDelegate {
         NSApp.orderFrontStandardAboutPanel(options: options)
     }
 
-    @IBAction func openImportBrowserDataWindow(_ sender: Any?) {
+    @objc func openImportBrowserDataWindow(_ sender: Any?) {
         DataImportViewController.show()
     }
 
-    @IBAction func openExportLogins(_ sender: Any?) {
+    @objc func openExportLogins(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window else { return }
 
@@ -203,7 +200,7 @@ extension AppDelegate {
         }
     }
 
-    @IBAction func openExportBookmarks(_ sender: Any?) {
+    @objc func openExportBookmarks(_ sender: Any?) {
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
               let window = windowController.window,
               let list = LocalBookmarkManager.shared.list else { return }
@@ -225,11 +222,11 @@ extension AppDelegate {
         }
     }
 
-    @IBAction func fireButtonAction(_ sender: NSButton) {
+    @objc func fireButtonAction(_ sender: NSButton) {
         FireCoordinator.fireButtonAction()
     }
 
-    @IBAction func navigateToPrivateEmail(_ sender: Any?) {
+    @objc func navigateToPrivateEmail(_ sender: Any?) {
         guard let window = NSApplication.shared.keyWindow,
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
@@ -244,7 +241,7 @@ extension MainViewController {
 
     /// Finds currently active Tab even if it‘s playing a Full Screen video
     private func getActiveTabAndIndex() -> (tab: Tab, index: TabIndex)? {
-        guard let tab = NSApp.keyWindow?.windowController?.activeTab else {
+        guard let tab = WindowControllersManager.shared.lastKeyMainWindowController?.activeTab else {
             assertionFailure("Could not get currently active Tab")
             return nil
         }
@@ -267,19 +264,19 @@ extension MainViewController {
 
     // MARK: - Main Menu
 
-    @IBAction func openPreferences(_ sender: Any?) {
+    @objc func openPreferences(_ sender: Any?) {
         makeKeyIfNeeded()
         browserTabViewController.openNewTab(with: .anyPreferencePane)
     }
 
     // MARK: - File
 
-    @IBAction func newTab(_ sender: Any?) {
+    @objc func newTab(_ sender: Any?) {
         makeKeyIfNeeded()
         browserTabViewController.openNewTab(with: .homePage)
     }
 
-    @IBAction func openLocation(_ sender: Any?) {
+    @objc func openLocation(_ sender: Any?) {
         makeKeyIfNeeded()
         guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
@@ -288,7 +285,7 @@ extension MainViewController {
         addressBarTextField.makeMeFirstResponder()
     }
 
-    @IBAction func closeTab(_ sender: Any?) {
+    @objc func closeTab(_ sender: Any?) {
         guard let (tab, index) = getActiveTabAndIndex() else { return }
         makeKeyIfNeeded()
 
@@ -318,28 +315,28 @@ extension MainViewController {
 
     // MARK: - View
 
-    @IBAction func reloadPage(_ sender: Any) {
+    @objc func reloadPage(_ sender: Any) {
         makeKeyIfNeeded()
         activeTabViewModel?.reload()
     }
 
-    @IBAction func stopLoadingPage(_ sender: Any) {
+    @objc func stopLoadingPage(_ sender: Any) {
         getActiveTabAndIndex()?.tab.stopLoading()
     }
 
-    @IBAction func zoomIn(_ sender: Any) {
+    @objc func zoomIn(_ sender: Any) {
         getActiveTabAndIndex()?.tab.webView.zoomIn()
     }
 
-    @IBAction func zoomOut(_ sender: Any) {
+    @objc func zoomOut(_ sender: Any) {
         getActiveTabAndIndex()?.tab.webView.zoomOut()
     }
 
-    @IBAction func actualSize(_ sender: Any) {
+    @objc func actualSize(_ sender: Any) {
         getActiveTabAndIndex()?.tab.webView.resetZoomLevel()
     }
 
-    @IBAction func toggleDownloads(_ sender: Any) {
+    @objc func toggleDownloads(_ sender: Any) {
         var navigationBarViewController = self.navigationBarViewController
         if view.window?.isPopUpWindow == true {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
@@ -356,7 +353,7 @@ extension MainViewController {
         navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
-    @IBAction func toggleBookmarksBarFromMenu(_ sender: Any) {
+    @objc func toggleBookmarksBarFromMenu(_ sender: Any) {
         // Leaving this keyboard shortcut in place.  When toggled on it will use the previously set appearence which defaults to "always".
         //  If the user sets it to "new tabs only" somewhere (e.g. preferences), then it'll be that.
         guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
@@ -370,44 +367,35 @@ extension MainViewController {
         }
     }
 
-    @IBAction func toggleAutofillShortcut(_ sender: Any) {
+    @objc func toggleAutofillShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .autofill)
     }
 
-    @IBAction func toggleBookmarksShortcut(_ sender: Any) {
+    @objc func toggleBookmarksShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .bookmarks)
     }
 
-    @IBAction func toggleDownloadsShortcut(_ sender: Any) {
+    @objc func toggleDownloadsShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .downloads)
     }
 
-    @IBAction func toggleNetworkProtectionShortcut(_ sender: Any) {
+    @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
-    }
-
-    @IBAction func toggleHomeButton(_ sender: Any) {
-        LocalPinningManager.shared.togglePinning(for: .homeButton)
-        if LocalPinningManager.shared.isPinned(.homeButton) {
-            Pixel.fire(.enableHomeButton)
-        } else {
-            Pixel.fire(.disableHomeButton)
-        }
     }
 
     // MARK: - History
 
-    @IBAction func back(_ sender: Any?) {
+    @objc func back(_ sender: Any?) {
         makeKeyIfNeeded()
         getActiveTabAndIndex()?.tab.goBack()
     }
 
-    @IBAction func forward(_ sender: Any?) {
+    @objc func forward(_ sender: Any?) {
         makeKeyIfNeeded()
         getActiveTabAndIndex()?.tab.goForward()
     }
 
-    @IBAction func home(_ sender: Any?) {
+    @objc func home(_ sender: Any?) {
         guard view.window?.isPopUpWindow == false,
             let (tab, _) = getActiveTabAndIndex(), tab === tabCollectionViewModel.selectedTab else {
 
@@ -430,7 +418,7 @@ extension MainViewController {
         adjustFirstResponder()
     }
 
-    @IBAction func clearAllHistory(_ sender: NSMenuItem) {
+    @objc func clearAllHistory(_ sender: NSMenuItem) {
         guard let window = view.window else {
             assertionFailure("No window")
             return
@@ -464,7 +452,7 @@ extension MainViewController {
 
     // MARK: - Bookmarks
 
-    @IBAction func bookmarkThisPage(_ sender: Any) {
+    @objc func bookmarkThisPage(_ sender: Any) {
         guard let tabIndex = getActiveTabAndIndex()?.index else { return }
         if tabCollectionViewModel.selectedTabIndex != tabIndex {
             tabCollectionViewModel.select(at: tabIndex)
@@ -477,7 +465,7 @@ extension MainViewController {
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
-    @IBAction func favoriteThisPage(_ sender: Any) {
+    @objc func favoriteThisPage(_ sender: Any) {
         guard let tabIndex = getActiveTabAndIndex()?.index else { return }
         if tabCollectionViewModel.selectedTabIndex != tabIndex {
             tabCollectionViewModel.select(at: tabIndex)
@@ -490,7 +478,7 @@ extension MainViewController {
             .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
     }
 
-    @IBAction func openBookmark(_ sender: Any?) {
+    @objc func openBookmark(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("MainViewController: Casting to menu item failed", type: .error)
             return
@@ -502,7 +490,7 @@ extension MainViewController {
         WindowControllersManager.shared.open(bookmark: bookmark)
     }
 
-    @IBAction func openAllInTabs(_ sender: Any?) {
+    @objc func openAllInTabs(_ sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             os_log("MainViewController: Casting to menu item failed", type: .error)
             return
@@ -520,14 +508,14 @@ extension MainViewController {
         tabCollectionViewModel.append(tabs: tabs)
     }
 
-    @IBAction func showManageBookmarks(_ sender: Any?) {
+    @objc func showManageBookmarks(_ sender: Any?) {
         makeKeyIfNeeded()
         browserTabViewController.openNewTab(with: .bookmarks)
     }
 
     // MARK: - Window
 
-    @IBAction func showPreviousTab(_ sender: Any?) {
+    @objc func showPreviousTab(_ sender: Any?) {
         makeKeyIfNeeded()
         guard let (tab, index) = getActiveTabAndIndex() else { return }
         if tabCollectionViewModel.selectedTab !== tab {
@@ -536,7 +524,7 @@ extension MainViewController {
         tabCollectionViewModel.selectPrevious()
     }
 
-    @IBAction func showNextTab(_ sender: Any?) {
+    @objc func showNextTab(_ sender: Any?) {
         guard let (tab, index) = getActiveTabAndIndex() else { return }
         makeKeyIfNeeded()
 
@@ -546,7 +534,7 @@ extension MainViewController {
         tabCollectionViewModel.selectNext()
     }
 
-    @IBAction func showTab(_ sender: Any?) {
+    @objc func showTab(_ sender: Any?) {
         makeKeyIfNeeded()
         guard let sender = sender as? NSMenuItem else {
             os_log("MainViewController: Casting to NSMenuItem failed", type: .error)
@@ -564,14 +552,14 @@ extension MainViewController {
         }
     }
 
-    @IBAction func moveTabToNewWindow(_ sender: Any?) {
+    @objc func moveTabToNewWindow(_ sender: Any?) {
         guard let (tab, index) = getActiveTabAndIndex() else { return }
 
         tabCollectionViewModel.remove(at: index)
         WindowsManager.openNewWindow(with: tab)
     }
 
-    @IBAction func pinOrUnpinTab(_ sender: Any?) {
+    @objc func pinOrUnpinTab(_ sender: Any?) {
         guard let (_, selectedTabIndex) = getActiveTabAndIndex() else { return }
 
         switch selectedTabIndex {
@@ -582,7 +570,7 @@ extension MainViewController {
         }
     }
 
-    @IBAction func mergeAllWindows(_ sender: Any?) {
+    @objc func mergeAllWindows(_ sender: Any?) {
         guard let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
         assert(!self.isBurner)
 
@@ -606,37 +594,32 @@ extension MainViewController {
 
     // MARK: - Printing
 
-    @IBAction func printWebView(_ sender: Any?) {
+    @objc func printWebView(_ sender: Any?) {
         getActiveTabAndIndex()?.tab.print()
     }
 
     // MARK: - Saving
 
-    @IBAction func saveAs(_ sender: Any) {
+    @objc func saveAs(_ sender: Any) {
         getActiveTabAndIndex()?.tab.saveWebContentAs()
     }
 
     // MARK: - Debug
 
-    @IBAction func resetDefaultBrowserPrompt(_ sender: Any?) {
+    @objc func resetDefaultBrowserPrompt(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.defaultBrowserDismissed)
     }
 
-    @IBAction func resetDefaultGrammarChecks(_ sender: Any?) {
+    @objc func resetDefaultGrammarChecks(_ sender: Any?) {
         UserDefaultsWrapper<Bool>.clear(.spellingCheckEnabledOnce)
         UserDefaultsWrapper<Bool>.clear(.grammarCheckEnabledOnce)
     }
 
-    @IBAction func openAppContainerInFinder(_ sender: Any?) {
-        let containerURL = URL.sandboxApplicationSupportURL
-        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
-    }
-
-    @IBAction func triggerFatalError(_ sender: Any?) {
+    @objc func triggerFatalError(_ sender: Any?) {
         fatalError("Fatal error triggered from the Debug menu")
     }
 
-    @IBAction func resetSecureVaultData(_ sender: Any?) {
+    @objc func resetSecureVaultData(_ sender: Any?) {
         let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
 
         let accounts = (try? vault?.accounts()) ?? []
@@ -663,24 +646,24 @@ extension MainViewController {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
     }
 
-    @IBAction func resetBookmarks(_ sender: Any?) {
+    @objc func resetBookmarks(_ sender: Any?) {
         LocalBookmarkManager.shared.resetBookmarks()
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageContinueSetUpImport.rawValue)
     }
 
-    @IBAction func resetPinnedTabs(_ sender: Any?) {
+    @objc func resetPinnedTabs(_ sender: Any?) {
         if tabCollectionViewModel.selectedTabIndex?.isPinnedTab == true, tabCollectionViewModel.tabCollection.tabs.count > 0 {
             tabCollectionViewModel.select(at: .unpinned(0))
         }
         tabCollectionViewModel.pinnedTabsManager?.tabCollection.removeAll()
     }
 
-    @IBAction func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
+    @objc func resetDuckPlayerOverlayInteractions(_ sender: Any?) {
         DuckPlayerPreferences.shared.youtubeOverlayAnyButtonPressed = false
         DuckPlayerPreferences.shared.youtubeOverlayInteracted = false
     }
 
-    @IBAction func resetMakeDuckDuckGoYoursUserSettings(_ sender: Any?) {
+    @objc func resetMakeDuckDuckGoYoursUserSettings(_ sender: Any?) {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowAllFeatures.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowMakeDefault.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
@@ -692,42 +675,42 @@ extension MainViewController {
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
     }
 
-    @IBAction func resetDailyPixels(_ sender: Any?) {
+    @objc func resetDailyPixels(_ sender: Any?) {
         UserDefaults.standard.removePersistentDomain(forName: DailyPixel.Constant.dailyPixelStorageIdentifier)
     }
 
-    @IBAction func changeInstallDateToToday(_ sender: Any?) {
+    @objc func changeInstallDateToToday(_ sender: Any?) {
         UserDefaults.standard.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
+    @objc func changeInstallDateToLessThan21DaysAgo(_ sender: Any?) {
         let lessThanTwentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -20, to: Date())
         UserDefaults.standard.set(lessThanTwentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
+    @objc func changeInstallDateToMoreThan21DaysAgoButLessThan27(_ sender: Any?) {
         let twentyOneDaysAgo = Calendar.current.date(byAdding: .day, value: -21, to: Date())
         UserDefaults.standard.set(twentyOneDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
+    @objc func changeInstallDateToMoreThan27DaysAgo(_ sender: Any?) {
         let twentyEightDaysAgo = Calendar.current.date(byAdding: .day, value: -28, to: Date())
         UserDefaults.standard.set(twentyEightDaysAgo, forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
     }
 
-    @IBAction func showSaveCredentialsPopover(_ sender: Any?) {
+    @objc func showSaveCredentialsPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowSaveCredentialsPopover, object: nil)
         #endif
     }
 
-    @IBAction func showCredentialsSavedPopover(_ sender: Any?) {
+    @objc func showCredentialsSavedPopover(_ sender: Any?) {
         #if DEBUG || REVIEW
         NotificationCenter.default.post(name: .ShowCredentialsSavedPopover, object: nil)
         #endif
     }
 
-    @IBAction func showPopUpWindow(_ sender: Any?) {
+    @objc func showPopUpWindow(_ sender: Any?) {
         let tabURL = Tab.TabContent.url(URL(string: "https://duckduckgo.com")!)
         let tab = Tab(content: tabURL,
                       webViewConfiguration: WKWebViewConfiguration(),
@@ -738,86 +721,59 @@ extension MainViewController {
         WindowsManager.openPopUpWindow(with: tab, origin: nil, contentSize: nil)
     }
 
-    @IBAction func resetEmailProtectionInContextPrompt(_ sender: Any?) {
+    @objc func resetEmailProtectionInContextPrompt(_ sender: Any?) {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
 
-    @IBAction func fetchConfigurationNow(_ sender: Any?) {
+    @objc func removeUserScripts(_ sender: Any?) {
+        tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
+        tabCollectionViewModel.selectedTab?.reload()
+        os_log("User scripts removed from the current tab", type: .info)
+    }
+
+    @objc func reloadConfigurationNow(_ sender: Any?) {
+        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
+
         ConfigurationManager.shared.forceRefresh()
     }
 
-    @IBAction func resetNetworkProtectionWaitlistState(_ sender: Any?) {
-#if NETWORK_PROTECTION
-        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-#endif
-    }
+    private func setConfigurationUrl(_ configurationUrl: URL?) {
+        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
 
-    @IBAction func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
-#if NETWORK_PROTECTION
-        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
-        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-#endif
-    }
-
-    @IBAction func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
-#if NETWORK_PROTECTION
-        let code = getInviteCode()
-
-        Task {
-            do {
-                let redeemer = NetworkProtectionCodeRedemptionCoordinator()
-                try await redeemer.redeem(code)
-                NetworkProtectionWaitlist().waitlistStorage.store(inviteCode: code)
-                NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
-            } catch {
-                // Do nothing here, this is just a debug menu
-            }
+        var configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: configurationUrl)
+        if configurationUrl == nil {
+            configurationProvider.resetToDefaultConfigurationUrl()
         }
-#endif
-    }
-
-    @IBAction func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
-#if NETWORK_PROTECTION
-        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification()
-#endif
-    }
-
-    @IBAction func resetNetworkProtectionActivationDate(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: nil)
-    }
-
-    @IBAction func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
-        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
-        DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
-    }
-
-    @IBAction func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date())
-    }
-
-    @IBAction func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
-    }
-
-    @IBAction func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
-        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
-    }
-
-    private func overrideNetworkProtectionActivationDate(to date: Date?) {
-        let store = DefaultWaitlistActivationDateStore()
-
-        if let date {
-            store.updateActivationDate(date)
+        Configuration.setURLProvider(configurationProvider)
+        ConfigurationManager.shared.forceRefresh()
+        if let configurationUrl {
+            os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
         } else {
-            store.removeDates()
+            os_log("New configuration URL reset to default", type: .info)
         }
+    }
+
+    @objc func setCustomConfigurationURL(_ sender: Any?) {
+        let currentConfigurationURL = AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString
+        let alert = NSAlert.customConfigurationAlert(configurationUrl: currentConfigurationURL)
+        if alert.runModal() != .cancel {
+            guard let textField = alert.accessoryView as? NSTextField,
+                  let newConfigurationUrl = URL(string: textField.stringValue) else {
+                os_log("Failed to set custom configuration URL", type: .error)
+                return
+            }
+
+            setConfigurationUrl(newConfigurationUrl)
+        }
+    }
+
+    @objc func resetConfigurationToDefault(_ sender: Any?) {
+        setConfigurationUrl(nil)
     }
 
     // MARK: - Developer Tools
 
-    @IBAction func toggleDeveloperTools(_ sender: Any?) {
+    @objc func toggleDeveloperTools(_ sender: Any?) {
         guard let webView = getActiveTabAndIndex()?.tab.webView else { return }
 
         if webView.isInspectorShown == true {
@@ -827,15 +783,15 @@ extension MainViewController {
         }
     }
 
-    @IBAction func openJavaScriptConsole(_ sender: Any?) {
+    @objc func openJavaScriptConsole(_ sender: Any?) {
         getActiveTabAndIndex()?.tab.webView.openJavaScriptConsole()
     }
 
-    @IBAction func showPageSource(_ sender: Any?) {
+    @objc func showPageSource(_ sender: Any?) {
         getActiveTabAndIndex()?.tab.webView.showPageSource()
     }
 
-    @IBAction func showPageResources(_ sender: Any?) {
+    @objc func showPageResources(_ sender: Any?) {
         getActiveTabAndIndex()?.tab.webView.showPageSource()
     }
 }
@@ -937,36 +893,8 @@ extension MainViewController: NSMenuItemValidation {
 
             return true
 
-        // Network Protection Debugging
-        case #selector(MainViewController.showNetworkProtectionInviteCodePrompt(_:)):
-            // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
-#if NETWORK_PROTECTION
-            let waitlist = NetworkProtectionWaitlist()
-            return waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
-#else
-            return false
-#endif
         default:
             return true
-        }
-    }
-
-    func getInviteCode() -> String {
-        let alert = NSAlert()
-        alert.addButton(withTitle: "Use Invite Code")
-        alert.addButton(withTitle: "Cancel")
-        alert.messageText = "Enter Invite Code"
-        alert.informativeText = "Please grab a Network Protection invite code from Asana and enter it here."
-
-        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        alert.accessoryView = textField
-
-        let response = alert.runModal()
-
-        if response == .alertFirstButtonReturn {
-            return textField.stringValue
-        } else {
-            return ""
         }
     }
 
@@ -1030,19 +958,19 @@ extension AppDelegate: NSMenuItemValidation {
 
 extension MainViewController: FindInPageDelegate {
 
-    @IBAction func findInPage(_ sender: Any) {
+    @objc func findInPage(_ sender: Any) {
         activeTabViewModel?.showFindInPage()
     }
 
-    @IBAction func findInPageNext(_ sender: Any) {
+    @objc func findInPageNext(_ sender: Any) {
         activeTabViewModel?.findInPageNext()
     }
 
-    @IBAction func findInPagePrevious(_ sender: Any) {
+    @objc func findInPagePrevious(_ sender: Any) {
         activeTabViewModel?.findInPagePrevious()
     }
 
-    @IBAction func findInPageDone(_ sender: Any) {
+    @objc func findInPageDone(_ sender: Any) {
         activeTabViewModel?.closeFindInPage()
     }
 

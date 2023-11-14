@@ -18,7 +18,7 @@
 
 import Foundation
 import NetworkProtection
-import XPC
+import XPCHelper
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
@@ -36,6 +36,10 @@ public protocol IPCServerInterface: AnyObject {
     /// Stop the VPN tunnel.
     ///
     func stop()
+
+    /// Debug commands
+    ///
+    func debugCommand(_ command: DebugCommand) async
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -58,6 +62,10 @@ protocol XPCServerInterface {
     /// Stop the VPN tunnel.
     ///
     func stop()
+
+    /// Debug commands
+    ///
+    func debugCommand(_ payload: Data, completion: @escaping () -> Void)
 }
 
 public final class TunnelControllerIPCServer {
@@ -138,5 +146,17 @@ extension TunnelControllerIPCServer: XPCServerInterface {
 
     func stop() {
         serverDelegate?.stop()
+    }
+
+    func debugCommand(_ payload: Data, completion: @escaping () -> Void) {
+        guard let command = try? JSONDecoder().decode(DebugCommand.self, from: payload) else {
+            completion()
+            return
+        }
+
+        Task {
+            await serverDelegate?.debugCommand(command)
+            completion()
+        }
     }
 }

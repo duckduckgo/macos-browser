@@ -24,6 +24,7 @@ import AppKit
 import Combine
 import NetworkProtection
 import NetworkProtectionUI
+import NetworkProtectionIPC
 #endif
 
 final class NavigationBarPopovers {
@@ -40,7 +41,11 @@ final class NavigationBarPopovers {
     private(set) var downloadsPopover: DownloadsPopover?
 
 #if NETWORK_PROTECTION
-    private(set) var networkProtectionPopover: NetworkProtectionPopover?
+    private let networkProtectionPopoverManager: NetworkProtectionNavBarPopoverManager
+
+    init(networkProtectionPopoverManager: NetworkProtectionNavBarPopoverManager) {
+        self.networkProtectionPopoverManager = networkProtectionPopoverManager
+    }
 #endif
 
     var passwordManagementDomain: String? {
@@ -68,7 +73,7 @@ final class NavigationBarPopovers {
     @MainActor
     var isNetworkProtectionPopoverShown: Bool {
 #if NETWORK_PROTECTION
-        networkProtectionPopover?.isShown ?? false
+        networkProtectionPopoverManager.isShown
 #else
         return false
 #endif
@@ -96,17 +101,7 @@ final class NavigationBarPopovers {
 
     func toggleNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
 #if NETWORK_PROTECTION
-        if let networkProtectionPopover, networkProtectionPopover.isShown {
-            networkProtectionPopover.close()
-        } else {
-            let featureVisibility = DefaultNetworkProtectionVisibility()
-
-            if featureVisibility.isNetworkProtectionVisible() {
-                showNetworkProtectionPopover(usingView: view, withDelegate: delegate)
-            } else {
-                featureVisibility.disableForWaitlistUsers()
-            }
-        }
+        networkProtectionPopoverManager.toggle(positionedBelow: view, withDelegate: delegate)
 #endif
     }
 
@@ -166,8 +161,8 @@ final class NavigationBarPopovers {
         }
 
 #if NETWORK_PROTECTION
-        if networkProtectionPopover?.isShown ?? false {
-            networkProtectionPopover?.close()
+        if networkProtectionPopoverManager.isShown {
+            networkProtectionPopoverManager.close()
         }
 #endif
 
@@ -287,41 +282,10 @@ final class NavigationBarPopovers {
     // MARK: - Network Protection
 
 #if NETWORK_PROTECTION
-    func showNetworkProtectionPopover(usingView view: NSView, withDelegate delegate: NSPopoverDelegate) {
-        let popover = networkProtectionPopover ?? {
-            let controller = NetworkProtectionTunnelController()
-            let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                        platformDidWakeNotification: NSWorkspace.didWakeNotification)
-            let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                                platformDidWakeNotification: NSWorkspace.didWakeNotification)
-            let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                                platformDidWakeNotification: NSWorkspace.didWakeNotification)
-            let statusReporter = DefaultNetworkProtectionStatusReporter(
-                statusObserver: statusObserver,
-                serverInfoObserver: statusInfoObserver,
-                connectionErrorObserver: connectionErrorObserver,
-                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-            )
-
-            let menuItems = [
-                NetworkProtectionStatusView.Model.MenuItem(
-                    name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                    action: {
-                        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                        await appLauncher.launchApp(withCommand: .shareFeedback)
-                })
-            ]
-
-            let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
-
-            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
-            popover.delegate = delegate
-
-            networkProtectionPopover = popover
-            return popover
-        }()
-        show(popover, positionedBelow: view)
+    func showNetworkProtectionPopover(
+        positionedBelow view: NSView,
+        withDelegate delegate: NSPopoverDelegate) {
+            networkProtectionPopoverManager.show(positionedBelow: view, withDelegate: delegate)
     }
 #endif
 }

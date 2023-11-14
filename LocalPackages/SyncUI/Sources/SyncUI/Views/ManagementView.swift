@@ -23,6 +23,7 @@ enum Const {
     enum Fonts {
         static let preferencePaneTitle: Font = .title2.weight(.semibold)
         static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
+        static let preferencePaneOptionTitle: Font = .title3
         static let preferencePaneCaption: Font = .subheadline
     }
 }
@@ -51,15 +52,18 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
             .background(RoundedRectangle(cornerRadius: 8).foregroundColor(.yellow))
             .padding(.bottom, 10)
 
-            Text(UserText.sync)
-                .font(Const.Fonts.preferencePaneTitle)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(UserText.sync)
+                    .font(Const.Fonts.preferencePaneTitle)
+                    .padding(.horizontal, 16)
 
-            if model.isSyncEnabled {
-                SyncEnabledView<ViewModel>()
-                    .environmentObject(model)
-            } else {
-                SyncSetupView<ViewModel>()
-                    .environmentObject(model)
+                if model.isSyncEnabled {
+                    SyncEnabledView<ViewModel>()
+                        .environmentObject(model)
+                } else {
+                    SyncSetupView<ViewModel>()
+                        .environmentObject(model)
+                }
             }
         }
         .alert(isPresented: $model.shouldShowErrorMessage) {
