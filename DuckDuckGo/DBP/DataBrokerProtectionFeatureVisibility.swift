@@ -21,7 +21,6 @@ import BrowserServicesKit
 import Common
 
 protocol DataBrokerProtectionFeatureVisibility {
-    //var bypassWaitlist: Bool { get set }
     func isFeatureVisible() -> Bool
     func disableAndDeleteForAllUsers()
     func disableAndDeleteForWaitlistUsers()
