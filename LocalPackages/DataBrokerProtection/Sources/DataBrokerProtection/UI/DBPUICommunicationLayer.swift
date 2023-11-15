@@ -124,7 +124,9 @@ struct DBPUICommunicationLayer: Subfeature {
 
         os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
 
-        return await delegate?.saveProfile()
+        let success = await delegate?.saveProfile()
+
+        return DBPUIStandardResponse(version: Constants.version, success: success ?? false)
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
