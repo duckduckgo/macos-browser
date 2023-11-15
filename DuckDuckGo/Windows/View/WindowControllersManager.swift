@@ -186,7 +186,17 @@ extension WindowControllersManager {
     }
 
     func showTab(with content: Tab.TabContent) {
-        guard let windowController = self.mainWindowController else { return }
+        guard let windowController = self.mainWindowController else {
+            Task {
+                WindowsManager.openNewWindow()
+
+                // Not proud of this ugly hack... ideally openNewWindow() should let us know when the window is ready
+                try? await Task.sleep(interval: 0.5)
+                showTab(with: content)
+            }
+
+            return
+        }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
