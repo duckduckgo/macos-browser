@@ -30,7 +30,7 @@ extension Preferences {
                 // TITLE
 
                 TextMenuTitle(text: UserText.vpn)
-                
+
                 // SECTION: Manage VPN
 
                 PreferencePaneSection {
