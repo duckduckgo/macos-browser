@@ -304,7 +304,7 @@ struct UserText {
 
     static let manageVPNSettingsTitle = NSLocalizedString("manage.vpn.settings.title", value: "Manage VPN", comment: "Manage VPN section title in VPN settings")
     static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "VPN Notifications", comment: "VPN Notifications section title in VPN settings")
-    static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced Settings", comment: "VPN Advanced section title in VPN settings")
+    static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced", comment: "VPN Advanced section title in VPN settings")
 
     // VPN Settings
 
@@ -354,15 +354,15 @@ struct UserText {
         comment: "Status Change Notification setting title")
     static let uninstallVPNButtonTitle = NSLocalizedString(
         "vpn.button.title.uninstall.vpn",
-        value: "Uninstall VPN",
+        value: "Uninstall DuckDuckGo VPN...",
         comment: "Uninstall VPN button title")
 
     // VPN Settings Alerts
 
-    static let uninstallVPNAlertTitle = NSLocalizedString("vpn.uninstall.alert.title", value: "Are you sure you want to uninstall our VPN?", comment: "Alert title when the user selects to uninstall our VPN")
+    static let uninstallVPNAlertTitle = NSLocalizedString("vpn.uninstall.alert.title", value: "Are you sure you want to uninstall the VPN?", comment: "Alert title when the user selects to uninstall our VPN")
     static let uninstallVPNInformativeText = NSLocalizedString(
         "vpn.uninstall.alert.informative.text",
-        value: "Uninstalling our VPN will remove it from your system and disconnect any active VPN connections.",
+        value: "Uninstalling the DuckDuckGo VPN will disconnect any active VPN connections and remove it from your device.",
         comment: "Informative text for the alert that comes up when the user decides to uninstall our VPN")
 
     // Misc

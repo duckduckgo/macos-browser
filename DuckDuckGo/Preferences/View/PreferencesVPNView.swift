@@ -70,7 +70,6 @@ extension Preferences {
                     Button(UserText.uninstallVPNButtonTitle) {
                         model.uninstallVPN()
                     }
-                    .buttonStyle(DestructiveActionButtonStyle(enabled: true))
                 }
             }
         }
