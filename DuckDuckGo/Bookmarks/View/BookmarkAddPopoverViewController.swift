@@ -36,7 +36,6 @@ final class BookmarkAddPopoverViewController: NSViewController {
     var bookmarkManager: BookmarkManager {
         guard let container else {
             return LocalBookmarkManager.shared
-
         }
         return container.bookmarkManager
     }
@@ -54,6 +53,7 @@ final class BookmarkAddPopoverViewController: NSViewController {
     }
 
     override func viewDidLoad() {
+        super.viewDidLoad()
         setupPickerSelectionCancellable()
         setupListPublisher()
         textField.delegate = self

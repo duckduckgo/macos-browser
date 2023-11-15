@@ -22,18 +22,14 @@ import Combine
 final class BookmarkAddFolderPopoverViewController: NSViewController {
 
     weak var container: BookmarkPopoverContainer?
-    var parentFolder: BookmarkFolder?
 
     @IBOutlet var folderNameTextField: NSTextField!
     @IBOutlet var folderPickerPopUpButton: NSPopUpButton!
     @IBOutlet var addFolderButton: NSButton!
 
-    private var cancellables = Set<AnyCancellable>()
-
     var bookmarkManager: BookmarkManager {
         guard let container else {
             return LocalBookmarkManager.shared
-
         }
         return container.bookmarkManager
     }
