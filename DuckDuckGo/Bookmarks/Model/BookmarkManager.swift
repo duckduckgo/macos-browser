@@ -163,7 +163,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
             self?.loadBookmarks()
             self?.requestSync()
-
         }
 
         return bookmark
@@ -184,7 +183,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
             self?.loadBookmarks()
             self?.requestSync()
-
         }
     }
 
@@ -192,7 +190,6 @@ final class LocalBookmarkManager: BookmarkManager {
         bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
             self?.loadBookmarks()
             self?.requestSync()
-
         }
     }
 
@@ -200,7 +197,6 @@ final class LocalBookmarkManager: BookmarkManager {
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
             self?.loadBookmarks()
             self?.requestSync()
-
         }
     }
 
@@ -214,15 +210,14 @@ final class LocalBookmarkManager: BookmarkManager {
         list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
         loadBookmarks()
-        self.requestSync()
+        requestSync()
 
     }
 
     func update(folder: BookmarkFolder) {
         bookmarkStore.update(folder: folder)
-        self.loadBookmarks()
-        self.requestSync()
-
+        loadBookmarks()
+        requestSync()
     }
 
     func updateUrl(of bookmark: Bookmark, to newUrl: URL) -> Bookmark? {
@@ -238,8 +233,8 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         bookmarkStore.update(bookmark: newBookmark)
-        self.loadBookmarks()
-        self.requestSync()
+        loadBookmarks()
+        requestSync()
 
         return newBookmark
     }
