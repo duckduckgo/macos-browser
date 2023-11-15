@@ -176,7 +176,6 @@ struct DBPUIScanSchedule: DBPUISendableMessage {
 
 struct DBPUIScanHistory: DBPUISendableMessage {
     let sitesScanned: Int
-    let scansCompleted: Int
 }
 
 extension DBPUIInitialScanState {
