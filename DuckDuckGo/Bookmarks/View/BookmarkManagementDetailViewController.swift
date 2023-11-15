@@ -279,9 +279,9 @@ extension BookmarkManagementDetailViewController: AddBookmarkModalViewController
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         if case let .folder(selectedFolder) = selectionState {
-            bookmarkManager.makeFolder(for: name, parent: selectedFolder)
+            bookmarkManager.makeFolder(for: name, parent: selectedFolder, completion: { _ in })
         } else {
-            bookmarkManager.makeFolder(for: name, parent: nil)
+            bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })
         }
     }
 

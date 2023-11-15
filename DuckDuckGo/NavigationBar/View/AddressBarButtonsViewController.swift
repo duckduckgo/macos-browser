@@ -975,6 +975,16 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
+    func popoverWillClose(_ notification: Notification) {
+        switch notification.object as? NSPopover {
+        case bookmarkPopover:
+            bookmarkPopover?.popoverWillClose()
+
+        default:
+            break
+        }
+    }
+
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
         case bookmarkPopover:

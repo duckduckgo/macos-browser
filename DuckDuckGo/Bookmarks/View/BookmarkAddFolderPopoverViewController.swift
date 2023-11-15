@@ -26,6 +26,7 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
 
     @IBOutlet var folderNameTextField: NSTextField!
     @IBOutlet var folderPickerPopUpButton: NSPopUpButton!
+    @IBOutlet var addFolderButton: NSButton!
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -64,18 +65,24 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
 
     @IBAction private func save(_ sender: NSButton) {
         let name = folderNameTextField.stringValue
-        guard let selectedFolder: BookmarkFolder = selectedFolderMenuItem?.representedObject as? BookmarkFolder,
-              let currentBookmark = self.bookmark else { return }
+        let selectedFolder = selectedFolderMenuItem?.representedObject as? BookmarkFolder
+        guard let currentBookmark = self.bookmark else { return }
 
-        bookmarkManager.makeFolder(for: name, parent: selectedFolder)
-        // self.bookmarkManager.move(objectUUIDs: [currentBookmark.id], toIndex: 1, withinParentFolder: .parent(uuid: folder.id), completion: { _ in })
-        container?.showBookmarkAddView()
+        // Create the folder and then move the bookmark to it
+        bookmarkManager.makeFolder(for: name, parent: selectedFolder, completion: { folder in
+            self.bookmarkManager.move(objectUUIDs: [currentBookmark.id],
+                                      toIndex: 1,
+                                      withinParentFolder: .parent(uuid: folder.id),
+                                      completion: { _ in })
+            self.container?.showBookmarkAddView()
+        })
 
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         folderNameTextField.delegate = self
+        addFolderButton.isEnabled = false
         refreshFolderPicker()
     }
 
@@ -91,6 +98,8 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
 
 extension BookmarkAddFolderPopoverViewController: NSTextFieldDelegate {
 
-    func controlTextDidChange(_ obj: Notification) {}
+    func controlTextDidChange(_ obj: Notification) {
+        addFolderButton.isEnabled = folderNameTextField.stringValue != ""
+    }
 
 }

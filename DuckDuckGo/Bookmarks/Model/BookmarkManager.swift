@@ -30,7 +30,7 @@ protocol BookmarkManager: AnyObject {
     func getBookmark(forUrl url: String) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
     func remove(objectsWithUUIDs uuids: [String])
@@ -246,7 +246,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Folders
 
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder {
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void) {
 
         let folder = BookmarkFolder(id: UUID().uuidString, title: title, parentFolderUUID: parent?.id, children: [])
 
@@ -254,11 +254,10 @@ final class LocalBookmarkManager: BookmarkManager {
             guard success else {
                 return
             }
-
             self?.loadBookmarks()
             self?.requestSync()
+            completion(folder)
         }
-        return folder
     }
 
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {

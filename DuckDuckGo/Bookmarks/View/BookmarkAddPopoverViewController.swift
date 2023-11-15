@@ -124,10 +124,6 @@ final class BookmarkAddPopoverViewController: NSViewController {
         favoriteButton.title = "  \(bookmark.isFavorite ? UserText.removeFromFavorites : UserText.addToFavorites)"
     }
 
-    private func reloadBookmarks() {
-
-    }
-
     private func refreshFolderPicker() {
         guard let menuItems = container?.getMenuItems() else {
             return

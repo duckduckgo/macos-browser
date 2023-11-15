@@ -25,6 +25,7 @@ protocol BookmarkPopoverContainer: AnyObject {
     func getMenuItems() -> [NSMenuItem]
     func showBookmarkAddView()
     func showFolderAddView()
+    func popoverWillClose()
     func popoverShouldClose()
 
 }
@@ -135,6 +136,10 @@ extension BookmarkPopover: BookmarkPopoverContainer {
 
     func showFolderAddView() {
         setupFolderAddController()
+    }
+
+    func popoverWillClose() {
+        setupBookmarkAddController()
     }
 
     func popoverShouldClose() {
