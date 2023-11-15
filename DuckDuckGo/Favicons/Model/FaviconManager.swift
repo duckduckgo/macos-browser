@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import Cocoa
 import Combine
 import BrowserServicesKit
@@ -336,8 +337,6 @@ final class FaviconManager: FaviconManagement {
         )
     }
 }
-
-import Bookmarks
 
 extension FaviconManager: Bookmarks.FaviconStoring {
 
