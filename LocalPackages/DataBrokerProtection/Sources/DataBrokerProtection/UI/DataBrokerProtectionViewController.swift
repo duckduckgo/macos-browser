@@ -25,7 +25,7 @@ import Combine
 final public class DataBrokerProtectionViewController: NSViewController {
 
     private enum Constants {
-        static let dbpUiUrl = "https://use-devtesting19.duckduckgo.com/dbp"
+        static let dbpUiUrl = "https://use-devtesting18.duckduckgo.com/dbp"
     }
 
     private let dataManager: DataBrokerProtectionDataManaging
