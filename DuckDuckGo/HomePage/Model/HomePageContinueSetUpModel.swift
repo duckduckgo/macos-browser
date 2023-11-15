@@ -349,12 +349,6 @@ extension HomePage.Models {
         }
 
         var firstRunFeatures: [FeatureType] {
-            if PixelExperiment.cohort == .onboardingExperiment1 {
-                var features: [FeatureType] = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .importBookmarksAndPasswords }
-                features.insert(.defaultBrowser, at: 0)
-                features.insert(.importBookmarksAndPasswords, at: 1)
-                return features
-            }
             var features: [FeatureType] = FeatureType.allCases.filter { $0 != .duckplayer && $0 != .cookiePopUp }
             features.insert(.duckplayer, at: 0)
             features.insert(.cookiePopUp, at: 1)
