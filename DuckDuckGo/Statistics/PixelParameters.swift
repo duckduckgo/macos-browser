@@ -45,8 +45,23 @@ extension Pixel.Event {
         case .serpInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
         case .serpDay21to27(let cohort):
-            return [PixelKit.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
+            return [PixelKit.Parameters.experimentCohort: cohort]
         case .setAsDefaultInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .newTabInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case  .emailEnabledInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case  .cookieManagementEnabledInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case  .watchInDuckPlayerInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case  .importDataInitial(let cohort):
             guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
@@ -85,11 +100,9 @@ extension Pixel.Event {
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
              .jsPixel,
-             .emailEnabledInitial,
              .cookieManagementEnabledInitial,
              .watchInDuckPlayerInitial,
              .importDataInitial,
-             .newTabInitial,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,

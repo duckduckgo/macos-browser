@@ -93,13 +93,6 @@ final class HomePageViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        if Pixel.isNewUser && OnboardingViewModel().onboardingFinished {
-            let repetition = Pixel.Event.Repetition(key: Pixel.Event.newTabInitial.name)
-            if repetition == .initial {
-                Pixel.fire(.newTabInitial)
-            }
-        }
-
         subscribeToHistory()
     }
 

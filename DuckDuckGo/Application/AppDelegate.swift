@@ -177,6 +177,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
+        // Clean up previous experiment
+        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts {
+            PixelExperiment.cleanup()
+        }
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
@@ -356,10 +360,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
-        let repetition = Pixel.Event.Repetition(key: Pixel.Event.emailEnabledInitial.name)
-        // Temporary pixel for first time user enables email protection
-        if Pixel.isNewUser && repetition == .initial {
-            Pixel.fire(.emailEnabledInitial)
+        if Pixel.isNewUser {
+            PixelExperiment.fireEmailProtectionEnabledPixel()
         }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
@@ -375,10 +377,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
-        // Temporary pixel for first time user import data
-        let repetition = Pixel.Event.Repetition(key: Pixel.Event.importDataInitial.name)
-        if Pixel.isNewUser && repetition == .initial {
-            Pixel.fire(.importDataInitial)
+        if Pixel.isNewUser {
+            PixelExperiment.fireImportDataInitialPixel()
         }
     }
 

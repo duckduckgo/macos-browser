@@ -53,6 +53,8 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
+                PixelExperiment.fireFirstSerpPixel()
+                PixelExperiment.fireDay21To27SerpPixel()
                 Pixel.fire(.serp)
                 self.fireDailyOsVersionCounterPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {

@@ -258,15 +258,17 @@ final class AppearancePreferences: ObservableObject {
     var isContinueSetUpAvailable: Bool {
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         guard privacyConfig.isEnabled(featureKey: .newTabContinueSetUp) == true else { return false }
-        let isNewUser = Pixel.firstLaunchDate.startOfDay == Date().startOfDay && OnboardingViewModel().onboardingFinished
-        print("EXPERIMENT: is new user \(isNewUser)")
-        print("EXPERIMENT: is new user \(Pixel.firstLaunchDate.startOfDay)")
-        if isNewUser {
-            let isControl = PixelExperiment.cohort == .control
-            print("EXPERIMENT: is control \(isControl)")
-            return isControl
+        if !PixelExperiment.isExperimentInstalled {
+            if OnboardingViewModel().onboardingFinished || Pixel.isNewUser {
+                Pixel.fire(.newTabInitial(), limitTo: .initial)
+            }
+            return true
         }
-        return true
+        if !OnboardingViewModel().onboardingFinished {
+            return true
+        }
+        let newTabExperimentCohort = PixelExperiment.cohort
+        return newTabExperimentCohort == .control
     }
 
     func updateUserInterfaceStyle() {

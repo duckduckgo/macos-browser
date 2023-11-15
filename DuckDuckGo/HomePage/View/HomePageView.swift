@@ -63,6 +63,8 @@ extension HomePage.Views {
                                 ContinueSetUpView()
                                     .padding(.top, 64)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                            } else {
+                                DefaultBrowserPrompt()
                             }
 
                             Favorites()
