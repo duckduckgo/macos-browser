@@ -58,6 +58,12 @@ jobs:
             flavor: Sandbox
           - active-arch: YES
             flavor: DBP
+          - integration-tests-target: Integration Tests
+            flavor: Non-Sandbox
+          - integration-tests-target: Integration Tests App Store
+            flavor: Sandbox
+          - integration-tests-target: Integration Tests
+            flavor: DBP
           - cache-key:
             flavor: Non-Sandbox
           - cache-key: sandbox-
@@ -110,7 +116,7 @@ jobs:
       continue-on-error: true
       run: brew install xcbeautify
 
-    - name: Build and test
+    - name: Build and run unit tests
       run: |
         echo "Runner ${RUNNER_NAME} (${RUNNER_TRACKING_ID})"
         export OS_ACTIVITY_MODE=debug
@@ -121,23 +127,21 @@ jobs:
           -configuration "CI" \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
-          '-skip-testing:Integration Tests' \
+          "-skip-testing:${{ matrix.integration-tests-target }}" \
           | tee ${{ matrix.flavor }}-unittests-xcodebuild.log \
           | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-unittests.xml \
           || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-unittests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-unittests.xcresult && exit 1; }
 
-        if [[ ${{ matrix.flavor }} == "DBP" ]]; then
-          echo "Skipping integration tests for ${{ matrix.flavor }} build"
-          exit 0
-        fi
-
+    - name: Run integration tests
+      if: matrix.flavor != 'DBP'
+      run: |
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
-          '-only-testing:Integration Tests' \
+          "-only-testing:${{ matrix.integration-tests-target }}" \
           -retry-tests-on-failure=3 \
           | tee ${{ matrix.flavor }}-integrationtests-xcodebuild.log \
           | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-integrationtests.xml \
