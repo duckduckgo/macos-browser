@@ -23,7 +23,7 @@ import UserScript
 import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
-    func setState() async
+    func saveProfile() async -> Bool
     func getUserProfile() -> DBPUIUserProfile?
     func deleteProfileData()
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
@@ -40,7 +40,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
 
 enum DBPUIReceivedMethodName: String {
     case handshake
-    case setState
+    case saveProfile
     case getCurrentUserProfile
     case deleteUserProfileData
     case addNameToCurrentUserProfile
@@ -61,7 +61,7 @@ enum DBPUISendableMethodName: String {
 
 struct DBPUICommunicationLayer: Subfeature {
     var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
-        .exact(hostname: "use-devtesting18.duckduckgo.com"),
+        .exact(hostname: "use-devtesting19.duckduckgo.com"),
         .exact(hostname: "duckduckgo.com")
     ])
     var featureName: String = "dbpuiCommunication"
@@ -82,7 +82,7 @@ struct DBPUICommunicationLayer: Subfeature {
 
         switch actionResult {
         case .handshake: return handshake
-        case .setState: return setState
+        case .saveProfile: return saveProfile
         case .getCurrentUserProfile: return getCurrentUserProfile
         case .deleteUserProfileData: return deleteUserProfileData
         case .addNameToCurrentUserProfile: return addNameToCurrentUserProfile
@@ -115,7 +115,7 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIStandardResponse(version: Constants.version, success: true)
     }
 
-    func setState(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+    func saveProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         guard let data = try? JSONSerialization.data(withJSONObject: params),
                 let result = try? JSONDecoder().decode(DBPUISetState.self, from: data) else {
             os_log("Failed to parse setState message", log: .dataBrokerProtection)
@@ -124,9 +124,7 @@ struct DBPUICommunicationLayer: Subfeature {
 
         os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
 
-        await delegate?.setState()
-
-        return nil
+        return await delegate?.saveProfile()
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {

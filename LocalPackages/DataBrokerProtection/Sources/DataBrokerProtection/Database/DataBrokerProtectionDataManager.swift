@@ -134,9 +134,10 @@ public final class InMemoryDataCache {
 }
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
-    func setState() async {
-        // other set state tasks
+    func saveProfile() async -> Bool {
         await delegate?.flushCache(profile: profile)
+
+        return true
     }
 
     private func indexForName(matching name: DBPUIUserProfileName, in profile: DataBrokerProtectionProfile) -> Int? {
