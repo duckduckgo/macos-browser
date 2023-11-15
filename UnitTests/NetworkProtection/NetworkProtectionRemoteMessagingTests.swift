@@ -151,7 +151,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         waitlistStorage.store(inviteCode: "ABCD1234")
         activationDateStorage._daysSinceActivation = 10
 
-        defaults.setValue(Date(), forKey: DefaultNetworkProtectionRemoteMessaging.PrivateConstants.lastRefreshDateKey)
+        defaults.setValue(Date(), forKey: DefaultNetworkProtectionRemoteMessaging.Constants.lastRefreshDateKey)
 
         let messaging = DefaultNetworkProtectionRemoteMessaging(
             messageRequest: request,

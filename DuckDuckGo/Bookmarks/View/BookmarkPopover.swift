@@ -37,7 +37,7 @@ final class BookmarkPopover: NSPopover {
 
     private weak var addressBar: NSView?
 
-    private enum PrivateConstants {
+    private enum Constants {
         static let storyboard = NSStoryboard(name: "Bookmarks", bundle: nil)
         static let bookmarkAddPopoverID = "BookmarkPopoverViewController"
         static let folderAddPopoverID = "BookmarkAddFolderPopoverViewController"
@@ -68,13 +68,13 @@ final class BookmarkPopover: NSPopover {
 
     // swiftlint:disable force_cast
     private func setupBookmarkAddController() {
-        let controller = PrivateConstants.storyboard.instantiateController(withIdentifier: PrivateConstants.bookmarkAddPopoverID) as! BookmarkAddPopoverViewController
+        let controller = Constants.storyboard.instantiateController(withIdentifier: Constants.bookmarkAddPopoverID) as! BookmarkAddPopoverViewController
         controller.container = self
         contentViewController = controller
     }
 
     private func setupFolderAddController() {
-        let controller = PrivateConstants.storyboard.instantiateController(withIdentifier: PrivateConstants.folderAddPopoverID) as! BookmarkAddFolderPopoverViewController
+        let controller = Constants.storyboard.instantiateController(withIdentifier: Constants.folderAddPopoverID) as! BookmarkAddFolderPopoverViewController
         controller.container = self
         contentViewController = controller
     }

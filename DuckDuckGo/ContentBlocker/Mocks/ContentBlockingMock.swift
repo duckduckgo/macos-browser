@@ -122,7 +122,7 @@ final class MockAttributing: AdClickAttributing {
 
 final class MockAttributionRulesProvider: AdClickAttributionRulesProviding {
 
-    enum PrivateConstants {
+    enum Constants {
         static let globalAttributionRulesListName = "global"
     }
 

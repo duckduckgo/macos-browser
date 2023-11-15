@@ -265,6 +265,7 @@ final class LocalBookmarkManager: BookmarkManager {
             if error == nil {
                 self?.requestSync()
             }
+            completion(error)
         }
     }
 
@@ -274,6 +275,7 @@ final class LocalBookmarkManager: BookmarkManager {
             if error == nil {
                 self?.requestSync()
             }
+            completion(error)
         }
     }
 
@@ -287,6 +289,7 @@ final class LocalBookmarkManager: BookmarkManager {
             if error == nil {
                 self?.requestSync()
             }
+            completion(error)
 
         }
     }
@@ -297,6 +300,7 @@ final class LocalBookmarkManager: BookmarkManager {
             if error == nil {
                 self?.requestSync()
             }
+            completion(error)
 
         }
     }

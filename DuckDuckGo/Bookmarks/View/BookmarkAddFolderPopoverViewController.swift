@@ -32,7 +32,6 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
 
     var bookmarkManager: BookmarkManager {
         guard let container else {
-            assertionFailure("The container has does not have a BookmarkManager Instance, defaulting to the shared instance ")
             return LocalBookmarkManager.shared
 
         }
