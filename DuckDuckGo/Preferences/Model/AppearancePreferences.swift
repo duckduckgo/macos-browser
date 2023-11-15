@@ -259,7 +259,7 @@ final class AppearancePreferences: ObservableObject {
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         guard privacyConfig.isEnabled(featureKey: .newTabContinueSetUp) == true else { return false }
         if !PixelExperiment.isExperimentInstalled {
-            if OnboardingViewModel().onboardingFinished || Pixel.isNewUser {
+            if OnboardingViewModel().onboardingFinished && Pixel.isNewUser {
                 Pixel.fire(.newTabInitial(), limitTo: .initial)
             }
             return true
@@ -267,8 +267,7 @@ final class AppearancePreferences: ObservableObject {
         if !OnboardingViewModel().onboardingFinished {
             return true
         }
-        let newTabExperimentCohort = PixelExperiment.cohort
-        return newTabExperimentCohort == .control
+        return PixelExperiment.cohort == .control
     }
 
     func updateUserInterfaceStyle() {
