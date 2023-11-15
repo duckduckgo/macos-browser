@@ -84,6 +84,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
 
         bookmarkStoreMock.bookmarks = [mockDestinationFolder]
         bookmarkManager.loadBookmarks()
+
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         let treeController = BookmarkTreeController(dataSource: treeDataSource)
         let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
@@ -113,7 +114,6 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
 
         XCTAssertEqual(result, .move)
-
     }
 
     func testWhenValidatingFolderDrop_AndDestinationIsSameFolder_ThenNoDragOperationIsReturned() {
@@ -134,7 +134,6 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
 
         XCTAssertEqual(result, .none)
-
     }
 
     func testWhenValidatingFolderDrop_AndDestinationIsAncestor_ThenNoneIsReturned() {
