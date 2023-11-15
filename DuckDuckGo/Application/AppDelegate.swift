@@ -180,6 +180,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
+            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
