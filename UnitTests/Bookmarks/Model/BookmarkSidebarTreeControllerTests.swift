@@ -61,7 +61,7 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
             let bookmarksNode = defaultNodes[2]
             XCTAssert(bookmarksNode.childNodes.isEmpty)
         })
-        
+
     }
 
     func testWhenBookmarkStoreHasTopLevelFolders_ThenTheDefaultBookmarksNodeHasThemAsChildren() {
@@ -82,10 +82,8 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
 
             let childNode = bookmarksNode.childNodes[0]
             XCTAssert(childNode.representedObjectEquals(topLevelFolder))
-        }
         })
-
-        
+    }
 
     func testWhenBookmarkStoreHasNestedFolders_ThenTheTreeContainsNestedNodes() {
         let bookmarkStoreMock = BookmarkStoreMock()
@@ -116,7 +114,6 @@ class BookmarkSidebarTreeControllerTests: XCTestCase {
             XCTAssert(childFolderNode.representedObjectEquals(childFolder))
         })
 
-        
     }
 
 }
