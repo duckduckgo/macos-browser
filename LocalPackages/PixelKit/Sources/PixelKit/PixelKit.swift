@@ -138,15 +138,13 @@ public final class PixelKit {
         case .dailyOnly:
             if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
                 fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                updatePixelLastFireDate(pixelName: pixelName)
             }
-
-            updatePixelLastFireDate(pixelName: pixelName)
         case .dailyAndContinuous:
             if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
                 fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                updatePixelLastFireDate(pixelName: pixelName)
             }
-
-            updatePixelLastFireDate(pixelName: pixelName)
 
             fireRequest(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
         }

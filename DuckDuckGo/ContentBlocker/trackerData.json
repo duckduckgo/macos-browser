@@ -1,7 +1,7 @@
 {
     "_builtWith": {
         "tracker-radar": "ae2fbc01abd26abf1903208a5cabbaed6a96ab2aa13779d2125a98fc45fee2cd-4013b4e91930c643394cb31c6c745356f133b04f",
-        "tracker-surrogates": "19af4ee0eead42f1ff65b8a94baadaac52fc8d39"
+        "tracker-surrogates": "abd6067fac9693cc5a43d48931b111ca08cb0d5a"
     },
     "readme": "https://github.com/duckduckgo/tracker-blocklists",
     "trackers": {
@@ -136,45 +136,14 @@
                 "Ad Motivated Tracking",
                 "Advertising"
             ],
-            "default": "ignore",
+            "default": "block",
             "rules": [
                 {
-                    "rule": "2mdn\\.net/dot\\.gif"
-                },
-                {
-                    "rule": "2mdn\\.net/10533936/1679336805544/"
-                },
-                {
-                    "rule": "2mdn\\.net/8762481/1679421215390"
-                },
-                {
-                    "rule": "2mdn\\.net/879366/"
-                },
-                {
-                    "rule": "2mdn\\.net/ads/"
-                },
-                {
-                    "rule": "2mdn\\.net/creatives/assets/"
-                },
-                {
-                    "rule": "2mdn\\.net/dfp/"
-                },
-                {
-                    "rule": "2mdn\\.net/dynamic/2/"
-                },
-                {
-                    "rule": "2mdn\\.net/sadbundle/"
-                },
-                {
-                    "rule": "2mdn\\.net/simgad/[0-9]+"
-                },
-                {
-                    "rule": "2mdn\\.net/videoplayback"
+                    "rule": "2mdn\\.net/instream/html5/ima3\\.js",
+                    "surrogate": "google-ima.js"
                 },
                 {
                     "rule": "2mdn\\.net/instream/video/client\\.js",
-                    "fingerprinting": 1,
-                    "cookies": 0,
                     "exceptions": {
                         "domains": [
                             "dailywire.com",
@@ -13298,7 +13267,13 @@
                 "Content Delivery",
                 "Embedded Content"
             ],
-            "default": "ignore"
+            "default": "ignore",
+            "rules": [
+                {
+                    "rule": "imasdk\\.googleapis\\.com/js/sdkloader/ima3\\.js",
+                    "surrogate": "google-ima.js"
+                }
+            ]
         },
         "imedia.cz": {
             "domain": "imedia.cz",
@@ -18820,7 +18795,13 @@
                 "SSO",
                 "Third-Party Analytics Marketing"
             ],
-            "default": "ignore"
+            "default": "block",
+            "rules": [
+                {
+                    "rule": "npttech\\.com/advertising\\.js",
+                    "surrogate": "noop.js"
+                }
+            ]
         },
         "nr-data.net": {
             "domain": "nr-data.net",
