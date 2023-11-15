@@ -27,7 +27,6 @@ protocol BookmarkPopoverContainer: AnyObject {
     func showFolderAddView()
     func popoverWillClose()
     func popoverShouldClose()
-
 }
 
 final class BookmarkPopover: NSPopover {
