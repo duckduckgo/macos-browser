@@ -495,6 +495,10 @@ struct UserText {
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
     static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
+    static let syncBookmarkPausedAlertTitle = NSLocalizedString("alert.sync-bookmarks-paused-title", value: "Bookmarks Sync is Paused", comment: "Title for alert shown when sync bookmarks paused for too many items")
+    static let syncBookmarkPausedAlertDescription = NSLocalizedString("alert.sync-bookmarks-paused-description", value: "You have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up.", comment: "Description for alert shown when sync bookmarks paused for too many items")
+    static let syncCredentialsPausedAlertTitle = NSLocalizedString("alert.sync-credentials-paused-title", value: "Passwords Sync is Paused", comment: "Title for alert shown when sync credentials paused for too many items")
+    static let syncCredentialsPausedAlertDescription = NSLocalizedString("alert.sync-credentials-paused-description", value: "You have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up.", comment: "Description for alert shown when sync credentials paused for too many items")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
@@ -737,7 +741,6 @@ struct UserText {
 
     static let onboardingWelcomeTitle = NSLocalizedString("onboarding.welcome.title", value: "Welcome to DuckDuckGo!", comment: "General welcome to the app title")
     static let onboardingWelcomeText = NSLocalizedString("onboarding.welcome.text", value: "Tired of being tracked online? You've come to the right place 👍\n\nI'll help you stay private️ as you search and browse the web. Trackers be gone!", comment: "Detailed welcome to the app text")
-    static let onboardingWelcomeTextV2 = NSLocalizedString("onboarding.welcome.text.v2", value: "Tired of being tracked online? You've come to the right place 👍\n\nTry searching or visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible\u{00A0}🔒", comment: "Detailed welcome to the app text")
     static let onboardingImportDataText = NSLocalizedString("onboarding.importdata.text", value: "First, let me help you import your bookmarks 📖 and passwords 🔑 from those less private browsers.", comment: "Call to action to import data from other browsers")
     static let onboardingSetDefaultText = NSLocalizedString("onboarding.setdefault.text", value: "Next, try setting DuckDuckGo as your default️ browser, so you can open links with peace of mind, every time.", comment: "Call to action to set the browser as default")
     static let onboardingStartBrowsingText = NSLocalizedString("onboarding.startbrowsing.text", value: "You’re all set!\n\nWant to see how I protect you? Try visiting one of your favorite sites 👆\n\nKeep watching the address bar as you go. I’ll be blocking trackers and upgrading the security of your connection when possible\u{00A0}🔒", comment: "Call to action to start using the app as a browser")

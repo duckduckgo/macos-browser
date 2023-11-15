@@ -166,6 +166,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 .setRegistrationKeyValidity,
                 .setSelectedServer,
                 .setSelectedEnvironment,
+                .setSelectedLocation,
                 .setShowInMenuBar:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break

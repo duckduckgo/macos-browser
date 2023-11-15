@@ -490,7 +490,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
         }
 
         XCTAssertEqual(topLevelEntities.count, 2)
-        XCTAssertFalse(topLevelEntities.map(\.id).contains(BookmarkEntity.Constants.favoritesFolderID))
+        XCTAssertFalse(topLevelEntities.map(\.id).contains(FavoritesFolderID.unified.rawValue))
     }
 
     func testWhenBookmarkIsMarkedAsFavorite_ThenItDoesNotChangeParentFolder() async {
@@ -740,6 +740,191 @@ final class LocalBookmarkStoreTests: XCTestCase {
                                        bookmark2: bookmark2,
                                        bookmark3: bookmark3,
                                        initialParentFolder: initialParentFolder)
+    }
+
+    // MARK: Favorites Display Mode
+
+    func testDisplayNativeMode_WhenBookmarkIsFavorited_ThenItIsAddedToNativeAndUnifiedFolders() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayNative(.desktop))
+
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: true)
+        _ = await bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil)
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            let bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertEqual(Set(bookmarkMO.favoritedOn), Set([.desktop, .unified]))
+        }
+    }
+
+    func testDisplayNativeMode_WhenNonNativeFavoriteIsFavoritedThenItIsAddedToNativeFolder() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayNative(.desktop))
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            var bookmarkMO = BookmarkEntity.makeBookmark(title: "Example", url: "https://example1.com", parent: rootFolder, context: context)
+            bookmarkMO.addToFavorites(with: .displayNative(.mobile), in: context)
+            try! context.save()
+
+            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+
+            bookmark.isFavorite = true
+            bookmarkStore.update(bookmark: bookmark)
+
+            bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertEqual(Set(bookmarkMO.favoritedOn), Set(FavoritesFolderID.allCases))
+        }
+    }
+
+    func testDisplayNativeMode_WhenNonNativeBrokenFavoriteIsFavoritedThenItIsAddedToNativeAndUnifiedFolder() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayNative(.desktop))
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            var bookmarkMO = BookmarkEntity.makeBookmark(title: "Example", url: "https://example1.com", parent: rootFolder, context: context)
+            let nonNativeFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: FavoritesFolderID.mobile.rawValue, in: context)!
+            bookmarkMO.addToFavorites(folders: [nonNativeFolder])
+            try! context.save()
+
+            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+
+            bookmark.isFavorite = true
+            bookmarkStore.update(bookmark: bookmark)
+
+            bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertEqual(Set(bookmarkMO.favoritedOn), Set(FavoritesFolderID.allCases))
+        }
+    }
+
+    func testDisplayNativeMode_WhenFavoriteIsUnfavoritedThenItIsRemovedFromNativeAndUnifiedFolder() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayNative(.desktop))
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            var bookmarkMO = BookmarkEntity.makeBookmark(title: "Example", url: "https://example1.com", parent: rootFolder, context: context)
+            bookmarkMO.addToFavorites(with: bookmarkStore.favoritesDisplayMode, in: context)
+            try! context.save()
+
+            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+
+            bookmark.isFavorite = false
+            bookmarkStore.update(bookmark: bookmark)
+
+            bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertTrue(bookmarkMO.favoritedOn.isEmpty)
+        }
+    }
+
+    func testDisplayNativeMode_WhenAllFormFactorsFavoriteIsUnfavoritedThenItIsOnlyRemovedFromNativeFolder() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayNative(.desktop))
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            var bookmarkMO = BookmarkEntity.makeBookmark(title: "Example", url: "https://example1.com", parent: rootFolder, context: context)
+            bookmarkMO.addToFavorites(with: bookmarkStore.favoritesDisplayMode, in: context)
+            let nonNativeFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: FavoritesFolderID.mobile.rawValue, in: context)!
+            bookmarkMO.addToFavorites(folders: [nonNativeFolder])
+            try! context.save()
+
+            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+
+            bookmark.isFavorite = false
+            bookmarkStore.update(bookmark: bookmark)
+
+            bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertEqual(Set(bookmarkMO.favoritedOn), Set([.mobile, .unified]))
+        }
+    }
+
+    func testDisplayUnifiedMode_WhenBookmarkIsFavoritedThenItIsAddedToNativeAndUnifiedFolders() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayUnified(native: .desktop))
+
+        let bookmark = Bookmark(id: UUID().uuidString, url: "https://example1.com", title: "Example", isFavorite: true)
+        _ = await bookmarkStore.save(bookmark: bookmark, parent: nil, index: nil)
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            let bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertEqual(Set(bookmarkMO.favoritedOn), Set([.desktop, .unified]))
+        }
+    }
+
+    func testDisplayUnifiedMode_WhenNonNativeFavoriteIsUnfavoritedThenItIsRemovedFromAllFolders() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayUnified(native: .desktop))
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            var bookmarkMO = BookmarkEntity.makeBookmark(title: "Example", url: "https://example1.com", parent: rootFolder, context: context)
+            bookmarkMO.addToFavorites(with: .displayNative(.mobile), in: context)
+            try! context.save()
+
+            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+
+            bookmark.isFavorite = true
+            bookmarkStore.update(bookmark: bookmark)
+
+            bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertEqual(Set(bookmarkMO.favoritedOn), Set(FavoritesFolderID.allCases))
+        }
+    }
+
+    func testDisplayUnifiedMode_WhenNonNativeBrokenFavoriteIsFavoritedThenItIsAddedToNativeAndUnifiedFolder() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayUnified(native: .desktop))
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            var bookmarkMO = BookmarkEntity.makeBookmark(title: "Example", url: "https://example1.com", parent: rootFolder, context: context)
+            let nonNativeFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: FavoritesFolderID.mobile.rawValue, in: context)!
+            bookmarkMO.addToFavorites(folders: [nonNativeFolder])
+            try! context.save()
+
+            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+
+            bookmark.isFavorite = true
+            bookmarkStore.update(bookmark: bookmark)
+
+            bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertEqual(Set(bookmarkMO.favoritedOn), Set(FavoritesFolderID.allCases))
+        }
+    }
+
+    func testDisplayUnifiedMode_WhenAllFormFactorsFavoriteIsUnfavoritedThenItIsRemovedFromAllFolders() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+        bookmarkStore.applyFavoritesDisplayMode(.displayUnified(native: .desktop))
+
+        context.performAndWait {
+            let rootFolder = BookmarkUtils.fetchRootFolder(context)!
+            var bookmarkMO = BookmarkEntity.makeBookmark(title: "Example", url: "https://example1.com", parent: rootFolder, context: context)
+            bookmarkMO.addToFavorites(with: bookmarkStore.favoritesDisplayMode, in: context)
+            let nonNativeFolder = BookmarkUtils.fetchFavoritesFolder(withUUID: FavoritesFolderID.mobile.rawValue, in: context)!
+            bookmarkMO.addToFavorites(folders: [nonNativeFolder])
+            try! context.save()
+
+            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+
+            bookmark.isFavorite = false
+            bookmarkStore.update(bookmark: bookmark)
+
+            bookmarkMO = rootFolder.childrenArray.first!
+            XCTAssertTrue(bookmarkMO.favoritedOn.isEmpty)
+        }
     }
 
     // MARK: Import
