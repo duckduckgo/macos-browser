@@ -42,14 +42,14 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
                     TextMenuItemCaption(text: UserText.vpnShowInMenuBarSettingDescription)
 
-                    ToggleMenuItem(title: UserText.vpnAlwaysONSettingTitle, isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: UserText.vpnAlwaysONSettingTitle, isOn: $model.alwaysON)
                         .disabled(true)
                     TextMenuItemCaption(text: UserText.vpnAlwaysOnSettingDescription)
 
                     ToggleMenuItem(title: UserText.vpnExcludeLocalNetworksSettingTitle, isOn: $model.excludeLocalNetworks)
                     TextMenuItemCaption(text: UserText.vpnExcludeLocalNetworksSettingDescription)
 
-                    ToggleMenuItem(title: UserText.vpnSecureDNSSettingTitle, isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: UserText.vpnSecureDNSSettingTitle, isOn: $model.secureDNS)
                         .disabled(true)
                     TextMenuItemCaption(text: UserText.vpnSecureDNSSettingDescription)
                 }
@@ -59,7 +59,7 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.vpnNotificationsSettingsTitle)
 
-                    ToggleMenuItem(title: UserText.vpnStatusChangeNotificationSettingTitle, isOn: $model.isAutoconsentEnabled)
+                    ToggleMenuItem(title: UserText.vpnStatusChangeNotificationSettingTitle, isOn: $model.notifyStatusChanges)
                 }
 
                 // SECTION: Uninstall

@@ -21,7 +21,8 @@ import NetworkProtection
 import AppKit
 
 final class VPNPreferencesModel: ObservableObject {
-    @Published var isAutoconsentEnabled: Bool = true
+
+    @Published var alwaysON = true
 
     @Published var connectOnLogin: Bool {
         didSet {
@@ -35,9 +36,17 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
+    @Published var secureDNS: Bool = true
+
     @Published var showInMenuBar: Bool {
         didSet {
             tunnelSettings.showInMenuBar = showInMenuBar
+        }
+    }
+
+    @Published var notifyStatusChanges: Bool {
+        didSet {
+            tunnelSettings.notifyStatusChanges = notifyStatusChanges
         }
     }
 
@@ -48,6 +57,7 @@ final class VPNPreferencesModel: ObservableObject {
 
         connectOnLogin = tunnelSettings.connectOnLogin
         excludeLocalNetworks = tunnelSettings.excludeLocalNetworks
+        notifyStatusChanges = tunnelSettings.notifyStatusChanges
         showInMenuBar = tunnelSettings.showInMenuBar
     }
 

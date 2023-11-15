@@ -163,6 +163,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         case .setExcludeLocalNetworks(let excludeLocalNetworks):
             try await handleSetExcludeLocalNetworks(excludeLocalNetworks)
         case .setConnectOnLogin,
+                .setNotifyStatusChanges,
                 .setRegistrationKeyValidity,
                 .setSelectedServer,
                 .setSelectedEnvironment,
