@@ -32,7 +32,7 @@ class PixelArgumentsTests: XCTestCase {
         bookmarkStore = BookmarkStoreMock()
         bookmarkStore.bookmarks = []
         bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStore, faviconManagement: FaviconManagerMock())
-        bookmarkManager.loadBookmarks()
+        bookmarkManager.loadBookmarks(completion: {})
         UserDefaultsWrapper<Any>.clearAll()
         fireproofDomains = FireproofDomains(store: FireproofDomainsStoreMock())
         pixelDataStore = PixelStoreMock()

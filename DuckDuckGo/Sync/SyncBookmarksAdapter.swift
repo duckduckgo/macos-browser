@@ -76,7 +76,7 @@ final class SyncBookmarksAdapter {
         let provider = BookmarksProvider(
             database: database,
             metadataStore: metadataStore) { [weak self] in
-                LocalBookmarkManager.shared.loadBookmarks()
+                LocalBookmarkManager.shared.loadBookmarks(completion: {})
                 self?.isSyncBookmarksPaused = false
                 self?.didShowBookmarksSyncPausedError = false
             }

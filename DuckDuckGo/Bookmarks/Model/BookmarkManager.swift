@@ -75,7 +75,7 @@ final class LocalBookmarkManager: BookmarkManager {
             .sink { [weak self] displayMode in
                 self?.favoritesDisplayMode = displayMode
                 self?.bookmarkStore.applyFavoritesDisplayMode(displayMode)
-                self?.loadBookmarks()
+                self?.loadBookmarks(completion: {})
             }
     }
 
@@ -94,11 +94,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Bookmarks
 
-    func loadBookmarks() {
-        loadBookmarks(completion: { _ in })
-    }
-
-    func loadBookmarks(completion: @escaping (BookmarkList?) -> Void) {
+    func loadBookmarks(completion: @escaping () -> Void) {
         bookmarkStore.loadAll(type: .topLevelEntities) { [weak self] (topLevelEntities, error) in
             guard error == nil, let topLevelEntities = topLevelEntities else {
                 os_log("LocalBookmarkManager: Failed to fetch entities.", type: .error)
@@ -118,7 +114,7 @@ final class LocalBookmarkManager: BookmarkManager {
                     }
 
                     self?.list = BookmarkList(entities: bookmarks, topLevelEntities: topLevelEntities, favorites: favorites)
-                    completion(self?.list)
+                    completion()
                 }
             }
         }
@@ -166,9 +162,8 @@ final class LocalBookmarkManager: BookmarkManager {
                 return
             }
 
-            self?.loadBookmarks(completion: { _ in
-                self?.requestSync()
-            })
+            self?.loadBookmarks(completion: {})
+            self?.requestSync()
 
         }
 
@@ -188,27 +183,24 @@ final class LocalBookmarkManager: BookmarkManager {
                 self?.list?.insert(bookmark)
             }
 
-            self?.loadBookmarks(completion: { _ in
-                self?.requestSync()
-            })
+            self?.loadBookmarks(completion: {})
+            self?.requestSync()
 
         }
     }
 
     func remove(folder: BookmarkFolder) {
         bookmarkStore.remove(objectsWithUUIDs: [folder.id]) { [weak self] _, _ in
-            self?.loadBookmarks(completion: { _ in
-                self?.requestSync()
-            })
+            self?.loadBookmarks(completion: {})
+            self?.requestSync()
 
         }
     }
 
     func remove(objectsWithUUIDs uuids: [String]) {
         bookmarkStore.remove(objectsWithUUIDs: uuids) { [weak self] _, _ in
-            self?.loadBookmarks(completion: { _ in
-                self?.requestSync()
-            })
+            self?.loadBookmarks(completion: {})
+            self?.requestSync()
 
         }
     }
@@ -222,17 +214,15 @@ final class LocalBookmarkManager: BookmarkManager {
 
         list?.update(with: bookmark)
         bookmarkStore.update(bookmark: bookmark)
-        loadBookmarks(completion: { _ in
-            self.requestSync()
-        })
+        loadBookmarks(completion: {})
+        self.requestSync()
 
     }
 
     func update(folder: BookmarkFolder) {
         bookmarkStore.update(folder: folder)
-        loadBookmarks(completion: { _ in
-            self.requestSync()
-        })
+        self.loadBookmarks(completion: {})
+        self.requestSync()
 
     }
 
@@ -249,9 +239,8 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         bookmarkStore.update(bookmark: newBookmark)
-        loadBookmarks(completion: { _ in
-            self.requestSync()
-        })
+        self.loadBookmarks(completion: {})
+        self.requestSync()
 
         return newBookmark
     }
@@ -266,9 +255,8 @@ final class LocalBookmarkManager: BookmarkManager {
                 return
             }
 
-            self?.loadBookmarks(completion: {_ in
-                self?.requestSync()
-            })
+            self?.loadBookmarks(completion: {})
+            self?.requestSync()
         }
 
         return folder
@@ -280,7 +268,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func add(objectsWithUUIDs uuids: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.add(objectsWithUUIDs: uuids, to: parent) { [weak self] error in
-            self?.loadBookmarks(completion: { _ in
+            self?.loadBookmarks(completion: {
                 if error == nil {
                     self?.requestSync()
                 }
@@ -292,7 +280,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func update(objectsWithUUIDs uuids: [String], update: @escaping (BaseBookmarkEntity) -> Void, completion: @escaping (Error?) -> Void) {
         bookmarkStore.update(objectsWithUUIDs: uuids, update: update) { [weak self] error in
-            self?.loadBookmarks(completion: { _ in
+            self?.loadBookmarks(completion: {
                 if error == nil {
                     self?.requestSync()
                 }
@@ -307,7 +295,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func move(objectUUIDs: [String], toIndex index: Int?, withinParentFolder parent: ParentFolderType, completion: @escaping (Error?) -> Void) {
         bookmarkStore.move(objectUUIDs: objectUUIDs, toIndex: index, withinParentFolder: parent) { [weak self] error in
-            self?.loadBookmarks(completion: { _ in
+            self?.loadBookmarks(completion: {
                 if error == nil {
                     self?.requestSync()
                 }
@@ -319,7 +307,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func moveFavorites(with objectUUIDs: [String], toIndex index: Int?, completion: @escaping (Error?) -> Void) {
         bookmarkStore.moveFavorites(with: objectUUIDs, toIndex: index) { [weak self] error in
-            self?.loadBookmarks(completion: { _ in
+            self?.loadBookmarks(completion: {
                 if error == nil {
                     self?.requestSync()
                 }
@@ -344,9 +332,8 @@ final class LocalBookmarkManager: BookmarkManager {
 
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
         let results = bookmarkStore.importBookmarks(bookmarks, source: source)
-        loadBookmarks(completion: {_ in
-            self.requestSync()
-        })
+        loadBookmarks(completion: {})
+        requestSync()
 
         return results
     }
@@ -375,9 +362,8 @@ final class LocalBookmarkManager: BookmarkManager {
         }
 
         store.resetBookmarks { [self] _ in
-            self.loadBookmarks(completion: { _ in
-                self.requestSync()
-            })
+            self.loadBookmarks(completion: {})
+            self.requestSync()
 
         }
     }

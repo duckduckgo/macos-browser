@@ -168,7 +168,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         HistoryCoordinator.shared.loadHistory()
         PrivacyFeatures.httpsUpgrade.loadDataAsync()
-        bookmarksManager.loadBookmarks()
+        bookmarksManager.loadBookmarks(completion: {})
         if case .normal = NSApp.runType {
             FaviconManager.shared.loadFavicons()
         }

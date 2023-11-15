@@ -43,12 +43,13 @@ final class LocalBookmarkManagerTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [Bookmark.aBookmark]
-        bookmarkManager.loadBookmarks()
+        bookmarkManager.loadBookmarks(completion: {
+            XCTAssert(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.urlObject!))
+            XCTAssertNotNil(bookmarkManager.getBookmark(for: Bookmark.aBookmark.urlObject!))
+            XCTAssert(bookmarkStoreMock.loadAllCalled)
+            XCTAssert(bookmarkManager.list!.bookmarks().count > 0)
+        })
 
-        XCTAssert(bookmarkManager.isUrlBookmarked(url: Bookmark.aBookmark.urlObject!))
-        XCTAssertNotNil(bookmarkManager.getBookmark(for: Bookmark.aBookmark.urlObject!))
-        XCTAssert(bookmarkStoreMock.loadAllCalled)
-        XCTAssert(bookmarkManager.list!.bookmarks().count > 0)
     }
 
     func testWhenLoadFails_ThenTheManagerHoldsBookmarksAreNil() {
@@ -58,10 +59,11 @@ final class LocalBookmarkManagerTests: XCTestCase {
 
         bookmarkStoreMock.bookmarks = nil
         bookmarkStoreMock.loadError = BookmarkManagerError.somethingReallyBad
-        bookmarkManager.loadBookmarks()
+        bookmarkManager.loadBookmarks(completion: {
+            XCTAssertNil(bookmarkManager.list?.bookmarks())
+            XCTAssert(bookmarkStoreMock.loadAllCalled)
+        })
 
-        XCTAssertNil(bookmarkManager.list?.bookmarks())
-        XCTAssert(bookmarkStoreMock.loadAllCalled)
     }
 
     func testWhenBookmarkIsCreated_ThenManagerSavesItToStore() {
@@ -168,7 +170,7 @@ fileprivate extension LocalBookmarkManager {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = []
-        bookmarkManager.loadBookmarks()
+        bookmarkManager.loadBookmarks(completion: {})
 
         return (bookmarkManager, bookmarkStoreMock)
     }
