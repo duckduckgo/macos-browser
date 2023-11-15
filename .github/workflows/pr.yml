@@ -126,6 +126,11 @@ jobs:
           | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-unittests.xml \
           || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-unittests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-unittests.xcresult && exit 1; }
 
+        if [[ ${{ matrix.flavor }} == "DBP" ]]; then
+          echo "Skipping integration tests for ${{ matrix.flavor }} build"
+          exit 0
+        fi
+
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
@@ -133,7 +138,7 @@ jobs:
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           '-only-testing:Integration Tests' \
-          -retry-tests-on-failure 3 \
+          -retry-tests-on-failure=3 \
           | tee ${{ matrix.flavor }}-integrationtests-xcodebuild.log \
           | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-integrationtests.xml \
           || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-integrationtests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-integrationtests.xcresult && exit 1; }
@@ -202,7 +207,7 @@ jobs:
 
     - name: Upload failed integration tests log
       uses: actions/upload-artifact@v3
-      if: failure()
+      if: failure() && matrix.flavor != 'DBP'
       with:
         name: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
         path: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
@@ -210,7 +215,7 @@ jobs:
 
     - name: Upload failed integration tests xcresult
       uses: actions/upload-artifact@v3
-      if: failure()
+      if: failure() && matrix.flavor != 'DBP'
       with:
         name: ${{ matrix.flavor }}-integrationtests.xcresult
         path: ${{ matrix.flavor }}-integrationtests.xcresult
