@@ -134,21 +134,7 @@ final class FaviconManager: FaviconManagement {
             // Fetch favicons if needed
             let faviconLinksToFetch = await self.filteringAlreadyFetchedFaviconLinks(from: faviconLinks)
             let newFavicons = await self.fetchFavicons(faviconLinks: faviconLinksToFetch, documentUrl: documentUrl)
-
-            // Insert new favicons to cache
-            await self.imageCache.insert(newFavicons)
-
-            // Pick most suitable favicons
-            let weekAgo = Date.weekAgo
-
-            let cachedFavicons = await self.imageCache.getFavicons(with: faviconLinks.lazy.compactMap { URL(string: $0.href) })?
-                .filter { favicon in
-                    favicon.dateCreated > weekAgo
-                }
-
-            let favicon = await self.handleFaviconReferenceCacheInsertion(documentURL: documentUrl,
-                                                                          cachedFavicons: cachedFavicons ?? [],
-                                                                          newFavicons: newFavicons)
+            let favicon = await self.cacheFavicons(newFavicons, faviconURLs: faviconLinks.lazy.compactMap { URL(string: $0.href) }, for: documentUrl)
 
             await completion(favicon)
         }
@@ -335,6 +321,20 @@ final class FaviconManager: FaviconManagement {
             return favicons
         }
     }
+
+    @discardableResult
+    private func cacheFavicons(_ favicons: [Favicon], faviconURLs: [URL], for documentUrl: URL) -> Favicon? {
+        // Insert new favicons to cache
+        imageCache.insert(favicons)
+        // Pick most suitable favicons
+        let cachedFavicons = imageCache.getFavicons(with: faviconURLs)?.filter { $0.dateCreated > Date.weekAgo }
+
+        return handleFaviconReferenceCacheInsertion(
+            documentURL: documentUrl,
+            cachedFavicons: cachedFavicons ?? [],
+            newFavicons: favicons
+        )
+    }
 }
 
 import Bookmarks
@@ -357,7 +357,9 @@ extension FaviconManager: Bookmarks.FaviconStoring {
 
             await self.awaitFaviconsLoaded()
 
-            let faviconURL = url ?? documentURL.appendingPathComponent("sync-favicon.ico")
+            // If URL is not provided, we don't know the favicon URL,
+            // so we use a made up URL that identifies sync-related favicon.
+            let faviconURL = url ?? documentURL.appendingPathComponent("ddgsync-favicon.ico")
 
             let favicon = Favicon(identifier: UUID(),
                                   url: faviconURL,
@@ -366,21 +368,7 @@ extension FaviconManager: Bookmarks.FaviconStoring {
                                   documentUrl: documentURL,
                                   dateCreated: Date())
 
-            // Fetch favicons if needed
-            let newFavicons = [favicon]
-
-            // Insert new favicons to cache
-            self.imageCache.insert(newFavicons)
-
-            // Pick most suitable favicons
-            let weekAgo = Date.weekAgo
-
-            let cachedFavicons = self.imageCache.getFavicons(with: [faviconURL])?
-                .filter { favicon in
-                    favicon.dateCreated > weekAgo
-                }
-
-            self.handleFaviconReferenceCacheInsertion(documentURL: documentURL, cachedFavicons: cachedFavicons ?? [], newFavicons: newFavicons)
+            self.cacheFavicons([favicon], faviconURLs: [faviconURL], for: documentURL)
         }
     }
 }
