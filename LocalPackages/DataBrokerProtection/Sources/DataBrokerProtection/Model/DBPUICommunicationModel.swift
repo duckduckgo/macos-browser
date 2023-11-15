@@ -128,11 +128,6 @@ struct DBPUIDataBrokerProfileMatch: Codable {
 /// Protocol to represent a message that can be passed from the host to the UI
 protocol DBPUISendableMessage: Codable {}
 
-/// Message to set the UI state. Sent from the host to the UI
-struct DBPUIWebSetState: DBPUISendableMessage {
-    let state: DBPUIState
-}
-
 /// Message representing the state of any scans and opt outs without state and grouping removed profiles by broker
 struct DBPUIScanAndOptOutMaintenanceState: DBPUISendableMessage {
     let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
