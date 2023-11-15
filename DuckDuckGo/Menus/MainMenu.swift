@@ -665,7 +665,7 @@ import Subscription
             alert.messageText = "Restart with DEBUG logging Enabled not supported for AppStore build"
             alert.informativeText = """
             Open terminal and run:
-            export \(ProcessInfo.Constants.osActivityMode)=\(ProcessInfo.Constants.debug)
+            export \(ProcessInfo.PrivateConstants.osActivityMode)=\(ProcessInfo.PrivateConstants.debug)
             "\(Bundle.main.executablePath!)"
             """
             alert.runModal()

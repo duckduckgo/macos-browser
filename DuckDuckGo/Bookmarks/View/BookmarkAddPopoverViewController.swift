@@ -19,13 +19,12 @@
 import Cocoa
 import Combine
 
-final class BookmarkPopoverViewController: NSViewController {
+final class BookmarkAddPopoverViewController: NSViewController {
 
     static let favoriteImage = NSImage(named: "Favorite")
     static let favoriteFilledImage = NSImage(named: "FavoriteFilled")
 
-    var container: BookmarkPopoverContainer?
-    weak var popover: BookmarkPopover?
+    weak var container: BookmarkPopoverContainer?
 
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var favoriteButton: NSButton!
@@ -65,7 +64,9 @@ final class BookmarkPopoverViewController: NSViewController {
                   let menuItem = self.folderPickerPopUpButton.item(at: index) else { return }
 
             let folder = menuItem.representedObject as? BookmarkFolder
-            self.bookmarkManager.add(bookmark: bookmark, to: folder, completion: { _ in })
+            self.bookmarkManager.add(bookmark: bookmark, to: folder, completion: { _ in
+                self.bookmark = self.bookmarkManager.getBookmark(forUrl: bookmark.url)
+            })
         }
     }
 
@@ -79,7 +80,6 @@ final class BookmarkPopoverViewController: NSViewController {
     @IBAction func removeButtonAction(_ sender: NSButton) {
         guard let bookmark = bookmark else { return }
         bookmarkManager.remove(bookmark: bookmark)
-
         container?.popoverShouldClose()
     }
 
@@ -125,8 +125,8 @@ final class BookmarkPopoverViewController: NSViewController {
             guard let folder = menuItem.representedObject as? BookmarkFolder else {
                 return false
             }
-
             return folder.id == bookmark?.parentFolderUUID
+
         })
 
         folderPickerPopUpButton.select(selectedFolderMenuItem ?? menuItems.first)
@@ -134,7 +134,7 @@ final class BookmarkPopoverViewController: NSViewController {
 
 }
 
-extension BookmarkPopoverViewController: NSTextFieldDelegate {
+extension BookmarkAddPopoverViewController: NSTextFieldDelegate {
 
     func controlTextDidChange(_ obj: Notification) {
         guard let bookmark = bookmark else { return }

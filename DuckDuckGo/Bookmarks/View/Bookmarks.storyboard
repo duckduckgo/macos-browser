@@ -360,10 +360,10 @@
             </objects>
             <point key="canvasLocation" x="912" y="404"/>
         </scene>
-        <!--Bookmark Popover View Controller-->
+        <!--Bookmark Add Popover View Controller-->
         <scene sceneID="3pH-Ju-wLu">
             <objects>
-                <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkPopoverViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkAddPopoverViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="2fn-ed-4g2">
                         <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -1086,6 +1086,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="folderNameTextField" destination="ulo-yp-xTO" id="pu2-Xj-UDa"/>
                         <outlet property="folderPickerPopUpButton" destination="iw1-vd-fVj" id="uPr-Q8-O6b"/>
                         <outlet property="textField" destination="ulo-yp-xTO" id="1nB-vZ-NXz"/>
                     </connections>

@@ -25,7 +25,7 @@ import BrowserServicesKit
 
 final class UpdateController: NSObject {
 
-    enum Constants {
+    enum PrivateConstants {
         static let internalChannelName = "internal-channel"
     }
 
@@ -88,7 +88,7 @@ extension UpdateController: SPUUpdaterDelegate {
 
     func allowedChannels(for updater: SPUUpdater) -> Set<String> {
         if internalUserDecider.isInternalUser {
-            return Set([Constants.internalChannelName])
+            return Set([PrivateConstants.internalChannelName])
         } else {
             return Set()
         }

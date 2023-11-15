@@ -17,17 +17,70 @@
 //
 
 import AppKit
+import Combine
 
 final class BookmarkAddFolderPopoverViewController: NSViewController {
+
     weak var container: BookmarkPopoverContainer?
+    var parentFolder: BookmarkFolder?
 
     @IBOutlet var folderNameTextField: NSTextField!
+    @IBOutlet var folderPickerPopUpButton: NSPopUpButton!
+
+    private var folderPickerSelectionCancellable: AnyCancellable?
+
+    var bookmarkManager: BookmarkManager {
+        guard let container else {
+            assertionFailure("The container has does not have a BookmarkManager Instance, defaulting to the shared instance ")
+            return LocalBookmarkManager.shared
+
+        }
+        return container.bookmarkManager
+    }
+
+    var bookmark: Bookmark? {
+        get {
+            container?.bookmark
+        }
+        set {
+            container?.bookmark = newValue
+        }
+    }
 
     @IBAction private func cancel(_ sender: NSButton) {
         container?.showBookmarkAddView()
     }
 
-    @IBAction private func addFolder(_ sender: NSButton) {
+    @IBAction private func save(_ sender: NSButton) {
     }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        folderNameTextField.delegate = self
+        refreshFolderPicker()
+    }
+
+    private func refreshFolderPicker() {
+        guard let menuItems = container?.bookmarksMenuItems else {
+            return
+        }
+        folderPickerPopUpButton.menu?.items = menuItems
+
+        let selectedFolderMenuItem = menuItems.first(where: { menuItem in
+            guard let folder = menuItem.representedObject as? BookmarkFolder else {
+                return false
+            }
+            return folder.id == bookmark?.parentFolderUUID
+
+        })
+
+        folderPickerPopUpButton.select(selectedFolderMenuItem ?? menuItems.first)
+    }
+
+}
+
+extension BookmarkAddFolderPopoverViewController: NSTextFieldDelegate {
+
+    func controlTextDidChange(_ obj: Notification) {}
 
 }

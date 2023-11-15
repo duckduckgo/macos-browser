@@ -19,7 +19,6 @@
 import Cocoa
 
 protocol BookmarkPopoverContainer: AnyObject {
-    var bookmarkFolder: BookmarkFolder? { get set }
     var bookmark: Bookmark? { get set }
     var bookmarkManager: BookmarkManager { get }
     var bookmarksMenuItems: [NSMenuItem] { get }
@@ -34,17 +33,14 @@ final class BookmarkPopover: NSPopover {
 
     var isNew = false
     var bookmark: Bookmark?
-    var bookmarkFolder: BookmarkFolder?
 
     private weak var addressBar: NSView?
 
-    private enum Constants {
+    private enum PrivateConstants {
         static let storyboard = NSStoryboard(name: "Bookmarks", bundle: nil)
         static let bookmarkAddPopoverID = "BookmarkPopoverViewController"
         static let folderAddPopoverID = "BookmarkAddFolderPopoverViewController"
     }
-
-    private var bookmarkPopover = "BookmarkPopoverViewController"
 
     /// prefferred bounding box for the popover positioning
     override var boundingFrame: NSRect {
@@ -71,13 +67,13 @@ final class BookmarkPopover: NSPopover {
 
     // swiftlint:disable force_cast
     private func setupBookmarkAddController() {
-        let controller = Constants.storyboard.instantiateController(withIdentifier: Constants.bookmarkAddPopoverID) as! BookmarkPopoverViewController
+        let controller = PrivateConstants.storyboard.instantiateController(withIdentifier: PrivateConstants.bookmarkAddPopoverID) as! BookmarkAddPopoverViewController
         controller.container = self
         contentViewController = controller
     }
 
     private func setupFolderAddController() {
-        let controller = Constants.storyboard.instantiateController(withIdentifier: Constants.folderAddPopoverID) as! BookmarkAddFolderPopoverViewController
+        let controller = PrivateConstants.storyboard.instantiateController(withIdentifier: PrivateConstants.folderAddPopoverID) as! BookmarkAddFolderPopoverViewController
         controller.container = self
         contentViewController = controller
     }

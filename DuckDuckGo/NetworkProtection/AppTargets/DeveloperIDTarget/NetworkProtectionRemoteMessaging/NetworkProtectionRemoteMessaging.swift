@@ -31,7 +31,7 @@ protocol NetworkProtectionRemoteMessaging {
 
 final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
 
-    enum Constants {
+    enum PrivateConstants {
         static let lastRefreshDateKey = "network-protection.remote-messaging.last-refresh-date"
     }
 
@@ -151,19 +151,19 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     func resetLastRefreshTimestamp() {
-        userDefaults.removeObject(forKey: Constants.lastRefreshDateKey)
+        userDefaults.removeObject(forKey: PrivateConstants.lastRefreshDateKey)
     }
 
     // MARK: - Private
 
     private func lastRefreshDate() -> Date? {
-        guard let object = userDefaults.object(forKey: Constants.lastRefreshDateKey) else {
+        guard let object = userDefaults.object(forKey: PrivateConstants.lastRefreshDateKey) else {
             return nil
         }
 
         guard let date = object as? Date else {
             assertionFailure("Got rate limited date, but couldn't convert it to Date")
-            userDefaults.removeObject(forKey: Constants.lastRefreshDateKey)
+            userDefaults.removeObject(forKey: PrivateConstants.lastRefreshDateKey)
             return nil
         }
 
@@ -171,7 +171,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     private func updateLastRefreshDate() {
-        userDefaults.setValue(Date(), forKey: Constants.lastRefreshDateKey)
+        userDefaults.setValue(Date(), forKey: PrivateConstants.lastRefreshDateKey)
     }
 
 }
