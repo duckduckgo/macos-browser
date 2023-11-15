@@ -381,6 +381,7 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <accessibility identifier="bookmark.add.new.folder.button"/>
                                             <connections>
                                                 <action selector="addFolder:" target="vCQ-b9-yaB" id="ORd-09-yPN"/>
                                             </connections>
@@ -407,6 +408,7 @@
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <accessibility identifier="bookmark.add.name.textfield"/>
                             </textField>
                             <popUpButton horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Zd-n4-XJh" userLabel="Folder Picker Pop Up Button">
                                 <rect key="frame" x="16" y="110" width="232" height="25"/>
@@ -421,6 +423,7 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <accessibility identifier="bookmark.add.folder.dropdown"/>
                             </popUpButton>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="19" y="94" width="262" height="1"/>
@@ -440,6 +443,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <accessibility identifier="bookmark.add.add.to.favorites.button"/>
                                 <connections>
                                     <action selector="favoritesButtonAction:" target="vCQ-b9-yaB" id="5Ku-TZ-qPS"/>
                                 </connections>
@@ -453,6 +457,7 @@
 DQ
 </string>
                                 </buttonCell>
+                                <accessibility description="bookmark.add.done.button" identifier="bookmark.add.done.button"/>
                                 <connections>
                                     <action selector="doneButtonAction:" target="vCQ-b9-yaB" id="zDN-yP-TrH"/>
                                 </connections>
@@ -463,6 +468,7 @@ DQ
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <accessibility identifier="bookmark.add.remove.button"/>
                                 <connections>
                                     <action selector="removeButtonAction:" target="vCQ-b9-yaB" id="gID-s8-sUP"/>
                                 </connections>
@@ -1007,6 +1013,7 @@ Gw
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
+                                            <accessibility identifier="bookmark.folder.folder.dropdown"/>
                                         </popUpButton>
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pvl-XC-NDQ">
                                             <rect key="frame" x="18" y="97" width="44" height="16"/>
@@ -1044,6 +1051,7 @@ Gw
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <accessibility identifier="bookmark.folder.name.textfield"/>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="upG-Q3-IUg">
                                 <rect key="frame" x="187" y="12" width="101" height="32"/>
@@ -1054,8 +1062,9 @@ Gw
 DQ
 </string>
                                 </buttonCell>
+                                <accessibility identifier="bookmark.add.add.folder.button"/>
                                 <connections>
-                                    <action selector="doneButtonAction:" target="pTx-lh-HJH" id="yrL-51-PBU"/>
+                                    <action selector="save:" target="pTx-lh-HJH" id="nbV-kT-UAi"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S2g-pz-0cZ">
@@ -1067,6 +1076,7 @@ DQ
 Gw
 </string>
                                 </buttonCell>
+                                <accessibility identifier="bookmark.add.cancel.button"/>
                                 <connections>
                                     <action selector="cancel:" target="pTx-lh-HJH" id="oOv-wy-LPC"/>
                                 </connections>
@@ -1093,7 +1103,7 @@ Gw
                 </viewController>
                 <customObject id="h5O-4J-o19" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-613" y="212"/>
+            <point key="canvasLocation" x="-613" y="221"/>
         </scene>
     </scenes>
     <resources>

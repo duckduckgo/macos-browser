@@ -83,17 +83,16 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [mockDestinationFolder]
-        bookmarkManager.loadBookmarks(completion: {
-            let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-            let treeController = BookmarkTreeController(dataSource: treeDataSource)
-            let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
-            let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
+        bookmarkManager.loadBookmarks()
+        let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
+        let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
-            let pasteboardBookmark = PasteboardBookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark")
-            let result = dataSource.validateDrop(for: [pasteboardBookmark], destination: mockDestinationNode)
+        let pasteboardBookmark = PasteboardBookmark(id: UUID().uuidString, url: "https://example.com", title: "Pasteboard Bookmark")
+        let result = dataSource.validateDrop(for: [pasteboardBookmark], destination: mockDestinationNode)
 
-            XCTAssertEqual(result, .move)
-        })
+        XCTAssertEqual(result, .move)
 
     }
 
@@ -104,17 +103,16 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [mockDestinationFolder]
-        bookmarkManager.loadBookmarks(completion: {
-            let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-            let treeController = BookmarkTreeController(dataSource: treeDataSource)
-            let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
-            let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
+        bookmarkManager.loadBookmarks()
+        let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
+        let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
 
-            let pasteboardFolder = PasteboardFolder(id: UUID().uuidString, name: "Pasteboard Folder")
-            let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
+        let pasteboardFolder = PasteboardFolder(id: UUID().uuidString, name: "Pasteboard Folder")
+        let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
 
-            XCTAssertEqual(result, .move)
-        })
+        XCTAssertEqual(result, .move)
 
     }
 
@@ -125,17 +123,16 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [mockDestinationFolder]
-        bookmarkManager.loadBookmarks(completion: {
-            let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-            let treeController = BookmarkTreeController(dataSource: treeDataSource)
-            let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
-            let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
+        bookmarkManager.loadBookmarks()
+        let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
+        let mockDestinationNode = treeController.node(representing: mockDestinationFolder)!
 
-            let pasteboardFolder = PasteboardFolder(id: mockDestinationFolder.id, name: "Pasteboard Folder")
-            let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
+        let pasteboardFolder = PasteboardFolder(id: mockDestinationFolder.id, name: "Pasteboard Folder")
+        let result = dataSource.validateDrop(for: [pasteboardFolder], destination: mockDestinationNode)
 
-            XCTAssertEqual(result, .none)
-        })
+        XCTAssertEqual(result, .none)
 
     }
 
@@ -148,18 +145,17 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = [rootFolder]
-        bookmarkManager.loadBookmarks(completion: {
-            let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
-            let treeController = BookmarkTreeController(dataSource: treeDataSource)
-            let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
-            let mockDestinationNode = treeController.node(representing: childFolder)!
+        bookmarkManager.loadBookmarks()
+        let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
+        let treeController = BookmarkTreeController(dataSource: treeDataSource)
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
+        let mockDestinationNode = treeController.node(representing: childFolder)!
 
-            // Simulate dragging the root folder onto the child folder:
-            let draggedFolder = PasteboardFolder(id: rootFolder.id, name: "Root")
-            let result = dataSource.validateDrop(for: [draggedFolder], destination: mockDestinationNode)
+        // Simulate dragging the root folder onto the child folder:
+        let draggedFolder = PasteboardFolder(id: rootFolder.id, name: "Root")
+        let result = dataSource.validateDrop(for: [draggedFolder], destination: mockDestinationNode)
 
-            XCTAssertEqual(result, .none)
-        })
+        XCTAssertEqual(result, .none)
     }
 
     // MARK: - Private
@@ -170,7 +166,7 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         let bookmarkManager = LocalBookmarkManager(bookmarkStore: bookmarkStoreMock, faviconManagement: faviconManagerMock)
 
         bookmarkStoreMock.bookmarks = bookmarks
-        bookmarkManager.loadBookmarks(completion: {})
+        bookmarkManager.loadBookmarks()
 
         let treeDataSource = BookmarkSidebarTreeController(bookmarkManager: bookmarkManager)
         return BookmarkTreeController(dataSource: treeDataSource)

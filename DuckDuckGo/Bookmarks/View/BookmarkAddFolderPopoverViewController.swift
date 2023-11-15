@@ -27,7 +27,7 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
     @IBOutlet var folderNameTextField: NSTextField!
     @IBOutlet var folderPickerPopUpButton: NSPopUpButton!
 
-    private var folderPickerSelectionCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     var bookmarkManager: BookmarkManager {
         guard let container else {
@@ -47,11 +47,30 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
         }
     }
 
+    var selectedFolderMenuItem: NSMenuItem? {
+        let selectedFolderMenuItem = folderPickerPopUpButton.menu?.items.first(where: { menuItem in
+            guard let folder = menuItem.representedObject as? BookmarkFolder else {
+                return false
+            }
+            return folder.id == bookmark?.parentFolderUUID
+
+        })
+        return selectedFolderMenuItem
+    }
+
     @IBAction private func cancel(_ sender: NSButton) {
         container?.showBookmarkAddView()
     }
 
     @IBAction private func save(_ sender: NSButton) {
+        let name = folderNameTextField.stringValue
+        guard let selectedFolder: BookmarkFolder = selectedFolderMenuItem?.representedObject as? BookmarkFolder,
+              let currentBookmark = self.bookmark else { return }
+
+        bookmarkManager.makeFolder(for: name, parent: selectedFolder)
+        // self.bookmarkManager.move(objectUUIDs: [currentBookmark.id], toIndex: 1, withinParentFolder: .parent(uuid: folder.id), completion: { _ in })
+        container?.showBookmarkAddView()
+
     }
 
     override func viewDidLoad() {
@@ -61,19 +80,10 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
     }
 
     private func refreshFolderPicker() {
-        guard let menuItems = container?.bookmarksMenuItems else {
+        guard let menuItems = container?.getMenuItems() else {
             return
         }
         folderPickerPopUpButton.menu?.items = menuItems
-
-        let selectedFolderMenuItem = menuItems.first(where: { menuItem in
-            guard let folder = menuItem.representedObject as? BookmarkFolder else {
-                return false
-            }
-            return folder.id == bookmark?.parentFolderUUID
-
-        })
-
         folderPickerPopUpButton.select(selectedFolderMenuItem ?? menuItems.first)
     }
 

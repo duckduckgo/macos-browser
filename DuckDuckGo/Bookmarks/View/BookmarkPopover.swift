@@ -21,8 +21,8 @@ import Cocoa
 protocol BookmarkPopoverContainer: AnyObject {
     var bookmark: Bookmark? { get set }
     var bookmarkManager: BookmarkManager { get }
-    var bookmarksMenuItems: [NSMenuItem] { get }
 
+    func getMenuItems() -> [NSMenuItem]
     func showBookmarkAddView()
     func showFolderAddView()
     func popoverShouldClose()
@@ -106,7 +106,7 @@ final class BookmarkPopover: NSPopover {
 
 extension BookmarkPopover: BookmarkPopoverContainer {
 
-    var bookmarksMenuItems: [NSMenuItem] {
+    func getMenuItems() -> [NSMenuItem] {
         guard let list = bookmarkManager.list else {
             assertionFailure("Tried to refresh bookmark folder picker, but couldn't get bookmark list")
             return []

@@ -31,6 +31,7 @@ final class BookmarkAddPopoverViewController: NSViewController {
     @IBOutlet weak var folderPickerPopUpButton: NSPopUpButton!
 
     private var folderPickerSelectionCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     var bookmarkManager: BookmarkManager {
         guard let container else {
@@ -54,19 +55,27 @@ final class BookmarkAddPopoverViewController: NSViewController {
     }
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-
+        setupPickerSelectionCancellable()
+        setupListPublisher()
         textField.delegate = self
+    }
 
+    private func setupListPublisher() {
+        bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            guard let url = self?.bookmark?.url else { return }
+            self?.bookmark = self?.bookmarkManager.getBookmark(forUrl: url)
+            self?.refreshFolderPicker()
+        }.store(in: &cancellables)
+    }
+
+    private func setupPickerSelectionCancellable() {
         folderPickerSelectionCancellable = folderPickerPopUpButton.selectionPublisher.dropFirst().sink { [weak self] index in
             guard let self = self,
                   let bookmark = self.bookmark,
                   let menuItem = self.folderPickerPopUpButton.item(at: index) else { return }
 
             let folder = menuItem.representedObject as? BookmarkFolder
-            self.bookmarkManager.add(bookmark: bookmark, to: folder, completion: { _ in
-                self.bookmark = self.bookmarkManager.getBookmark(forUrl: bookmark.url)
-            })
+            self.bookmarkManager.add(bookmark: bookmark, to: folder, completion: { _ in })
         }
     }
 
@@ -115,8 +124,12 @@ final class BookmarkAddPopoverViewController: NSViewController {
         favoriteButton.title = "  \(bookmark.isFavorite ? UserText.removeFromFavorites : UserText.addToFavorites)"
     }
 
+    private func reloadBookmarks() {
+
+    }
+
     private func refreshFolderPicker() {
-        guard let menuItems = container?.bookmarksMenuItems else {
+        guard let menuItems = container?.getMenuItems() else {
             return
         }
         folderPickerPopUpButton.menu?.items = menuItems
