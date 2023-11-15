@@ -60,11 +60,6 @@ struct DBPUIStandardResponse: Codable {
     }
 }
 
-/// Message to set the UI state. Sent from the UI to the host
-struct DBPUISetState: Codable {
-    let state: DBPUIState
-}
-
 /// Message Object representing a user profile name
 struct DBPUIUserProfileName: Codable {
     let first: String

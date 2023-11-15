@@ -116,13 +116,7 @@ struct DBPUICommunicationLayer: Subfeature {
     }
 
     func saveProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(DBPUISetState.self, from: data) else {
-            os_log("Failed to parse setState message", log: .dataBrokerProtection)
-            throw DBPUIError.malformedRequest
-        }
-
-        os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
+        os_log("Web UI requested to save the profile", log: .dataBrokerProtection)
 
         let success = await delegate?.saveProfile()
 
