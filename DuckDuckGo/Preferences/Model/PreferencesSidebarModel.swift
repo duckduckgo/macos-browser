@@ -19,6 +19,7 @@
 import SwiftUI
 import BrowserServicesKit
 import Combine
+import NetworkProtection
 
 final class PreferencesSidebarModel: ObservableObject {
 
@@ -54,9 +55,10 @@ final class PreferencesSidebarModel: ObservableObject {
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
-        includeDuckPlayer: Bool
+        includeDuckPlayer: Bool,
+        tunnelSettings: TunnelSettings
     ) {
-        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer) },
+        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPNSettings: tunnelSettings.showVPNSettings) },
                   tabSwitcherTabs: tabSwitcherTabs,
                   privacyConfigurationManager: privacyConfigurationManager)
     }

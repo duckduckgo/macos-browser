@@ -19,12 +19,14 @@
 import AppKit
 import SwiftUI
 import Combine
+import NetworkProtection
 
 final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
 
-    let model = PreferencesSidebarModel(includeDuckPlayer: DuckPlayer.shared.isAvailable)
+    let model = PreferencesSidebarModel(includeDuckPlayer: DuckPlayer.shared.isAvailable,
+                                        tunnelSettings: .init(defaults: .shared))
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 

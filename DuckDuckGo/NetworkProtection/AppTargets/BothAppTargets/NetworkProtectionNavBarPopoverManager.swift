@@ -58,22 +58,32 @@ final class NetworkProtectionNavBarPopoverManager {
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
             )
 
-            let menuItems = [
-                NetworkProtectionStatusView.Model.MenuItem(name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
-                    let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                    await appLauncher.launchApp(withCommand: .showSettings)
-                }),
-                NetworkProtectionStatusView.Model.MenuItem(
-                    name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                    action: {
-                        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                        await appLauncher.launchApp(withCommand: .shareFeedback)
-                    })
-            ]
-
             let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
+            let tunnelSettings = TunnelSettings(defaults: .shared)
 
-            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
+            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter) {
+
+                var menuItems = [
+                    NetworkProtectionStatusView.Model.MenuItem(
+                        name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                        action: {
+                            let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                            await appLauncher.launchApp(withCommand: .shareFeedback)
+                        })
+                ]
+
+                if tunnelSettings.showVPNSettings {
+                    menuItems.insert(
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
+                                let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                                await appLauncher.launchApp(withCommand: .showSettings)
+                            }),
+                        at: 0)
+                }
+
+                return menuItems
+            }
             popover.delegate = delegate
 
             networkProtectionPopover = popover

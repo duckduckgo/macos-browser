@@ -116,6 +116,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     ///
     @MainActor
     private lazy var networkProtectionMenu: StatusBarMenu = {
+        makeStatusBarMenu()
+    }()
+
+    @MainActor
+    private func makeStatusBarMenu() -> StatusBarMenu {
         #if DEBUG
         let iconProvider = DebugMenuIconProvider()
         #elseif REVIEW
@@ -124,26 +129,38 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         let iconProvider = MenuIconProvider()
         #endif
 
-        let menuItems = [
-            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
-                await self?.appLauncher.launchApp(withCommand: .showSettings)
-            }),
-            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                await self?.appLauncher.launchApp(withCommand: .shareFeedback)
-            })
-        ]
-
         let onboardingStatusPublisher = UserDefaults.shared.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
+
+        let tunnelSettings = self.tunnelSettings
 
         return StatusBarMenu(
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
             controller: tunnelController,
-            iconProvider: iconProvider,
-            menuItems: menuItems)
-    }()
+            iconProvider: iconProvider) {
+                if tunnelSettings.showVPNSettings {
+                    return [
+                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
+                            await self?.appLauncher.launchApp(withCommand: .showSettings)
+                        }),
+                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                            await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                        })
+                    ]
+                } else {
+                    return [
+                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                            await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                        }),
+                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
+                            await self?.appLauncher.launchApp(withCommand: .justOpen)
+                        })
+                    ]
+                }
+            }
+    }
 
     @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {

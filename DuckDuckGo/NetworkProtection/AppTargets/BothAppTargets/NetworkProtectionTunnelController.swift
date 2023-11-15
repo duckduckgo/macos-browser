@@ -168,7 +168,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 .setSelectedServer,
                 .setSelectedEnvironment,
                 .setSelectedLocation,
-                .setShowInMenuBar:
+                .setShowInMenuBar,
+                .setShowVPNSettings:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
         }

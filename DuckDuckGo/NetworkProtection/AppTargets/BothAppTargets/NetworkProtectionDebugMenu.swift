@@ -37,6 +37,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let registrationKeyValidityMenu: NSMenu
     private let registrationKeyValidityAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setRegistrationKeyValidity))
 
+    private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
+    private let showVPNSettingsMenuItem = NSMenuItem(title: "Show in settings", action: #selector(NetworkProtectionDebugMenu.toggleShowVPNSettings))
+
     private let exclusionsMenu = NSMenu()
 
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
@@ -74,6 +77,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
                 .targetting(self)
+
             NSMenuItem.separator()
 
             connectOnLogInMenuItem
@@ -139,6 +143,17 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
                 .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
+
+            NSMenuItem(title: "VPN Settings") {
+                resetToDefaults
+                    .targetting(self)
+
+                NSMenuItem.separator()
+
+                showVPNSettingsMenuItem
+                    .targetting(self)
+            }
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Kill Switch (alternative approach)") {
@@ -202,6 +217,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 await NSAlert(error: error).runModal()
             }
         }
+    }
+
+    @objc func resetSettings(_ sender: Any?) {
+        settings.resetToDefaults()
     }
 
     /// Removes the system extension and agents for Network Protection.
@@ -290,6 +309,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
 
         NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)*/
+    }
+
+    @objc func toggleShowVPNSettings(_ sender: NSMenuItem) {
+        settings.showVPNSettings.toggle()
     }
 
     @objc func openAppContainerInFinder(_ sender: Any?) {
@@ -399,6 +422,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
         updateNetworkProtectionItems()
+
+        showVPNSettingsMenuItem.state = settings.showVPNSettings ? .on : .off
     }
 
     private func updateEnvironmentMenu() {

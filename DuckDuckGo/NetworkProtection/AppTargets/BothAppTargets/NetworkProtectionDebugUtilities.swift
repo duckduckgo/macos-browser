@@ -38,10 +38,15 @@ final class NetworkProtectionDebugUtilities {
 
     private let loginItemsManager: LoginItemsManager
 
+    // MARK: - Settings
+
+    private let settings: TunnelSettings
+
     // MARK: - Initializers
 
-    init(loginItemsManager: LoginItemsManager = .init()) {
+    init(loginItemsManager: LoginItemsManager = .init(), settings: TunnelSettings = .init(defaults: .shared)) {
         self.loginItemsManager = loginItemsManager
+        self.settings = settings
 
         let ipcClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId)
 
@@ -52,6 +57,7 @@ final class NetworkProtectionDebugUtilities {
     // MARK: - Debug commands for the extension
 
     func resetAllState(keepAuthToken: Bool) async throws {
+        settings.resetToDefaults()
         networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
 
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
