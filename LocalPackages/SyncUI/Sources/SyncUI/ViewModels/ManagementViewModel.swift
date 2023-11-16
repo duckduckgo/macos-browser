@@ -49,8 +49,6 @@ public protocol ManagementViewModel: ObservableObject {
     func manageBookmarks()
     func manageLogins()
 
-
-
     // NEW UI METHODS
 
     func syncWithAnotherDevicePressed()
@@ -61,4 +59,5 @@ public protocol ManagementViewModel: ObservableObject {
     func recoveryCodePasted(_ code: String)
     func copyRecoveryCode()
     func recoveryCodeNextPressed()
+    func copyCodeDesplayed()
 }

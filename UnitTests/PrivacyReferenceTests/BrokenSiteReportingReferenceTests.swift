@@ -32,8 +32,10 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
     private func makeURLRequest(with parameters: [String: String]) -> URLRequest {
         APIRequest.Headers.setUserAgent("")
+        var params = parameters
+        params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
-                                                     queryParameters: parameters,
+                                                     queryParameters: params,
                                                      allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters)
         return configuration.request
     }
@@ -63,7 +65,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            isGPCEnabled: test.gpcEnabled ?? false,
                                            ampURL: "",
                                            urlParametersRemoved: false,
-                                           protected: true,
+                                           protectionsState: test.protectionsEnabled,
                                            manufacturer: test.manufacturer ?? "")
 
             let request = makeURLRequest(with: breakage.requestParameters)
@@ -124,6 +126,7 @@ private struct Test: Codable {
     let exceptPlatforms: [String]
     let manufacturer, model, os: String?
     let gpcEnabled: Bool?
+    let protectionsEnabled: Bool
 }
 
 // MARK: - ExpectReportURLParam

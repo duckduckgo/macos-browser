@@ -118,6 +118,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             do {
                 try await syncService.disconnect()
                 managementDialogModel.endFlow()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 errorMessage = String(describing: error)
             }
@@ -277,6 +279,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             managementDialogModel.endFlow()
             do {
                 try await syncService.deleteAccount()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -386,7 +390,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                             for device in devices where device.name != thisDeviceName {
                                 syncedDevices.append(device)
                             }
-
                             self.onEndFlow()
                             presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: devices.count == 2))
                         }.store(in: &cancellables)
@@ -484,9 +487,20 @@ extension SyncPreferences {
     @MainActor
     func copyRecoveryCode() {
         guard let recoveryCode else { return }
+        copy(text: recoveryCode)
+    }
+
+    @MainActor
+    func copyCodeDesplayed() {
+        guard let codeToDisplay else { return }
+        copy(text: codeToDisplay)
+    }
+
+    @MainActor
+    private func copy(text: String) {
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.setString(recoveryCode, forType: .string)
+        pasteboard.setString(text, forType: .string)
     }
 
     @MainActor
@@ -496,8 +510,8 @@ extension SyncPreferences {
 
     private func showDevicedSynced() {
         Task { @MainActor in
-            guard let recoveryKey else { return }
-            let device = deviceInfo()
+//            guard let recoveryKey else { return }
+//            let device = deviceInfo()
 //            let knownDevices = Set(self.devices.map { $0.id })
             let syncedDevices = self.devices.filter { !$0.isCurrent }
             let isSingleDevice = syncedDevices.count == 0

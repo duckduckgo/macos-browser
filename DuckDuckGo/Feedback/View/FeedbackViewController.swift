@@ -307,7 +307,7 @@ final class FeedbackViewController: NSViewController {
             let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
             let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
             let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-            let protected = configuration.isFeature(.contentBlocking, enabledForDomain: currentTabUrl?.host)
+            let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTabUrl?.host)
 
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   description: browserFeedbackTextView.string,
@@ -320,7 +320,7 @@ final class FeedbackViewController: NSViewController {
                                                   isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                                   ampURL: ampURL,
                                                   urlParametersRemoved: urlParametersRemoved,
-                                                  protected: protected,
+                                                  protectionsState: protectionsState,
                                                   reportFlow: .native)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }

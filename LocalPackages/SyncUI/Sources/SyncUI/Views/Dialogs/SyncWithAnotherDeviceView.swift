@@ -26,9 +26,45 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
     let code: String
 
     @State private var selectedSegment = 0
+    @State private var showQRCode = true
 
     public init(code: String) {
         self.code = code
+    }
+
+    public var body: some View {
+        SyncDialog(spacing: 20.0) {
+            Image("Sync-Pair-96")
+            Text("Sync With Another Device").bold()
+                .font(Font.system(size: 17))
+            Text("Go to Settings › Sync in the DuckDuckGo Browser on a another device and select Sync with Another Device.")
+                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                .multilineTextAlignment(.center)
+            VStack(spacing: 20) {
+                pickerView()
+                if selectedSegment == 0 {
+                    if showQRCode {
+                        scanQRCodeView()
+                    } else {
+                        showTextCodeView()
+                    }
+                } else {
+                    enterCodeView()
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.top, 16)
+            .frame(width: 380, height: 332)
+            .roundedBorder()
+
+        }
+    buttons: {
+        Button(UserText.cancel) {
+            model.endDialogFlow()
+        }
+    }
+    .frame(width: 420)
+    .background(Color.white)
     }
 
     fileprivate func pickerView() -> some View {
@@ -70,66 +106,118 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
         .roundedBorder()
     }
 
-    public var body: some View {
-        SyncDialog(spacing: 20.0) {
-            Image("Sync-Pair-96x96")
-            Text("Sync With Another Device").bold()
-            Text("Go to Settings › Sync in the DuckDuckGo Browser on a another device and select Sync with Another Device.")
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                .multilineTextAlignment(.center)
-            VStack(spacing: 16.0) {
-                pickerView()
-                if selectedSegment == 0 {
-                    Text("Scan this QR code to connect with a mobile device.")
-                    QRCode(string: code, size: CGSize(width: 220, height: 220))
-                    HStack(spacing: 4) {
-                        Text("Desktop Users: ")
-                        HStack {
-                            Text("View Text Code")
-                                .fontWeight(.semibold)
-                            Image("Arrow-Circle-Right-12")
-                        }
-                        .foregroundColor(Color("LinkBlueColor"))
-                    }
-                    .frame(alignment: .center)
-                } else {
-                    Text("Enter the text code in the field below to connect")
-                    if recoveryCodeModel.recoveryCode.isEmpty {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(.white)
-                        }
-                        .frame(width: 284, height: 210)
-                    } else {
-                        Text(recoveryCodeModel.recoveryCode)
-                            .multilineTextAlignment(.center)
-                            .frame(width: 284, height: 210)
-                    }
-
-                    Button {
-                        recoveryCodeModel.paste()
-                        model.recoveryCodePasted(recoveryCodeModel.recoveryCode)
-                    } label: {
-                        HStack {
-                            Image("Paste")
-                            Text("Paste")
-                        }
-                    }
-                    .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
+    fileprivate func scanQRCodeView() -> some View {
+        return  Group {
+            Text("Scan this QR code to connect with a mobile device.")
+            QRCode(string: code, size: CGSize(width: 164, height: 164))
+            HStack(spacing: 4) {
+                Text("Desktop Users: ")
+                HStack {
+                    Text("View Text Code")
+                        .fontWeight(.semibold)
+                    Image("Arrow-Circle-Right-12")
+                }
+                .foregroundColor(Color("LinkBlueColor"))
+                .onTapGesture {
+                    showQRCode = false
                 }
             }
-            .frame(width: 380, height: 390)
-            .roundedBorder()
-
-        }
-    buttons: {
-        Button(UserText.cancel) {
-            model.endDialogFlow()
+            .frame(alignment: .center)
         }
     }
-    .frame(width: 420)
-    .background(Color.white)
+
+    fileprivate func enterCodeView() -> some View {
+        return Group {
+            Text("Enter the text code in the field below to connect")
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(.white)
+                    Text(recoveryCodeModel.recoveryCode)
+                        .font(
+                            Font.custom("SF Mono", size: 13)
+                                .weight(.medium)
+                        )
+                        .kerning(2)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(3)
+                        .padding(.horizontal)
+                }
+                .frame(
+                    width: 348,
+                    height: recoveryCodeModel.recoveryCode.isEmpty ? 32 : 120
+                )
+            Button {
+                recoveryCodeModel.paste()
+                model.recoveryCodePasted(recoveryCodeModel.recoveryCode)
+            } label: {
+                HStack {
+                    Image("Paste")
+                    Text("Paste")
+                }
+            }
+            .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
+        }
+    }
+
+    fileprivate func showTextCodeView() -> some View {
+        return Group {
+            VStack(spacing: 20) {
+                Text("Share this code to connect with a desktop machine.")
+                Text(code)
+                    .font(
+                    Font.custom("SF Mono", size: 13)
+                    .weight(.medium)
+                    )
+                    .kerning(2)
+                    .lineSpacing(5)
+                    .multilineTextAlignment(.center)
+                HStack(spacing: 10) {
+                    Button {
+                        shareContent(code)
+                    } label: {
+                        HStack {
+                            Image("Share")
+                            Text("Share")
+                        }
+                        .frame(width: 153, height: 28)
+                    }
+                    Button {
+                        model.copyCodeDesplayed()
+                    } label: {
+                        HStack {
+                            Image("Copy")
+                            Text("Copy")
+                        }
+                        .frame(width: 153, height: 28)
+                    }
+                }
+                .frame(width: 348, height: 32)
+                HStack(spacing: 4) {
+                    Text("Mobile Users: ")
+                    HStack {
+                        Text("View QR Code")
+                            .fontWeight(.semibold)
+                        Image("Arrow-Circle-Right-12")
+                    }
+                    .foregroundColor(Color("LinkBlueColor"))
+                    .onTapGesture {
+                        showQRCode = true
+                    }
+                }
+                .frame(alignment: .center)
+            }
+        }
+        .frame(width: 348)
+    }
+
+    private func shareContent(_ sharedText: String) {
+        guard let contentView = NSApp.keyWindow?.contentView else {
+            return
+        }
+        let sharingPicker = NSSharingServicePicker(items: [sharedText])
+
+        sharingPicker.show(relativeTo: contentView.frame, of: contentView, preferredEdge: .maxY)
     }
 }

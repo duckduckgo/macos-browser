@@ -95,14 +95,15 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertEqual(managementDialogModel.currentDialog, .removeDevice(device))
     }
 
-    @MainActor func testOnTurnOffSyncThenSyncServiceIsDisconnected() {
+
+    @MainActor func testOnTurnOffSyncThenSyncServiceIsDisconnected() async {
         let expectation = XCTestExpectation(description: "Disconnect completed")
         Task {
             syncPreferences.turnOffSync()
             XCTAssertNil(managementDialogModel.currentDialog)
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 5.0)
+        await fulfillment(of: [expectation], timeout: 5.0)
         XCTAssertTrue(ddgSyncing.disconnectCalled)
     }
 
@@ -211,6 +212,9 @@ struct MockRemoteConnecting: RemoteConnecting {
 }
 
 struct MockPersistor: AppearancePreferencesPersistor {
+
+    var homeButtonPosition: HomeButtonPosition = .hidden
+
     var showFullURL: Bool = false
 
     var showAutocompleteSuggestions: Bool = false
