@@ -69,8 +69,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - User Defaults
 
-    /// Test setting to exclude duckduckgo route from VPN
     /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
+    /// Test setting to exclude duckduckgo route from VPN
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionExcludedRoutes, defaultValue: [:])
     private(set) var excludedRoutesPreferences: [String: Bool]
@@ -492,7 +492,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     private func includedRoutes() -> [NetworkProtection.IPAddressRange] {
         []
     }
-
 
     /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
     @MainActor
