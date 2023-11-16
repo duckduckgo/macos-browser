@@ -215,7 +215,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             await showProgress(with: "Purchase in progress...")
 
-            // Hide after some time in case nothing happens
+            // Hide it after some time in case nothing happens
             /*
             DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
                 print("hiding it since nothing happened!")
@@ -223,68 +223,21 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
              */
 
-            await PurchaseManager.shared.restorePurchases()
-
-            guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return "" }
-            var externalID = await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation)
-
-            if externalID == "error" {
-                print("No past transactions or account or both?")
-
-                switch await AuthService.createAccount() {
-                case .success(let response):
-                    externalID = response.externalID
-                    externalID = await AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
-                case .failure(let error):
-                    print("Error: \(error)")
-                    return nil
-                }
-            }
-
-            guard externalID != "error" else {
-                print("still some error")
-                await hideProgress()
+            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id) {
+            case .success:
+                break
+            case .failure:
                 return nil
             }
 
-            // Has account purchase then
-            print("Has account \(externalID)")
+            await updateProgressTitle("Completing purchase...")
 
-            // rework to wrap and make a purchase with identifier
-            if let product = PurchaseManager.shared.availableProducts.first(where: { $0.id == subscriptionSelection.id }) {
-                let purchaseResult = await PurchaseManager.shared.purchase(product, customUUID: externalID)
+            await AppStorePurchaseFlow.checkForEntitlements(wait: 2.0, retry: 15)
 
-                if purchaseResult == "ok" {
-                    // purchase ok now wait for the entitlements
-                    await updateProgressTitle("Completing purchase...")
+            await hideProgress()
 
-                print("[Loop start]")
-                    var count = 0
-                    var hasEntitlements = false
-
-                    repeat {
-                        print("Attempt \(count)")
-                        let entitlements = await AccountManager().fetchEntitlements()
-                        hasEntitlements = !entitlements.isEmpty
-
-                        if !hasEntitlements {
-                            count += 1
-                            try await Task.sleep(seconds: 2)
-                        } else {
-                            print("Got entitlements!")
-                        }
-                    } while !hasEntitlements && count < 15
-                print("[Loop end]")
-
-                    // Done
-                    await hideProgress()
-                    DispatchQueue.main.async {
-                        self.pushAction(method: .onPurchaseUpdate, webView: message.webView!, params: PurchaseUpdate(type: "completed"))
-                    }
-                } else {
-                    print("Something went wrong, reason: \(purchaseResult)")
-                    await hideProgress()
-                }
+            DispatchQueue.main.async {
+                self.pushAction(method: .onPurchaseUpdate, webView: message.webView!, params: PurchaseUpdate(type: "completed"))
             }
         }
 
