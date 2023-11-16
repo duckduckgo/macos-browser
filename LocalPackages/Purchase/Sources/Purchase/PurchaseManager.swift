@@ -102,7 +102,7 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    public func fetchAvailableProducts() async -> [Product] {
+    func fetchAvailableProducts() async -> [Product] {
         print(" -- [PurchaseManager] fetchAvailableProducts()")
 
         do {
@@ -157,6 +157,11 @@ public final class PurchaseManager: ObservableObject {
 
         var transactions: [VerificationResult<Transaction>] = []
 
+
+//        if let result = await Transaction.latest(for: "subscription.1month") {
+//            transactions.append(result)
+//        }
+
         for await result in Transaction.all {
             transactions.append(result)
         }
@@ -167,46 +172,59 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    public func purchase(_ product: Product, customUUID: String) {
+    public func purchase(_ product: Product, customUUID: String) async -> String {
         print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(customUUID))")
 
         print("purchaseQueue append!")
         purchaseQueue.append(product.id)
 
-        Task {
-            print(" -- [PurchaseManager] starting await task")
+        print(" -- [PurchaseManager] starting purchase")
 
-            var options: Set<Product.PurchaseOption> = Set()
+        var options: Set<Product.PurchaseOption> = Set()
 
-            if let token = UUID(uuidString: customUUID) {
-                options.insert(.appAccountToken(token))
-            }
-
-            let result = try await product.purchase(options: options)
-
-            print(" -- [PurchaseManager] receiving await task result")
-            purchaseQueue.removeAll()
-            print("purchaseQueue removeAll!")
-
-            switch result {
-            case let .success(.verified(transaction)):
-                // Successful purchase
-                await transaction.finish()
-                await self.updatePurchasedProducts()
-            case let .success(.unverified(_, error)):
-                // Successful purchase but transaction/receipt can't be verified
-                // Could be a jailbroken phone
-                print("Error: \(error.localizedDescription)")
-            case .pending:
-                // Transaction waiting on SCA (Strong Customer Authentication) or
-                // approval from Ask to Buy
-                break
-            case .userCancelled:
-                break
-            @unknown default:
-                break
-            }
+        if let token = UUID(uuidString: customUUID) {
+            options.insert(.appAccountToken(token))
+        } else {
+            print("Wrong UUID")
+            return "error"
         }
+
+
+        let result: Product.PurchaseResult
+        do {
+            result = try await product.purchase(options: options)
+        } catch {
+            print("error \(error)")
+            return "error"
+        }
+
+        print(" -- [PurchaseManager] purchase complete")
+
+        purchaseQueue.removeAll()
+        print("purchaseQueue removeAll!")
+
+        switch result {
+        case let .success(.verified(transaction)):
+            // Successful purchase
+            await transaction.finish()
+            await self.updatePurchasedProducts()
+            return "ok"
+        case let .success(.unverified(_, error)):
+            // Successful purchase but transaction/receipt can't be verified
+            // Could be a jailbroken phone
+            print("Error: \(error.localizedDescription)")
+            return "error"
+        case .pending:
+            // Transaction waiting on SCA (Strong Customer Authentication) or
+            // approval from Ask to Buy
+            break
+        case .userCancelled:
+            return "cancelled"
+        @unknown default:
+            return "unknown"
+        }
+
+        return "unknown"
     }
 
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {

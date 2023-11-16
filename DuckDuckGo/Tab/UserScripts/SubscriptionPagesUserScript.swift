@@ -26,6 +26,8 @@ import Navigation
 import WebKit
 import UserScript
 import Account
+import Purchase
+import Subscription
 
 public extension Notification.Name {
     static let subscriptionPageCloseAndOpenPreferences = Notification.Name("com.duckduckgo.subscriptionPage.CloseAndOpenPreferences")
@@ -171,8 +173,19 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             let name: String
         }
 
-        let subscriptionOptions = [SubscriptionOption(id: "bundle_1", cost: .init(displayPrice: "$9.99", recurrence: "monthly")),
-                                   SubscriptionOption(id: "bundle_2", cost: .init(displayPrice: "$99.99", recurrence: "yearly"))]
+        let subscriptionOptions: [SubscriptionOption]
+
+        if #available(macOS 12.0, *) {
+            let monthly = PurchaseManager.shared.availableProducts.first(where: { $0.id.contains("1month") })
+            let yearly = PurchaseManager.shared.availableProducts.first(where: { $0.id.contains("1year") })
+
+            guard let monthly, let yearly else { return nil }
+
+            subscriptionOptions = [SubscriptionOption(id: monthly.id, cost: .init(displayPrice: monthly.displayPrice, recurrence: "monthly")),
+                                   SubscriptionOption(id: yearly.id, cost: .init(displayPrice: yearly.displayPrice, recurrence: "yearly"))]
+        } else {
+            return nil
+        }
 
         let message = SubscriptionOptions(platform: "macos",
                                           options: subscriptionOptions,
@@ -192,27 +205,112 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let message = original
 
-        guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
-            assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
-            return nil
-        }
-
-        print("Selected: \(subscriptionSelection.id)")
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            guard let webview = message.webView else {
-                print("No WebView")
-                return
+        if #available(macOS 12.0, *) {
+            guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
+                assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
+                return nil
             }
 
-//            self.broker?.push(method: "onPurchaseUpdate", params: PurchaseUpdate(type: "completed"), for: self, into: webview)
+            print("Selected: \(subscriptionSelection.id)")
 
-            print("Completed!")
-            self.pushAction(method: .onPurchaseUpdate, webView: original.webView!, params: PurchaseUpdate(type: "completed"))
+            await showProgress(with: "Purchase in progress...")
 
+            // Hide after some time in case nothing happens
+            /*
+            DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+                print("hiding it since nothing happened!")
+                self.hideProgress()
+            }
+             */
+
+            await PurchaseManager.shared.restorePurchases()
+
+            var externalID = await AccountManager().asyncSignInByRestoringPastPurchases()
+
+            if externalID == "error" {
+                print("No past transactions or account or both?")
+
+                switch await AuthService.createAccount() {
+                case .success(let response):
+                    AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
+                    externalID = response.externalID
+                case .failure(let error):
+                    print("Error: \(error)")
+                    return nil
+                }
+            }
+
+            guard externalID != "error" else {
+                print("still some error")
+                await hideProgress()
+                return nil
+            }
+
+            // Has account purchase then
+            print("Has account \(externalID)")
+
+            // rework to wrap and make a purchase with identifier
+            if let product = PurchaseManager.shared.availableProducts.first(where: { $0.id == subscriptionSelection.id }) {
+                let purchaseResult = await PurchaseManager.shared.purchase(product, customUUID: externalID)
+
+                if purchaseResult == "ok" {
+                    // purchase ok now wait for the entitlements
+                    await updateProgressTitle("Completing purchase...")
+
+                print("[Loop start]")
+                    var count = 0
+                    var hasEntitlements = false
+
+                    repeat {
+                        print("Attempt \(count)")
+                        let entitlements = await AccountManager().fetchEntitlements()
+                        hasEntitlements = !entitlements.isEmpty
+
+                        if !hasEntitlements {
+                            count += 1
+                            try await Task.sleep(seconds: 2)
+                        } else {
+                            print("Got entitlements!")
+                        }
+                    } while !hasEntitlements && count < 15
+                print("[Loop end]")
+
+                    // Done
+                    await hideProgress()
+                    DispatchQueue.main.async {
+                        self.pushAction(method: .onPurchaseUpdate, webView: original.webView!, params: PurchaseUpdate(type: "completed"))
+                    }
+                } else {
+                    print("Something went wrong, reason: \(purchaseResult)")
+                    await hideProgress()
+                }
+            }
         }
 
         return nil
+    }
+
+    private weak var purchaseInProgressViewController: PurchaseInProgressViewController?
+
+    @MainActor
+    private func showProgress(with title: String) {
+        guard purchaseInProgressViewController == nil else { return }
+        let progressVC = PurchaseInProgressViewController(title: title)
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(progressVC)
+        purchaseInProgressViewController = progressVC
+    }
+
+    @MainActor
+    private func updateProgressTitle(_ title: String) {
+        guard let purchaseInProgressViewController else { return }
+        purchaseInProgressViewController.updateTitleText(title)
+    }
+
+    @MainActor
+    private func hideProgress() {
+        guard let purchaseInProgressViewController else { return }
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(purchaseInProgressViewController)
+        self.purchaseInProgressViewController = nil
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -245,6 +343,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
 
+}
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: Double) async throws {
+        let duration = UInt64(seconds * 1_000_000_000)
+        try await Task.sleep(nanoseconds: duration)
+    }
 }
 
 #endif

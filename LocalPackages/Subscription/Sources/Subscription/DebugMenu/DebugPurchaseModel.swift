@@ -50,11 +50,11 @@ public final class DebugPurchaseModel: ObservableObject {
             }
 
             if let externalID {
-                manager.purchase(product, customUUID: externalID)
+                await manager.purchase(product, customUUID: externalID)
             } else {
                 switch await AuthService.createAccount() {
                 case .success(let response):
-                    manager.purchase(product, customUUID: response.externalID)
+                    await manager.purchase(product, customUUID: response.externalID)
                     AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
                 case .failure(let error):
                     print("Error: \(error)")

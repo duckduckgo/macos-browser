@@ -153,6 +153,20 @@ public class AccountManager {
         }
     }
 
+    public func fetchEntitlements() async -> [String] {
+        guard let accessToken else { return [] }
+
+        switch await AuthService.validateToken(accessToken: accessToken) {
+        case .success(let response):
+            let entitlements = response.account.entitlements
+            return entitlements.map { $0.name }
+
+        case .failure(let error):
+            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+            return []
+        }
+    }
+
     public func signInByRestoringPastPurchases() {
         if #available(macOS 12.0, *) {
             Task {
@@ -201,6 +215,57 @@ public class AccountManager {
                 os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
                 return
             }
+        }
+    }
+
+    public func asyncSignInByRestoringPastPurchases() async -> String {
+        if #available(macOS 12.0, *) {
+            // Fetch most recent purchase
+            guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else {
+                os_log("No transactions", log: .error)
+                return "error"
+            }
+
+            // Do the store login to get short-lived token
+            let authToken: String
+            switch await AuthService.storeLogin(signature: jwsRepresentation) {
+            case .success(let response):
+                authToken = response.authToken
+            case .failure(let error):
+                os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+                return "error"
+            }
+
+            storeAuthToken(token: authToken)
+            return await asyncExchangeTokensAndRefreshEntitlements(with: authToken)
+        }
+
+        return ""
+    }
+
+    public func asyncExchangeTokensAndRefreshEntitlements(with authToken: String) async -> String {
+        // Exchange short-lived auth token to a long-lived access token
+        let accessToken: String
+        switch await AuthService.getAccessToken(token: authToken) {
+        case .success(let response):
+            accessToken = response.accessToken
+        case .failure(let error):
+            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+            return "error"
+        }
+
+        // Fetch entitlements and account details and store the data
+        switch await AuthService.validateToken(accessToken: accessToken) {
+        case .success(let response):
+            self.storeAuthToken(token: authToken)
+            self.storeAccount(token: accessToken,
+                              email: response.account.email)
+
+            return response.account.externalID
+
+        case .failure(let error):
+            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+            return "error"
         }
     }
 }
