@@ -665,8 +665,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
         callsList.filter { $0 }.count > 0 // If one value is true. The database was called
     }
 
-    func save(_ profile: DataBrokerProtectionProfile) {
+    func save(_ profile: DataBrokerProtectionProfile) -> Bool {
         wasSaveProfileCalled = true
+
+        return true
     }
 
     func fetchProfile() -> DataBrokerProtectionProfile? {
