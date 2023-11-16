@@ -152,8 +152,11 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func restorePurchases(_ sender: Any?) {
-        Task {
-            await accountManager.signInByRestoringPastPurchases()
+        if #available(macOS 12.0, *) {
+            Task {
+                guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
+                _ = await accountManager.signInByRestoringPastPurchases(from: jwsRepresentation)
+            }
         }
     }
 

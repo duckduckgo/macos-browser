@@ -105,8 +105,11 @@ extension Preferences {
             })
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                Task {
-                    await AccountManager().signInByRestoringPastPurchases()
+                if #available(macOS 12.0, *) {
+                    Task {
+                        guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
+                        await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation)
+                    }
                 }
             }, openURLHandler: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)

@@ -225,7 +225,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             await PurchaseManager.shared.restorePurchases()
 
-            var externalID = await AccountManager().signInByRestoringPastPurchases()
+            guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return "" }
+            var externalID = await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation)
 
             if externalID == "error" {
                 print("No past transactions or account or both?")
