@@ -30,6 +30,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
     private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
     private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
+    private let waitlistBypassItem = NSMenuItem(title: "Bypass Waitlist", action: #selector(DataBrokerProtectionDebugMenu.toggleBypassWaitlist))
 
     init() {
         super.init(title: "Personal Information Removal")
@@ -46,6 +47,12 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
                 NSMenuItem(title: "Fetch Invite Code", action: #selector(DataBrokerProtectionDebugMenu.fetchInviteCode))
                     .targetting(self)
+
+                NSMenuItem.separator()
+
+                waitlistBypassItem
+                    .targetting(self)
+
                 NSMenuItem.separator()
 
                 waitlistTokenItem
@@ -74,6 +81,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
         os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)
+    }
+
+    @objc private func toggleBypassWaitlist() {
+        DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist.toggle()
     }
 
     @objc private func resetTermsAndConditionsAcceptance() {
@@ -111,6 +122,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
         let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
         waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
+
+        waitlistBypassItem.state = DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist ? .on : .off
     }
 }
 
