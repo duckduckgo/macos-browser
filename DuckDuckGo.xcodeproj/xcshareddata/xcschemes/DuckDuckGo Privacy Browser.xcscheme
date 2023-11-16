@@ -223,6 +223,7 @@
             key = "DYLD_FRAMEWORK_PATH"
             value = "$(SRCROOT)/../WebKit/WebKitBuild/Release"
             isEnabled = "YES">
+         </EnvironmentVariable>
          <EnvironmentVariable
             key = "OS_ACTIVITY_DT_MODE"
             value = "YES"
