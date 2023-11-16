@@ -1644,6 +1644,8 @@
 		371D00E129D8509400EC8598 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 371D00E029D8509400EC8598 /* OpenSSL */; };
 		372BC2A12A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
 		372BC2A22A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
+		372CF3652B06433D00546060 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37761866298E7AFB00772EFC /* WebKit.framework */; };
+		372CF3662B06434C00546060 /* emoji-substitution in Resources */ = {isa = PBXBuildFile; fileRef = 37CA73EF298D94220080C0FC /* emoji-substitution */; };
 		3739326529AE4B39009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326429AE4B39009346AE /* DDGSync */; };
 		3739326729AE4B42009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326629AE4B42009346AE /* DDGSync */; };
 		373A1AA8283ED1B900586521 /* BookmarkHTMLReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */; };
@@ -5113,6 +5115,7 @@
 				4B957BD72AC7AE700062CA31 /* NetworkProtection in Frameworks */,
 				4B957BD82AC7AE700062CA31 /* BrowserServicesKit in Frameworks */,
 				4B957BD92AC7AE700062CA31 /* Account in Frameworks */,
+				372CF3652B06433D00546060 /* WebKit.framework in Frameworks */,
 				4B957BDA2AC7AE700062CA31 /* Bookmarks in Frameworks */,
 				4B957BDB2AC7AE700062CA31 /* ContentBlocking in Frameworks */,
 				4B957BDC2AC7AE700062CA31 /* SwiftUIExtensions in Frameworks */,
@@ -9519,6 +9522,7 @@
 				4B957C1E2AC7AE700062CA31 /* Main.storyboard in Resources */,
 				4B957C1F2AC7AE700062CA31 /* social_images in Resources */,
 				4B957C202AC7AE700062CA31 /* shield-dot-mouse-over.json in Resources */,
+				372CF3662B06434C00546060 /* emoji-substitution in Resources */,
 				4B957C212AC7AE700062CA31 /* Localizable.stringsdict in Resources */,
 				4B957C222AC7AE700062CA31 /* fb-sdk.js in Resources */,
 				4B957C232AC7AE700062CA31 /* PasswordManager.storyboard in Resources */,
