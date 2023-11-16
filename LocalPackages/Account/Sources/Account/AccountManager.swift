@@ -55,7 +55,7 @@ public class AccountManager {
             return nil
         }
     }
-    
+
     public var accessToken: String? {
         do {
             return try storage.getAccessToken()
@@ -138,19 +138,7 @@ public class AccountManager {
     // MARK: -
 
     public func hasEntitlement(for name: String) async -> Bool {
-        guard let accessToken else { return false }
-
-        switch await AuthService.validateToken(accessToken: accessToken) {
-        case .success(let response):
-            let entitlements = response.account.entitlements
-            return entitlements.contains { entitlement in
-                entitlement.name == name
-            }
-
-        case .failure(let error):
-            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
-            return false
-        }
+        await fetchEntitlements().contains(name)
     }
 
     public func fetchEntitlements() async -> [String] {
@@ -167,58 +155,7 @@ public class AccountManager {
         }
     }
 
-    public func signInByRestoringPastPurchases() {
-        if #available(macOS 12.0, *) {
-            Task {
-                // Fetch most recent purchase
-                guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else {
-                    os_log("No transactions", log: .error)
-                    return
-                }
-
-                // Do the store login to get short-lived token
-                let authToken: String
-                switch await AuthService.storeLogin(signature: jwsRepresentation) {
-                case .success(let response):
-                    authToken = response.authToken
-                case .failure(let error):
-                    os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
-                    return
-                }
-
-                storeAuthToken(token: authToken)
-                exchangeTokensAndRefreshEntitlements(with: authToken)
-            }
-        }
-    }
-
-    public func exchangeTokensAndRefreshEntitlements(with authToken: String) {
-        Task {
-            // Exchange short-lived auth token to a long-lived access token
-            let accessToken: String
-            switch await AuthService.getAccessToken(token: authToken) {
-            case .success(let response):
-                accessToken = response.accessToken
-            case .failure(let error):
-                os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
-                return
-            }
-
-            // Fetch entitlements and account details and store the data
-            switch await AuthService.validateToken(accessToken: accessToken) {
-            case .success(let response):
-                self.storeAuthToken(token: authToken)
-                self.storeAccount(token: accessToken,
-                                  email: response.account.email)
-
-            case .failure(let error):
-                os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
-                return
-            }
-        }
-    }
-
-    public func asyncSignInByRestoringPastPurchases() async -> String {
+    public func signInByRestoringPastPurchases() async -> String {
         if #available(macOS 12.0, *) {
             // Fetch most recent purchase
             guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else {
@@ -237,13 +174,13 @@ public class AccountManager {
             }
 
             storeAuthToken(token: authToken)
-            return await asyncExchangeTokensAndRefreshEntitlements(with: authToken)
+            return await exchangeTokensAndRefreshEntitlements(with: authToken)
         }
 
         return ""
     }
 
-    public func asyncExchangeTokensAndRefreshEntitlements(with authToken: String) async -> String {
+    public func exchangeTokensAndRefreshEntitlements(with authToken: String) async -> String {
         // Exchange short-lived auth token to a long-lived access token
         let accessToken: String
         switch await AuthService.getAccessToken(token: authToken) {

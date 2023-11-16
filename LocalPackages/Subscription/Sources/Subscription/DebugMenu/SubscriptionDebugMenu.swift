@@ -106,7 +106,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func checkEntitlements() {
         Task {
             var results: [String] = []
-            
+
             for entitlementName in ["fake", "dummy1", "dummy2", "dummy3"] {
                 let result = await AccountManager().hasEntitlement(for: entitlementName)
                 let resultSummary = "Entitlement check for \(entitlementName): \(result)"
@@ -152,7 +152,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func restorePurchases(_ sender: Any?) {
-        accountManager.signInByRestoringPastPurchases()
+        Task {
+            await accountManager.signInByRestoringPastPurchases()
+        }
     }
 
     @objc

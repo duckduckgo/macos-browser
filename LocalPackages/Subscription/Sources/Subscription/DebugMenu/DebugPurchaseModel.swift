@@ -24,11 +24,13 @@ import Account
 @available(macOS 12.0, *)
 public final class DebugPurchaseModel: ObservableObject {
 
-    var manager: PurchaseManager
+    var purchaseManager: PurchaseManager
+    var accountManager: AccountManager = AccountManager()
+
     @Published var subscriptions: [SubscriptionRowModel]
 
     init(manager: PurchaseManager, subscriptions: [SubscriptionRowModel] = []) {
-        self.manager = manager
+        self.purchaseManager = manager
         self.subscriptions = subscriptions
     }
 
@@ -50,12 +52,12 @@ public final class DebugPurchaseModel: ObservableObject {
             }
 
             if let externalID {
-                await manager.purchase(product, customUUID: externalID)
+                _ = await purchaseManager.purchase(product, customUUID: externalID)
             } else {
                 switch await AuthService.createAccount() {
                 case .success(let response):
-                    await manager.purchase(product, customUUID: response.externalID)
-                    AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
+                    _ = await purchaseManager.purchase(product, customUUID: response.externalID)
+                    _ = await accountManager.exchangeTokensAndRefreshEntitlements(with: response.authToken)
                 case .failure(let error):
                     print("Error: \(error)")
                     return

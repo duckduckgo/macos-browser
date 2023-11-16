@@ -105,7 +105,9 @@ extension Preferences {
             })
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                AccountManager().signInByRestoringPastPurchases()
+                Task {
+                    await AccountManager().signInByRestoringPastPurchases()
+                }
             }, openURLHandler: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)
             }, goToSyncPreferences: {

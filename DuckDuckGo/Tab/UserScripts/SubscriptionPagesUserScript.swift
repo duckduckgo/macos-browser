@@ -130,7 +130,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 
-        AccountManager().exchangeTokensAndRefreshEntitlements(with: subscriptionValues.token)
+        _ = await AccountManager().exchangeTokensAndRefreshEntitlements(with: subscriptionValues.token)
         return nil
     }
 
@@ -225,15 +225,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             await PurchaseManager.shared.restorePurchases()
 
-            var externalID = await AccountManager().asyncSignInByRestoringPastPurchases()
+            var externalID = await AccountManager().signInByRestoringPastPurchases()
 
             if externalID == "error" {
                 print("No past transactions or account or both?")
 
                 switch await AuthService.createAccount() {
                 case .success(let response):
-                    AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
                     externalID = response.externalID
+                    externalID = await AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
                 case .failure(let error):
                     print("Error: \(error)")
                     return nil
@@ -278,7 +278,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     // Done
                     await hideProgress()
                     DispatchQueue.main.async {
-                        self.pushAction(method: .onPurchaseUpdate, webView: original.webView!, params: PurchaseUpdate(type: "completed"))
+                        self.pushAction(method: .onPurchaseUpdate, webView: message.webView!, params: PurchaseUpdate(type: "completed"))
                     }
                 } else {
                     print("Something went wrong, reason: \(purchaseResult)")
@@ -317,21 +317,21 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         print(">>> Selected to activate a subscription -- show the activation settings screen")
         return nil
     }
-    
+
     func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct FeatureSelection: Codable {
             let feature: String
         }
-        
+
         guard let featureSelection: FeatureSelection = DecodableHelper.decode(from: params) else {
             assertionFailure("SubscriptionPagesUserScript: expected JSON representation of FeatureSelection")
             return nil
         }
-        
+
         print(">>> Selected a feature -- show the corresponding UI", featureSelection)
         return nil
     }
-    
+
     enum SubscribeActionName: String {
         case onPurchaseUpdate
     }
