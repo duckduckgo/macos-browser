@@ -79,17 +79,12 @@ final class HomePageViewController: NSViewController {
 
         refreshModels()
 
-        let missingFaviconHandler = MissingFaviconHandler { [weak self] _ in
-            self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
-        }
-
         let rootView = HomePage.Views.RootView(isBurner: tabCollectionViewModel.isBurner)
             .environmentObject(favoritesModel)
             .environmentObject(defaultBrowserModel)
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
             .environmentObject(appearancePreferences)
-            .environmentObject(missingFaviconHandler)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()
@@ -205,6 +200,8 @@ final class HomePageViewController: NSViewController {
             self?.showAddEditController(for: bookmark)
         }, moveFavorite: { [weak self] (bookmark, index) in
             self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
+        }, onFaviconMissing: { [weak self] in
+            self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
     }
 

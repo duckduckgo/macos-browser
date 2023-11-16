@@ -19,23 +19,13 @@
 import SwiftUI
 import SwiftUIExtensions
 
-final class MissingFaviconHandler: ObservableObject {
-    static let noOp = MissingFaviconHandler(onFaviconMissing: { _ in })
-
-    init(onFaviconMissing: @escaping (URL) -> Void) {
-        self.onFaviconMissing = onFaviconMissing
-    }
-
-    let onFaviconMissing: (URL) -> Void
-}
-
 struct FaviconView: View {
 
     let faviconManagement: FaviconManagement = FaviconManager.shared
-    @EnvironmentObject var missingFaviconHandler: MissingFaviconHandler
 
     let url: URL?
     let size: CGFloat
+    let onFaviconMissing: (() -> Void)?
 
     var domain: String {
         url?.host ?? ""
@@ -44,9 +34,10 @@ struct FaviconView: View {
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(url: URL?, size: CGFloat = 32) {
+    init(url: URL?, size: CGFloat = 32, onFaviconMissing: (() -> Void)? = nil) {
         self.url = url
         self.size = size
+        self.onFaviconMissing = onFaviconMissing
     }
 
     @MainActor(unsafe)
@@ -62,7 +53,7 @@ struct FaviconView: View {
                 self.image = image
                 return
             }
-            missingFaviconHandler.onFaviconMissing(url)
+            onFaviconMissing?()
         }
 
         image = nil
