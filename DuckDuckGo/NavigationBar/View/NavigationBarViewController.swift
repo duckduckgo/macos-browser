@@ -662,6 +662,7 @@ final class NavigationBarViewController: NSViewController {
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[0])
                     navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[1])
                     homeButtonSeparator.heightAnchor.constraint(equalToConstant: Constants.homeButtonSeparatorHeight).isActive = true
+                    homeButtonSeparator.translatesAutoresizingMaskIntoConstraints = false
                     NSLayoutConstraint.activate([NSLayoutConstraint(item: homeButtonSeparator as Any,
                                                                         attribute: .centerY,
                                                                         relatedBy: .equal,
