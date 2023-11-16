@@ -38,7 +38,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let registrationKeyValidityAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setRegistrationKeyValidity))
 
     private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
-    private let showVPNSettingsMenuItem = NSMenuItem(title: "Show in settings", action: #selector(NetworkProtectionDebugMenu.toggleShowVPNSettings))
 
     private let exclusionsMenu = NSMenu()
 
@@ -66,17 +65,22 @@ final class NetworkProtectionDebugMenu: NSMenu {
         super.init(title: "Network Protection")
 
         buildItems {
-            NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
-                .targetting(self)
+            NSMenuItem(title: "Reset") {
+                NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
+                    .targetting(self)
 
-            NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
-                .targetting(self)
+                NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
+                    .targetting(self)
 
-            NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
-                .targetting(self)
+                resetToDefaults
+                    .targetting(self)
 
-            NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
-                .targetting(self)
+                NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
+                    .targetting(self)
+
+                NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
+                    .targetting(self)
+            }
 
             NSMenuItem.separator()
 
@@ -143,16 +147,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
                 .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
-
-            NSMenuItem(title: "VPN Settings") {
-                resetToDefaults
-                    .targetting(self)
-
-                NSMenuItem.separator()
-
-                showVPNSettingsMenuItem
-                    .targetting(self)
-            }
 
             NSMenuItem.separator()
 
@@ -311,10 +305,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)*/
     }
 
-    @objc func toggleShowVPNSettings(_ sender: NSMenuItem) {
-        settings.showVPNSettings.toggle()
-    }
-
     @objc func openAppContainerInFinder(_ sender: Any?) {
         let containerURL = URL.sandboxApplicationSupportURL
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
@@ -392,14 +382,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateExclusionsMenuItems() {
         exclusionsMenu.removeAllItems()
 
-        for item in settings.exclusionList {
+        for item in settings.excludedRoutes {
             let menuItem: NSMenuItem
             switch item {
             case .section(let title):
                 menuItem = NSMenuItem(title: title, action: nil, target: nil)
                 menuItem.isEnabled = false
 
-            case .exclusion(range: let range, description: let description, default: _):
+            case .range(let range, let description):
                 menuItem = NSMenuItem(title: "\(range)\(description != nil ? " (\(description!))" : "")",
                                       action: #selector(toggleExclusionAction),
                                       target: self,
@@ -422,8 +412,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
         updateNetworkProtectionItems()
-
-        showVPNSettingsMenuItem.state = settings.showVPNSettings ? .on : .off
     }
 
     private func updateEnvironmentMenu() {

@@ -65,22 +65,17 @@ final class NetworkProtectionNavBarPopoverManager {
 
                 var menuItems = [
                     NetworkProtectionStatusView.Model.MenuItem(
+                        name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
+                            let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                            await appLauncher.launchApp(withCommand: .showSettings)
+                        }),
+                    NetworkProtectionStatusView.Model.MenuItem(
                         name: UserText.networkProtectionNavBarStatusViewShareFeedback,
                         action: {
                             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
                             await appLauncher.launchApp(withCommand: .shareFeedback)
                         })
                 ]
-
-                if settings.showVPNSettings {
-                    menuItems.insert(
-                        NetworkProtectionStatusView.Model.MenuItem(
-                            name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
-                                let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                                await appLauncher.launchApp(withCommand: .showSettings)
-                            }),
-                        at: 0)
-                }
 
                 return menuItems
             }

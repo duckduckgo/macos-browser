@@ -25,8 +25,7 @@ final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
 
-    let model = PreferencesSidebarModel(includeDuckPlayer: DuckPlayer.shared.isAvailable,
-                                        settings: .init(defaults: .shared))
+    let model = PreferencesSidebarModel(includeDuckPlayer: DuckPlayer.shared.isAvailable)
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 

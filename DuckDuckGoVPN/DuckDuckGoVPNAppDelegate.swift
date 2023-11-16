@@ -140,25 +140,14 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             statusReporter: statusReporter,
             controller: tunnelController,
             iconProvider: iconProvider) {
-                if tunnelSettings.showVPNSettings {
-                    return [
-                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
-                            await self?.appLauncher.launchApp(withCommand: .showSettings)
-                        }),
-                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                            await self?.appLauncher.launchApp(withCommand: .shareFeedback)
-                        })
-                    ]
-                } else {
-                    return [
-                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                            await self?.appLauncher.launchApp(withCommand: .shareFeedback)
-                        }),
-                        StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                            await self?.appLauncher.launchApp(withCommand: .justOpen)
-                        })
-                    ]
-                }
+                [
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .showSettings)
+                    }),
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                    })
+                ]
             }
     }
 
