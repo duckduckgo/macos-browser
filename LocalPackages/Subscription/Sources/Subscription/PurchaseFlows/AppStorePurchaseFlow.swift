@@ -43,8 +43,9 @@ public final class AppStorePurchaseFlow {
 
         let externalID: String
 
-        // Try fetching most recent
+        // Check for past transactions most recent
         if let jwsRepresentation = await PurchaseManager.mostRecentTransaction() {
+            // Attempt sign in using purchase history
             switch await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation) {
             case .success(let existingExternalID):
                 externalID = existingExternalID
@@ -52,6 +53,7 @@ public final class AppStorePurchaseFlow {
                 return .failure(.authenticatingWithTransactionFailed)
             }
         } else {
+            // No history, create new account
             switch await AuthService.createAccount() {
             case .success(let response):
                 externalID = response.externalID
@@ -62,47 +64,30 @@ public final class AppStorePurchaseFlow {
         }
 
         // Make the purchase
-        switch await makePurchase(identifier, externalID: externalID) {
-        case true:
+        switch await PurchaseManager.shared.purchaseSubscription(with: identifier, externalID: externalID) {
+        case .success:
             return .success(())
-        case false:
+        case .failure(let error):
+            print("Something went wrong, reason: \(error)")
             return .failure(.purchaseUnsuccessful)
         }
     }
 
-    private static func makePurchase(_ identifier: String, externalID: String) async -> Bool {
-        // rework to wrap and make a purchase with identifier
-        if let product = PurchaseManager.shared.availableProducts.first(where: { $0.id == identifier }) {
-            let purchaseResult = await PurchaseManager.shared.purchase(product, customUUID: externalID)
-
-            if purchaseResult == "ok" {
-                return true
-            } else {
-                print("Something went wrong, reason: \(purchaseResult)")
-                return false
-            }
-        }
-
-        return false
-    }
-
     @discardableResult
-    public static func checkForEntitlements(wait second: Double, retry times: Int) async -> Bool {
+    public static func checkForEntitlements(wait waitTime: Double, retry retryCount: Int) async -> Bool {
         var count = 0
         var hasEntitlements = false
 
         repeat {
-            print("Attempt \(count)")
             hasEntitlements = await !AccountManager().fetchEntitlements().isEmpty
 
             if hasEntitlements {
-                print("Got entitlements!")
                 break
             } else {
                 count += 1
-                try? await Task.sleep(seconds: 2)
+                try? await Task.sleep(seconds: waitTime)
             }
-        } while !hasEntitlements && count < 15
+        } while !hasEntitlements && count < retryCount
 
         return hasEntitlements
     }

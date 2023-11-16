@@ -27,6 +27,16 @@ public enum StoreError: Error {
     case failedVerification
 }
 
+enum PurchaseManagerError: Error {
+    case productNotFound
+    case externalIDisNotAValidUUID
+    case purchaseFailed
+    case transactionCannotBeVerified
+    case transactionPendingAuthentication
+    case purchaseCancelledByUser
+    case unknownError
+}
+
 @available(macOS 12.0, *)
 public final class PurchaseManager: ObservableObject {
 
@@ -170,9 +180,14 @@ public final class PurchaseManager: ObservableObject {
         return transactions.first?.jwsRepresentation
     }
 
+
+
     @MainActor
-    public func purchase(_ product: Product, customUUID: String) async -> String {
-        print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(customUUID))")
+    public func purchaseSubscription(with identifier: String, externalID: String) async -> Result<Void, Error> {
+        
+        guard let product = availableProducts.first(where: { $0.id == identifier }) else { return .failure(PurchaseManagerError.productNotFound) }
+
+        print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(externalID))")
 
         print("purchaseQueue append!")
         purchaseQueue.append(product.id)
@@ -181,20 +196,19 @@ public final class PurchaseManager: ObservableObject {
 
         var options: Set<Product.PurchaseOption> = Set()
 
-        if let token = UUID(uuidString: customUUID) {
+        if let token = UUID(uuidString: externalID) {
             options.insert(.appAccountToken(token))
         } else {
             print("Wrong UUID")
-            return "error"
+            return .failure(PurchaseManagerError.externalIDisNotAValidUUID)
         }
-
 
         let result: Product.PurchaseResult
         do {
             result = try await product.purchase(options: options)
         } catch {
             print("error \(error)")
-            return "error"
+            return .failure(PurchaseManagerError.purchaseFailed)
         }
 
         print(" -- [PurchaseManager] purchase complete")
@@ -207,23 +221,21 @@ public final class PurchaseManager: ObservableObject {
             // Successful purchase
             await transaction.finish()
             await self.updatePurchasedProducts()
-            return "ok"
+            return .success(())
         case let .success(.unverified(_, error)):
             // Successful purchase but transaction/receipt can't be verified
             // Could be a jailbroken phone
             print("Error: \(error.localizedDescription)")
-            return "error"
+            return .failure(PurchaseManagerError.transactionCannotBeVerified)
         case .pending:
             // Transaction waiting on SCA (Strong Customer Authentication) or
             // approval from Ask to Buy
-            break
+            return .failure(PurchaseManagerError.transactionPendingAuthentication)
         case .userCancelled:
-            return "cancelled"
+            return .failure(PurchaseManagerError.purchaseCancelledByUser)
         @unknown default:
-            return "unknown"
+            return .failure(PurchaseManagerError.unknownError)
         }
-
-        return "unknown"
     }
 
     private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
