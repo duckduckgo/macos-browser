@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "075773533bfca9196115674d2ab1b085570854dd",
-        "version" : "84.0.1"
+        "branch" : "fcappelli/breakage_report_improvements",
+        "revision" : "279f27bb1f8d9b706c15e10cf516db3c08ef5eb6"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "b4ac92a444e79d5651930482623b9f6dc9265667",
-        "version" : "2.0.0"
+        "branch" : "shane/ios-form",
+        "revision" : "ad774518f25039ca46d3a7b94e4bf1288f5f581b"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
