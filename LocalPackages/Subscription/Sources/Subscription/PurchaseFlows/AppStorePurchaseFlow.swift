@@ -28,7 +28,7 @@ public final class AppStorePurchaseFlow {
         case appStoreAuthenticationFailed
         case authenticatingWithTransactionFailed
         case accountCreationFailed
-        case purchaseUnsuccessful
+        case purchaseFailed
         case somethingWentWrong
     }
 
@@ -58,7 +58,7 @@ public final class AppStorePurchaseFlow {
             case .success(let response):
                 externalID = response.externalID
                 await AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
-            case .failure(let error):
+            case .failure:
                 return .failure(.accountCreationFailed)
             }
         }
@@ -69,7 +69,7 @@ public final class AppStorePurchaseFlow {
             return .success(())
         case .failure(let error):
             print("Something went wrong, reason: \(error)")
-            return .failure(.purchaseUnsuccessful)
+            return .failure(.purchaseFailed)
         }
     }
 

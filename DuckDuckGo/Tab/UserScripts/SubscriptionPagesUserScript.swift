@@ -226,7 +226,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id) {
             case .success:
                 break
-            case .failure:
+            case .failure(let error):
+                print("Purchase failed: \(error)")
                 await hideProgress()
                 return nil
             }
