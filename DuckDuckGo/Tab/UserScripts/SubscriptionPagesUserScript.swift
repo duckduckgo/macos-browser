@@ -130,7 +130,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 
-        _ = await AccountManager().exchangeTokensAndRefreshEntitlements(with: subscriptionValues.token)
+        await AccountManager().exchangeTokensAndRefreshEntitlements(with: subscriptionValues.token)
         return nil
     }
 

@@ -161,11 +161,6 @@ public final class PurchaseManager: ObservableObject {
 
         var transactions: [VerificationResult<Transaction>] = []
 
-
-//        if let result = await Transaction.latest(for: "subscription.1month") {
-//            transactions.append(result)
-//        }
-
         for await result in Transaction.all {
             transactions.append(result)
         }

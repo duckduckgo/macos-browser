@@ -26,8 +26,8 @@ public final class AppStorePurchaseFlow {
 
     public enum Error: Swift.Error {
         case appStoreAuthenticationFailed
-        case noPastTransactions
-        case accountCreationUnsuccessful
+        case authenticatingWithTransactionFailed
+        case accountCreationFailed
         case purchaseUnsuccessful
         case somethingWentWrong
     }
@@ -41,8 +41,24 @@ public final class AppStorePurchaseFlow {
             return .failure(.appStoreAuthenticationFailed)
         }
 
-        // Get externalID from current account based on past purchases or create a new one
-        guard let externalID = await getUsersExternalID() else { return .failure(.accountCreationUnsuccessful) }
+        let externalID: String
+
+        // Try fetching most recent
+        if let jwsRepresentation = await PurchaseManager.mostRecentTransaction() {
+            switch await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation) {
+            case .success(let existingExternalID):
+                externalID = existingExternalID
+            case .failure:
+                return .failure(.authenticatingWithTransactionFailed)
+            }
+        } else {
+            switch await AuthService.createAccount() {
+            case .success(let response):
+                externalID = await AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
+            case .failure(let error):
+                return .failure(.accountCreationFailed)
+            }
+        }
 
         // Make the purchase
         switch await makePurchase(identifier, externalID: externalID) {
@@ -51,30 +67,6 @@ public final class AppStorePurchaseFlow {
         case false:
             return .failure(.purchaseUnsuccessful)
         }
-    }
-
-    private static func getUsersExternalID() async -> String? {
-        var externalID: String?
-
-        // Try fetching most recent
-        if let jwsRepresentation = await PurchaseManager.mostRecentTransaction() {
-            externalID = await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation)
-        }
-
-        if externalID == "error" {
-            print("No past transactions or account or both?")
-
-            switch await AuthService.createAccount() {
-            case .success(let response):
-                externalID = response.externalID
-                _ = await AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
-            case .failure(let error):
-                print("Error: \(error)")
-                externalID = nil
-            }
-        }
-
-        return externalID
     }
 
     private static func makePurchase(_ identifier: String, externalID: String) async -> Bool {
