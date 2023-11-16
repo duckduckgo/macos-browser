@@ -1034,9 +1034,9 @@ fileprivate extension BookmarkEntity {
     func update(with bookmark: Bookmark, favoritesFoldersToAddFavorite: [BookmarkEntity], favoritesDisplayMode: FavoritesDisplayMode) {
         url = bookmark.url
         title = bookmark.title
-        if bookmark.isFavorite {
+        if bookmark.isFavorite && Set(favoritesFoldersToAddFavorite) != favoriteFoldersSet {
             addToFavorites(folders: favoritesFoldersToAddFavorite)
-        } else {
+        } else if !bookmark.isFavorite && !favoriteFoldersSet.isEmpty {
             removeFromFavorites(with: favoritesDisplayMode)
         }
     }

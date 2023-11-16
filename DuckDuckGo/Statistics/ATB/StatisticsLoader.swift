@@ -53,8 +53,6 @@ final class StatisticsLoader {
                         completion()
                     }
                 }
-                PixelExperiment.fireDay21To27SerpPixel()
-                PixelExperiment.fireFirstSerpPixel()
                 Pixel.fire(.serp)
                 self.fireDailyOsVersionCounterPixel()
             } else if !self.statisticsStore.isAppRetentionFiredToday {
@@ -210,6 +208,7 @@ final class StatisticsLoader {
 
         if let updateVersion = atb.updateVersion {
             statisticsStore.atb = updateVersion
+            statisticsStore.variant = nil
         }
     }
 

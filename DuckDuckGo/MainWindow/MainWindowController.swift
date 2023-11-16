@@ -263,9 +263,9 @@ extension MainWindowController: NSWindowDelegate {
 
         // Unregistering triggers deinitialization of this object.
         // Because it's also the delegate, deinit within this method caused crash
-        DispatchQueue.main.async {
-            WindowControllersManager.shared.unregister(self)
-        }
+        // Push the Window Controller into current autorelease pool so it‘s released when the event loop pass ends
+        _=Unmanaged.passRetained(self).autorelease()
+        WindowControllersManager.shared.unregister(self)
     }
 
     func windowShouldClose(_ sender: NSWindow) -> Bool {

@@ -184,6 +184,7 @@ struct DataBrokerProtectionTermsAndConditionsContentView: View {
                 } else {
                     Text("• Our main Privacy Policy also applies here.")
                 }
+                Text("• This beta product may collect more diagnostic data than our typical products. Examples of such data include: alerts of low memory, application restarts, and user engagement with product features.")
             }
             .padding(.leading, groupLeadingPadding)
 
