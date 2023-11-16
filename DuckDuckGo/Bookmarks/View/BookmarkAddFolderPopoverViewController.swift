@@ -43,7 +43,7 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
         }
     }
 
-    var selectedFolderMenuItem: NSMenuItem? {
+    var currentBookmarkFolder: NSMenuItem? {
         let selectedFolderMenuItem = folderPickerPopUpButton.menu?.items.first(where: { menuItem in
             guard let folder = menuItem.representedObject as? BookmarkFolder else {
                 return false
@@ -60,7 +60,7 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
 
     @IBAction private func save(_ sender: NSButton) {
         let name = folderNameTextField.stringValue
-        let selectedFolder = selectedFolderMenuItem?.representedObject as? BookmarkFolder
+        let selectedFolder = folderPickerPopUpButton.selectedItem?.representedObject as? BookmarkFolder
         guard let currentBookmark = self.bookmark else { return }
 
         // Create the folder and then move the bookmark to it
@@ -86,7 +86,7 @@ final class BookmarkAddFolderPopoverViewController: NSViewController {
             return
         }
         folderPickerPopUpButton.menu?.items = menuItems
-        folderPickerPopUpButton.select(selectedFolderMenuItem ?? menuItems.first)
+        folderPickerPopUpButton.select(currentBookmarkFolder ?? menuItems.first)
     }
 
 }
