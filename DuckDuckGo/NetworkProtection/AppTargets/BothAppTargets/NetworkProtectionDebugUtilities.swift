@@ -40,11 +40,11 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Settings
 
-    private let settings: TunnelSettings
+    private let settings: VPNSettings
 
     // MARK: - Initializers
 
-    init(loginItemsManager: LoginItemsManager = .init(), settings: TunnelSettings = .init(defaults: .shared)) {
+    init(loginItemsManager: LoginItemsManager = .init(), settings: VPNSettings = .init(defaults: .shared)) {
         self.loginItemsManager = loginItemsManager
         self.settings = settings
 

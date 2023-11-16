@@ -59,7 +59,7 @@ final class NetworkProtectionNavBarPopoverManager {
             )
 
             let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
-            let tunnelSettings = TunnelSettings(defaults: .shared)
+            let settings = VPNSettings(defaults: .shared)
 
             let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter) {
 
@@ -72,7 +72,7 @@ final class NetworkProtectionNavBarPopoverManager {
                         })
                 ]
 
-                if tunnelSettings.showVPNSettings {
+                if settings.showVPNSettings {
                     menuItems.insert(
                         NetworkProtectionStatusView.Model.MenuItem(
                             name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {

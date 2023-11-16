@@ -37,23 +37,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - User Notifications
-
-    private static func makeNotificationsPresenter() -> NetworkProtectionNotificationsPresenter {
-#if NETP_SYSTEM_EXTENSION
-        return NetworkProtectionAgentNotificationsPresenter(notificationCenter: DistributedNotificationCenter.default())
-#else
-        let parentBundlePath = "../../../"
-        let mainAppURL: URL
-        if #available(macOS 13, *) {
-            mainAppURL = URL(filePath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        } else {
-            mainAppURL = URL(fileURLWithPath: parentBundlePath, relativeTo: Bundle.main.bundleURL)
-        }
-        return NetworkProtectionUNNotificationsPresenter(appLauncher: AppLauncher(appBundleURL: mainAppURL))
-#endif
-    }
-
     private let appLauncher: AppLaunching?
 
     // MARK: - Error Reporting
@@ -181,20 +164,27 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     @objc public init() {
         self.appLauncher = AppLauncher(appBundleURL: .mainAppBundleURL)
 
+#if NETP_SYSTEM_EXTENSION
+        let settings = VPNSettings(defaults: .standard)
+#else
+        let settings = VPNSettings(defaults: .shared)
+#endif
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
         let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: NetworkProtectionBundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
                                                              errorEvents: debugEvents)
+        let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
 
-        super.init(notificationsPresenter: Self.makeNotificationsPresenter(),
+        super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
                    keychainType: NetworkProtectionBundle.keychainType,
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
-                   providerEvents: Self.packetTunnelProviderEvents)
+                   providerEvents: Self.packetTunnelProviderEvents,
+                   settings: settings)
 
         observeConnectionStatusChanges()
         observeServerChanges()

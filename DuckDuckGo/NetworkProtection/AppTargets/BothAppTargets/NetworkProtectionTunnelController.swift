@@ -35,7 +35,7 @@ typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
-    let settings: TunnelSettings
+    let settings: VPNSettings
 
     // MARK: - Combine Cancellables
 
@@ -117,7 +117,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
-         settings: TunnelSettings,
+         settings: VPNSettings,
          notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
@@ -154,7 +154,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     /// The extension can also handle these changes so not everything needs to be handled here.
     ///
-    private func handleSettingsChange(_ change: TunnelSettings.Change) async throws {
+    private func handleSettingsChange(_ change: VPNSettings.Change) async throws {
         switch change {
         case .setIncludeAllNetworks(let includeAllNetworks):
             try await handleSetIncludeAllNetworks(includeAllNetworks)
@@ -203,7 +203,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         updateRoutes()
     }
 
-    private func relaySettingsChange(_ change: TunnelSettings.Change) async throws {
+    private func relaySettingsChange(_ change: VPNSettings.Change) async throws {
         guard await isConnected,
               let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
 

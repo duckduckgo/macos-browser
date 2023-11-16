@@ -183,7 +183,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Tunnel Settings
 
-    private let settings = TunnelSettings(defaults: .shared)
+    private let settings = VPNSettings(defaults: .shared)
 
     // MARK: - Debug Logic
 
@@ -253,7 +253,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func setSelectedServer(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedServer: TunnelSettings.SelectedServer
+        let selectedServer: VPNSettings.SelectedServer
 
         if title == "Automatic" {
             selectedServer = .automatic
@@ -589,7 +589,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     // MARK: Environment
     @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedEnvironment: TunnelSettings.SelectedEnvironment
+        let selectedEnvironment: VPNSettings.SelectedEnvironment
 
         if title == "Staging" {
             selectedEnvironment = .staging

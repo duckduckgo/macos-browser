@@ -26,13 +26,13 @@ final class VPNPreferencesModel: ObservableObject {
 
     @Published var connectOnLogin: Bool {
         didSet {
-            tunnelSettings.connectOnLogin = connectOnLogin
+            settings.connectOnLogin = connectOnLogin
         }
     }
 
     @Published var excludeLocalNetworks: Bool {
         didSet {
-            tunnelSettings.excludeLocalNetworks = excludeLocalNetworks
+            settings.excludeLocalNetworks = excludeLocalNetworks
         }
     }
 
@@ -40,25 +40,25 @@ final class VPNPreferencesModel: ObservableObject {
 
     @Published var showInMenuBar: Bool {
         didSet {
-            tunnelSettings.showInMenuBar = showInMenuBar
+            settings.showInMenuBar = showInMenuBar
         }
     }
 
     @Published var notifyStatusChanges: Bool {
         didSet {
-            tunnelSettings.notifyStatusChanges = notifyStatusChanges
+            settings.notifyStatusChanges = notifyStatusChanges
         }
     }
 
-    private let tunnelSettings: TunnelSettings
+    private let settings: VPNSettings
 
-    init(tunnelSettings: TunnelSettings = .init(defaults: .shared)) {
-        self.tunnelSettings = tunnelSettings
+    init(settings: VPNSettings = .init(defaults: .shared)) {
+        self.settings = settings
 
-        connectOnLogin = tunnelSettings.connectOnLogin
-        excludeLocalNetworks = tunnelSettings.excludeLocalNetworks
-        notifyStatusChanges = tunnelSettings.notifyStatusChanges
-        showInMenuBar = tunnelSettings.showInMenuBar
+        connectOnLogin = settings.connectOnLogin
+        excludeLocalNetworks = settings.excludeLocalNetworks
+        notifyStatusChanges = settings.notifyStatusChanges
+        showInMenuBar = settings.showInMenuBar
     }
 
     func uninstallVPN() {

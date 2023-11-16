@@ -68,7 +68,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
 #endif
 
-    private lazy var tunnelSettings = TunnelSettings(defaults: .shared)
+    private lazy var tunnelSettings = VPNSettings(defaults: .shared)
 
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,

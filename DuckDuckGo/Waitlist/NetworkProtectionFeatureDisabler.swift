@@ -34,14 +34,14 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     private let log: OSLog
     private let loginItemsManager: LoginItemsManager
     private let pinningManager: LocalPinningManager
-    private let settings: TunnelSettings
+    private let settings: VPNSettings
     private let userDefaults: UserDefaults
     private let ipcClient: TunnelControllerIPCClient
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
          userDefaults: UserDefaults = .shared,
-         settings: TunnelSettings = .init(defaults: .shared),
+         settings: VPNSettings = .init(defaults: .shared),
          ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId),
          log: OSLog = .networkProtection) {
 

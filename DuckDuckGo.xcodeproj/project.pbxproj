@@ -2975,6 +2975,8 @@
 		7BF1A9DC2AE0551C00FCA683 /* DBPUnitTests.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */; };
 		7BFCB74E2ADE7E1A00DA3EA7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BFCB74D2ADE7E1A00DA3EA7 /* PixelKit */; };
 		7BFCB7502ADE7E2300DA3EA7 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */; };
+		7BFD0B7F2B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFD0B7E2B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift */; };
+		7BFD0B802B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFD0B7E2B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift */; };
 		7BFE95522A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift */; };
 		7BFE95542A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */; };
 		7BFE95552A9DF2990081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */; };
@@ -4381,10 +4383,12 @@
 		7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkExtensionController.swift; sourceTree = "<group>"; };
 		7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainType+ClientDefault.swift"; sourceTree = "<group>"; };
 		7BD8679A2A9E9E000063B9F7 /* NetworkProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
+		7BD952562B06236200BCCB7A /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../../BrowserServicesKit; sourceTree = "<group>"; };
 		7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionDebugMenu.swift; sourceTree = "<group>"; };
 		7BEC182D2AD5D89C00D30536 /* SystemExtensionManager */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SystemExtensionManager; sourceTree = "<group>"; };
 		7BF1A9D72AE054D300FCA683 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7BF1A9DB2AE0551C00FCA683 /* DBPUnitTests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DBPUnitTests.xcconfig; sourceTree = "<group>"; };
+		7BFD0B7E2B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNotificationsPresenterFactory.swift; sourceTree = "<group>"; };
 		7BFE95512A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift; sourceTree = "<group>"; };
 		7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionWaitlist.swift"; sourceTree = "<group>"; };
 		85012B0129133F9F003D0DCC /* NavigationBarPopovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarPopovers.swift; sourceTree = "<group>"; };
@@ -5590,6 +5594,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
+				7BD952562B06236200BCCB7A /* BrowserServicesKit */,
 				1E862A852A9FBD7000F84D4B /* Account */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
@@ -5975,6 +5980,7 @@
 			isa = PBXGroup;
 			children = (
 				EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */,
+				7BFD0B7E2B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift */,
 			);
 			path = NetworkExtensionTargets;
 			sourceTree = "<group>";
@@ -11717,6 +11723,7 @@
 				4BF0E50B2AD2552200FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B2537782A11C00F00610219 /* NetworkProtectionExtensionMachService.swift in Sources */,
 				B65DA5F32A77D3C700CBEE8D /* UserDefaultsWrapper.swift in Sources */,
+				7BFD0B802B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift in Sources */,
 				4B2537722A11BF8B00610219 /* main.swift in Sources */,
 				EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */,
 				4B2D06292A11C0C900DE1F49 /* NetworkProtectionBundle.swift in Sources */,
@@ -11819,6 +11826,7 @@
 				EEF12E6E2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */,
 				4BF0E50C2AD2552300FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B4D60AC2A0C804B00BCD287 /* OptionalExtension.swift in Sources */,
+				7BFD0B7F2B06261F00727D35 /* NetworkProtectionNotificationsPresenterFactory.swift in Sources */,
 				B6F92BA72A691A44002ABA6B /* NetworkProtectionUserDefaultsConstants.swift in Sources */,
 				B65DA5F22A77D3C600CBEE8D /* UserDefaultsWrapper.swift in Sources */,
 				EEAD7A7A2A1D3E20002A24E7 /* AppLauncher.swift in Sources */,
@@ -14457,7 +14465,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = d1784c9240204ece3349e8cd65b621876653c4d0;
+				revision = 299e73ed6c9dc83f2b3935c4ba5d230cbb4e5489;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

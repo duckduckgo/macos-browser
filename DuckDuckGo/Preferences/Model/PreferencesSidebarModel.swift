@@ -56,9 +56,9 @@ final class PreferencesSidebarModel: ObservableObject {
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         includeDuckPlayer: Bool,
-        tunnelSettings: TunnelSettings
+        settings: VPNSettings
     ) {
-        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPNSettings: tunnelSettings.showVPNSettings) },
+        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPNSettings: settings.showVPNSettings) },
                   tabSwitcherTabs: tabSwitcherTabs,
                   privacyConfigurationManager: privacyConfigurationManager)
     }
