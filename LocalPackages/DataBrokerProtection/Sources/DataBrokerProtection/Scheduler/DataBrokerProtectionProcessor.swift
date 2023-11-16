@@ -30,20 +30,20 @@ final class DataBrokerProtectionProcessor {
     private let operationRunnerProvider: OperationRunnerProvider
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
-    private var errorHandler: EventMapping<DataBrokerProtectionOperationError>?
+    private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         errorHandler: EventMapping<DataBrokerProtectionOperationError>? = nil) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
 
         self.database = database
         self.config = config
         self.operationRunnerProvider = operationRunnerProvider
         self.notificationCenter = notificationCenter
         self.operationQueue = OperationQueue()
-        self.errorHandler = errorHandler
+        self.pixelHandler = pixelHandler
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
     }
 
@@ -55,7 +55,13 @@ final class DataBrokerProtectionProcessor {
                       showWebView: showWebView) {
             os_log("Scans done", log: .dataBrokerProtection)
             completion?()
+            self.calculateMisMatches()
         }
+    }
+
+    private func calculateMisMatches() {
+        let mismatchUseCase = MismatchCalculatorUseCase(database: database, pixelHandler: pixelHandler)
+        mismatchUseCase.calculateMismatches()
     }
 
     func runAllOptOutOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
@@ -63,7 +69,7 @@ final class DataBrokerProtectionProcessor {
         runOperations(operationType: .optOut,
                       priorityDate: nil,
                       showWebView: showWebView) {
-            os_log("Scans done", log: .dataBrokerProtection)
+            os_log("Optouts done", log: .dataBrokerProtection)
             completion?()
         }
     }
@@ -103,8 +109,7 @@ final class DataBrokerProtectionProcessor {
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()
         }
 
-        let profileId: Int64 = 1 // We assume one profile for now
-        let brokersProfileData = database.fetchAllBrokerProfileQueryData(for: profileId)
+        let brokersProfileData = database.fetchAllBrokerProfileQueryData()
         let dataBrokerOperationCollections = createDataBrokerOperationCollections(from: brokersProfileData,
                                                                                   operationType: operationType,
                                                                                   priorityDate: priorityDate,
@@ -139,7 +144,7 @@ final class DataBrokerProtectionProcessor {
                                                                 priorityDate: priorityDate,
                                                                 notificationCenter: notificationCenter,
                                                                 runner: operationRunnerProvider.getOperationRunner(),
-                                                                errorHandler: errorHandler,
+                                                                pixelHandler: pixelHandler,
                                                                 showWebView: showWebView)
                 collections.append(collection)
 
@@ -148,5 +153,9 @@ final class DataBrokerProtectionProcessor {
         }
 
         return collections
+    }
+
+    deinit {
+        os_log("Deinit DataBrokerProtectionProcessor", log: .dataBrokerProtection)
     }
 }

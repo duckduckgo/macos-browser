@@ -89,18 +89,16 @@ final class HomePageViewController: NSViewController {
 
         subscribeToBookmarks()
         subscribeToBurningData()
+    }
 
-        // Temporary pixel for first time user sees the new tab
-        if Pixel.isNewUser {
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        if Pixel.isNewUser && OnboardingViewModel().onboardingFinished {
             let repetition = Pixel.Event.Repetition(key: Pixel.Event.newTabInitial.name)
             if repetition == .initial {
                 Pixel.fire(.newTabInitial)
             }
         }
-    }
-
-    override func viewWillAppear() {
-        super.viewWillAppear()
 
         subscribeToHistory()
     }
@@ -130,7 +128,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func refreshModels() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
@@ -145,7 +143,23 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor())
+#if NETWORK_PROTECTION
+        let vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: tabCollectionViewModel,
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
+            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging()
+        )
+#else
+        let vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: tabCollectionViewModel,
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        )
+#endif
+
         vm.delegate = self
         return vm
     }

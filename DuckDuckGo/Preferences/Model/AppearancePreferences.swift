@@ -18,17 +18,21 @@
 
 import Foundation
 import AppKit
+import Bookmarks
+import Common
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
     var defaultPageZoom: CGFloat { get set }
+    var favoritesDisplayMode: String? { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
     var isRecentActivityVisible: Bool { get set }
     var showBookmarksBar: Bool { get set }
     var bookmarksBarAppearance: BookmarksBarAppearance { get set }
+    var homeButtonPosition: HomeButtonPosition { get set }
 }
 
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
@@ -43,6 +47,9 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
     var defaultPageZoom: CGFloat
+
+    @UserDefaultsWrapper(key: .favoritesDisplayMode, defaultValue: FavoritesDisplayMode.displayNative(.desktop).description)
+    var favoritesDisplayMode: String?
 
     @UserDefaultsWrapper(key: .homePageIsFavoriteVisible, defaultValue: true)
     var isFavoriteVisible: Bool
@@ -67,6 +74,15 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
             bookmarksBarValue = newValue.rawValue
         }
     }
+
+    @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
+    var homeButtonPosition: HomeButtonPosition
+}
+
+enum HomeButtonPosition: String, CaseIterable {
+    case hidden
+    case left
+    case right
 }
 
 enum DefaultZoomValue: CGFloat, CaseIterable {
@@ -129,6 +145,21 @@ enum ThemeName: String, Equatable, CaseIterable {
     }
 }
 
+extension FavoritesDisplayMode: LosslessStringConvertible {
+    static let `default` = FavoritesDisplayMode.displayNative(.desktop)
+
+    public init?(_ description: String) {
+        switch description {
+        case FavoritesDisplayMode.displayNative(.desktop).description:
+            self = .displayNative(.desktop)
+        case FavoritesDisplayMode.displayUnified(native: .desktop).description:
+            self = .displayUnified(native: .desktop)
+        default:
+            return nil
+        }
+    }
+}
+
 final class AppearancePreferences: ObservableObject {
 
     struct Notifications {
@@ -153,6 +184,12 @@ final class AppearancePreferences: ObservableObject {
     @Published var showAutocompleteSuggestions: Bool {
         didSet {
             persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
+        }
+    }
+
+    @Published var favoritesDisplayMode: FavoritesDisplayMode {
+        didSet {
+            persistor.favoritesDisplayMode = favoritesDisplayMode.description
         }
     }
 
@@ -204,6 +241,20 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var homeButtonPosition: HomeButtonPosition {
+        didSet {
+            persistor.homeButtonPosition = homeButtonPosition
+            switch homeButtonPosition {
+            case .hidden:
+                Pixel.fire(.homeButtonHidden)
+            case .left:
+                Pixel.fire(.homeButtonLeft)
+            case .right:
+                Pixel.fire(.homeButtonRight)
+            }
+        }
+    }
+
     var isContinueSetUpAvailable: Bool {
         let privacyConfig = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig
         return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp)
@@ -218,13 +269,25 @@ final class AppearancePreferences: ObservableObject {
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
         showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
+        favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
         defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
+        homeButtonPosition = persistor.homeButtonPosition
     }
 
     private var persistor: AppearancePreferencesPersistor
+
+    private func requestSync() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            syncService.scheduler.notifyDataChanged()
+        }
+    }
 }

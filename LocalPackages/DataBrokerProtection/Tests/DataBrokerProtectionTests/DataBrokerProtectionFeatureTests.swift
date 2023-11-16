@@ -111,6 +111,7 @@ final class MockCSSCommunicationDelegate: CCFCommunicationDelegate {
     var profiles: [ExtractedProfile]?
     var url: URL?
     var captchaInfo: GetCaptchaInfoResponse?
+    var solveCaptchaResponse: SolveCaptchaResponse?
     var successActionId: String?
 
     func loadURL(url: URL) {
@@ -133,11 +134,16 @@ final class MockCSSCommunicationDelegate: CCFCommunicationDelegate {
         self.lastError = error
     }
 
+    func solveCaptcha(with response: SolveCaptchaResponse) async {
+        self.solveCaptchaResponse = response
+    }
+
     func reset() {
         lastError = nil
         profiles = nil
         url = nil
         successActionId = nil
         captchaInfo = nil
+        solveCaptchaResponse = nil
     }
 }

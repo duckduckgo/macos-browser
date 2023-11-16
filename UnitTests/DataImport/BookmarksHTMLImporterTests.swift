@@ -72,26 +72,6 @@ final class BookmarksHTMLImporterTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func testWhenValidBookmarksFileIsLoadedButImporterThrowsAnErrorThenBookmarksImportReturnsFailure() {
-        let completionExpectation = expectation(description: "Import Bookmarks Completion")
-
-        underlyingBookmarkImporter.throwableError = BookmarkImportErrorMock()
-
-        dataImporter = .init(fileURL: bookmarksFileURL("bookmarks_safari.html"), bookmarkImporter: underlyingBookmarkImporter)
-
-        dataImporter.importData(types: [.bookmarks], from: nil) { result in
-            switch result {
-            case .success:
-                XCTFail("unexpected import success")
-            case let .failure(error):
-                XCTAssertEqual(error.errorType, .cannotAccessCoreData)
-            }
-            completionExpectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 1)
-    }
-
     func testWhenInvalidBookmarksFileIsLoadedThenBookmarksImportReturnsFailure() {
         let completionExpectation = expectation(description: "Import Bookmarks Completion")
         let expectedImportResult = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
@@ -105,10 +85,11 @@ final class BookmarksHTMLImporterTests: XCTestCase {
 
         dataImporter.importData(types: [.bookmarks], from: nil) { result in
             switch result {
-            case .success:
-                XCTFail("unexpected import success")
-            case let .failure(error):
-                XCTAssertEqual(error.errorType, .cannotReadFile)
+            case let .failure(error as BookmarkHTMLReader.ImportError):
+                XCTAssertEqual(error.type, .parseXml)
+                XCTAssertEqual((error.underlyingError as NSError?)?.domain, XMLParser.errorDomain)
+            default:
+                XCTFail("unexpected \(result)")
             }
             completionExpectation.fulfill()
         }

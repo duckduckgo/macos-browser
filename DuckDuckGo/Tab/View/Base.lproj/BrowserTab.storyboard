@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21699.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="D9y-55-iLO">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="D9y-55-iLO">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21699.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -9,8 +9,8 @@
         <!--Browser Tab View Controller-->
         <scene sceneID="qRm-AW-AdQ">
             <objects>
-                <viewController id="D9y-55-iLO" customClass="BrowserTabViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="aev-t9-Epw" customClass="BrowserTabView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                <viewController id="D9y-55-iLO" customClass="BrowserTabViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="aev-t9-Epw" customClass="BrowserTabView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="513" height="492"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -20,10 +20,10 @@
                                     <segue destination="fQy-ie-1zy" kind="embed" destinationCreationSelector="createHomePageViewController:" id="XdA-0x-M1n"/>
                                 </connections>
                             </containerView>
-                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="513" height="492"/>
                                 <subviews>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
                                         <rect key="frame" x="141" y="253" width="232" height="17"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can’t load this page." id="W60-yd-bv3">
                                             <font key="font" metaFont="systemSemibold" size="14"/>
@@ -31,7 +31,7 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField horizontalHuggingPriority="351" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
+                                    <textField focusRingType="none" horizontalHuggingPriority="351" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
                                         <rect key="frame" x="157" y="229" width="199" height="16"/>
                                         <textFieldCell key="cell" title="An unknown error has occurred." id="rLZ-IC-OXf">
                                             <font key="font" metaFont="system"/>
@@ -54,10 +54,10 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="TI8-MI-JdM" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="TI8-MI-JdM" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="-2" y="-4" width="139" height="31"/>
                                 <subviews>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v5b-uq-Sj6">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="v5b-uq-Sj6">
                                         <rect key="frame" x="10" y="10" width="123" height="15"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="https://example.com/" id="V9k-YC-WHR">
                                             <font key="font" metaFont="cellTitle"/>

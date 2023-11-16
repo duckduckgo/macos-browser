@@ -40,9 +40,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     init(windowControllerManager: WindowControllersManagerProtocol) {
         self.windowControllerManager = windowControllerManager
 
-        guard !NSApp.isRunningUnitTests else {
-            return
-        }
+        guard NSApp.runType.requiresEnvironment else { return }
         subscribeToWindowControllersManager()
     }
 
@@ -110,7 +108,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func cacheWindowContent(mainWindowController: MainWindowController) {
         let tabCollection = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection
         guard let first = tabCollection.tabs.first,
-              (!first.isContentEmpty || tabCollection.tabs.count > 1),
+              !first.isContentEmpty || tabCollection.tabs.count > 1,
               !mainWindowController.mainViewController.tabCollectionViewModel.isBurner else {
             // Don't cache empty window and burner windows
             return

@@ -65,27 +65,20 @@ struct DBPUISetState: Codable {
     let state: DBPUIState
 }
 
-/// Enum representing possible scan and opt out states
-enum DBPUIScanAndOptOutStatus: String, Codable {
-    case notRunning
-    case quickScan
-    case noProfileMatch
-    case removingProfile
-    case complete
-}
-
 /// Message Object representing a user profile name
 struct DBPUIUserProfileName: Codable {
     let first: String
-    let middle: String
+    let middle: String?
     let last: String
+    let suffix: String?
 }
 
 /// Message Object representing a user profile address
 struct DBPUIUserProfileAddress: Codable {
-    let street: String
+    let street: String?
     let city: String
     let state: String
+    let zipCode: String?
 }
 
 /// Message Object representing a user profile containing one or more names and addresses
@@ -102,9 +95,23 @@ struct DBPUIIndex: Codable {
     let index: Int
 }
 
+struct DBPUINameAtIndex: Codable {
+    let index: Int
+    let name: DBPUIUserProfileName
+}
+
+struct DBPUIAddressAtIndex: Codable {
+    let index: Int
+    let address: DBPUIUserProfileAddress
+}
+
 /// Message Object representing a data broker
-struct DBPUIDataBroker: Codable {
+struct DBPUIDataBroker: Codable, Hashable {
     let name: String
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+    }
 }
 
 /// Message Object representing a requested change to the user profile's brith year
@@ -117,8 +124,10 @@ struct DBPUIBirthYear: Codable {
 /// and addresses that were matched
 struct DBPUIDataBrokerProfileMatch: Codable {
     let dataBroker: DBPUIDataBroker
-    let names: [DBPUIUserProfileName]
+    let name: String
     let addresses: [DBPUIUserProfileAddress]
+    let alternativeNames: [String]
+    let relatives: [String]
 }
 
 /// Protocol to represent a message that can be passed from the host to the UI
@@ -129,9 +138,49 @@ struct DBPUIWebSetState: DBPUISendableMessage {
     let state: DBPUIState
 }
 
-/// Message representing the state of any scans and opt outs
-struct ScanAndOptOutState: DBPUISendableMessage {
-    let status: DBPUIScanAndOptOutStatus
+/// Message representing the state of any scans and opt outs without state and grouping removed profiles by broker
+struct DBPUIScanAndOptOutMaintenanceState: DBPUISendableMessage {
     let inProgressOptOuts: [DBPUIDataBrokerProfileMatch]
-    let completedOptOuts: [DBPUIDataBrokerProfileMatch]
+    let completedOptOuts: [DBPUIOptOutMatch]
+    let scanSchedule: DBPUIScanSchedule
+    let scanHistory: DBPUIScanHistory
+}
+
+struct DBPUIOptOutMatch: DBPUISendableMessage {
+    let dataBroker: DBPUIDataBroker
+    let matches: Int
+}
+
+/// Data representing the initial scan progress
+struct DBPUIScanProgress: DBPUISendableMessage {
+    let currentScans: Int
+    let totalScans: Int
+}
+
+/// Data to represent the intial scan state
+/// It will show the current scans + total, and the results found
+struct DBPUIInitialScanState: DBPUISendableMessage {
+    let resultsFound: [DBPUIDataBrokerProfileMatch]
+    let scanProgress: DBPUIScanProgress
+}
+
+struct DBUIScanDate: DBPUISendableMessage {
+    let date: Double
+    let dataBrokers: [DBPUIDataBroker]
+}
+
+struct DBPUIScanSchedule: DBPUISendableMessage {
+    let lastScan: DBUIScanDate
+    let nextScan: DBUIScanDate
+}
+
+struct DBPUIScanHistory: DBPUISendableMessage {
+    let sitesScanned: Int
+}
+
+extension DBPUIInitialScanState {
+    static var empty: DBPUIInitialScanState {
+        .init(resultsFound: [DBPUIDataBrokerProfileMatch](),
+              scanProgress: DBPUIScanProgress(currentScans: 0, totalScans: 0))
+    }
 }

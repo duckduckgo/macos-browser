@@ -21,6 +21,11 @@ import BrowserServicesKit
 import Common
 import Foundation
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+import NetworkProtectionUI
+#endif
+
 extension HomePage.Models {
 
     static let newHomePageTabOpen = Notification.Name("newHomePageAppOpen")
@@ -34,10 +39,14 @@ extension HomePage.Models {
         let itemsRowCountWhenCollapsed = HomePage.featureRowCountWhenCollapsed
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
-        let privacyConfig: PrivacyConfiguration
+        let privacyConfigurationManager: PrivacyConfigurationManaging
+
+#if NETWORK_PROTECTION
+        let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
+#endif
 
         var isDay0SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
             if let day0SurveyString =  newTabContinueSetUpSettings["surveyCardDay0"] as? String {
                 if day0SurveyString == "enabled" {
                     return true
@@ -46,7 +55,7 @@ extension HomePage.Models {
             return false
         }
         var isDay7SurveyEnabled: Bool {
-            let newTabContinueSetUpSettings = privacyConfig.settings(for: .newTabContinueSetUp)
+            let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
             if let day7SurveyString =  newTabContinueSetUpSettings["surveyCardDay7"] as? String {
                 if day7SurveyString == "enabled" {
                     return true
@@ -55,7 +64,7 @@ extension HomePage.Models {
             return false
         }
         var duckPlayerURL: String {
-            let duckPlayerSettings = privacyConfig.settings(for: .duckPlayer)
+            let duckPlayerSettings = privacyConfigurationManager.privacyConfig.settings(for: .duckPlayer)
             return duckPlayerSettings["tryDuckPlayerLink"] as? String ?? "https://www.youtube.com/watch?v=yKWIA-Pys4c"
         }
         var day0SurveyURL: String = "https://selfserve.decipherinc.com/survey/selfserve/32ab/230701?list=1"
@@ -103,14 +112,14 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
         private var shouldShowSurveyDay7: Bool
 
-        @UserDefaultsWrapper(key: .homePageShowNetworkProtectionBetaEndedNotice, defaultValue: true)
-        private var shouldShowNetworkProtectionBetaEndedNotice: Bool
-
         @UserDefaultsWrapper(key: .homePageIsFirstSession, defaultValue: true)
         private var isFirstSession: Bool
 
         @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
         private var firstLaunchDate: Date
+
+        @UserDefaultsWrapper(key: .shouldShowNetworkProtectionSystemExtensionUpgradePrompt, defaultValue: true)
+        private var shouldShowNetworkProtectionSystemExtensionUpgradePrompt: Bool
 
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
@@ -122,7 +131,7 @@ extension HomePage.Models {
 
         lazy var statisticsStore: StatisticsStore = LocalStatisticsStore()
 
-        lazy var listOfFeatures = isFirstSession ? FeatureType.allCases: randomiseFeatures()
+        lazy var listOfFeatures = isFirstSession ? firstRunFeatures : randomisedFeatures
 
         private var featuresMatrix: [[FeatureType]] = [[]] {
             didSet {
@@ -132,6 +141,7 @@ extension HomePage.Models {
 
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
+#if NETWORK_PROTECTION
         init(defaultBrowserProvider: DefaultBrowserProvider,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
@@ -139,7 +149,8 @@ extension HomePage.Models {
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
-             privacyConfig: PrivacyConfiguration = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig) {
+             networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
+             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
@@ -147,11 +158,34 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
-            self.privacyConfig = privacyConfig
+            self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
+            self.privacyConfigurationManager = privacyConfigurationManager
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
         }
+#else
+        init(defaultBrowserProvider: DefaultBrowserProvider,
+             dataImportProvider: DataImportStatusProviding,
+             tabCollectionViewModel: TabCollectionViewModel,
+             emailManager: EmailManager = EmailManager(),
+             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
+             cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
+             duckPlayerPreferences: DuckPlayerPreferencesPersistor,
+             privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
+            self.defaultBrowserProvider = defaultBrowserProvider
+            self.dataImportProvider = dataImportProvider
+            self.tabCollectionViewModel = tabCollectionViewModel
+            self.emailManager = emailManager
+            self.privacyPreferences = privacyPreferences
+            self.cookieConsentPopoverManager = cookieConsentPopoverManager
+            self.duckPlayerPreferences = duckPlayerPreferences
+            self.privacyConfigurationManager = privacyConfigurationManager
+            refreshFeaturesMatrix()
+            NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
+        }
+#endif
 
         // swiftlint:disable cyclomatic_complexity
         @MainActor func performAction(for featureType: FeatureType) {
@@ -188,8 +222,12 @@ extension HomePage.Models {
                 visitSurvey(day: .day0)
             case .surveyDay7:
                 visitSurvey(day: .day7)
-            case .networkProtectionBetaEndedNotice:
-                removeItem(for: .networkProtectionBetaEndedNotice)
+            case .networkProtectionRemoteMessage(let message):
+                handle(remoteMessage: message)
+            case .networkProtectionSystemExtensionUpgrade:
+#if NETWORK_PROTECTION
+                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+#endif
             }
         }
         // swiftlint:enable cyclomatic_complexity
@@ -210,19 +248,40 @@ extension HomePage.Models {
                 shouldShowSurveyDay0 = false
             case .surveyDay7:
                 shouldShowSurveyDay7 = false
-            case .networkProtectionBetaEndedNotice:
-                shouldShowNetworkProtectionBetaEndedNotice = false
+            case .networkProtectionRemoteMessage(let message):
+#if NETWORK_PROTECTION
+                networkProtectionRemoteMessaging.dismiss(message: message)
+                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
+#endif
+            case .networkProtectionSystemExtensionUpgrade:
+                shouldShowNetworkProtectionSystemExtensionUpgradePrompt = false
             }
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable cyclomatic_complexity
+        // swiftlint:disable cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 
-            if shouldNetworkProtectionBetaEndedNoticeBeVisible {
-                features.append(.networkProtectionBetaEndedNotice)
+#if NETWORK_PROTECTION
+
+            // Only show the upgrade card to users who have used the VPN before:
+            let activationStore = DefaultWaitlistActivationDateStore()
+            if shouldShowNetworkProtectionSystemExtensionUpgradePrompt,
+               UserDefaults.shared.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
+               activationStore.daysSinceActivation() != nil {
+                features.append(.networkProtectionSystemExtensionUpgrade)
             }
+
+            for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
+                features.append(.networkProtectionRemoteMessage(message))
+                DailyPixel.fire(
+                    pixel: .networkProtectionRemoteMessageDisplayed(messageID: message.id),
+                    frequency: .dailyOnly,
+                    includeAppVersionParameter: true
+                )
+            }
+#endif
 
             for feature in listOfFeatures {
                 switch feature {
@@ -254,18 +313,18 @@ extension HomePage.Models {
                     if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
-                case .networkProtectionBetaEndedNotice:
-                    break // Do nothing, as the NetP beta ended notice will always be added to the start of the list
+                case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
+                    break // Do nothing, NetP remote messages get appended first
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
-        // swiftlint:enable cyclomatic_complexity
+        // swiftlint:enable cyclomatic_complexity function_body_length
 
         // Helper Functions
         @objc private func newTabOpenNotification(_ notification: Notification) {
             if !isFirstSession {
-                listOfFeatures = randomiseFeatures()
+                listOfFeatures = randomisedFeatures
             }
 #if DEBUG
             isFirstSession = false
@@ -279,13 +338,20 @@ extension HomePage.Models {
             refreshFeaturesMatrix()
         }
 
-        private func randomiseFeatures() -> [FeatureType] {
+        var randomisedFeatures: [FeatureType] {
             var features = FeatureType.allCases
             features.shuffle()
             for (index, feature) in features.enumerated() where feature == .defaultBrowser {
                 features.remove(at: index)
                 features.insert(feature, at: 0)
             }
+            return features
+        }
+
+        var firstRunFeatures: [FeatureType] {
+            var features: [FeatureType] = FeatureType.allCases.filter { $0 != .duckplayer && $0 != .cookiePopUp }
+            features.insert(.duckplayer, at: 0)
+            features.insert(.cookiePopUp, at: 1)
             return features
         }
 
@@ -340,50 +406,6 @@ extension HomePage.Models {
             firstLaunchDate <= oneWeekAgo
         }
 
-        /// The Network Protection beta ended card should only be displayed under the following conditions:
-        ///
-        /// 1. The user has gone through the waitlist AND used Network Protection at least once
-        /// 2. The `waitlistBetaActive` flag has been set to disabled
-        /// 3. The user has not already dismissed the card
-        private var shouldNetworkProtectionBetaEndedNoticeBeVisible: Bool {
-#if NETWORK_PROTECTION
-            // 1. The user has signed up for the waitlist AND used Network Protection at least once:
-
-            let waitlistStorage = NetworkProtectionWaitlist().waitlistStorage
-            let isWaitlistUser = waitlistStorage.isWaitlistUser && waitlistStorage.isInvited
-
-            guard isWaitlistUser else {
-                return false
-            }
-
-            let activationStore = WaitlistActivationDateStore()
-            guard activationStore.daysSinceActivation() != nil else {
-                return false
-            }
-
-            // 2. The `waitlistBetaActive` flag has been set to disabled
-
-            let featureOverrides = DefaultWaitlistBetaOverrides()
-            let waitlistFlagEnabled: Bool
-
-            switch featureOverrides.waitlistActive {
-            case .useRemoteValue: waitlistFlagEnabled = privacyConfig.isSubfeatureEnabled(NetworkProtectionSubfeature.waitlistBetaActive)
-            case .on: waitlistFlagEnabled = true
-            case .off: waitlistFlagEnabled = false
-            }
-
-            guard !waitlistFlagEnabled else {
-                return false
-            }
-
-            // 3. The user has not already dismissed the card
-
-            return shouldShowNetworkProtectionBetaEndedNotice
-#else
-            return false
-#endif
-        }
-
         private enum SurveyDay {
             case day0
             case day7
@@ -412,10 +434,44 @@ extension HomePage.Models {
                 }
             }
         }
+
+        @MainActor private func handle(remoteMessage: NetworkProtectionRemoteMessage) {
+#if NETWORK_PROTECTION
+            guard let actionType = remoteMessage.action.actionType else {
+                Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                refreshFeaturesMatrix()
+                return
+            }
+
+            switch actionType {
+            case .openNetworkProtection:
+                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+            case .openSurveyURL, .openURL:
+                if let surveyURL = remoteMessage.presentableSurveyURL() {
+                    let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
+                    tabCollectionViewModel.append(tab: tab)
+                    Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+
+                    // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
+                    networkProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                    refreshFeaturesMatrix()
+                }
+            }
+#endif
+        }
     }
 
     // MARK: Feature Type
-    enum FeatureType: CaseIterable {
+    enum FeatureType: CaseIterable, Equatable, Hashable {
+
+        // CaseIterable doesn't work with enums that have associated values, so we have to implement it manually.
+        // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
+        // included elsewhere.
+        static var allCases: [HomePage.Models.FeatureType] {
+            [.duckplayer, .cookiePopUp, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay7]
+        }
+
         case duckplayer
         case cookiePopUp
         case emailProtection
@@ -423,7 +479,8 @@ extension HomePage.Models {
         case importBookmarksAndPasswords
         case surveyDay0
         case surveyDay7
-        case networkProtectionBetaEndedNotice
+        case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
+        case networkProtectionSystemExtensionUpgrade
 
         var title: String {
             switch self {
@@ -441,8 +498,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0CardTitle
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7CardTitle
-            case .networkProtectionBetaEndedNotice:
-                return UserText.networkProtectionBetaEndedCardTitle
+            case .networkProtectionRemoteMessage(let message):
+                return message.cardTitle
+            case .networkProtectionSystemExtensionUpgrade:
+                return "VPN Update Available"
             }
         }
 
@@ -462,8 +521,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0Summary
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Summary
-            case .networkProtectionBetaEndedNotice:
-                return UserText.networkProtectionBetaEndedCardText
+            case .networkProtectionRemoteMessage(let message):
+                return message.cardDescription
+            case .networkProtectionSystemExtensionUpgrade:
+                return "Allow VPN system software again to continue testing Network Protection."
             }
         }
 
@@ -483,8 +544,10 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay0Action
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Action
-            case .networkProtectionBetaEndedNotice:
-                return UserText.networkProtectionBetaEndedCardAction
+            case .networkProtectionRemoteMessage(let message):
+                return message.action.actionTitle
+            case .networkProtectionSystemExtensionUpgrade:
+                return "Update VPN"
             }
         }
 
@@ -506,7 +569,7 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .surveyDay7:
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
-            case .networkProtectionBetaEndedNotice:
+            case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
             }
         }

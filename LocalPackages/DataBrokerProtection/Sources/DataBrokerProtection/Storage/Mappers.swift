@@ -25,6 +25,7 @@ struct MapperToDB {
 
     init(mechanism: @escaping (Data) throws -> Data) {
         self.mechanism = mechanism
+        jsonEncoder.dateEncodingStrategy = .millisecondsSince1970
     }
 
     func mapToDB(id: Int64? = nil, profile: DataBrokerProtectionProfile) throws -> ProfileDB {
@@ -62,7 +63,7 @@ struct MapperToDB {
 
     func mapToDB(_ profileQuery: ProfileQuery, relatedTo profileId: Int64) throws -> ProfileQueryDB {
         .init(
-            id: nil,
+            id: profileQuery.id,
             profileId: profileId,
             first: try mechanism(profileQuery.firstName.encoded),
             last: try mechanism(profileQuery.lastName.encoded),
@@ -73,7 +74,8 @@ struct MapperToDB {
             street: try profileQuery.street.encoded(mechanism),
             zipCode: try profileQuery.zip.encoded(mechanism),
             phone: try profileQuery.phone.encoded(mechanism),
-            birthYear: try withUnsafeBytes(of: profileQuery.birthYear) { try mechanism(Data($0)) }
+            birthYear: try withUnsafeBytes(of: profileQuery.birthYear) { try mechanism(Data($0)) },
+            deprecated: profileQuery.deprecated
         )
     }
 
@@ -110,6 +112,14 @@ struct MapperToDB {
             timestamp: historyEvent.date
         )
     }
+
+    func mapToDB(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) -> OptOutAttemptDB {
+        .init(extractedProfileId: extractedProfileId,
+              dataBroker: dataBroker,
+              attemptId: attemptUUID.uuidString,
+              lastStageDate: lastStageDate,
+              startDate: startTime)
+    }
 }
 
 struct MapperToModel {
@@ -119,6 +129,7 @@ struct MapperToModel {
 
     init(mechanism: @escaping (Data) throws -> Data) {
         self.mechanism = mechanism
+        self.jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
     }
 
     func mapToModel(_ profile: FullProfileDB) throws -> DataBrokerProtectionProfile {
@@ -162,7 +173,9 @@ struct MapperToModel {
             name: decodedBroker.name,
             steps: decodedBroker.steps,
             version: decodedBroker.version,
-            schedulingConfig: decodedBroker.schedulingConfig
+            schedulingConfig: decodedBroker.schedulingConfig,
+            parent: decodedBroker.parent,
+            mirrorSites: decodedBroker.mirrorSites
         )
     }
 
@@ -180,7 +193,8 @@ struct MapperToModel {
             phone: try profileQueryDB.phone.decode(mechanism),
             birthYear: try mechanism(profileQueryDB.birthYear).withUnsafeBytes {
                 $0.load(as: Int.self)
-            }
+            },
+            deprecated: profileQueryDB.deprecated
         )
     }
 
@@ -235,6 +249,14 @@ struct MapperToModel {
             type: decodedEventType,
             date: optOutEvent.timestamp
         )
+    }
+
+    func mapToModel(_ optOutAttempt: OptOutAttemptDB) -> AttemptInformation {
+        .init(extractedProfileId: optOutAttempt.extractedProfileId,
+              dataBroker: optOutAttempt.dataBroker,
+              attemptId: optOutAttempt.attemptId,
+              lastStageDate: optOutAttempt.lastStageDate,
+              startDate: optOutAttempt.startDate)
     }
 }
 

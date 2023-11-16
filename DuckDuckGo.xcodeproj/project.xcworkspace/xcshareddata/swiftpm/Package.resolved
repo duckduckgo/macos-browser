@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "dominik/webextensions",
-        "revision" : "2a161e16b1823324e29b49009aed6cf1d9806ce8"
+        "branch" : "dominik/webextensions2",
+        "revision" : "3a305dd2719fdbce189baa67615f0537bdac7b80"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "8def15fe8a4c2fb76730f640507e9fd1d6c1f8a7",
-        "version" : "4.32.0"
+        "revision" : "254b23cf292140498650421bb31fd05740f4579b",
+        "version" : "4.40.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "20a6aeddbd86b43fd83c42aa45fdd9ec6db0e0f7",
-        "version" : "8.2.0"
+        "revision" : "c8e895c8fd50dc76e8d8dc827a636ad77b7f46ff",
+        "version" : "9.0.0"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/OpenSSL-XCFramework",
       "state" : {
-        "revision" : "238e8f700809ff0e1cad5f906cb4c3b0f77f44f9",
-        "version" : "1.1.1900"
+        "revision" : "bb7bfc010ef4d2e7913c343663b167e2a984ac79",
+        "version" : "3.1.2000"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "51e2b46f413bf3ef18afefad631ca70f2c25ef70",
-        "version" : "1.4.0"
+        "revision" : "b4ac92a444e79d5651930482623b9f6dc9265667",
+        "version" : "2.0.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "87e4fcbac39912f9cdb9a9acf205cad60e1ca3bc",
-        "version" : "2.4.2"
+        "revision" : "1f07f4096e52f19b5e7abaa697b7fc592b7ff57c",
+        "version" : "2.5.1"
       }
     },
     {

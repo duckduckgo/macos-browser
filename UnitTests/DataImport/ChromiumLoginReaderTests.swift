@@ -40,6 +40,7 @@ class ChromiumLoginReaderTests: XCTestCase {
     func testImportFromVersion32() throws {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.v32.databaseDirectoryURL,
+            source: .chrome,
             processName: "Chrome",
             decryptionKey: ChromiumLoginStore.v32.decryptionKey
         )
@@ -68,6 +69,7 @@ class ChromiumLoginReaderTests: XCTestCase {
 
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
+            source: .chrome,
             processName: "Chrome",
             decryptionKey: ChromiumLoginStore.legacy.decryptionKey
         )
@@ -87,16 +89,18 @@ class ChromiumLoginReaderTests: XCTestCase {
         let mockPrompt = MockChromiumPrompt(returnValue: .userDeniedKeychainPrompt)
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
+            source: .chrome,
             processName: "Chrome",
             decryptionKeyPrompt: mockPrompt
         )
 
         let result = reader.readLogins()
 
-        if case let .failure(type) = result {
-            XCTAssertEqual(type, .userDeniedKeychainPrompt)
-        } else {
-            XCTFail("Received unexpected success")
+        switch result {
+        case .failure(let error as ChromiumLoginReader.ImportError):
+            XCTAssertEqual(error.type, .userDeniedKeychainPrompt)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 
@@ -104,16 +108,19 @@ class ChromiumLoginReaderTests: XCTestCase {
         let mockPrompt = MockChromiumPrompt(returnValue: .keychainError(123))
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
+            source: .chrome,
             processName: "Chrome",
             decryptionKeyPrompt: mockPrompt
         )
 
         let result = reader.readLogins()
 
-        if case let .failure(type) = result {
-            XCTAssertEqual(type, .decryptionKeyAccessFailed(123))
-        } else {
-            XCTFail("Received unexpected success")
+        switch result {
+        case .failure(let error as ChromiumLoginReader.ImportError):
+            XCTAssertEqual(error.type, .decryptionKeyAccessFailed)
+            XCTAssertEqual((error.underlyingError as NSError?)?.code, 123)
+        default:
+            XCTFail("Received unexpected \(result)")
         }
     }
 

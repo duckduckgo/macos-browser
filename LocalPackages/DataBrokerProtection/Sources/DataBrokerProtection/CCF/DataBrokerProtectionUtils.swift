@@ -19,18 +19,19 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
 
 @MainActor
 final class DataBrokerUserContentController: WKUserContentController {
 
-    let dataBrokerUserScripts: DataBrokerUserScript
+    var dataBrokerUserScripts: DataBrokerUserScript?
 
     init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         dataBrokerUserScripts = DataBrokerUserScript(privacyConfig: privacyConfigurationManager, prefs: prefs, delegate: delegate)
 
         super.init()
 
-        dataBrokerUserScripts.userScripts.forEach {
+        dataBrokerUserScripts?.userScripts.forEach {
             let userScript = $0.makeWKUserScriptSync()
             self.installUserScripts([userScript], handlers: [$0])
         }
@@ -43,6 +44,20 @@ final class DataBrokerUserContentController: WKUserContentController {
     private func installUserScripts(_ wkUserScripts: [WKUserScript], handlers: [UserScript]) {
         handlers.forEach { self.addHandler($0) }
         wkUserScripts.forEach(self.addUserScript)
+    }
+
+    public func cleanUpBeforeClosing() {
+        os_log("Cleaning up DBP user scripts", log: .dataBrokerProtection)
+
+        self.removeAllUserScripts()
+        self.removeAllScriptMessageHandlers()
+
+        self.removeAllContentRuleLists()
+        dataBrokerUserScripts = nil
+    }
+
+    deinit {
+        os_log("DataBrokerUserContentController Deinit", log: .dataBrokerProtection)
     }
 }
 

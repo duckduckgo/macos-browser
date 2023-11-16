@@ -21,6 +21,7 @@ import DataBrokerProtection
 import AppKit
 import Common
 import SwiftUI
+import BrowserServicesKit
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -31,9 +32,31 @@ final class DBPHomeViewController: NSViewController {
     private let dataBrokerProtectionManager: DataBrokerProtectionManager
 
     lazy var dataBrokerProtectionViewController: DataBrokerProtectionViewController = {
-        DataBrokerProtectionViewController(scheduler: dataBrokerProtectionManager.scheduler,
-                                           dataManager: dataBrokerProtectionManager.dataManager,
-                                           notificationCenter: NotificationCenter.default)
+        let privacyConfigurationManager = PrivacyFeatures.contentBlocking.privacyConfigurationManager
+        let features = ContentScopeFeatureToggles(emailProtection: false,
+                                                  emailProtectionIncontextSignup: false,
+                                                  credentialsAutofill: false,
+                                                  identitiesAutofill: false,
+                                                  creditCardsAutofill: false,
+                                                  credentialsSaving: false,
+                                                  passwordGeneration: false,
+                                                  inlineIconCredentials: false,
+                                                  thirdPartyCredentialsProvider: false)
+
+        let privacySettings = PrivacySecurityPreferences.shared
+        let sessionKey = UUID().uuidString
+        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+                                                sessionKey: sessionKey,
+                                                featureToggles: features)
+
+        return DataBrokerProtectionViewController(
+            scheduler: dataBrokerProtectionManager.scheduler,
+            dataManager: dataBrokerProtectionManager.dataManager,
+            privacyConfig: privacyConfigurationManager,
+            prefs: prefs,
+            openURLHandler: { url in
+                WindowControllersManager.shared.show(url: url, newTab: true)
+            })
     }()
 
     init(dataBrokerProtectionManager: DataBrokerProtectionManager) {
@@ -106,15 +129,33 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
     }
 }
 
-public class DataBrokerProtectionErrorHandling: EventMapping<DataBrokerProtectionOperationError> {
+public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
     public init() {
         super.init { event, _, _, _ in
-            Pixel.fire(.debug(event: .dataBrokerProtectionError, error: event.error), withAdditionalParameters: event.params)
+            switch event {
+            case .error(let error, _):
+                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+            case .parentChildMatches,
+                    .optOutStart,
+                    .optOutEmailGenerate,
+                    .optOutCaptchaParse,
+                    .optOutCaptchaSend,
+                    .optOutCaptchaSolve,
+                    .optOutSubmit,
+                    .optOutEmailReceive,
+                    .optOutEmailConfirm,
+                    .optOutValidate,
+                    .optOutFinish,
+                    .optOutSubmitSuccess,
+                    .optOutSuccess,
+                    .optOutFailure:
+                Pixel.fire(.pixelKitEvent(event))
+            }
         }
     }
 
-    override init(mapping: @escaping EventMapping<DataBrokerProtectionOperationError>.Mapping) {
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
         fatalError("Use init()")
     }
 }

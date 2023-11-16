@@ -57,11 +57,6 @@ final class WebViewSnapshotView: NSView {
         }
     }
 
-    override func viewWillMove(toSuperview newSuperview: NSView?) {
-        super.viewWillMove(toSuperview: newSuperview)
-
-    }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

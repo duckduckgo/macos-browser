@@ -1,0 +1,65 @@
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+#include "../AppTargetsBase.xcconfig"
+#include "../../AppStore.xcconfig"
+
+// Override AppTargetsBase.xcconfig until we resolve bundle IDs.
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(DBP_AGENT_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(DBP_AGENT_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(DBP_AGENT_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(DBP_AGENT_BUNDLE_ID)
+
+INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_KEY_LSUIElement = YES
+INFOPLIST_KEY_NSPrincipalClass = Application
+
+// Just make sure to override anything set by the AppTargetBase.xcconfig
+//CODE_SIGN_STYLE[config=Debug][sdk=*] = Manual
+//CODE_SIGN_STYLE[config=Release][sdk=*] = Manual
+
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements
+CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoDBPBackgroundAgent/DuckDuckGoDBPBackgroundAgent.entitlements
+
+CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
+CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
+CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
+
+PRODUCT_NAME = $(DBP_AGENT_PRODUCT_NAME)
+
+PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS DBP Agent - Review
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = macOS DBP Agent - Release
+
+FEATURE_FLAGS = FEEDBACK DBP NETWORK_PROTECTION
+
+GCC_PREPROCESSOR_DEFINITIONS[arch=*][sdk=*] = DBP=1 NETP_SYSTEM_EXTENSION=1
+GCC_PREPROCESSOR_DEFINITIONS[config=CI][arch=*][sdk=*] = DBP=1 NETP_SYSTEM_EXTENSION=1 DEBUG=1 CI=1 $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[config=Debug][arch=*][sdk=*] = DBP=1 NETP_SYSTEM_EXTENSION=1 DEBUG=1 $(inherited)
+GCC_PREPROCESSOR_DEFINITIONS[config=Review][arch=*][sdk=*] = DBP=1 NETP_SYSTEM_EXTENSION=1 REVIEW=1 $(inherited)
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*][sdk=*] = NETP_SYSTEM_EXTENSION $(FEATURE_FLAGS)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=CI][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION DEBUG CI $(FEATURE_FLAGS)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Debug][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION DEBUG $(FEATURE_FLAGS)
+SWIFT_ACTIVE_COMPILATION_CONDITIONS[config=Review][arch=*][sdk=*] = NETP_SYSTEM_EXTENSION REVIEW $(FEATURE_FLAGS)
+
+SWIFT_OBJC_BRIDGING_HEADER =
+SKIP_INSTALL = YES
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME =
+
+#include? "../../../LocalOverrides.xcconfig"

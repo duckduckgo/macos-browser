@@ -39,6 +39,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
         case bitwardenFound
 
         // Bitwarden connection:
+        case accessToContainersNotApproved
         case waitingForConnectionPermission
         case connectToBitwarden
 
@@ -56,6 +57,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             switch self {
             case .disclaimer, .lookingForBitwarden, .oldVersion, .bitwardenFound: return "Next"
             case .waitingForConnectionPermission, .connectToBitwarden: return "Connect"
+            case .accessToContainersNotApproved: return "Open System Settings"
             case .connectedToBitwarden: return "OK"
             }
         }
@@ -108,6 +110,8 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = .waitingForConnectionPermission
         case .integrationNotApproved:
             self.viewState = .waitingForConnectionPermission
+        case .accessToContainersNotApproved:
+            self.viewState = .accessToContainersNotApproved
         case .missingHandshake:
             self.viewState = .connectToBitwarden
         case .waitingForHandshakeApproval:
@@ -122,6 +126,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
             self.viewState = .connectedToBitwarden
         case .error(error: let error):
             self.error = error
+
         }
     }
     // swiftlint:enable cyclomatic_complexity
@@ -136,6 +141,12 @@ final class ConnectBitwardenViewModel: ObservableObject {
                 bitwardenManager.openBitwarden()
             } else if viewState == .disclaimer {
                 viewState = .lookingForBitwarden
+            } else if viewState == .accessToContainersNotApproved {
+                guard let link = URL.fullDiskAccess else {
+                    assertionFailure("Can't initialize link to Settings")
+                    return
+                }
+                NSWorkspace.shared.open(link)
             }
 
         case .cancel:

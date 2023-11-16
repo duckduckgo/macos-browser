@@ -35,15 +35,17 @@ final class ScanOperation: DataBrokerOperation {
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
+    var stageCalculator: DataBrokerProtectionStageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
+    var retriesCountOnError: Int = 0
 
     init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          query: BrokerProfileQueryData,
          emailService: EmailServiceProtocol = EmailService(),
          captchaService: CaptchaServiceProtocol = CaptchaService(),
-         operationAwaitTime: TimeInterval = 1,
+         operationAwaitTime: TimeInterval = 3,
          shouldRunNextStep: @escaping () -> Bool
     ) {
         self.privacyConfig = privacyConfig
@@ -58,8 +60,10 @@ final class ScanOperation: DataBrokerOperation {
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
+             stageCalculator: DataBrokerProtectionStageDurationCalculator, // We do not need it for scans - for now.
              showWebView: Bool) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
+            self.stageCalculator = stageCalculator
             self.continuation = continuation
             Task {
                 await initialize(handler: webViewHandler, isFakeBroker: query.dataBroker.isFakeBroker, showWebView: showWebView)
@@ -89,6 +93,7 @@ final class ScanOperation: DataBrokerOperation {
     }
 
     func executeNextStep() async {
+        retriesCountOnError = 0 // We reset the retries on error when it is successful
         os_log("SCAN Waiting %{public}f seconds...", log: .action, operationAwaitTime)
 
         try? await Task.sleep(nanoseconds: UInt64(operationAwaitTime) * 1_000_000_000)

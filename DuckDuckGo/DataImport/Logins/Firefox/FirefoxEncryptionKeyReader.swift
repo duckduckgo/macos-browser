@@ -23,132 +23,140 @@ import GRDB
 
 protocol FirefoxEncryptionKeyReading {
 
-    func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError>
-    func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError>
+    func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data>
+    func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data>
 
 }
 
 final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
-    func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
-        guard let result = try? FirefoxBerkeleyDatabaseReader.readDatabase(at: key3DatabaseURL.path) else {
-            return .failure(.databaseAccessFailed)
-        }
+    typealias KeyReaderFileLineError = FileLineError<FirefoxEncryptionKeyReader>
 
-        guard let globalSalt = result["global-salt"],
-              let asnData = result["data"]?[4...] else { // Drop the first 4 bytes, they aren't required for decryption and can be ignored
-            return .failure(.decryptionFailed)
+    func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data> {
+        var operationType: FirefoxLoginReader.ImportError.OperationType = .key3readerStage1
+        do {
+            let data = try getEncryptionKey(key3DatabaseURL: key3DatabaseURL, primaryPassword: primaryPassword, operationType: &operationType)
+            return .success(data)
+        } catch {
+            return .failure(FirefoxLoginReader.ImportError(type: operationType, underlyingError: error))
         }
+    }
+
+    private func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String, operationType: inout FirefoxLoginReader.ImportError.OperationType) throws -> Data {
+
+        let result = try FirefoxBerkeleyDatabaseReader.readDatabase(at: key3DatabaseURL.path)
+
+        let globalSalt = try result["global-salt"] ?? { throw KeyReaderFileLineError() }()
+        var asnData = try result["data"] ?? { throw KeyReaderFileLineError() }()
+        guard asnData.count > 4 else { throw KeyReaderFileLineError() }
+        asnData = asnData[4...] // Drop the first 4 bytes, they aren't required for decryption and can be ignored
 
         // Part 1: Take the data from the database and decrypt it.
 
-        guard let decodedASNData = try? ASN1Parser.parse(data: asnData),
-              let entrySalt = extractKey3EntrySalt(from: decodedASNData),
-              let ciphertext = extractCiphertext(from: decodedASNData)else {
-            return .failure(.decryptionFailed)
-        }
+        let decodedASNData = try ASN1Parser.parse(data: asnData)
+        let entrySalt = try extractKey3EntrySalt(from: decodedASNData)
+        let ciphertext = try extractCiphertext(from: decodedASNData)
 
-        guard let decryptedData = tripleDesDecrypt(ciphertext: ciphertext,
-                                                   globalSalt: globalSalt,
-                                                   entrySalt: entrySalt,
-                                                   primaryPassword: primaryPassword) else {
-            return .failure(.decryptionFailed)
-        }
+        let decryptedData = try tripleDesDecrypt(ciphertext: ciphertext,
+                                                 globalSalt: globalSalt,
+                                                 entrySalt: entrySalt,
+                                                 primaryPassword: primaryPassword)
 
         // Part 2: Take the decrypted ASN1 data, parse it, and extract the key.
+        operationType = .key3readerStage2
+        let decryptedASNData = try ASN1Parser.parse(data: decryptedData)
+        let extractedASNData = try extractKey3DecryptedASNData(from: decryptedASNData)
 
-        guard let decryptedASNData = try? ASN1Parser.parse(data: decryptedData),
-              let extractedASNData = extractKey3DecryptedASNData(from: decryptedASNData),
-              let keyContainerASNData = try? ASN1Parser.parse(data: extractedASNData),
-              let key = extractKey3Key(from: keyContainerASNData) else {
-            return .failure(.decryptionFailed)
-        }
+        operationType = .key3readerStage3
+        let keyContainerASNData = try ASN1Parser.parse(data: extractedASNData)
+        let key = try extractKey3Key(from: keyContainerASNData)
 
-        return .success(key)
+        return key
     }
 
-    func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> Result<Data, FirefoxLoginReader.ImportError> {
+    func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data> {
+        var operationType: FirefoxLoginReader.ImportError.OperationType = .key4readerStage1
         do {
             return try key4DatabaseURL.withTemporaryFile { temporaryDatabaseURL in
-                do {
-                    if let data = try getKey(key4DatabaseURL: temporaryDatabaseURL, primaryPassword: primaryPassword) {
-                        return .success(data)
-                    } else {
-                        return .failure(.databaseAccessFailed)
-                    }
-                } catch {
-                    if let importError = error as? FirefoxLoginReader.ImportError {
-                        return .failure(importError)
-                    } else {
-                        return .failure(.couldNotGetDecryptionKey)
-                    }
-                }
+                let data = try getKey(key4DatabaseURL: temporaryDatabaseURL, primaryPassword: primaryPassword, operationType: &operationType)
+                return .success(data)
             }
+        } catch let error as FirefoxLoginReader.ImportError {
+            return .failure(error)
         } catch {
-            return .failure(.failedToTemporarilyCopyFile)
+            return .failure(FirefoxLoginReader.ImportError(type: operationType, underlyingError: KeyReaderFileLineError()))
         }
     }
 
-    private func getKey(key4DatabaseURL databaseURL: URL, primaryPassword: String) throws -> Data? {
+    private func getKey(key4DatabaseURL databaseURL: URL, primaryPassword: String, operationType: inout FirefoxLoginReader.ImportError.OperationType) throws -> Data {
         let queue = try DatabaseQueue(path: databaseURL.path)
 
         return try queue.read { database in
-            guard let metadataRow = try? Row.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'") else {
-                throw FirefoxLoginReader.ImportError.databaseAccessFailed
-            }
+            guard let metadataRow = try MetadataRow.fetchOne(database, sql: "SELECT item1, item2 FROM metadata WHERE id = 'password'") else { throw KeyReaderFileLineError() }
 
-            let globalSalt: Data = metadataRow["item1"]
-            let item2: Data = metadataRow["item2"]
+            let decodedASNData = try ASN1Parser.parse(data: metadataRow.item2)
 
-            guard let decodedASNData = try? ASN1Parser.parse(data: item2) else {
-                throw FirefoxLoginReader.ImportError.decryptionFailed
-            }
-
+            operationType = .key4readerStage2
             if let tripleDesData = try extractKeyUsing3DES(from: decodedASNData,
-                                                           globalSalt: globalSalt,
+                                                           globalSalt: metadataRow.globalSalt,
                                                            primaryPassword: primaryPassword,
                                                            database: database) {
+
                 return tripleDesData
-            } else {
-                return try extractKeyUsingAES(from: decodedASNData,
-                                              globalSalt: globalSalt,
-                                              primaryPassword: primaryPassword,
-                                              database: database)
             }
+
+            operationType = .key4readerStage3
+            return try extractKeyUsingAES(from: decodedASNData,
+                                          globalSalt: metadataRow.globalSalt,
+                                          primaryPassword: primaryPassword,
+                                          database: database)
+        }
+    }
+
+    fileprivate struct MetadataRow: FetchableRecord {
+        let globalSalt: Data
+        let item2: Data
+
+        init(row: Row) {
+            globalSalt = row["item1"]
+            item2 = row["item2"]
         }
     }
 
     // MARK: - Key3 Database Parsing
 
-    private func extractKey3EntrySalt(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(outerSequence) = tlv,
-              let firstSequence = outerSequence[safe: 0],
-              case let .sequence(secondSequence) = firstSequence,
-              let penultimateSequence = secondSequence[safe: 1],
-              case let .sequence(finalSequence) = penultimateSequence,
-              let octetString = finalSequence[safe: 0],
+    private func extractKey3EntrySalt(from tlv: ASN1Parser.Node) throws -> Data {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(outerSequence) = tlv, lineError.next(),
+              let firstSequence = outerSequence[safe: 0], lineError.next(),
+              case let .sequence(secondSequence) = firstSequence, lineError.next(),
+              let penultimateSequence = secondSequence[safe: 1], lineError.next(),
+              case let .sequence(finalSequence) = penultimateSequence, lineError.next(),
+              let octetString = finalSequence[safe: 0], lineError.next(),
               case let .octetString(data: data) = octetString else {
-            return nil
+            throw lineError
         }
 
         return data
     }
 
-    private func extractKey3DecryptedASNData(from node: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(outerSequence) = node,
-              let octetString = outerSequence[safe: 2],
+    private func extractKey3DecryptedASNData(from node: ASN1Parser.Node) throws -> Data {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(outerSequence) = node, lineError.next(),
+              let octetString = outerSequence[safe: 2], lineError.next(),
               case let .octetString(data: data) = octetString else {
-            return nil
+            throw lineError
         }
 
         return data
     }
 
-    private func extractKey3Key(from node: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(outerSequence) = node,
-              let integer = outerSequence[safe: 3],
+    private func extractKey3Key(from node: ASN1Parser.Node) throws -> Data {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(outerSequence) = node, lineError.next(),
+              let integer = outerSequence[safe: 3], lineError.next(),
               case let .integer(data: data) = integer else {
-            return nil
+            throw lineError
         }
 
         return data
@@ -163,15 +171,10 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     /// key = k[:24] # first 24 bytes (EDE keying, also called 3TDEA)
     /// iv = k[-8:]  # last 8 bytes
     /// clearText = DES3.new(key, DES3.CBC, iv).decrypt(cipherText)
-    private func tripleDesDecrypt(ciphertext: Data, globalSalt: Data, entrySalt: Data, primaryPassword: String) -> Data? {
-        guard let primaryPasswordData = primaryPassword.data(using: .utf8), let pes = NSMutableData(length: 20) else {
-            return nil
-        }
-
-        entrySalt.withUnsafeBytes { rawBufferPointer in
-            let pointer = rawBufferPointer.baseAddress!
-            pes.replaceBytes(in: NSRange(location: 0, length: entrySalt.count), withBytes: pointer)
-        }
+    private func tripleDesDecrypt(ciphertext: Data, globalSalt: Data, entrySalt: Data, primaryPassword: String) throws -> Data {
+        let primaryPasswordData = primaryPassword.utf8data
+        var pes = Data(count: 20)
+        pes.replaceSubrange(0..<min(entrySalt.count, pes.count), with: entrySalt[0..<min(entrySalt.count, pes.count)])
 
         let hp = SHA.from(data: globalSalt + primaryPasswordData)
         let chp = SHA.from(data: hp + entrySalt)
@@ -183,7 +186,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         let key = k.prefix(24)
         let iv = k.suffix(8)
 
-        return Cryptography.decrypt3DES(data: ciphertext, key: key, iv: iv)
+        return try Cryptography.decrypt3DES(data: ciphertext, key: key, iv: iv)
     }
 
     private func calculateHMAC(key: Data, message: Data) -> Data {
@@ -195,80 +198,85 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
     // MARK: - Key4 Database Parsing
 
-    private func extractKey4EntrySalt(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values1) = tlv,
-              let firstValue = values1[safe: 0],
-              case let .sequence(values2) = firstValue,
-              let secondValue = values2[safe: 1],
-              case let .sequence(values3) = secondValue,
-              let thirdValue = values3[safe: 0],
-              case let .sequence(values4) = thirdValue,
-              let fourthValue = values4[safe: 1],
-              case let .sequence(values5) = fourthValue,
-              let fifthValue = values5[safe: 0],
+    private func extractKey4EntrySalt(from tlv: ASN1Parser.Node) throws -> Data {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(values1) = tlv, lineError.next(),
+              let firstValue = values1[safe: 0], lineError.next(),
+              case let .sequence(values2) = firstValue, lineError.next(),
+              let secondValue = values2[safe: 1], lineError.next(),
+              case let .sequence(values3) = secondValue, lineError.next(),
+              let thirdValue = values3[safe: 0], lineError.next(),
+              case let .sequence(values4) = thirdValue, lineError.next(),
+              let fourthValue = values4[safe: 1], lineError.next(),
+              case let .sequence(values5) = fourthValue, lineError.next(),
+              let fifthValue = values5[safe: 0], lineError.next(),
               case let .octetString(data: data) = fifthValue else {
-            return nil
+            throw lineError
         }
 
         return data
     }
 
-    private func extractIterationCount(from tlv: ASN1Parser.Node) -> Int? {
-        guard case let .sequence(values1) = tlv,
-              let firstValue = values1[safe: 0],
-              case let .sequence(values2) = firstValue,
-              let secondValue = values2[safe: 1],
-              case let .sequence(values3) = secondValue,
-              let thirdValue = values3[safe: 0],
-              case let .sequence(values4) = thirdValue,
-              let fourthValue = values4[safe: 1],
-              case let .sequence(values5) = fourthValue,
-              let fifthValue = values5[safe: 1],
+    private func extractIterationCount(from tlv: ASN1Parser.Node) throws -> Int {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(values1) = tlv, lineError.next(),
+              let firstValue = values1[safe: 0], lineError.next(),
+              case let .sequence(values2) = firstValue, lineError.next(),
+              let secondValue = values2[safe: 1], lineError.next(),
+              case let .sequence(values3) = secondValue, lineError.next(),
+              let thirdValue = values3[safe: 0], lineError.next(),
+              case let .sequence(values4) = thirdValue, lineError.next(),
+              let fourthValue = values4[safe: 1], lineError.next(),
+              case let .sequence(values5) = fourthValue, lineError.next(),
+              let fifthValue = values5[safe: 1], lineError.next(),
               case let .integer(data: data) = fifthValue else {
-            return nil
+            throw lineError
         }
 
         return data.integer
     }
 
-    private func extractKeyLength(from tlv: ASN1Parser.Node) -> Int? {
-        guard case let .sequence(values1) = tlv,
-              let firstValue = values1[safe: 0],
-              case let .sequence(values2) = firstValue,
-              let secondValue = values2[safe: 1],
-              case let .sequence(values3) = secondValue,
-              let thirdValue = values3[safe: 0],
-              case let .sequence(values4) = thirdValue,
-              let fourthValue = values4[safe: 1],
-              case let .sequence(values5) = fourthValue,
-              let fifthValue = values5[safe: 2],
+    private func extractKeyLength(from tlv: ASN1Parser.Node) throws -> Int {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(values1) = tlv, lineError.next(),
+              let firstValue = values1[safe: 0], lineError.next(),
+              case let .sequence(values2) = firstValue, lineError.next(),
+              let secondValue = values2[safe: 1], lineError.next(),
+              case let .sequence(values3) = secondValue, lineError.next(),
+              let thirdValue = values3[safe: 0], lineError.next(),
+              case let .sequence(values4) = thirdValue, lineError.next(),
+              let fourthValue = values4[safe: 1], lineError.next(),
+              case let .sequence(values5) = fourthValue, lineError.next(),
+              let fifthValue = values5[safe: 2], lineError.next(),
               case let .integer(data: data) = fifthValue else {
-            return nil
+            throw lineError
         }
 
         return data.integer
     }
 
-    private func extractInitializationVector(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values1) = tlv,
-              let firstValue = values1[safe: 0],
-              case let .sequence(values2) = firstValue,
-              let secondValue = values2[safe: 1],
-              case let .sequence(values3) = secondValue,
-              let thirdValue = values3[safe: 1],
-              case let .sequence(values4) = thirdValue,
-              let fourthValue = values4[safe: 1],
+    private func extractInitializationVector(from tlv: ASN1Parser.Node) throws -> Data {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(values1) = tlv, lineError.next(),
+              let firstValue = values1[safe: 0], lineError.next(),
+              case let .sequence(values2) = firstValue, lineError.next(),
+              let secondValue = values2[safe: 1], lineError.next(),
+              case let .sequence(values3) = secondValue, lineError.next(),
+              let thirdValue = values3[safe: 1], lineError.next(),
+              case let .sequence(values4) = thirdValue, lineError.next(),
+              let fourthValue = values4[safe: 1], lineError.next(),
               case let .octetString(data: data) = fourthValue else {
-            return nil
+            throw lineError
         }
 
         return data
     }
 
-    private func extractCiphertext(from tlv: ASN1Parser.Node) -> Data? {
-        guard case let .sequence(values) = tlv,
+    private func extractCiphertext(from tlv: ASN1Parser.Node) throws -> Data {
+        var lineError = KeyReaderFileLineError.nextLine()
+        guard case let .sequence(values) = tlv, lineError.next(),
               case let .octetString(data: data) = values[safe: 1] else {
-            return nil
+            throw lineError
         }
 
         return data
@@ -277,97 +285,86 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     private func aesDecrypt(tlv: ASN1Parser.Node,
                             iv: Data,
                             globalSalt: Data,
-                            primaryPassword: String) -> Data? {
-        guard let data = extractCiphertext(from: tlv),
-              let entrySalt = extractKey4EntrySalt(from: tlv),
-              let iterationCount = extractIterationCount(from: tlv),
-              let keyLength = extractKeyLength(from: tlv),
-              let primaryPasswordData = primaryPassword.data(using: .utf8) else { return nil }
+                            primaryPassword: String) throws -> Data {
+        let data = try extractCiphertext(from: tlv)
+        let entrySalt = try extractKey4EntrySalt(from: tlv)
+        let iterationCount = try extractIterationCount(from: tlv)
+        let keyLength = try extractKeyLength(from: tlv)
+        let primaryPasswordData = primaryPassword.utf8data
 
         assert(keyLength == 32)
 
         let passwordData = globalSalt + primaryPasswordData
         let hashData = SHA.from(data: passwordData)
 
-        guard let commonCryptoKey = Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
-                                                               salt: entrySalt,
-                                                               keyByteCount: keyLength,
-                                                               rounds: iterationCount,
-                                                               kdf: .sha256) else { return nil }
+        let commonCryptoKey = try Cryptography.decryptPBKDF2(password: .base64(hashData.base64EncodedString()),
+                                                             salt: entrySalt,
+                                                             keyByteCount: keyLength,
+                                                             rounds: iterationCount,
+                                                             kdf: .sha256)
 
         let iv = Data([4, 14]) + iv
-        guard let decryptedData = Cryptography.decryptAESCBC(data: data, key: commonCryptoKey.dataRepresentation, iv: iv) else {
-            return nil
-        }
+        let decryptedData = try Cryptography.decryptAESCBC(data: data, key: commonCryptoKey.dataRepresentation, iv: iv)
 
-        return Data(decryptedData)
+        return decryptedData
     }
 
     // MARK: - ASN Key Extraction
 
     private func extractKeyUsing3DES(from node: ASN1Parser.Node, globalSalt: Data, primaryPassword: String, database: GRDB.Database) throws -> Data? {
-        guard let entrySalt = extractKey3EntrySalt(from: node), let passwordCheckCiphertext = extractCiphertext(from: node) else {
-            return nil
-        }
+        guard let decryptedCiphertext: Data = {
+            guard let entrySalt = try? extractKey3EntrySalt(from: node),
+                  let passwordCheckCiphertext = try? extractCiphertext(from: node) else { return nil }
 
-        guard let decryptedCiphertext = tripleDesDecrypt(ciphertext: passwordCheckCiphertext,
-                                                         globalSalt: globalSalt,
-                                                         entrySalt: entrySalt,
-                                                         primaryPassword: primaryPassword) else {
-            return nil
-        }
+            return try? tripleDesDecrypt(ciphertext: passwordCheckCiphertext,
+                                         globalSalt: globalSalt,
+                                         entrySalt: entrySalt,
+                                         primaryPassword: primaryPassword)
+        }() else { return nil }
 
         let passwordCheckString = String(data: decryptedCiphertext, encoding: .utf8)
 
-        if passwordCheckString != "password-check" {
-            throw FirefoxLoginReader.ImportError.requiresPrimaryPassword
-        }
+        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
 
-        guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
-            throw FirefoxLoginReader.ImportError.decryptionFailed
-        }
+        guard let nssPrivateRow = try NssPrivateRow.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else { throw KeyReaderFileLineError() }
 
-        let a11: Data = nssPrivateRow["a11"]
-        let a102: Data = nssPrivateRow["a102"]
+        assert(nssPrivateRow.a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
 
-        assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
+        let decodedA11 = try ASN1Parser.parse(data: nssPrivateRow.a11)
+        let entrySalt = try extractKey3EntrySalt(from: decodedA11)
+        let ciphertext = try extractCiphertext(from: decodedA11)
 
-        guard let decodedA11 = try? ASN1Parser.parse(data: a11),
-              let entrySalt = extractKey3EntrySalt(from: decodedA11),
-              let ciphertext = extractCiphertext(from: decodedA11) else {
-            throw FirefoxLoginReader.ImportError.decryptionFailed
-        }
-
-        return tripleDesDecrypt(ciphertext: ciphertext, globalSalt: globalSalt, entrySalt: entrySalt, primaryPassword: primaryPassword)
+        let data = try tripleDesDecrypt(ciphertext: ciphertext, globalSalt: globalSalt, entrySalt: entrySalt, primaryPassword: primaryPassword)
+        return data
     }
 
-    private func extractKeyUsingAES(from node: ASN1Parser.Node, globalSalt: Data, primaryPassword: String, database: GRDB.Database) throws -> Data? {
-        guard let iv = extractInitializationVector(from: node),
-              let decryptedItem2 = aesDecrypt(tlv: node, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword) else {
-            throw FirefoxLoginReader.ImportError.decryptionFailed
-        }
+    private func extractKeyUsingAES(from node: ASN1Parser.Node, globalSalt: Data, primaryPassword: String, database: GRDB.Database) throws -> Data {
+        let iv = try extractInitializationVector(from: node)
+        let decryptedItem2 = try aesDecrypt(tlv: node, iv: iv, globalSalt: globalSalt, primaryPassword: primaryPassword)
 
         let passwordCheckString = String(data: decryptedItem2, encoding: .utf8)
 
         // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
-        if passwordCheckString != "password-check" {
-            throw FirefoxLoginReader.ImportError.requiresPrimaryPassword
+        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
+
+        guard let nssPrivateRow = try NssPrivateRow.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else { throw KeyReaderFileLineError() }
+
+        assert(nssPrivateRow.a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
+
+        let decodedA11 = try ASN1Parser.parse(data: nssPrivateRow.a11)
+        let finalIV = try extractInitializationVector(from: decodedA11)
+
+        return try aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
+    }
+
+    fileprivate struct NssPrivateRow: FetchableRecord {
+        let a11: Data
+        let a102: Data
+
+        init(row: Row) {
+            a11 = row["a11"]
+            a102 = row["a102"]
         }
-
-        guard let nssPrivateRow = try? Row.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else {
-            throw FirefoxLoginReader.ImportError.decryptionFailed
-        }
-
-        let a11: Data = nssPrivateRow["a11"]
-        let a102: Data = nssPrivateRow["a102"]
-
-        assert(a102 == Data([248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]))
-
-        guard let decodedA11 = try? ASN1Parser.parse(data: a11), let finalIV = extractInitializationVector(from: decodedA11) else {
-            throw FirefoxLoginReader.ImportError.decryptionFailed
-        }
-
-        return aesDecrypt(tlv: decodedA11, iv: finalIV, globalSalt: globalSalt, primaryPassword: primaryPassword)
     }
 
 }

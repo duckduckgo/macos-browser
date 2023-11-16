@@ -29,8 +29,8 @@ class MockBookmarkManager: BookmarkManager {
         return false
     }
 
-    func isHostInBookmarks(host: String) -> Bool {
-        return false
+    func allHosts() -> Set<String> {
+        return []
     }
 
     func getBookmark(for url: URL) -> DuckDuckGo_Privacy_Browser.Bookmark? {
@@ -84,6 +84,10 @@ class MockBookmarkManager: BookmarkManager {
     func importBookmarks(_ bookmarks: DuckDuckGo_Privacy_Browser.ImportedBookmarks, source: DuckDuckGo_Privacy_Browser.BookmarkImportSource) -> DuckDuckGo_Privacy_Browser.BookmarkImportResult {
         BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
     }
+
+    func handleFavoritesAfterDisablingSync() {}
+
+    var didMigrateToFormFactorSpecificFavorites: Bool = false
 
     @Published var list: BookmarkList?
 

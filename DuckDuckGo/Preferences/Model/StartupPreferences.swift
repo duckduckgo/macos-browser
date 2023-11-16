@@ -17,17 +17,46 @@
 //
 
 import Foundation
+import Combine
 
 protocol StartupPreferencesPersistor {
+    var appearancePrefs: AppearancePreferences { get set }
     var restorePreviousSession: Bool { get set }
+    var launchToCustomHomePage: Bool { get set }
+    var customHomePageURL: String { get set }
 }
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
+    var appearancePrefs: AppearancePreferences
+
     @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
+
+    @UserDefaultsWrapper(key: .launchToCustomHomePage, defaultValue: false)
+    var launchToCustomHomePage: Bool
+
+    @UserDefaultsWrapper(key: .customHomePageURL, defaultValue: URL.duckDuckGo.absoluteString)
+    var customHomePageURL: String
+
 }
 
 final class StartupPreferences: ObservableObject {
+
+    static let shared = StartupPreferences()
+    private let pinningManager: LocalPinningManager
+    private var persistor: StartupPreferencesPersistor
+    private var pinnedViewsNotificationCancellable: AnyCancellable?
+
+    init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
+         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared)) {
+        self.pinningManager = pinningManager
+        self.persistor = persistor
+        restorePreviousSession = persistor.restorePreviousSession
+        launchToCustomHomePage = persistor.launchToCustomHomePage
+        customHomePageURL = persistor.customHomePageURL
+        updateHomeButtonState()
+        listenToPinningManagerNotifications()
+    }
 
     @Published var restorePreviousSession: Bool {
         didSet {
@@ -35,10 +64,80 @@ final class StartupPreferences: ObservableObject {
         }
     }
 
-    init(persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()) {
-        self.persistor = persistor
-        restorePreviousSession = persistor.restorePreviousSession
+    @Published var launchToCustomHomePage: Bool {
+        didSet {
+            persistor.launchToCustomHomePage = launchToCustomHomePage
+        }
     }
 
-    private var persistor: StartupPreferencesPersistor
+    @Published var customHomePageURL: String {
+        didSet {
+            guard let urlWithScheme = urlWithScheme(customHomePageURL) else {
+                return
+            }
+            if customHomePageURL != urlWithScheme {
+                customHomePageURL = urlWithScheme
+            }
+            persistor.customHomePageURL = customHomePageURL
+        }
+    }
+
+    @Published var homeButtonPosition: HomeButtonPosition = .hidden
+
+    var formattedCustomHomePageURL: String {
+        let trimmedURL = customHomePageURL.trimmingWhitespace()
+        guard let url = URL(trimmedAddressBarString: trimmedURL) else {
+            return URL.duckDuckGo.absoluteString
+        }
+        return url.absoluteString
+    }
+
+    var friendlyURL: String {
+        var friendlyURL = customHomePageURL
+        if friendlyURL.count > 30 {
+            let index = friendlyURL.index(friendlyURL.startIndex, offsetBy: 27)
+            friendlyURL = String(friendlyURL[..<index]) + "..."
+        }
+        return friendlyURL
+    }
+
+    func isValidURL(_ text: String) -> Bool {
+        guard let url = text.url else { return false }
+        return !text.isEmpty && url.isValid
+    }
+
+    func updateHomeButton() {
+        persistor.appearancePrefs.homeButtonPosition = homeButtonPosition
+        if homeButtonPosition != .hidden {
+            pinningManager.unpin(.homeButton)
+            pinningManager.pin(.homeButton)
+        } else {
+            pinningManager.unpin(.homeButton)
+        }
+    }
+
+    private func updateHomeButtonState() {
+        homeButtonPosition = pinningManager.isPinned(.homeButton) ? persistor.appearancePrefs.homeButtonPosition : .hidden
+    }
+
+    private func listenToPinningManagerNotifications() {
+        pinnedViewsNotificationCancellable = NotificationCenter.default.publisher(for: .PinnedViewsChanged).sink { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            self.updateHomeButtonState()
+        }
+    }
+
+    private func urlWithScheme(_ urlString: String) -> String? {
+        guard var urlWithScheme = urlString.url else {
+            return nil
+        }
+        // Force 'https' if 'http' not explicitly set by user
+        if urlWithScheme.isHttp && !urlString.hasPrefix(URL.NavigationalScheme.http.separated()) {
+            urlWithScheme = urlWithScheme.toHttps() ?? urlWithScheme
+        }
+        return urlWithScheme.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
+    }
+
 }

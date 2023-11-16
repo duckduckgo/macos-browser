@@ -56,20 +56,13 @@ struct DataBrokerProtectionContainerView: View {
                             scanButtonClicked: {
                                 navigationViewModel.updateNavigation(.scanStarted)
                                 containerViewModel.scanAfterProfileCreation { scanResult in
-                                    if navigationViewModel.bodyViewType != .scanStarted {
-                                        return
-                                    }
-                                    switch scanResult {
-                                    case .noResults:
-                                        navigationViewModel.updateNavigation(.noResults)
-                                    case .results:
-                                        resultsViewModel.reloadData()
-                                        navigationViewModel.updateNavigation(.results)
+                                    updateUIWithScanResult(scanResult: scanResult)
+
+                                    if scanResult == .results && !DataBrokerDebugFlagBlockScheduler().isFlagOn() {
                                         containerViewModel.runQueuedOperationsAndStartScheduler()
                                     }
                                 }
                             }, backToDashboardClicked: {
-                                containerViewModel.runQueuedOperationsAndStartScheduler()
                                 navigationViewModel.updateNavigation(.results)
                             })
                         .frame(width: 670)
@@ -95,19 +88,52 @@ struct DataBrokerProtectionContainerView: View {
         )
     }
 
+    private func updateUIWithScanResult(scanResult: ContainerViewModel.ScanResult) {
+        if navigationViewModel.bodyViewType != .scanStarted {
+            return
+        }
+        switch scanResult {
+        case .noResults:
+            navigationViewModel.updateNavigation(.noResults)
+        case .results:
+            resultsViewModel.reloadData()
+            navigationViewModel.updateNavigation(.results)
+        }
+    }
+
     @ViewBuilder
     private func debugUI() -> some View {
         VStack(alignment: .leading) {
-            Text("Scheduler status: \(containerViewModel.schedulerStatus)")
-
             Toggle("Use Fake Broker", isOn: $containerViewModel.useFakeBroker)
 
             Toggle("Display WebViews", isOn: $containerViewModel.showWebView)
+
+            Toggle("Block Scheduler", isOn: $containerViewModel.preventSchedulerStart)
 
             Button {
                 containerViewModel.forceSchedulerRun()
             } label: {
                 Text("Force operations run")
+            }
+
+            Button {
+                containerViewModel.forceRunScans { result in
+                    updateUIWithScanResult(scanResult: result)
+                }
+            } label: {
+                Text("Run Scans")
+            }
+
+            Button {
+                containerViewModel.forceRunOptOuts()
+            } label: {
+                Text("Run Opt-Outs")
+            }
+
+            Button {
+                containerViewModel.cleanData()
+            } label: {
+                Text("Clean Data & Close")
             }
 
             HStack {
@@ -123,7 +149,6 @@ struct DataBrokerProtectionContainerView: View {
         }
         .padding()
         .blurredBackground()
-
     }
 
     @ViewBuilder
@@ -137,7 +162,6 @@ struct DataBrokerProtectionContainerView: View {
                     shouldShowDebugUI.toggle()
                 },
                                     editProfileClicked: {
-                    containerViewModel.stopAllOperations()
                     navigationViewModel.updateNavigation(.createProfile)
                 })
                 .frame(height: 300)
@@ -163,7 +187,7 @@ struct DataBrokerProtectionContainerView_Previews: PreviewProvider {
         let navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
         let profileViewModel = ProfileViewModel(dataManager: dataManager)
         let resultsViewModel = ResultsViewModel(dataManager: dataManager)
-        let containerViewModel = ContainerViewModel(scheduler: PreviewScheduler(), dataManager: dataManager)
+        let containerViewModel = ContainerViewModel(scheduler: DataBrokerProtectionNoOpScheduler(), dataManager: dataManager)
 
         DataBrokerProtectionContainerView(containerViewModel: containerViewModel,
                                           navigationViewModel: navigationViewModel,

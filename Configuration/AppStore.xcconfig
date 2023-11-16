@@ -46,4 +46,4 @@ AGENT_BUNDLE_ID[config=Debug][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.n
 AGENT_BUNDLE_ID[config=CI][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent.review
 
-AGENT_PRODUCT_NAME = DuckDuckGo Agent App Store
+AGENT_PRODUCT_NAME = DuckDuckGo VPN App Store

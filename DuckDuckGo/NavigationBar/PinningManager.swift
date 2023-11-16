@@ -27,6 +27,7 @@ enum PinnableView: String {
     case bookmarks
     case downloads
     case networkProtection
+    case homeButton
 }
 
 protocol PinningManager {
@@ -115,6 +116,7 @@ final class LocalPinningManager: PinningManager {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
+        case .homeButton: return ""
         case .networkProtection:
 #if NETWORK_PROTECTION
             if !networkProtectionFeatureActivation.isFeatureActivated {

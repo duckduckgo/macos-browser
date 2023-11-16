@@ -109,17 +109,15 @@ final class Fire {
         self.recentlyClosedCoordinator = recentlyClosedCoordinator
         self.pinnedTabsManager = pinnedTabsManager ?? WindowControllersManager.shared.pinnedTabsManager
         self.bookmarkManager = bookmarkManager
-        self.syncService = syncService ?? (NSApp.delegate as? AppDelegate)?.syncService
-        self.syncDataProviders = syncDataProviders ?? (NSApp.delegate as? AppDelegate)?.syncDataProviders
+        self.syncService = syncService ?? NSApp.delegateTyped.syncService
+        self.syncDataProviders = syncDataProviders ?? NSApp.delegateTyped.syncDataProviders
         self.secureVaultFactory = secureVaultFactory
         self.tld = tld
         self.autoconsentManagement = autoconsentManagement ?? AutoconsentManagement.shared
         if let stateRestorationManager = stateRestorationManager {
             self.stateRestorationManager = stateRestorationManager
-        } else if let appDelegate = NSApp.delegate as? AppDelegate {
-            self.stateRestorationManager = appDelegate.stateRestorationManager
         } else {
-            self.stateRestorationManager = nil
+            self.stateRestorationManager = NSApp.delegateTyped.stateRestorationManager
         }
     }
 
@@ -204,7 +202,7 @@ final class Fire {
 
             group.enter()
             self.burnTabs(burningEntity: .allWindows(mainWindowControllers: windowControllers, selectedDomains: Set())) {
-                Task {
+                Task { @MainActor in
                     await self.burnWebCache()
                     self.burnHistory {
                         self.burnPermissions {
@@ -306,7 +304,7 @@ final class Fire {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             if self.windowControllerManager.mainWindowControllers.count == 0 {
-                (NSApp.delegate as? AppDelegate)?.newWindow(self)
+                NSApp.delegateTyped.newWindow(self)
             }
         }
     }
@@ -390,6 +388,7 @@ final class Fire {
         return Set(accounts.compactMap { $0.domain })
     }
 
+    @MainActor
     private func burnFavicons(completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnExcept(fireproofDomains: FireproofDomains.shared,
@@ -398,6 +397,7 @@ final class Fire {
                                           completion: completion)
     }
 
+    @MainActor
     private func burnFavicons(for baseDomains: Set<String>, completion: @escaping () -> Void) {
         let autofillDomains = autofillDomains()
         self.faviconManagement.burnDomains(baseDomains,

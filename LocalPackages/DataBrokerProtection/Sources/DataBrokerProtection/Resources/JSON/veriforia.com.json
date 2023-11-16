@@ -1,0 +1,67 @@
+{
+  "name": "veriforia.com",
+  "version": "0.1.1",
+  "parent": "verecor.com",
+  "addedDatetime": 1677733200000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "ffb30e97-b03f-4157-a511-09ad8ffb8b54",
+          "url": "https://veriforia.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "1d8d9c20-9897-4386-8bc1-bd591abe7c81",
+          "selector": ".search-item",
+          "profile": {
+            "name": {
+              "selector": ".//div[@class='col-sm-24 col-md-19 col-text']"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-16 name']//li",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//span[@itemprop='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//li[@itemprop='relatedTo']",
+              "findElements": true,
+              "beforeText": ","
+            },
+            "profileUrl": {
+              "selector": "a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

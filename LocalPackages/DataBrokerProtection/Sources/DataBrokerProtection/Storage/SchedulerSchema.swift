@@ -34,6 +34,7 @@ struct ProfileQueryDB: Codable {
     let zipCode: Data?
     let phone: Data?
     let birthYear: Data
+    let deprecated: Bool
 }
 
 extension ProfileQueryDB: PersistableRecord, FetchableRecord {
@@ -52,6 +53,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         case zipCode
         case phone
         case birthYear
+        case deprecated
     }
 
     init(row: Row) throws {
@@ -67,6 +69,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         zipCode = row[Columns.zipCode]
         phone = row[Columns.phone]
         birthYear = row[Columns.birthYear]
+        deprecated = row[Columns.deprecated]
     }
 
     func encode(to container: inout PersistenceContainer) throws {
@@ -82,6 +85,7 @@ extension ProfileQueryDB: PersistableRecord, FetchableRecord {
         container[Columns.zipCode] = zipCode
         container[Columns.phone] = phone
         container[Columns.birthYear] = birthYear
+        container[Columns.deprecated] = deprecated
     }
 }
 
@@ -307,5 +311,43 @@ extension ExtractedProfileDB: PersistableRecord, FetchableRecord {
         container[Columns.profileQueryId] = profileQueryId
         container[Columns.profile] = profile
         container[Columns.removedDate] = removedDate
+    }
+}
+
+struct OptOutAttemptDB: Codable {
+    let extractedProfileId: Int64
+    let dataBroker: String
+    var attemptId: String
+    var lastStageDate: Date
+    var startDate: Date
+}
+
+extension OptOutAttemptDB: PersistableRecord, FetchableRecord {
+    static let databaseTableName: String = "optOutAttempt"
+
+    static let extractedProfile = belongsTo(ExtractedProfileDB.self)
+
+    enum Columns: String, ColumnExpression {
+        case extractedProfileId
+        case dataBroker
+        case attemptId
+        case lastStageDate
+        case startDate
+    }
+
+    init(row: Row) throws {
+        extractedProfileId = row[Columns.extractedProfileId]
+        dataBroker = row[Columns.dataBroker]
+        attemptId = row[Columns.attemptId]
+        lastStageDate = row[Columns.lastStageDate]
+        startDate = row[Columns.startDate]
+    }
+
+    func encode(to container: inout PersistenceContainer) throws {
+        container[Columns.extractedProfileId] = extractedProfileId
+        container[Columns.dataBroker] = dataBroker
+        container[Columns.attemptId] = attemptId
+        container[Columns.lastStageDate] = lastStageDate
+        container[Columns.startDate] = startDate
     }
 }

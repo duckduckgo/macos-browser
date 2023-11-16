@@ -116,7 +116,6 @@ class OnboardingTests: XCTestCase {
 }
 
 final class MockOnboardingDelegate: NSObject, OnboardingDelegate {
-
     var didRequestImportDataCalled = 0
     var didRequestSetDefaultCalled = 0
     var hasFinishedCalled = 0

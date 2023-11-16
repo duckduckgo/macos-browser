@@ -21,10 +21,6 @@ import Foundation
 
 final class SafariBookmarksReader {
 
-    enum ImportError: Error {
-        case unexpectedBookmarksFileFormat
-    }
-
     private enum Constants {
         static let bookmarkChildrenKey = "Children"
         static let bookmarksBar = "BookmarksBar"
@@ -40,20 +36,46 @@ final class SafariBookmarksReader {
         static let leafType = "WebBookmarkTypeLeaf"
     }
 
+    struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case readPlist
+
+            case getTopLevelEntries
+        }
+
+        var action: DataImportAction { .bookmarks }
+        var source: DataImport.Source { .safari }
+        let type: OperationType
+        let underlyingError: Error?
+    }
+
     private let safariBookmarksFileURL: URL
+    private var currentOperationType: ImportError.OperationType = .readPlist
 
     init(safariBookmarksFileURL: URL) {
         self.safariBookmarksFileURL = safariBookmarksFileURL
     }
 
-    func readBookmarks() -> Result<ImportedBookmarks, SafariBookmarksReader.ImportError> {
-        guard let plistData = readPropertyList() else {
-            return .failure(.unexpectedBookmarksFileFormat)
+    func readBookmarks() -> DataImportResult<ImportedBookmarks> {
+        do {
+            let bookmarks = try reallyReadBookmarks()
+            return .success(bookmarks)
+        } catch {
+            os_log("Failed to read Safari Bookmarks Plist at \"%s\": %s", log: .dataImportExport, type: .error, safariBookmarksFileURL.path, error.localizedDescription)
+            switch error {
+            case let error as ImportError:
+                return .failure(error)
+            default:
+                return .failure(ImportError(type: currentOperationType, underlyingError: error))
+            }
         }
+    }
 
-        guard let topLevelEntries = plistData[Constants.bookmarkChildrenKey] as? [[String: AnyObject]] else {
-            return .failure(.unexpectedBookmarksFileFormat)
-        }
+    private func reallyReadBookmarks() throws -> ImportedBookmarks {
+        currentOperationType = .readPlist
+        let plistData = try readPropertyList()
+
+        guard let topLevelEntries = plistData[Constants.bookmarkChildrenKey] as? [[String: AnyObject]] else { throw ImportError(type: .getTopLevelEntries, underlyingError: nil) }
 
         var bookmarksBar: ImportedBookmarks.BookmarkOrFolder?
         var otherBookmarks: [ImportedBookmarks.BookmarkOrFolder] = []
@@ -81,7 +103,7 @@ final class SafariBookmarksReader {
         let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolder)
 
-        return .success(importedBookmarks)
+        return importedBookmarks
     }
 
     private func bookmarkOrFolder(from entry: [String: AnyObject]) -> ImportedBookmarks.BookmarkOrFolder? {
@@ -107,19 +129,14 @@ final class SafariBookmarksReader {
         return nil
     }
 
-    private func readPropertyList() -> [String: AnyObject]? {
+    private func readPropertyList() throws -> [String: AnyObject] {
         var propertyListFormat = PropertyListSerialization.PropertyListFormat.xml
         var plistData: [String: AnyObject] = [:]
 
-        do {
-            let serializedData = try Data(contentsOf: safariBookmarksFileURL)
-            plistData = try PropertyListSerialization.propertyList(from: serializedData,
-                                                                   options: [],
-                                                                   format: &propertyListFormat) as? [String: AnyObject] ?? [:]
-        } catch {
-            os_log("Failed to read Safari Bookmarks Plist at path: %s", log: .dataImportExport, type: .error, safariBookmarksFileURL.absoluteString)
-            return nil
-        }
+        let serializedData = try Data(contentsOf: safariBookmarksFileURL)
+        plistData = try PropertyListSerialization.propertyList(from: serializedData,
+                                                               options: [],
+                                                               format: &propertyListFormat) as? [String: AnyObject] ?? [:]
 
         return plistData
     }

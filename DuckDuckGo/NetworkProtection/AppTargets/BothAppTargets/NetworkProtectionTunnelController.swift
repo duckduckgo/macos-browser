@@ -25,14 +25,21 @@ import Common
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
+import SystemExtensionManager
 import SystemExtensions
 import Networking
-import LoginItems
+import PixelKit
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
+
+    let settings: TunnelSettings
+
+    // MARK: - Combine Cancellables
+
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Debug Helpers
 
@@ -55,42 +62,17 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Auth token store
     private let tokenStore: NetworkProtectionTokenStore
 
-    // MARK: - Login Items
-
-    private let loginItemsManager = LoginItemsManager()
-
     // MARK: - Debug Options Support
 
-    private let debugUtilities = NetworkProtectionDebugUtilities()
+    private let networkExtensionBundleID: String
+    private let networkExtensionController: NetworkExtensionController
 
-    /// Kill Switch: Enable enforceRoutes flag
-    ///
-    /// Applies enforceRoutes setting, sets up excludedRoutes in MacPacketTunnelProvider and disables disconnect on failure
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldEnforceRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldEnforceRoutes)
-    private(set) var shouldEnforceRoutes: Bool
-
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldIncludeAllNetworks, defaultValue: NetworkProtectionUserDefaultsConstants.shouldIncludeAllNetworks)
-    private(set) var shouldIncludeAllNetworks
+    // MARK: - User Defaults
 
     /// Test setting to exclude duckduckgo route from VPN
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionExcludedRoutes, defaultValue: [:])
     private(set) var excludedRoutesPreferences: [String: Bool]
-
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionShouldExcludeLocalRoutes, defaultValue: NetworkProtectionUserDefaultsConstants.shouldExcludeLocalRoutes)
-    private(set) var shouldExcludeLocalRoutes: Bool
-
-    /// When enabled VPN connection will be automatically initiated by DuckDuckGoAgentAppDelegate on launch even if disconnected manually (Always On rule disabled)
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
-    private(set) var shouldAutoConnectOnLogIn: Bool
-
-    @MainActor
-    @UserDefaultsWrapper(key: .networkProtectionConnectionTesterEnabled, defaultValue: NetworkProtectionUserDefaultsConstants.isConnectionTesterEnabled, defaults: .shared)
-    private(set) var isConnectionTesterEnabled: Bool
 
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
@@ -106,7 +88,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// a VPN-access popup to the user.
     ///
     private func loadTunnelManager() async -> NETunnelProviderManager? {
-        try? await NETunnelProviderManager.loadAllFromPreferences().first
+        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+        return tunnels?.first {
+            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == networkExtensionBundleID
+        }
     }
 
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
@@ -130,12 +115,98 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///         - notificationCenter: (meant for testing) the notification center that this object will use.
     ///         - logger: (meant for testing) the logger that this object will use.
     ///
-    init(notificationCenter: NotificationCenter = .default,
+    init(networkExtensionBundleID: String,
+         networkExtensionController: NetworkExtensionController,
+         settings: TunnelSettings,
+         notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
+        self.networkExtensionBundleID = networkExtensionBundleID
+        self.networkExtensionController = networkExtensionController
+        self.settings = settings
         self.tokenStore = tokenStore
+
+        subscribeToSettingsChanges()
+    }
+
+    // MARK: - Tunnel Settings
+
+    private func subscribeToSettingsChanges() {
+        settings.changePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] change in
+                guard let self else { return }
+
+                Task {
+                    // Offer the extension a chance to handle the settings change
+                    try? await self.relaySettingsChange(change)
+
+                    // Handle the settings change right in the controller
+                    try? await self.handleSettingsChange(change)
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    /// This is where the tunnel has a chance to handle the settings change locally.
+    ///
+    /// The extension can also handle these changes so not everything needs to be handled here.
+    ///
+    private func handleSettingsChange(_ change: TunnelSettings.Change) async throws {
+        switch change {
+        case .setIncludeAllNetworks(let includeAllNetworks):
+            try await handleSetIncludeAllNetworks(includeAllNetworks)
+        case .setEnforceRoutes(let enforceRoutes):
+            try await handleSetEnforceRoutes(enforceRoutes)
+        case .setExcludeLocalNetworks(let excludeLocalNetworks):
+            try await handleSetExcludeLocalNetworks(excludeLocalNetworks)
+        case .setRegistrationKeyValidity,
+                .setSelectedServer,
+                .setSelectedLocation,
+                .setSelectedEnvironment:
+            // Intentional no-op as this is handled by the extension
+            break
+        }
+    }
+
+    private func handleSetIncludeAllNetworks(_ includeAllNetworks: Bool) async throws {
+        guard let tunnelManager = await loadTunnelManager(),
+              tunnelManager.protocolConfiguration?.includeAllNetworks == !includeAllNetworks else {
+            return
+        }
+
+        try await setupAndSave(tunnelManager)
+    }
+
+    private func handleSetEnforceRoutes(_ enforceRoutes: Bool) async throws {
+        guard let tunnelManager = await loadTunnelManager(),
+              tunnelManager.protocolConfiguration?.enforceRoutes == !enforceRoutes else {
+            return
+        }
+
+        try await setupAndSave(tunnelManager)
+    }
+
+    private func handleSetExcludeLocalNetworks(_ excludeLocalNetworks: Bool) async throws {
+        guard let tunnelManager = await loadTunnelManager(),
+              tunnelManager.protocolConfiguration?.excludeLocalNetworks == !excludeLocalNetworks else {
+            return
+        }
+
+        try await setupAndSave(tunnelManager)
+        updateRoutes()
+    }
+
+    private func relaySettingsChange(_ change: TunnelSettings.Change) async throws {
+        guard await isConnected,
+              let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
+
+        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderRequest(.changeTunnelSetting(change))
+        if let errorMessage {
+            throw TunnelFailureError(errorDescription: errorMessage.value)
+        }
     }
 
     // MARK: - Tunnel Configuration
@@ -166,11 +237,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.disconnectOnSleep = false
 
             // kill switch
-            protocolConfiguration.enforceRoutes = shouldEnforceRoutes
+            protocolConfiguration.enforceRoutes = settings.enforceRoutes
             // this setting breaks Connection Tester
-            protocolConfiguration.includeAllNetworks = shouldIncludeAllNetworks
-
-            protocolConfiguration.excludeLocalNetworks = shouldExcludeLocalRoutes
+            protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
+            protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
 
             return protocolConfiguration
         }()
@@ -200,25 +270,47 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     // MARK: - Ensure things are working
 
 #if NETP_SYSTEM_EXTENSION
-    /// - Returns: `true` if the system extension and the background agent were activated successfully
+    /// Ensures that the system extension is activated if necessary.
     ///
-    private func ensureSystemExtensionIsActivated() async throws -> Bool {
-        var activated = false
+    private func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
+        do {
+            try await networkExtensionController.activateSystemExtension(
+                waitingForUserApproval: waitingForUserApproval)
+        } catch {
+            switch error {
+            case OSSystemExtensionError.requestSuperseded:
+                // Even if the installation request is superseded we want to show the message that tells the user
+                // to go to System Settings to allow the extension
+                controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
+            case SystemExtensionRequestError.unknownRequestResult:
+                controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
 
-        for try await event in SystemExtensionManager().activate() {
-            switch event {
-            case .waitingForUserApproval:
-                onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
-            case .activated:
-                self.controllerErrorStore.lastErrorMessage = nil
-                activated = true
-            case .willActivateAfterReboot:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionSystemExtensionUnknownActivationResult,
+                    frequency: .standard,
+                    includeAppVersionParameter: true)
+            case SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
+            default:
+                controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
+
+            return
         }
 
-        try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
-        return activated
+        self.controllerErrorStore.lastErrorMessage = nil
+
+        // We'll only update to completed if we were showing the onboarding step to
+        // allow the system extension.  Otherwise we may override the allow-VPN
+        // onboarding step.
+        //
+        // Additionally if the onboarding step was allowing the system extension, we won't
+        // start the tunnel at once, and instead require that the user enables the toggle.
+        //
+        if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
+            onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowVPNConfiguration).rawValue
+            return
+        }
     }
 #endif
 
@@ -245,31 +337,23 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Starts the VPN connection used for Network Protection
     ///
     func start() async {
-        await start(enableLoginItems: true)
-    }
-
-    func start(enableLoginItems: Bool) async {
         controllerErrorStore.lastErrorMessage = nil
 
-        do {
 #if NETP_SYSTEM_EXTENSION
-            guard try await ensureSystemExtensionIsActivated() else {
-                return
+        do {
+            try await activateSystemExtension { [weak self] in
+                // If we're waiting for user approval we wanna make sure the
+                // onboarding step is set correctly.  This can be useful to
+                // help prevent the value from being de-synchronized.
+                self?.onboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
             }
-
-            // We'll only update to completed if we were showing the onboarding step to
-            // allow the system extension.  Otherwise we may override the allow-VPN
-            // onboarding step.
-            //
-            // Additionally if the onboarding step was allowing the system extension, we won't
-            // start the tunnel at once, and instead require that the user enables the toggle.
-            //
-            if onboardingStatusRawValue == OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue {
-                onboardingStatusRawValue = OnboardingStatus.completed.rawValue
-                return
-            }
+        } catch {
+            await stop()
+            return
+        }
 #endif
 
+        do {
             let tunnelManager: NETunnelProviderManager
 
             do {
@@ -283,10 +367,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             }
             onboardingStatusRawValue = OnboardingStatus.completed.rawValue
 
-            if enableLoginItems {
-                loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
-            }
-
             switch tunnelManager.connection.status {
             case .invalid:
                 throw StartError.connectionStatusInvalid
@@ -296,11 +376,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             default:
                 try await start(tunnelManager)
             }
-        } catch OSSystemExtensionError.requestSuperseded {
-            await stop()
-            // Even if the installation request is superseded we want to show the message that tells the user
-            // to go to System Settings to allow the extension
-            controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
         } catch {
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
@@ -312,9 +387,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
         options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
-        options[NetworkProtectionOptionKey.selectedServer] = debugUtilities.selectedServerName() as NSString?
-        options[NetworkProtectionOptionKey.keyValidity] = debugUtilities.registrationKeyValidity.map(String.init(describing:)) as NSString?
-        options[NetworkProtectionOptionKey.connectionTesterEnabled] = await NSNumber(value: isConnectionTesterEnabled)
+        options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as? NSString
+        options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
+
+        if case .custom(let keyValidity) = settings.registrationKeyValidity {
+            options[NetworkProtectionOptionKey.keyValidity] = String(describing: keyValidity) as NSString
+        }
 
         if Self.simulationOptions.isEnabled(.tunnelFailure) {
             Self.simulationOptions.setEnabled(false, option: .tunnelFailure)
@@ -367,7 +445,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     @MainActor
     func enableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
-        tunnelManager.onDemandRules = [NEOnDemandRuleConnect(interfaceType: .any)]
+        let rule = NEOnDemandRuleConnect()
+        rule.interfaceTypeMatch = .any
+
+        tunnelManager.onDemandRules = [rule]
         tunnelManager.isOnDemandEnabled = true
 
         try await tunnelManager.saveToPreferences()
@@ -381,111 +462,15 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    func enableEnforceRoutes() async throws {
-        shouldEnforceRoutes = true
-
-        // calls setupAndSave where configuration is done
-        _=try await loadOrMakeTunnelManager()
-    }
-
-    @MainActor
-    func disableEnforceRoutes() async throws {
-        shouldEnforceRoutes = false
-
-        guard let tunnelManager = await loadTunnelManager(),
-              tunnelManager.protocolConfiguration?.enforceRoutes == true else { return }
-
-        try await setupAndSave(tunnelManager)
-    }
-
-    @MainActor
-    func enableIncludeAllNetworks() async throws {
-        shouldIncludeAllNetworks = true
-
-        // calls setupAndSave where configuration is done
-        _=try await loadOrMakeTunnelManager()
-    }
-
-    @MainActor
-    func disableIncludeAllNetworks() async throws {
-        shouldIncludeAllNetworks = false
-
-        guard let tunnelManager = await loadTunnelManager(),
-              tunnelManager.protocolConfiguration?.includeAllNetworks == true else { return }
-
-        try await setupAndSave(tunnelManager)
-    }
-
-    @MainActor
-    func toggleShouldEnforceRoutes() {
-        shouldEnforceRoutes.toggle()
-
-        // update configuration if connected
-        Task { [shouldEnforceRoutes] in
-            guard await isConnected else { return }
-
-            if shouldEnforceRoutes {
-                try await enableEnforceRoutes()
-            } else {
-                try await disableEnforceRoutes()
-            }
-        }
-    }
-
-    @MainActor
-    func toggleShouldIncludeAllNetworks() {
-        shouldIncludeAllNetworks.toggle()
-
-        // update configuration if connected
-        Task { [shouldIncludeAllNetworks] in
-            guard await isConnected else { return }
-
-            if shouldIncludeAllNetworks {
-                try await enableIncludeAllNetworks()
-            } else {
-                try await disableIncludeAllNetworks()
-            }
-        }
-    }
-
-    // TO BE Refactored when the Exclusion List is added
-    enum ExclusionListItem {
-        case section(String)
-        case exclusion(range: NetworkProtection.IPAddressRange, description: String? = nil, `default`: Bool)
-    }
-    static let exclusionList: [ExclusionListItem] = [
-        .section("IPv4 Local Routes"),
-
-        .exclusion(range: "10.0.0.0/8"     /* 255.0.0.0 */, description: "disabled for enforceRoutes", default: true),
-        .exclusion(range: "172.16.0.0/12"  /* 255.240.0.0 */, default: true),
-        .exclusion(range: "192.168.0.0/16" /* 255.255.0.0 */, default: true),
-        .exclusion(range: "169.254.0.0/16" /* 255.255.0.0 */, description: "Link-local", default: true),
-        .exclusion(range: "127.0.0.0/8"    /* 255.0.0.0 */, description: "Loopback", default: true),
-        .exclusion(range: "224.0.0.0/4"    /* 240.0.0.0 (corrected subnet mask) */, description: "Multicast", default: true),
-        .exclusion(range: "100.64.0.0/16"  /* 255.255.0.0 */, description: "Shared Address Space", default: true),
-
-        .section("IPv6 Local Routes"),
-        .exclusion(range: "fe80::/10", description: "link local", default: false),
-        .exclusion(range: "ff00::/8", description: "multicast", default: false),
-        .exclusion(range: "fc00::/7", description: "local unicast", default: false),
-        .exclusion(range: "::1/128", description: "loopback", default: false),
-
-        .section("duckduckgo.com"),
-        .exclusion(range: "52.142.124.215/32", default: false),
-        .exclusion(range: "52.250.42.157/32", default: false),
-        .exclusion(range: "40.114.177.156/32", default: false),
-    ]
-
-    @MainActor
     private func excludedRoutes() -> [NetworkProtection.IPAddressRange] {
-        Self.exclusionList.compactMap { [excludedRoutesPreferences] item -> NetworkProtection.IPAddressRange? in
+        settings.exclusionList.compactMap { [excludedRoutesPreferences] item -> NetworkProtection.IPAddressRange? in
             guard case .exclusion(range: let range, description: _, default: let defaultValue) = item,
                   excludedRoutesPreferences[range.stringRepresentation, default: defaultValue] == true
             else { return nil }
             // TO BE fixed:
             // when 10.11.12.1 DNS is used 10.0.0.0/8 should be included (not excluded)
             // but marking 10.11.12.1 as an Included Route breaks tunnel (probably these routes are conflicting)
-            if shouldEnforceRoutes && range == "10.0.0.0/8" {
+            if settings.enforceRoutes && range == "10.0.0.0/8" {
                 return nil
             }
 
@@ -500,12 +485,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     @MainActor
-    func toggleShouldExcludeLocalRoutes() {
-        shouldExcludeLocalRoutes.toggle()
-        updateRoutes()
-    }
-
-    @MainActor
     func setExcludedRoute(_ route: String, enabled: Bool) {
         excludedRoutesPreferences[route] = enabled
         updateRoutes()
@@ -514,7 +493,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @MainActor
     func isExcludedRouteEnabled(_ route: String) -> Bool {
         guard let range = IPAddressRange(from: route),
-              let exclusionListItem = Self.exclusionList.first(where: {
+              let exclusionListItem = settings.exclusionList.first(where: {
                   if case .exclusion(range: range, description: _, default: _) = $0 { return true }
                   return false
               }),
@@ -524,7 +503,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             return false
         }
         // TO BE fixed: see excludedRoutes()
-        if shouldEnforceRoutes && route == "10.0.0.0/8" {
+        if settings.enforceRoutes && route == "10.0.0.0/8" {
             return false
         }
         return excludedRoutesPreferences[route, default: defaultValue]
@@ -537,16 +516,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             try await activeSession.sendProviderMessage(.setIncludedRoutes(includedRoutes()))
             try await activeSession.sendProviderMessage(.setExcludedRoutes(excludedRoutes()))
         }
-    }
-
-    @MainActor
-    func toggleShouldAutoConnectOnLogIn() {
-        shouldAutoConnectOnLogIn.toggle()
-    }
-
-    @MainActor
-    func toggleConnectionTesterEnabled() {
-        isConnectionTesterEnabled.toggle()
     }
 
     struct TunnelFailureError: LocalizedError {
@@ -570,6 +539,16 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         } else {
             Self.simulationOptions.setEnabled(true, option: .crashFatalError)
             try await sendProviderMessageToActiveSession(.simulateTunnelFatalError)
+        }
+    }
+
+    @MainActor
+    func toggleShouldSimulateConnectionInterruption() async throws {
+        if Self.simulationOptions.isEnabled(.connectionInterruption) {
+            Self.simulationOptions.setEnabled(false, option: .connectionInterruption)
+        } else {
+            Self.simulationOptions.setEnabled(true, option: .connectionInterruption)
+            try await sendProviderMessageToActiveSession(.simulateConnectionInterruption)
         }
     }
 

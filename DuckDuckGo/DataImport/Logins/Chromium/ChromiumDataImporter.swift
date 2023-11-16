@@ -46,83 +46,74 @@ internal class ChromiumDataImporter: DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
-                    completion: @escaping (Result<DataImport.Summary, DataImportError>) -> Void) {
+                    modalWindow: NSWindow? = nil,
+                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        let result = importData(types: types, from: profile, modalWindow: modalWindow)
+        completion(result)
+    }
 
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, modalWindow: NSWindow?) -> DataImportResult<DataImport.Summary> {
         var summary = DataImport.Summary()
         let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
 
         if types.contains(.logins) {
-            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, processName: processName)
-            let loginResult = loginReader.readLogins()
+            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source, processName: processName)
+            let loginResult = loginReader.readLogins(modalWindow: modalWindow)
 
             switch loginResult {
             case .success(let logins):
                 do {
-                    summary.loginsResult = .completed(try loginImporter.importLogins(logins))
+                    let result = try loginImporter.importLogins(logins)
+                    summary.loginsResult = .completed(result)
                 } catch {
-                    completion(.failure(.logins(.cannotAccessSecureVault)))
-                    return
+                    return .failure(LoginImporterError(source: source, error: error))
                 }
             case .failure(let error):
-                completion(.failure(.logins(error)))
-                return
+                return .failure(error)
             }
         }
 
         if types.contains(.bookmarks) {
-            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: dataDirectoryURL)
+            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             importFavicons(from: dataDirectoryURL)
 
             switch bookmarkResult {
             case .success(let bookmarks):
-                do {
-                    summary.bookmarksResult = try bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
-                } catch {
-                    completion(.failure(.bookmarks(.cannotAccessSecureVault)))
-                    return
-                }
-            case .failure(let error):
-                switch error {
-                case .noBookmarksFileFound:
-                    // If there are no bookmarks, treat it as a successful import of zero bookmarks.
-                    let result = BookmarkImportResult.init(successful: 0, duplicates: 0, failed: 0)
-                    summary.bookmarksResult = result
+                summary.bookmarksResult = bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
 
-                case .bookmarksFileDecodingFailed:
-                    completion(.failure(.bookmarks(.cannotReadFile)))
-                    return
-                }
+            case .failure(let error):
+                return .failure(error)
             }
         }
 
-        completion(.success(summary))
+        return .success(summary)
     }
 
+    @MainActor(unsafe)
     func importFavicons(from dataDirectoryURL: URL) {
-        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL)
+        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
         case .success(let faviconsByURL):
-            for (pageURLString, fetchedFavicons) in faviconsByURL {
-                if let pageURL = URL(string: pageURLString) {
-                    let favicons = fetchedFavicons.map {
-                        Favicon(identifier: UUID(),
-                                url: pageURL,
-                                image: $0.image,
-                                relation: .icon,
-                                documentUrl: pageURL,
-                                dateCreated: Date())
-                    }
-
-                    faviconManager.handleFavicons(favicons, documentUrl: pageURL)
+            let faviconsByDocument = faviconsByURL.reduce(into: [URL: [Favicon]]()) { result, pair in
+                guard let pageURL = URL(string: pair.key) else { return }
+                let favicons = pair.value.map {
+                    Favicon(identifier: UUID(),
+                            url: pageURL,
+                            image: $0.image,
+                            relation: .icon,
+                            documentUrl: pageURL,
+                            dateCreated: Date())
                 }
+                result[pageURL] = favicons
             }
+            faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
-        case .failure:
-            Pixel.fire(.faviconImportFailed(source: self.source.pixelEventSource))
+        case .failure(let error):
+            Pixel.fire(.dataImportFailed(error))
         }
     }
 

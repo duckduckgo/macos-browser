@@ -35,6 +35,11 @@ final class ConfigurationManager {
         case bloomFilterExclusionsNotFound
         case bloomFilterExclusionsPersistenceFailed
 
+        func withUnderlyingError(_ underlyingError: Swift.Error) -> Swift.Error {
+            let nsError = self as NSError
+            return NSError(domain: nsError.domain, code: nsError.code, userInfo: [NSUnderlyingErrorKey: underlyingError])
+        }
+
     }
 
     enum Constants {
@@ -54,7 +59,7 @@ final class ConfigurationManager {
     static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
 
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
-    private var lastUpdateTime: Date
+    private(set) var lastUpdateTime: Date
 
     private var timerCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
@@ -215,7 +220,7 @@ final class ConfigurationManager {
                 try await PrivacyFeatures.httpsUpgrade.persistBloomFilter(specification: spec, data: bloomFilterData)
             } catch {
                 assertionFailure("persistBloomFilter failed: \(error)")
-                throw Error.bloomFilterPersistenceFailed
+                throw Error.bloomFilterPersistenceFailed.withUnderlyingError(error)
             }
             await PrivacyFeatures.httpsUpgrade.loadData()
         }.value
@@ -230,7 +235,7 @@ final class ConfigurationManager {
             do {
                 try await PrivacyFeatures.httpsUpgrade.persistExcludedDomains(excludedDomains)
             } catch {
-                throw Error.bloomFilterExclusionsPersistenceFailed
+                throw Error.bloomFilterExclusionsPersistenceFailed.withUnderlyingError(error)
             }
             await PrivacyFeatures.httpsUpgrade.loadData()
         }.value

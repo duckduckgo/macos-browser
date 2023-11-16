@@ -25,13 +25,14 @@ import Common
 final class FaviconManagerMock: FaviconManagement {
 
     func loadFavicons() {}
-    var areFaviconsLoaded: Bool { return true }
+    @Published var areFaviconsLoaded = true
+    var faviconsLoadedPublisher: Published<Bool>.Publisher { $areFaviconsLoaded }
 
     func handleFaviconLinks(_ faviconLinks: [FaviconUserScript.FaviconLink], documentUrl: URL, completion: @escaping (Favicon?) -> Void) {
         completion(nil)
     }
 
-    func handleFavicons(_ favicons: [Favicon], documentUrl: URL) {
+    func handleFaviconsByDocumentUrl(_ faviconsByDocumentUrl: [URL: [Favicon]]) {
         // no-op
     }
 
@@ -51,6 +52,7 @@ final class FaviconManagerMock: FaviconManagement {
         completion()
     }
 
+    // swiftlint:disable:next function_parameter_count
     func burnDomains(_ domains: Set<String>, exceptBookmarks bookmarkManager: DuckDuckGo_Privacy_Browser.BookmarkManager, exceptSavedLogins: Set<String>, exceptExistingHistory history: DuckDuckGo_Privacy_Browser.History, tld: Common.TLD, completion: @escaping () -> Void) {
         completion()
     }

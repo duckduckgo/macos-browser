@@ -25,7 +25,7 @@ protocol BookmarkManager: AnyObject {
 
     func isUrlBookmarked(url: URL) -> Bool
     func isUrlFavorited(url: URL) -> Bool
-    func isHostInBookmarks(host: String) -> Bool
+    func allHosts() -> Set<String>
     func getBookmark(for url: URL) -> Bookmark?
     func getBookmark(forUrl url: String) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
@@ -45,6 +45,9 @@ protocol BookmarkManager: AnyObject {
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
+    func handleFavoritesAfterDisablingSync()
+    var didMigrateToFormFactorSpecificFavorites: Bool { get }
+
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
@@ -55,18 +58,39 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {}
+    private init() {
+        self.subscribeToFavoritesDisplayMode()
+    }
 
     init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
         self.bookmarkStore = bookmarkStore
         self.faviconManagement = faviconManagement
+        self.subscribeToFavoritesDisplayMode()
+    }
+
+    private func subscribeToFavoritesDisplayMode() {
+        favoritesDisplayMode = AppearancePreferences.shared.favoritesDisplayMode
+        favoritesDisplayModeCancellable = AppearancePreferences.shared.$favoritesDisplayMode
+            .dropFirst()
+            .sink { [weak self] displayMode in
+                self?.favoritesDisplayMode = displayMode
+                self?.bookmarkStore.applyFavoritesDisplayMode(displayMode)
+                self?.loadBookmarks()
+            }
     }
 
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
 
+    var didMigrateToFormFactorSpecificFavorites: Bool {
+        bookmarkStore.didMigrateToFormFactorSpecificFavorites
+    }
+
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+
+    private var favoritesDisplayMode: FavoritesDisplayMode = .displayNative(.desktop)
+    private var favoritesDisplayModeCancellable: AnyCancellable?
 
     // MARK: - Bookmarks
 
@@ -103,13 +127,8 @@ final class LocalBookmarkManager: BookmarkManager {
         return list?[url.absoluteString]?.isFavorite == true
     }
 
-    func isHostInBookmarks(host: String) -> Bool {
-        return list?.allBookmarkURLsOrdered.contains(where: { bookmark in
-            if let url = bookmark.urlObject {
-                return url.host == host
-            }
-            return false
-        }) ?? false
+    func allHosts() -> Set<String> {
+        Set(list?.allBookmarkURLsOrdered.compactMap(\.urlObject?.host) ?? [])
     }
 
     func getBookmark(for url: URL) -> Bookmark? {
@@ -286,6 +305,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Favicons
 
+    @MainActor(unsafe)
     private func favicon(for host: String?) -> NSImage? {
         if let host = host {
             return faviconManagement.getCachedFavicon(for: host, sizeCategory: .small)?.image
@@ -304,6 +324,22 @@ final class LocalBookmarkManager: BookmarkManager {
         return results
     }
 
+    // MARK: - Sync
+
+    func handleFavoritesAfterDisablingSync() {
+        bookmarkStore.handleFavoritesAfterDisablingSync()
+    }
+
+    func requestSync() {
+        Task { @MainActor in
+            guard let syncService = NSApp.delegateTyped.syncService else {
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            syncService.scheduler.notifyDataChanged()
+        }
+    }
+
     // MARK: - Debugging
 
     func resetBookmarks() {
@@ -311,18 +347,9 @@ final class LocalBookmarkManager: BookmarkManager {
             return
         }
 
-        store.resetBookmarks()
-        loadBookmarks()
-        requestSync()
-    }
-
-    func requestSync() {
-        Task { @MainActor in
-            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
-                return
-            }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-            syncService.scheduler.notifyDataChanged()
+        store.resetBookmarks { [self] _ in
+            self.loadBookmarks()
+            self.requestSync()
         }
     }
 }

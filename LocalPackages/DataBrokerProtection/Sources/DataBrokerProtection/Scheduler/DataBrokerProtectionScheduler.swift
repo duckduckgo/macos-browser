@@ -21,22 +21,23 @@ import Common
 import BrowserServicesKit
 import Combine
 
-public enum DataBrokerProtectionSchedulerStatus {
+public enum DataBrokerProtectionSchedulerStatus: Codable {
     case stopped
     case idle
     case running
 }
 
 public protocol DataBrokerProtectionScheduler {
-    var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
+
     var status: DataBrokerProtectionSchedulerStatus { get }
+    var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { get }
 
     func startScheduler(showWebView: Bool)
     func stopScheduler()
 
-    func optOutAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func scanAllBrokers(showWebView: Bool, completion: (() -> Void)?)
-    func runQueuedOperations(showWebView: Bool, completion: (() -> Void)?)
+    func optOutAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func scanAllBrokers(showWebView: Bool, completion: ((Error?) -> Void)?)
+    func runQueuedOperations(showWebView: Bool, completion: ((Error?) -> Void)?)
     func runAllOperations(showWebView: Bool)
 }
 
@@ -67,15 +68,19 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let contentScopeProperties: ContentScopeProperties
     private let dataManager: DataBrokerProtectionDataManager
     private let activity: NSBackgroundActivityScheduler
-    private let errorHandler: EventMapping<DataBrokerProtectionOperationError>
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let schedulerIdentifier = "com.duckduckgo.macos.browser.databroker-protection-scheduler"
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
 
+    /// Ensures that only one scheduler operation is executed at the same time.
+    ///
+    private let schedulerDispatchQueue = DispatchQueue(label: "schedulerDispatchQueue", qos: .default)
+
     @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
 
-    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status}
+    public var statusPublisher: Published<DataBrokerProtectionSchedulerStatus>.Publisher { $status }
 
     private lazy var dataBrokerProcessor: DataBrokerProtectionProcessor = {
 
@@ -88,17 +93,16 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                                              config: DataBrokerProtectionSchedulerConfig(),
                                              operationRunnerProvider: runnerProvider,
                                              notificationCenter: notificationCenter,
-                                             errorHandler: errorHandler)
+                                             pixelHandler: pixelHandler)
     }()
 
     public init(privacyConfigManager: PrivacyConfigurationManaging,
                 contentScopeProperties: ContentScopeProperties,
                 dataManager: DataBrokerProtectionDataManager,
                 notificationCenter: NotificationCenter = NotificationCenter.default,
-                errorHandler: EventMapping<DataBrokerProtectionOperationError>,
+                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 redeemUseCase: DataBrokerProtectionRedeemUseCase
     ) {
-
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
         activity.interval = SchedulerCycle.interval
@@ -108,7 +112,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.dataManager = dataManager
         self.privacyConfigManager = privacyConfigManager
         self.contentScopeProperties = contentScopeProperties
-        self.errorHandler = errorHandler
+        self.pixelHandler = pixelHandler
         self.notificationCenter = notificationCenter
 
         self.emailService = EmailService(redeemUseCase: redeemUseCase)
@@ -149,22 +153,26 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.dataBrokerProcessor.runAllOperations(showWebView: showWebView)
     }
 
-    public func runQueuedOperations(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    public func runQueuedOperations(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
         dataBrokerProcessor.runQueuedOperations(showWebView: showWebView,
-                                                completion: completion)
+                                                completion: { completion?(nil) })
 
     }
 
-    public func scanAllBrokers(showWebView: Bool = false, completion: (() -> Void)? = nil) {
+    public func scanAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
+        stopScheduler()
+
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
-        self.dataBrokerProcessor.runAllScanOperations(showWebView: showWebView,
-                                                      completion: completion)
+        dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] in
+            self?.startScheduler(showWebView: showWebView)
+            completion?(nil)
+        }
     }
 
-    public func optOutAllBrokers(showWebView: Bool = false, completion: (() -> Void)?) {
+    public func optOutAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)?) {
         os_log("Opting out all brokers...", log: .dataBrokerProtection)
         self.dataBrokerProcessor.runAllOptOutOperations(showWebView: showWebView,
-                                                        completion: completion)
+                                                        completion: { completion?(nil) })
     }
 }

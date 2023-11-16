@@ -20,6 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
+@MainActor
 class FaviconReferenceCacheTests: XCTestCase {
 
     func testWhenFaviconUrlIsAddedToHostCache_ThenFaviconUrlIsUsedForWholeDomain() {
@@ -34,9 +35,9 @@ class FaviconReferenceCacheTests: XCTestCase {
         XCTAssert(URL.aDocumentUrl1.host == URL.aDocumentUrl2.host)
 
         referenceCache.insert(faviconUrls: (URL.aFaviconUrl1, URL.aFaviconUrl1), documentUrl: URL.aDocumentUrl1)
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
         XCTAssertNil(referenceCache.getFaviconUrl(for: URL.aDocumentUrl3, sizeCategory: .small))
     }
 
@@ -49,18 +50,18 @@ class FaviconReferenceCacheTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
 
-        XCTAssert(URL.aDocumentUrl1.host == URL.aDocumentUrl2.host)
+        XCTAssertEqual(URL.aDocumentUrl1.host, URL.aDocumentUrl2.host)
 
         referenceCache.insert(faviconUrls: (URL.aFaviconUrl1, URL.aFaviconUrl1), documentUrl: URL.aDocumentUrl1)
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
         XCTAssertNil(referenceCache.getFaviconUrl(for: URL.aDocumentUrl3, sizeCategory: .small))
 
         referenceCache.insert(faviconUrls: (URL.aFaviconUrl2, URL.aFaviconUrl2), documentUrl: URL.aDocumentUrl2)
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl2 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl2, referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
         XCTAssertNil(referenceCache.getFaviconUrl(for: URL.aDocumentUrl3, sizeCategory: .small))
     }
 
@@ -73,18 +74,18 @@ class FaviconReferenceCacheTests: XCTestCase {
 
         waitForExpectations(timeout: 1, handler: nil)
 
-        XCTAssert(URL.aFaviconUrl1.host == URL.aFaviconUrl2.host)
+        XCTAssertEqual(URL.aFaviconUrl1.host, URL.aFaviconUrl2.host)
 
         referenceCache.insert(faviconUrls: (URL.aFaviconUrl1, URL.aFaviconUrl1), documentUrl: URL.aDocumentUrl1)
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
 
         referenceCache.insert(faviconUrls: (URL.aFaviconUrl2, URL.aFaviconUrl2), documentUrl: URL.aDocumentUrl2)
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl2 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl2, referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
 
         referenceCache.insert(faviconUrls: (URL.aFaviconUrl1, URL.aFaviconUrl1), documentUrl: URL.aDocumentUrl2)
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
-        XCTAssert(URL.aFaviconUrl1 == referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl1.host!, sizeCategory: .small))
+        XCTAssertEqual(URL.aFaviconUrl1, referenceCache.getFaviconUrl(for: URL.aDocumentUrl2, sizeCategory: .small))
     }
 }
 

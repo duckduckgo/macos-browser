@@ -27,11 +27,11 @@ final class ContainerViewModel: ObservableObject {
 
     private let scheduler: DataBrokerProtectionScheduler
     private let dataManager: DataBrokerProtectionDataManaging
-    private var cancellables = Set<AnyCancellable>()
 
-    @Published var schedulerStatus = ""
+    @Published var scanResults: ScanResult?
     @Published var showWebView = false
     @Published var useFakeBroker = false
+    @Published var preventSchedulerStart = false
 
     internal init(scheduler: DataBrokerProtectionScheduler,
                   dataManager: DataBrokerProtectionDataManaging) {
@@ -39,40 +39,21 @@ final class ContainerViewModel: ObservableObject {
         self.dataManager = dataManager
 
         restoreFakeBrokerStatus()
-        setupCancellable()
-    }
-
-    private func setupCancellable() {
-        scheduler.statusPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-
-                switch status {
-                case .idle:
-                    self?.schedulerStatus = "🟠 Idle"
-                case .running:
-                    self?.schedulerStatus = "🟢 Running"
-                case .stopped:
-                    self?.schedulerStatus = "🔴 Stopped"
-                }
-            }.store(in: &cancellables)
-
-        $useFakeBroker
-            .receive(on: DispatchQueue.main)
-            .sink { value in
-                FakeBrokerUserDefaults().setFakeBrokerFlag(value)
-            }.store(in: &cancellables)
-
     }
 
     private func restoreFakeBrokerStatus() {
-        useFakeBroker = FakeBrokerUserDefaults().isFakeBrokerFlagOn()
+        useFakeBroker = DataBrokerDebugFlagFakeBroker().isFlagOn()
+        preventSchedulerStart = DataBrokerDebugFlagBlockScheduler().isFlagOn()
+        showWebView = DataBrokerDebugFlagShowWebView().isFlagOn()
     }
 
     func runQueuedOperationsAndStartScheduler() {
-        scheduler.runQueuedOperations(showWebView: showWebView) { [weak self] in
-            guard let self = self else { return }
-            self.scheduler.startScheduler(showWebView: self.showWebView)
+        scheduler.runQueuedOperations(showWebView: showWebView) { [scheduler] error in
+            guard error == nil else {
+                return
+            }
+
+            scheduler.startScheduler(showWebView: self.showWebView)
         }
     }
 
@@ -80,15 +61,34 @@ final class ContainerViewModel: ObservableObject {
         scheduler.runAllOperations(showWebView: showWebView)
     }
 
-    func stopAllOperations() {
-        scheduler.stopScheduler()
+    func forceRunScans(completion: @escaping (ScanResult) -> Void) {
+        scanAndUpdateUI(completion: completion)
+    }
+
+    func forceRunOptOuts() {
+        scheduler.optOutAllBrokers(showWebView: showWebView, completion: nil)
+    }
+
+    func cleanData() {
+        let fileManager = FileManager.default
+        // Not the best way to hardcode this, but it's just for the debug UI
+        let filePath = NSHomeDirectory() + "/Library/Containers/com.duckduckgo.macos.browser.dbp.debug/Data/Library/Application Support/DBP/Vault.db"
+
+        do {
+            try fileManager.removeItem(atPath: filePath)
+        } catch {
+            print("Error removing file: \(error.localizedDescription)")
+        }
+        exit(0)
     }
 
     func scanAfterProfileCreation(completion: @escaping (ScanResult) -> Void) {
-        scheduler.stopScheduler()
+        scanAndUpdateUI(completion: completion)
+    }
 
-        scheduler.scanAllBrokers(showWebView: showWebView) { [weak self] in
-            guard let self = self else { return }
+    private func scanAndUpdateUI(completion: @escaping (ScanResult) -> Void) {
+        scheduler.scanAllBrokers(showWebView: self.showWebView) { [weak self] error in
+            guard error == nil, let self = self else { return }
 
             DispatchQueue.main.async {
                 let hasResults = self.dataManager.hasMatches()

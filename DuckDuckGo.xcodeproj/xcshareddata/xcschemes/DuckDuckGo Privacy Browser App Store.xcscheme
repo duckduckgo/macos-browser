@@ -153,6 +153,16 @@
                ReferencedContainer = "container:LocalPackages/SyncUI">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PixelKitTests"
+               BuildableName = "PixelKitTests"
+               BlueprintName = "PixelKitTests"
+               ReferencedContainer = "container:LocalPackages/PixelKit">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -194,6 +204,15 @@
          <EnvironmentVariable
             key = "DYLD_LIBRARY_PATH"
             value = "$(SRCROOT)/../WebKit/WebKitBuild/Release"
+            isEnabled = "YES">
+         <EnvironmentVariable
+            key = "OS_ACTIVITY_DT_MODE"
+            value = "YES"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "OS_ACTIVITY_MODE"
+            value = "debug"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

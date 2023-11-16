@@ -52,6 +52,7 @@ extension UserText {
         }
     }
 
+    static let networkProtectionUnknownActivationError = NSLocalizedString("network.protection.system.extension.unknown.activation.error", value: "There as an unexpected error. Please try again.", comment: "Message shown to users when they try to enable NetP and there is an unexpected activation error.")
     static let networkProtectionPleaseReboot = NSLocalizedString("network.protection.system.extension.please.reboot", value: "Please reboot to activate Network Protection", comment: "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation")
 
 }
@@ -100,10 +101,6 @@ extension UserText {
     static let networkProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("network-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Network Protection join waitlist screen")
     static let networkProtectionWaitlistButtonAgreeAndContinue = NSLocalizedString("network-protection.waitlist.button.agree-and-continue", value: "Agree and Continue", comment: "Agree and Continue button for Network Protection join waitlist screen")
 
-    static let networkProtectionBetaEndedCardTitle = NSLocalizedString("network-protection.waitlist.beta-ended-card.title", value: "VPN Beta Closed", comment: "Title for the Network Protection beta ended card")
-    static let networkProtectionBetaEndedCardText = NSLocalizedString("network-protection.waitlist.beta-ended-card.text", value: "Thank you for participating! We look forward to sharing more with you in future product announcements.", comment: "Text for the Network Protection beta ended card")
-    static let networkProtectionBetaEndedCardAction = NSLocalizedString("network-protection.waitlist.beta-ended-card.action", value: "Dismiss", comment: "Action text for the Network Protection beta ended card")
-
 }
 
 // MARK: - Network Protection Terms of Service
@@ -120,13 +117,13 @@ extension UserText {
     static let networkProtectionPrivacyPolicySection2List = NSLocalizedString("network-protection.privacy-policy.section.2.list", value: "That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:\n    • Website visits\n    • DNS requests\n    • Connections made\n    • IP addresses used\n    • Session lengths", comment: "Privacy Policy list for Network Protection")
 
     static let networkProtectionPrivacyPolicySection3Title = NSLocalizedString("network-protection.privacy-policy.section.3.title", value: "We only keep anonymous performance metrics that we cannot connect to your online activity.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection3List = NSLocalizedString("network-protection.privacy-policy.section.3.title", value: "Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.\n\nWe use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded.", comment: "Privacy Policy list for Network Protection")
+    static let networkProtectionPrivacyPolicySection3List = NSLocalizedString("network-protection.privacy-policy.section.3.list", value: "Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.\n\nWe use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded.", comment: "Privacy Policy list for Network Protection")
 
     static let networkProtectionPrivacyPolicySection4Title = NSLocalizedString("network-protection.privacy-policy.section.4.title", value: "We use dedicated servers for all VPN traffic.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection4List = NSLocalizedString("network-protection.privacy-policy.section.4.title", value: "Dedicated servers means they are not shared with anyone else.\n\nWe rent our servers from providers we carefully selected because they meet our privacy requirements.\n\nWe have strict access controls in place so that only limited DuckDuckGo team members have access to our servers.", comment: "Privacy Policy list for Network Protection")
+    static let networkProtectionPrivacyPolicySection4List = NSLocalizedString("network-protection.privacy-policy.section.4.list", value: "Dedicated servers means they are not shared with anyone else.\n\nWe rent our servers from providers we carefully selected because they meet our privacy requirements.\n\nWe have strict access controls in place so that only limited DuckDuckGo team members have access to our servers.", comment: "Privacy Policy list for Network Protection")
 
     static let networkProtectionPrivacyPolicySection5Title = NSLocalizedString("network-protection.privacy-policy.section.5.title", value: "We protect and limit use of your data when you communicate directly with DuckDuckGo.", comment: "Privacy Policy title for Network Protection")
-    static let networkProtectionPrivacyPolicySection5List = NSLocalizedString("network-protection.privacy-policy.section.5.title", value: "If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\nIf you participate in a voluntary product survey or questionnaire and agree to provide further feedback, we may contact you using the information you provide.\n\nWe will permanently delete all personal information you provided to us (email, contact information), within 30 days after closing a support case or, in the case of follow up feedback, within 60 days after ending this beta service.", comment: "Privacy Policy list for Network Protection")
+    static let networkProtectionPrivacyPolicySection5List = NSLocalizedString("network-protection.privacy-policy.section.5.list", value: "If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\nIf you participate in a voluntary product survey or questionnaire and agree to provide further feedback, we may contact you using the information you provide.\n\nWe will permanently delete all personal information you provided to us (email, contact information), within 30 days after closing a support case or, in the case of follow up feedback, within 60 days after ending this beta service.", comment: "Privacy Policy list for Network Protection")
 
     static let networkProtectionTermsOfServiceTitle = NSLocalizedString("network-protection.terms-of-service.title", value: "Terms of Service", comment: "Terms of Service title for Network Protection")
 
@@ -152,7 +149,56 @@ extension UserText {
     static let networkProtectionTermsOfServiceSection7Title = NSLocalizedString("network-protection.terms-of-service.section.7.title", value: "We are continually updating the service.", comment: "Terms of Service title for Network Protection")
     static let networkProtectionTermsOfServiceSection7List = NSLocalizedString("network-protection.terms-of-service.section.7.list", value: "The service is in beta, and we are regularly changing it.\n\nService coverage, speed, server locations, and quality may vary without warning.", comment: "Terms of Service list for Network Protection")
 
-    static let networkProtectionTermsOfServiceSection8Title = NSLocalizedString("network-protection.terms-of-service.section.7.title", value: "We need your feedback.", comment: "Terms of Service title for Network Protection")
-    static let networkProtectionTermsOfServiceSection8List = NSLocalizedString("network-protection.terms-of-service.section.7.list", value: "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.", comment: "Terms of Service list for Network Protection")
+    static let networkProtectionTermsOfServiceSection8Title = NSLocalizedString("network-protection.terms-of-service.section.8.title", value: "We need your feedback.", comment: "Terms of Service title for Network Protection")
+    static let networkProtectionTermsOfServiceSection8List = NSLocalizedString("network-protection.terms-of-service.section.8.list", value: "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.", comment: "Terms of Service list for Network Protection")
 
 }
+
+#if DBP
+// MARK: - Data Broker Protection Waitlist
+extension UserText {
+    static let dataBrokerProtectionPrivacyPolicyTitle = NSLocalizedString("data-broker-protection.privacy-policy.title", value: "Privacy Policy", comment: "Privacy Policy title for Personal Information Removal")
+
+    static let dataBrokerProtectionWaitlistNotificationTitle = NSLocalizedString("data-broker-protection.waitlist.notification.title", value: "Personal Information Removal beta is ready!", comment: "Title for Personal Information Removal waitlist notification")
+    static let dataBrokerProtectionWaitlistNotificationText = NSLocalizedString("data-broker-protection.waitlist.notification.text", value: "Open your invite", comment: "Title for Personal Information Removal waitlist notification")
+
+    static let dataBrokerProtectionWaitlistJoinTitle = NSLocalizedString("data-broker-protection.waitlist.join.title", value: "Personal Information Removal Beta", comment: "Title for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistJoinSubtitle1 = NSLocalizedString("data-broker-protection.waitlist.join.subtitle.1", value: "Automatically scan and remove your data from 17+ sites that sell personal information with DuckDuckGo’s Personal Information Removal.", comment: "First subtitle for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistJoinSubtitle2 = NSLocalizedString("data-broker-protection.waitlist.join.subtitle.2", value: "Join the waitlist, and we’ll notify you when it’s your turn.", comment: "Second subtitle for Personal Information Removal join waitlist screen")
+
+    static let dataBrokerProtectionWaitlistJoinedTitle = NSLocalizedString("data-broker-protection.waitlist.joined.title", value: "You’re on the list!", comment: "Title for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle1 = NSLocalizedString("data-broker-protection.waitlist.joined.with-notifications.subtitle.1", value: "New invites are sent every few days, on a first come, first served basis.", comment: "Subtitle 1 for Personal Information Removal joined waitlist screen when notifications are enabled")
+    static let dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle2 = NSLocalizedString("data-broker-protection.waitlist.joined.with-notifications.subtitle.2", value: "We’ll notify you when your invite is ready.", comment: "Subtitle 2 for Personal Information Removal joined waitlist screen when notifications are enabled")
+    static let dataBrokerProtectionWaitlistEnableNotifications = NSLocalizedString("data-broker-protection.waitlist.enable-notifications", value: "Want to get a notification when your Personal Information Removal invite is ready?", comment: "Enable notifications prompt for Personal Information Removal joined waitlist screen")
+
+    static let dataBrokerProtectionWaitlistInvitedTitle = NSLocalizedString("data-broker-protection.waitlist.invited.title", value: "You’re invited to try\nPersonal Information Removal beta!", comment: "Title for Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSubtitle = NSLocalizedString("data-broker-protection.waitlist.invited.subtitle", value: "Automatically find and remove your personal information – such as your name and address – from 17+ sites that store and sell it, reducing the risk of identity theft and spam.", comment: "Subtitle for Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistInvitedSection1Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-1.title", value: "Continuous Scan and Removal", comment: "Title for section 1 of the Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSection1Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-1.subtitle", value: "Automatically scans for your info, requests its removal, and re-scans regularly to ensure it doesn’t reappear.", comment: "Subtitle for section 1 of the Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistInvitedSection2Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-2.title", value: "Private by Design", comment: "Title for section 2 of the Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSection2Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-2.subtitle", value: "The removal process is initiated on your device, and the info you provide during setup is stored on your device only.", comment: "Subtitle for section 2 of the Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistInvitedSection3Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-3.title", value: "Real-Time Progress Updates", comment: "Title for section 3 of the Personal Information Removal invited screen")
+    static let dataBrokerProtectionWaitlistInvitedSection3Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-3.subtitle", value: "See what information has been removed, and monitor progress of ongoing removals from your dashboard.", comment: "Subtitle for section 3 of the Personal Information Removal invited screen")
+
+    static let dataBrokerProtectionWaitlistEnableTitle = NSLocalizedString("data-broker-protection.waitlist.enable.title", value: "Let’s get started", comment: "Title for Personal Information Removal enable screen")
+    static let dataBrokerProtectionWaitlistEnableSubtitle = NSLocalizedString("data-broker-protection.waitlist.enable.subtitle", value: "We’ll need your name, address and the year you were born in order to find your personal information on data broker sites\n\nThis info is stored securely on your device, and is never sent to DuckDuckGo.", comment: "Subtitle for Personal Information Removal enable screen")
+
+    static let dataBrokerProtectionWaitlistAvailabilityDisclaimer = NSLocalizedString("data-broker-protection.waitlist.availability-disclaimer", value: "Personal Information Removal is free to use during the beta.", comment: "Availability disclaimer for Personal Information Removal join waitlist screen")
+
+    static let dataBrokerProtectionWaitlistButtonClose = NSLocalizedString("data-broker-protection.waitlist.button.close", value: "Close", comment: "Close button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonDone = NSLocalizedString("data-broker-protection.waitlist.button.done", value: "Done", comment: "Close button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonDismiss = NSLocalizedString("data-broker-protection.waitlist.button.dismiss", value: "Dismiss", comment: "Dismiss button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonCancel = NSLocalizedString("data-broker-protection.waitlist.button.cancel", value: "Cancel", comment: "Cancel button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonNoThanks = NSLocalizedString("data-broker-protection.waitlist.button.no-thanks", value: "No Thanks", comment: "No Thanks button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonGetStarted = NSLocalizedString("data-broker-protection.waitlist.button.get-started", value: "Get Started", comment: "Get Started button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonGotIt = NSLocalizedString("data-broker-protection.waitlist.button.got-it", value: "Get started", comment: "Get started button for Personal Information Removal joined waitlist screen")
+
+    static let dataBrokerProtectionWaitlistButtonEnableNotifications = NSLocalizedString("data-broker-protection.waitlist.button.enable-notifications", value: "Enable Notifications", comment: "Enable Notifications button for Personal Information Removal joined waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("data-broker-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Personal Information Removal join waitlist screen")
+    static let dataBrokerProtectionWaitlistButtonAgreeAndContinue = NSLocalizedString("data-broker-protection.waitlist.button.agree-and-continue", value: "Agree and Continue", comment: "Agree and Continue button for Personal Information Removal join waitlist screen")
+}
+
+#endif

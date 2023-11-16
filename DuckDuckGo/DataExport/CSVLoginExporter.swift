@@ -72,11 +72,8 @@ final class CSVLoginExporter {
         let headerRow = ["\"title\",\"url\",\"username\",\"password\""]
         let csvString = (headerRow + credentialsAsCSVRows).joined(separator: "\n")
 
-        if let stringData = csvString.data(using: .utf8) {
-            _ = fileStore.persist(stringData, url: url)
-        } else {
-            throw CSVLoginExportError.failedToEncodeLogins
-        }
+        let stringData = csvString.utf8data
+        _ = fileStore.persist(stringData, url: url)
     }
 
 }
