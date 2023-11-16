@@ -14462,7 +14462,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				branch = dominik/webextensions2;
+				branch = dominik/webextensions;
 				kind = branch;
 			};
 		};
