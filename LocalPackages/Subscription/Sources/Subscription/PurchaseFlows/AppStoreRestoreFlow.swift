@@ -36,23 +36,7 @@ public final class AppStoreRestoreFlow {
 
     public static func restoreAccountFromAppleID() async -> Result<AppStoreRestoreFlow.Success, AppStoreRestoreFlow.Error> {
 
-//        // Try fetching most recent
-//        if let jwsRepresentation = await PurchaseManager.mostRecentTransaction() {
-//            externalID = await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation)
-//        }
-//
-//        if externalID == "error" {
-//            print("No past transactions or account or both?")
-//
-//            switch await AuthService.createAccount() {
-//            case .success(let response):
-//                externalID = response.externalID
-//                _ = await AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
-//            case .failure(let error):
-//                print("Error: \(error)")
-//                externalID = nil
-//            }
-//        }
+
 
         return .success(.ok)
     }

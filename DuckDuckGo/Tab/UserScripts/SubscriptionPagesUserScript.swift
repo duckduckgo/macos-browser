@@ -297,14 +297,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         print(">>> Pushing into WebView:", method.rawValue, String(describing: params))
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
-
-}
-
-extension Task where Success == Never, Failure == Never {
-    static func sleep(seconds: Double) async throws {
-        let duration = UInt64(seconds * 1_000_000_000)
-        try await Task.sleep(nanoseconds: duration)
-    }
 }
 
 #endif

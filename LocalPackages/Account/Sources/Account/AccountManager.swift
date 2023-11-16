@@ -168,11 +168,11 @@ public class AccountManager {
 
         storeAuthToken(token: authToken)
 
-        let result = await exchangeTokensAndRefreshEntitlements(with: authToken)
-        return .success(result)
+        return await exchangeTokensAndRefreshEntitlements(with: authToken)
     }
 
-    public func exchangeTokensAndRefreshEntitlements(with authToken: String) async -> String {
+    @discardableResult
+    public func exchangeTokensAndRefreshEntitlements(with authToken: String) async -> Result<String, Error> {
         // Exchange short-lived auth token to a long-lived access token
         let accessToken: String
         switch await AuthService.getAccessToken(token: authToken) {
@@ -180,7 +180,7 @@ public class AccountManager {
             accessToken = response.accessToken
         case .failure(let error):
             os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
-            return "error"
+            return .failure(error)
         }
 
         // Fetch entitlements and account details and store the data
@@ -190,11 +190,11 @@ public class AccountManager {
             self.storeAccount(token: accessToken,
                               email: response.account.email)
 
-            return response.account.externalID
+            return .success(response.account.externalID)
 
         case .failure(let error):
             os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
-            return "error"
+            return .failure(error)
         }
     }
 }
