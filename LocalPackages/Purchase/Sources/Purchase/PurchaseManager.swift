@@ -67,7 +67,8 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    public func restorePurchases() async {
+    @discardableResult
+    public func syncAppleIDAccount() async -> Result<Void, Error> {
         do {
             purchaseQueue.removeAll()
 
@@ -79,8 +80,11 @@ public final class PurchaseManager: ObservableObject {
 
             await updatePurchasedProducts()
             await updateAvailableProducts()
+
+            return .success(())
         } catch {
             print("AppStore.sync error: \(error)")
+            return .failure(error)
         }
     }
 

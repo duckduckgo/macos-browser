@@ -21,40 +21,38 @@ import StoreKit
 import Purchase
 import Account
 
+@available(macOS 12.0, *)
 public final class AppStorePurchaseFlow {
 
-    public enum PurchaseResult {
-        case ok
-    }
-
     public enum Error: Swift.Error {
+        case appStoreAuthenticationFailed
         case noPastTransactions
         case accountCreationUnsuccessful
         case purchaseUnsuccessful
         case somethingWentWrong
     }
 
-    public static func purchaseSubscription(with identifier: String) async -> Result<AppStorePurchaseFlow.PurchaseResult, AppStorePurchaseFlow.Error> {
-        if #available(macOS 12.0, *) {
-            // Trigger sign in pop-up
-            await PurchaseManager.shared.restorePurchases()
-
-            // Get externalID from current account based on past purchases or create a new one
-            guard let externalID = await getUsersExternalID() else { return .failure(.accountCreationUnsuccessful) }
-
-            // Make the purchase
-            switch await makePurchase(identifier, externalID: externalID) {
-            case true:
-                return .success(.ok)
-            case false:
-                return .failure(.purchaseUnsuccessful)
-            }
+    public static func purchaseSubscription(with identifier: String) async -> Result<Void, AppStorePurchaseFlow.Error> {
+        // Trigger sign in pop-up
+        switch await PurchaseManager.shared.syncAppleIDAccount() {
+        case .success:
+            break
+        case .failure:
+            return .failure(.appStoreAuthenticationFailed)
         }
 
-        return .failure(.somethingWentWrong)
+        // Get externalID from current account based on past purchases or create a new one
+        guard let externalID = await getUsersExternalID() else { return .failure(.accountCreationUnsuccessful) }
+
+        // Make the purchase
+        switch await makePurchase(identifier, externalID: externalID) {
+        case true:
+            return .success(())
+        case false:
+            return .failure(.purchaseUnsuccessful)
+        }
     }
 
-    @available(macOS 12.0, *)
     private static func getUsersExternalID() async -> String? {
         var externalID: String?
 
@@ -79,7 +77,6 @@ public final class AppStorePurchaseFlow {
         return externalID
     }
 
-    @available(macOS 12.0, *)
     private static func makePurchase(_ identifier: String, externalID: String) async -> Bool {
         // rework to wrap and make a purchase with identifier
         if let product = PurchaseManager.shared.availableProducts.first(where: { $0.id == identifier }) {

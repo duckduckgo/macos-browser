@@ -227,6 +227,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success:
                 break
             case .failure:
+                await hideProgress()
                 return nil
             }
 

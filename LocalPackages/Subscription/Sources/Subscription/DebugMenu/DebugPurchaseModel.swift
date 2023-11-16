@@ -39,30 +39,7 @@ public final class DebugPurchaseModel: ObservableObject {
         print("Attempting purchase: \(product.displayName)")
 
         Task {
-            var externalID: String?
-
-            if let token = AccountManager().accessToken {
-                switch await AuthService.validateToken(accessToken: token) {
-                case .success(let response):
-                    externalID = response.account.externalID
-                case .failure(let error):
-                    print("Error: \(error)")
-                    return
-                }
-            }
-
-            if let externalID {
-                _ = await purchaseManager.purchase(product, customUUID: externalID)
-            } else {
-                switch await AuthService.createAccount() {
-                case .success(let response):
-                    _ = await purchaseManager.purchase(product, customUUID: response.externalID)
-                    _ = await accountManager.exchangeTokensAndRefreshEntitlements(with: response.authToken)
-                case .failure(let error):
-                    print("Error: \(error)")
-                    return
-                }
-            }
+            await AppStorePurchaseFlow.purchaseSubscription(with: product.id)
         }
     }
 }

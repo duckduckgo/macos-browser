@@ -57,11 +57,11 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionInfo), target: self))
         if #available(macOS 12.0, *) {
             menu.addItem(NSMenuItem(title: "Check Purchase Products Availability", action: #selector(checkProductsAvailability), target: self))
-            menu.addItem(NSMenuItem(title: "Restore App Store purchases (requires sign-in)", action: #selector(restoreAppStore), target: self))
         }
         menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         menu.addItem(.separator())
         if #available(macOS 12.0, *) {
+            menu.addItem(NSMenuItem(title: "Sync App Store AppleID Account (re- sign-in)", action: #selector(syncAppleIDAccount), target: self))
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
         }
         menu.addItem(.separator())
@@ -133,9 +133,9 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @available(macOS 12.0, *)
     @objc
-    func restoreAppStore() {
+    func syncAppleIDAccount() {
         Task {
-            await purchaseManager.restorePurchases()
+            await purchaseManager.syncAppleIDAccount()
         }
     }
 
