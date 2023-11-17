@@ -150,6 +150,7 @@ struct DataImportViewModel {
         }
 
         if self.areAllSelectedDataTypesSuccessfullyImported {
+            successfulImportHappened = true
             NotificationCenter.default.post(name: .dataImportComplete, object: nil)
         }
 
@@ -217,12 +218,7 @@ struct DataImportViewModel {
             break
         }
         // all done
-        for (_, result) in summary {
-            if case .failure = result {
-                return .feedback()
-            }
-        }
-        return .summary
+        return areAllSelectedDataTypesSuccessfullyImported ? .summary : .feedback()
     }
 
     /// Skip button press
@@ -511,6 +507,10 @@ extension DataImportViewModel {
     }
     var isSecondaryButtonDisabled: Bool {
         false
+    }
+
+    var isSelectFileButtonDisabled: Bool {
+        importTask != nil
     }
 
     @MainActor

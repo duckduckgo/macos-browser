@@ -25,11 +25,14 @@ struct FileImportView: View {
     let action: (() -> Void)
     private let instructions: [[FileImportInstructionsItem]]
 
-    init(source: DataImport.Source, dataType: DataImport.DataType, action: (() -> Void)? = nil) {
+    private var isButtonDisabled: Bool
+
+    init(source: DataImport.Source, dataType: DataImport.DataType, isButtonDisabled: Bool, action: (() -> Void)? = nil) {
         self.source = source
         self.dataType = dataType
         self.action = action ?? {}
         self.instructions = Self.instructions(for: source, dataType: dataType)
+        self.isButtonDisabled = isButtonDisabled
     }
 
     // swiftlint:disable:next function_body_length
@@ -188,6 +191,7 @@ struct FileImportView: View {
                             Text(localizedStringKey)
                         case .button(let localizedTitleKey):
                             Button(localizedTitleKey, action: action)
+                                .disabled(isButtonDisabled)
                         }
                     }
                 }
@@ -217,7 +221,7 @@ struct CircleNumberView: View {
 // MARK: - Preview
 
 #Preview {
-    FileImportView(source: .bitwarden, dataType: .passwords)
+    FileImportView(source: .bitwarden, dataType: .passwords, isButtonDisabled: false)
         .frame(width: 512 - 20)
 
 }

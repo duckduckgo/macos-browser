@@ -113,7 +113,7 @@ struct DataImportView: View {
                 }
 
                 // manual file import instructions for CSV/HTML
-                FileImportView(source: viewModel.importSource, dataType: dataType) {
+                FileImportView(source: viewModel.importSource, dataType: dataType, isButtonDisabled: viewModel.isSelectFileButtonDisabled) {
                     viewModel.selectFile()
                 }
 

@@ -37,4 +37,8 @@ final class YandexDataImporter: ChromiumDataImporter {
         return super.importData(types: types.filter { $0 != .passwords })
     }
 
+    override func requiresKeychainPassword(for selectedDataTypes: Set<DataImport.DataType>) -> Bool {
+        false
+    }
+
 }
