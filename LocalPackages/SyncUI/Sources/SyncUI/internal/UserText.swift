@@ -73,7 +73,6 @@ enum UserText {
     static let showTextCodeTitle = NSLocalizedString("prefrences.sync.show-text-code-dialog-title", value: "Text Code", comment: "Title for show text code dialog")
     static let showTextCodeCaption = NSLocalizedString("prefrences.sync.show-text-code-dialog-caption", value: "Use this code after choosing \"Enter Text Code\" during sync setup on another device", comment: "Caption for show text code dialog")
 
-    static let allSetDialogTitle = NSLocalizedString("prefrences.sync.all-set-dyalog-title", value: "All Set!", comment: "Title for all set dialog title")
     static let allSetDialogCaption = NSLocalizedString("prefrences.all-set-dyalog-caption", value: "Your bookmarks and logins will now be safely stored on DuckDuckGo's secure server.", comment: "Caption for all set dialog")
 
     static let recoverSyncedDataTitle = NSLocalizedString("preferences.sync.recover-synced-data", value: "Enter Recovery Code", comment: "Recover Sync data dialog title")

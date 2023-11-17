@@ -64,7 +64,6 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
         }
     }
     .frame(width: 420)
-    .background(Color.white)
     }
 
     fileprivate func pickerView() -> some View {

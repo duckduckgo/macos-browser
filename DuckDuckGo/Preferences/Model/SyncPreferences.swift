@@ -320,26 +320,34 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func turnOnSync() {
         Task { @MainActor in
+            onEndFlow()
             isCreatingAccount = true
             defer {
                 isCreatingAccount = false
             }
             do {
                 let device = deviceInfo()
+                presentDialog(type: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                confirmSetupComplete()
+                onEndFlow()
+                presentDialog(type: .saveRecoveryCode)
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
     }
 
-    func startPollingForRecoveryKey() {
+    func startPollingForRecoveryKey(isRecovery: Bool) {
         Task { @MainActor in
             do {
                 self.connector = try syncService.remoteConnect()
                 self.codeToDisplay = connector?.code
-                self.presentDialog(type: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
+                if isRecovery {
+                    onEndFlow()
+                    self.presentDialog(type: .enterRecoveryCode(code: codeToDisplay ?? ""))
+                } else {
+                    self.presentDialog(type: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
+                }
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
                     onEndFlow()
                     presentDialog(type: .prepareToSync)
@@ -464,19 +472,25 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
 // NEW UI Method
 extension SyncPreferences {
-    @MainActor 
+
+    @MainActor
+    func enterRecoveryCodePressed() {
+        startPollingForRecoveryKey(isRecovery: true)
+    }
+
+    @MainActor
     func syncWithAnotherDevicePressed() {
-        self.startPollingForRecoveryKey()
+        self.startPollingForRecoveryKey(isRecovery: false)
     }
 
     @MainActor
     func syncWithServerPressed() {
-
+        presentDialog(type: .syncWithServer)
     }
 
     @MainActor
     func recoverDataPressed() {
-
+        presentDialog(type: .recoverSyncedData)
     }
 
     @MainActor
@@ -551,6 +565,21 @@ extension SyncPreferences {
                 view: DeviceSyncedView<SyncPreferences>(devices: devices, isSingleDevice: isSingleDevice)
                     .environmentObject(self)
             )
+        case .syncWithServer:
+            viewController = SyncDialogViewController(
+                view: SyncWithServerView<SyncPreferences>()
+                    .environmentObject(self)
+            )
+        case .enterRecoveryCode(let code):
+            viewController = SyncDialogViewController(
+                view: EnterRecoveryCodeView<SyncPreferences>(code: code)
+                    .environmentObject(self)
+                    .environmentObject(RecoveryCodeViewModel()))
+        case .recoverSyncedData:
+            viewController = SyncDialogViewController(
+                view: RecoverSyncedDataView<SyncPreferences>()
+                    .environmentObject(self)
+            )
         }
 
         guard let dialogWindow = viewController.wrappedInWindowController().window else { return }
@@ -571,6 +600,9 @@ extension SyncPreferences {
         case prepareToSync
         case saveRecoveryCode
         case nowSyncingView(devices: [SyncDevice], isSingleDevice: Bool)
+        case syncWithServer
+        case enterRecoveryCode(code: String)
+        case recoverSyncedData
     }
 
     func endDialogFlow() {

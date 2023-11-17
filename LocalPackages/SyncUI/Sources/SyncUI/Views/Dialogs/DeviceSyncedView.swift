@@ -30,18 +30,11 @@ public struct DeviceSyncedView<ViewModel>: View where ViewModel: ManagementViewM
         self.isSingleDevice = isSingleDevice
     }
 
-    var title: String {
-        if isSingleDevice {
-            return UserText.allSetDialogTitle
-        }
-        return UserText.deviceSynced
-    }
-
     public var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-setup-success")
-                Text(title)
+                Text(UserText.deviceSynced)
                     .font(.system(size: 17, weight: .bold))
                 VStack(alignment: .center) {
                     if isSingleDevice {

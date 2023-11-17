@@ -43,7 +43,7 @@ public protocol ManagementViewModel: ObservableObject {
     func saveRecoveryPDF()
     func refreshDevices()
     func turnOnSync()
-    func startPollingForRecoveryKey()
+//    func startPollingForRecoveryKey()
     func stopPollingForRecoveryKey()
 
     func manageBookmarks()
@@ -60,4 +60,5 @@ public protocol ManagementViewModel: ObservableObject {
     func copyRecoveryCode()
     func recoveryCodeNextPressed()
     func copyCodeDesplayed()
+    func enterRecoveryCodePressed()
 }

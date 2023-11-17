@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 public struct PreparingToSyncView: View {
 
@@ -37,6 +38,37 @@ public struct PreparingToSyncView: View {
         } buttons: {
         }
         .padding(.vertical, 20)
+    }
+
+}
+
+public struct RecoverSyncedDataView<ViewModel>: View where ViewModel: ManagementViewModel {
+    @EnvironmentObject var model: ViewModel
+
+    public init() {}
+
+    public var body: some View {
+        SyncDialog(spacing: 20.0) {
+            VStack(alignment: .center, spacing: 20) {
+                Image("Sync-96")
+                Text("Recover Synced Data")
+                    .font(.system(size: 17, weight: .bold))
+                Text("To restore your synced data, you'll need the \"Recovery Code\" you saved when you first set up the sync. This code may have been saved as a PDF with a QR code or as a text code.")
+                    .frame(width: 320, alignment: .center)
+                    .multilineTextAlignment(.center)
+                    .fixedSize()
+            }
+            .frame(width: 320)
+        } buttons: {
+            Button(UserText.cancel) {
+                model.endDialogFlow()
+            }
+            .buttonStyle(DismissActionButtonStyle())
+            Button("Enter Code") {
+                model.enterRecoveryCodePressed()
+            }
+            .buttonStyle(DefaultActionButtonStyle(enabled: true))
+        }
     }
 
 }
