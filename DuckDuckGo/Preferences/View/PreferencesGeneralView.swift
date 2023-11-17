@@ -85,10 +85,16 @@ extension Preferences {
                     .pickerStyle(.radioGroup)
                     .offset(x: Const.pickerHorizontalOffset)
                     .padding(.bottom, 0)
-                    ToggleMenuItem(title: UserText.showHomeButtonSettings, isOn: $startupModel.isHomeButtonVisible)
-                        .onChange(of: startupModel.isHomeButtonVisible) { _ in
-                            startupModel.toggleHomeButton()
+                    HStack {
+                        Picker(UserText.mainMenuHomeButton, selection: $startupModel.homeButtonPosition) {
+                            ForEach(HomeButtonPosition.allCases, id: \.self) { position in
+                                Text(UserText.mainMenuHomeButton(for: position)).tag(position)
+                            }
+                        }.scaledToFit()
+                        .onChange(of: startupModel.homeButtonPosition) { _ in
+                            startupModel.updateHomeButton()
                         }
+                    }
                 }.sheet(isPresented: $showingCustomHomePageSheet) {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }

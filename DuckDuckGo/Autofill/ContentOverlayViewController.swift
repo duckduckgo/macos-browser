@@ -53,6 +53,8 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     lazy var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
 
+    lazy var privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+
     public override func viewDidLoad() {
         initWebView()
         addTrackingArea()
@@ -168,7 +170,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }
 
     nonisolated
-    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+    public func emailManagerKeychainAccessFailed(_ emailManager: EmailManager, accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription
@@ -189,7 +191,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
             parameters["keychain_operation"] = "save"
         }
 
-        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+        Pixel.fire(.debug(event: .emailAutofillKeychainError, error: error), withAdditionalParameters: parameters)
     }
 
     private enum Constants {
@@ -208,6 +210,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
         self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
     }
+
 }
 
 extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDelegate {
@@ -337,5 +340,18 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         } else {
             autofillPreferencesModel.showAutofillPopover(.logins)
         }
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        let properties = ContentScopeProperties(gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                                sessionKey: topAutofillUserScript?.sessionKey ?? "",
+                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig))
+
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: properties)
+            .build()
+            .buildRuntimeConfigResponse()
+
+        completionHandler(runtimeConfiguration)
     }
 }

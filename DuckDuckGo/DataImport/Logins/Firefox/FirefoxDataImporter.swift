@@ -19,7 +19,7 @@
 import Foundation
 import SecureStorage
 
-final class FirefoxDataImporter: DataImporter {
+internal class FirefoxDataImporter: DataImporter {
 
     var primaryPassword: String?
 
@@ -39,6 +39,7 @@ final class FirefoxDataImporter: DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
         let result = importData(types: types, from: profile)
         completion(result)

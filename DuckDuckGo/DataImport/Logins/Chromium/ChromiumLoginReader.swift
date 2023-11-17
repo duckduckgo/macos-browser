@@ -79,18 +79,34 @@ final class ChromiumLoginReader {
         self.source = source
     }
 
-    func readLogins() -> DataImportResult<[ImportedLoginCredential]> {
+    func readLogins(modalWindow: NSWindow? = nil) -> DataImportResult<[ImportedLoginCredential]> {
         let key: String
 
         if let decryptionKey = decryptionKey {
             key = decryptionKey
         } else {
-            let keyPromptResult = decryptionKeyPrompt.promptForChromiumPasswordKeychainAccess(processName: processName)
+            let modalSession = modalWindow.map(NSApp.beginModalSession)
+
+            var keyPromptResult: ChromiumKeychainPromptResult?
+            DispatchQueue.global().async {
+                keyPromptResult = self.decryptionKeyPrompt.promptForChromiumPasswordKeychainAccess(processName: self.processName)
+                DispatchQueue.main.async {
+                    modalSession.map(NSApp.endModalSession)
+                }
+            }
+            if let modalSession {
+                while case .continue = NSApp.runModalSession(modalSession) {}
+                NSApp.stopModal()
+            } else {
+                while keyPromptResult == nil {
+                    RunLoop.main.run(mode: .common, before: Date().addingTimeInterval(0.5))
+                }
+            }
 
             switch keyPromptResult {
             case .password(let passwordString): key = passwordString
             case .failedToDecodePasswordData: return .failure(importError(type: .failedToDecodePasswordData))
-            case .userDeniedKeychainPrompt: return .failure(importError(type: .userDeniedKeychainPrompt))
+            case .none, .userDeniedKeychainPrompt: return .failure(importError(type: .userDeniedKeychainPrompt))
             case .keychainError(let status): return .failure(decryptionKeyAccessFailed(status))
             }
         }

@@ -16,84 +16,169 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import AppKit
 import Common
 import Foundation
-
-#if !NETWORK_PROTECTION
-
-/// App store placedholder.  Should be replaced with the actual thing once we enable NetP in App Store builds.
-///
-@objc
-final class NetworkProtectionDebugMenu: NSMenu {
-    /// This is just present so we can remove this menu item in App Store builds.
-    ///
-    @IBOutlet weak var mainMenuItem: NSMenuItem?
-
-    override func awakeFromNib() {
-        // Hide the entire NetP debug menu when the feature is disabled:
-        mainMenuItem?.removeFromParent()
-    }
-}
-
-#else
-
 import NetworkProtection
+import SwiftUI
 
 /// Controller for the Network Protection debug menu.
 ///
-@objc
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
 
-    // MARK: - Outlets: Menus
+    private let environmentMenu = NSMenu()
 
-    @IBOutlet weak var preferredServerMenu: NSMenu? {
-        didSet {
-            populateNetworkProtectionServerListMenuItems()
+    private let preferredServerMenu: NSMenu
+    private let preferredServerAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setSelectedServer))
+
+    private let registrationKeyValidityMenu: NSMenu
+    private let registrationKeyValidityAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setRegistrationKeyValidity))
+
+    private let exclusionsMenu = NSMenu()
+
+    private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
+    private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
+    private let connectOnLogInMenuItem = NSMenuItem(title: "Connect on Log In", action: #selector(NetworkProtectionDebugMenu.toggleConnectOnLogInAction))
+
+    private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
+
+    private let enterWaitlistInviteCodeItem = NSMenuItem(title: "Enter Waitlist Invite Code", action: #selector(NetworkProtectionDebugMenu.showNetworkProtectionInviteCodePrompt))
+
+    private let waitlistTokenItem = NSMenuItem(title: "Waitlist Token:")
+    private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
+    private let waitlistInviteCodeItem = NSMenuItem(title: "Waitlist Invite Code:")
+    private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
+
+    // swiftlint:disable:next function_body_length
+    init() {
+        preferredServerMenu = NSMenu { [preferredServerAutomaticItem] in
+            preferredServerAutomaticItem
         }
+        registrationKeyValidityMenu = NSMenu { [registrationKeyValidityAutomaticItem] in
+            registrationKeyValidityAutomaticItem
+        }
+        super.init(title: "Network Protection")
+
+        buildItems {
+            NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
+                .targetting(self)
+
+            NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
+                .targetting(self)
+
+            NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
+                .targetting(self)
+
+            NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
+                .targetting(self)
+            NSMenuItem.separator()
+
+            connectOnLogInMenuItem
+                .targetting(self)
+            shouldEnforceRoutesMenuItem
+                .targetting(self)
+            NSMenuItem(title: "Excluded Routes").submenu(exclusionsMenu)
+            NSMenuItem.separator()
+
+            NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
+                .targetting(self)
+
+            NSMenuItem(title: "Onboarding")
+                .submenu(NetworkProtectionOnboardingMenu())
+
+            NSMenuItem(title: "Environment")
+                .submenu(environmentMenu)
+
+            NSMenuItem(title: "Preferred Server").submenu(preferredServerMenu)
+
+            NSMenuItem(title: "Registration Key") {
+                NSMenuItem(title: "Expire Now", action: #selector(NetworkProtectionDebugMenu.expireRegistrationKeyNow))
+                    .targetting(self)
+
+#if DEBUG
+                NSMenuItem.separator()
+                NSMenuItem(title: "Validity").submenu(registrationKeyValidityMenu)
+#endif
+            }
+
+            NSMenuItem(title: "Simulate Failure")
+                .submenu(NetworkProtectionSimulateFailureMenu())
+
+            NSMenuItem(title: "Override NetP Activation Date") {
+                NSMenuItem(title: "Reset Activation Date", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionActivationDate))
+                    .targetting(self)
+                NSMenuItem(title: "Set Activation Date to Now", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateToNow))
+                    .targetting(self)
+                NSMenuItem(title: "Set Activation Date to 5 Days Ago", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateTo5DaysAgo))
+                    .targetting(self)
+                NSMenuItem(title: "Set Activation Date to 10 Days Ago", action: #selector(NetworkProtectionDebugMenu.overrideNetworkProtectionActivationDateTo10DaysAgo))
+                    .targetting(self)
+            }
+
+            NSMenuItem(title: "NetP Waitlist") {
+                NSMenuItem(title: "Reset Waitlist State", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionWaitlistState))
+                    .targetting(self)
+                NSMenuItem(title: "Reset T&C Acceptance", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionTermsAndConditionsAcceptance))
+                    .targetting(self)
+
+                enterWaitlistInviteCodeItem
+                    .targetting(self)
+
+                NSMenuItem(title: "Send Waitlist Notification", action: #selector(NetworkProtectionDebugMenu.sendNetworkProtectionWaitlistAvailableNotification))
+                    .targetting(self)
+                NSMenuItem.separator()
+
+                waitlistTokenItem
+                waitlistTimestampItem
+                waitlistInviteCodeItem
+                waitlistTermsAndConditionsAcceptedItem
+            }
+
+            NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
+                .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
+            NSMenuItem.separator()
+
+            NSMenuItem(title: "Kill Switch (alternative approach)") {
+                shouldIncludeAllNetworksMenuItem
+                    .targetting(self)
+                excludeLocalNetworksMenuItem
+                    .targetting(self)
+            }
+
+            NSMenuItem(title: "Open App Container in Finder", action: #selector(NetworkProtectionDebugMenu.openAppContainerInFinder))
+                .targetting(self)
+        }
+
+        preferredServerMenu.autoenablesItems = false
+        populateNetworkProtectionEnvironmentListMenuItems()
+        populateNetworkProtectionServerListMenuItems()
+        populateNetworkProtectionRegistrationKeyValidityMenuItems()
+
+        exclusionsMenu.delegate = self
+        exclusionsMenu.autoenablesItems = false
+        populateExclusionsMenuItems()
     }
 
-    @IBOutlet weak var registrationKeyValidityMenu: NSMenu? {
-        didSet {
-            populateNetworkProtectionRegistrationKeyValidityMenuItems()
-        }
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
-    @IBOutlet weak var exclusionsMenu: NSMenu! {
-        didSet {
-            populateExclusionsMenuItems()
-        }
-    }
+    // MARK: - Tunnel Settings
 
-    // MARK: - Outlets: Menu Items
-
-    /// This is just present so we can remove this menu item in App Store builds.
-    ///
-    @IBOutlet weak var mainMenuItem: NSMenuItem!
-    @IBOutlet weak var registrationKeyValidityMenuSeparatorItem: NSMenuItem!
-    @IBOutlet weak var registrationKeyValidityMenuItem: NSMenuItem!
-    @IBOutlet weak var registrationKeyValidityAutomaticItem: NSMenuItem!
-    @IBOutlet weak var preferredServerAutomaticItem: NSMenuItem!
-
-    @IBOutlet weak var enableConnectOnDemandMenuItem: NSMenuItem!
-    @IBOutlet weak var shouldEnforceRoutesMenuItem: NSMenuItem!
-    @IBOutlet weak var shouldIncludeAllNetworksMenuItem: NSMenuItem!
-    @IBOutlet weak var connectOnLogInMenuItem: NSMenuItem!
-
-    @IBOutlet weak var excludeDDGRouteMenuItem: NSMenuItem!
-    @IBOutlet weak var excludeLocalNetworksMenuItem: NSMenuItem!
+    private let settings = TunnelSettings(defaults: .shared)
 
     // MARK: - Debug Logic
 
     private let debugUtilities = NetworkProtectionDebugUtilities()
 
-    // MARK: - Debug Menu IBActions
+    // MARK: - Debug Menu Actions
 
     /// Resets all state for NetworkProtection.
     ///
-    @IBAction
-    func resetAllState(_ sender: Any?) {
+    @objc func resetAllState(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
 
@@ -107,8 +192,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     /// Resets all state for NetworkProtection.
     ///
-    @IBAction
-    func resetAllKeepingInvite(_ sender: Any?) {
+    @objc func resetAllKeepingInvite(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
 
@@ -122,8 +206,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     /// Removes the system extension and agents for Network Protection.
     ///
-    @IBAction
-    func removeSystemExtensionAndAgents(_ sender: Any?) {
+    @objc func removeSystemExtensionAndAgents(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.removeSystemExtensionAndAgentsAlert().runModal() else { return }
 
@@ -137,8 +220,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     /// Sends a test user notification.
     ///
-    @IBAction
-    func sendTestNotification(_ sender: Any?) {
+    @objc func sendTestNotification(_ sender: Any?) {
         Task { @MainActor in
             do {
                 try await debugUtilities.sendTestNotificationRequest()
@@ -150,10 +232,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     /// Sets the selected server.
     ///
-    @IBAction
-    func setSelectedServer(_ menuItem: NSMenuItem) {
+    @objc func setSelectedServer(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedServer: SelectedNetworkProtectionServer
+        let selectedServer: TunnelSettings.SelectedServer
 
         if title == "Automatic" {
             selectedServer = .automatic
@@ -162,13 +243,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
             selectedServer = .endpoint(titleComponents.first!)
         }
 
-        debugUtilities.setSelectedServer(selectedServer: selectedServer)
+        settings.selectedServer = selectedServer
     }
 
     /// Expires the registration key immediately.
     ///
-    @IBAction
-    func expireRegistrationKeyNow(_ sender: Any?) {
+    @objc func expireRegistrationKeyNow(_ sender: Any?) {
         Task {
             await debugUtilities.expireRegistrationKeyNow()
         }
@@ -176,59 +256,65 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     /// Sets the registration key validity.
     ///
-    @IBAction
-    func setRegistrationKeyValidity(_ menuItem: NSMenuItem) {
-        // nil means automatic
-        let validity = menuItem.representedObject as? TimeInterval
+    @objc func setRegistrationKeyValidity(_ menuItem: NSMenuItem) {
+        guard let timeInterval = menuItem.representedObject as? TimeInterval else {
+            settings.registrationKeyValidity = .automatic
+            return
+        }
 
-        debugUtilities.registrationKeyValidity = validity
+        settings.registrationKeyValidity = .custom(timeInterval)
     }
 
-    @IBAction
-    func toggleEnforceRoutesAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldEnforceRoutes()
+    @objc func toggleEnforceRoutesAction(_ sender: Any?) {
+        settings.enforceRoutes.toggle()
     }
 
-    @IBAction
-    func toggleIncludeAllNetworks(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldIncludeAllNetworks()
+    @objc func toggleIncludeAllNetworks(_ sender: Any?) {
+        settings.includeAllNetworks.toggle()
     }
 
-    @IBAction
-    func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldExcludeLocalRoutes()
+    @objc func toggleShouldExcludeLocalRoutes(_ sender: Any?) {
+        settings.excludeLocalNetworks.toggle()
     }
 
-    @IBAction
-    func toggleConnectOnLogInAction(_ sender: Any?) {
-        NetworkProtectionTunnelController().toggleShouldAutoConnectOnLogIn()
+    @objc func toggleConnectOnLogInAction(_ sender: Any?) {
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
     }
 
-    @IBAction
-    func toggleExclusionAction(_ sender: NSMenuItem) {
+    @objc func toggleExclusionAction(_ sender: NSMenuItem) {
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        /*
         guard let addressRange = sender.representedObject as? String else {
             assertionFailure("Unexpected representedObject")
             return
         }
-        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)
+
+        NetworkProtectionTunnelController().setExcludedRoute(addressRange, enabled: sender.state == .off)*/
+    }
+
+    @objc func openAppContainerInFinder(_ sender: Any?) {
+        let containerURL = URL.sandboxApplicationSupportURL
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: containerURL.path)
     }
 
     // MARK: Populating Menu Items
 
-    private func populateNetworkProtectionServerListMenuItems() {
-        guard let submenu = preferredServerMenu,
-              let automaticItem = preferredServerAutomaticItem else {
-            assertionFailure("\(#function): Failed to get submenu")
-            return
-        }
+    private func populateNetworkProtectionEnvironmentListMenuItems() {
+        environmentMenu.items = [
+            NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+        ]
+    }
 
+    private func populateNetworkProtectionServerListMenuItems() {
         let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
         let servers = (try? networkProtectionServerStore.storedNetworkProtectionServerList()) ?? []
 
+        preferredServerAutomaticItem.target = self
         if servers.isEmpty {
-            submenu.items = [automaticItem]
+            preferredServerMenu.items = [preferredServerAutomaticItem]
         } else {
-            submenu.items = [automaticItem, NSMenuItem.separator()] + servers.map({ server in
+            preferredServerMenu.items = [preferredServerAutomaticItem, NSMenuItem.separator()] + servers.map({ server in
                 let title: String
 
                 if server.isRegistered {
@@ -262,18 +348,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private func populateNetworkProtectionRegistrationKeyValidityMenuItems() {
 #if DEBUG
-        guard let menu = registrationKeyValidityMenu,
-              let automaticItem = registrationKeyValidityAutomaticItem else {
-
-            assertionFailure("\(#function): Failed to get menu or automatic item")
-            return
-        }
-
+        registrationKeyValidityAutomaticItem.target = self
         if Self.registrationKeyValidityOptions.isEmpty {
             // Not likely to happen as it's hard-coded, but still...
-            menu.items = [automaticItem]
+            registrationKeyValidityMenu.items = [registrationKeyValidityAutomaticItem]
         } else {
-            menu.items = [automaticItem, NSMenuItem.separator()] + Self.registrationKeyValidityOptions.map { option in
+            registrationKeyValidityMenu.items = [registrationKeyValidityAutomaticItem, NSMenuItem.separator()] + Self.registrationKeyValidityOptions.map { option in
                 let menuItem = NSMenuItem(title: option.title,
                                           action: #selector(setRegistrationKeyValidity(_:)),
                                           target: self,
@@ -283,22 +363,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 return menuItem
             }
         }
-#else
-        guard let separator = registrationKeyValidityMenuSeparatorItem,
-              let validityMenu = registrationKeyValidityMenuItem else {
-            assertionFailure("\(#function): Failed to get menu or automatic item")
-            return
-        }
-
-        separator.isHidden = true
-        validityMenu.isHidden = true
 #endif
     }
 
     private func populateExclusionsMenuItems() {
         exclusionsMenu.removeAllItems()
 
-        for item in NetworkProtectionTunnelController.exclusionList {
+        for item in settings.exclusionList {
             let menuItem: NSMenuItem
             switch item {
             case .section(let title):
@@ -313,85 +384,211 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
             exclusionsMenu.addItem(menuItem)
         }
+
+        // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
+        let waitlist = NetworkProtectionWaitlist()
+        enterWaitlistInviteCodeItem.isEnabled = waitlist.waitlistStorage.isOnWaitlist || waitlist.waitlistStorage.isInvited
+
     }
 
     // MARK: - Menu State Update
 
     override func update() {
+        updateEnvironmentMenu()
         updatePreferredServerMenu()
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
+        updateNetworkProtectionItems()
+    }
+
+    private func updateEnvironmentMenu() {
+        let selectedEnvironment = settings.selectedEnvironment
+
+        switch selectedEnvironment {
+        case .production:
+            environmentMenu.items.first?.state = .on
+            environmentMenu.items.last?.state = .off
+        case .staging:
+            environmentMenu.items.first?.state = .off
+            environmentMenu.items.last?.state = .on
+        }
     }
 
     private func updatePreferredServerMenu() {
-        guard let menu = preferredServerMenu else {
-            assertionFailure("Outlet not connected for preferredServerMenu")
-            return
-        }
+        let selectedServer = settings.selectedServer
 
-        let selectedServerName = debugUtilities.selectedServerName()
+        switch selectedServer {
+        case .automatic:
+            preferredServerMenu.items.first?.state = .on
+        case .endpoint(let selectedServerName):
+            preferredServerMenu.items.first?.state = .off
 
-        if selectedServerName == nil {
-            menu.items.first?.state = .on
-        } else {
-            menu.items.first?.state = .off
-        }
+            // We're skipping the first two items because they're the automatic menu item and
+            // the separator line.
+            let serverItems = preferredServerMenu.items.dropFirst(2)
 
-        // We're skipping the first two items because they're the automatic menu item and
-        // the separator line.
-        let serverItems = menu.items.dropFirst(2)
-
-        for item in serverItems {
-            if let selectedServerName,
-               item.title.hasPrefix(selectedServerName) {
-                item.state = .on
-            } else {
-                item.state = .off
+            for item in serverItems {
+                if item.title.hasPrefix(selectedServerName) {
+                    item.state = .on
+                } else {
+                    item.state = .off
+                }
             }
         }
     }
 
     private func updateRekeyValidityMenu() {
-        guard let menu = registrationKeyValidityMenu else {
-            assertionFailure("Outlet not connected for preferredServerMenu")
-            return
-        }
+        switch settings.registrationKeyValidity {
+        case .automatic:
+            registrationKeyValidityMenu.items.first?.state = .on
+        case .custom(let timeInterval):
+            registrationKeyValidityMenu.items.first?.state = .off
 
-        let selectedValidity = debugUtilities.registrationKeyValidity
+            // We're skipping the first two items because they're the automatic menu item and
+            // the separator line.
+            let serverItems = registrationKeyValidityMenu.items.dropFirst(2)
 
-        if selectedValidity == nil {
-            menu.items.first?.state = .on
-        } else {
-            menu.items.first?.state = .off
-        }
-
-        // We're skipping the first two items because they're the automatic menu item and
-        // the separator line.
-        let serverItems = menu.items.dropFirst(2)
-
-        for item in serverItems {
-            if item.representedObject as? TimeInterval == selectedValidity {
-                item.state = .on
-            } else {
-                item.state = .off
+            for item in serverItems {
+                if item.representedObject as? TimeInterval == timeInterval {
+                    item.state = .on
+                } else {
+                    item.state = .off
+                }
             }
         }
     }
 
     private func updateNetworkProtectionMenuItemsState() {
-        let controller = NetworkProtectionTunnelController()
-
-        shouldEnforceRoutesMenuItem.state = controller.shouldEnforceRoutes ? .on : .off
-        shouldIncludeAllNetworksMenuItem.state = controller.shouldIncludeAllNetworks ? .on : .off
-        connectOnLogInMenuItem.state = controller.shouldAutoConnectOnLogIn ? .on : .off
-
-        excludeLocalNetworksMenuItem.state = controller.shouldExcludeLocalRoutes ? .on : .off
+        shouldEnforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
+        shouldIncludeAllNetworksMenuItem.state = settings.includeAllNetworks ? .on : .off
+        excludeLocalNetworksMenuItem.state = settings.excludeLocalNetworks ? .on : .off
     }
 
+    private func updateNetworkProtectionItems() {
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
+        waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
+        waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
+
+        if let timestamp = waitlistStorage.getWaitlistTimestamp() {
+            waitlistTimestampItem.title = "Waitlist Timestamp: \(String(describing: timestamp))"
+        } else {
+            waitlistTimestampItem.title = "Waitlist Timestamp: N/A"
+        }
+
+        let accepted = UserDefaults().bool(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
+    }
+
+    // MARK: Waitlist
+
+    @objc func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
+        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
+    }
+
+    @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: nil)
+    }
+
+    @objc func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
+        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
+    }
+
+    @objc func overrideNetworkProtectionActivationDateToNow(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date())
+    }
+
+    @objc func overrideNetworkProtectionActivationDateTo5DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(5))
+    }
+
+    @objc func overrideNetworkProtectionActivationDateTo10DaysAgo(_ sender: Any?) {
+        overrideNetworkProtectionActivationDate(to: Date.daysAgo(10))
+    }
+
+    private func overrideNetworkProtectionActivationDate(to date: Date?) {
+        let store = DefaultWaitlistActivationDateStore()
+
+        if let date {
+            store.updateActivationDate(date)
+        } else {
+            store.removeDates()
+        }
+    }
+
+    @objc func resetNetworkProtectionWaitlistState(_ sender: Any?) {
+        NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+    }
+
+    @objc func resetNetworkProtectionTermsAndConditionsAcceptance(_ sender: Any?) {
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+    }
+
+    @objc func showNetworkProtectionInviteCodePrompt(_ sender: Any?) {
+        let code = getInviteCode()
+
+        Task {
+            do {
+                let redeemer = NetworkProtectionCodeRedemptionCoordinator()
+                try await redeemer.redeem(code)
+                NetworkProtectionWaitlist().waitlistStorage.store(inviteCode: code)
+                NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+            } catch {
+                // Do nothing here, this is just a debug menu
+            }
+        }
+    }
+
+    private func getInviteCode() -> String {
+        let alert = NSAlert()
+        alert.addButton(withTitle: "Use Invite Code")
+        alert.addButton(withTitle: "Cancel")
+        alert.messageText = "Enter Invite Code"
+        alert.informativeText = "Please grab a Network Protection invite code from Asana and enter it here."
+
+        let textField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        alert.accessoryView = textField
+
+        let response = alert.runModal()
+
+        if response == .alertFirstButtonReturn {
+            return textField.stringValue
+        } else {
+            return ""
+        }
+    }
+
+    // MARK: Environment
+    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
+        let title = menuItem.title
+        let selectedEnvironment: TunnelSettings.SelectedEnvironment
+
+        if title == "Staging" {
+            selectedEnvironment = .staging
+        } else {
+            selectedEnvironment = .production
+        }
+
+        settings.selectedEnvironment = selectedEnvironment
+
+        Task {
+            _ = try await NetworkProtectionDeviceManager.create().refreshServerList()
+            await MainActor.run {
+                populateNetworkProtectionServerListMenuItems()
+            }
+            settings.selectedServer = .automatic
+        }
+    }
 }
+
 extension NetworkProtectionDebugMenu: NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
+        // Temporarily disabled: https://app.asana.com/0/0/1205766100762904/f
+        /*
         if menu === exclusionsMenu {
             let controller = NetworkProtectionTunnelController()
             for item in menu.items {
@@ -401,8 +598,14 @@ extension NetworkProtectionDebugMenu: NSMenuDelegate {
                 item.isEnabled = !(controller.shouldEnforceRoutes && route == "10.0.0.0/8")
             }
         }
+         */
     }
-
 }
+
+#if DEBUG
+#Preview {
+    return MenuPreview(menu: NetworkProtectionDebugMenu())
+}
+#endif
 
 #endif

@@ -21,23 +21,33 @@ import Foundation
 internal class ChromiumDataImporter: DataImporter {
 
     var processName: String {
-        fatalError("Subclasses must provide their own process name")
+        "Chromium"
     }
 
     var source: DataImport.Source {
-        fatalError("Subclasses must return a source")
+        .chromium
     }
 
     private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
-    private let loginImporter: LoginImporter
+    private let loginImporter: LoginImporter?
     private let faviconManager: FaviconManagement
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
         self.applicationDataDirectoryURL = applicationDataDirectoryURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
+    }
+
+    convenience init(loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter) {
+        let applicationSupport = URL.nonSandboxApplicationSupportDirectoryURL
+        let defaultDataURL = applicationSupport.appendingPathComponent("Chromium/Default/")
+
+        self.init(applicationDataDirectoryURL: defaultDataURL,
+                  loginImporter: loginImporter,
+                  bookmarkImporter: bookmarkImporter,
+                  faviconManager: FaviconManager.shared)
     }
 
     func importableTypes() -> [DataImport.DataType] {
@@ -46,18 +56,19 @@ internal class ChromiumDataImporter: DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow? = nil,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
-        let result = importData(types: types, from: profile)
+        let result = importData(types: types, from: profile, modalWindow: modalWindow)
         completion(result)
     }
 
-    private func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) -> DataImportResult<DataImport.Summary> {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, modalWindow: NSWindow?) -> DataImportResult<DataImport.Summary> {
         var summary = DataImport.Summary()
         let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
 
-        if types.contains(.logins) {
+        if types.contains(.logins), let loginImporter {
             let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source, processName: processName)
-            let loginResult = loginReader.readLogins()
+            let loginResult = loginReader.readLogins(modalWindow: modalWindow)
 
             switch loginResult {
             case .success(let logins):

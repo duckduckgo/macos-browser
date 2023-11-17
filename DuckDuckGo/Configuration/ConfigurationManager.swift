@@ -59,7 +59,7 @@ final class ConfigurationManager {
     static let queue: DispatchQueue = DispatchQueue(label: "Configuration Manager")
 
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
-    private var lastUpdateTime: Date
+    private(set) var lastUpdateTime: Date
 
     private var timerCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()

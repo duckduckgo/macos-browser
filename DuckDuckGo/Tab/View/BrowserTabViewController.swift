@@ -121,6 +121,11 @@ final class BrowserTabViewController: NSViewController {
                                                selector: #selector(onCloseDataBrokerProtection),
                                                name: .dbpDidClose,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDataBrokerWaitlistGetStartedPressedByUser),
+                                               name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist,
+                                               object: nil)
+
 #endif
 
 #if SUBSCRIPTION
@@ -162,6 +167,7 @@ final class BrowserTabViewController: NSViewController {
         self.previouslySelectedTab = nil
     }
 
+#if DBP
     @objc
     private func onCloseDataBrokerProtection(_ notification: Notification) {
         guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
@@ -174,6 +180,13 @@ final class BrowserTabViewController: NSViewController {
             self.previouslySelectedTab = nil
         }
     }
+
+    @objc
+    private func onDataBrokerWaitlistGetStartedPressedByUser(_ notification: Notification) {
+        WindowControllersManager.shared.showDataBrokerProtectionTab()
+    }
+
+#endif
 
 #if SUBSCRIPTION
     @objc
@@ -474,7 +487,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished && PixelExperiment.cohort == .control {
+            if !OnboardingViewModel().onboardingFinished {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
@@ -938,12 +951,6 @@ extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingHasFinished() {
         (view.window?.windowController as? MainWindowController)?.userInteraction(prevented: false)
-    }
-
-    func goToNewTabPage() {
-        tabViewModel?.tab.setContent(.homePage)
-        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
-        mainVC.navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
     }
 
 }

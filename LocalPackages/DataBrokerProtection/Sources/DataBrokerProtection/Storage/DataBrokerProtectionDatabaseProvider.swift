@@ -29,6 +29,7 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
     func saveProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64
     func fetchProfile(with id: Int64) throws -> FullProfileDB?
+    func deleteProfileData() throws
 
     func save(_ broker: BrokerDB) throws -> Int64
     func update(_ broker: BrokerDB) throws
@@ -78,11 +79,11 @@ protocol DataBrokerProtectionDatabaseProvider: SecureStorageDatabaseProvider {
 final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDatabaseProvider, DataBrokerProtectionDatabaseProvider {
 
     public static func defaultDatabaseURL() -> URL {
-        return DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "DBP", fileName: "Vault.db")
+        return DefaultDataBrokerProtectionDatabaseProvider.databaseFilePath(directoryName: "DBP", fileName: "Vault.db", appGroupIdentifier: Bundle.main.appGroupName)
     }
 
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
-        try super.init(file: file, key: key, writerType: .queue) { migrator in
+        try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
             migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
             migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
@@ -317,6 +318,33 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 .including(all: ProfileDB.addresses)
                 .including(all: ProfileDB.phoneNumbers)
             return try FullProfileDB.fetchOne(database, request)
+        }
+    }
+
+    func deleteProfileData() throws {
+        try db.write { db in
+            try ScanHistoryEventDB
+                .deleteAll(db)
+            try OptOutHistoryEventDB
+                .deleteAll(db)
+            try ExtractedProfileDB
+                .deleteAll(db)
+            try ScanDB
+                .deleteAll(db)
+            try OptOutDB
+                .deleteAll(db)
+            try BrokerDB
+                .deleteAll(db)
+            try ProfileQueryDB
+                .deleteAll(db)
+            try NameDB
+                .deleteAll(db)
+            try AddressDB
+                .deleteAll(db)
+            try PhoneDB
+                .deleteAll(db)
+            try ProfileDB
+                .deleteAll(db)
         }
     }
 

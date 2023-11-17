@@ -77,7 +77,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, userEntered: nil)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -158,7 +158,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, userEntered: nil)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -277,7 +277,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, userEntered: nil)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -321,7 +321,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, userEntered: nil)?.result
 
         workspace.appUrl = nil
 
@@ -337,7 +337,7 @@ final class TabPermissionsTests: XCTestCase {
             XCTFail("Unexpected permissions query \(query)")
         }
 
-        let result = await tab.setUrl(externalUrl, userEntered: nil)?.value?.result
+        let result = await tab.setUrl(externalUrl, userEntered: nil)?.result
 
         guard case .failure(let error) = result else {
             XCTFail("unexpected result \(String(describing: result))")
@@ -359,7 +359,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(urls.url, userEntered: nil)?.result
 
         workspace.appUrl = nil
 
@@ -375,7 +375,7 @@ final class TabPermissionsTests: XCTestCase {
             XCTFail("Unexpected permissions query \(query)")
         }
 
-        let result = await tab.setUrl(externalUrl, userEntered: externalUrl.absoluteString)?.value?.result
+        let result = await tab.setUrl(externalUrl, userEntered: externalUrl.absoluteString)?.result
 
         guard case .failure(let error) = result,
               let error = error as? DidCancelError,

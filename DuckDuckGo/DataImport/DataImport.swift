@@ -18,17 +18,24 @@
 
 import AppKit
 import SecureStorage
+import PixelKit
 
 enum DataImport {
 
     enum Source: CaseIterable, Equatable {
-
         case brave
         case chrome
+        case chromium
+        case coccoc
         case edge
         case firefox
+        case opera
+        case operaGX
         case safari
         case safariTechnologyPreview
+        case tor
+        case vivaldi
+        case yandex
         case onePassword8
         case onePassword7
         case bitwarden
@@ -44,14 +51,28 @@ enum DataImport {
                 return "Brave"
             case .chrome:
                 return "Chrome"
+            case .chromium:
+                return "Chromium"
+            case .coccoc:
+                return "Cốc Cốc"
             case .edge:
                 return "Edge"
             case .firefox:
                 return "Firefox"
+            case .opera:
+                return "Opera"
+            case .operaGX:
+                return "OperaGX"
             case .safari:
                 return "Safari"
             case .safariTechnologyPreview:
                 return "Safari Technology Preview"
+            case .tor:
+                return "Tor Browser"
+            case .vivaldi:
+                return "Vivaldi"
+            case .yandex:
+                return "Yandex"
             case .bitwarden:
                 return "Bitwarden"
             case .lastPass:
@@ -80,7 +101,7 @@ enum DataImport {
             case .csv, .bitwarden, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML:
                 // Users can always import from exported files
                 return true
-            case .brave, .chrome, .edge, .firefox, .safari, .safariTechnologyPreview:
+            case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .safari, .safariTechnologyPreview, .tor, .vivaldi, .yandex:
                 // Users can't import from browsers unless they're installed
                 return false
             }
@@ -114,6 +135,13 @@ enum DataImport {
     }
 
     struct BrowserProfileList {
+
+        enum Constants {
+            static let chromiumDefaultProfileName = "Default"
+            static let chromiumProfilePrefix = "Profile "
+            static let firefoxDefaultProfileName = "default-release"
+        }
+
         let browser: ThirdPartyBrowser
         let profiles: [BrowserProfile]
 
@@ -125,24 +153,24 @@ enum DataImport {
             self.browser = browser
 
             switch browser {
-            case .brave, .chrome, .edge:
+            case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
                 // Chromium profiles are either named "Default", or a series of incrementing profile names, i.e. "Profile 1", "Profile 2", etc.
                 let potentialProfiles = profileURLs.map({
-                    BrowserProfile.for(browser: browser, profileURL: $0)
+                    BrowserProfile(browser: browser, profileURL: $0)
                 })
 
                 let filteredProfiles =  potentialProfiles.filter {
-                    $0.hasNonDefaultProfileName ||
-                        $0.profileName == "Default" ||
-                        $0.profileName.hasPrefix("Profile ")
+                    $0.chromiumPreferences != nil
+                    || $0.profileName == Constants.chromiumDefaultProfileName
+                    || $0.profileName.hasPrefix(Constants.chromiumProfilePrefix)
                 }
 
                 let sortedProfiles = filteredProfiles.sorted()
 
                 self.profiles = sortedProfiles
-            case .firefox, .safari, .safariTechnologyPreview:
+            case .firefox, .safari, .safariTechnologyPreview, .tor:
                 self.profiles = profileURLs.map {
-                    BrowserProfile.for(browser: browser, profileURL: $0)
+                    BrowserProfile(browser: browser, profileURL: $0)
                 }.sorted()
             case .bitwarden, .lastPass, .onePassword7, .onePassword8:
                 self.profiles = []
@@ -155,10 +183,10 @@ enum DataImport {
 
         var defaultProfile: BrowserProfile? {
             switch browser {
-            case .brave, .chrome, .edge:
-                return profiles.first { $0.profileName == "Default" } ?? profiles.first
-            case .firefox:
-                return profiles.first { $0.profileName == "default-release" } ?? profiles.first
+            case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
+                return profiles.first { $0.profileName == Constants.chromiumDefaultProfileName } ?? profiles.first
+            case .firefox, .tor:
+                return profiles.first { $0.profileName == Constants.firefoxDefaultProfileName } ?? profiles.first
             case .safari, .safariTechnologyPreview, .bitwarden, .lastPass, .onePassword7, .onePassword8:
                 return profiles.first
             }
@@ -174,21 +202,13 @@ enum DataImport {
 
         let profileURL: URL
         var profileName: String {
-            return detectedChromePreferencesProfileName ?? fallbackProfileName
-        }
-
-        var hasNonDefaultProfileName: Bool {
-            return detectedChromePreferencesProfileName != nil
+            return chromiumPreferences?.profileName ?? fallbackProfileName
         }
 
         private let browser: ThirdPartyBrowser
         private let fileStore: FileStore
         private let fallbackProfileName: String
-        private let detectedChromePreferencesProfileName: String?
-
-        static func `for`(browser: ThirdPartyBrowser, profileURL: URL) -> BrowserProfile {
-            return BrowserProfile(browser: browser, profileURL: profileURL)
-        }
+        let chromiumPreferences: ChromiumPreferences?
 
         init(browser: ThirdPartyBrowser, profileURL: URL, fileStore: FileStore = FileManager.default) {
             self.browser = browser
@@ -196,7 +216,7 @@ enum DataImport {
             self.profileURL = profileURL
 
             self.fallbackProfileName = Self.getDefaultProfileName(at: profileURL)
-            self.detectedChromePreferencesProfileName = Self.getChromeProfileName(at: profileURL, fileStore: fileStore)
+            self.chromiumPreferences = Self.getChromiumProfilePreferences(at: profileURL, fileStore: fileStore)
         }
 
         var hasBrowserData: Bool {
@@ -207,7 +227,7 @@ enum DataImport {
             let profileDirectoryContentsSet = Set(profileDirectoryContents)
 
             switch browser {
-            case .brave, .chrome, .edge:
+            case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi:
                 let hasChromiumLogins = ChromiumLoginReader.LoginDataFileName.allCases.contains { loginFileName in
                     return profileDirectoryContentsSet.contains(loginFileName.rawValue)
                 }
@@ -215,7 +235,7 @@ enum DataImport {
                 let hasChromiumBookmarks = profileDirectoryContentsSet.contains(ChromiumBookmarksReader.Constants.defaultBookmarksFileName)
 
                 return hasChromiumLogins || hasChromiumBookmarks
-            case .firefox:
+            case .firefox, .tor:
                 let hasFirefoxLogins = FirefoxLoginReader.DataFormat.allCases.contains { dataFormat in
                     let (databaseName, loginFileName) = dataFormat.formatFileNames
 
@@ -234,7 +254,7 @@ enum DataImport {
             return profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
         }
 
-        private static func getChromeProfileName(at profileURL: URL, fileStore: FileStore) -> String? {
+        private static func getChromiumProfilePreferences(at profileURL: URL, fileStore: FileStore) -> ChromiumPreferences? {
             guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else {
                 return nil
             }
@@ -244,9 +264,9 @@ enum DataImport {
             }
 
             if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
-               let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
-               let chromePreferences = try? ChromePreferences(from: chromePreferenceData) {
-                return chromePreferences.profileName
+               let preferencesData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
+               let preferences = try? ChromiumPreferences(from: preferencesData) {
+                return preferences
             }
 
             return nil
@@ -270,7 +290,7 @@ enum DataImportAction {
     case generic
 }
 
-protocol DataImportError: Error, CustomNSError, ErrorWithParameters {
+protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters {
     associatedtype OperationType: RawRepresentable where OperationType.RawValue == Int
 
     var source: DataImport.Source { get }
@@ -307,8 +327,14 @@ protocol DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void)
 
+}
+extension DataImporter {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        self.importData(types: types, from: profile, modalWindow: nil, completion: completion)
+    }
 }
 
 enum DataImportResult<T> {

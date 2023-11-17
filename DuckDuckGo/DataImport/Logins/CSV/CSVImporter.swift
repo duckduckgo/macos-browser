@@ -130,7 +130,8 @@ final class CSVImporter: DataImporter {
             switch source {
             case .onePassword7, .onePassword8:
                 self.init(titleIndex: 3, urlIndex: 5, usernameIndex: 6, passwordIndex: 2)
-            case .lastPass, .firefox, .edge, .chrome, .brave, .safari, .safariTechnologyPreview, .csv, .bookmarksHTML, .bitwarden:
+            case .lastPass, .firefox, .edge, .chrome, .chromium, .coccoc, .brave, .opera, .operaGX,
+                 .safari, .safariTechnologyPreview, .tor, .vivaldi, .yandex, .csv, .bookmarksHTML, .bitwarden:
                 return nil
             }
         }
@@ -189,6 +190,7 @@ final class CSVImporter: DataImporter {
     // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
         let fileContents: String
         do {

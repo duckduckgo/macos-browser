@@ -89,7 +89,7 @@ class BrowserProfileListTests: XCTestCase {
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "User Name (profile@duck.com)")
-        XCTAssertTrue(profile.hasNonDefaultProfileName)
+        XCTAssertNotNil(profile.chromiumPreferences?.profileName)
     }
 
     func testWhenGettingProfileName_AndProfileHasNoDetectedChromiumName_ThenDetectedNameIsUsed() {
@@ -111,7 +111,7 @@ class BrowserProfileListTests: XCTestCase {
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "ChromeProfile")
-        XCTAssertTrue(profile.hasNonDefaultProfileName)
+        XCTAssertNotNil(profile.chromiumPreferences?.profileName)
     }
 
     func testWhenGettingProfileName_AndChromiumPreferencesAreDetected_AndProfileNameIsSystemProfile_ThenProfileHasDefaultProfileName() {
@@ -132,7 +132,7 @@ class BrowserProfileListTests: XCTestCase {
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "System Profile")
-        XCTAssertFalse(profile.hasNonDefaultProfileName)
+        XCTAssertNil(profile.chromiumPreferences?.profileName)
     }
 
     private func profile(named name: String) -> URL {
