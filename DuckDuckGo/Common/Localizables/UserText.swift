@@ -314,7 +314,7 @@ struct UserText {
         comment: "Connect on Login setting title")
     static let vpnConnectOnLoginSettingDescription = NSLocalizedString(
         "vpn.setting.description.connect.on.login",
-        value: "Automatically connect to the VPN service when you login",
+        value: "Automatically connect to the VPN service when you login.",
         comment: "Connect on Login setting description")
     static let vpnShowInMenuBarSettingTitle = NSLocalizedString(
         "vpn.setting.title.connect.on.login",
@@ -322,15 +322,15 @@ struct UserText {
         comment: "Show VPN in menu bar setting title")
     static let vpnShowInMenuBarSettingDescription = NSLocalizedString(
         "vpn.setting.description.connect.on.login",
-        value: "Display VPN status in menu bar, next to the Wi-Fi and Battery",
-        comment: "Show VPN in menu bar setting description")
+        value: "Display VPN status in menu bar.",
+        comment: "Show VPN in menu bar setting description.")
     static let vpnAlwaysONSettingTitle = NSLocalizedString(
         "vpn.setting.title.always.on",
         value: "Always ON",
         comment: "Always ON setting title")
     static let vpnAlwaysOnSettingDescription = NSLocalizedString(
         "vpn.setting.description.always.on",
-        value: "Display VPN status in menu bar, next to the Wi-Fi and Battery",
+        value: "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled.",
         comment: "Always ON setting description")
     static let vpnExcludeLocalNetworksSettingTitle = NSLocalizedString(
         "vpn.setting.title.exclude.local.networks",
@@ -338,7 +338,7 @@ struct UserText {
         comment: "Exclude Local Networks setting title")
     static let vpnExcludeLocalNetworksSettingDescription = NSLocalizedString(
         "vpn.setting.description.exclude.local.networks",
-        value: "Let local traffic bypass the VPN and connect to devices on your local network, like a printer",
+        value: "Let local traffic bypass the VPN and connect to devices on your local network, like a printer.",
         comment: "Exclude Local Networks setting description")
     static let vpnSecureDNSSettingTitle = NSLocalizedString(
         "vpn.setting.title.secure.dns",
@@ -350,7 +350,7 @@ struct UserText {
         comment: "Secure DNS setting description")
     static let vpnStatusChangeNotificationSettingTitle = NSLocalizedString(
         "vpn.setting.title.status.change.notification",
-        value: "Get notified if your connection drops or VPN status changes",
+        value: "Get notified if your connection drops or VPN status changes.",
         comment: "Status Change Notification setting title")
     static let uninstallVPNButtonTitle = NSLocalizedString(
         "vpn.button.title.uninstall.vpn",
