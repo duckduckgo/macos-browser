@@ -56,6 +56,7 @@ final class ContinueSetUpModelTests: XCTestCase {
 
     @MainActor override func setUp() {
         UserDefaultsWrapper<Any>.clearAll()
+        userDefaults.set(true, forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
         userDefaults.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
