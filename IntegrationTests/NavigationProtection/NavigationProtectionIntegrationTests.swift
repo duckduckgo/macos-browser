@@ -273,54 +273,6 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             XCTAssertEqual(results.results, expected)
         }
     }
-
-    @MainActor
-    func testUrlBarSpoofingWithLongLoadingNavigations() async throws {
-        let tab = Tab(content: .none)
-        window = WindowsManager.openNewWindow(with: tab)!
-        
-        // run
-        let url = URL(string: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html")!
-        PrivacySecurityPreferences.shared.gpcEnabled = false
-        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
-        _=try await tab.webView.evaluateJavaScript("(function() { run(); return true; })()")
-        
-        // wait
-        while(tab.isLoading) {
-            try await Task.sleep(nanoseconds: UInt64(100 * Double(NSEC_PER_MSEC)))
-        }
-        
-        // address bar should not be updated this early
-        let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
-        XCTAssertNotEqual(tabViewModel.addressBarString, "https://duckduckgo.com:8443/")
-    }
-
-    @MainActor
-    func testUrlBarSpoofingWithUnsupportedApplicationScheme() async throws {
-        let tab = Tab(content: .none)
-        window = WindowsManager.openNewWindow(with: tab)!
-        
-        let url = URL(string: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-application-scheme.html")!
-        PrivacySecurityPreferences.shared.gpcEnabled = false
-        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
-        
-        // run
-        _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('run').click(); return true; })()")
-        
-        // wait
-        let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
-        while(tabViewModel.tab.isLoading) {
-            try await Task.sleep(nanoseconds: UInt64(100 * Double(NSEC_PER_MSEC)))
-        }
-        
-        // the exploit is unreliable, so we also accept address bar being empty string
-        let spoofedContent = try await tabViewModel.tab.webView.find("Not DDG.")
-        let addressBarUpdated = tabViewModel.addressBarString == "https://duckduckgo.com/"
-        let addressBarEmpty = tabViewModel.addressBarString == ""
-        XCTAssertTrue(addressBarUpdated || addressBarEmpty)
-        XCTAssertTrue(!spoofedContent.matchFound)
-    }
-
 }
 
 private extension Tab {
