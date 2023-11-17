@@ -23,7 +23,7 @@ struct DataImportSourcePicker: View {
 
     @State private var viewModel: DataImportSourceViewModel
 
-    private var importSources: [DataImport.Source] {
+    private var importSources: [DataImport.Source?] {
         viewModel.importSources
     }
 
@@ -35,22 +35,21 @@ struct DataImportSourcePicker: View {
     var body: some View {
         Picker(selection: $viewModel.selectedSourceIndex) {
             ForEach(importSources.indices, id: \.self) { idx in
-                HStack {
-                    // The CSV row is at the bottom of the picker, and requires a separator above it, but only if the item array isn't
-                    // empty (which would happen if there are no valid sources).
-                    if idx > 0, [.onePassword8, .csv].contains(importSources[idx]) {
-                        Divider()
+                if let source = importSources[idx] {
+                    HStack {
+                        if let icon = source.importSourceImage?.resized(to: NSSize(width: 16, height: 16)) {
+                            Image(nsImage: icon)
+                        }
+                        Text(source.importSourceName)
                     }
-
-                    if let icon = importSources[idx].importSourceImage?.resized(to: NSSize(width: 16, height: 16)) {
-                        Image(nsImage: icon)
-                    }
-                    Text(importSources[idx].importSourceName)
+                } else {
+                    Divider()
                 }
             }
         } label: {}
             .onChange(of: viewModel.selectedSourceIndex) { idx in
-                viewModel.onSelectedSourceChanged(importSources[idx])
+                guard let importSource = importSources[idx] else { return }
+                viewModel.onSelectedSourceChanged(importSource)
             }
             .pickerStyle(MenuPickerStyle())
     }
@@ -59,6 +58,6 @@ struct DataImportSourcePicker: View {
 
 #Preview {
     DataImportSourcePicker(selectedSource: .csv) {
-        print("seiection:", $0)
+        print("selection:", $0)
     }
 }

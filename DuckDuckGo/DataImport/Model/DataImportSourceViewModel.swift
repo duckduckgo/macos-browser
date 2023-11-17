@@ -26,8 +26,18 @@ struct DataImportSourceViewModel {
     let onSelectedSourceChanged: (DataImport.Source) -> Void
 
     init(importSources: [DataImport.Source]? = nil, selectedSource: DataImport.Source, onSelectedSourceChanged: @escaping (DataImport.Source) -> Void) {
+        var importSources: [DataImport.Source?] = (importSources ?? DataImport.Source.allCases.filter(\.canImportData))
 
-        self.importSources = importSources ?? DataImport.Source.allCases.filter(\.canImportData)
+        // The CSV row is at the bottom of the picker, and requires a separator above it, but only if the item array isn't
+        // empty (which would happen if there are no valid sources).
+        for source in [DataImport.Source.onePassword8, .csv] {
+            if let idx = importSources.lastIndex(of: source), idx > 0 {
+                // separator
+                importSources.insert(nil, at: idx)
+            }
+        }
+        self.importSources = importSources
+
         assert(!self.importSources.isEmpty)
 
         self.selectedSourceIndex = self.importSources.firstIndex(of: selectedSource) ?? 0

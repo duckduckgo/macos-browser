@@ -457,7 +457,9 @@ extension DataImportViewModel {
             return .initiateImport
 
         case .fileImport:
-            if case .summary = nextScreen(skip: true) {
+            if case .fileImport = importSource.initialScreen {
+                return nil
+            } else if case .summary = nextScreen(skip: true) {
                 return secondaryButton == .back ? .cancel : nil
             }
             return .skip
