@@ -17,31 +17,27 @@
 //
 
 import AppKit
+import Account
 import SwiftUI
 
 public final class SubscriptionAccessViewController: NSViewController {
+
+    private let accountManager: AccountManager
+    private var actionHandlers: SubscriptionAccessActionHandlers
 
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init() {
+    public init(accountManager: AccountManager = AccountManager(), actionHandlers: SubscriptionAccessActionHandlers) {
+        self.accountManager = accountManager
+        self.actionHandlers = actionHandlers
         super.init(nibName: nil, bundle: nil)
     }
 
     public override func loadView() {
-        let actionHandlers = SubscriptionAccessActionHandlers(
-            restorePurchases: {
-                // restore purchases
-            },
-            openURLHandler: { _ in
-                // open URL here
-            }, goToSyncPreferences: {
-                // go to sync
-            })
-
-        let model = ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
-//        let model = ShareSubscriptionAccessModel(actionHandlers: actionHandlers)
+        let isSignedIn = accountManager.isSignedIn
+        let model: SubscriptionAccessModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
 
         let subscriptionAccessView = SubscriptionAccessView(model: model,
                                                             dismiss: { [weak self] in

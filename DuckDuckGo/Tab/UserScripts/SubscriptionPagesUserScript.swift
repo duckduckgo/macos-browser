@@ -199,10 +199,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             let id: String
         }
 
-        struct PurchaseUpdate: Codable {
-            let type: String
-        }
-
         let message = original
 
         if #available(macOS 12.0, *) {
@@ -271,6 +267,34 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         print(">>> Selected to activate a subscription -- show the activation settings screen")
+
+        let message = original
+
+        Task { @MainActor in
+            let actionHandlers = SubscriptionAccessActionHandlers(
+                restorePurchases: {
+                    if #available(macOS 12.0, *) {
+                        Task {
+                            guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
+                            switch await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation) {
+                            case .success:
+                                message.webView?.reload()
+                            case .failure:
+                                break
+                            }
+                        }
+                    }
+                },
+                openURLHandler: { url in
+                    WindowControllersManager.shared.show(url: url, newTab: true)
+                }, goToSyncPreferences: {
+                    WindowControllersManager.shared.show(url: URL(string: "about:preferences/sync")!, newTab: true)
+                })
+
+            let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
+            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
+        }
+
         return nil
     }
 
@@ -290,6 +314,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     enum SubscribeActionName: String {
         case onPurchaseUpdate
+    }
+
+    struct PurchaseUpdate: Codable {
+        let type: String
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
