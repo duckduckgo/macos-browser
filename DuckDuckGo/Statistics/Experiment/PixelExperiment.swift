@@ -34,7 +34,7 @@ enum PixelExperiment: String, CaseIterable {
 
     static var isNoCardsExperimentOn: Bool {
         // This is to avoid the cohort is assigned before the user actually sees the new tab page (after the onboarding has been completed)
-        if OnboardingViewModel().onboardingFinished {
+        if isExperimentInstalled && OnboardingViewModel().onboardingFinished {
             return true
         }
         // Cohort are assigned the first time it's called
