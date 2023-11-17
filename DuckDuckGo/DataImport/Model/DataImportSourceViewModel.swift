@@ -20,7 +20,7 @@ import Foundation
 
 struct DataImportSourceViewModel {
 
-    let importSources: [DataImport.Source]
+    let importSources: [DataImport.Source?]
     var selectedSourceIndex: Int
 
     let onSelectedSourceChanged: (DataImport.Source) -> Void
