@@ -126,6 +126,7 @@ final class FileImportViewController: NSViewController {
             lastPassInfoView.isHidden = true
             onePassword7InfoView.isHidden = true
             onePassword8InfoView.isHidden = true
+            bitwardenInfoView.isHidden = true
             selectFileButton.title = UserText.importLoginsSelectBrowserCSVFile
         case .onePassword7:
             descriptionLabel.isHidden = true

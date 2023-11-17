@@ -1584,7 +1584,7 @@ Gw
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="p9R-Ta-H50" userLabel="1Password 7 Info View">
-                                        <rect key="frame" x="0.0" y="607" width="472" height="286"/>
+                                        <rect key="frame" x="0.0" y="674" width="472" height="286"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JFc-G2-1jH" userLabel="Version Info Stack View">
                                                 <rect key="frame" x="0.0" y="254" width="472" height="32"/>
@@ -1983,13 +1983,13 @@ Gw
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="N72-5P-3dY" userLabel="1Password 8 Info View">
-                                        <rect key="frame" x="0.0" y="317" width="472" height="270"/>
+                                        <rect key="frame" x="0.0" y="350" width="472" height="304"/>
                                         <subviews>
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KGi-zW-0Ve" userLabel="Version Info Stack View">
-                                                <rect key="frame" x="0.0" y="238" width="472" height="32"/>
+                                                <rect key="frame" x="0.0" y="256" width="472" height="48"/>
                                                 <subviews>
                                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rZa-Wh-cwe" userLabel="Password Export Info">
-                                                        <rect key="frame" x="0.0" y="8" width="16" height="16"/>
+                                                        <rect key="frame" x="0.0" y="16" width="16" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="1Ic-f9-GcJ"/>
                                                             <constraint firstAttribute="width" constant="16" id="DQw-O5-Est"/>
@@ -2026,13 +2026,13 @@ Gw
                                                 </textFieldCell>
                                             </textField>
                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="24" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I2m-UN-yiB">
-                                                <rect key="frame" x="0.0" y="0.0" width="472" height="183"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="472" height="201"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EBb-W0-lgj">
-                                                        <rect key="frame" x="0.0" y="39" width="472" height="144"/>
+                                                        <rect key="frame" x="0.0" y="39" width="472" height="162"/>
                                                         <subviews>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="rDK-Nd-3FM" userLabel="1">
-                                                                <rect key="frame" x="0.0" y="124" width="469" height="20"/>
+                                                                <rect key="frame" x="0.0" y="142" width="469" height="20"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="0CU-8N-veN">
                                                                         <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
@@ -2079,10 +2079,10 @@ Gw
                                                                 </constraints>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="glR-ni-P9g" userLabel="2">
-                                                                <rect key="frame" x="0.0" y="84" width="472" height="32"/>
+                                                                <rect key="frame" x="0.0" y="84" width="472" height="50"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="jYr-y7-z6U">
-                                                                        <rect key="frame" x="0.0" y="12" width="20" height="20"/>
+                                                                        <rect key="frame" x="0.0" y="30" width="20" height="20"/>
                                                                         <view key="contentView" id="faC-RL-5iP">
                                                                             <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2313,10 +2313,10 @@ Gw
                                         </customSpacing>
                                     </stackView>
                                     <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" verticalHuggingPriority="1000" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9gt-TP-5yx" userLabel="Bitwarden Info View">
-                                        <rect key="frame" x="0.0" y="94" width="472" height="203"/>
+                                        <rect key="frame" x="0.0" y="94" width="472" height="236"/>
                                         <subviews>
                                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rmh-QO-jo8">
-                                                <rect key="frame" x="-2" y="188" width="300" height="15"/>
+                                                <rect key="frame" x="-2" y="221" width="300" height="15"/>
                                                 <textFieldCell key="cell" alignment="left" title="Step 1: Export your passwords from Bitwarden" id="eNa-7u-rmB">
                                                     <font key="font" size="13" name="SFProText-Semibold"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -2324,13 +2324,13 @@ Gw
                                                 </textFieldCell>
                                             </textField>
                                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="24" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8d5-Cz-gXl">
-                                                <rect key="frame" x="0.0" y="0.0" width="472" height="168"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="472" height="201"/>
                                                 <subviews>
                                                     <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lEV-Hs-lqY">
-                                                        <rect key="frame" x="0.0" y="39" width="472" height="129"/>
+                                                        <rect key="frame" x="0.0" y="39" width="472" height="162"/>
                                                         <subviews>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="jSu-cF-BkQ" userLabel="1">
-                                                                <rect key="frame" x="0.0" y="109" width="469" height="20"/>
+                                                                <rect key="frame" x="0.0" y="142" width="469" height="20"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="RHn-dG-2iL">
                                                                         <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
@@ -2377,10 +2377,10 @@ Gw
                                                                 </constraints>
                                                             </customView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="dmw-3w-CRr" userLabel="2">
-                                                                <rect key="frame" x="0.0" y="84" width="472" height="17"/>
+                                                                <rect key="frame" x="0.0" y="84" width="472" height="50"/>
                                                                 <subviews>
                                                                     <box boxType="custom" borderType="none" borderWidth="0.0" cornerRadius="10" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="UTx-1x-VyW">
-                                                                        <rect key="frame" x="0.0" y="-3" width="20" height="20"/>
+                                                                        <rect key="frame" x="0.0" y="30" width="20" height="20"/>
                                                                         <view key="contentView" id="6dV-Rq-Moq">
                                                                             <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2406,7 +2406,7 @@ Gw
                                                                         <color key="fillColor" name="GlobalBackgroundColor"/>
                                                                     </box>
                                                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Fng-uh-xKC">
-                                                                        <rect key="frame" x="22" y="0.0" width="444" height="15"/>
+                                                                        <rect key="frame" x="22" y="0.0" width="444" height="48"/>
                                                                         <textFieldCell key="cell" title="Select File → Export vault from the Menu Bar" allowsEditingTextAttributes="YES" id="Wi7-SP-7wF">
                                                                             <font key="font" size="13" name="SFProText-Regular"/>
                                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
