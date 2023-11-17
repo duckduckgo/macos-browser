@@ -168,6 +168,11 @@ public struct UserDefaultsWrapper<T> {
         // Sync
 
         case syncEnvironment = "sync.environment"
+        case favoritesDisplayMode = "sync.favorites-display-mode"
+        case syncBookmarksPaused = "sync.bookmarks-paused"
+        case syncCredentialsPaused = "sync.credentials-paused"
+        case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
+        case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
     }
 
     enum RemovedKeys: String, CaseIterable {

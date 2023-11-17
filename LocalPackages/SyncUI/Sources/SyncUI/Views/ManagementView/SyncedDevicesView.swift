@@ -56,6 +56,14 @@ struct SyncedDeviceIcon: View {
     }
 
     var body: some View {
+        IconOnBackground(image: image)
+    }
+}
+
+struct IconOnBackground: View {
+    var image: NSImage
+
+    var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
                 .fill(Color("BlackWhite100").opacity(0.06))

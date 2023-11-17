@@ -40,12 +40,14 @@ class StatisticsLoaderTests: XCTestCase {
 
         mockStatisticsStore.atb = "atb"
         mockStatisticsStore.searchRetentionAtb = "retentionatb"
+        mockStatisticsStore.variant = "test"
         loadSuccessfulUpdateAtbStub()
 
         let expect = expectation(description: "Successful atb updates retention store")
         testee.refreshSearchRetentionAtb {
             XCTAssertEqual(self.mockStatisticsStore.atb, "v20-1")
             XCTAssertEqual(self.mockStatisticsStore.searchRetentionAtb, "v77-5")
+            XCTAssertNil(self.mockStatisticsStore.variant)
             expect.fulfill()
         }
 
