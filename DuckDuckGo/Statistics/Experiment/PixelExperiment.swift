@@ -34,8 +34,7 @@ enum PixelExperiment: String, CaseIterable {
 
     static var isNoCardsExperimentOn: Bool {
         // This is to avoid the cohort is assigned before the user actually sees the new tab page (after the onboarding has been completed)
-        let isOnbordingFinished = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
-        if !isOnbordingFinished {
+        if OnboardingViewModel().onboardingFinished {
             return true
         }
         // Cohort are assigned the first time it's called
