@@ -34,7 +34,7 @@ extension Preferences {
                 // SECTION: Manage VPN
 
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.manageVPNSettingsTitle)
+                    TextMenuItemHeader(text: UserText.vpnSettingsTitle)
 
                     ToggleMenuItem(title: UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
                     TextMenuItemCaption(text: UserText.vpnConnectOnLoginSettingDescription)

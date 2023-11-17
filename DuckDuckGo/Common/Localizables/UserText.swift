@@ -302,7 +302,7 @@ struct UserText {
 
     // VPN Setting Titles
 
-    static let manageVPNSettingsTitle = NSLocalizedString("manage.vpn.settings.title", value: "Manage VPN", comment: "Manage VPN section title in VPN settings")
+    static let vpnSettingsTitle = NSLocalizedString("vpn.settings.title", value: "VPN Settings", comment: "VPN Settings section title in VPN settings")
     static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "VPN Notifications", comment: "VPN Notifications section title in VPN settings")
     static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced", comment: "VPN Advanced section title in VPN settings")
 
@@ -362,7 +362,7 @@ struct UserText {
     static let uninstallVPNAlertTitle = NSLocalizedString("vpn.uninstall.alert.title", value: "Are you sure you want to uninstall the VPN?", comment: "Alert title when the user selects to uninstall our VPN")
     static let uninstallVPNInformativeText = NSLocalizedString(
         "vpn.uninstall.alert.informative.text",
-        value: "Uninstalling the DuckDuckGo VPN will disconnect any active VPN connections and remove it from your device.",
+        value: "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device.",
         comment: "Informative text for the alert that comes up when the user decides to uninstall our VPN")
 
     // Misc
