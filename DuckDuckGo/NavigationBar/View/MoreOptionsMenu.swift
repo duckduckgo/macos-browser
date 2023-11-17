@@ -149,7 +149,7 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        if DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
+        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist &&  DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
@@ -342,6 +342,8 @@ final class MoreOptionsMenu: NSMenu {
 
             DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
 
+        } else {
+            DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
         }
 
 #endif // DBP
@@ -715,4 +717,4 @@ final class LoginsSubMenu: NSMenu {
 
 }
 
-extension MoreOptionsMenu: EmailManagerRequestDelegate { }
+extension MoreOptionsMenu: EmailManagerRequestDelegate {}

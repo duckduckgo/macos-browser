@@ -22,33 +22,45 @@ import SwiftUIExtensions
 struct RecoverAccountView: View {
     @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
+    let isRecovery: Bool
+    let isActiveDevice: Bool
+    var instructionText: String {
+        if isRecovery {
+            return UserText.recoverSyncedDataExplanation
+        }
+        return UserText.manuallyEnterCodeExplanation
+
+    }
+    var titleText: String {
+        if isRecovery {
+            return UserText.recoverSyncedDataTitle
+        }
+        return UserText.manuallyEnterCodeTitle
+    }
 
     func submitRecoveryCode() {
-        model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode)
+        model.delegate?.recoverDevice(using: recoveryCodeModel.recoveryCode, isActiveDevice: isActiveDevice)
     }
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
-            Text(UserText.recoverSyncedDataTitle)
+            Text(titleText)
                 .font(.system(size: 17, weight: .bold))
 
             EnterCodeView(
-                instructions: UserText.recoverSyncedDataExplanation,
+                instructions: instructionText,
                 buttonCaption: UserText.pasteFromClipboard) {
                     submitRecoveryCode()
                 }.environmentObject(recoveryCodeModel)
+                .frame(height: 256)
 
         } buttons: {
             Button(UserText.cancel) {
                 model.endFlow()
             }
-            Button(UserText.submit) {
-                submitRecoveryCode()
-            }
-            .buttonStyle(DefaultActionButtonStyle(enabled: !recoveryCodeModel.shouldDisableSubmitButton))
-            .disabled(recoveryCodeModel.shouldDisableSubmitButton)
+            .buttonStyle(DismissActionButtonStyle())
         }
-        .frame(width: 480, height: 432)
+        .frame(width: 480, height: 390)
     }
 
 }

@@ -180,7 +180,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
-            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -220,9 +219,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
-        }
+        DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
 #endif
     }
 
@@ -241,9 +238,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #endif
 
 #if DBP
-        Task {
-            try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
-        }
+        DataBrokerProtectionAppEvents().applicationDidBecomeActive()
 #endif
     }
 
@@ -320,6 +315,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let environment = defaultEnvironment
 #endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
+        if bookmarksManager.didMigrateToFormFactorSpecificFavorites {
+            syncDataProviders.bookmarksAdapter.shouldResetBookmarksSyncTimestamp = true
+        }
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
         syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
@@ -411,10 +409,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
-                     DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount, includeAppVersionParameter: true)
-                    DataBrokerProtectionWaitlistViewControllerPresenter.show()
-                }
+                DataBrokerProtectionAppEvents().handleNotification()
             }
 #endif
         }

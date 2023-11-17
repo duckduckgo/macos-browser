@@ -61,21 +61,26 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     ///
     func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) {
         Task {
+            // To disable NetP we need the login item to be running
+            // This should be fine though as we'll disable them further down below
+            enableLoginItems()
+
+            // Allow some time for the login items to fully launch
+            try? await Task.sleep(interval: 0.5)
+
             unpinNetworkProtection()
 
             if uninstallSystemExtension {
-                await resetAllStateForVPNApp(uninstallSystemExtension: uninstallSystemExtension)
+                await removeSystemExtension()
             }
+
+            await removeVPNConfiguration()
+
+            // We want to give some time for the login item to reset state before disabling it
+            try? await Task.sleep(interval: 0.5)
 
             disableLoginItems()
 
-            await resetNetworkExtensionState()
-
-            // ☝️ Take care of resetting all state within the extension first, and wait half a second
-            try? await Task.sleep(interval: 0.5)
-            // 👇 And only afterwards turn off the tunnel and remove it from preferences
-
-            await stopTunnel()
             resetUserDefaults()
 
             if !keepAuthToken {
@@ -84,12 +89,16 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         }
     }
 
+    private func enableLoginItems() {
+        loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: log)
+    }
+
     func disableLoginItems() {
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
-    func resetAllStateForVPNApp(uninstallSystemExtension: Bool) async {
-        await ipcClient.resetAll(uninstallSystemExtension: uninstallSystemExtension)
+    func removeSystemExtension() async {
+        await ipcClient.debugCommand(.removeSystemExtension)
 
 #if NETP_SYSTEM_EXTENSION
         userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
@@ -104,15 +113,11 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         try NetworkProtectionKeychainTokenStore().deleteToken()
     }
 
-    private func resetNetworkExtensionState() async {
-        if let activeSession = try? await ConnectionSessionUtilities.activeSession() {
-            try? activeSession.sendProviderMessage(.resetAllState) {
-                os_log("Status was reset in the extension", log: self.log)
-            }
-        }
-    }
+    private func removeVPNConfiguration() async {
+        // Remove the agent VPN configuration
+        await ipcClient.debugCommand(.removeVPNConfiguration)
 
-    private func stopTunnel() async {
+        // Remove the legacy (local) configuration
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
 
         if let tunnels = tunnels {

@@ -141,7 +141,7 @@ final class MainViewController: NSViewController {
 #endif
 
 #if DBP
-        sendActiveDataBrokerProtectionWaitlistUserPixel()
+        DataBrokerProtectionAppEvents().windowDidBecomeMain()
 #endif
     }
 
@@ -418,13 +418,6 @@ final class MainViewController: NSViewController {
     }
 #endif
 
-#if DBP
-    private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
-        if DefaultDataBrokerProtectionFeatureVisibility().isWaitlistEnabled {
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistUserActive, frequency: .dailyOnly, includeAppVersionParameter: true)
-        }
-    }
-#endif
     // MARK: - First responder
 
     func adjustFirstResponder() {

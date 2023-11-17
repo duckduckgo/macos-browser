@@ -30,13 +30,15 @@ extension BrokerProfileQueryData {
                      lastRunDate: Date? = nil,
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
-                     scanHistoryEvents: [HistoryEvent] = [HistoryEvent]()) -> BrokerProfileQueryData {
+                     scanHistoryEvents: [HistoryEvent] = [HistoryEvent](),
+                     mirrorSites: [MirrorSite] = [MirrorSite]()) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: dataBrokerName,
                 steps: steps,
                 version: "1.0.0",
-                schedulingConfig: DataBrokerScheduleConfig.mock
+                schedulingConfig: DataBrokerScheduleConfig.mock,
+                mirrorSites: mirrorSites
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
             scanOperationData: ScanOperationData(brokerId: 1,
@@ -663,8 +665,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
         callsList.filter { $0 }.count > 0 // If one value is true. The database was called
     }
 
-    func save(_ profile: DataBrokerProtectionProfile) {
+    func save(_ profile: DataBrokerProtectionProfile) -> Bool {
         wasSaveProfileCalled = true
+
+        return true
     }
 
     func fetchProfile() -> DataBrokerProtectionProfile? {

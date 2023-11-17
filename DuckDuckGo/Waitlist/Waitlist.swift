@@ -274,7 +274,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
             store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
             request: ProductWaitlistRequest(productName: Self.apiProductName),
             redeemUseCase: RedeemUseCase(),
-            redeemAuthenticationRepository: UserDefaultsAuthenticationData()
+            redeemAuthenticationRepository: KeychainAuthenticationData()
         )
     }
 
@@ -288,6 +288,10 @@ struct DataBrokerProtectionWaitlist: Waitlist {
     }
 
     func redeemDataBrokerProtectionInviteCodeIfAvailable() async throws {
+        if DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
+            return
+        }
+
         do {
             guard waitlistStorage.getWaitlistToken() != nil else {
                 os_log("User not in DBP waitlist, returning...", log: .default)
