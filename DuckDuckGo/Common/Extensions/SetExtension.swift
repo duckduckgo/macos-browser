@@ -32,3 +32,11 @@ extension Set where Element == String {
     }
 
 }
+
+extension Set {
+
+    @inlinable func intersects<S: Sequence>(_ other: S) -> Bool where Element == S.Element {
+        !isDisjoint(with: other)
+    }
+
+}

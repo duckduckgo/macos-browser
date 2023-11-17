@@ -43,7 +43,7 @@ protocol BookmarkManager: AnyObject {
     func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
 
     func handleFavoritesAfterDisablingSync()
     var didMigrateToFormFactorSpecificFavorites: Bool { get }
@@ -316,7 +316,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Import
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
         let results = bookmarkStore.importBookmarks(bookmarks, source: source)
         loadBookmarks()
         requestSync()

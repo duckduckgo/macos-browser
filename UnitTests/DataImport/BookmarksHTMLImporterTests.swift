@@ -50,7 +50,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
     func testWhenValidBookmarksFileIsLoadedThenBookmarksImportIsSuccessful() {
         let importExpectation = expectation(description: "Import Bookmarks")
         let completionExpectation = expectation(description: "Import Bookmarks Completion")
-        let expectedImportResult = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+        let expectedImportResult = BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
 
         underlyingBookmarkImporter.importBookmarks = { (_, _) in
             importExpectation.fulfill()
@@ -74,7 +74,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
 
     func testWhenInvalidBookmarksFileIsLoadedThenBookmarksImportReturnsFailure() {
         let completionExpectation = expectation(description: "Import Bookmarks Completion")
-        let expectedImportResult = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+        let expectedImportResult = BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
 
         underlyingBookmarkImporter.importBookmarks = { (_, _) in
             XCTFail("unexpected import success")

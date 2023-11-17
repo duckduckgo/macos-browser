@@ -40,7 +40,7 @@ final class SharingMenu: NSMenu {
         self.items = services.map { service in
             NSMenuItem(service: service, target: self, action: #selector(sharingItemSelected))
         } + [
-            NSMenuItem(title: UserText.moreMenuItem, action: #selector(openSharingPreferences), target: self).withImage(.more)
+            NSMenuItem(title: UserText.moreMenuItem, action: #selector(openSharingPreferences), target: self).withImage(.sharedMoreMenu)
         ]
     }
 
@@ -173,7 +173,7 @@ private extension NSMenuItem {
 
 private extension NSImage {
 
-    static var more: NSImage? {
+    static var sharedMoreMenu: NSImage? {
         let sharedMoreMenuImageSelector = NSSelectorFromString("sharedMoreMenuImage")
         guard NSSharingServicePicker.responds(to: sharedMoreMenuImageSelector) else { return nil }
         return NSSharingServicePicker.perform(sharedMoreMenuImageSelector)?.takeUnretainedValue() as? NSImage

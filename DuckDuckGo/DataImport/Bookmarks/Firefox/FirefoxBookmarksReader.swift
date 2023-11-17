@@ -47,15 +47,17 @@ final class FirefoxBookmarksReader {
         }
 
         var action: DataImportAction { .bookmarks }
-        var source: DataImport.Source { .firefox }
+        let source: DataImport.Source
         let type: OperationType
         let underlyingError: Error?
     }
 
     private let firefoxPlacesDatabaseURL: URL
+    private let source: DataImport.Source
     private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
 
-    init(firefoxDataDirectoryURL: URL) {
+    init(source: DataImport.Source, firefoxDataDirectoryURL: URL) {
+        self.source = source
         self.firefoxPlacesDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.placesDatabaseName)
     }
 
@@ -69,7 +71,7 @@ final class FirefoxBookmarksReader {
         } catch let error as ImportError {
             return .failure(error)
         } catch {
-            return .failure(ImportError(type: currentOperationType, underlyingError: error))
+            return .failure(ImportError(source: source, type: currentOperationType, underlyingError: error))
         }
     }
 
@@ -82,7 +84,7 @@ final class FirefoxBookmarksReader {
         let bookmarks: DatabaseBookmarks = try queue.read { database in
             currentOperationType = .fetchRootEntries
             let rootEntries = try FolderRow.fetchAll(database, sql: rootEntryQuery())
-            guard let rootEntry = rootEntries.first else { throw ImportError(type: .noRootEntries, underlyingError: nil) }
+            guard let rootEntry = rootEntries.first else { throw ImportError(source: source, type: .noRootEntries, underlyingError: nil) }
 
             assert(rootEntries.count == 1, "moz_bookmarks should only have one root entry")
 

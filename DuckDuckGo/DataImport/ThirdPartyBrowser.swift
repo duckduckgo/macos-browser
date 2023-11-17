@@ -181,23 +181,53 @@ enum ThirdPartyBrowser: CaseIterable {
         }
     }
 
-    func browserProfiles(applicationSupportURL: URL? = nil) -> DataImport.BrowserProfileList? {
-        // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
-        // return the profile anyway and check the file system permissions when preparing to import.
-        if [.safari, .safariTechnologyPreview].contains(self),
-           let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL) {
-            return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
+    func browserProfiles(applicationSupportURL: URL? = nil) -> DataImport.BrowserProfileList {
+        var potentialProfileURLs: [URL] {
+            guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL) else { return [] }
+            let potentialProfileURLs = (try? FileManager.default.contentsOfDirectory(at: profilePath,
+                                                                                     includingPropertiesForKeys: nil,
+                                                                                     options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath)) ?? []
+            return potentialProfileURLs + [profilePath]
         }
 
-        guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL),
-              var potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
-                                                                                      includingPropertiesForKeys: nil,
-                                                                                      options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
-            return nil
-        }
-        potentialProfileURLs.append(profilePath)
+        let profiles: [DataImport.BrowserProfile]
+        switch self {
+        case .safari, .safariTechnologyPreview:
+            // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
+            // return the profile anyway and check the file system permissions when preparing to import.
+            guard let profileURL = profilesDirectory(applicationSupportURL: applicationSupportURL) else {
+                assertionFailure("Unexpected nil profileURL for Safari")
+                profiles = []
+                break
+            }
+            profiles = [DataImport.BrowserProfile(browser: self, profileURL: profileURL)]
 
-        return DataImport.BrowserProfileList(browser: self, profileURLs: potentialProfileURLs)
+        case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
+            // Chromium profiles are either named "Default", or a series of incrementing profile names, i.e. "Profile 1", "Profile 2", etc.
+            let potentialProfiles = potentialProfileURLs.map {
+                DataImport.BrowserProfile(browser: self, profileURL: $0)
+            }
+
+            let filteredProfiles =  potentialProfiles.filter {
+                $0.chromiumPreferences != nil
+                || $0.profileName == DataImport.BrowserProfileList.Constants.chromiumDefaultProfileName
+                || $0.profileName.hasPrefix(DataImport.BrowserProfileList.Constants.chromiumProfilePrefix)
+            }
+
+            let sortedProfiles = filteredProfiles.sorted()
+
+            profiles = sortedProfiles
+
+        case .firefox, .tor:
+            profiles = potentialProfileURLs.map {
+                DataImport.BrowserProfile(browser: self, profileURL: $0)
+            }.sorted()
+
+        case .bitwarden, .lastPass, .onePassword7, .onePassword8:
+            profiles = []
+        }
+
+        return DataImport.BrowserProfileList(browser: self, profiles: profiles)
     }
 
     private func findRunningApplications() -> [NSRunningApplication] {
@@ -230,6 +260,22 @@ enum ThirdPartyBrowser: CaseIterable {
         case .vivaldi: return applicationSupportURL.appendingPathComponent("Vivaldi/")
         case .yandex: return applicationSupportURL.appendingPathComponent("Yandex/YandexBrowser/")
         case .bitwarden, .lastPass, .onePassword7, .onePassword8: return nil
+        }
+    }
+
+    var keychainProcessName: String {
+        switch self {
+        case .brave: "Brave"
+        case .chrome: "Chrome"
+        case .chromium: "Chromium"
+        case .coccoc: "CocCoc"
+        case .edge: "Microsoft Edge"
+        case .opera, .operaGX: "Opera"
+        case .vivaldi: "Vivaldi"
+        case .yandex: "Yandex"
+        // do not require Keychain access
+        case .firefox, .safari, .safariTechnologyPreview, .tor,
+             .bitwarden, .lastPass, .onePassword7, .onePassword8: ""
         }
     }
 

@@ -23,8 +23,8 @@ final class MockLoginImporter: LoginImporter {
 
     var importedLogins: DataImport.Summary?
 
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
-        let summary = DataImport.CompletedLoginsResult(successfulImports: logins.map(\.username), duplicateImports: [], failedImports: [])
+    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.LoginsImportSummary {
+        let summary = DataImport.LoginsImportSummary(successfulImports: logins.map(\.username), duplicateImports: [], failedImports: [])
 
         self.importedLogins = .init(bookmarksResult: nil, loginsResult: .completed(summary))
         return summary
@@ -36,10 +36,10 @@ struct BookmarkImportErrorMock: Error {}
 
 struct MockBookmarkImporter: BookmarkImporter {
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
         return importBookmarks(bookmarks, source)
     }
 
-    var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
+    var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarksImportSummary
 
 }

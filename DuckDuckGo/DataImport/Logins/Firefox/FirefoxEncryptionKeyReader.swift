@@ -32,13 +32,21 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
     typealias KeyReaderFileLineError = FileLineError<FirefoxEncryptionKeyReader>
 
+    private let source: DataImport.Source
+
+    init(source: DataImport.Source) {
+        self.source = source
+    }
+
     func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data> {
         var operationType: FirefoxLoginReader.ImportError.OperationType = .key3readerStage1
         do {
             let data = try getEncryptionKey(key3DatabaseURL: key3DatabaseURL, primaryPassword: primaryPassword, operationType: &operationType)
             return .success(data)
+        } catch let error as FirefoxLoginReader.ImportError {
+            return .failure(error)
         } catch {
-            return .failure(FirefoxLoginReader.ImportError(type: operationType, underlyingError: error))
+            return .failure(FirefoxLoginReader.ImportError(source: source, type: operationType, underlyingError: error))
         }
     }
 
@@ -84,7 +92,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         } catch let error as FirefoxLoginReader.ImportError {
             return .failure(error)
         } catch {
-            return .failure(FirefoxLoginReader.ImportError(type: operationType, underlyingError: KeyReaderFileLineError()))
+            return .failure(FirefoxLoginReader.ImportError(source: source, type: operationType, underlyingError: error))
         }
     }
 
@@ -324,7 +332,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
         let passwordCheckString = String(data: decryptedCiphertext, encoding: .utf8)
 
-        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
+        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(source: source, type: .requiresPrimaryPassword, underlyingError: nil) }
 
         guard let nssPrivateRow = try NssPrivateRow.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else { throw KeyReaderFileLineError() }
 
@@ -345,7 +353,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         let passwordCheckString = String(data: decryptedItem2, encoding: .utf8)
 
         // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
-        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
+        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(source: source, type: .requiresPrimaryPassword, underlyingError: nil) }
 
         guard let nssPrivateRow = try NssPrivateRow.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else { throw KeyReaderFileLineError() }
 

@@ -33,7 +33,7 @@ final class FirefoxFaviconsReader {
         }
 
         var action: DataImportAction { .favicons }
-        var source: DataImport.Source { .firefox }
+        let source: DataImport.Source
         let type: OperationType
         let underlyingError: Error?
     }
@@ -56,10 +56,12 @@ final class FirefoxFaviconsReader {
         }
     }
 
+    private let source: DataImport.Source
     private let firefoxFaviconsDatabaseURL: URL
     private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
 
-    init(firefoxDataDirectoryURL: URL) {
+    init(source: DataImport.Source, firefoxDataDirectoryURL: URL) {
+        self.source = source
         self.firefoxFaviconsDatabaseURL = firefoxDataDirectoryURL.appendingPathComponent(Constants.faviconsDatabaseName)
     }
 
@@ -73,7 +75,7 @@ final class FirefoxFaviconsReader {
         } catch let error as ImportError {
             return .failure(error)
         } catch {
-            return .failure(ImportError(type: currentOperationType, underlyingError: error))
+            return .failure(ImportError(source: source, type: currentOperationType, underlyingError: error))
         }
     }
 

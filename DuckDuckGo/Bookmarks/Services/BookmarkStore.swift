@@ -30,12 +30,12 @@ enum ParentFolderType {
     case parent(uuid: String)
 }
 
-struct BookmarkImportResult: Equatable {
+struct BookmarksImportSummary: Equatable {
     var successful: Int
     var duplicates: Int
     var failed: Int
 
-    static func += (left: inout BookmarkImportResult, right: BookmarkImportResult) {
+    static func += (left: inout BookmarksImportSummary, right: BookmarksImportSummary) {
         left.successful += right.successful
         left.duplicates += right.duplicates
         left.failed += right.failed
@@ -57,7 +57,7 @@ protocol BookmarkStore {
     func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
 
     func handleFavoritesAfterDisablingSync()
     var didMigrateToFormFactorSpecificFavorites: Bool { get }

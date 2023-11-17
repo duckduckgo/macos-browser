@@ -141,7 +141,6 @@ final class CSVImporter: DataImporter {
     struct ImportError: DataImportError {
         enum OperationType: Int {
             case cannotReadFile
-            case cannotAccessSecureVault
         }
 
         var action: DataImportAction { .logins }
@@ -151,19 +150,19 @@ final class CSVImporter: DataImporter {
     }
 
     private let fileURL: URL
-    private let loginImporter: LoginImporter?
+    private let loginImporter: LoginImporter
     private let defaultColumnPositions: ColumnPositions?
 
-    init(fileURL: URL, loginImporter: LoginImporter?, defaultColumnPositions: ColumnPositions? = nil) {
+    init(fileURL: URL, loginImporter: LoginImporter, defaultColumnPositions: ColumnPositions?) {
         self.fileURL = fileURL
         self.loginImporter = loginImporter
         self.defaultColumnPositions = defaultColumnPositions
     }
 
-    func totalValidLogins() -> Int {
+    static func totalValidLogins(in fileURL: URL, defaultColumnPositions: ColumnPositions?) -> Int {
         guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else { return 0 }
 
-        let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions) ?? []
+        let logins = extractLogins(from: fileContents, defaultColumnPositions: defaultColumnPositions) ?? []
 
         return logins.count
     }
@@ -172,53 +171,61 @@ final class CSVImporter: DataImporter {
                               defaultColumnPositions: ColumnPositions? = nil) -> [ImportedLoginCredential]? {
         guard let parsed = try? CSVParser().parse(string: fileContents) else { return nil }
 
-        if let columnPositions = ColumnPositions(csv: parsed) {
-            return parsed.dropFirst().compactMap(columnPositions.read)
+        let columnPositions: ColumnPositions?
+        var startRow = 0
+        if let autodetected = ColumnPositions(csv: parsed) {
+            columnPositions = autodetected
+            startRow = 1
         } else {
-            return parsed.compactMap(defaultColumnPositions.read)
+            columnPositions = defaultColumnPositions
+        }
+
+        guard parsed.indices.contains(startRow) else { return [] } // no data
+
+        let result = parsed[startRow...].compactMap(columnPositions.read)
+
+        guard !result.isEmpty else {
+            if parsed.filter({ !$0.isEmpty }).isEmpty {
+                return [] // no data
+            } else {
+                return nil // error: could not parse data
+            }
+        }
+
+        return result
+    }
+
+    var importableTypes: [DataImport.DataType] {
+        return [.passwords]
+    }
+
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        .detachedWithProgress { updateProgress in
+            let result = self.importLoginsSync()
+            return [.passwords: result]
         }
     }
 
-    func importableTypes() -> [DataImport.DataType] {
-        if fileURL.pathExtension == "csv" {
-            return [.logins]
-        } else {
-            return []
-        }
-    }
-
-    // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    modalWindow: NSWindow?,
-                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+    func importLoginsSync() -> DataImportResult<DataImport.DataTypeSummary> {
         let fileContents: String
         do {
             fileContents = try String(contentsOf: fileURL, encoding: .utf8)
         } catch {
-            completion(.failure(ImportError(type: .cannotReadFile, underlyingError: error)))
-            return
-        }
-        guard let loginImporter = self.loginImporter else {
-            completion(.failure(ImportError(type: .cannotAccessSecureVault, underlyingError: nil)))
-            return
+            return .failure(ImportError(type: .cannotReadFile, underlyingError: error))
         }
 
-        DispatchQueue.global(qos: .userInitiated).async { [defaultColumnPositions] in
-            do {
-                let loginCredentials = try Self.extractLogins(from: fileContents,
-                                                              defaultColumnPositions: defaultColumnPositions) ?? {
-                    throw LoginImporterError(source: .csv, error: nil, type: .malformedCSV)
-                }()
-                let result = try loginImporter.importLogins(loginCredentials)
-                DispatchQueue.main.async {
-                    completion(.success(DataImport.Summary(bookmarksResult: nil, loginsResult: .completed(result))))
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(LoginImporterError(source: .csv, error: error)))
-                }
-            }
+        do {
+            let loginCredentials = try Self.extractLogins(from: fileContents, defaultColumnPositions: defaultColumnPositions) ?? {
+                throw LoginImporterError(source: .csv, error: nil, type: .malformedCSV)
+            }()
+            let summary = try loginImporter.importLogins(loginCredentials)
+
+            return .success(summary)
+
+        } catch let error as DataImportError {
+            return .failure(error)
+        } catch {
+            return .failure(LoginImporterError(source: .csv, error: error))
         }
     }
 

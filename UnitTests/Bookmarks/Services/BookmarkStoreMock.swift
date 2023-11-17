@@ -88,9 +88,9 @@ final class BookmarkStoreMock: BookmarkStore {
     }
 
     var importBookmarksCalled = false
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
         importBookmarksCalled = true
-        return BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+        return BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
     }
 
     var canMoveObjectWithUUIDCalled = false

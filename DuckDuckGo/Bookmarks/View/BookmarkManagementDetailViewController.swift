@@ -125,7 +125,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {

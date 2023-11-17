@@ -331,6 +331,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
+
+        NotificationCenter.default.addObserver(self, selector: #selector(onDataImportComplete), name: .dataImportComplete, object: nil)
+    }
+
+    @objc private func onDataImportComplete() {
+        guard let syncService else { return }
+        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+        syncService.scheduler.requestSyncImmediately()
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {

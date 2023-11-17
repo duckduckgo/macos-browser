@@ -71,6 +71,13 @@ final class SafariBookmarksReader {
         }
     }
 
+    func validateFileReadAccess() -> DataImportResult<Void> {
+        if !FileManager.default.isReadableFile(atPath: safariBookmarksFileURL.path) {
+            return .failure(ImportError(type: .readPlist, underlyingError: CocoaError(.fileReadNoPermission, userInfo: [kCFErrorURLKey as String: safariBookmarksFileURL])))
+        }
+        return .success( () )
+    }
+
     private func reallyReadBookmarks() throws -> ImportedBookmarks {
         currentOperationType = .readPlist
         let plistData = try readPropertyList()

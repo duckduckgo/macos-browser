@@ -56,7 +56,6 @@ final class ChromiumLoginReader {
 
     private let chromiumLocalLoginDirectoryURL: URL
     private let chromiumGoogleAccountLoginDirectoryURL: URL
-    private let processName: String
     private let decryptionKey: String?
     private let decryptionKeyPrompt: ChromiumKeychainPrompting
 
@@ -68,12 +67,10 @@ final class ChromiumLoginReader {
 
     init(chromiumDataDirectoryURL: URL,
          source: DataImport.Source,
-         processName: String,
          decryptionKey: String? = nil,
          decryptionKeyPrompt: ChromiumKeychainPrompting = ChromiumKeychainPrompt()) {
         self.chromiumLocalLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent(LoginDataFileName.loginData.rawValue)
         self.chromiumGoogleAccountLoginDirectoryURL = chromiumDataDirectoryURL.appendingPathComponent(LoginDataFileName.loginDataForAccount.rawValue)
-        self.processName = processName
         self.decryptionKey = decryptionKey
         self.decryptionKeyPrompt = decryptionKeyPrompt
         self.source = source
@@ -89,7 +86,8 @@ final class ChromiumLoginReader {
 
             var keyPromptResult: ChromiumKeychainPromptResult?
             DispatchQueue.global().async {
-                keyPromptResult = self.decryptionKeyPrompt.promptForChromiumPasswordKeychainAccess(processName: self.processName)
+                let processName = ThirdPartyBrowser.browser(for: self.source)!.keychainProcessName
+                keyPromptResult = self.decryptionKeyPrompt.promptForChromiumPasswordKeychainAccess(processName: processName)
                 DispatchQueue.main.async {
                     modalSession.map(NSApp.endModalSession)
                 }

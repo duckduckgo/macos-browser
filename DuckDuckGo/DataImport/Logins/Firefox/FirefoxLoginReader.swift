@@ -26,7 +26,9 @@ final class FirefoxLoginReader {
         enum OperationType: Int {
             case requiresPrimaryPassword = -1
 
-            case couldNotFindLoginsFile
+            case couldNotDetermineFormat = -2
+
+            case couldNotFindLoginsFile = 0
             case couldNotReadLoginsFile
 
             case key3readerStage1
@@ -42,7 +44,7 @@ final class FirefoxLoginReader {
         }
 
         var action: DataImportAction { .logins }
-        var source: DataImport.Source { .firefox }
+        let source: DataImport.Source
         let type: OperationType
         let underlyingError: Error?
     }
@@ -66,94 +68,79 @@ final class FirefoxLoginReader {
 
     private let keyReader: FirefoxEncryptionKeyReading
     private let primaryPassword: String?
+    private let source: DataImport.Source
     private let firefoxProfileURL: URL
-    private var currentOperationType: ImportError.OperationType = .requiresPrimaryPassword
 
     /// Initialize a FirefoxLoginReader with a profile path and optional primary password.
     ///
     /// - Parameter firefoxProfileURL: The path to the profile being imported from. This should be the base path of the profile, containing the database and JSON files.
     /// - Parameter primaryPassword: The password used to decrypt the login data. This is optional, as Firefox's primary password feature is optional.
-    init(firefoxProfileURL: URL,
-         keyReader: FirefoxEncryptionKeyReading = FirefoxEncryptionKeyReader(),
+    init(source: DataImport.Source,
+         firefoxProfileURL: URL,
+         keyReader: FirefoxEncryptionKeyReading? = nil,
          primaryPassword: String? = nil) {
 
-        self.keyReader = keyReader
+        self.source = source
+        self.keyReader = keyReader ?? FirefoxEncryptionKeyReader(source: source)
         self.primaryPassword = primaryPassword
         self.firefoxProfileURL = firefoxProfileURL
     }
 
     func readLogins(dataFormat: DataFormat?) -> DataImportResult<[ImportedLoginCredential]> {
+        var currentOperationType: ImportError.OperationType = .couldNotFindLoginsFile
         do {
-            let result = try reallyReadLogins(dataFormat: dataFormat)
+            let dataFormat = try dataFormat ?? detectLoginFormat() ?? { throw ImportError(source: source, type: .couldNotDetermineFormat, underlyingError: nil) }()
+            let keyData = try getEncryptionKey(dataFormat: dataFormat)
+            let result = try reallyReadLogins(dataFormat: dataFormat, keyData: keyData, currentOperationType: &currentOperationType)
             return .success(result)
         } catch let error as ImportError {
             return .failure(error)
         } catch {
-            return .failure(ImportError(type: currentOperationType, underlyingError: error))
+            return .failure(ImportError(source: source, type: currentOperationType, underlyingError: error))
         }
     }
 
-    private func reallyReadLogins(dataFormat: DataFormat?) throws -> [ImportedLoginCredential] {
-        var detectedFormat: DataFormat?
-        var foundKeyDatabaseWithoutLoginFile = false
+    func getEncryptionKey() throws -> Data {
+        let dataFormat = try detectLoginFormat() ?? { throw ImportError(source: source, type: .couldNotDetermineFormat, underlyingError: nil) }()
+        return try getEncryptionKey(dataFormat: dataFormat)
+    }
 
-        if let dataFormat = dataFormat {
-            detectedFormat = dataFormat
-        } else {
-            let detectionResult = detectLoginFormat(withProfileURL: firefoxProfileURL)
-            detectedFormat = detectionResult.dataFormat
-            foundKeyDatabaseWithoutLoginFile = detectionResult.foundKeyDatabaseButNoLoginsFile
+    private func getEncryptionKey(dataFormat: DataFormat) throws -> Data {
+        let databaseURL = firefoxProfileURL.appendingPathComponent(dataFormat.formatFileNames.databaseName)
+
+        switch dataFormat {
+        case .version2: 
+            return try keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "").get()
+        case .version3:
+            return try keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "").get()
         }
+    }
 
-        // There's a legitimate case where the key database exists, but there's no logins file. This happens when the user has never
-        // saved a login. To avoid showing them an error, we check for the existence of the SQLite database but no logins file.
-        if foundKeyDatabaseWithoutLoginFile {
-            return []
-        }
+    private func reallyReadLogins(dataFormat: DataFormat, keyData: Data, currentOperationType: inout ImportError.OperationType) throws -> [ImportedLoginCredential] {
+        let loginsFileURL = firefoxProfileURL.appendingPathComponent(dataFormat.formatFileNames.loginsFileName)
 
-        guard let detectedFormat else { throw ImportError(type: .couldNotFindLoginsFile, underlyingError: nil) }
-
-        let databaseURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.databaseName)
-        let loginsFileURL = firefoxProfileURL.appendingPathComponent(detectedFormat.formatFileNames.loginsFileName)
-
-        // If there isn't a file where logins are expected, consider it a successful import of 0 logins
-        // to avoid showing an error state.
-        guard FileManager.default.fileExists(atPath: loginsFileURL.path) else {
-            return []
-        }
 
         currentOperationType = .couldNotReadLoginsFile
         let logins = try readLoginsFile(from: loginsFileURL.path)
 
-        let encryptionKeyResult: DataImportResult<Data>
-
-        switch detectedFormat {
-        case .version2: encryptionKeyResult = keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
-        case .version3: encryptionKeyResult = keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "")
-        }
-
-        let keyData = try encryptionKeyResult.get()
-        let decryptedLogins = try decrypt(logins: logins, with: keyData)
+        let decryptedLogins = try decrypt(logins: logins, with: keyData, currentOperationType: &currentOperationType)
         return decryptedLogins
     }
 
-    private func detectLoginFormat(withProfileURL firefoxProfileURL: URL) -> (dataFormat: DataFormat?, foundKeyDatabaseButNoLoginsFile: Bool) {
-        var foundKeyDatabaseWithoutLoginFile = false
-
+    private func detectLoginFormat() throws -> DataFormat? {
         for potentialFormat in DataFormat.allCases {
-            let potentialDatabaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
-            let potentialLoginsFileURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginsFileName)
+            let databaseURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.databaseName)
+            let loginsURL = firefoxProfileURL.appendingPathComponent(potentialFormat.formatFileNames.loginsFileName)
 
-            if FileManager.default.fileExists(atPath: potentialDatabaseURL.path) {
-                if FileManager.default.fileExists(atPath: potentialLoginsFileURL.path) {
-                    return (potentialFormat, false)
-                } else {
-                    foundKeyDatabaseWithoutLoginFile = true
+            if FileManager.default.fileExists(atPath: databaseURL.path) {
+                guard FileManager.default.fileExists(atPath: loginsURL.path) else {
+                    throw ImportError(source: source, type: .couldNotFindLoginsFile, underlyingError: nil)
                 }
+                return potentialFormat
             }
         }
 
-        return (nil, foundKeyDatabaseWithoutLoginFile)
+        return nil
     }
 
     private func readLoginsFile(from loginsFilePath: String) throws -> EncryptedFirefoxLogins {
@@ -162,7 +149,7 @@ final class FirefoxLoginReader {
         return try JSONDecoder().decode(EncryptedFirefoxLogins.self, from: loginsFileData)
     }
 
-    private func decrypt(logins: EncryptedFirefoxLogins, with key: Data) throws -> [ImportedLoginCredential] {
+    private func decrypt(logins: EncryptedFirefoxLogins, with key: Data, currentOperationType: inout ImportError.OperationType) throws -> [ImportedLoginCredential] {
         var credentials = [ImportedLoginCredential]()
 
         // Filter out rows that are used by the Firefox sync service.

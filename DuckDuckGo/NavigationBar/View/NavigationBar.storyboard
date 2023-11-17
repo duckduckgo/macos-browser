@@ -389,7 +389,7 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="ENV-0H-Fcc" userLabel="Inactive Background View with Progress" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="2" y="2" width="722" height="28"/>
                                 <subviews>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="4x6-Xn-fNv" customClass="ProgressView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="4x6-Xn-fNv" customClass="LoadingProgressView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="722" height="2"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="2" id="phH-XL-CIq"/>

@@ -20,35 +20,21 @@ import Foundation
 
 final class YandexDataImporter: ChromiumDataImporter {
 
-    override var processName: String {
-        return "Yandex"
-    }
-
-    override var source: DataImport.Source {
-        return .yandex
-    }
-
-    init(bookmarkImporter: BookmarkImporter) {
-        let applicationSupport = URL.nonSandboxApplicationSupportDirectoryURL
-        let defaultDataURL = applicationSupport.appendingPathComponent("Yandex/YandexBrowser/Default/")
-
-        super.init(applicationDataDirectoryURL: defaultDataURL,
+    init(profileURL: URL, bookmarkImporter: BookmarkImporter) {
+        super.init(source: .yandex,
+                   profileURL: profileURL,
                    loginImporter: nil,
                    bookmarkImporter: bookmarkImporter,
                    faviconManager: FaviconManager.shared)
     }
 
-    override func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, modalWindow: NSWindow?) -> DataImportResult<DataImport.Summary> {
-        var result = super.importData(types: types.filter { $0 != .logins }, from: profile, modalWindow: modalWindow)
+    override var importableTypes: [DataImport.DataType] {
+        return [.bookmarks]
+    }
 
-        if case .success(var summary) = result,
-           types.contains(.logins) {
-
-            summary.loginsResult = .awaited
-            result = .success(summary)
-        }
-
-        return result
+    override func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        // logins will be imported from CSV
+        return super.importData(types: types.filter { $0 != .passwords })
     }
 
 }

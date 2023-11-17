@@ -54,9 +54,13 @@ fileprivate extension Feedback.Category {
 
     var asanaId: String {
         switch self {
-        case .bug: return "1199184518165816"
-        case .featureRequest: return "1199184518165815"
-        case .other: return "1200574389728916"
+        case .generalFeedback: "1199184518165814"
+        case .designFeedback: "1199214127353569"
+        case .bug: "1199184518165816"
+        case .featureRequest: "1199184518165815"
+        case .other: "1200574389728916"
+        case .usability: "1204135764912065"
+        case .dataImport: "1205975547451886"
         }
     }
 

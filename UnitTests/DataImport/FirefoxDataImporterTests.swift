@@ -23,34 +23,19 @@ import XCTest
 @MainActor
 class FirefoxDataImporterTests: XCTestCase {
 
-    func testWhenImportingWithoutAnyDataTypes_ThenSummaryIsEmpty() async {
-        let loginImporter = MockLoginImporter()
-        let faviconManager = FaviconManagerMock()
-        let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 0, duplicates: 0, failed: 0) })
-        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
-
-        let summary = await importer.importData(types: [], from: .init(browser: .firefox, profileURL: resourceURL()))
-
-        if case let .success(summary) = summary {
-            XCTAssert(summary.isEmpty)
-        } else {
-            XCTFail("Received failure unexpectedly")
-        }
-    }
-
     func testWhenImportingBookmarks_AndBookmarkImportSucceeds_ThenSummaryIsPopulated() async {
         let loginImporter = MockLoginImporter()
         let faviconManager = FaviconManagerMock()
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 1, duplicates: 2, failed: 3) })
-        let importer = FirefoxDataImporter(loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
+        let importer = FirefoxDataImporter(profile: .init(browser: .firefox, profileURL: resourceURL()), loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
 
-        let summary = await importer.importData(types: [.bookmarks], from: .init(browser: .firefox, profileURL: resourceURL()))
+        let result = await importer.importData(types: [.bookmarks])
 
-        if case let .success(summary) = summary {
-            XCTAssertEqual(summary.bookmarksResult?.successful, 1)
-            XCTAssertEqual(summary.bookmarksResult?.duplicates, 2)
-            XCTAssertEqual(summary.bookmarksResult?.failed, 3)
-            XCTAssertNil(summary.loginsResult)
+        XCTAssertNil(result.logins)
+        if case let .success(bookmarks) = result.bookmarks {
+            XCTAssertEqual(bookmarks.successful, 1)
+            XCTAssertEqual(bookmarks.duplicates, 2)
+            XCTAssertEqual(bookmarks.failed, 3)
         } else {
             XCTFail("Received populated summary unexpectedly")
         }
@@ -63,9 +48,9 @@ class FirefoxDataImporterTests: XCTestCase {
 }
 
 extension FirefoxDataImporter {
-    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?) async -> DataImportResult<DataImport.Summary> {
+    func importData(types: Set<DataImport.DataType>) async -> DataImport.Summary {
         return await withCheckedContinuation { continuation in
-            importData(types: types, from: profile) { result in
+            importData(types: types) { result in
                 continuation.resume(returning: result)
             }
         }

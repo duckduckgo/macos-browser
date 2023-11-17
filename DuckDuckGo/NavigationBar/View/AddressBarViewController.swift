@@ -28,7 +28,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeOuterBorderView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
-    @IBOutlet var progressIndicator: ProgressView!
+    @IBOutlet var progressIndicator: LoadingProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
     private static let defaultActiveTextFieldMinX: CGFloat = 40

@@ -20,90 +20,77 @@ import Foundation
 
 internal class ChromiumDataImporter: DataImporter {
 
-    var processName: String {
-        "Chromium"
-    }
-
-    var source: DataImport.Source {
-        .chromium
-    }
-
-    private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter?
     private let faviconManager: FaviconManagement
+    private let profileURL: URL
+    private let source: DataImport.Source
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
-        self.applicationDataDirectoryURL = applicationDataDirectoryURL
+    init(source: DataImport.Source, profileURL: URL, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        self.source = source
+        self.profileURL = profileURL
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
     }
 
-    convenience init(loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter) {
-        let applicationSupport = URL.nonSandboxApplicationSupportDirectoryURL
-        let defaultDataURL = applicationSupport.appendingPathComponent("Chromium/Default/")
-
-        self.init(applicationDataDirectoryURL: defaultDataURL,
+    convenience init(source: DataImport.Source, profileURL: URL, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter) {
+        self.init(source: source,
+                  profileURL: profileURL,
                   loginImporter: loginImporter,
                   bookmarkImporter: bookmarkImporter,
                   faviconManager: FaviconManager.shared)
     }
 
-    func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks]
+    var importableTypes: [DataImport.DataType] {
+        return [.passwords, .bookmarks]
     }
 
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    modalWindow: NSWindow? = nil,
-                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
-        let result = importData(types: types, from: profile, modalWindow: modalWindow)
-        completion(result)
+    /// Start import process. Can throw synchronously if pre-import checks fail (e.g. file access)
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        .detachedWithProgress { updateProgress in
+            await self.importData(types: types, updateProgress: updateProgress)
+        }
     }
 
-    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, modalWindow: NSWindow?) -> DataImportResult<DataImport.Summary> {
-        var summary = DataImport.Summary()
-        let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
+    private func importData(types: Set<DataImport.DataType>, updateProgress: DataImportProgressCallback) async -> DataImportSummary {
+        var summary = DataImportSummary()
 
-        if types.contains(.logins), let loginImporter {
-            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source, processName: processName)
-            let loginResult = loginReader.readLogins(modalWindow: modalWindow)
+        if types.contains(.passwords), let loginImporter {
+            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: profileURL, source: source)
+            let loginResult = loginReader.readLogins(modalWindow: nil)
 
-            switch loginResult {
-            case .success(let logins):
+            let loginsSummary = loginResult.flatMap { logins in
                 do {
-                    let result = try loginImporter.importLogins(logins)
-                    summary.loginsResult = .completed(result)
+                    return try .success(loginImporter.importLogins(logins))
                 } catch {
                     return .failure(LoginImporterError(source: source, error: error))
                 }
-            case .failure(let error):
-                return .failure(error)
             }
+
+            summary[.passwords] = loginsSummary
         }
 
         if types.contains(.bookmarks) {
-            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source)
+            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: profileURL, source: source)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
-            importFavicons(from: dataDirectoryURL)
-
-            switch bookmarkResult {
-            case .success(let bookmarks):
-                summary.bookmarksResult = bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
-
-            case .failure(let error):
-                return .failure(error)
+            let bookmarksSummary = bookmarkResult.map { bookmarks in
+                bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
             }
+
+            if case .success = bookmarksSummary {
+                await importFavicons()
+            }
+
+            summary[.bookmarks] = bookmarksSummary.map { .init($0) }
         }
 
-        return .success(summary)
+        return summary
     }
 
-    @MainActor(unsafe)
-    func importFavicons(from dataDirectoryURL: URL) {
-        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source)
+    private func importFavicons() async {
+        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: profileURL, source: source)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
@@ -120,11 +107,15 @@ internal class ChromiumDataImporter: DataImporter {
                 }
                 result[pageURL] = favicons
             }
-            faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
+            await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
             Pixel.fire(.dataImportFailed(error))
         }
+    }
+
+    func requiresKeychainPassword(for selectedDataTypes: Set<DataImport.DataType>) -> Bool {
+        return selectedDataTypes.contains(.passwords)
     }
 
 }

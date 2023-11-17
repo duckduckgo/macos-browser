@@ -285,7 +285,7 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         self.dismiss()
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {

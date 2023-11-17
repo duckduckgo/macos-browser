@@ -39,6 +39,6 @@ struct ImportedLoginCredential: Equatable {
 
 protocol LoginImporter {
 
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult
+    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.DataTypeSummary
 
 }

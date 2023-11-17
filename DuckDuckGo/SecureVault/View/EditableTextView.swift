@@ -25,10 +25,11 @@ struct EditableTextView: NSViewRepresentable {
 
     var isEditable: Bool = true
     var font: NSFont? = .systemFont(ofSize: 14, weight: .regular)
-    var onEditingChanged: () -> Void       = {}
+    var onEditingChanged: () -> Void = {}
     var onCommit: () -> Void = {}
     var onTextChange: (String) -> Void = { _ in }
     var maxLength: Int?
+    var insets: NSSize?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -38,7 +39,8 @@ struct EditableTextView: NSViewRepresentable {
         let textView = CustomTextView(
             text: text,
             isEditable: isEditable,
-            font: font
+            font: font,
+            insets: insets
         )
         textView.delegate = context.coordinator
         return textView
@@ -92,8 +94,9 @@ extension EditableTextView {
 
 final class CustomTextView: NSView {
 
-    private var isEditable: Bool
-    private var font: NSFont?
+    private let isEditable: Bool
+    private let font: NSFont?
+    private let insets: NSSize?
     weak var delegate: NSTextViewDelegate?
 
     var text: String {
@@ -149,16 +152,20 @@ final class CustomTextView: NSView {
         textView.minSize = NSSize(width: 0, height: contentSize.height)
         textView.textColor = NSColor.labelColor
         textView.allowsUndo = true
+        if let insets {
+            textView.textContainerInset = insets
+        }
 
         return textView
     }()
 
     // MARK: - Init
 
-    init(text: String, isEditable: Bool, font: NSFont?) {
+    init(text: String, isEditable: Bool, font: NSFont?, insets: NSSize?) {
         self.font = font
         self.isEditable = isEditable
         self.text = text
+        self.insets = insets
 
         super.init(frame: .zero)
     }

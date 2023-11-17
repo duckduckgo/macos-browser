@@ -1,5 +1,5 @@
 //
-//  ProgressView.swift
+//  LoadingProgressView.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 
 @IBDesignable
-final class ProgressView: NSView, CAAnimationDelegate {
+final class LoadingProgressView: NSView, CAAnimationDelegate {
 
     private var progressLayer = CAGradientLayer()
     private var progressMask = CALayer()
@@ -261,7 +261,7 @@ final class ProgressView: NSView, CAAnimationDelegate {
 
 }
 
-extension ProgressView {
+extension LoadingProgressView {
 
     struct Constants {
         static let gradientAnimationKey = "animateGradient"

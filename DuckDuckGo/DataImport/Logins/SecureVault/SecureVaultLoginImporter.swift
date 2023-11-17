@@ -22,13 +22,7 @@ import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
-    private let secureVault: any AutofillSecureVault
-
-    init(secureVault: any AutofillSecureVault) {
-        self.secureVault = secureVault
-    }
-
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
+    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.DataTypeSummary {
         let vault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
 
         var successful: [String] = []
@@ -64,7 +58,7 @@ final class SecureVaultLoginImporter: LoginImporter {
             }
         }
 
-        return .init(successfulImports: successful, duplicateImports: duplicates, failedImports: failed)
+        return .init(successful: successful.count, duplicate: duplicates.count, failed: failed.count)
     }
 
 }
