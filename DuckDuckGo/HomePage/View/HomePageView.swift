@@ -38,7 +38,7 @@ extension HomePage.Views {
             if isBurner {
                 BurnerHomePageView()
             } else {
-                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isNoCardExperimentOn: model.isNoCardsExperimentOn)
+                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isNoCardExperimentOn: PixelExperiment.isNoCardsExperimentOn)
                     .contextMenu(ContextMenu(menuItems: {
                         if model.isContinueSetUpAvailable {
                             Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)

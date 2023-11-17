@@ -260,22 +260,6 @@ final class AppearancePreferences: ObservableObject {
         return privacyConfig.isEnabled(featureKey: .newTabContinueSetUp)
     }
 
-    var isNoCardsExperimentOn: Bool {
-        // This is to allow to keep firing the new tab initial pixel when the experiment is not installed
-        if !PixelExperiment.isExperimentInstalled {
-            if OnboardingViewModel().onboardingFinished && Pixel.isNewUser {
-                Pixel.fire(.newTabInitial(), limitTo: .initial)
-            }
-            return false
-        }
-        // This is to avoid the cohort is assigned before the user actually sees the new tab page (after the onboarding has been completed
-        if !OnboardingViewModel().onboardingFinished {
-            return true
-        }
-        // Cohort are assigned the first time it's called
-        return PixelExperiment.cohort == .noCards
-    }
-
     func updateUserInterfaceStyle() {
         NSApp.appearance = currentThemeName.appearance
     }

@@ -32,6 +32,16 @@ enum PixelExperiment: String, CaseIterable {
         return logic.isInstalled
     }
 
+    static var isNoCardsExperimentOn: Bool {
+        // This is to avoid the cohort is assigned before the user actually sees the new tab page (after the onboarding has been completed)
+        let isOnbordingFinished = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.onboardingFinished.rawValue)
+        if !isOnbordingFinished {
+            return true
+        }
+        // Cohort are assigned the first time it's called
+        return Self.cohort == .noCards
+    }
+
     static var allocatedCohortDoesNotMatchCurrentCohorts: Bool {
         guard let allocatedCohort = logic.allocatedCohort else { return false }
         if PixelExperiment(rawValue: allocatedCohort) == nil {
