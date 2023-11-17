@@ -293,6 +293,7 @@ private extension BookmarkImportSource {
              .thirdPartyBrowser(.tor),
              .thirdPartyBrowser(.vivaldi),
              .thirdPartyBrowser(.yandex),
+             .thirdPartyBrowser(.bitwarden),
              .thirdPartyBrowser(.onePassword8),
              .thirdPartyBrowser(.onePassword7),
              .thirdPartyBrowser(.lastPass),

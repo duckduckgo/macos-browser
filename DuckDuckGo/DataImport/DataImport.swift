@@ -38,6 +38,7 @@ enum DataImport {
         case yandex
         case onePassword8
         case onePassword7
+        case bitwarden
         case lastPass
         case csv
         case bookmarksHTML
@@ -72,6 +73,8 @@ enum DataImport {
                 return "Vivaldi"
             case .yandex:
                 return "Yandex"
+            case .bitwarden:
+                return "Bitwarden"
             case .lastPass:
                 return "LastPass"
             case .onePassword7:
@@ -95,7 +98,7 @@ enum DataImport {
             }
 
             switch self {
-            case .csv, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML:
+            case .csv, .bitwarden, .onePassword8, .onePassword7, .lastPass, .bookmarksHTML:
                 // Users can always import from exported files
                 return true
             case .brave, .chrome, .chromium, .coccoc, .edge, .firefox, .opera, .operaGX, .safari, .safariTechnologyPreview, .tor, .vivaldi, .yandex:
@@ -169,7 +172,7 @@ enum DataImport {
                 self.profiles = profileURLs.map {
                     BrowserProfile(browser: browser, profileURL: $0)
                 }.sorted()
-            case .lastPass, .onePassword7, .onePassword8:
+            case .bitwarden, .lastPass, .onePassword7, .onePassword8:
                 self.profiles = []
             }
         }
@@ -184,7 +187,7 @@ enum DataImport {
                 return profiles.first { $0.profileName == Constants.chromiumDefaultProfileName } ?? profiles.first
             case .firefox, .tor:
                 return profiles.first { $0.profileName == Constants.firefoxDefaultProfileName } ?? profiles.first
-            case .safari, .safariTechnologyPreview, .lastPass, .onePassword7, .onePassword8:
+            case .safari, .safariTechnologyPreview, .bitwarden, .lastPass, .onePassword7, .onePassword8:
                 return profiles.first
             }
         }
@@ -366,6 +369,7 @@ struct LoginImporterError: DataImportError {
         let rawValue: Int
 
         static let defaultFirefoxProfilePathNotFound = OperationType(rawValue: -1)
+        static let malformedCSV = OperationType(rawValue: -2)
     }
 
     var type: OperationType {

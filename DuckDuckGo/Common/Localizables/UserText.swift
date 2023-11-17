@@ -521,6 +521,7 @@ struct UserText {
     static let importLoginsSelectBrowserCSVFile = NSLocalizedString("import.logins.select-browser-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a browser CSV file")
     static let importLoginsSelect1PasswordCSVFile = NSLocalizedString("import.logins.select-1password-csv-file", value: "Select 1Password CSV File…", comment: "Button text for selecting a 1Password CSV file")
     static let importLoginsSelectLastPassCSVFile = NSLocalizedString("import.logins.select-lastpass-csv-file", value: "Select LastPass CSV File…", comment: "Button text for selecting a LastPass CSV file")
+    static let importLoginsSelectBitwardenCSVFile = NSLocalizedString("import.logins.select-bitwarden-csv-file", value: "Select Bitwarden CSV File…", comment: "Button text for selecting a Bitwarden CSV file")
 
     static let importLoginsSelectAnotherFile = NSLocalizedString("import.logins.select-another-file", value: "Select Another CSV File…", comment: "Button text for selecting another file")
     static let importLoginsFailedToReadCSVFile = NSLocalizedString("import.logins.failed-to-read-file", value: "Failed to get CSV file URL", comment: "Error text when importing a CSV file")

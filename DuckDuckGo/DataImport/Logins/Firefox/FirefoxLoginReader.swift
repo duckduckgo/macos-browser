@@ -176,7 +176,7 @@ final class FirefoxLoginReader {
                 currentOperationType = .decryptPassword
                 let decryptedPassword = try decrypt(credential: login.encryptedPassword, key: key)
 
-                credentials.append(ImportedLoginCredential(url: login.hostname, username: decryptedUsername, password: decryptedPassword))
+                credentials.append(ImportedLoginCredential(url: login.hostname, username: decryptedUsername, password: decryptedPassword, notes: nil))
             } catch {
                 lastError = error
             }
