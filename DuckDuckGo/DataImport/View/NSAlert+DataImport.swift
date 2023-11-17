@@ -24,35 +24,6 @@ extension NSAlert {
         return (accessoryView as? NSTextField)?.stringValue
     }
 
-    static func importFailedAlert(linkDelegate: NSTextViewDelegate) -> NSAlert {
-        let alert = NSAlert()
-
-        let linkText = UserText.dataImportSubmitFeedback
-        let informativeText = UserText.dataImportFailedBody
-
-        let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: 250, height: 0))
-        textView.applyLabelStyle()
-
-        let attributedString = NSMutableAttributedString(string: informativeText)
-        attributedString.addLink("", toText: linkText) // The actual value of the link isn't important, we're reacting to the click via the delegate
-        attributedString.addAttributes([
-            .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-            .foregroundColor: NSColor(named: "BlackWhite60")!
-        ], range: NSRange(location: 0, length: attributedString.length))
-
-        textView.textStorage?.setAttributedString(attributedString)
-
-        textView.sizeToFit()
-        textView.delegate = linkDelegate
-
-        alert.messageText = UserText.dataImportFailedTitle
-        alert.accessoryView = textView
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.dataImportAlertAccept)
-
-        return alert
-    }
-
     static func passwordRequiredAlert(source: DataImport.Source) -> NSAlert {
         let textField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 280, height: 24))
         let alert = NSAlert()
@@ -64,17 +35,6 @@ extension NSAlert {
         alert.window.initialFirstResponder = textField
         alert.addButton(withTitle: UserText.dataImportAlertImport)
         alert.addButton(withTitle: UserText.dataImportAlertCancel)
-
-        return alert
-    }
-
-    static func failureAlert(message: String) -> NSAlert {
-        let alert = NSAlert()
-
-        alert.messageText = UserText.dataImportFailedTitle
-        alert.informativeText = message
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: UserText.dataImportAlertAccept)
 
         return alert
     }
