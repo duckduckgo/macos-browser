@@ -25,16 +25,28 @@ import GRDB
 @testable import DataBrokerProtection
 
 extension BrokerProfileQueryData {
-    static func mock(with steps: [Step] = [Step]()) -> BrokerProfileQueryData {
+    static func mock(with steps: [Step] = [Step](),
+                     dataBrokerName: String = "test",
+                     lastRunDate: Date? = nil,
+                     preferredRunDate: Date? = nil,
+                     extractedProfile: ExtractedProfile? = nil,
+                     scanHistoryEvents: [HistoryEvent] = [HistoryEvent](),
+                     mirrorSites: [MirrorSite] = [MirrorSite]()) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
-                name: "test",
+                name: dataBrokerName,
                 steps: steps,
                 version: "1.0.0",
-                schedulingConfig: DataBrokerScheduleConfig.mock
+                schedulingConfig: DataBrokerScheduleConfig.mock,
+                mirrorSites: mirrorSites
             ),
             profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
-            scanOperationData: ScanOperationData(brokerId: 1, profileQueryId: 1, historyEvents: [HistoryEvent]())
+            scanOperationData: ScanOperationData(brokerId: 1,
+                                                 profileQueryId: 1,
+                                                 preferredRunDate: preferredRunDate,
+                                                 historyEvents: scanHistoryEvents,
+                                                 lastRunDate: lastRunDate),
+            optOutOperationsData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutOperationData]()
         )
     }
 }
@@ -445,6 +457,10 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
         profile
     }
 
+    func deleteProfileData() throws {
+        return
+    }
+
     func save(broker: DataBroker) throws -> Int64 {
         wasBrokerSavedCalled = true
         return 1
@@ -607,6 +623,7 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
 final class MockDatabase: DataBrokerProtectionRepository {
     var wasSaveProfileCalled = false
     var wasFetchProfileCalled = false
+    var wasDeleteProfileDataCalled = false
     var wasSaveOptOutOperationCalled = false
     var wasBrokerProfileQueryDataCalled = false
     var wasFetchAllBrokerProfileQueryDataCalled = false
@@ -632,6 +649,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
         wasFetchProfileCalled,
+        wasDeleteProfileDataCalled,
         wasSaveOptOutOperationCalled,
         wasBrokerProfileQueryDataCalled,
         wasFetchAllBrokerProfileQueryDataCalled,
@@ -647,13 +665,19 @@ final class MockDatabase: DataBrokerProtectionRepository {
         callsList.filter { $0 }.count > 0 // If one value is true. The database was called
     }
 
-    func save(_ profile: DataBrokerProtectionProfile) {
+    func save(_ profile: DataBrokerProtectionProfile) -> Bool {
         wasSaveProfileCalled = true
+
+        return true
     }
 
     func fetchProfile() -> DataBrokerProtectionProfile? {
         wasFetchProfileCalled = true
         return nil
+    }
+
+    func deleteProfileData() {
+        wasDeleteProfileDataCalled = true
     }
 
     func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
@@ -662,6 +686,10 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData? {
         wasBrokerProfileQueryDataCalled = true
+
+        if !brokerProfileQueryDataToReturn.isEmpty {
+            return brokerProfileQueryDataToReturn.first
+        }
 
         if let lastHistoryEventToReturn = self.lastHistoryEventToReturn {
             let scanOperationData = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
@@ -708,7 +736,9 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent? {
         wasFetchLastHistoryEventCalled = true
-
+        if let event = brokerProfileQueryDataToReturn.first?.events.last {
+            return event
+        }
         return lastHistoryEventToReturn
     }
 

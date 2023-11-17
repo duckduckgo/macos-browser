@@ -68,7 +68,6 @@ class PixelExperimentTests: XCTestCase {
         PixelExperiment.fireEnrollmentPixel()
         PixelExperiment.fireFirstSerpPixel()
         PixelExperiment.fireDay21To27SerpPixel()
-        PixelExperiment.fireSetAsDefaultInitialPixel()
     }
 
     func testWhenNoCohort_NoEnrollmentPixelFired() {

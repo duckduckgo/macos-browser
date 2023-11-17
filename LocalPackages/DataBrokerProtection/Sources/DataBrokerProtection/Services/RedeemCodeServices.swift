@@ -46,6 +46,7 @@ public protocol AuthenticationRepository {
 
     func save(accessToken: String)
     func save(inviteCode: String)
+    func reset()
 }
 
 public protocol DataBrokerProtectionAuthenticationService {
@@ -62,7 +63,7 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
     private let authenticationRepository: AuthenticationRepository
 
     public init(authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService(),
-                authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()) {
+                authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()) {
         self.authenticationService = authenticationService
         self.authenticationRepository = authenticationRepository
     }
@@ -92,13 +93,13 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
     }
 }
 
-// ⚠️ NOTE: This is just a temporary solution. We should not store the access token on User Defaults.
-// The access token will be saved in the secure database once we have that in place.
-public final class UserDefaultsAuthenticationData: AuthenticationRepository {
-    struct Keys {
-        static let accessTokenKey = "dbp:accessTokenKey"
-        static let inviteCodeKey = "dbp:inviteCodeKey"
+public final class KeychainAuthenticationData: AuthenticationRepository {
+    enum DBPWaitlistKeys: String {
+        case accessTokenKey = "dbp:accessTokenKey"
+        case inviteCodeKey = "dbp:inviteCodeKey"
     }
+
+    let keychainPrefix = Bundle.main.bundleIdentifier ?? "com.duckduckgo"
 
     // Initialize this constant with the DBP API Dev Access Token on Bitwarden if you do not want to use the redeem endpoint.
     private let developmentToken: String? = nil
@@ -106,19 +107,87 @@ public final class UserDefaultsAuthenticationData: AuthenticationRepository {
     public init() {}
 
     public func getInviteCode() -> String? {
-        UserDefaults.standard.string(forKey: Keys.inviteCodeKey)
+        return getString(forField: .inviteCodeKey)
     }
 
     public func getAccessToken() -> String? {
-        UserDefaults.standard.string(forKey: Keys.accessTokenKey) ?? developmentToken
+        getString(forField: .accessTokenKey)
     }
 
     public func save(accessToken: String) {
-        UserDefaults.standard.set(accessToken, forKey: Keys.accessTokenKey)
+        add(string: accessToken, forField: .accessTokenKey)
     }
 
     public func save(inviteCode: String) {
-        UserDefaults.standard.set(inviteCode, forKey: Keys.inviteCodeKey)
+        add(string: inviteCode, forField: .inviteCodeKey)
+    }
+
+    public func reset() {
+        deleteItem(forField: .inviteCodeKey)
+        deleteItem(forField: .accessTokenKey)
+    }
+
+    // MARK: - Keychain Read
+
+    private func getString(forField field: DBPWaitlistKeys) -> String? {
+        guard let data = retrieveData(forField: field),
+              let string = String(data: data, encoding: String.Encoding.utf8) else {
+            return nil
+        }
+        return string
+    }
+
+    private func retrieveData(forField field: DBPWaitlistKeys) -> Data? {
+        var query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        query[kSecReturnData as String] = true
+
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess, let existingItem = item as? Data else {
+            return nil
+        }
+
+        return existingItem
+    }
+
+    // MARK: - Keychain Write
+
+    private func add(string: String, forField field: DBPWaitlistKeys) {
+        guard let stringData = string.data(using: .utf8) else {
+            return
+        }
+
+        deleteItem(forField: field)
+        add(data: stringData, forField: field)
+    }
+
+    private func add(data: Data, forField field: DBPWaitlistKeys) {
+        var query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        query[kSecValueData as String] = data
+        SecItemAdd(query as CFDictionary, nil)
+    }
+
+    private func deleteItem(forField field: DBPWaitlistKeys) {
+        let query = defaultAttributes(serviceName: keychainServiceName(for: field))
+        SecItemDelete(query as CFDictionary)
+    }
+
+    // MARK: -
+
+    private func defaultAttributes(serviceName: String) -> [String: Any] {
+        return [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrSynchronizable as String: false,
+            kSecUseDataProtectionKeychain as String: true,
+            kSecAttrAccessGroup as String: Bundle.main.appGroupName,
+            kSecAttrService as String: serviceName,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+        ]
+    }
+
+    func keychainServiceName(for field: DBPWaitlistKeys) -> String {
+        [keychainPrefix, "waitlist", field.rawValue].joined(separator: ".")
     }
 }
 
@@ -140,7 +209,11 @@ struct RedeemResponse: Codable {
 
 public struct AuthenticationService: DataBrokerProtectionAuthenticationService {
     private struct Constants {
+#if DEBUG
+        static let redeemURL = "https://dbp-staging.duckduckgo.com/dbp/redeem?"
+#else
         static let redeemURL = "https://dbp.duckduckgo.com/dbp/redeem?"
+#endif
     }
 
     private let urlSession: URLSession

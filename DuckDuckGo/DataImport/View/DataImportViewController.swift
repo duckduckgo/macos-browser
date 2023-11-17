@@ -502,7 +502,7 @@ final class DataImportViewController: NSViewController {
     }
 
     private func requestSync() {
-        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+        guard let syncService = NSApp.delegateTyped.syncService else {
             return
         }
         os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")

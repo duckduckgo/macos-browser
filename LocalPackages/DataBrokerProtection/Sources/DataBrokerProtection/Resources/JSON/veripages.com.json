@@ -1,7 +1,7 @@
 {
   "name": "veripages.com",
-  "version": "0.1.0",
-  "parent": "peoplefinders.com",
+  "version": "0.1.1",
+  "parent": "verecor.com",
   "addedDatetime": 1691985600000,
   "steps": [
     {
@@ -10,12 +10,21 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "e66c5522-d532-4db0-9b56-0565b2753f6c",
-          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}"
+          "id": "e1adef78-997c-42f5-8c33-501566fc705b",
+          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&fage=${ageRange}&state=${state}&city=${city}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
         },
         {
           "actionType": "extract",
-          "id": "f8f302aa-c881-422b-8d2f-98aa115b4378",
+          "id": "1a06491a-e2b6-4d04-9ac2-d14b0776415a",
           "selector": ".search-item",
           "profile": {
             "name": {

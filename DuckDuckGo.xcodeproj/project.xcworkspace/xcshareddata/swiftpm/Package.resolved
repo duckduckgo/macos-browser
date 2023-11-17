@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "43fd829917f61f605fc110b68bb1bf1841276b3c",
-        "version" : "81.1.0"
+        "revision" : "b97c451037f7a24aef6389be8252df301d2294cd",
+        "version" : "84.1.1"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "74b6142c016be354144f28551de41b50c4864b1f",
-        "version" : "4.37.0"
+        "revision" : "254b23cf292140498650421bb31fd05740f4579b",
+        "version" : "4.40.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "55466f10a339843cb79a27af62d5d61c030740b2",
-        "version" : "8.4.1"
+        "revision" : "93677cc02cfe650ce7f417246afd0e8e972cd83e",
+        "version" : "10.0.0"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "51e2b46f413bf3ef18afefad631ca70f2c25ef70",
-        "version" : "1.4.0"
+        "revision" : "b4ac92a444e79d5651930482623b9f6dc9265667",
+        "version" : "2.0.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "f0ceaf5cc9f3f23daa0ccb6dcebd79fc96ccc7d9",
-        "version" : "2.5.0"
+        "revision" : "1f07f4096e52f19b5e7abaa697b7fc592b7ff57c",
+        "version" : "2.5.1"
       }
     },
     {
