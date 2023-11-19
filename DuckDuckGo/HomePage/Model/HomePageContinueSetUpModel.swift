@@ -43,6 +43,7 @@ extension HomePage.Models {
 
 #if NETWORK_PROTECTION
         let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
+        let appGroupUserDefaults: UserDefaults
 #endif
 
         var isDay0SurveyEnabled: Bool {
@@ -150,6 +151,7 @@ extension HomePage.Models {
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
+             appGroupUserDefaults: UserDefaults,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
@@ -159,6 +161,7 @@ extension HomePage.Models {
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
+            self.appGroupUserDefaults = appGroupUserDefaults
             self.privacyConfigurationManager = privacyConfigurationManager
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
@@ -268,7 +271,7 @@ extension HomePage.Models {
             // Only show the upgrade card to users who have used the VPN before:
             let activationStore = DefaultWaitlistActivationDateStore()
             if shouldShowNetworkProtectionSystemExtensionUpgradePrompt,
-               UserDefaults.shared.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
+               appGroupUserDefaults.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
                activationStore.daysSinceActivation() != nil {
                 features.append(.networkProtectionSystemExtensionUpgrade)
             }

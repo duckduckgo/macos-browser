@@ -150,7 +150,8 @@ final class HomePageViewController: NSViewController {
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
-            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging()
+            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
+            appGroupUserDefaults: .shared
         )
 #else
         let vm = HomePage.Models.ContinueSetUpModel(
