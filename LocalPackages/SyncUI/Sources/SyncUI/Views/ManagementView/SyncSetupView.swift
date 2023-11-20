@@ -73,15 +73,6 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                         }
                 }
             }
-            HStack {
-                Image("DownloadsPreferences")
-                Text("DuckDuckGo for Other Platforms")
-                    .foregroundColor(Color("LinkBlueColor"))
-            }
-            .padding(.top, 12)
-            .onTapGesture {
-                model.downloadDDGPressed()
-            }
         }
     }
 

@@ -19,30 +19,32 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct TurnOffSyncView: View {
+public struct TurnOffSyncView<ViewModel>: View where ViewModel: ManagementViewModel {
 
-    @EnvironmentObject var model: ManagementDialogModel
+    @EnvironmentObject var model: ViewModel
 
-    var body: some View {
+    public init() {}
+
+    public var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRemoveDeviceDesktop")
                 Text(UserText.turnOffSyncConfirmTitle)
                     .font(.system(size: 17, weight: .bold))
                 Text(UserText.turnOffSyncConfirmMessage)
+                    .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                     .multilineTextAlignment(.center)
             }
         } buttons: {
             Button(UserText.cancel) {
-                model.endFlow()
+                model.endDialogFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
             Button(UserText.turnOff) {
-                model.delegate?.turnOffSync()
+                model.turnOffSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .frame(height: 250)
     }
 
 }

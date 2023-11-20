@@ -37,7 +37,28 @@ public struct PreparingToSyncView: View {
             .frame(width: 320)
         } buttons: {
         }
-        .padding(.vertical, 20)
+    }
+
+}
+
+public struct YourDataIsReturningView: View {
+
+    public init() {}
+
+    public var body: some View {
+        SyncDialog(spacing: 20.0, bottomText: "Downloading…") {
+            VStack(alignment: .center, spacing: 20) {
+                Image("Lock-Succes-96")
+                Text("Your Data is Returning!")
+                    .font(.system(size: 17, weight: .bold))
+                Text("Your bookmarks and logins will now be restored from DuckDuckGo's secure server.")
+                    .frame(width: 320, alignment: .center)
+                    .multilineTextAlignment(.center)
+                    .fixedSize()
+            }
+            .frame(width: 320)
+        } buttons: {
+        }
     }
 
 }

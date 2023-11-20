@@ -81,7 +81,7 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(selectedSegment == 0 ? Color("BlackWhite10") : .clear, lineWidth: 1)
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(selectedSegment == 0 ? Color.white : Color("BlackWhite1"))
+                        .fill(selectedSegment == 0 ? Color("PickerViewSelected") : Color("BlackWhite1"))
                 }
             )
             HStack {
@@ -97,7 +97,7 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(selectedSegment == 1 ? Color("BlackWhite10") : .clear, lineWidth: 1)
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(selectedSegment == 1 ? Color.white : Color("BlackWhite1"))
+                        .fill(selectedSegment == 1 ? Color("PickerViewSelected")  : Color("BlackWhite1"))
                 }
             )
         }
@@ -132,7 +132,7 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(.white)
+                        .fill(.clear)
                     Text(recoveryCodeModel.recoveryCode)
                         .font(
                             Font.custom("SF Mono", size: 13)
@@ -149,7 +149,7 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
                 )
             Button {
                 recoveryCodeModel.paste()
-                model.recoveryCodePasted(recoveryCodeModel.recoveryCode)
+                model.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: false)
             } label: {
                 HStack {
                     Image("Paste")
@@ -219,4 +219,11 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
 
         sharingPicker.show(relativeTo: contentView.frame, of: contentView, preferredEdge: .maxY)
     }
+}
+
+
+public protocol SyncWithAnotherDeviceManaging: ObservableObject {
+    func cancelPressed()
+    func copyCodeDesplayed()
+    func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
 }

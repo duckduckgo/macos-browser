@@ -22,13 +22,14 @@ import Combine
 public protocol ManagementDialogModelDelegate: AnyObject {
     var isUnifiedFavoritesEnabled: Bool { get set }
 
-    func recoverDevice(recoveryCode: String)
+    func recoverDevice(recoveryCode: String, fromRecoveryScreen: Bool)
     func saveRecoveryPDF()
     func turnOffSync()
     func updateDeviceName(_ name: String)
     func removeDevice(_ device: SyncDevice)
     func deleteAccount()
     func presentSaveRecoveryPDF()
+    
 }
 
 public final class ManagementDialogModel: ObservableObject {

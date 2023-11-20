@@ -34,10 +34,11 @@ public struct EnterRecoveryCodeView<ViewModel>: View where ViewModel: Management
             Text("Enter Code")
                 .font(.system(size: 17, weight: .bold))
             Text("Enter the code on your Recovery PDF, or another synced device, to recover your synced data.")
+                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                 .multilineTextAlignment(.center)
-            VStack {
+            VStack(spacing: 16) {
                 Text("Paste Code Here")
-                HStack {
+                HStack(spacing: 10) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
@@ -53,16 +54,20 @@ public struct EnterRecoveryCodeView<ViewModel>: View where ViewModel: Management
                             .lineSpacing(3)
                             .padding(.horizontal)
                     }
-                    .frame(width: 348, height: 32)
+                    .frame(width: 290, height: 32)
                     Button {
                         recoveryCodeModel.paste()
-                        model.recoveryCodePasted(recoveryCodeModel.recoveryCode)
+                        model.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: true)
                     } label: {
                         Image("Paste")
+                            .frame(width: 32, height: 32)
                     }
                 }
+                .frame(width: 348)
             }
+            .padding()
             .roundedBorder()
+            .padding()
             HStack {
                 line()
                 Text("or scan QR code with a device that is still connected")
@@ -79,6 +84,7 @@ public struct EnterRecoveryCodeView<ViewModel>: View where ViewModel: Management
             }
             .buttonStyle(DismissActionButtonStyle())
         }
+        .frame(width: 420)
     }
 
     func line() -> some View {

@@ -133,6 +133,19 @@ struct SyncedDevicesList: View {
                     }
                 }
             }
+            Rectangle()
+                .fill(Color("BlackWhite10"))
+                .frame(height: 1)
+                .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
+            SyncPreferencesRow {
+            } centerContent: {
+                Button {
+
+                } label: {
+                    Text("Sync with Another Device")
+                        .frame(height: 24)
+                }
+            }
         }
         .roundedBorder()
     }

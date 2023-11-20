@@ -39,7 +39,7 @@ struct RecoverAccountView: View {
     }
 
     func submitRecoveryCode() {
-        model.delegate?.recoverDevice(recoveryCode: recoveryCodeModel.recoveryCode)
+//        model.delegate?.recoverDevice(recoveryCode: recoveryCodeModel.recoveryCode )/
     }
 
     var body: some View {
