@@ -3548,6 +3548,10 @@
 		B6B1E88B26D774090062C350 /* LinkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B1E88A26D774090062C350 /* LinkButton.swift */; };
 		B6B2400E28083B49001B8F3A /* WebViewContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */; };
 		B6B3E0E12657EA7A0040E0A2 /* NSScreenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */; };
+		B6B4D1C52B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
+		B6B4D1C62B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
+		B6B4D1C72B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
+		B6B4D1C82B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
 		B6B5F57F2B024105008DB58A /* DataImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */; };
 		B6B5F5802B024105008DB58A /* DataImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */; };
 		B6B5F5812B024105008DB58A /* DataImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */; };
@@ -4873,6 +4877,7 @@
 		B6B1E88A26D774090062C350 /* LinkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkButton.swift; sourceTree = "<group>"; };
 		B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainerView.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
+		B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportReportModel.swift; sourceTree = "<group>"; };
 		B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportSummaryView.swift; sourceTree = "<group>"; };
 		B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestFilePermissionView.swift; sourceTree = "<group>"; };
 		B6B5F5882B03673B008DB58A /* BrowserImportMoreInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportMoreInfoView.swift; sourceTree = "<group>"; };
@@ -8489,6 +8494,7 @@
 			children = (
 				B6BCC5222AFCDABB002C5499 /* DataImportSourceViewModel.swift */,
 				B677FC532B064A9C0099EB04 /* DataImportViewModel.swift */,
+				B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10237,6 +10243,7 @@
 				3192A0442A4C4CFF0084EA89 /* DownloadsPreferences.swift in Sources */,
 				4B67854C2AA8DE78008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				3192A0452A4C4CFF0084EA89 /* PasswordManagementItemList.swift in Sources */,
+				B6B4D1C72B0B3B5400C26286 /* DataImportReportModel.swift in Sources */,
 				3192A0462A4C4CFF0084EA89 /* Bookmark.swift in Sources */,
 				3192A0472A4C4CFF0084EA89 /* ConnectBitwardenViewModel.swift in Sources */,
 				3192A0492A4C4CFF0084EA89 /* NSNotificationName+DataImport.swift in Sources */,
@@ -10819,6 +10826,7 @@
 				3706FABD293F65D500E42796 /* NSNotificationName+PasswordManager.swift in Sources */,
 				3706FABE293F65D500E42796 /* RulesCompilationMonitor.swift in Sources */,
 				3706FABF293F65D500E42796 /* CrashReportReader.swift in Sources */,
+				B6B4D1C62B0B3B5400C26286 /* DataImportReportModel.swift in Sources */,
 				3706FAC0293F65D500E42796 /* DataTaskProviding.swift in Sources */,
 				3706FAC1293F65D500E42796 /* FeedbackViewController.swift in Sources */,
 				3706FAC2293F65D500E42796 /* FaviconSelector.swift in Sources */,
@@ -11917,6 +11925,7 @@
 				4B9579942AC7AE700062CA31 /* CrashReportReader.swift in Sources */,
 				4B9579952AC7AE700062CA31 /* DataTaskProviding.swift in Sources */,
 				4B9579962AC7AE700062CA31 /* FeatureFlag.swift in Sources */,
+				B6B4D1C82B0B3B5400C26286 /* DataImportReportModel.swift in Sources */,
 				4B9579972AC7AE700062CA31 /* FeedbackViewController.swift in Sources */,
 				4B9579982AC7AE700062CA31 /* FaviconSelector.swift in Sources */,
 				4B9579992AC7AE700062CA31 /* AddEditFavoriteViewController.swift in Sources */,
@@ -12624,6 +12633,7 @@
 				857FFEC027D239DC00415E7A /* HyperLink.swift in Sources */,
 				37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */,
 				4B9292A426670D2A00AD2C21 /* PasteboardWriting.swift in Sources */,
+				B6B4D1C52B0B3B5400C26286 /* DataImportReportModel.swift in Sources */,
 				4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */,
 				B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */,
 				4BB88B5025B7BA2B006F6B06 /* TabInstrumentation.swift in Sources */,
