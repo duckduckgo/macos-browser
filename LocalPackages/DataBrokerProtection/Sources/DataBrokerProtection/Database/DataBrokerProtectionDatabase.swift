@@ -326,7 +326,7 @@ extension DataBrokerProtectionDatabase {
 
         for brokerId in brokerIDs {
             for profileQueryId in profileQueryIDs {
-                try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: nil)
+                try vault.save(brokerId: brokerId, profileQueryId: profileQueryId, lastRunDate: nil, preferredRunDate: Date())
             }
         }
     }
