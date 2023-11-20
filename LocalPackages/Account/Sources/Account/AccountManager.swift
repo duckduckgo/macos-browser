@@ -166,8 +166,6 @@ public class AccountManager {
             return .failure(error)
         }
 
-        storeAuthToken(token: authToken)
-
         return await exchangeAndStoreTokens(with: authToken)
     }
 
