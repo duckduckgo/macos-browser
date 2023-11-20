@@ -259,3 +259,50 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         fatalError("Use init()")
     }
 }
+
+/*
+ This is required so that pixels can have associated generic Errors, whilst still having DataBrokerProtectionPixels conform to Equatable. This is because many things within DBP return generic Errors.
+It may yet be possible to make DataBrokerProtectionPixels not conform to equatable
+ */
+public struct EquatableError: Error, Equatable, CustomStringConvertible {
+    public let base: Error
+    private let equals: (Error) -> Bool
+
+    init<Base: Error>(_ base: Base) {
+        self.base = base
+        self.equals = { String(reflecting: $0) == String(reflecting: base) }
+    }
+
+    init<Base: Error & Equatable>(_ base: Base) {
+        self.base = base
+        self.equals = { ($0 as? Base) == base }
+    }
+
+    public static func ==(lhs: EquatableError, rhs: EquatableError) -> Bool {
+        lhs.equals(rhs.base)
+    }
+
+    public var description: String {
+        "\(self.base)"
+    }
+
+    public func asError<Base: Error>(type: Base.Type) -> Base? {
+        self.base as? Base
+    }
+
+    public var localizedDescription: String {
+        self.base.localizedDescription
+    }
+}
+
+extension Error where Self: Equatable {
+    public func toEquatableError() -> EquatableError {
+        EquatableError(self)
+    }
+}
+
+extension Error {
+    public func toEquatableError() -> EquatableError {
+        EquatableError(self)
+    }
+}
