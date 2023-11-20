@@ -18,17 +18,6 @@
 
 import Foundation
 
-extension URL {
-
-    static var addEmailToSubscription: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!
-    }
-
-    static var manageSubscriptionEmail: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/manage")!
-    }
-}
-
 public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var title = UserText.shareModalTitle
     public var description = UserText.shareModalDescription

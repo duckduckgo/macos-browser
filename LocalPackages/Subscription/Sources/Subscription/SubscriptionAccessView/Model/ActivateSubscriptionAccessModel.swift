@@ -18,13 +18,6 @@
 
 import Foundation
 
-extension URL {
-
-    static var activateSubscriptionViaEmail: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!
-    }
-}
-
 public final class ActivateSubscriptionAccessModel: SubscriptionAccessModel {
     public var actionHandlers: SubscriptionAccessActionHandlers
     public var title = UserText.activateModalTitle

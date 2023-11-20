@@ -19,17 +19,6 @@
 import Foundation
 import Account
 
-extension URL {
-
-    static var purchaseSubscription: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/welcome")!
-    }
-
-    static var subscriptionFAQ: URL {
-        URL(string: "https://duckduckgo.com/about")!
-    }
-}
-
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isSignedIn: Bool = false
