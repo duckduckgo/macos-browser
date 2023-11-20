@@ -42,7 +42,7 @@ public final class DataBrokerProtectionManager {
         let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, pixelHandler: pixelHandler)
         let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
 
-        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler)
+        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler, pixelHandler: pixelHandler)
     }()
 
     private init() {

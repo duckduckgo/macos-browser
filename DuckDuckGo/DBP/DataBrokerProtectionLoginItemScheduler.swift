@@ -18,25 +18,30 @@
 
 import Foundation
 import DataBrokerProtection
+import Common
 
 /// A scheduler that launches a login item and the communicates with it through an IPC scheduler.
 ///
 final class DataBrokerProtectionLoginItemScheduler {
     private let ipcScheduler: DataBrokerProtectionIPCScheduler
     private let loginItemsManager: LoginItemsManager
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
-    init(ipcScheduler: DataBrokerProtectionIPCScheduler, loginItemsManager: LoginItemsManager = .init()) {
+    init(ipcScheduler: DataBrokerProtectionIPCScheduler, loginItemsManager: LoginItemsManager = .init(), pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
         self.ipcScheduler = ipcScheduler
         self.loginItemsManager = loginItemsManager
+        self.pixelHandler = pixelHandler
     }
 
     // MARK: - Login Item Management
 
     func disableLoginItem() {
+        pixelHandler.fire(.disableLoginItem)
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 
     func enableLoginItem() {
+        pixelHandler.fire(.enableLoginItem)
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 }

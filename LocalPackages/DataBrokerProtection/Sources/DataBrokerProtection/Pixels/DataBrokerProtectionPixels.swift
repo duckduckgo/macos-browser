@@ -154,15 +154,16 @@ public enum DataBrokerProtectionPixels: Equatable {
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String)
 
+    // Backgrond Agent events
     case backgroundAgentStarted
     case backgroundAgentStartedStoppingDueToAnotherInstanceRunning
     case backgroundAgentRunOperationsAndStartSchedulerIfPossible
     case backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile
-
     // There's currently no point firing this because the scheduler never calls the completion with an error
     // case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackError(error: Error)
     case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler
 
+    // IPC server events
     case ipcServerRegister
     case ipcServerStartScheduler
     case ipcServerStopScheduler
@@ -173,6 +174,12 @@ public enum DataBrokerProtectionPixels: Equatable {
     case ipcServerRunQueuedOperations
     case ipcServerRunQueuedOperationsCompletion(error: EquatableError?)
     case ipcServerRunAllOperations
+
+    // Login Item events
+    case enableLoginItem
+    case restartLoginItem
+    case disableLoginItem
+    case resetLoginItem
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -218,6 +225,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .ipcServerRunQueuedOperations: return "dbp_macos_ipc-server_run-queued-operations"
         case .ipcServerRunQueuedOperationsCompletion: return "dbp_macos_ipc-server_run-queued-operations_completion"
         case .ipcServerRunAllOperations: return "dbp_macos_ipc-server_run-all-operations"
+
+        case .enableLoginItem: return "dbp_macos_enable-login-item"
+        case .restartLoginItem: return "dbp_macos_restart-login-item"
+        case .disableLoginItem: return "dbp_macos_disable-login-item"
+        case .resetLoginItem: return "dbp_macos_reset-login-item"
         }
     }
 
@@ -268,9 +280,11 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
                 .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
-                .backgroundAgentStartedStoppingDueToAnotherInstanceRunning
-
-            :
+                .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
+                .enableLoginItem,
+                .restartLoginItem,
+                .disableLoginItem,
+                .resetLoginItem:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -323,9 +337,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerOptOutAllBrokers,
                     .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
-                    .ipcServerRunAllOperations
-
-                :
+                    .ipcServerRunAllOperations,
+                    .enableLoginItem,
+                    .restartLoginItem,
+                    .disableLoginItem,
+                    .resetLoginItem:
                 PixelKit.fire(event)
             }
         }

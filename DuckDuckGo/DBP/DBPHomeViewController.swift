@@ -165,7 +165,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerOptOutAllBrokers,
                     .ipcServerScanAllBrokers,
                     .ipcServerRunQueuedOperations,
-                    .ipcServerRunAllOperations:
+                    .ipcServerRunAllOperations,
+                    .enableLoginItem,
+                    .restartLoginItem,
+                    .disableLoginItem,
+                    .resetLoginItem:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }
