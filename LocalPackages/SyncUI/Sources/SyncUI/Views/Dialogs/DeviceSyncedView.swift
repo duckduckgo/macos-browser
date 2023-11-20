@@ -87,38 +87,4 @@ struct DeviceSyncedView: View{
             }
         }
     }
-
-//    struct OptionsView: View {
-//        @EnvironmentObject var model: ManagementDialogModel
-//        var body: some View {
-//            VStack(spacing: 8) {
-//                Text(UserText.optionsSectionDialogTitle)
-//                    .font(.system(size: 11))
-//                    .foregroundColor(Color("BlackWhite60"))
-//                VStack {
-//                    Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-//                        VStack(alignment: .leading, spacing: 2) {
-//                            Text(UserText.shareFavoritesOptionTitle)
-//                                .font(.system(size: 13))
-//                                .foregroundColor(Color("BlackWhite80"))
-//                            Text(UserText.shareFavoritesOptionCaption)
-//                                .font(.system(size: 11))
-//                                .foregroundColor(Color("BlackWhite60"))
-//                                .frame(width: 254)
-//                                .fixedSize()
-//                        }
-//                        .frame(width: 254)
-//                    }
-//                    .padding(.bottom, 13)
-//                    .padding(.top, 7)
-//                    .padding(.horizontal, 16)
-//                    .frame(height: 65)
-//                    .toggleStyle(.switch)
-//                    .roundedBorder()
-//                }
-//                .frame(width: 320)
-//            }
-//            .padding(.top, 32)
-//        }
-//    }
 }

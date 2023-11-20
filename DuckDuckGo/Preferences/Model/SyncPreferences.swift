@@ -64,9 +64,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             } else {
                 shouldRequestSyncOnFavoritesOptionChange = true
             }
-            if managementDialogModel.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
-                managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
-            }
         }
     }
 
@@ -82,21 +79,21 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.account?.recoveryCode
     }
 
-    @MainActor
-    func presentRecoverSyncAccountDialog() {
-        presentDialog(for: .recoverAccount)
-    }
+//    @MainActor
+//    func presentRecoverSyncAccountDialog() {
+//        presentDialog(for: .recoverAccount)
+//    }
+//
+//    @MainActor
+//    func presentManuallyEnterCodeDialog() {
+//        presentDialog(for: .manuallyEnterCode)
+//    }
 
-    @MainActor
-    func presentManuallyEnterCodeDialog() {
-        presentDialog(for: .manuallyEnterCode)
-    }
-
-    @MainActor
-    func presentShowTextCodeDialog() {
-        let code: String = recoveryCode ?? codeToDisplay ?? ""
-        presentDialog(for: .showTextCode(code))
-    }
+//    @MainActor
+//    func presentShowTextCodeDialog() {
+//        let code: String = recoveryCode ?? codeToDisplay ?? ""
+//        presentDialog(for: .showTextCode(code))
+//    }
 
     @MainActor
     func turnOffSyncPressed() {
@@ -148,7 +145,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
-        self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
 
         apperancePreferences.$favoritesDisplayMode
             .map(\.isDisplayUnified)
@@ -421,15 +417,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .deleteAccount(devices))
     }
 
-    @MainActor
-    func confirmSetupComplete() {
-        presentDialog(for: .firstDeviceSetup)
-    }
-
-    @MainActor
-    func presentSaveRecoveryPDF() {
-        presentDialog(for: .saveRecoveryPDF(recoveryCode ?? ""))
-    }
 
     @MainActor
     func copyCodeDesplayed() {

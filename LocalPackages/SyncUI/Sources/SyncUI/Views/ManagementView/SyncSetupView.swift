@@ -75,80 +75,6 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
             }
         }
     }
-
-//    var body: some View {
-//        Text(UserText.syncSetupExplanation)
-//            .fixMultilineScrollableText()
-//            .padding(.horizontal, 16)
-//        PreferencePaneSection {
-//            VStack(alignment: .leading, spacing: 12) {
-//                Group {
-//                    if model.isCreatingAccount {
-//                        ProgressView()
-//                    } else {
-//                        VStack(alignment: .leading, spacing: 24) {
-//                            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.codeToDisplay ?? "")
-//                                .environmentObject(model)
-//                                .onAppear {
-//                                    model.startPollingForRecoveryKey()
-//                                }
-//                                .onDisappear {
-//                                    model.stopPollingForRecoveryKey()
-//                                }
-//                            SyncSetupStartCardView()
-//                            SyncSetupRecoverCardView()
-//                            Text(UserText.syncSetUpFooter)
-//                                .font(.system(size: 11))
-//                                .foregroundColor(Color("GreyTextColor"))
-//                                .padding(.horizontal, 16)
-//                        }
-//                    }
-//                }.frame(minWidth: 100)
-//            }
-//        }
-//    }
-
-}
-
-// MARK: - Card Views
-extension SyncSetupView {
-    struct SyncSetupStartCardView: View {
-        @EnvironmentObject var model: ViewModel
-        var body: some View {
-            HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(UserText.syncFirstDeviceSetUpCardTitle)
-                            .fontWeight(.semibold)
-                        Text(UserText.syncFirstDeviceSetUpCardExplanation)
-                            .foregroundColor(Color("GreyTextColor"))
-                    }
-                    Button(UserText.syncFirstDeviceSetUpActionTitle) {
-                        model.turnOnSync()
-                    }
-                }
-                .frame(width: 424, alignment: .topLeading)
-                Image("Sync-Desktop-New-96x96")
-            }
-            .padding(16)
-            .roundedBorder()
-        }
-    }
-
-    struct SyncSetupRecoverCardView: View {
-        @EnvironmentObject var model: ViewModel
-        var body: some View {
-            HStack {
-                Button(UserText.syncRecoverDataActionTitle) {
-                    model.presentRecoverSyncAccountDialog()
-                }
-                Spacer()
-            }
-            .padding(16)
-            .frame(width: 512)
-            .roundedBorder()
-        }
-    }
 }
 
 // MARK: - QRCodeView
@@ -169,40 +95,5 @@ struct QRCodeView: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(Color("ClearColor"))
         })
-    }
-}
-
-struct SyncSetupSyncAnotherDeviceCardView<ViewModel>: View where ViewModel: ManagementViewModel {
-    @EnvironmentObject var model: ViewModel
-    let code: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(UserText.syncAddDeviceCardExplanation)
-                    .foregroundColor(Color("GreyTextColor"))
-                QRCodeView(recoveryCode: code)
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(UserText.syncAddDeviceCardActionsExplanation)
-                        .foregroundColor(Color("GreyTextColor"))
-                    Text(UserText.syncAddDeviceShowTextActionTitle)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color("LinkBlueColor"))
-                        .onTapGesture {
-                            model.presentShowTextCodeDialog()
-                        }
-                    Text(UserText.syncAddDeviceEnterCodeActionTitle)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color("LinkBlueColor"))
-                        .onTapGesture {
-                            model.presentManuallyEnterCodeDialog()
-                        }
-                }
-            }
-            .frame(width: 424, alignment: .topLeading)
-            Image("Sync-Pair-96x96")
-        }
-        .padding(16)
-        .roundedBorder()
     }
 }

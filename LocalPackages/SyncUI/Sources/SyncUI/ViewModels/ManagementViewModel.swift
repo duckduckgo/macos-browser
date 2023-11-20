@@ -32,10 +32,6 @@ public protocol ManagementViewModel: ObservableObject {
     var devices: [SyncDevice] { get }
     var isUnifiedFavoritesEnabled: Bool { get set }
 
-    func presentShowTextCodeDialog()
-    func presentManuallyEnterCodeDialog()
-    func presentRecoverSyncAccountDialog()
-//    func presentTurnOffSyncConfirmDialog()
     func presentDeleteAccount()
     func presentDeviceDetails(_ device: SyncDevice)
     func presentRemoveDevice(_ device: SyncDevice)
@@ -43,23 +39,12 @@ public protocol ManagementViewModel: ObservableObject {
     func saveRecoveryPDF()
     func refreshDevices()
     func turnOnSync()
-//    func startPollingForRecoveryKey()
-    func stopPollingForRecoveryKey()
 
     func manageBookmarks()
     func manageLogins()
 
-    // NEW UI METHODS
-
     func syncWithAnotherDevicePressed()
     func syncWithServerPressed()
     func recoverDataPressed()
-    func downloadDDGPressed()
-    func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
-    func copyRecoveryCode()
-    func recoveryCodeNextPressed()
-    func copyCodeDesplayed()
-    func enterRecoveryCodePressed()
     func turnOffSyncPressed()
-    func turnOffSync()
 }
