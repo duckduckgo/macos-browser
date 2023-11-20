@@ -233,9 +233,6 @@ final class MoreOptionsMenu: NSMenu {
 
 #if SUBSCRIPTION
     @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
-        if #available(macOS 12.0, *) {
-            _ = PurchaseManager.shared
-        }
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
     }
 #endif

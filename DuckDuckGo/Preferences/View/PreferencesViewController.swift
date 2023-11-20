@@ -64,14 +64,6 @@ final class PreferencesViewController: NSViewController {
             .sink { [weak self] identifier in
                 self?.delegate?.selectedPreferencePane(identifier)
             }
-
-#if SUBSCRIPTION
-        if #available(macOS 12.0, *) {
-            Task {
-                await PurchaseManager.shared.updateAvailableProducts()
-            }
-        }
-#endif
     }
 
     override func viewWillDisappear() {

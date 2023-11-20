@@ -33,6 +33,10 @@ import UserNotifications
 import NetworkProtection
 #endif
 
+#if SUBSCRIPTION
+import Purchase
+#endif
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
@@ -222,6 +226,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if DBP
         DataBrokerProtectionManager.shared.runOperationsAndStartSchedulerIfPossible()
+#endif
+
+#if SUBSCRIPTION
+        if #available(macOS 12.0, *) {
+            Task {
+                await PurchaseManager.shared.updateAvailableProducts()
+            }
+        }
 #endif
     }
 
