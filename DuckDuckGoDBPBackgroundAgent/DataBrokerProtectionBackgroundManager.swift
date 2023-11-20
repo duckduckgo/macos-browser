@@ -26,12 +26,14 @@ public final class DataBrokerProtectionBackgroundManager {
 
     static let shared = DataBrokerProtectionBackgroundManager()
 
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+
     private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
-    private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler)
+    private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler, pixelHandler: pixelHandler)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -69,16 +71,20 @@ public final class DataBrokerProtectionBackgroundManager {
     }
 
     public func runOperationsAndStartSchedulerIfPossible() {
+        pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossible)
 
         // If there's no saved profile we don't need to start the scheduler
         if dataManager.fetchProfile() != nil {
             scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
-                guard error == nil else {
+                if let error = error {
                     return
                 }
 
+                self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
                 self?.scheduler.startScheduler()
             }
+        } else {
+            pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile)
         }
     }
 }

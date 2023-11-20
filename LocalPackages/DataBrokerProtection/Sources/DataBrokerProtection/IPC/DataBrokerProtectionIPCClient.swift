@@ -19,6 +19,7 @@
 import Combine
 import Foundation
 import XPCHelper
+import Common
 
 /// This protocol describes the server-side IPC interface for controlling the tunnel
 ///
@@ -33,6 +34,8 @@ protocol XPCClientInterface {
 }
 
 public final class DataBrokerProtectionIPCClient {
+
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
     // MARK: - XPC Communication
 
@@ -49,7 +52,8 @@ public final class DataBrokerProtectionIPCClient {
 
     // MARK: - Initializers
 
-    public init(machServiceName: String) {
+    public init(machServiceName: String, pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+        self.pixelHandler = pixelHandler
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
 
@@ -68,6 +72,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
     public func register() {
         xpc.execute(call: { server in
+            self.pixelHandler.fire(.ipcServerRegister)
             server.register()
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
@@ -77,6 +82,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
     public func startScheduler(showWebView: Bool) {
         xpc.execute(call: { server in
+            self.pixelHandler.fire(.ipcServerStartScheduler)
             server.startScheduler(showWebView: showWebView)
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
@@ -86,6 +92,7 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
     public func stopScheduler() {
         xpc.execute(call: { server in
+            self.pixelHandler.fire(.ipcServerStopScheduler)
             server.stopScheduler()
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
@@ -95,30 +102,46 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
     public func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         xpc.execute(call: { server in
-            server.optOutAllBrokers(showWebView: showWebView, completion: completion)
+            self.pixelHandler.fire(.ipcServerOptOutAllBrokers)
+            server.optOutAllBrokers(showWebView: showWebView) { error in
+                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error?.toEquatableError()))
+                completion(error)
+            }
         }, xpcReplyErrorHandler: { error in
+            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error.toEquatableError()))
             completion(error)
         })
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         xpc.execute(call: { server in
-            server.scanAllBrokers(showWebView: showWebView, completion: completion)
+            self.pixelHandler.fire(.ipcServerScanAllBrokers)
+            server.scanAllBrokers(showWebView: showWebView) { error in
+                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error?.toEquatableError()))
+                completion(error)
+            }
         }, xpcReplyErrorHandler: { error in
+            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error.toEquatableError()))
             completion(error)
         })
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         xpc.execute(call: { server in
-            server.runQueuedOperations(showWebView: showWebView, completion: completion)
+            self.pixelHandler.fire(.ipcServerRunQueuedOperations)
+            server.runQueuedOperations(showWebView: showWebView) { error in
+                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error?.toEquatableError()))
+                completion(error)
+            }
         }, xpcReplyErrorHandler: { error in
+            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error.toEquatableError()))
             completion(error)
         })
     }
 
     public func runAllOperations(showWebView: Bool) {
         xpc.execute(call: { server in
+            self.pixelHandler.fire(.ipcServerRunAllOperations)
             server.runAllOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block

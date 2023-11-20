@@ -136,6 +136,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+            case .ipcServerOptOutAllBrokersCompletion(error: let error),
+                    .ipcServerScanAllBrokersCompletion(error: let error),
+                    .ipcServerRunQueuedOperationsCompletion(error: let error):
+                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error?.base))
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -149,7 +153,19 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutFinish,
                     .optOutSubmitSuccess,
                     .optOutSuccess,
-                    .optOutFailure:
+                    .optOutFailure,
+                    .backgroundAgentStarted,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
+                    .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
+                    .ipcServerRegister,
+                    .ipcServerStartScheduler,
+                    .ipcServerStopScheduler,
+                    .ipcServerOptOutAllBrokers,
+                    .ipcServerScanAllBrokers,
+                    .ipcServerRunQueuedOperations,
+                    .ipcServerRunAllOperations:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

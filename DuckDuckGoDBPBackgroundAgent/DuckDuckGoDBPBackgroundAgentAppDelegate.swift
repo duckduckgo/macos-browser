@@ -54,9 +54,14 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
                 onComplete(error)
             }
         }
+
+        let pixelHandler = DataBrokerProtectionPixelsHandler()
+        pixelHandler.fire(.backgroundAgentStarted)
+
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
             os_log(.error, log: .dbpBackgroundAgent, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            pixelHandler.fire(.backgroundAgentStartedStoppingDueToAnotherInstanceRunning)
             exit(0)
         }
 

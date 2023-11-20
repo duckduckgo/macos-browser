@@ -130,6 +130,7 @@ public enum DataBrokerProtectionPixels: Equatable {
         static let appVersionParamKey = "app_version"
         static let attemptIdParamKey = "attempt_id"
         static let durationParamKey = "duration"
+        static let bundleIDParamKey = "bundle_id"
         static let stageKey = "stage"
     }
 
@@ -152,6 +153,26 @@ public enum DataBrokerProtectionPixels: Equatable {
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String)
+
+    case backgroundAgentStarted
+    case backgroundAgentStartedStoppingDueToAnotherInstanceRunning
+    case backgroundAgentRunOperationsAndStartSchedulerIfPossible
+    case backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile
+
+    // There's currently no point firing this because the scheduler never calls the completion with an error
+    // case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackError(error: Error)
+    case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler
+
+    case ipcServerRegister
+    case ipcServerStartScheduler
+    case ipcServerStopScheduler
+    case ipcServerOptOutAllBrokers
+    case ipcServerOptOutAllBrokersCompletion(error: EquatableError?)
+    case ipcServerScanAllBrokers
+    case ipcServerScanAllBrokersCompletion(error: EquatableError?)
+    case ipcServerRunQueuedOperations
+    case ipcServerRunQueuedOperationsCompletion(error: EquatableError?)
+    case ipcServerRunAllOperations
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -179,6 +200,24 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
             // Debug Pixels
         case .error: return "data_broker_error"
+
+        case .backgroundAgentStarted: return "dbp_macos_background-agent_started"
+        case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "dbp_macos_background-agent_started_stopping-due-to-another-instance-running"
+
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossible: return "dbp_macos_background-agent-run-operations-and-start-scheduler-if-possible"
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile: return "dbp_macos_background-agent-run-operations-and-start-scheduler-if-possible_no-saved-profile"
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler: return "dbp_macos_background-agent-run-operations-and-start-scheduler-if-possible_callback_start-scheduler"
+
+        case .ipcServerRegister: return "dbp_macos_ipc-server_register"
+        case .ipcServerStartScheduler: return "dbp_macos_ipc-server_start-scheduler"
+        case .ipcServerStopScheduler: return "dbp_macos_ipc-server_stop-scheduler"
+        case .ipcServerOptOutAllBrokers: return "dbp_macos_ipc-server_opt-out-all-brokers"
+        case .ipcServerOptOutAllBrokersCompletion: return "dbp_macos_ipc-server_opt-out-all-brokers_completion"
+        case .ipcServerScanAllBrokers: return "dbp_macos_ipc-server_scan-all-brokers"
+        case .ipcServerScanAllBrokersCompletion: return "dbp_macos_ipc-server_scan-all-brokers_completion"
+        case .ipcServerRunQueuedOperations: return "dbp_macos_ipc-server_run-queued-operations"
+        case .ipcServerRunQueuedOperationsCompletion: return "dbp_macos_ipc-server_run-queued-operations_completion"
+        case .ipcServerRunAllOperations: return "dbp_macos_ipc-server_run-all-operations"
         }
     }
 
@@ -225,6 +264,25 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFailure(let dataBroker, let attemptId, let duration, let stage):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage]
+        case .backgroundAgentStarted,
+                .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
+                .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
+                .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
+                .backgroundAgentStartedStoppingDueToAnotherInstanceRunning
+
+            :
+            return [:]
+        case .ipcServerRegister,
+                .ipcServerStartScheduler,
+                .ipcServerStopScheduler,
+                .ipcServerOptOutAllBrokers,
+                .ipcServerOptOutAllBrokersCompletion,
+                .ipcServerScanAllBrokers,
+                .ipcServerScanAllBrokersCompletion,
+                .ipcServerRunQueuedOperations,
+                .ipcServerRunQueuedOperationsCompletion,
+                .ipcServerRunAllOperations:
+            return [Consts.bundleIDParamKey: Bundle.main.bundleIdentifier ?? "nil"]
         }
     }
 }
@@ -236,6 +294,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 PixelKit.fire(DebugEvent(event, error: error))
+            case .ipcServerOptOutAllBrokersCompletion(error: let error),
+                    .ipcServerScanAllBrokersCompletion(error: let error),
+                    .ipcServerRunQueuedOperationsCompletion(error: let error):
+                PixelKit.fire(DebugEvent(event, error: error?.base))
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -249,7 +311,21 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutFinish,
                     .optOutSubmitSuccess,
                     .optOutSuccess,
-                    .optOutFailure:
+                    .optOutFailure,
+                    .backgroundAgentStarted,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
+                    .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
+                    .ipcServerRegister,
+                    .ipcServerStartScheduler,
+                    .ipcServerStopScheduler,
+                    .ipcServerOptOutAllBrokers,
+                    .ipcServerScanAllBrokers,
+                    .ipcServerRunQueuedOperations,
+                    .ipcServerRunAllOperations
+
+                :
                 PixelKit.fire(event)
             }
         }
