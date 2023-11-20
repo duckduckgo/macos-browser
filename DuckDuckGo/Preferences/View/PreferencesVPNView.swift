@@ -34,7 +34,7 @@ extension Preferences {
                 // SECTION: Manage VPN
 
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.vpnSettingsTitle)
+                    TextMenuItemHeader(text: UserText.vpnGeneralTitle)
 
                     ToggleMenuItem(title: UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
                     TextMenuItemCaption(text: UserText.vpnConnectOnLoginSettingDescription)
@@ -42,12 +42,12 @@ extension Preferences {
                     ToggleMenuItem(title: UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
                     TextMenuItemCaption(text: UserText.vpnShowInMenuBarSettingDescription)
 
+                    ToggleMenuItem(title: UserText.vpnExcludeLocalNetworksSettingTitle, isOn: $model.excludeLocalNetworks)
+                    TextMenuItemCaption(text: UserText.vpnExcludeLocalNetworksSettingDescription)
+
                     ToggleMenuItem(title: UserText.vpnAlwaysONSettingTitle, isOn: $model.alwaysON)
                         .disabled(true)
                     TextMenuItemCaption(text: UserText.vpnAlwaysOnSettingDescription)
-
-                    ToggleMenuItem(title: UserText.vpnExcludeLocalNetworksSettingTitle, isOn: $model.excludeLocalNetworks)
-                    TextMenuItemCaption(text: UserText.vpnExcludeLocalNetworksSettingDescription)
 
                     ToggleMenuItem(title: UserText.vpnSecureDNSSettingTitle, isOn: $model.secureDNS)
                         .disabled(true)
