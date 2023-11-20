@@ -128,12 +128,12 @@ extension Pixel {
         case debug(event: Debug, error: Error? = nil)
 
         // Activation Points
-        case newTabInitial
-        case emailEnabledInitial
-        case cookieManagementEnabledInitial
-        case watchInDuckPlayerInitial
-        case setAsDefaultInitial(cohort: String)
-        case importDataInitial
+        case newTabInitial(cohort: String? = nil)
+        case emailEnabledInitial(cohort: String? = nil)
+        case cookieManagementEnabledInitial(cohort: String? = nil)
+        case watchInDuckPlayerInitial(cohort: String? = nil)
+        case setAsDefaultInitial(cohort: String? = nil)
+        case importDataInitial(cohort: String? = nil)
 
         // New Tab section removed
         case favoriteSectionHidden

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1700090866226,
+    "version": 1700485869914,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -2954,6 +2954,15 @@
                         ]
                     },
                     {
+                        "domain": "takealot.com",
+                        "rules": [
+                            {
+                                "selector": "[class*='ad-slot_']",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "target.com",
                         "rules": [
                             {
@@ -3394,7 +3403,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "3662e5f5ca7c7666d53c107085573a01"
+            "hash": "0cd1e0751059ab8c2766b958ee11723c"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3754,6 +3763,9 @@
             "state": "enabled",
             "exceptions": [
                 {
+                    "domain": "abcnews.go.com"
+                },
+                {
                     "domain": "allegiantair.com"
                 },
                 {
@@ -3778,6 +3790,9 @@
                     "domain": "verizon.com"
                 },
                 {
+                    "domain": "chime.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -3799,7 +3814,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "083267b595694bd75cda73218f8811c2"
+            "hash": "010134a983618c70ffdf4862af8d532b"
         },
         "harmfulApis": {
             "settings": {
@@ -4589,16 +4604,6 @@
                                 "rule": "htlb.casalemedia.com/cygnus",
                                 "domains": [
                                     "aternos.org"
-                                ]
-                            }
-                        ]
-                    },
-                    "cdn.trackjs.com": {
-                        "rules": [
-                            {
-                                "rule": "cdn.trackjs.com/agent/v3/latest/t.js",
-                                "domains": [
-                                    "delta.com"
                                 ]
                             }
                         ]
@@ -5932,6 +5937,17 @@
                             }
                         ]
                     },
+                    "live.primis.tech": {
+                        "rules": [
+                            {
+                                "rule": "live.primis.tech/live/liveView.php",
+                                "domains": [
+                                    "belfastlive.co.uk",
+                                    "cornwalllive.com"
+                                ]
+                            }
+                        ]
+                    },
                     "livechatinc.com": {
                         "rules": [
                             {
@@ -6395,6 +6411,16 @@
                             }
                         ]
                     },
+                    "protection-widget.route.com": {
+                        "rules": [
+                            {
+                                "rule": "protection-widget.route.com/protect.core.js",
+                                "domains": [
+                                    "littleunicorn.com"
+                                ]
+                            }
+                        ]
+                    },
                     "pubmatic.com": {
                         "rules": [
                             {
@@ -6649,6 +6675,16 @@
                             }
                         ]
                     },
+                    "taboola.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.taboola.com/libtrc/tipranks-tipranks/loader.js",
+                                "domains": [
+                                    "tipranks.com"
+                                ]
+                            }
+                        ]
+                    },
                     "tealiumiq.com": {
                         "rules": [
                             {
@@ -6711,6 +6747,22 @@
                                 "rule": "tags.tiqcdn.com/utag/.*/utag..*.js",
                                 "domains": [
                                     "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "tags.tiqcdn.com/utag/",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "trackjs.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.trackjs.com/agent/v3/latest/t.js",
+                                "domains": [
+                                    "delta.com"
                                 ]
                             }
                         ]
@@ -7037,7 +7089,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "e618528080749762ad8eb85a989104f5"
+            "hash": "40c0cbd113a9a39e475d6723ddee9be3"
         },
         "trackingCookies1p": {
             "settings": {

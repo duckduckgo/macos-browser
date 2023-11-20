@@ -122,45 +122,63 @@ final class BWCommunicator: BWCommunication {
 
     // MARK: - Receiving Messages
 
+    private let realisticMessageLength = 200000
+    private var accumulatedData = Data()
+    private let dataQueue = DispatchQueue(label: "BWCommunicator.queue")
+
     func receiveData(_ fileHandle: FileHandle) {
+        let newData = fileHandle.availableData
+        dataQueue.async {
+            self.accumulatedData.append(newData)
+            self.processAccumulatedData()
+        }
+    }
 
-        func readMessage(availableData: Data) -> (messageData: Data?, availableData: Data) {
-            guard availableData.count > 0 else { return (nil, availableData: availableData) }
+    private func processAccumulatedData() {
+        dataQueue.async {
+            repeat {
+                let (messageData, remainingData) = self.readMessage(availableData: self.accumulatedData)
+                self.accumulatedData = remainingData
 
-            // First 4 bytes of the message contain the message length
-            let dataPrefix = availableData.prefix(4)
-            guard dataPrefix.count == 4 else {
-                assertionFailure("Wrong format of the message")
-                return (nil, availableData)
-            }
+                guard let messageData = messageData else {
+                    return
+                }
 
-            let dataPrefixArray = [UInt8](dataPrefix)
-            let messageLength = fromByteArray(dataPrefixArray, UInt32.self)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
 
-            let dataPostfix = availableData.dropFirst(4)
-            let messageData = dataPostfix.prefix(Int(messageLength))
-            let availableData = dataPostfix.dropFirst(Int(messageLength))
-            return (messageData: messageData, availableData: availableData)
+                    self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
+                }
+            } while self.accumulatedData.count >= 2 /*EOF*/
+        }
+    }
+
+    func readMessage(availableData: Data) -> (messageData: Data?, availableData: Data) {
+        guard availableData.count > 0 else { return (nil, availableData: availableData) }
+
+        // First 4 bytes of the message contain the message length
+        let dataPrefix = availableData.prefix(4)
+        guard dataPrefix.count == 4 else {
+            assertionFailure("Wrong format of the message")
+            return (nil, availableData)
         }
 
-        var availableData = fileHandle.availableData
-        repeat {
-            let (messageData, nextAvailableData) = readMessage(availableData: availableData)
-            availableData = nextAvailableData
+        let dataPrefixArray = [UInt8](dataPrefix)
+        let messageLength = fromByteArray(dataPrefixArray, UInt32.self)
 
-            guard let messageData = messageData else {
-                if availableData.count >= 2 {
-                    assertionFailure("Wrong format of the message")
-                }
-                return
+        let dataPostfix = availableData.dropFirst(4)
+
+        if messageLength > dataPostfix.count {
+            if messageLength > realisticMessageLength {
+                self.accumulatedData = Data()
+                return (nil, Data())
             }
+            return (nil, availableData)
+        }
 
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-
-                self.delegate?.bitwardenCommunicator(self, didReceiveMessageData: messageData)
-            }
-        } while availableData.count >= 2 /*EOF*/
+        let messageData = dataPostfix.prefix(Int(messageLength))
+        let availableData = dataPostfix.dropFirst(Int(messageLength))
+        return (messageData: messageData, availableData: availableData)
     }
 
     private func fromByteArray<T>(_ value: [UInt8], _: T.Type) -> T {

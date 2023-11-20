@@ -43,6 +43,7 @@ extension HomePage.Models {
 
 #if NETWORK_PROTECTION
         let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
+        let appGroupUserDefaults: UserDefaults
 #endif
 
         var isDay0SurveyEnabled: Bool {
@@ -150,6 +151,7 @@ extension HomePage.Models {
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
+             appGroupUserDefaults: UserDefaults,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
@@ -159,6 +161,7 @@ extension HomePage.Models {
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
+            self.appGroupUserDefaults = appGroupUserDefaults
             self.privacyConfigurationManager = privacyConfigurationManager
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
@@ -268,7 +271,7 @@ extension HomePage.Models {
             // Only show the upgrade card to users who have used the VPN before:
             let activationStore = DefaultWaitlistActivationDateStore()
             if shouldShowNetworkProtectionSystemExtensionUpgradePrompt,
-               UserDefaults.shared.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
+               appGroupUserDefaults.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
                activationStore.daysSinceActivation() != nil {
                 features.append(.networkProtectionSystemExtensionUpgrade)
             }
@@ -349,12 +352,6 @@ extension HomePage.Models {
         }
 
         var firstRunFeatures: [FeatureType] {
-            if PixelExperiment.cohort == .onboardingExperiment1 {
-                var features: [FeatureType] = FeatureType.allCases.filter { $0 != .defaultBrowser && $0 != .importBookmarksAndPasswords }
-                features.insert(.defaultBrowser, at: 0)
-                features.insert(.importBookmarksAndPasswords, at: 1)
-                return features
-            }
             var features: [FeatureType] = FeatureType.allCases.filter { $0 != .duckplayer && $0 != .cookiePopUp }
             features.insert(.duckplayer, at: 0)
             features.insert(.cookiePopUp, at: 1)
@@ -370,34 +367,40 @@ extension HomePage.Models {
         }
 
         private var shouldMakeDefaultCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowMakeDefaultSetting &&
             !defaultBrowserProvider.isDefault
         }
 
         private var shouldImportCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowImportSetting &&
             !dataImportProvider.didImport
         }
 
         private var shouldDuckPlayerCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowDuckPlayerSetting &&
             duckPlayerPreferences.duckPlayerModeBool == nil &&
             !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
         private var shouldEmailProtectionCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowEmailProtectionSetting &&
             !emailManager.isSignedIn
         }
 
         private var shouldCookieCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowCookieSetting &&
             privacyPreferences.autoconsentEnabled != true
         }
 
         private var shouldSurveyDay0BeVisible: Bool {
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
-            return isDay0SurveyEnabled &&
+            return !PixelExperiment.isNoCardsExperimentOn &&
+            isDay0SurveyEnabled &&
             shouldShowSurveyDay0 &&
             !userInteractedWithSurveyDay0 &&
             firstLaunchDate > oneDayAgo
@@ -405,7 +408,8 @@ extension HomePage.Models {
 
         private var shouldSurveyDay7BeVisible: Bool {
             let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
-            return isDay7SurveyEnabled &&
+            return !PixelExperiment.isNoCardsExperimentOn &&
+            isDay7SurveyEnabled &&
             shouldShowSurveyDay0 &&
             shouldShowSurveyDay7 &&
             !userInteractedWithSurveyDay0 &&
