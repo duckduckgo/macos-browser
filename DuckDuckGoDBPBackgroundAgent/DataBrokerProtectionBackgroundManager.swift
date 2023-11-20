@@ -76,7 +76,8 @@ public final class DataBrokerProtectionBackgroundManager {
         // If there's no saved profile we don't need to start the scheduler
         if dataManager.fetchProfile() != nil {
             scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
-                if let error = error {
+                guard error == nil else {
+                    // Ideally we'd fire a pixel here, however at the moment the scheduler never ever returns an error
                     return
                 }
 
