@@ -21,7 +21,7 @@ import Account
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
-    @Published var isSignedIn: Bool = false
+    @Published var isUserAuthenticated: Bool = false
     @Published var hasEntitlements: Bool = false
     var sheetModel: SubscriptionAccessModel
 
@@ -34,22 +34,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.actionHandler = actionHandler
         self.sheetActionHandler = sheetActionHandler
 
-        let isSignedIn = accountManager.isSignedIn
-        self.isSignedIn = isSignedIn
-        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+        let isUserAuthenticated = accountManager.isUserAuthenticated
+        self.isUserAuthenticated = isUserAuthenticated
+        sheetModel = isUserAuthenticated ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
 
         NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
-            self.updateSignInState(true)
+            self.updateUserAuthenticatedState(true)
         }
 
         NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { _ in
-            self.updateSignInState(false)
+            self.updateUserAuthenticatedState(false)
         }
     }
 
-    private func updateSignInState(_ isSignedIn: Bool) {
-        self.isSignedIn = isSignedIn
-        sheetModel = isSignedIn ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+    private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
+        self.isUserAuthenticated = isUserAuthenticated
+        sheetModel = isUserAuthenticated ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
     }
 
     @MainActor

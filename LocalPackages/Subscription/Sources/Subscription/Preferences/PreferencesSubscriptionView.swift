@@ -64,7 +64,7 @@ public struct PreferencesSubscriptionView: View {
                 .frame(height: 20)
 
             VStack {
-                if model.isSignedIn {
+                if model.isUserAuthenticated {
                     UniversalHeaderView {
                         Image("subscription-active-icon", bundle: .module)
                             .padding(4)
@@ -111,7 +111,7 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "vpn-service-icon",
                             title: UserText.vpnServiceTitle,
                             description: UserText.vpnServiceDescription,
-                            buttonName: model.isSignedIn ? "Manage" : nil,
+                            buttonName: model.isUserAuthenticated ? "Manage" : nil,
                             buttonAction: { model.openVPN() },
                             enabled: model.hasEntitlements)
 
@@ -121,7 +121,7 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "pir-service-icon",
                             title: UserText.personalInformationRemovalServiceTitle,
                             description: UserText.personalInformationRemovalServiceDescription,
-                            buttonName: model.isSignedIn ? "View" : nil,
+                            buttonName: model.isUserAuthenticated ? "View" : nil,
                             buttonAction: { model.openPersonalInformationRemoval() },
                             enabled: model.hasEntitlements)
 
@@ -131,7 +131,7 @@ public struct PreferencesSubscriptionView: View {
                 SectionView(iconName: "itr-service-icon",
                             title: UserText.identityTheftRestorationServiceTitle,
                             description: UserText.identityTheftRestorationServiceDescription,
-                            buttonName: model.isSignedIn ? "View" : nil,
+                            buttonName: model.isUserAuthenticated ? "View" : nil,
                             buttonAction: { model.openIdentityTheftRestoration() },
                             enabled: model.hasEntitlements)
             }

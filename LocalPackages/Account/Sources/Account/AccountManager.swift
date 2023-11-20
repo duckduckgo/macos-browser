@@ -33,7 +33,7 @@ public class AccountManager {
     private let storage: AccountStorage
     public weak var delegate: AccountManagerKeychainAccessDelegate?
 
-    public var isSignedIn: Bool {
+    public var isUserAuthenticated: Bool {
         return accessToken != nil
     }
 

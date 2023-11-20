@@ -48,7 +48,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
 #if SUBSCRIPTION
-    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
+    func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
 #endif
 }
 
@@ -232,8 +232,8 @@ final class MoreOptionsMenu: NSMenu {
     }
 
 #if SUBSCRIPTION
-    @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
+    @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
 #endif
 
@@ -295,7 +295,7 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        items.append(contentsOf: AccountManager().isSignedIn ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+        items.append(contentsOf: AccountManager().isUserAuthenticated ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
 #else
         items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
 #endif
@@ -355,7 +355,7 @@ final class MoreOptionsMenu: NSMenu {
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
         let privacyProItem = NSMenuItem(title: "",
-                                        action: #selector(openSubscriptionPreferences(_:)),
+                                        action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "SubscriptionIcon"))
