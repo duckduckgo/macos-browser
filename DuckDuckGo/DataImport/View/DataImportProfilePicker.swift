@@ -62,6 +62,6 @@ struct DataImportProfilePicker: View {
         .init(browser: .chrome,
               profileURL: URL(fileURLWithPath: "/test/Profile 1"))
     } set: {
-        print("seiection:", $0)
+        print("Profile selected:", $0.debugDescription ?? "<nil>")
     })
 }
