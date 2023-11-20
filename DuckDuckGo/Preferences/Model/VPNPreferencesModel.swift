@@ -16,9 +16,11 @@
 //  limitations under the License.
 //
 
+import AppKit
+import Combine
 import Foundation
 import NetworkProtection
-import AppKit
+import NetworkProtectionUI
 
 final class VPNPreferencesModel: ObservableObject {
 
@@ -50,15 +52,35 @@ final class VPNPreferencesModel: ObservableObject {
         }
     }
 
-    private let settings: VPNSettings
+    @Published var showUninstallVPN: Bool
 
-    init(settings: VPNSettings = .init(defaults: .shared)) {
+    private var onboardingStatus: OnboardingStatus {
+        didSet {
+            showUninstallVPN = onboardingStatus != .default
+        }
+    }
+
+    private let settings: VPNSettings
+    private var cancellables = Set<AnyCancellable>()
+
+    init(settings: VPNSettings = .init(defaults: .shared),
+         defaults: UserDefaults = .shared) {
         self.settings = settings
 
         connectOnLogin = settings.connectOnLogin
         excludeLocalNetworks = settings.excludeLocalNetworks
         notifyStatusChanges = settings.notifyStatusChanges
         showInMenuBar = settings.showInMenuBar
+        showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
+        onboardingStatus = defaults.networkProtectionOnboardingStatus
+
+        subscribeToOnboardingStatusChanges(defaults: defaults)
+    }
+
+    func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
+        defaults.networkProtectionOnboardingStatusPublisher
+            .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     func uninstallVPN() {

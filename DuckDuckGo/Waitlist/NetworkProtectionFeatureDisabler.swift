@@ -99,10 +99,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     func removeSystemExtension() async {
         await ipcClient.debugCommand(.removeSystemExtension)
-
-#if NETP_SYSTEM_EXTENSION
-        userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
-#endif
     }
 
     private func unpinNetworkProtection() {
@@ -127,10 +123,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
             }
         }
     }
-
+    
     private func resetUserDefaults() {
         settings.resetToDefaults()
-        userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
     }
 }
 

@@ -64,11 +64,11 @@ extension Preferences {
 
                 // SECTION: Uninstall
 
-                PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.vpnAdvancedSettingsTitle)
-
-                    Button(UserText.uninstallVPNButtonTitle) {
-                        model.uninstallVPN()
+                if model.showUninstallVPN {
+                    PreferencePaneSection {
+                        Button(UserText.uninstallVPNButtonTitle) {
+                            model.uninstallVPN()
+                        }
                     }
                 }
             }

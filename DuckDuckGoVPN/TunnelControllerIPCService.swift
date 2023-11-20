@@ -20,6 +20,7 @@ import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import NetworkProtectionUI
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
 /// changes that need to be relayed back to IPC clients.
@@ -33,15 +34,18 @@ final class TunnelControllerIPCService {
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
+    private let defaults: UserDefaults
 
     init(tunnelController: TunnelController,
          networkExtensionController: NetworkExtensionController,
-         statusReporter: NetworkProtectionStatusReporter) {
+         statusReporter: NetworkProtectionStatusReporter,
+         defaults: UserDefaults = .shared) {
 
         self.tunnelController = tunnelController
         self.networkExtensionController = networkExtensionController
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
+        self.defaults = defaults
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
@@ -118,7 +122,16 @@ extension TunnelControllerIPCService: IPCServerInterface {
         switch command {
         case .removeSystemExtension:
             await VPNConfigurationManager().removeVPNConfiguration()
-            try? await networkExtensionController.deactivateSystemExtension()
+            defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
+
+#if NETP_SYSTEM_EXTENSION
+            do {
+                try await networkExtensionController.deactivateSystemExtension()
+                defaults.networkProtectionOnboardingStatus = .default
+            } catch {
+                // No-op: for now we're not handling this type of error.
+            }
+#endif
         case .expireRegistrationKey:
             // Intentional no-op: handled by the extension
             break
