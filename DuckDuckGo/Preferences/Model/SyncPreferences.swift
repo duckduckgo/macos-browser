@@ -117,7 +117,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         Task { @MainActor in
             do {
                 try await syncService.disconnect()
-                onEndFlow()
+                managementDialogModel.endFlow()
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
@@ -317,7 +317,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func turnOnSync() {
         Task { @MainActor in
-            onEndFlow()
+            managementDialogModel.endFlow()
             isCreatingAccount = true
             defer {
                 isCreatingAccount = false
@@ -402,7 +402,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                             for device in devices where device.name != thisDeviceName {
                                 syncedDevices.append(device)
                             }
-                            presentDialog(for: .nowSyncing(devices: syncedDevices, isSingleDevice: devices.count == 0))
+                            self.presentDialog(for: .nowSyncing(devices: syncedDevices, isSingleDevice: devices.count == 0))
                         }.store(in: &cancellables)
 
                     // The UI will update when the devices list changes.
