@@ -29,9 +29,18 @@ public enum ManagementDialogKind: Equatable {
     case showTextCode(_ code: String)
     case manuallyEnterCode
     case firstDeviceSetup
-    case nowSyncing(_ devices: [SyncDevice], isSingleDevice: Bool)
+
+
+    // new UI
+
+    case syncWithAnotherDevice(code: String)
     case prepareToSync
     case saveRecoveryCode(_ code: String)
+    case nowSyncing(devices: [SyncDevice], isSingleDevice: Bool)
+    case syncWithServer
+    case enterRecoveryCode(code: String)
+    case recoverSyncedData
+    case yourDataIsReturning
 }
 
 public struct ManagementDialog: View {
@@ -66,9 +75,9 @@ public struct ManagementDialog: View {
             case .firstDeviceSetup:
                 EmptyView()
             case .saveRecoveryPDF(let code):
-                EmptyView()
+                SaveRecoveryPDFView(code: code)
             case .turnOffSync:
-                EmptyView()
+                TurnOffSyncView()
             case .deviceDetails(let device):
                 DeviceDetailsView(device: device)
             case .removeDevice(let device):
@@ -77,6 +86,23 @@ public struct ManagementDialog: View {
                 DeleteAccountView(devices: devices)
             case .showTextCode(let code):
                 ShowTextCodeView(code: code)
+
+            case .syncWithAnotherDevice(let code):
+                SyncWithAnotherDeviceView(code: code)
+            case .prepareToSync:
+                PreparingToSyncView()
+            case .saveRecoveryCode(let code):
+                SaveRecoveryPDFView(code: code)
+            case .nowSyncing(devices: let devices, isSingleDevice: let isSingleDevice):
+                DeviceSyncedView(devices: devices, isSingleDevice: isSingleDevice)
+            case .syncWithServer:
+                SyncWithServerView()
+            case .enterRecoveryCode(let code):
+                EnterRecoveryCodeView(code: code)
+            case .recoverSyncedData:
+                RecoverSyncedDataView()
+            case .yourDataIsReturning:
+                YourDataIsReturningView()
 
             default:
                 EmptyView()

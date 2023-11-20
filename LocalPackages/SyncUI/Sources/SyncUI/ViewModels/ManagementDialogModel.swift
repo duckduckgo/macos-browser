@@ -23,13 +23,21 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     var isUnifiedFavoritesEnabled: Bool { get set }
 
     func recoverDevice(recoveryCode: String, fromRecoveryScreen: Bool)
-    func saveRecoveryPDF()
     func turnOffSync()
     func updateDeviceName(_ name: String)
     func removeDevice(_ device: SyncDevice)
     func deleteAccount()
     func presentSaveRecoveryPDF()
-    
+
+    // New UI
+    func copyCodeDesplayed()
+    func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
+    func copyRecoveryCode()
+    func saveRecoveryPDF()
+    func recoveryCodeNextPressed()
+    func turnOnSync()
+    func recoveryCodePasted(_ code: String)
+    func enterRecoveryCodePressed()
 }
 
 public final class ManagementDialogModel: ObservableObject {

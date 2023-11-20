@@ -19,8 +19,8 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public struct EnterRecoveryCodeView<ViewModel>: View where ViewModel: ManagementViewModel {
-    @EnvironmentObject var model: ViewModel
+public struct EnterRecoveryCodeView: View {
+    @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
     let code: String
 
@@ -57,7 +57,7 @@ public struct EnterRecoveryCodeView<ViewModel>: View where ViewModel: Management
                     .frame(width: 290, height: 32)
                     Button {
                         recoveryCodeModel.paste()
-                        model.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: true)
+                        model.delegate?.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: true)
                     } label: {
                         Image("Paste")
                             .frame(width: 32, height: 32)
@@ -80,7 +80,7 @@ public struct EnterRecoveryCodeView<ViewModel>: View where ViewModel: Management
             QRCode(string: code, size: CGSize(width: 192, height: 192))
         } buttons: {
             Button(UserText.cancel) {
-                model.endDialogFlow()
+                model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
         }

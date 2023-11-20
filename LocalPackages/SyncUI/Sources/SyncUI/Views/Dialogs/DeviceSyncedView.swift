@@ -19,18 +19,13 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public struct DeviceSyncedView<ViewModel>: View where ViewModel: ManagementViewModel {
-    @EnvironmentObject var model: ViewModel
+struct DeviceSyncedView: View{
+    @EnvironmentObject var model: ManagementDialogModel
 
     let devices: [SyncDevice]
     let isSingleDevice: Bool
 
-    public init(devices: [SyncDevice], isSingleDevice: Bool) {
-        self.devices = devices
-        self.isSingleDevice = isSingleDevice
-    }
-
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-setup-success")
@@ -47,7 +42,7 @@ public struct DeviceSyncedView<ViewModel>: View where ViewModel: ManagementViewM
             .frame(width: 320)
         } buttons: {
             Button(UserText.done) {
-                model.endDialogFlow()
+                model.endFlow()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

@@ -55,7 +55,6 @@ public protocol ManagementViewModel: ObservableObject {
     func syncWithServerPressed()
     func recoverDataPressed()
     func downloadDDGPressed()
-    func endDialogFlow()
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
     func copyRecoveryCode()
     func recoveryCodeNextPressed()

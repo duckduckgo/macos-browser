@@ -19,15 +19,11 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: ManagementViewModel {
-    @EnvironmentObject var viewModel: ViewModel
+struct SaveRecoveryPDFView: View {
+    @EnvironmentObject var viewModel: ManagementDialogModel
     let code: String
 
-    public init(code: String) {
-        self.code = code
-    }
-
-    public var body: some View {
+    var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRecoveryPDF")
@@ -51,13 +47,13 @@ public struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: ManagementVi
                 .frame(width: 340)
                 HStack {
                     Button {
-                        viewModel.copyRecoveryCode()
+                        viewModel.delegate?.copyRecoveryCode()
                     } label: {
                         Text("Copy Code")
                             .frame(width: 155, height: 28)
                     }
                     Button {
-                        viewModel.saveRecoveryPDF()
+                        viewModel.delegate?.saveRecoveryPDF()
                     } label: {
                         Text("Save PDF")
                             .frame(width: 155, height: 28)
@@ -75,7 +71,7 @@ public struct SaveRecoveryPDFView<ViewModel>: View where ViewModel: ManagementVi
                 .fixedSize(horizontal: false, vertical: true)
         } buttons: {
             Button(UserText.next) {
-                viewModel.recoveryCodeNextPressed()
+                viewModel.delegate?.recoveryCodeNextPressed()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

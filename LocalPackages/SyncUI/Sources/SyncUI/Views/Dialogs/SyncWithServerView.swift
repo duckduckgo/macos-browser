@@ -19,12 +19,10 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public struct SyncWithServerView<ViewModel>: View where ViewModel: ManagementViewModel {
-    @EnvironmentObject var model: ViewModel
+struct SyncWithServerView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
-    public init() {}
-
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Server-96")
             Text("Sync and Back Up This Device")
@@ -41,11 +39,11 @@ public struct SyncWithServerView<ViewModel>: View where ViewModel: ManagementVie
                 .foregroundColor(Color("BlackWhite60"))
         } buttons: {
             Button(UserText.cancel) {
-                model.endDialogFlow()
+                model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
             Button("Turn on Sync") {
-                model.turnOnSync()
+                model.delegate?.turnOnSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

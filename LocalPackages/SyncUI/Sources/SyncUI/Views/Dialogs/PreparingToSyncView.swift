@@ -19,11 +19,9 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public struct PreparingToSyncView: View {
+struct PreparingToSyncView: View {
 
-    public init() {}
-
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0, bottomText: "Connecting…") {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-96")
@@ -41,11 +39,9 @@ public struct PreparingToSyncView: View {
 
 }
 
-public struct YourDataIsReturningView: View {
+struct YourDataIsReturningView: View {
 
-    public init() {}
-
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0, bottomText: "Downloading…") {
             VStack(alignment: .center, spacing: 20) {
                 Image("Lock-Succes-96")
@@ -63,12 +59,10 @@ public struct YourDataIsReturningView: View {
 
 }
 
-public struct RecoverSyncedDataView<ViewModel>: View where ViewModel: ManagementViewModel {
-    @EnvironmentObject var model: ViewModel
+struct RecoverSyncedDataView: View {
+    @EnvironmentObject var model: ManagementDialogModel
 
-    public init() {}
-
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-96")
@@ -82,11 +76,11 @@ public struct RecoverSyncedDataView<ViewModel>: View where ViewModel: Management
             .frame(width: 320)
         } buttons: {
             Button(UserText.cancel) {
-                model.endDialogFlow()
+                model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
             Button("Enter Code") {
-                model.enterRecoveryCodePressed()
+                model.delegate?.enterRecoveryCodePressed()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

@@ -19,13 +19,11 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public struct TurnOffSyncView<ViewModel>: View where ViewModel: ManagementViewModel {
+struct TurnOffSyncView: View {
 
-    @EnvironmentObject var model: ViewModel
+    @EnvironmentObject var model: ManagementDialogModel
 
-    public init() {}
-
-    public var body: some View {
+    var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRemoveDeviceDesktop")
@@ -37,11 +35,11 @@ public struct TurnOffSyncView<ViewModel>: View where ViewModel: ManagementViewMo
             }
         } buttons: {
             Button(UserText.cancel) {
-                model.endDialogFlow()
+                model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
             Button(UserText.turnOff) {
-                model.turnOffSync()
+                model.delegate?.turnOffSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }

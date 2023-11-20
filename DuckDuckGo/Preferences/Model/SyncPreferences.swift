@@ -100,7 +100,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     @MainActor
     func turnOffSyncPressed() {
-        presentDialog(type: .turnOffSync)
+        presentDialog(for: .turnOffSync)
     }
 
     @MainActor
@@ -276,7 +276,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func deleteAccount() {
         Task { @MainActor in
-            managementDialogModel.endFlow()
             do {
                 try await syncService.deleteAccount()
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
@@ -312,8 +311,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         if isRecovery {
             showDevicesSynced()
         } else {
-            onEndFlow()
-            presentDialog(type: .saveRecoveryCode)
+            presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
         }
     }
 
@@ -326,10 +324,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             }
             do {
                 let device = deviceInfo()
-                presentDialog(type: .prepareToSync)
+                presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                onEndFlow()
-                presentDialog(type: .saveRecoveryCode)
+                presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -342,19 +339,19 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 self.connector = try syncService.remoteConnect()
                 self.codeToDisplay = connector?.code
                 if isRecovery {
-                    self.presentDialog(type: .enterRecoveryCode(code: codeToDisplay ?? ""))
+                    self.presentDialog(for: .enterRecoveryCode(code: codeToDisplay ?? ""))
                 } else {
-                    self.presentDialog(type: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
+                    self.presentDialog(for: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
                 }
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    onEndFlow()
                     if isRecovery {
-                        presentDialog(type: .yourDataIsReturning)
+                        presentDialog(for: .yourDataIsReturning)
                     } else {
-                        presentDialog(type: .prepareToSync)
+                        presentDialog(for: .prepareToSync)
                     }
                     self.recoveryKey = recoveryKey
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: isRecovery)
+                    stopPollingForRecoveryKey()
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
@@ -379,11 +376,10 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     managementDialogModel.errorMessage = "Invalid code"
                     return
                 }
-                onEndFlow()
                 if fromRecoveryScreen {
-                    presentDialog(type: .yourDataIsReturning)
+                    presentDialog(for: .yourDataIsReturning)
                 } else {
-                    presentDialog(type: .prepareToSync)
+                    presentDialog(for: .prepareToSync)
                 }
                 if let recoveryKey = syncCode.recovery {
                     // This will error if the account already exists, we don't have good UI for this just now
@@ -406,8 +402,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                             for device in devices where device.name != thisDeviceName {
                                 syncedDevices.append(device)
                             }
-                            self.onEndFlow()
-                            presentDialog(type: .nowSyncingView(devices: syncedDevices, isSingleDevice: devices.count == 0))
+                            presentDialog(for: .nowSyncing(devices: syncedDevices, isSingleDevice: devices.count == 0))
                         }.store(in: &cancellables)
 
                     // The UI will update when the devices list changes.
@@ -475,7 +470,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         Task { @MainActor in
             do {
                 try await syncService.disconnect(deviceId: device.id)
-                managementDialogModel.endFlow()
                 refreshDevices()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
@@ -490,7 +484,6 @@ extension SyncPreferences {
 
     @MainActor
     func enterRecoveryCodePressed() {
-        onEndFlow()
         startPollingForRecoveryKey(isRecovery: true)
     }
 
@@ -501,12 +494,12 @@ extension SyncPreferences {
 
     @MainActor
     func syncWithServerPressed() {
-        presentDialog(type: .syncWithServer)
+        presentDialog(for: .syncWithServer)
     }
 
     @MainActor
     func recoverDataPressed() {
-        presentDialog(type: .recoverSyncedData)
+        presentDialog(for: .recoverSyncedData)
     }
 
     @MainActor
@@ -536,127 +529,12 @@ extension SyncPreferences {
         Task { @MainActor in
             let syncedDevices = self.devices.filter { !$0.isCurrent }
             let isSingleDevice = syncedDevices.count == 0
-            onEndFlow()
-            presentDialog(type: .nowSyncingView(devices: syncedDevices, isSingleDevice: isSingleDevice))
+            presentDialog(for: .nowSyncing(devices: syncedDevices, isSingleDevice: isSingleDevice))
         }
     }
 
     func recoveryCodePasted(_ code: String) {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: true)
-    }
-
-    @MainActor
-    private func presentDialog(type: DialogType) {
-        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
-            assertionFailure("Sync: Failed to present SyncManagementDialogViewController")
-            return
-        }
-        var viewController: NSViewController
-
-        switch type {
-        case .syncWithAnotherDevice(let code):
-            viewController = SyncDialogViewController(
-                view: SyncWithAnotherDeviceView<SyncPreferences>(code: code)
-                    .environmentObject(self)
-                    .environmentObject(RecoveryCodeViewModel()))
-        case .prepareToSync:
-            viewController = SyncDialogViewController(
-                view: PreparingToSyncView()
-            )
-
-        case .saveRecoveryCode:
-            viewController = SyncDialogViewController(
-                view: SaveRecoveryPDFView<SyncPreferences>(code: recoveryCode ?? "")
-                    .environmentObject(self)
-            )
-
-        case .nowSyncingView(let devices, let isSingleDevice):
-            viewController = SyncDialogViewController(
-                view: DeviceSyncedView<SyncPreferences>(devices: devices, isSingleDevice: isSingleDevice)
-                    .environmentObject(self)
-            )
-        case .syncWithServer:
-            viewController = SyncDialogViewController(
-                view: SyncWithServerView<SyncPreferences>()
-                    .environmentObject(self)
-            )
-        case .enterRecoveryCode(let code):
-            viewController = SyncDialogViewController(
-                view: EnterRecoveryCodeView<SyncPreferences>(code: code)
-                    .environmentObject(self)
-                    .environmentObject(RecoveryCodeViewModel()))
-        case .recoverSyncedData:
-            viewController = SyncDialogViewController(
-                view: RecoverSyncedDataView<SyncPreferences>()
-                    .environmentObject(self)
-            )
-        case .yourDataIsReturning:
-            viewController = SyncDialogViewController(
-                view: YourDataIsReturningView()
-            )
-        case .turnOffSync:
-            viewController = SyncDialogViewController(
-                view: TurnOffSyncView<SyncPreferences>()
-                    .environmentObject(self)
-            )
-        }
-
-        guard let dialogWindow = viewController.wrappedInWindowController().window else { return }
-        parentWindowController.window?.beginSheet(dialogWindow)
-
-        onEndFlow = {
-            guard let sheetParent = dialogWindow.sheetParent else {
-                assertionFailure("window or sheet parent not present")
-                return
-            }
-            sheetParent.endSheet(dialogWindow)
-            self.stopPollingForRecoveryKey()
-        }
-    }
-
-    enum DialogType {
-        case syncWithAnotherDevice(code: String)
-        case prepareToSync
-        case saveRecoveryCode
-        case nowSyncingView(devices: [SyncDevice], isSingleDevice: Bool)
-        case syncWithServer
-        case enterRecoveryCode(code: String)
-        case recoverSyncedData
-        case yourDataIsReturning
-        case turnOffSync
-    }
-
-    func endDialogFlow() {
-        onEndFlow()
-    }
-
-}
-
-final class SyncDialogViewController<ConcreteView: View>: NSViewController {
-
-    init(view: ConcreteView) {
-        self.dialogView = view
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    let dialogView: ConcreteView
-
-    override func loadView() {
-        view = NSHostingView(rootView: dialogView)
-    }
-
-}
-
-
-
-extension SyncPreferences {
-    func cancelPressed() {
-        onEndFlow()
     }
 
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {

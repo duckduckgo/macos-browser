@@ -19,20 +19,16 @@
 import SwiftUI
 import SwiftUIExtensions
 
-public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: ManagementViewModel {
+struct SyncWithAnotherDeviceView: View {
 
-    @EnvironmentObject var model: ViewModel
+    @EnvironmentObject var model: ManagementDialogModel
     @EnvironmentObject var recoveryCodeModel: RecoveryCodeViewModel
     let code: String
 
     @State private var selectedSegment = 0
     @State private var showQRCode = true
 
-    public init(code: String) {
-        self.code = code
-    }
-
-    public var body: some View {
+    var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Pair-96")
             Text("Sync With Another Device").bold()
@@ -60,7 +56,7 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
         }
     buttons: {
         Button(UserText.cancel) {
-            model.endDialogFlow()
+            model.endFlow()
         }
     }
     .frame(width: 420)
@@ -149,7 +145,7 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
                 )
             Button {
                 recoveryCodeModel.paste()
-                model.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: false)
+                model.delegate?.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: false)
             } label: {
                 HStack {
                     Image("Paste")
@@ -183,7 +179,7 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
                         .frame(width: 153, height: 28)
                     }
                     Button {
-                        model.copyCodeDesplayed()
+                        model.delegate?.copyCodeDesplayed()
                     } label: {
                         HStack {
                             Image("Copy")
@@ -219,11 +215,4 @@ public struct SyncWithAnotherDeviceView<ViewModel>: View where ViewModel: Manage
 
         sharingPicker.show(relativeTo: contentView.frame, of: contentView, preferredEdge: .maxY)
     }
-}
-
-
-public protocol SyncWithAnotherDeviceManaging: ObservableObject {
-    func cancelPressed()
-    func copyCodeDesplayed()
-    func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
 }
