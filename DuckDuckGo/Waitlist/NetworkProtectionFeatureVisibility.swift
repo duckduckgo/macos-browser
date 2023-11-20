@@ -34,6 +34,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
+    private let networkProtectionWaitlist = NetworkProtectionWaitlist()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
 
     var waitlistIsOngoing: Bool {
@@ -63,6 +64,10 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         isEasterEggUser || waitlistIsOngoing
     }
 
+    var isEnabled: Bool {
+        isEasterEggUser || (waitlistIsOngoing && isInvitedWaitlistUser)
+    }
+
     /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
     ///
     private var isEasterEggUser: Bool {
@@ -77,7 +82,13 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Waitlist users are users that have the waitlist enabled and active
     ///
     private var isWaitlistUser: Bool {
-        NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+        networkProtectionWaitlist.waitlistStorage.isWaitlistUser
+    }
+
+    /// Waitlist users are users that have the waitlist enabled and active and are invited
+    ///
+    private var isInvitedWaitlistUser: Bool {
+        networkProtectionWaitlist.waitlistStorage.isWaitlistUser && networkProtectionWaitlist.waitlistStorage.isInvited
     }
 
     private var isWaitlistBetaActive: Bool {

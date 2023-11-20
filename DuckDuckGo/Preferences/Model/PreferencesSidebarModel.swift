@@ -56,7 +56,13 @@ final class PreferencesSidebarModel: ObservableObject {
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
         includeDuckPlayer: Bool
     ) {
-        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer) },
+        let loadSections = {
+            let includingVPN = DefaultNetworkProtectionVisibility().isEnabled
+
+            return PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPN: includingVPN)
+        }
+
+        self.init(loadSections: loadSections,
                   tabSwitcherTabs: tabSwitcherTabs,
                   privacyConfigurationManager: privacyConfigurationManager)
     }
