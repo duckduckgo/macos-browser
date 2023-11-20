@@ -48,6 +48,20 @@ final class FeedbackSender {
         }
     }
 
+    func sendDataImportReport(_ report: DataImportReportModel) {
+        sendFeedback(Feedback(category: .dataImport,
+                              comment: """
+                              \(report.text.trimmingWhitespace())
+
+                              ---
+
+                              Import source: \(report.importSourceDescription)
+                              Error: \(report.error.localizedDescription)
+                              """,
+                              appVersion: "\(AppVersion.shared.versionNumber)",
+                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)"))
+    }
+
 }
 
 fileprivate extension Feedback.Category {

@@ -48,9 +48,9 @@ struct DataImportViewModel {
     /// Show Open Panel to choose CSV/HTML file
     private let openPanelCallback: @MainActor (DataType) -> URL?
 
-    typealias FeedbackSenderFactory = () -> (Feedback) -> Void
+    typealias ReportSenderFactory = () -> (DataImportReportModel) -> Void
     /// Factory for a DataImporter for importSource
-    private let feedbackSenderFactory: FeedbackSenderFactory
+    private let reportSenderFactory: ReportSenderFactory
 
     enum Screen: Hashable {
         case profileAndDataTypesPicker
@@ -59,7 +59,7 @@ struct DataImportViewModel {
         case fileImport(DataType)
         case fileImportSummary(DataType)
         case summary
-        case feedback(String = "")
+        case feedback
 
         var fileImportDataType: DataType? {
             if case .fileImport(let dataType) = self { return dataType }
@@ -82,12 +82,14 @@ struct DataImportViewModel {
     /// collected import summary for current import operation per selected import source
     private(set) var summary = DataImportViewSummary()
 
+    private var userReportText: String = ""
+
     init(importSource: Source? = nil,
          loadProfiles: @escaping (ThirdPartyBrowser) -> BrowserProfileList = { $0.browserProfiles() },
          dataImporterFactory: @escaping DataImporterFactory = dataImporter,
          requestPrimaryPasswordCallback: @escaping @MainActor (Source) -> String? = Self.requestPrimaryPasswordCallback,
          openPanelCallback: @escaping @MainActor (DataType) -> URL? = Self.openPanelCallback,
-         feedbackSenderFactory: @escaping FeedbackSenderFactory = { FeedbackSender().sendFeedback }) {
+         reportSenderFactory: @escaping ReportSenderFactory = { FeedbackSender().sendDataImportReport }) {
 
         let importSource = importSource ?? ThirdPartyBrowser.installedBrowsers.first?.importSource ?? .csv
 
@@ -104,7 +106,7 @@ struct DataImportViewModel {
         self.requestPrimaryPasswordCallback = requestPrimaryPasswordCallback
 
         self.openPanelCallback = openPanelCallback
-        self.feedbackSenderFactory = feedbackSenderFactory
+        self.reportSenderFactory = reportSenderFactory
     }
 
     /// Import button press (starts browser data import)
@@ -163,6 +165,7 @@ struct DataImportViewModel {
     private mutating func handleErrors(_ summary: [DataType: any DataImportError]) -> Bool {
         for error in summary.values {
             switch error {
+            // TODO: Chrome user denied keychain prompt error
             // firefox passwords db is master-password protected: request password
             case let error as FirefoxLoginReader.ImportError where error.type == .requiresPrimaryPassword:
 
@@ -218,7 +221,7 @@ struct DataImportViewModel {
             break
         }
         // all done
-        return areAllSelectedDataTypesSuccessfullyImported ? .summary : .feedback()
+        return areAllSelectedDataTypesSuccessfullyImported ? .summary : .feedback
     }
 
     /// Skip button press
@@ -238,16 +241,8 @@ struct DataImportViewModel {
     }
 
     func submitReport() {
-        guard case .feedback(let comment) = screen else {
-            assertionFailure("wrong screen \(screen)")
-            return
-        }
-        let sendFeedback = feedbackSenderFactory()
-        sendFeedback(Feedback(category: .dataImport,
-                              // TODO: import source version
-                              comment: comment.trimmingWhitespace() + "\n\n---\n\n" + summarizedError.localizedDescription,
-                              appVersion: "\(AppVersion.shared.versionNumber)",
-                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)"))
+        let sendReport = reportSenderFactory()
+        sendReport(reportModel)
     }
 
 }
@@ -433,9 +428,9 @@ extension DataImportViewModel {
         case .profileAndDataTypesPicker:
             guard let importer = selectedProfile.map({
                 dataImporterFactory(/* importSource: */ importSource,
-                                                        /* dataType: */ nil,
-                                                        /* profileURL: */ $0.profileURL,
-                                                        /* primaryPassword: */ nil)
+                                    /* dataType: */ nil,
+                                    /* profileURL: */ $0.profileURL,
+                                    /* primaryPassword: */ nil)
             }),
                   selectedDataTypes.intersects(importer.importableTypes) else {
                 // no profiles found
@@ -524,7 +519,7 @@ extension DataImportViewModel {
     }
 
     mutating func update(with importSource: Source) {
-        self = .init(importSource: importSource, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, feedbackSenderFactory: feedbackSenderFactory)
+        self = .init(importSource: importSource, loadProfiles: loadProfiles, dataImporterFactory: dataImporterFactory, requestPrimaryPasswordCallback: requestPrimaryPasswordCallback, reportSenderFactory: reportSenderFactory)
     }
 
     @MainActor
@@ -573,8 +568,19 @@ extension DataImportViewModel {
         return newState
     }
 
-    mutating func updateFeedbackComment(_ comment: String) {
-        self.screen = .feedback(comment)
+    private var retryNumber: Int {
+        summary.reduce(into: [:]) {
+            // get maximum number of failures per data type
+            $0[$1.dataType, default: 0] += $1.result.isSuccess ? 0 : 1
+        }.values.max() ?? 0
+    }
+
+    var reportModel: DataImportReportModel {
+        get {
+            DataImportReportModel(importSource: importSource, error: summarizedError, text: userReportText, retryNumber: retryNumber)
+        } set {
+            userReportText = newValue.text
+        }
     }
 
 }

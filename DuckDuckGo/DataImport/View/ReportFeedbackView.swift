@@ -16,29 +16,19 @@
 //  limitations under the License.
 //
 
-import Common
 import SwiftUI
 
 struct ReportFeedbackView: View {
 
-    @Binding var text: String
+    @Binding var model: DataImportReportModel
 
-    let retryNumber: Int
-    var title: LocalizedStringKey {
-        if retryNumber <= 1 {
+    private var title: LocalizedStringKey {
+        if model.retryNumber <= 1 {
             "Please submit a report to help us fix the issue."
         } else {
             "That didn’t work either. Please submit a report to help us fix the issue."
         }
     }
-
-    // TODO: pass these from main view
-    var osVersion: String = "\(ProcessInfo.processInfo.operatingSystemVersion)"
-    var appVersion: String = "\(AppVersion.shared.versionNumber)"
-    var importSource: DataImport.Source
-
-    var importSourceVersion: String?
-    var error: LocalizedError
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -52,23 +42,22 @@ struct ReportFeedbackView: View {
                 The following information will be sent to DuckDuckGo. No personally identifiable information will be sent.
                 """)
 
-                InfoItemView("macOS version", osVersion)
-                InfoItemView("DuckDuckGo browser version", appVersion)
-                InfoItemView("The version of the browser you are trying to import from",
-                             importSource.importSourceName + (importSourceVersion.map { " \($0)" } ?? ""))
-                InfoItemView("Error message & code", error.localizedDescription)
+                InfoItemView("macOS version", model.osVersion)
+                InfoItemView("DuckDuckGo browser version", model.appVersion)
+                InfoItemView("The version of the browser you are trying to import from", model.importSourceDescription)
+                InfoItemView("Error message & code", model.error.localizedDescription)
             }
             Spacer().frame(height: 24)
 
             ZStack(alignment: .top) {
-                EditableTextView(text: $text,
+                EditableTextView(text: $model.text,
                                  font: NSFont(name: "SF Pro Text", size: 13),
                                  insets: NSSize(width: 11, height: 11))
                 .cornerRadius(6)
                 .frame(height: 114)
                 .shadow(radius: 1, x: 0, y: 1)
 
-                if text.isEmpty {
+                if model.text.isEmpty {
                     HStack {
                         Text("Add any details that you think may help us fix the problem")
                             .font(.custom("SF Pro Text", size: 13))
@@ -113,11 +102,7 @@ private struct InfoItemView: View {
 
 #Preview {
 
-    ReportFeedbackView(text: .constant(""), 
-                       retryNumber: 2,
-                       importSource: .safari,
-                       importSourceVersion: UserAgent.safariVersion,
-                       error: {
+    ReportFeedbackView(model: .constant(.init(importSource: .safari, importSourceVersion: UserAgent.safariVersion, error: {
         enum ImportError: DataImportError {
             enum OperationType: Int {
                 case imp
@@ -138,7 +123,7 @@ private struct InfoItemView: View {
             case err(Error)
         }
         return ImportError.err(CocoaError(.fileReadUnknown))
-    }())
+    }(), retryNumber: 1)))
         .frame(width: 512 - 20)
         .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
 

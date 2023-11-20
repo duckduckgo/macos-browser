@@ -49,18 +49,6 @@ struct DataImportView: View {
     @State private var progressText: String?
     @State private var progressFraction: Double?
 
-    private func feedbackComment() -> Binding<String> {
-        Binding {
-            guard case .feedback(let comment) = viewModel.screen else {
-                assertionFailure("wrong screen")
-                return ""
-            }
-            return comment
-        } set: {
-            viewModel.updateFeedbackComment($0)
-        }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("Import Browser Data")
@@ -140,13 +128,7 @@ struct DataImportView: View {
                 })
 
             case .feedback:
-                ReportFeedbackView(text: feedbackComment(), 
-                                   retryNumber: viewModel.summary.reduce(into: [:]) {
-                                       // get maximum number of failures per data type
-                                       $0[$1.dataType, default: 0] += $1.result.isSuccess ? 0 : 1
-                                   }.values.max() ?? 0,
-                                   importSource: viewModel.importSource,
-                                   error: viewModel.summarizedError)
+                ReportFeedbackView(model: $viewModel.reportModel)
             }
 
             // Import in progress…
@@ -401,7 +383,7 @@ extension DataImportViewModel.ButtonType {
         return "password"
     } openPanelCallback: { _ in
         URL(fileURLWithPath: "/test/path")
-    } feedbackSenderFactory: { 
+    } reportSenderFactory: { 
         { feedback in
             print("send feedback:", feedback)
         }
