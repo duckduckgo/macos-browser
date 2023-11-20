@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1699902134160,
+    "version": 1700090866226,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -243,6 +243,9 @@
                     "domain": "capital.fr"
                 },
                 {
+                    "domain": "metro.co.uk"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -261,19 +264,16 @@
                 ]
             },
             "state": "enabled",
-            "hash": "4719cb6c793d13a9ac81c329f4d206c8"
+            "hash": "9ab9e1acdb6a8617c77109acc1e3943c"
         },
         "autofill": {
             "exceptions": [
-                {
-                    "domain": "containerstore.com"
-                },
                 {
                     "domain": "roll20.net"
                 }
             ],
             "state": "enabled",
-            "hash": "ed7ec0e087870eaeec3c5e14b64bcced"
+            "hash": "b1ae580a636957bcbe90d16aa92c40bd"
         },
         "clickToLoad": {
             "exceptions": [
@@ -1388,6 +1388,14 @@
                         "type": "closest-empty"
                     },
                     {
+                        "selector": "#ad-top",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#ad-wrap",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".ad-wrap",
                         "type": "closest-empty"
                     },
@@ -1477,6 +1485,10 @@
                     },
                     {
                         "selector": "[data-ad]",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": ".instream_ad",
                         "type": "hide-empty"
                     },
                     {
@@ -2648,6 +2660,19 @@
                         ]
                     },
                     {
+                        "domain": "petapixel.com",
+                        "rules": [
+                            {
+                                "selector": ".banners",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#ppvideoadvertisement",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "peterboroughtoday.co.uk",
                         "rules": [
                             {
@@ -2991,10 +3016,28 @@
                         ]
                     },
                     {
+                        "domain": "thewordfinder.com",
+                        "rules": [
+                            {
+                                "selector": "[id*='adngin']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "thingiverse.com",
                         "rules": [
                             {
                                 "selector": "[class*='AdCard__leaderboard']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "tinybeans.com",
+                        "rules": [
+                            {
+                                "selector": ".tb-ad",
                                 "type": "hide-empty"
                             }
                         ]
@@ -3234,10 +3277,6 @@
                             {
                                 "selector": "[data-content='Advertisement']",
                                 "type": "hide-empty"
-                            },
-                            {
-                                "selector": "[id*='default']",
-                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -3355,7 +3394,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "6662ab083eddd997154b5e11cb73cef5"
+            "hash": "3662e5f5ca7c7666d53c107085573a01"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4353,12 +4392,37 @@
                             {
                                 "rule": "c.amazon-adsystem.com/aax2/apstag.js",
                                 "domains": [
+                                    "4029tv.com",
                                     "cnn.com",
                                     "corriere.it",
                                     "eurogamer.net",
+                                    "kcci.com",
+                                    "kcra.com",
+                                    "ketv.com",
+                                    "kmbc.com",
+                                    "koat.com",
+                                    "koco.com",
+                                    "ksbw.com",
+                                    "mynbc5.com",
                                     "seattletimes.com",
+                                    "thesurfersview.com",
+                                    "wapt.com",
+                                    "wbaltv.com",
                                     "wcvb.com",
-                                    "wildrivers.lostcoastoutpost.com"
+                                    "wdsu.com",
+                                    "wesh.com",
+                                    "wgal.com",
+                                    "wildrivers.lostcoastoutpost.com",
+                                    "wisn.com",
+                                    "wlky.com",
+                                    "wlwt.com",
+                                    "wmtw.com",
+                                    "wmur.com",
+                                    "wpbf.com",
+                                    "wtae.com",
+                                    "wvtm13.com",
+                                    "wxii12.com",
+                                    "wyff4.com"
                                 ]
                             }
                         ]
@@ -4642,6 +4706,12 @@
                                 "rule": "d2s6j0ghajv79z.cloudfront.net",
                                 "domains": [
                                     "sigalert.com"
+                                ]
+                            },
+                            {
+                                "rule": "dbukjj6eu5tsf.cloudfront.net/assets.sidearmsports.com/common/js/20170825/video.js",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5347,7 +5417,11 @@
                             {
                                 "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
                                 "domains": [
+                                    "bloomberg.com",
+                                    "games.washingtonpost.com",
+                                    "metro.co.uk",
                                     "nfl.com",
+                                    "paper-io.com",
                                     "rawstory.com",
                                     "usatoday.com"
                                 ]
@@ -5369,6 +5443,7 @@
                             {
                                 "rule": "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
                                 "domains": [
+                                    "drakescans.com",
                                     "duden.de",
                                     "magicgameworld.com",
                                     "rocketnews24.com",
@@ -6010,6 +6085,16 @@
                                 "rule": "connect.nosto.com/script/shopify/nosto.js",
                                 "domains": [
                                     "oneill.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "npttech.com": {
+                        "rules": [
+                            {
+                                "rule": "npttech.com/advertising.js",
+                                "domains": [
+                                    "blick.ch"
                                 ]
                             }
                         ]
@@ -6952,7 +7037,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "e6610ec6627faa2b0166eabafdd6759f"
+            "hash": "e618528080749762ad8eb85a989104f5"
         },
         "trackingCookies1p": {
             "settings": {
@@ -7355,6 +7440,24 @@
             "exceptions": [],
             "state": "disabled",
             "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
+        "windowsStartupBoost": {
+            "exceptions": [
+                {
+                    "domain": "earth.google.com"
+                },
+                {
+                    "domain": "iscorp.com"
+                },
+                {
+                    "domain": "marvel.com"
+                },
+                {
+                    "domain": "sundancecatalog.com"
+                }
+            ],
+            "state": "disabled",
+            "hash": "5e792dd491428702bc0104240fbce0ce"
         },
         "windowsWaitlist": {
             "exceptions": [],
