@@ -57,7 +57,7 @@ public final class AppStorePurchaseFlow {
             switch await AuthService.createAccount() {
             case .success(let response):
                 externalID = response.externalID
-                await AccountManager().exchangeTokensAndRefreshEntitlements(with: response.authToken)
+                await AccountManager().exchangeAndStoreTokens(with: response.authToken)
             case .failure:
                 return .failure(.accountCreationFailed)
             }

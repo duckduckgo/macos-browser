@@ -168,11 +168,11 @@ public class AccountManager {
 
         storeAuthToken(token: authToken)
 
-        return await exchangeTokensAndRefreshEntitlements(with: authToken)
+        return await exchangeAndStoreTokens(with: authToken)
     }
 
     @discardableResult
-    public func exchangeTokensAndRefreshEntitlements(with authToken: String) async -> Result<String, Error> {
+    public func exchangeAndStoreTokens(with authToken: String) async -> Result<String, Error> {
         // Exchange short-lived auth token to a long-lived access token
         let accessToken: String
         switch await AuthService.getAccessToken(token: authToken) {
