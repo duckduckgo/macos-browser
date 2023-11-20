@@ -63,7 +63,7 @@ struct MapperToUI {
 
     private func mapMatchesToUI(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
         let matches = brokerProfileQueryData.compactMap {
-            for extractedProfile in $0.extractedProfiles {
+            for extractedProfile in $0.extractedProfiles where !$0.profileQuery.deprecated {
                 var profiles = [mapToUI($0.dataBroker, extractedProfile: extractedProfile)]
                 if !$0.dataBroker.mirrorSites.isEmpty {
                     let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
@@ -207,11 +207,15 @@ extension String {
 fileprivate extension BrokerProfileQueryData {
 
     var totalScans: Int {
-        return 1 + dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        if profileQuery.deprecated {
+            return 0
+        } else {
+            return 1 + dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        }
     }
 
     var currentScans: Int {
-        if scanOperationData.lastRunDate != nil {
+        if scanOperationData.lastRunDate != nil && !profileQuery.deprecated {
             return 1 + dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
         } else {
             return 0
