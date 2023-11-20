@@ -275,8 +275,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 restorePurchases: {
                     if #available(macOS 12.0, *) {
                         Task {
-                            guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
-                            switch await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation) {
+                            switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
                             case .success:
                                 message.webView?.reload()
                             case .failure:

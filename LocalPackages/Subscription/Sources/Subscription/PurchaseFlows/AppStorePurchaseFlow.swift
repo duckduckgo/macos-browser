@@ -44,22 +44,22 @@ public final class AppStorePurchaseFlow {
         let externalID: String
 
         // Check for past transactions most recent
-        if let jwsRepresentation = await PurchaseManager.mostRecentTransaction() {
-            // Attempt sign in using purchase history
-            switch await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation) {
-            case .success(let existingExternalID):
-                externalID = existingExternalID
-            case .failure:
+        switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+        case .success(let existingExternalID):
+            externalID = existingExternalID
+        case .failure(let error):
+            switch error {
+            case .missingAccountOrTransactions:
+                // No history, create new account
+                switch await AuthService.createAccount() {
+                case .success(let response):
+                    externalID = response.externalID
+                    await AccountManager().exchangeAndStoreTokens(with: response.authToken)
+                case .failure:
+                    return .failure(.accountCreationFailed)
+                }
+            default:
                 return .failure(.authenticatingWithTransactionFailed)
-            }
-        } else {
-            // No history, create new account
-            switch await AuthService.createAccount() {
-            case .success(let response):
-                externalID = response.externalID
-                await AccountManager().exchangeAndStoreTokens(with: response.authToken)
-            case .failure:
-                return .failure(.accountCreationFailed)
             }
         }
 

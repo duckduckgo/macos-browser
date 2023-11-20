@@ -107,8 +107,7 @@ extension Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
-                        guard let jwsRepresentation = await PurchaseManager.mostRecentTransaction() else { return }
-                        await AccountManager().signInByRestoringPastPurchases(from: jwsRepresentation)
+                        await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
                     }
                 }
             }, openURLHandler: { url in

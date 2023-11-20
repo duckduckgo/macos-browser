@@ -155,21 +155,6 @@ public class AccountManager {
     }
 
     @discardableResult
-    public func signInByRestoringPastPurchases(from lastTransactionJWSRepresentation: String) async -> Result<String, Error> {
-        // Do the store login to get short-lived token
-        let authToken: String
-        switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
-        case .success(let response):
-            authToken = response.authToken
-        case .failure(let error):
-            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
-            return .failure(error)
-        }
-
-        return await exchangeAndStoreTokens(with: authToken)
-    }
-
-    @discardableResult
     public func exchangeAndStoreTokens(with authToken: String) async -> Result<String, Error> {
         // Exchange short-lived auth token to a long-lived access token
         let accessToken: String

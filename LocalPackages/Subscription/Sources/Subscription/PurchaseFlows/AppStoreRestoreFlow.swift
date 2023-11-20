@@ -24,20 +24,31 @@ import Account
 @available(macOS 12.0, *)
 public final class AppStoreRestoreFlow {
 
-    public enum Success {
-        case ok
-    }
-
     public enum Error: Swift.Error {
         case missingAccountOrTransactions
-        case userCancelled
+        case pastTransactionAuthenticationFailure
+        case accessTokenObtainingError
         case somethingWentWrong
     }
 
-    public static func restoreAccountFromAppleID() async -> Result<AppStoreRestoreFlow.Success, AppStoreRestoreFlow.Error> {
+    public static func restoreAccountFromPastPurchase() async -> Result<String, AppStoreRestoreFlow.Error> {
+        guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return .failure(.missingAccountOrTransactions) }
 
+        // Do the store login to get short-lived token
+        let authToken: String
 
+        switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+        case .success(let response):
+            authToken = response.authToken
+        case .failure:
+            return .failure(.pastTransactionAuthenticationFailure)
+        }
 
-        return .success(.ok)
+        switch await AccountManager().exchangeAndStoreTokens(with: authToken) {
+        case .success(let externalID):
+            return .success(externalID)
+        case .failure:
+            return .failure(.accessTokenObtainingError)
+        }
     }
 }
