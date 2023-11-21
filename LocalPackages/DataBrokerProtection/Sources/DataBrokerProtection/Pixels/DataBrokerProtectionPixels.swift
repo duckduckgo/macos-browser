@@ -226,10 +226,10 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .ipcServerRunQueuedOperationsCompletion: return "dbp_macos_ipc-server_run-queued-operations_completion"
         case .ipcServerRunAllOperations: return "dbp_macos_ipc-server_run-all-operations"
 
-        case .enableLoginItem: return "dbp_macos_enable-login-item"
-        case .restartLoginItem: return "dbp_macos_restart-login-item"
-        case .disableLoginItem: return "dbp_macos_disable-login-item"
-        case .resetLoginItem: return "dbp_macos_reset-login-item"
+        case .enableLoginItem: return "dbp_macos_login-item_enable"
+        case .restartLoginItem: return "dbp_macos_login-item_restart"
+        case .disableLoginItem: return "dbp_macos_login-item_disable"
+        case .resetLoginItem: return "dbp_macos_login-item_reset"
         }
     }
 
