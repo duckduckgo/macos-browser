@@ -30,6 +30,7 @@ public extension PixelKit {
         public static let errorDesc = "d"
         public static let errorCount = "c"
         public static let errorSource = "error_source"
+        public static let sourceBrowserVersion = "source_browser_version"
         public static let underlyingErrorCode = "ue"
         public static let underlyingErrorDesc = "ud"
         public static let underlyingErrorSQLiteCode = "sqlrc"

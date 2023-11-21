@@ -147,7 +147,7 @@ struct DataImportViewModel {
             self.summary.append( (dataType, result) )
 
             if case .failure(let error) = result {
-                Pixel.fire(.dataImportFailed(source: importSource, error: error))
+                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
             }
         }
 
@@ -581,8 +581,13 @@ extension DataImportViewModel {
 
     var reportModel: DataImportReportModel {
         get {
-            DataImportReportModel(importSource: importSource, error: summarizedError, text: userReportText, retryNumber: retryNumber)
-        } set {
+            DataImportReportModel(importSource: importSource,
+                                  importSourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile),
+                                  error: summarizedError,
+                                  text: userReportText,
+                                  retryNumber: retryNumber)
+        }
+        set {
             userReportText = newValue.text
         }
     }

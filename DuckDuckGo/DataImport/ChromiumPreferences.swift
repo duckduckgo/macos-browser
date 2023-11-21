@@ -28,15 +28,31 @@ struct ChromiumPreferences: Decodable {
         let name: String?
         let createdByVersion: String?
     }
+    struct Extensions: Decodable {
+        let lastChromeVersion: String?
+    }
+
+    enum Constants {
+        static let chromiumPreferencesFileName = "Preferences"
+    }
 
     let accountInfo: [AccountInfo]?
     let profile: Profile
+
+    let extensions: Extensions?
 
     init(from data: Data) throws {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         self = try decoder.decode(Self.self, from: data)
+    }
+
+    init(profileURL: URL, fileStore: FileStore = FileManager.default) throws {
+        guard let preferencesData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)) else {
+            throw CocoaError(.fileReadUnknown)
+        }
+        try self.init(from: preferencesData)
     }
 
     var profileName: String? {
@@ -52,6 +68,10 @@ struct ChromiumPreferences: Decodable {
             }
         }
         return profile.name
+    }
+
+    var appVersion: String? {
+        profile.createdByVersion ?? extensions?.lastChromeVersion
     }
 
 }

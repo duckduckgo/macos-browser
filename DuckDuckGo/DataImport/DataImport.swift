@@ -129,6 +129,23 @@ enum DataImport {
             }
         }
 
+        func installedAppsMajorVersionDescription(selectedProfile: BrowserProfile?) -> String? {
+            let installedVersions: Set<String>
+            if let appVersion = selectedProfile?.appVersion, !appVersion.isEmpty {
+                installedVersions = [appVersion]
+            } else if let versions = ThirdPartyBrowser.browser(for: self)?.installedAppsVersions {
+                installedVersions = versions
+            } else {
+                return nil
+            }
+            return Set(installedVersions.map {
+                // get major version
+                $0.components(separatedBy: ".")[0]
+            }.sorted())
+            // list installed browsers major versions separated
+            .joined(separator: "; ")
+        }
+
     }
 
     enum DataType: String, Hashable, CaseIterable {
@@ -197,19 +214,49 @@ enum DataImport {
     struct BrowserProfile: Comparable {
 
         enum Constants {
-            static let chromiumPreferencesFileName = "Preferences"
             static let chromiumSystemProfileName = "System Profile"
         }
 
         let profileURL: URL
         var profileName: String {
-            return chromiumPreferences?.profileName ?? fallbackProfileName
+            if profileURL.lastPathComponent == Constants.chromiumSystemProfileName {
+                return Constants.chromiumSystemProfileName
+            }
+
+            return profilePreferences?.profileName ?? fallbackProfileName
         }
 
         let browser: ThirdPartyBrowser
         private let fileStore: FileStore
         private let fallbackProfileName: String
-        let chromiumPreferences: ChromiumPreferences?
+
+        enum ProfilePreferences {
+            case chromium(ChromiumPreferences)
+            case firefox(FirefoxCompatibilityPreferences)
+
+            var appVersion: String? {
+                switch self {
+                case .chromium(let preferences): preferences.appVersion
+                case .firefox(let preferences): preferences.lastVersion
+                }
+            }
+
+            var profileName: String? {
+                switch self {
+                case .chromium(let preferences): preferences.profileName
+                case .firefox: nil
+                }
+            }
+
+            var isChromium: Bool {
+                if case .chromium = self { true } else { false }
+            }
+        }
+        let profilePreferences: ProfilePreferences?
+
+        var appVersion: String? {
+            profilePreferences?.appVersion
+        }
 
         init(browser: ThirdPartyBrowser, profileURL: URL, fileStore: FileStore = FileManager.default) {
             self.browser = browser
@@ -217,7 +264,17 @@ enum DataImport {
             self.profileURL = profileURL
 
             self.fallbackProfileName = Self.getDefaultProfileName(at: profileURL)
-            self.chromiumPreferences = Self.getChromiumProfilePreferences(at: profileURL, fileStore: fileStore)
+
+            switch browser {
+            case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
+                self.profilePreferences = (try? ChromiumPreferences(profileURL: profileURL, fileStore: fileStore))
+                    .map(ProfilePreferences.chromium)
+            case .firefox, .tor:
+                self.profilePreferences = (try? FirefoxCompatibilityPreferences(profileURL: profileURL, fileStore: fileStore))
+                    .map(ProfilePreferences.firefox)
+            case .bitwarden, .safari, .safariTechnologyPreview, .lastPass, .onePassword7, .onePassword8:
+                self.profilePreferences = nil
+            }
         }
 
         enum ProfileDataItemValidationResult {
@@ -300,30 +357,16 @@ enum DataImport {
             return profileURL.lastPathComponent.components(separatedBy: ".").last ?? profileURL.lastPathComponent
         }
 
-        private static func getChromiumProfilePreferences(at profileURL: URL, fileStore: FileStore) -> ChromiumPreferences? {
-            guard let profileDirectoryContents = try? fileStore.directoryContents(at: profileURL.path) else {
-                return nil
-            }
-
-            guard profileURL.lastPathComponent != Constants.chromiumSystemProfileName else {
-                return nil
-            }
-
-            if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
-               let preferencesData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
-               let preferences = try? ChromiumPreferences(from: preferencesData) {
-                return preferences
-            }
-
-            return nil
-        }
-
         static func < (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
             return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
         }
 
         static func == (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
             return lhs.profileURL == rhs.profileURL
+        }
+
+        func installedAppsMajorVersionDescription() -> String? {
+            self.browser.importSource.installedAppsMajorVersionDescription(selectedProfile: self)
         }
     }
 

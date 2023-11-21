@@ -139,6 +139,19 @@ enum ThirdPartyBrowser: CaseIterable {
         return nil
     }
 
+    var installedAppsVersions: Set<String>? {
+        let versions = bundleIdentifiers.all
+            .reduce(into: Set<String>()) { result, bundleId in
+                for url in NSWorkspace.shared.urls(forApplicationsWithBundleId: bundleId) {
+                    guard let version = ApplicationVersionReader.getVersion(of: url.path),
+                          !version.isEmpty else { continue }
+                    result.insert(version)
+                }
+            }
+        guard !versions.isEmpty else { return nil }
+        return versions
+    }
+
     private var bundleIdentifiers: BundleIdentifiers {
         switch self {
         case .brave: return BundleIdentifiers(productionBundleID: "com.brave.Browser", relatedBundleIDs: ["com.brave.Browser.nightly"])
@@ -209,7 +222,7 @@ enum ThirdPartyBrowser: CaseIterable {
             }
 
             let filteredProfiles =  potentialProfiles.filter {
-                $0.chromiumPreferences != nil
+                $0.profilePreferences?.isChromium == true
                 || $0.profileName == DataImport.BrowserProfileList.Constants.chromiumDefaultProfileName
                 || $0.profileName.hasPrefix(DataImport.BrowserProfileList.Constants.chromiumProfilePrefix)
             }

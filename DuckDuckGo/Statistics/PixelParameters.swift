@@ -26,7 +26,6 @@ extension Pixel.Event {
             return event.parameters
 
         case .debug(event: let debugEvent, error: let error):
-
             var params = error?.pixelParameters ?? [:]
 
             if case let .assertionFailure(message, file, line) = debugEvent {
@@ -37,8 +36,13 @@ extension Pixel.Event {
 
             return params
 
-        case .dataImportFailed(source: _, error: let error):
-            return error.pixelParameters
+        case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
+            var params = error.pixelParameters
+
+            if let version {
+                params[PixelKit.Parameters.sourceBrowserVersion] = version
+            }
+            return params
 
         case .launchInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]

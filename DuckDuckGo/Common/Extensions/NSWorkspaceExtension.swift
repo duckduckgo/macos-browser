@@ -58,4 +58,12 @@ extension NSWorkspace {
         return missionControlWindows.count > allScreenSizes.count
     }
 
+    @available(macOS, obsoleted: 14.0, message: "This needs to be removed as it‘s no longer necessary.")
+    @nonobjc func urls(forApplicationsWithBundleId bundleId: String) -> [URL] {
+        if #available(macOS 12.0, *) {
+            return self.urlsForApplications(withBundleIdentifier: bundleId)
+        }
+        return LSCopyApplicationURLsForBundleIdentifier(bundleId as CFString, nil)?.takeRetainedValue() as? [URL] ?? []
+    }
+
 }
