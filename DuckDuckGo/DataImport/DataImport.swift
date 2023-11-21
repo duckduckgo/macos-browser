@@ -178,10 +178,6 @@ enum DataImport {
             self.profiles = profiles
         }
 
-        var shouldShowProfilePicker: Bool {
-            return validImportableProfiles.count > 1
-        }
-
         var defaultProfile: BrowserProfile? {
             switch browser {
             case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
@@ -242,7 +238,7 @@ enum DataImport {
             let profileDirectoryContentsSet = Set(profileDirectoryContents)
 
             return .init(logins: validateLoginsData(profileDirectoryContents: profileDirectoryContentsSet),
-                    bookmarks: validateBookmarksData(profileDirectoryContents: profileDirectoryContentsSet))
+                         bookmarks: validateBookmarksData(profileDirectoryContents: profileDirectoryContentsSet))
         }
 
         private func validateLoginsData(profileDirectoryContents: Set<String>) -> ProfileDataItemValidationResult {

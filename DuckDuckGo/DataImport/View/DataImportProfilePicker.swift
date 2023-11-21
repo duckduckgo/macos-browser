@@ -24,7 +24,7 @@ struct DataImportProfilePicker: View {
     @Binding private var selectedProfile: DataImport.BrowserProfile?
 
     init(profileList: DataImport.BrowserProfileList?, selectedProfile: Binding<DataImport.BrowserProfile?>) {
-        self.profiles = profileList?.profiles ?? []
+        self.profiles = profileList?.validImportableProfiles ?? []
         self._selectedProfile = selectedProfile
     }
 
