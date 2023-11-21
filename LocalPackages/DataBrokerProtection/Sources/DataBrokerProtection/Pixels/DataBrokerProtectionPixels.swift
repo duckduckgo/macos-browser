@@ -208,28 +208,28 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             // Debug Pixels
         case .error: return "data_broker_error"
 
-        case .backgroundAgentStarted: return "dbp_macos_background-agent_started"
-        case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "dbp_macos_background-agent_started_stopping-due-to-another-instance-running"
+        case .backgroundAgentStarted: return "m_macos_dbp_background-agent_started"
+        case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "m_macos_dbp_background-agent_started_stopping-due-to-another-instance-running"
 
-        case .backgroundAgentRunOperationsAndStartSchedulerIfPossible: return "dbp_macos_background-agent-run-operations-and-start-scheduler-if-possible"
-        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile: return "dbp_macos_background-agent-run-operations-and-start-scheduler-if-possible_no-saved-profile"
-        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler: return "dbp_macos_background-agent-run-operations-and-start-scheduler-if-possible_callback_start-scheduler"
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossible: return "m_macos_dbp_background-agent-run-operations-and-start-scheduler-if-possible"
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile: return "m_macos_dbp_background-agent-run-operations-and-start-scheduler-if-possible_no-saved-profile"
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler: return "m_macos_dbp_background-agent-run-operations-and-start-scheduler-if-possible_callback_start-scheduler"
 
-        case .ipcServerRegister: return "dbp_macos_ipc-server_register"
-        case .ipcServerStartScheduler: return "dbp_macos_ipc-server_start-scheduler"
-        case .ipcServerStopScheduler: return "dbp_macos_ipc-server_stop-scheduler"
-        case .ipcServerOptOutAllBrokers: return "dbp_macos_ipc-server_opt-out-all-brokers"
-        case .ipcServerOptOutAllBrokersCompletion: return "dbp_macos_ipc-server_opt-out-all-brokers_completion"
-        case .ipcServerScanAllBrokers: return "dbp_macos_ipc-server_scan-all-brokers"
-        case .ipcServerScanAllBrokersCompletion: return "dbp_macos_ipc-server_scan-all-brokers_completion"
-        case .ipcServerRunQueuedOperations: return "dbp_macos_ipc-server_run-queued-operations"
-        case .ipcServerRunQueuedOperationsCompletion: return "dbp_macos_ipc-server_run-queued-operations_completion"
-        case .ipcServerRunAllOperations: return "dbp_macos_ipc-server_run-all-operations"
+        case .ipcServerRegister: return "m_macos_dbp_ipc-server_register"
+        case .ipcServerStartScheduler: return "m_macos_dbp_ipc-server_start-scheduler"
+        case .ipcServerStopScheduler: return "m_macos_dbp_ipc-server_stop-scheduler"
+        case .ipcServerOptOutAllBrokers: return "m_macos_dbp_ipc-server_opt-out-all-brokers"
+        case .ipcServerOptOutAllBrokersCompletion: return "m_macos_dbp_ipc-server_opt-out-all-brokers_completion"
+        case .ipcServerScanAllBrokers: return "m_macos_dbp_ipc-server_scan-all-brokers"
+        case .ipcServerScanAllBrokersCompletion: return "m_macos_dbp_ipc-server_scan-all-brokers_completion"
+        case .ipcServerRunQueuedOperations: return "m_macos_dbp_ipc-server_run-queued-operations"
+        case .ipcServerRunQueuedOperationsCompletion: return "m_macos_dbp_ipc-server_run-queued-operations_completion"
+        case .ipcServerRunAllOperations: return "m_macos_dbp_ipc-server_run-all-operations"
 
-        case .enableLoginItem: return "dbp_macos_login-item_enable"
-        case .restartLoginItem: return "dbp_macos_login-item_restart"
-        case .disableLoginItem: return "dbp_macos_login-item_disable"
-        case .resetLoginItem: return "dbp_macos_login-item_reset"
+        case .enableLoginItem: return "m_macos_dbp_login-item_enable"
+        case .restartLoginItem: return "m_macos_dbp_login-item_restart"
+        case .disableLoginItem: return "m_macos_dbp_login-item_disable"
+        case .resetLoginItem: return "m_macos_dbp_login-item_reset"
         }
     }
 
