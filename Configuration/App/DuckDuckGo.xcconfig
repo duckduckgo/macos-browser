@@ -14,7 +14,7 @@
 //
 
 #include "AppTargetsBase.xcconfig"
-#include "../NetworkProtectionDeveloperID.xcconfig"
+#include "../DeveloperID.xcconfig"
 
 PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
