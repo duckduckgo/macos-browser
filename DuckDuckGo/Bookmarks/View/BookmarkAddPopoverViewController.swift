@@ -29,6 +29,7 @@ final class BookmarkAddPopoverViewController: NSViewController {
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var favoriteButton: NSButton!
     @IBOutlet weak var folderPickerPopUpButton: NSPopUpButton!
+    @IBOutlet weak var folderAddButton: NSButton!
 
     private var folderPickerSelectionCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
@@ -56,6 +57,7 @@ final class BookmarkAddPopoverViewController: NSViewController {
         super.viewDidLoad()
         setupPickerSelectionCancellable()
         setupListPublisher()
+        folderAddButton.setButtonType(.onOff)
         textField.delegate = self
     }
 
