@@ -25,14 +25,13 @@ public protocol ManagementDialogModelDelegate: AnyObject {
     func updateDeviceName(_ name: String)
     func removeDevice(_ device: SyncDevice)
     func deleteAccount()
-    func copyCodeDesplayed()
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
-    func copyRecoveryCode()
     func saveRecoveryPDF()
     func recoveryCodeNextPressed()
     func turnOnSync()
     func recoveryCodePasted(_ code: String)
     func enterRecoveryCodePressed()
+    func copyCode()
 }
 
 public final class ManagementDialogModel: ObservableObject {

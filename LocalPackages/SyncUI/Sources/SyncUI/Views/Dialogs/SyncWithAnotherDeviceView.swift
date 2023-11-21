@@ -179,7 +179,7 @@ struct SyncWithAnotherDeviceView: View {
                         .frame(width: 153, height: 28)
                     }
                     Button {
-                        model.delegate?.copyCodeDesplayed()
+                        model.delegate?.copyCode()
                     } label: {
                         HStack {
                             Image("Copy")

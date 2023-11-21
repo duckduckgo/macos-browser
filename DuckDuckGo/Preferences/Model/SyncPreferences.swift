@@ -269,7 +269,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
-
+    
     func deleteAccount() {
         Task { @MainActor in
             do {
@@ -417,17 +417,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         presentDialog(for: .deleteAccount(devices))
     }
 
-
-    @MainActor
-    func copyCodeDesplayed() {
-        guard let codeToDisplay else { return }
-        copy(text: codeToDisplay)
-    }
-
-
     @MainActor
     func saveRecoveryPDF() {
-
         guard let recoveryCode = syncService.account?.recoveryCode else {
             assertionFailure()
             return
@@ -458,6 +449,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 try await syncService.disconnect(deviceId: device.id)
                 refreshDevices()
+                managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
@@ -476,7 +468,11 @@ extension SyncPreferences {
 
     @MainActor
     func syncWithAnotherDevicePressed() {
-        self.startPollingForRecoveryKey(isRecovery: false)
+        if isSyncEnabled {
+            presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
+        } else {
+            self.startPollingForRecoveryKey(isRecovery: false)
+        }
     }
 
     @MainActor
@@ -494,17 +490,30 @@ extension SyncPreferences {
 
     }
 
-    @MainActor
-    func copyRecoveryCode() {
-        guard let recoveryCode else { return }
-        copy(text: recoveryCode)
-    }
+//    @MainActor
+//    func copyCodeDesplayed() {
+//        guard let codeToDisplay else { return }
+//        copy(text: codeToDisplay)
+//    }
+//
+//    @MainActor
+//    func copyRecoveryCode() {
+//        guard let recoveryCode else { return }
+//        copy(text: recoveryCode)
+//    }
 
     @MainActor
-    private func copy(text: String) {
+    func copyCode() {
+        var code: String?
+        if isSyncEnabled {
+            code = recoveryCode
+        } else {
+            code = codeToDisplay
+        }
+        guard let code else { return }
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.setString(text, forType: .string)
+        pasteboard.setString(code, forType: .string)
     }
 
     @MainActor

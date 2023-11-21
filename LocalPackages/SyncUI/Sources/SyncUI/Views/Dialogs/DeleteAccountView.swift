@@ -39,6 +39,7 @@ struct DeleteAccountView: View {
 
             ScrollView {
                 SyncedDevicesList(devices: devices)
+                    .roundedBorder()
             }
 
         } buttons: {
