@@ -32,7 +32,7 @@ public final class AppStorePurchaseFlow {
         case somethingWentWrong
     }
 
-    public static func purchaseSubscription(with identifier: String) async -> Result<Void, AppStorePurchaseFlow.Error> {
+    public static func purchaseSubscription(with identifier: String, emailAccessToken: String?) async -> Result<Void, AppStorePurchaseFlow.Error> {
         // Trigger sign in pop-up
         switch await PurchaseManager.shared.syncAppleIDAccount() {
         case .success:
@@ -51,7 +51,7 @@ public final class AppStorePurchaseFlow {
             switch error {
             case .missingAccountOrTransactions:
                 // No history, create new account
-                switch await AuthService.createAccount() {
+                switch await AuthService.createAccount(emailAccessToken: emailAccessToken) {
                 case .success(let response):
                     externalID = response.externalID
                     await AccountManager().exchangeAndStoreTokens(with: response.authToken)

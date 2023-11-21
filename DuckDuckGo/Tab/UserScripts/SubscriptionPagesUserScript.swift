@@ -219,7 +219,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             }
              */
 
-            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id) {
+            let emailAccessToken = try? EmailManager().getToken()
+
+            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
             case .success:
                 break
             case .failure(let error):

@@ -68,8 +68,14 @@ public struct AuthService: APIService {
 
     // MARK: -
 
-    public static func createAccount() async -> Result<CreateAccountResponse, APIServiceError> {
-        await executeAPICall(method: "POST", endpoint: "account/create")
+    public static func createAccount(emailAccessToken: String?) async -> Result<CreateAccountResponse, APIServiceError> {
+        var headers: [String: String]?
+
+        if let emailAccessToken {
+            headers = makeAuthorizationHeader(for: emailAccessToken)
+        }
+
+        return await executeAPICall(method: "POST", endpoint: "account/create", headers: headers)
     }
 
     public struct CreateAccountResponse: Decodable {
