@@ -23,6 +23,7 @@ private class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
 
     private let clientInterface: NSXPCInterface
     private let serverInterface: NSXPCInterface
+    private let connectionSetQueue = DispatchQueue(label: "com.duckduckgo.XPCConnectionsManager.connectionSetQueue")
     weak var delegate: AnyObject?
 
     /// The active connections
@@ -45,12 +46,18 @@ private class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
                 return
             }
 
-            self.connections.remove(newConnection)
+            self.connectionSetQueue.async {
+                self.connections.remove(newConnection)
+            }
         }
 
         newConnection.interruptionHandler = closeConnection
         newConnection.invalidationHandler = closeConnection
-        connections.insert(newConnection)
+
+        self.connectionSetQueue.async {
+            self.connections.insert(newConnection)
+        }
+
         newConnection.activate()
 
         return true
