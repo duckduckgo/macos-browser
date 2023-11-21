@@ -31,8 +31,7 @@ extension DataImportView {
 
         let sheetWindow = SheetHostingWindow(rootView: DataImportView())
 
-        window.beginSheet(sheetWindow, completionHandler: completion.map { completion in
-            { _ in
+        window.beginSheet(sheetWindow, completionHandler: completion.map { completion in { _ in
                 completion()
             }
         })
@@ -382,7 +381,7 @@ extension DataImportViewModel.ButtonType {
         return "password"
     } openPanelCallback: { _ in
         URL(fileURLWithPath: "/test/path")
-    } reportSenderFactory: { 
+    } reportSenderFactory: {
         { feedback in
             print("send feedback:", feedback)
         }

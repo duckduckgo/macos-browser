@@ -199,7 +199,7 @@ final class CSVImporter: DataImporter {
     }
 
     func importData(types: Set<DataImport.DataType>) -> DataImportTask {
-        .detachedWithProgress { updateProgress in
+        .detachedWithProgress { _ in
             let result = self.importLoginsSync()
             return [.passwords: result]
         }

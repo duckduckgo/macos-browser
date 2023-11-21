@@ -105,7 +105,7 @@ final class FirefoxLoginReader {
         let databaseURL = firefoxProfileURL.appendingPathComponent(dataFormat.formatFileNames.databaseName)
 
         switch dataFormat {
-        case .version2: 
+        case .version2:
             return try keyReader.getEncryptionKey(key3DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "").get()
         case .version3:
             return try keyReader.getEncryptionKey(key4DatabaseURL: databaseURL, primaryPassword: primaryPassword ?? "").get()
@@ -114,7 +114,6 @@ final class FirefoxLoginReader {
 
     private func reallyReadLogins(dataFormat: DataFormat, keyData: Data, currentOperationType: inout ImportError.OperationType) throws -> [ImportedLoginCredential] {
         let loginsFileURL = firefoxProfileURL.appendingPathComponent(dataFormat.formatFileNames.loginsFileName)
-
 
         currentOperationType = .couldNotReadLoginsFile
         let logins = try readLoginsFile(from: loginsFileURL.path)

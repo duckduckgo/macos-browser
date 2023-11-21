@@ -482,7 +482,7 @@ enum DataImportResult<T> {
 extension DataImportResult: Equatable where T: Equatable {
     static func == (lhs: DataImportResult<T>, rhs: DataImportResult<T>) -> Bool {
         switch lhs {
-        case .success(let value): 
+        case .success(let value):
             if case .success(value) = rhs {
                 true
             } else {

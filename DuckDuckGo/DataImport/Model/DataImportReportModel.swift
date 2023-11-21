@@ -26,7 +26,7 @@ struct DataImportReportModel {
 
     var importSource: DataImport.Source
     var importSourceVersion: String?
-    
+
     var importSourceDescription: String {
         [importSource.importSourceName, importSourceVersion].compactMap { $0 }.joined(separator: " ")
     }

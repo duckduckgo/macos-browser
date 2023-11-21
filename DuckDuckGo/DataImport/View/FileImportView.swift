@@ -144,7 +144,7 @@ struct FileImportView: View {
                 If there is no header, it supports two formats:
                 """
                 1; "URL, Username, Password"
-                2; "Title, URL, Username, Password";
+                2; "Title, URL, Username, Password"
 
                 .button("Select Passwords CSV File…")
 
@@ -287,7 +287,7 @@ private func buildInstructions(@FileImportInstructionsBuilder builder: () -> [Fi
 
     // zip [1, "text 1", 2, "text 2", "text 3"] to [[1, "text 1"], [2, "text 2"], ["text 3"]]
     var result: [[FileImportInstructionsItem]] = []
-    var currentNumber: Int? = nil
+    var currentNumber: Int?
 
     for item in items {
         switch item {
