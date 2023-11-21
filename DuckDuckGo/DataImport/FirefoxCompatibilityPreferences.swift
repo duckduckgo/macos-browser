@@ -1,5 +1,5 @@
 //
-//  FirefoxPreferences.swift
+//  FirefoxCompatibilityPreferences.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -47,6 +47,5 @@ struct FirefoxCompatibilityPreferences {
         }
         self.init(from: preferencesData)
     }
-
 
 }

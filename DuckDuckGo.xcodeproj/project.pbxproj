@@ -3552,10 +3552,10 @@
 		B6B4D1C62B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
 		B6B4D1C72B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
 		B6B4D1C82B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
-		B6B4D1CA2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxPreferences.swift */; };
-		B6B4D1CB2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxPreferences.swift */; };
-		B6B4D1CC2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxPreferences.swift */; };
-		B6B4D1CD2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxPreferences.swift */; };
+		B6B4D1CA2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
+		B6B4D1CB2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
+		B6B4D1CC2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
+		B6B4D1CD2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
 		B6B5F57F2B024105008DB58A /* DataImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */; };
 		B6B5F5802B024105008DB58A /* DataImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */; };
 		B6B5F5812B024105008DB58A /* DataImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */; };
@@ -4882,7 +4882,7 @@
 		B6B2400D28083B49001B8F3A /* WebViewContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainerView.swift; sourceTree = "<group>"; };
 		B6B3E0DC2657E9CF0040E0A2 /* NSScreenExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSScreenExtension.swift; sourceTree = "<group>"; };
 		B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportReportModel.swift; sourceTree = "<group>"; };
-		B6B4D1C92B0C8C9200C26286 /* FirefoxPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxPreferences.swift; sourceTree = "<group>"; };
+		B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxCompatibilityPreferences.swift; sourceTree = "<group>"; };
 		B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportSummaryView.swift; sourceTree = "<group>"; };
 		B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestFilePermissionView.swift; sourceTree = "<group>"; };
 		B6B5F5882B03673B008DB58A /* BrowserImportMoreInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportMoreInfoView.swift; sourceTree = "<group>"; };
@@ -6091,7 +6091,7 @@
 				4B5A4F4B27F3A5AA008FBD88 /* NSNotificationName+DataImport.swift */,
 				4B59024726B3673600489384 /* ThirdPartyBrowser.swift */,
 				4B7A57CE279A4EF300B1C70E /* ChromiumPreferences.swift */,
-				B6B4D1C92B0C8C9200C26286 /* FirefoxPreferences.swift */,
+				B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */,
 				4BB99CF326FE191E001E4761 /* Bookmarks */,
 				4B723DF126B0002B00E14D75 /* Logins */,
 				4B723DEC26B0002B00E14D75 /* View */,
@@ -10314,7 +10314,7 @@
 				3192A07C2A4C4CFF0084EA89 /* MainViewController.swift in Sources */,
 				3192A07D2A4C4CFF0084EA89 /* DuckPlayer.swift in Sources */,
 				3192A07E2A4C4CFF0084EA89 /* Favicon.swift in Sources */,
-				B6B4D1CC2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */,
+				B6B4D1CC2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				B6BCC5252AFCDABB002C5499 /* DataImportSourceViewModel.swift in Sources */,
 				3192A07F2A4C4CFF0084EA89 /* SuggestionContainerViewModel.swift in Sources */,
 				3192A0802A4C4CFF0084EA89 /* FirePopoverWrapperViewController.swift in Sources */,
@@ -11149,7 +11149,7 @@
 				3706FBBD293F65D500E42796 /* Preferences.swift in Sources */,
 				3706FBBE293F65D500E42796 /* DownloadListViewModel.swift in Sources */,
 				3706FBBF293F65D500E42796 /* BookmarkManagementDetailViewController.swift in Sources */,
-				B6B4D1CB2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */,
+				B6B4D1CB2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				3706FBC0293F65D500E42796 /* CSVImporter.swift in Sources */,
 				3706FBC1293F65D500E42796 /* StartupPreferences.swift in Sources */,
 				3706FBC2293F65D500E42796 /* MainMenu.swift in Sources */,
@@ -11871,7 +11871,7 @@
 				4B9579542AC7AE700062CA31 /* DownloadListStore.swift in Sources */,
 				4B9579552AC7AE700062CA31 /* Logging.swift in Sources */,
 				4B9579562AC7AE700062CA31 /* CrashReportPromptPresenter.swift in Sources */,
-				B6B4D1CD2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */,
+				B6B4D1CD2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				4B9579572AC7AE700062CA31 /* BWCredential.swift in Sources */,
 				4B9579582AC7AE700062CA31 /* PreferencesRootView.swift in Sources */,
 				4B9579592AC7AE700062CA31 /* AppStateChangedPublisher.swift in Sources */,
@@ -13023,7 +13023,7 @@
 				EA0BA3A9272217E6002A0B6C /* ClickToLoadUserScript.swift in Sources */,
 				AAA892EA250A4CEF005B37B2 /* WindowControllersManager.swift in Sources */,
 				85C5991B27D10CF000E605B2 /* FireAnimationView.swift in Sources */,
-				B6B4D1CA2B0C8C9200C26286 /* FirefoxPreferences.swift in Sources */,
+				B6B4D1CA2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */,
 				AA6197C4276B314D008396F0 /* FaviconUrlReference.swift in Sources */,
 				AAC5E4C825D6A6E8007F5990 /* BookmarkPopoverViewController.swift in Sources */,
 				B696AFFB2AC5924800C93203 /* FileLineError.swift in Sources */,
