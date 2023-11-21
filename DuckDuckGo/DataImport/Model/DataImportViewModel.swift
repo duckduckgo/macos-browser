@@ -259,12 +259,12 @@ private func dataImporter(for source: DataImport.Source, fileDataType: DataImpor
     }
     return switch source {
     case .bookmarksHTML,
-        _ where fileDataType == .bookmarks:
+         /* any */_ where fileDataType == .bookmarks:
 
         BookmarkHTMLImporter(fileURL: url, bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared))
 
     case .onePassword8, .onePassword7, .bitwarden, .lastPass, .csv,
-        _ where fileDataType == .passwords:
+         /* any */_ where fileDataType == .passwords:
         CSVImporter(fileURL: url, loginImporter: SecureVaultLoginImporter(), defaultColumnPositions: .init(source: source))
 
     case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi:

@@ -21,12 +21,12 @@ import Foundation
 
 final class MockLoginImporter: LoginImporter {
 
-    var importedLogins: DataImport.Summary?
+    var importedLogins: DataImportSummary?
 
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.LoginsImportSummary {
-        let summary = DataImport.LoginsImportSummary(successfulImports: logins.map(\.username), duplicateImports: [], failedImports: [])
+    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.DataTypeSummary {
+        let summary = DataImport.DataTypeSummary(successful: logins.count, duplicate: 0, failed: 0)
 
-        self.importedLogins = .init(bookmarksResult: nil, loginsResult: .completed(summary))
+        self.importedLogins = [.passwords: .success(summary)]
         return summary
     }
 

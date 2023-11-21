@@ -23,7 +23,7 @@ import XCTest
 class ChromiumBookmarksReaderTests: XCTestCase {
 
     func testImportingBookmarks() {
-        let bookmarksReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: resourceURL(), source: .chrome)
+        let bookmarksReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: resourceURL())
         let bookmarks = bookmarksReader.readBookmarks()
 
         guard case let .success(bookmarks) = bookmarks else {

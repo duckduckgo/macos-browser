@@ -26,7 +26,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
 
     override func setUpWithError() throws {
         underlyingBookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in
-                .init(successful: 0, duplicates: 0, failed: 0)
+            .init(successful: 0, duplicates: 0, failed: 0)
         })
     }
 
@@ -47,53 +47,28 @@ final class BookmarksHTMLImporterTests: XCTestCase {
         XCTAssertEqual(dataImporter.totalBookmarks, 0)
     }
 
-    func testWhenValidBookmarksFileIsLoadedThenBookmarksImportIsSuccessful() {
-        let importExpectation = expectation(description: "Import Bookmarks")
-        let completionExpectation = expectation(description: "Import Bookmarks Completion")
-        let expectedImportResult = BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
-
-        underlyingBookmarkImporter.importBookmarks = { (_, _) in
-            importExpectation.fulfill()
-            return expectedImportResult
+    func testWhenValidBookmarksFileIsLoadedThenBookmarksImportIsSuccessful() async {
+        underlyingBookmarkImporter.importBookmarks = { (_, _) in 
+            .init(successful: 42, duplicates: 2, failed: 3)
         }
 
         dataImporter = .init(fileURL: bookmarksFileURL("bookmarks_safari.html"), bookmarkImporter: underlyingBookmarkImporter)
 
-        dataImporter.importData(types: [.bookmarks], from: nil) { result in
-            switch result {
-            case let .success(summary):
-                XCTAssertEqual(summary, .init(bookmarksResult: expectedImportResult))
-            default:
-                XCTFail("unexpected import error")
-            }
-            completionExpectation.fulfill()
-        }
+        let result = await dataImporter.importData(types: [.bookmarks]).task.value
 
-        waitForExpectations(timeout: 1)
+        XCTAssertEqual(result, [.bookmarks: .success(.init(successful: 42, duplicate: 2, failed: 3))])
     }
 
-    func testWhenInvalidBookmarksFileIsLoadedThenBookmarksImportReturnsFailure() {
-        let completionExpectation = expectation(description: "Import Bookmarks Completion")
-        let expectedImportResult = BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
-
+    func testWhenInvalidBookmarksFileIsLoadedThenBookmarksImportReturnsFailure() async {
         underlyingBookmarkImporter.importBookmarks = { (_, _) in
-            XCTFail("unexpected import success")
-            return expectedImportResult
+            .init(successful: 0, duplicates: 0, failed: 0)
         }
 
         dataImporter = .init(fileURL: bookmarksFileURL("bookmarks_invalid.html"), bookmarkImporter: underlyingBookmarkImporter)
 
-        dataImporter.importData(types: [.bookmarks], from: nil) { result in
-            switch result {
-            case let .failure(error as BookmarkHTMLReader.ImportError):
-                XCTAssertEqual(error.type, .parseXml)
-                XCTAssertEqual((error.underlyingError as NSError?)?.domain, XMLParser.errorDomain)
-            default:
-                XCTFail("unexpected \(result)")
-            }
-            completionExpectation.fulfill()
-        }
+        let result = await dataImporter.importData(types: [.bookmarks]).task.value
 
-        waitForExpectations(timeout: 1)
+        XCTAssertEqual(result, [.bookmarks: .failure(BookmarkHTMLReader.ImportError(type: .parseXml, underlyingError: NSError(domain: XMLParser.errorDomain, code: XMLParser.ErrorCode.prematureDocumentEndError.rawValue)))])
     }
+
 }

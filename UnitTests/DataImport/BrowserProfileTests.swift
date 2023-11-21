@@ -132,7 +132,7 @@ class BrowserProfileListTests: XCTestCase {
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertEqual(profile.profileName, "System Profile")
-        XCTAssertNil(profile.chromiumPreferences?.profileName)
+        XCTAssertEqual(profile.chromiumPreferences?.profileName, "ChromeProfile")
     }
 
     private func profile(named name: String) -> URL {

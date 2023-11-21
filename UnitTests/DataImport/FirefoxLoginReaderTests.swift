@@ -132,7 +132,7 @@ class FirefoxLoginReaderTests: XCTestCase {
 
         switch result {
         case .failure(let error as FirefoxLoginReader.ImportError):
-            XCTAssertEqual(error.type, .couldNotFindLoginsFile)
+            XCTAssertEqual(error.type, .couldNotDetermineFormat)
         default:
             XCTFail("Received unexpected \(result)")
         }

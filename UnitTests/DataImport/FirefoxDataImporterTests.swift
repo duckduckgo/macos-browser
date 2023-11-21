@@ -27,14 +27,14 @@ class FirefoxDataImporterTests: XCTestCase {
         let loginImporter = MockLoginImporter()
         let faviconManager = FaviconManagerMock()
         let bookmarkImporter = MockBookmarkImporter(importBookmarks: { _, _ in .init(successful: 1, duplicates: 2, failed: 3) })
-        let importer = FirefoxDataImporter(profile: .init(browser: .firefox, profileURL: resourceURL()), loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
+        let importer = FirefoxDataImporter(profile: .init(browser: .firefox, profileURL: resourceURL()), primaryPassword: nil, loginImporter: loginImporter, bookmarkImporter: bookmarkImporter, faviconManager: faviconManager)
 
         let result = await importer.importData(types: [.bookmarks])
 
-        XCTAssertNil(result.logins)
-        if case let .success(bookmarks) = result.bookmarks {
+        XCTAssertNil(result[.passwords])
+        if case let .success(bookmarks) = result[.bookmarks] {
             XCTAssertEqual(bookmarks.successful, 1)
-            XCTAssertEqual(bookmarks.duplicates, 2)
+            XCTAssertEqual(bookmarks.duplicate, 2)
             XCTAssertEqual(bookmarks.failed, 3)
         } else {
             XCTFail("Received populated summary unexpectedly")
@@ -48,11 +48,7 @@ class FirefoxDataImporterTests: XCTestCase {
 }
 
 extension FirefoxDataImporter {
-    func importData(types: Set<DataImport.DataType>) async -> DataImport.Summary {
-        return await withCheckedContinuation { continuation in
-            importData(types: types) { result in
-                continuation.resume(returning: result)
-            }
-        }
+    func importData(types: Set<DataImport.DataType>) async -> DataImportSummary {
+        return await importData(types: types).task.value
     }
 }
