@@ -770,7 +770,7 @@ extension Pixel.Event.Debug {
         case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
         case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
 
-        case .loginItemUpdateError: return "login-item-update-error"
+        case .loginItemUpdateError: return "login-item_update-error"
         }
     }
 }
