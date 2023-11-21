@@ -42,8 +42,10 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
                        defaultHeaders: [:],
-                       log: .dbpBackgroundAgentPixel) {
-            (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+                       log: .dbpBackgroundAgentPixel) { (pixelName: String,
+                                                         headers: [String: String],
+                                                         parameters: [String: String], _, _,
+                                                         onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
