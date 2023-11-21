@@ -144,7 +144,7 @@ struct FileImportView: View {
                 If there is no header, it supports two formats:
                 """
                 1; "URL, Username, Password"
-                2; "Title, URL, Username, Password"
+                2; "Title, URL, Username, Password";
 
                 .button("Select Passwords CSV File…")
 
