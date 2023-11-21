@@ -502,7 +502,7 @@ struct UserText {
 
     // MARK: - Login Import & Export
 
-    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
+    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Passwords File", comment: "Title text for the CSV importer")
     static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File", comment: "Title text for the HTML Bookmarks importer")
 
     static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")
