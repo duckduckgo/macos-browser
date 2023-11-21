@@ -139,4 +139,91 @@ class BrowserProfileListTests: XCTestCase {
         return mockURL.appendingPathComponent(name)
     }
 
+    func testWhenLastChromiumVersionIsPresentInProfile_InstalledAppsReturnsMajorVersion() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "profile": {
+                "created_by_version": "118.0.5993.54"
+            },
+            "extensions": {
+                "last_chrome_version": "120.0.1111.42"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "118.0.5993.54")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "118")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "118")
+    }
+
+    func testWhenLastChromiumVersionIsNotPresentInProfile_CreatedByVersionIsReturned() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "profile": {
+                "created_by_version": "118.0.5993.54"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "118.0.5993.54")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "118")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "118")
+    }
+
+    func testWhenFirefoxLastVersionIsPresentInProfile_LastVersionIsReturned() {
+        let profileURL = profile(named: "Firefox.default")
+        let fileStore = FileStoreMock()
+
+        let conf = """
+        [Compatibility]
+          LastVersion = 118.0.1_20230927232528/20230927232528
+        LastOSABI=Darwin_aarch64-gcc3
+            LastPlatformDir=/Applications/Firefox.app/Contents/Resources
+        LastAppDir=/Applications/Firefox.app/Contents/Resources/browser
+        """
+
+        fileStore.storage["compatibility.ini"] = conf.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["compatibility.ini"]
+
+        let profile = DataImport.BrowserProfile(browser: .firefox, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "118.0.1_20230927232528/20230927232528")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "118")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "118")
+    }
+
+    func testWhenNoVersionInProfile_InstalledAppsVersionsReturned() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        { "profile": {} }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertNil(profile.appVersion)
+        // TODO: dependency
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription()?.sorted(), DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile)?.sorted())
+    }
+
 }
