@@ -22,6 +22,7 @@ import AppKit
 import Common
 import SwiftUI
 import BrowserServicesKit
+import PixelKit
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -139,7 +140,8 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             case .ipcServerOptOutAllBrokersCompletion(error: let error),
                     .ipcServerScanAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
-                Pixel.fire(.debug(event: .pixelKitEvent(event), error: error?.base))
+                // We can't use .debug directly because it modifies the pixel name and clobbers the params
+                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error?.base)))
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
