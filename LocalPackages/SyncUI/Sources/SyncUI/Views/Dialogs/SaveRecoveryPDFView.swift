@@ -27,11 +27,8 @@ struct SaveRecoveryPDFView: View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRecoveryPDF")
-                Text(UserText.saveRecoveryPDF)
-                    .font(.system(size: 17, weight: .bold))
-                Text(UserText.recoveryPDFExplanation)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                SyncUIConstants.TextHeader(text: UserText.saveRecoveryPDF)
+                SyncUIConstants.TextDetailMultiline(text: UserText.recoveryPDFExplanation)
             }
             VStack(alignment: .leading, spacing: 20) {
                 HStack {

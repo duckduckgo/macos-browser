@@ -25,12 +25,8 @@ struct PreparingToSyncView: View {
         SyncDialog(spacing: 20.0, bottomText: "Connecting…") {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-96")
-                Text("Prepating to Sync")
-                    .font(.system(size: 17, weight: .bold))
-                Text("We're setting up the connection to synchronize your bookmarks and saved logins with the other device.")
-                    .frame(width: 320, alignment: .center)
-                    .multilineTextAlignment(.center)
-                    .fixedSize()
+                SyncUIConstants.TextHeader(text: "Prepating to Sync")
+                SyncUIConstants.TextDetailMultiline(text: "We're setting up the connection to synchronize your bookmarks and saved logins with the other device.")
             }
             .frame(width: 320)
         } buttons: {
@@ -45,12 +41,8 @@ struct YourDataIsReturningView: View {
         SyncDialog(spacing: 20.0, bottomText: "Downloading…") {
             VStack(alignment: .center, spacing: 20) {
                 Image("Lock-Succes-96")
-                Text("Your Data is Returning!")
-                    .font(.system(size: 17, weight: .bold))
-                Text("Your bookmarks and logins will now be restored from DuckDuckGo's secure server.")
-                    .frame(width: 320, alignment: .center)
-                    .multilineTextAlignment(.center)
-                    .fixedSize()
+                SyncUIConstants.TextHeader(text: "Your Data is Returning!")
+                SyncUIConstants.TextDetailMultiline(text: "Your bookmarks and logins will now be restored from DuckDuckGo's secure server.")
             }
             .frame(width: 320)
         } buttons: {
@@ -66,12 +58,8 @@ struct RecoverSyncedDataView: View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-96")
-                Text("Recover Synced Data")
-                    .font(.system(size: 17, weight: .bold))
-                Text("To restore your synced data, you'll need the \"Recovery Code\" you saved when you first set up the sync. This code may have been saved as a PDF with a QR code or as a text code.")
-                    .frame(width: 320, alignment: .center)
-                    .multilineTextAlignment(.center)
-                    .fixedSize()
+                SyncUIConstants.TextHeader(text: "Recover Synced Data")
+                SyncUIConstants.TextDetailMultiline(text: "To restore your synced data, you'll need the \"Recovery Code\" you saved when you first set up the sync. This code may have been saved as a PDF with a QR code or as a text code.")
             }
             .frame(width: 320)
         } buttons: {

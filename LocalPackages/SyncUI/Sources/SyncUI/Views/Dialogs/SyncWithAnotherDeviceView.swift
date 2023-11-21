@@ -31,11 +31,8 @@ struct SyncWithAnotherDeviceView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Pair-96")
-            Text("Sync With Another Device").bold()
-                .font(Font.system(size: 17))
-            Text("Go to Settings › Sync in the DuckDuckGo Browser on a another device and select Sync with Another Device.")
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                .multilineTextAlignment(.center)
+            SyncUIConstants.TextHeader(text: "Sync With Another Device")
+            SyncUIConstants.TextDetailMultiline(text: "Go to Settings › Sync in the DuckDuckGo Browser on a another device and select Sync with Another Device.")
             VStack(spacing: 20) {
                 pickerView()
                 if selectedSegment == 0 {

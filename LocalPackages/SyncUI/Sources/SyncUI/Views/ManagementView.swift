@@ -37,21 +37,6 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Work in Progress")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.black)
-
-                // swiftlint:disable line_length
-                Text("This feature is viewable to internal users only and is still being developed and tested. Currently you can create accounts, connect and manage devices, and sync bookmarks, favorites, Autofill logins and Email Protection status. **[More Info](https://app.asana.com/0/1201493110486074/1203756800930481/f)**")
-                    .foregroundColor(.black)
-                    .font(.system(size: 11, weight: .regular))
-                // swiftlint:enable line_length
-            }
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(.yellow))
-            .padding(.bottom, 10)
-
             VStack(alignment: .leading, spacing: 8) {
                 Text(UserText.sync)
                     .font(.system(size: 17))

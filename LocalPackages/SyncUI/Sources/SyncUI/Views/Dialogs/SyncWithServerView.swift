@@ -25,14 +25,9 @@ struct SyncWithServerView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Server-96")
-            Text("Sync and Back Up This Device")
-                .font(.system(size: 17, weight: .bold))
-            Text("Your bookmarks and saved logins will be encrypted and begin syncing with DuckDuckGo's server.")
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                .multilineTextAlignment(.center)
-            Text("Only your device holds the decryption key; DuckDuckGo cannot access it.")
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                .multilineTextAlignment(.center)
+            SyncUIConstants.TextHeader(text: "Sync and Back Up This Device")
+            SyncUIConstants.TextDetailMultiline(text: "Your bookmarks and saved logins will be encrypted and begin syncing with DuckDuckGo's server.")
+            SyncUIConstants.TextDetailMultiline(text: "Only your device holds the decryption key; DuckDuckGo cannot access it.")
             Spacer()
             Text("You can add other devices for syncing later.")
                 .font(.system(size: 11))

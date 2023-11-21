@@ -31,11 +31,8 @@ public struct EnterRecoveryCodeView: View {
     public var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Lock-Succes-96")
-            Text("Enter Code")
-                .font(.system(size: 17, weight: .bold))
-            Text("Enter the code on your Recovery PDF, or another synced device, to recover your synced data.")
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
-                .multilineTextAlignment(.center)
+            SyncUIConstants.TextHeader(text: "Enter Code")
+            SyncUIConstants.TextDetailMultiline(text: "Enter the code on your Recovery PDF, or another synced device, to recover your synced data.")
             VStack(spacing: 16) {
                 Text("Paste Code Here")
                 HStack(spacing: 10) {
@@ -43,7 +40,7 @@ public struct EnterRecoveryCodeView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
                         RoundedRectangle(cornerRadius: 8)
-                            .fill(.white)
+                            .fill(.clear)
                         Text(recoveryCodeModel.recoveryCode)
                             .font(
                                 Font.custom("SF Mono", size: 13)

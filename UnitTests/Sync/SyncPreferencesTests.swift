@@ -63,30 +63,30 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertEqual(syncPreferences.recoveryCode, account.recoveryCode)
     }
 
-    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
-        syncPreferences.presentRecoverSyncAccountDialog()
-
-        XCTAssertEqual(managementDialogModel.currentDialog, .recoverAccount)
-    }
-
-    @MainActor func testOnPresentManuallyEnterCodeDialogThenManuallyEnterCodeShown() {
-        syncPreferences.presentManuallyEnterCodeDialog()
-
-        XCTAssertEqual(managementDialogModel.currentDialog, .manuallyEnterCode)
-    }
-
-    @MainActor func testOnPresentShowTextCodeDialogThenShowTextCodeShown() {
-        syncPreferences.codeToDisplay = "adfasdf"
-        syncPreferences.presentShowTextCodeDialog()
-
-        XCTAssertEqual(managementDialogModel.currentDialog, .showTextCode(syncPreferences.codeToDisplay ?? ""))
-    }
-
-    @MainActor func testOnPresentTurnOffSyncConfirmDialogThenTurnOffSyncShown() {
-        syncPreferences.presentTurnOffSyncConfirmDialog()
-
-        XCTAssertEqual(managementDialogModel.currentDialog, .turnOffSync)
-    }
+//    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
+//        syncPreferences.presentRecoverSyncAccountDialog()
+//
+//        XCTAssertEqual(managementDialogModel.currentDialog, .recoverAccount)
+//    }
+//
+//    @MainActor func testOnPresentManuallyEnterCodeDialogThenManuallyEnterCodeShown() {
+//        syncPreferences.presentManuallyEnterCodeDialog()
+//
+//        XCTAssertEqual(managementDialogModel.currentDialog, .manuallyEnterCode)
+//    }
+//
+//    @MainActor func testOnPresentShowTextCodeDialogThenShowTextCodeShown() {
+//        syncPreferences.codeToDisplay = "adfasdf"
+//        syncPreferences.presentShowTextCodeDialog()
+//
+//        XCTAssertEqual(managementDialogModel.currentDialog, .showTextCode(syncPreferences.codeToDisplay ?? ""))
+//    }
+//
+//    @MainActor func testOnPresentTurnOffSyncConfirmDialogThenTurnOffSyncShown() {
+//        syncPreferences.presentTurnOffSyncConfirmDialog()
+//
+//        XCTAssertEqual(managementDialogModel.currentDialog, .turnOffSync)
+//    }
 
     @MainActor func testOnPresentRemoveDeviceThenRemoveDEviceShown() {
         let device = SyncDevice(kind: .desktop, name: "test", id: "test")

@@ -29,8 +29,7 @@ struct DeviceSyncedView: View{
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-setup-success")
-                Text(UserText.deviceSynced)
-                    .font(.system(size: 17, weight: .bold))
+                SyncUIConstants.TextHeader(text: UserText.deviceSynced)
                 VStack(alignment: .center) {
                     if isSingleDevice {
                         SingleDeviceSetTextView()

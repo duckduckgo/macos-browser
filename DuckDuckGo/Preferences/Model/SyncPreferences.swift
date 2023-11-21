@@ -269,7 +269,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
-    
+
     func deleteAccount() {
         Task { @MainActor in
             do {
@@ -489,18 +489,6 @@ extension SyncPreferences {
     func downloadDDGPressed() {
 
     }
-
-//    @MainActor
-//    func copyCodeDesplayed() {
-//        guard let codeToDisplay else { return }
-//        copy(text: codeToDisplay)
-//    }
-//
-//    @MainActor
-//    func copyRecoveryCode() {
-//        guard let recoveryCode else { return }
-//        copy(text: recoveryCode)
-//    }
 
     @MainActor
     func copyCode() {

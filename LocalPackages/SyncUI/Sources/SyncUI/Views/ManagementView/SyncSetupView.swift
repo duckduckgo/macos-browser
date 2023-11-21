@@ -26,12 +26,8 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
         return VStack(alignment: .center, spacing: 16) {
             Image("Sync-Pair-96x96")
             VStack(alignment: .center, spacing: 8) {
-                Text("Begin Sync")
-                    .bold()
-                    .font(.system(size: 17))
-                Text("Safely synchronize your bookmarks and logins between your devices via DuckDuckGo's secure server.")
-                    .foregroundColor(Color("BlackWhite60"))
-                    .multilineTextAlignment(.center)
+                SyncUIConstants.TextHeader(text: "Begin Sync")
+                SyncUIConstants.TextDetailSecondary(text: "Safely synchronize your bookmarks and logins between your devices via DuckDuckGo's secure server.")
             }
             .padding(.bottom, 16)
             ZStack {
@@ -55,45 +51,18 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
         VStack(alignment: .leading, spacing: 24) {
             syncWithAnotherDeviceView()
             VStack(alignment: .leading, spacing: 12) {
-                Text("Other Options")
-                    .font(
-                        .system(size: 17)
-                        .weight(.semibold)
-                    )
+                SyncUIConstants.TextHeader2(text: "Other Options")
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Sync with Server to Back Up")
-                        .foregroundColor(Color("LinkBlueColor"))
+                    SyncUIConstants.TextLink(text: "Sync with Server to Back Up")
                         .onTapGesture {
                             model.syncWithServerPressed()
                         }
-                    Text("Recover Data")
-                        .foregroundColor(Color("LinkBlueColor"))
+                    SyncUIConstants.TextLink(text: "Recover Data")
                         .onTapGesture {
                             model.recoverDataPressed()
                         }
                 }
             }
         }
-    }
-}
-
-// MARK: - QRCodeView
-struct QRCodeView: View {
-    let recoveryCode: String
-
-    var body: some View {
-        VStack(alignment: .center) {
-            QRCode(string: recoveryCode, size: .init(width: 160, height: 160))
-            Text("Scan this QR code with another device")
-                .foregroundColor(Color("GreyTextColor"))
-        }
-        .padding(.vertical, 16)
-        .frame(width: 480)
-        .background(ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color("BlackWhite10"), lineWidth: 1)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color("ClearColor"))
-        })
     }
 }
