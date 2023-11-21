@@ -23,7 +23,7 @@ private class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
 
     private let clientInterface: NSXPCInterface
     private let serverInterface: NSXPCInterface
-    private let connectionSetQueue = DispatchQueue(label: "com.duckduckgo.XPCConnectionsManager.connectionSetQueue")
+    private let queue = DispatchQueue(label: "com.duckduckgo.XPCConnectionsManager.queue")
     weak var delegate: AnyObject?
 
     /// The active connections
@@ -36,29 +36,27 @@ private class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
     }
 
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
-        newConnection.exportedInterface = serverInterface
-        newConnection.exportedObject = delegate
-        newConnection.remoteObjectInterface = clientInterface
+        queue.sync {
+            newConnection.exportedInterface = serverInterface
+            newConnection.exportedObject = delegate
+            newConnection.remoteObjectInterface = clientInterface
 
-        let closeConnection = { [weak self, weak newConnection] in
-            guard let self,
-                  let newConnection else {
-                return
+            let closeConnection = { [weak self, weak newConnection] in
+                guard let self,
+                      let newConnection else {
+                    return
+                }
+
+                self.queue.async {
+                    self.connections.remove(newConnection)
+                }
             }
 
-            self.connectionSetQueue.async {
-                self.connections.remove(newConnection)
-            }
+            newConnection.interruptionHandler = closeConnection
+            newConnection.invalidationHandler = closeConnection
+            connections.insert(newConnection)
+            newConnection.activate()
         }
-
-        newConnection.interruptionHandler = closeConnection
-        newConnection.invalidationHandler = closeConnection
-
-        self.connectionSetQueue.async {
-            self.connections.insert(newConnection)
-        }
-
-        newConnection.activate()
 
         return true
     }
