@@ -69,6 +69,7 @@ public final class AppStorePurchaseFlow {
             return .success(())
         case .failure(let error):
             print("Something went wrong, reason: \(error)")
+            AccountManager().signOut()
             return .failure(.purchaseFailed)
         }
     }
