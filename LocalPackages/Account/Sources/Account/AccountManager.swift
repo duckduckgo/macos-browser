@@ -180,4 +180,16 @@ public class AccountManager {
             return .failure(error)
         }
     }
+
+    public func refreshAccountData() async {
+        guard let accessToken else { return }
+
+        switch await AuthService.validateToken(accessToken: accessToken) {
+        case .success(let response):
+            self.storeAccount(token: accessToken,
+                              email: response.account.email)
+        case .failure(let error):
+            break
+        }
+    }
 }
