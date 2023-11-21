@@ -144,7 +144,6 @@ final class CSVImporter: DataImporter {
         }
 
         var action: DataImportAction { .logins }
-        var source: DataImport.Source { .csv }
         let type: OperationType
         let underlyingError: Error?
     }
@@ -216,7 +215,7 @@ final class CSVImporter: DataImporter {
 
         do {
             let loginCredentials = try Self.extractLogins(from: fileContents, defaultColumnPositions: defaultColumnPositions) ?? {
-                throw LoginImporterError(source: .csv, error: nil, type: .malformedCSV)
+                throw LoginImporterError(error: nil, type: .malformedCSV)
             }()
             let summary = try loginImporter.importLogins(loginCredentials)
 
@@ -225,7 +224,7 @@ final class CSVImporter: DataImporter {
         } catch let error as DataImportError {
             return .failure(error)
         } catch {
-            return .failure(LoginImporterError(source: .csv, error: error))
+            return .failure(LoginImporterError(error: error))
         }
     }
 

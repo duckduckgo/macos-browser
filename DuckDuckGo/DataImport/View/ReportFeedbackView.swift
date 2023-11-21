@@ -109,7 +109,6 @@ private struct InfoItemView: View {
             }
 
             var type: OperationType { .imp }
-            var source: DataImport.Source { .chrome }
             var action: DataImportAction { .generic }
             var underlyingError: Error? {
                 if case .err(let err) = self {

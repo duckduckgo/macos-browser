@@ -37,7 +37,7 @@ extension Pixel.Event {
 
             return params
 
-        case .dataImportFailed(let error):
+        case .dataImportFailed(source: _, error: let error):
             return error.pixelParameters
 
         case .launchInitial(let cohort):

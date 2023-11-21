@@ -24,13 +24,15 @@ internal class FirefoxDataImporter: DataImporter {
     private let loginImporter: LoginImporter
     private let bookmarkImporter: BookmarkImporter
     private let faviconManager: FaviconManagement
-    private let profileURL: URL
-    private let source: DataImport.Source
+    private let profile: DataImport.BrowserProfile
+    private var source: DataImport.Source {
+        profile.browser.importSource
+    }
+
     private let primaryPassword: String?
 
-    init(source: DataImport.Source, profileURL: URL, primaryPassword: String?, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
-        self.source = source
-        self.profileURL = profileURL
+    init(profile: DataImport.BrowserProfile, primaryPassword: String?, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        self.profile = profile
         self.primaryPassword = primaryPassword
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
@@ -54,14 +56,14 @@ internal class FirefoxDataImporter: DataImporter {
         if types.contains(.passwords) {
             try? updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
 
-            let loginReader = FirefoxLoginReader(source: source, firefoxProfileURL: profileURL, primaryPassword: self.primaryPassword)
+            let loginReader = FirefoxLoginReader(firefoxProfileURL: profile.profileURL, primaryPassword: self.primaryPassword)
             let loginResult = loginReader.readLogins(dataFormat: nil)
 
             let loginsSummary = loginResult.flatMap { logins in
                 do {
                     return try .success(loginImporter.importLogins(logins))
                 } catch {
-                    return .failure(LoginImporterError(source: source, error: error))
+                    return .failure(LoginImporterError(error: error))
                 }
             }
 
@@ -73,7 +75,7 @@ internal class FirefoxDataImporter: DataImporter {
         if types.contains(.bookmarks) {
             try? updateProgress(.importingBookmarks(numberOfBookmarks: nil, fraction: 0.0))
 
-            let bookmarkReader = FirefoxBookmarksReader(source: source, firefoxDataDirectoryURL: profileURL)
+            let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: profile.profileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             let bookmarksSummary = bookmarkResult.map { bookmarks in
@@ -94,7 +96,7 @@ internal class FirefoxDataImporter: DataImporter {
     }
 
     private func importFavicons() async {
-        let faviconsReader = FirefoxFaviconsReader(source: source, firefoxDataDirectoryURL: profileURL)
+        let faviconsReader = FirefoxFaviconsReader(firefoxDataDirectoryURL: profile.profileURL)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
@@ -114,7 +116,7 @@ internal class FirefoxDataImporter: DataImporter {
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
-            Pixel.fire(.dataImportFailed(error))
+            Pixel.fire(.dataImportFailed(source: source, error: error))
         }
     }
 
@@ -122,7 +124,7 @@ internal class FirefoxDataImporter: DataImporter {
     func validateAccess(for selectedDataTypes: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]? {
         guard selectedDataTypes.contains(.passwords) else { return nil }
 
-        let loginReader = FirefoxLoginReader(source: source, firefoxProfileURL: profileURL, primaryPassword: nil)
+        let loginReader = FirefoxLoginReader(firefoxProfileURL: profile.profileURL, primaryPassword: nil)
         do {
             _=try loginReader.getEncryptionKey()
             return nil

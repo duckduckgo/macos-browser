@@ -33,12 +33,11 @@ final class ChromiumFaviconsReader {
         }
 
         var action: DataImportAction { .favicons }
-        let source: DataImport.Source
         let type: OperationType
         let underlyingError: Error?
     }
     func importError(type: ImportError.OperationType, underlyingError: Error) -> ImportError {
-        ImportError(source: source, type: type, underlyingError: underlyingError)
+        ImportError(type: type, underlyingError: underlyingError)
     }
 
     final class ChromiumFavicon: FetchableRecord {
@@ -61,11 +60,9 @@ final class ChromiumFaviconsReader {
 
     private let chromiumFaviconsDatabaseURL: URL
     private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
-    private let source: DataImport.Source
 
-    init(chromiumDataDirectoryURL: URL, source: DataImport.Source) {
+    init(chromiumDataDirectoryURL: URL) {
         self.chromiumFaviconsDatabaseURL = chromiumDataDirectoryURL.appendingPathComponent(Constants.faviconsDatabaseName)
-        self.source = source
     }
 
     func readFavicons() -> DataImportResult<[String: [ChromiumFavicon]]> {

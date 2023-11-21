@@ -37,16 +37,13 @@ final class ChromiumLoginReader {
         }
 
         var action: DataImportAction { .logins }
-        let source: DataImport.Source
         let type: OperationType
-        let underlyingError: Error?
+        var underlyingError: Error?
 
     }
-    private func importError(type: ImportError.OperationType, underlyingError: Error? = nil) -> ImportError {
-        ImportError(source: source, type: type, underlyingError: underlyingError)
-    }
+
     private func decryptionKeyAccessFailed(_ status: OSStatus) -> ImportError {
-        importError(type: .decryptionKeyAccessFailed, underlyingError: NSError(domain: "KeychainError", code: Int(status)))
+        ImportError(type: .decryptionKeyAccessFailed, underlyingError: NSError(domain: "KeychainError", code: Int(status)))
     }
 
     enum LoginDataFileName: String, CaseIterable {
@@ -103,8 +100,8 @@ final class ChromiumLoginReader {
 
             switch keyPromptResult {
             case .password(let passwordString): key = passwordString
-            case .failedToDecodePasswordData: return .failure(importError(type: .failedToDecodePasswordData))
-            case .none, .userDeniedKeychainPrompt: return .failure(importError(type: .userDeniedKeychainPrompt))
+            case .failedToDecodePasswordData: return .failure(ImportError(type: .failedToDecodePasswordData))
+            case .none, .userDeniedKeychainPrompt: return .failure(ImportError(type: .userDeniedKeychainPrompt))
             case .keychainError(let status): return .failure(decryptionKeyAccessFailed(status))
             }
         }
@@ -113,7 +110,7 @@ final class ChromiumLoginReader {
         do {
             derivedKey = try deriveKey(from: key)
         } catch {
-            return .failure(importError(type: .decryptionFailed, underlyingError: error))
+            return .failure(ImportError(type: .decryptionFailed, underlyingError: error))
         }
 
         return readLogins(using: derivedKey)
@@ -124,7 +121,7 @@ final class ChromiumLoginReader {
             .filter { FileManager.default.fileExists(atPath: $0.path) }
 
         guard !loginFileURLs.isEmpty else {
-            return .failure(importError(type: .couldNotFindLoginData))
+            return .failure(ImportError(type: .couldNotFindLoginData))
         }
 
         var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
@@ -153,7 +150,7 @@ final class ChromiumLoginReader {
         } catch let error as ImportError {
             return .failure(error)
         } catch {
-            return .failure(importError(type: .createImportedLoginCredentialsFailure, underlyingError: error))
+            return .failure(ImportError(type: .createImportedLoginCredentialsFailure, underlyingError: error))
         }
     }
 
@@ -165,7 +162,7 @@ final class ChromiumLoginReader {
         do {
             temporaryDatabaseURL = try temporaryFileHandler.copyFileToTemporaryDirectory()
         } catch {
-            return .failure(importError(type: .failedToTemporarilyCopyDatabase, underlyingError: error))
+            return .failure(ImportError(type: .failedToTemporarilyCopyDatabase, underlyingError: error))
         }
 
         var loginRows = [ChromiumCredential.ID: ChromiumCredential]()
@@ -193,7 +190,7 @@ final class ChromiumLoginReader {
             }
 
         } catch {
-            return .failure(importError(type: .databaseAccessFailed, underlyingError: error))
+            return .failure(ImportError(type: .databaseAccessFailed, underlyingError: error))
         }
 
         return .success(loginRows)
@@ -248,13 +245,13 @@ final class ChromiumLoginReader {
     }
 
     private func decrypt(passwordData: Data, with key: Data) throws -> String {
-        guard passwordData.count >= 4 else { throw importError(type: .passwordDataTooShort, underlyingError: nil) }
+        guard passwordData.count >= 4 else { throw ImportError(type: .passwordDataTooShort, underlyingError: nil) }
 
         let trimmedPasswordData = passwordData[3...]
         let iv = String(repeating: " ", count: 16).utf8data
         let decrypted = try Cryptography.decryptAESCBC(data: trimmedPasswordData, key: key, iv: iv)
 
-        return try String(data: decrypted, encoding: .utf8) ?? { throw importError(type: .dataToStringConversionError, underlyingError: nil) }()
+        return try String(data: decrypted, encoding: .utf8) ?? { throw ImportError(type: .dataToStringConversionError, underlyingError: nil) }()
     }
 
 }

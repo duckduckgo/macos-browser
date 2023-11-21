@@ -254,7 +254,6 @@ extension DataImportViewModel.ButtonType {
             }
 
             var type: OperationType { .imp }
-            var source: DataImport.Source { .chrome }
             var action: DataImportAction { .generic }
             var underlyingError: Error? {
                 if case .err(let err) = self {
@@ -272,7 +271,7 @@ extension DataImportViewModel.ButtonType {
         }
 
         func validateAccess(for types: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]? {
-            source == .firefox && types.contains(.passwords) ? [.passwords: FirefoxLoginReader.ImportError(source: .firefox, type: .requiresPrimaryPassword, underlyingError: nil)] : nil
+            source == .firefox && types.contains(.passwords) ? [.passwords: FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil)] : nil
         }
 
         func requiresKeychainPassword(for selectedDataTypes: Set<DataImport.DataType>) -> Bool {

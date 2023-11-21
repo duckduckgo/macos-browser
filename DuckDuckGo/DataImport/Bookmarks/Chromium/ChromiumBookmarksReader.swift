@@ -31,20 +31,14 @@ final class ChromiumBookmarksReader {
         }
 
         var action: DataImportAction { .bookmarks }
-        let source: DataImport.Source
         let type: OperationType
         let underlyingError: Error?
     }
-    func importError(type: ImportError.OperationType, underlyingError: Error) -> ImportError {
-        ImportError(source: source, type: type, underlyingError: underlyingError)
-    }
 
     private let chromiumBookmarksFileURL: URL
-    private let source: DataImport.Source
 
-    init(chromiumDataDirectoryURL: URL, source: DataImport.Source, bookmarksFileName: String = Constants.defaultBookmarksFileName) {
+    init(chromiumDataDirectoryURL: URL, bookmarksFileName: String = Constants.defaultBookmarksFileName) {
         self.chromiumBookmarksFileURL = chromiumDataDirectoryURL.appendingPathComponent(bookmarksFileName)
-        self.source = source
     }
 
     func readBookmarks() -> DataImportResult<ImportedBookmarks> {
@@ -55,7 +49,7 @@ final class ChromiumBookmarksReader {
             let decodedBookmarks = try JSONDecoder().decode(ImportedBookmarks.self, from: bookmarksFileData)
             return .success(decodedBookmarks)
         } catch {
-            return .failure(importError(type: currentOperationType, underlyingError: error))
+            return .failure(ImportError(type: currentOperationType, underlyingError: error))
         }
     }
 

@@ -20,9 +20,8 @@ import Foundation
 
 final class YandexDataImporter: ChromiumDataImporter {
 
-    init(profileURL: URL, bookmarkImporter: BookmarkImporter) {
-        super.init(source: .yandex,
-                   profileURL: profileURL,
+    init(profile: DataImport.BrowserProfile, bookmarkImporter: BookmarkImporter) {
+        super.init(profile: profile,
                    loginImporter: nil,
                    bookmarkImporter: bookmarkImporter,
                    faviconManager: FaviconManager.shared)

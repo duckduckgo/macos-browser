@@ -147,7 +147,7 @@ struct DataImportViewModel {
             self.summary.append( (dataType, result) )
 
             if case .failure(let error) = result {
-                Pixel.fire(.dataImportFailed(error))
+                Pixel.fire(.dataImportFailed(source: importSource, error: error))
             }
         }
 
@@ -250,7 +250,14 @@ struct DataImportViewModel {
 @MainActor
 private func dataImporter(for source: DataImport.Source, fileDataType: DataImport.DataType?, url: URL, primaryPassword: String?) -> DataImporter {
 
-    switch source {
+    var profile: DataImport.BrowserProfile {
+        let browser = ThirdPartyBrowser.browser(for: source) ?? {
+            assertionFailure("Trying to get browser name for file import source \(source)")
+            return .chrome
+        }()
+        return DataImport.BrowserProfile(browser: browser, profileURL: url)
+    }
+    return switch source {
     case .bookmarksHTML,
         _ where fileDataType == .bookmarks:
 
@@ -261,23 +268,20 @@ private func dataImporter(for source: DataImport.Source, fileDataType: DataImpor
         CSVImporter(fileURL: url, loginImporter: SecureVaultLoginImporter(), defaultColumnPositions: .init(source: source))
 
     case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi:
-        ChromiumDataImporter(source: source,
-                             profileURL: url,
+        ChromiumDataImporter(profile: profile,
                              loginImporter: SecureVaultLoginImporter(),
                              bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared))
     case .yandex:
-        YandexDataImporter(profileURL: url,
+        YandexDataImporter(profile: profile,
                            bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared))
     case .firefox, .tor:
-        FirefoxDataImporter(source: source,
-                            profileURL: url,
+        FirefoxDataImporter(profile: profile,
                             primaryPassword: primaryPassword,
                             loginImporter: SecureVaultLoginImporter(),
                             bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared),
                             faviconManager: FaviconManager.shared)
     case .safari, .safariTechnologyPreview:
-        SafariDataImporter(source: source,
-                           profileURL: url,
+        SafariDataImporter(profile: profile,
                            bookmarkImporter: CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared))
     }
 }

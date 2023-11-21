@@ -33,12 +33,15 @@ final class SafariDataImporter: DataImporter {
         return openPanel.urls.first
     }
 
-    private let safariDataDirectoryUrl: URL
     private let bookmarkImporter: BookmarkImporter
     private let faviconManager: FaviconManagement
+    private let profile: DataImport.BrowserProfile
+    private var source: DataImport.Source {
+        profile.browser.importSource
+    }
 
-    init(source: DataImport.Source, profileURL: URL, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement = FaviconManager.shared) {
-        self.safariDataDirectoryUrl = profileURL
+    init(profile: DataImport.BrowserProfile, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement = FaviconManager.shared) {
+        self.profile = profile
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
     }
@@ -57,7 +60,7 @@ final class SafariDataImporter: DataImporter {
     static private let bookmarksFileName = "Bookmarks.plist"
 
     private var fileUrl: URL {
-        safariDataDirectoryUrl.appendingPathComponent(Self.bookmarksFileName)
+        profile.profileURL.appendingPathComponent(Self.bookmarksFileName)
     }
 
     func validateAccess(for types: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]? {
@@ -78,11 +81,11 @@ final class SafariDataImporter: DataImporter {
         let bookmarkResult = bookmarkReader.readBookmarks()
 
         let summary = bookmarkResult.map { bookmarks in
-            bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(.safari))
+            bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
         }
 
         if case .success = summary {
-            await importFavicons(from: safariDataDirectoryUrl)
+            await importFavicons(from: profile.profileURL)
         }
 
         return [.bookmarks: summary.map { .init($0) }]
@@ -109,7 +112,7 @@ final class SafariDataImporter: DataImporter {
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
-            Pixel.fire(.dataImportFailed(error))
+            Pixel.fire(.dataImportFailed(source: source, error: error))
         }
     }
 

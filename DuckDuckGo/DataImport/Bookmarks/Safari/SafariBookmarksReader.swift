@@ -44,7 +44,6 @@ final class SafariBookmarksReader {
         }
 
         var action: DataImportAction { .bookmarks }
-        var source: DataImport.Source { .safari }
         let type: OperationType
         let underlyingError: Error?
     }

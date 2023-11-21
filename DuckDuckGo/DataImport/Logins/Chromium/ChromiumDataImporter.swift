@@ -23,20 +23,20 @@ internal class ChromiumDataImporter: DataImporter {
     private let bookmarkImporter: BookmarkImporter
     private let loginImporter: LoginImporter?
     private let faviconManager: FaviconManagement
-    private let profileURL: URL
-    private let source: DataImport.Source
+    private let profile: DataImport.BrowserProfile
+    private var source: DataImport.Source {
+        profile.browser.importSource
+    }
 
-    init(source: DataImport.Source, profileURL: URL, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
-        self.source = source
-        self.profileURL = profileURL
+    init(profile: DataImport.BrowserProfile, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        self.profile = profile
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
     }
 
-    convenience init(source: DataImport.Source, profileURL: URL, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter) {
-        self.init(source: source,
-                  profileURL: profileURL,
+    convenience init(profile: DataImport.BrowserProfile, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter) {
+        self.init(profile: profile,
                   loginImporter: loginImporter,
                   bookmarkImporter: bookmarkImporter,
                   faviconManager: FaviconManager.shared)
@@ -57,14 +57,14 @@ internal class ChromiumDataImporter: DataImporter {
         var summary = DataImportSummary()
 
         if types.contains(.passwords), let loginImporter {
-            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: profileURL, source: source)
+            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: profile.profileURL, source: source)
             let loginResult = loginReader.readLogins(modalWindow: nil)
 
             let loginsSummary = loginResult.flatMap { logins in
                 do {
                     return try .success(loginImporter.importLogins(logins))
                 } catch {
-                    return .failure(LoginImporterError(source: source, error: error))
+                    return .failure(LoginImporterError(error: error))
                 }
             }
 
@@ -72,7 +72,7 @@ internal class ChromiumDataImporter: DataImporter {
         }
 
         if types.contains(.bookmarks) {
-            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: profileURL, source: source)
+            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: profile.profileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
             let bookmarksSummary = bookmarkResult.map { bookmarks in
@@ -90,7 +90,7 @@ internal class ChromiumDataImporter: DataImporter {
     }
 
     private func importFavicons() async {
-        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: profileURL, source: source)
+        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: profile.profileURL)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
@@ -110,7 +110,7 @@ internal class ChromiumDataImporter: DataImporter {
             await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
-            Pixel.fire(.dataImportFailed(error))
+            Pixel.fire(.dataImportFailed(source: source, error: error))
         }
     }
 

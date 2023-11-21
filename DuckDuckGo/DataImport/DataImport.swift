@@ -339,7 +339,6 @@ enum DataImportAction {
 protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters, LocalizedError {
     associatedtype OperationType: RawRepresentable where OperationType.RawValue == Int
 
-    var source: DataImport.Source { get }
     var action: DataImportAction { get }
     var type: OperationType { get }
     var underlyingError: Error? { get }
@@ -480,16 +479,34 @@ enum DataImportResult<T> {
 
 }
 
+extension DataImportResult: Equatable where T: Equatable {
+    static func == (lhs: DataImportResult<T>, rhs: DataImportResult<T>) -> Bool {
+        switch lhs {
+        case .success(let value): 
+            if case .success(value) = rhs {
+                true
+            } else {
+                false
+            }
+        case .failure(let error1):
+            if case .failure(let error2) = rhs {
+                error1.errorParameters == error2.errorParameters
+            } else {
+                false
+            }
+        }
+    }
+
+}
+
 struct LoginImporterError: DataImportError {
 
     private let error: Error?
     private let _type: OperationType?
 
     var action: DataImportAction { .logins }
-    let source: DataImport.Source
 
-    init(source: DataImport.Source, error: Error?, type: OperationType? = nil) {
-        self.source = source
+    init(error: Error?, type: OperationType? = nil) {
         self.error = error
         self._type = type
     }

@@ -35,7 +35,6 @@ final class SafariFaviconsReader {
         }
 
         var action: DataImportAction { .favicons }
-        var source: DataImport.Source { .safari }
         let type: OperationType
         let underlyingError: Error?
     }

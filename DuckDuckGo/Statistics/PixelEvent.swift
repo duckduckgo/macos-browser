@@ -100,7 +100,7 @@ extension Pixel {
 
         case dailyOsVersionCounter
 
-        case dataImportFailed(any DataImportError)
+        case dataImportFailed(source: DataImport.Source, error: any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
@@ -360,10 +360,10 @@ extension Pixel.Event {
         case .dailyOsVersionCounter:
             return "m_mac_daily-os-version-counter"
 
-        case .dataImportFailed(let error) where error.action == .favicons:
-            return "m_mac_favicon-import-failed_\(error.source)"
-        case .dataImportFailed(let error):
-            return "m_mac_data-import-failed_\(error.action)_\(error.source)"
+        case .dataImportFailed(source: let source, error: let error) where error.action == .favicons:
+            return "m_mac_favicon-import-failed_\(source)"
+        case .dataImportFailed(source: let source, error: let error):
+            return "m_mac_data-import-failed_\(error.action)_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"

@@ -38,7 +38,6 @@ final class BookmarkHTMLReader {
         }
 
         var action: DataImportAction { .bookmarks }
-        var source: DataImport.Source { .bookmarksHTML }
         let type: OperationType
         let underlyingError: Error?
     }
