@@ -36,22 +36,46 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.vpnGeneralTitle)
 
-                    ToggleMenuItem(title: UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
-                    TextMenuItemCaption(text: UserText.vpnConnectOnLoginSettingDescription)
+                    SpacedCheckbox {
+                        ToggleMenuItem(title: UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
+                    }
 
-                    ToggleMenuItem(title: UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
-                    TextMenuItemCaption(text: UserText.vpnShowInMenuBarSettingDescription)
+                    SpacedCheckbox {
+                        ToggleMenuItem(title: UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
+                    }
 
-                    ToggleMenuItem(title: UserText.vpnExcludeLocalNetworksSettingTitle, isOn: $model.excludeLocalNetworks)
-                    TextMenuItemCaption(text: UserText.vpnExcludeLocalNetworksSettingDescription)
+                    SpacedCheckbox {
+                        ToggleMenuItemWithDescription(title: UserText.vpnExcludeLocalNetworksSettingTitle,
+                                                      description: UserText.vpnExcludeLocalNetworksSettingDescription,
+                                                      isOn: $model.excludeLocalNetworks,
+                                                      spacing: 12)
+                    }
 
-                    ToggleMenuItem(title: UserText.vpnAlwaysONSettingTitle, isOn: $model.alwaysON)
-                        .disabled(true)
-                    TextMenuItemCaption(text: UserText.vpnAlwaysOnSettingDescription)
+                    VStack(alignment: .leading) {
+                        HStack(spacing: 10) {
+                            Image("InfoSubtle-16")
 
-                    ToggleMenuItem(title: UserText.vpnSecureDNSSettingTitle, isOn: $model.secureDNS)
-                        .disabled(true)
-                    TextMenuItemCaption(text: UserText.vpnSecureDNSSettingDescription)
+                            VStack {
+                                HStack {
+                                    Text(UserText.vpnSecureDNSSettingDescription)
+                                        .padding(0)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(Color("BlackWhite60"))
+                                        .multilineTextAlignment(.leading)
+                                        .fixMultilineScrollableText()
+
+                                    Spacer()
+                                }
+                            }
+                            .frame(idealWidth: .infinity, maxWidth: .infinity)
+
+                            Spacer()
+                        }
+                    }.frame(alignment: .topLeading)
+                        .frame(idealWidth: .infinity, maxWidth: .infinity)
+                        .padding(10)
+                        .background(Color("BlackWhite10"))
+                        .roundedBorder()
                 }
 
                 // SECTION: VPN Notifications
@@ -59,7 +83,7 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.vpnNotificationsSettingsTitle)
 
-                    ToggleMenuItem(title: UserText.vpnStatusChangeNotificationSettingTitle, isOn: $model.notifyStatusChanges)
+                    ToggleMenuItem(title: "VPN connection drops or status changes", isOn: $model.notifyStatusChanges)
                 }
 
                 // SECTION: Uninstall
