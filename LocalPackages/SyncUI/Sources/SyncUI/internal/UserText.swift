@@ -28,6 +28,7 @@ enum UserText {
     static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
     static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
     static let share = NSLocalizedString("share", value: "Share", comment: "Share button")
+    static let paste = NSLocalizedString("paste", value: "Paste", comment: "Paste button")
     static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
     static let done = NSLocalizedString("done", value: "Done", comment: "Done button")
 
@@ -63,7 +64,7 @@ enum UserText {
     static let reciverSyncedDataDialogButton = NSLocalizedString("preferences.recover-synced-data.dialog-button", value: "Enter Code", comment: "Sync recover synced data dialog button")
 
     // Sync Title
-    static let sync = NSLocalizedString("preferences.sync", value: "Sync and Back Up", comment: "Show sync preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
 
     static let turnOff = NSLocalizedString("preferences.sync.turn-off", value: "Turn Off", comment: "Turn off sync confirmation dialog button title")
     static let turnOffSync = NSLocalizedString("preferences.sync.turn-off.ellipsis", value: "Turn off Sync...", comment: "Disable sync button caption")
@@ -94,6 +95,21 @@ enum UserText {
 
     static let recovery = NSLocalizedString("prefrences.sync.recovery", value: "Recovery", comment: "Sync settings section title")
     static let recoveryInstructions = NSLocalizedString("prefrences.sync.recovery-instructions", value: "If you lose your device, you will need this recovery code to restore your synced data.", comment: "Instructions on how to restore synced data")
+
+    // Sync with another device dialog
+    static let syncWithAnotherDeviceTitle = NSLocalizedString("preferences.sync.sync-with-another-device.dialog-title", value: "Sync with Another Device", comment: "Sync with another device dialog title")
+    static let syncWithAnotherDeviceSubtitle1 = NSLocalizedString("preferences.sync.sync-with-another-device.dialog-subtitle1", value: "Go to ", comment: "Sync with another device dialog subtitle first part")
+    static let syncWithAnotherDeviceSubtitle2 = NSLocalizedString("preferences.sync.sync-with-another-device.dialog-subtitle2", value: "Settings › Sync ", comment: "Sync with another device dialog subtitle second part")
+    static let syncWithAnotherDeviceSubtitle3 = NSLocalizedString("preferences.sync.sync-with-another-device.dialog-subtitle3", value: "in the DuckDuckGo Browser on a another device and select Sync with Another Device.", comment: "Sync with another device dialog subtitle thisrd part")
+    static let syncWithAnotherDeviceShowCodeButton = NSLocalizedString("preferences.sync.sync-with-another-device.show-code-button", value: "Show Code", comment: "Sync with another device dialog show code button")
+    static let syncWithAnotherDeviceEnterCodeButton = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-button", value: "Enter Code", comment: "Sync with another device dialog enter code button")
+    static let syncWithAnotherDeviceShowQRCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.show-qr-code-explanation", value: "Scan this QR code to connect with a mobile device.", comment: "Sync with another device dialog show qr code explanation")
+    static let syncWithAnotherDeviceEnterCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-explanation", value: "Enter the text code in the field below to connect", comment: "Sync with another device dialog enter code explanation")
+    static let syncWithAnotherDeviceShowCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.show-code-explanation", value: "Share this code to connect with a desktop machine.", comment: "Sync with another device dialog show code explanation")
+    static let syncWithAnotherDeviceMobileUsers = NSLocalizedString("preferences.sync.sync-with-another-device.mobile-users", value: "Mobile Users: ", comment: "Sync with another device dialog mobile users section")
+    static let syncWithAnotherDeviceDesktopUsers = NSLocalizedString("preferences.sync.sync-with-another-device.desktop-users", value: "Desktop Users: ", comment: "Sync with another device dialog desktop users section")
+    static let syncWithAnotherDeviceViewQRCode = NSLocalizedString("preferences.sync.sync-with-another-device.view-qr-code-link", value: "View QR Code", comment: "Sync with another device dialog view qr code link")
+    static let syncWithAnotherDeviceViewTextCode = NSLocalizedString("preferences.sync.sync-with-another-device.view-text-code-link", value: "View Text Code", comment: "Sync with another device dialog view text code link")
 
     // Save recovery PDF dialog
     static let saveRecoveryPDF = NSLocalizedString("prefrences.sync.save-recovery-pdf", value: "Save Your Recovery Code", comment: "Caption for a button to save Sync recovery PDF")

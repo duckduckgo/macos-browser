@@ -31,8 +31,10 @@ struct SyncWithAnotherDeviceView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Pair-96")
-            SyncUIConstants.TextHeader(text: "Sync With Another Device")
-            SyncUIConstants.TextDetailMultiline(text: "Go to Settings › Sync in the DuckDuckGo Browser on a another device and select Sync with Another Device.")
+            SyncUIConstants.TextHeader(text: UserText.syncWithAnotherDeviceTitle)
+            Text("\(Text(UserText.syncWithAnotherDeviceSubtitle1)) \(Text(UserText.syncWithAnotherDeviceSubtitle2).bold()) \(Text(UserText.syncWithAnotherDeviceSubtitle3))")
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.center)
             VStack(spacing: 20) {
                 pickerView()
                 if selectedSegment == 0 {
@@ -63,7 +65,7 @@ struct SyncWithAnotherDeviceView: View {
         return HStack(spacing: 0) {
             HStack {
                 Image("QR-Icon")
-                Text("Show Code")
+                Text(UserText.syncWithAnotherDeviceShowCodeButton)
             }
             .onTapGesture {
                 selectedSegment = 0
@@ -79,7 +81,7 @@ struct SyncWithAnotherDeviceView: View {
             )
             HStack {
                 Image("Keyboard-16D")
-                Text("Enter Code")
+                Text(UserText.syncWithAnotherDeviceEnterCodeButton)
             }
             .onTapGesture {
                 selectedSegment = 1
@@ -100,12 +102,12 @@ struct SyncWithAnotherDeviceView: View {
 
     fileprivate func scanQRCodeView() -> some View {
         return  Group {
-            Text("Scan this QR code to connect with a mobile device.")
+            Text(UserText.syncWithAnotherDeviceShowCodeExplanation)
             QRCode(string: code, size: CGSize(width: 164, height: 164))
             HStack(spacing: 4) {
-                Text("Desktop Users: ")
+                Text(UserText.syncWithAnotherDeviceDesktopUsers)
                 HStack {
-                    Text("View Text Code")
+                    Text(UserText.syncWithAnotherDeviceViewTextCode)
                         .fontWeight(.semibold)
                     Image("Arrow-Circle-Right-12")
                 }
@@ -120,7 +122,7 @@ struct SyncWithAnotherDeviceView: View {
 
     fileprivate func enterCodeView() -> some View {
         return Group {
-            Text("Enter the text code in the field below to connect")
+            Text(UserText.syncWithAnotherDeviceEnterCodeExplanation)
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
@@ -146,7 +148,7 @@ struct SyncWithAnotherDeviceView: View {
             } label: {
                 HStack {
                     Image("Paste")
-                    Text("Paste")
+                    Text(UserText.paste)
                 }
             }
             .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
@@ -156,7 +158,7 @@ struct SyncWithAnotherDeviceView: View {
     fileprivate func showTextCodeView() -> some View {
         return Group {
             VStack(spacing: 20) {
-                Text("Share this code to connect with a desktop machine.")
+                Text(UserText.syncWithAnotherDeviceShowCodeExplanation)
                 Text(code)
                     .font(
                     Font.custom("SF Mono", size: 13)
@@ -171,7 +173,7 @@ struct SyncWithAnotherDeviceView: View {
                     } label: {
                         HStack {
                             Image("Share")
-                            Text("Share")
+                            Text(UserText.share)
                         }
                         .frame(width: 153, height: 28)
                     }
@@ -180,16 +182,16 @@ struct SyncWithAnotherDeviceView: View {
                     } label: {
                         HStack {
                             Image("Copy")
-                            Text("Copy")
+                            Text(UserText.copy)
                         }
                         .frame(width: 153, height: 28)
                     }
                 }
                 .frame(width: 348, height: 32)
                 HStack(spacing: 4) {
-                    Text("Mobile Users: ")
+                    Text(UserText.syncWithAnotherDeviceMobileUsers)
                     HStack {
-                        Text("View QR Code")
+                        Text(UserText.syncWithAnotherDeviceViewQRCode)
                             .fontWeight(.semibold)
                         Image("Arrow-Circle-Right-12")
                     }
