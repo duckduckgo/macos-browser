@@ -219,7 +219,7 @@ final class ConfigurationManager {
             do {
                 try await PrivacyFeatures.httpsUpgrade.persistBloomFilter(specification: spec, data: bloomFilterData)
             } catch {
-//                assertionFailure("persistBloomFilter failed: \(error)")
+                assertionFailure("persistBloomFilter failed: \(error)")
                 throw Error.bloomFilterPersistenceFailed.withUnderlyingError(error)
             }
             await PrivacyFeatures.httpsUpgrade.loadData()

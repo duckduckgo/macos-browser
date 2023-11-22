@@ -63,30 +63,23 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertEqual(syncPreferences.recoveryCode, account.recoveryCode)
     }
 
-//    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
-//        syncPreferences.presentRecoverSyncAccountDialog()
-//
-//        XCTAssertEqual(managementDialogModel.currentDialog, .recoverAccount)
-//    }
-//
-//    @MainActor func testOnPresentManuallyEnterCodeDialogThenManuallyEnterCodeShown() {
-//        syncPreferences.presentManuallyEnterCodeDialog()
-//
-//        XCTAssertEqual(managementDialogModel.currentDialog, .manuallyEnterCode)
-//    }
-//
-//    @MainActor func testOnPresentShowTextCodeDialogThenShowTextCodeShown() {
-//        syncPreferences.codeToDisplay = "adfasdf"
-//        syncPreferences.presentShowTextCodeDialog()
-//
-//        XCTAssertEqual(managementDialogModel.currentDialog, .showTextCode(syncPreferences.codeToDisplay ?? ""))
-//    }
-//
-//    @MainActor func testOnPresentTurnOffSyncConfirmDialogThenTurnOffSyncShown() {
-//        syncPreferences.presentTurnOffSyncConfirmDialog()
-//
-//        XCTAssertEqual(managementDialogModel.currentDialog, .turnOffSync)
-//    }
+    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
+        syncPreferences.recoverDataPressed()
+
+        XCTAssertEqual(managementDialogModel.currentDialog, .recoverSyncedData)
+    }
+
+    @MainActor func testOnSyncWithServerPressedThenSyncWithServerDialogShown() {
+        syncPreferences.syncWithServerPressed()
+
+        XCTAssertEqual(managementDialogModel.currentDialog, .syncWithServer)
+    }
+
+    @MainActor func testOnPresentTurnOffSyncConfirmDialogThenTurnOffSyncShown() {
+        syncPreferences.turnOffSyncPressed()
+
+        XCTAssertEqual(managementDialogModel.currentDialog, .turnOffSync)
+    }
 
     @MainActor func testOnPresentRemoveDeviceThenRemoveDEviceShown() {
         let device = SyncDevice(kind: .desktop, name: "test", id: "test")
@@ -94,7 +87,6 @@ final class SyncPreferencesTests: XCTestCase {
 
         XCTAssertEqual(managementDialogModel.currentDialog, .removeDevice(device))
     }
-
 
     @MainActor func testOnTurnOffSyncThenSyncServiceIsDisconnected() async {
         let expectation = XCTestExpectation(description: "Disconnect completed")

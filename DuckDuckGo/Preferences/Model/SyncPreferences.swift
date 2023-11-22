@@ -436,11 +436,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         }
     }
 
-}
-
-// NEW UI Method
-extension SyncPreferences {
-
     @MainActor
     func enterRecoveryCodePressed() {
         startPollingForRecoveryKey(isRecovery: true)
@@ -489,7 +484,7 @@ extension SyncPreferences {
         showDevicesSynced()
     }
 
-    @MainActor 
+    @MainActor
     private func showDevicesSynced() {
         presentDialog(for: .nowSyncing)
     }
