@@ -28,6 +28,27 @@ enum PixelExperiment: String, CaseIterable {
         logic.cohort
     }
 
+    static var isExperimentInstalled: Bool {
+        return logic.isInstalled
+    }
+
+    static var isNoCardsExperimentOn: Bool {
+        // This is to avoid the cohort is assigned before the user actually sees the new tab page (after the onboarding has been completed)
+        if isExperimentInstalled && !OnboardingViewModel().onboardingFinished {
+            return true
+        }
+        // Cohort are assigned the first time it's called
+        return Self.cohort == .noCards
+    }
+
+    static var allocatedCohortDoesNotMatchCurrentCohorts: Bool {
+        guard let allocatedCohort = logic.allocatedCohort else { return false }
+        if PixelExperiment(rawValue: allocatedCohort) == nil {
+            return true
+        }
+        return false
+    }
+
     /// Enables this experiment for new users when called from the new installation path.
     static func install() {
         logic.install()
@@ -39,7 +60,8 @@ enum PixelExperiment: String, CaseIterable {
 
     // These are the variants. Rename or add/remove them as needed.  If you change the string value
     //  remember to keep it clear for privacy triage.
-    case control
+    case control = "c"
+    case noCards = "d"
 }
 
 /// These functions contain the business logic for determining if the pixel should be fired or not.
@@ -59,6 +81,22 @@ extension PixelExperiment {
 
     static func fireSetAsDefaultInitialPixel() {
         logic.fireSetAsDefaultInitialPixel()
+    }
+
+    static func fireImportDataInitialPixel() {
+        logic.fireImportDataInitialPixel()
+    }
+
+    static func fireWatchInDuckPlayerPixel() {
+        logic.fireWatchInDuckPlayerPixel()
+    }
+
+    static func fireCookieManagementEnabledPixel() {
+        logic.fireCookieManagementEnabledPixel()
+    }
+
+    static func fireEmailProtectionEnabledPixel() {
+        logic.fireEmailProtectionEnabledPixel()
     }
 
 }
@@ -85,10 +123,10 @@ final internal class PixelExperimentLogic {
     }
 
     @UserDefaultsWrapper(key: .pixelExperimentInstalled, defaultValue: false)
-    private var isInstalled: Bool
+    var isInstalled: Bool
 
     @UserDefaultsWrapper(key: .pixelExperimentCohort, defaultValue: nil)
-    private var allocatedCohort: String?
+    var allocatedCohort: String?
 
     @UserDefaultsWrapper(key: .pixelExperimentEnrollmentDate, defaultValue: nil)
     private var enrollmentDate: Date?
@@ -124,7 +162,7 @@ final internal class PixelExperimentLogic {
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
         guard allocatedCohort != nil, let cohort else { return }
-        Pixel.fire(.launchInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
+        Pixel.fire(.newTabInitial(cohort: cohort.rawValue), limitTo: .initial, includeAppVersionParameter: false)
     }
 
     func fireFirstSerpPixel() {
@@ -145,6 +183,38 @@ final internal class PixelExperimentLogic {
             Pixel.fire(.setAsDefaultInitial(cohort: cohort.rawValue), limitTo: .initial)
         } else {
             Pixel.fire(.setAsDefaultInitial(), limitTo: .initial)
+        }
+    }
+
+    func fireImportDataInitialPixel() {
+        if allocatedCohort != nil, let cohort {
+            Pixel.fire(.importDataInitial(cohort: cohort.rawValue), limitTo: .initial)
+        } else {
+            Pixel.fire(.importDataInitial(), limitTo: .initial)
+        }
+    }
+
+    func fireWatchInDuckPlayerPixel() {
+        if allocatedCohort != nil, let cohort {
+            Pixel.fire(.watchInDuckPlayerInitial(cohort: cohort.rawValue), limitTo: .initial)
+        } else {
+            Pixel.fire(.watchInDuckPlayerInitial(), limitTo: .initial)
+        }
+    }
+
+    func fireCookieManagementEnabledPixel() {
+        if allocatedCohort != nil, let cohort {
+            Pixel.fire(.cookieManagementEnabledInitial(cohort: cohort.rawValue), limitTo: .initial)
+        } else {
+            Pixel.fire(.cookieManagementEnabledInitial(), limitTo: .initial)
+        }
+    }
+
+    func fireEmailProtectionEnabledPixel() {
+        if allocatedCohort != nil, let cohort {
+            Pixel.fire(.emailEnabledInitial(cohort: cohort.rawValue), limitTo: .initial)
+        } else {
+            Pixel.fire(.emailEnabledInitial(), limitTo: .initial)
         }
     }
 
