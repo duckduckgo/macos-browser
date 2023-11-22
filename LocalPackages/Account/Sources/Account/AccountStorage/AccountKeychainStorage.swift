@@ -72,6 +72,18 @@ public class AccountKeychainStorage: AccountStorage {
         try Self.getString(forField: .email)
     }
 
+    public func getExternalID() throws -> String? {
+        try Self.getString(forField: .externalID)
+    }
+
+    public func store(externalID: String?) throws {
+        if let externalID = externalID, !externalID.isEmpty {
+            try Self.set(string: externalID, forField: .externalID)
+        } else {
+            try Self.deleteItem(forField: .externalID)
+        }
+    }
+
     public func store(email: String?) throws {
         if let email = email, !email.isEmpty {
             try Self.set(string: email, forField: .email)
@@ -84,6 +96,7 @@ public class AccountKeychainStorage: AccountStorage {
         try Self.deleteItem(forField: .authToken)
         try Self.deleteItem(forField: .accessToken)
         try Self.deleteItem(forField: .email)
+        try Self.deleteItem(forField: .externalID)
     }
 
 }
@@ -98,6 +111,7 @@ private extension AccountKeychainStorage {
         case authToken = "account.authToken"
         case accessToken = "account.accessToken"
         case email = "account.email"
+        case externalID = "account.external_id"
 
         var keyValue: String {
             (Bundle.main.bundleIdentifier ?? "com.duckduckgo") + "." + rawValue

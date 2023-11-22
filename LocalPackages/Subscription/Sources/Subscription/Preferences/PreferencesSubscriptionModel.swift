@@ -23,7 +23,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var hasEntitlements: Bool = false
-    var sheetModel: SubscriptionAccessModel
+    lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
     private let accountManager: AccountManager
     private var actionHandler: PreferencesSubscriptionActionHandlers
@@ -36,7 +36,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         let isUserAuthenticated = accountManager.isUserAuthenticated
         self.isUserAuthenticated = isUserAuthenticated
-        sheetModel = isUserAuthenticated ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
 
         NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
             self.updateUserAuthenticatedState(true)
@@ -47,9 +46,17 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
+    private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
+        if accountManager.isUserAuthenticated {
+            ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email)
+        } else {
+            ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+        }
+    }
+
     private func updateUserAuthenticatedState(_ isUserAuthenticated: Bool) {
         self.isUserAuthenticated = isUserAuthenticated
-        sheetModel = isUserAuthenticated ? ShareSubscriptionAccessModel(actionHandlers: sheetActionHandler, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: sheetActionHandler)
+        sheetModel = makeSubscriptionAccessModel()
     }
 
     @MainActor

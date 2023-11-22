@@ -83,6 +83,20 @@ public class AccountManager {
         }
     }
 
+    public var externalID: String? {
+        do {
+            return try storage.getExternalID()
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+                delegate?.accountManagerKeychainAccessFailed(accessType: .getExternalID, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
+            
+            return nil
+        }
+    }
+    
     public func storeAuthToken(token: String) {
         do {
             try storage.store(authToken: token)
@@ -95,8 +109,7 @@ public class AccountManager {
         }
     }
 
-    public func storeAccount(token: String, email: String?) {
-        os_log("AccountManager: storeAccount token: %@ email: %@ externalID:%@", log: .account, token, email ?? "nil")
+    public func storeAccount(token: String, email: String?, externalID: String?) {
         do {
             try storage.store(accessToken: token)
         } catch {
@@ -117,6 +130,15 @@ public class AccountManager {
             }
         }
 
+        do {
+            try storage.store(externalID: externalID)
+        } catch {
+            if let error = error as? AccountKeychainAccessError {
+                delegate?.accountManagerKeychainAccessFailed(accessType: .storeExternalID, error: error)
+            } else {
+                assertionFailure("Expected AccountKeychainAccessError")
+            }
+        }
         NotificationCenter.default.post(name: .accountDidSignIn, object: self, userInfo: nil)
     }
 
@@ -171,7 +193,8 @@ public class AccountManager {
         case .success(let response):
             self.storeAuthToken(token: authToken)
             self.storeAccount(token: accessToken,
-                              email: response.account.email)
+                              email: response.account.email,
+                              externalID: response.account.externalID)
 
             return .success(response.account.externalID)
 
@@ -187,7 +210,8 @@ public class AccountManager {
         switch await AuthService.validateToken(accessToken: accessToken) {
         case .success(let response):
             self.storeAccount(token: accessToken,
-                              email: response.account.email)
+                              email: response.account.email,
+                              externalID: response.account.externalID)
         case .failure:
             break
         }

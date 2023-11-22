@@ -63,7 +63,15 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
         case .appleID:
             actionHandlers.restorePurchases()
         case .email:
-            actionHandlers.openURLHandler(hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription)
+            let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
+
+            Task {
+                await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
+
+                DispatchQueue.main.async {
+                    self.actionHandlers.openURLHandler(url)
+                }
+            }
         case .sync:
             actionHandlers.goToSyncPreferences()
         }

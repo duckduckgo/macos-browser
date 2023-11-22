@@ -36,9 +36,7 @@ public final class SubscriptionAccessViewController: NSViewController {
     }
 
     public override func loadView() {
-        let model: SubscriptionAccessModel = accountManager.isUserAuthenticated ? ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: accountManager.email) : ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
-
-        let subscriptionAccessView = SubscriptionAccessView(model: model,
+        let subscriptionAccessView = SubscriptionAccessView(model: makeSubscriptionAccessModel(),
                                                             dismiss: { [weak self] in
                 guard let self = self else { return }
                 self.presentingViewController?.dismiss(self)
@@ -55,4 +53,11 @@ public final class SubscriptionAccessViewController: NSViewController {
         view.addSubview(hostingView)
     }
 
+    private func makeSubscriptionAccessModel() -> SubscriptionAccessModel {
+        if accountManager.isUserAuthenticated {
+            ShareSubscriptionAccessModel(actionHandlers: actionHandlers, email: accountManager.email)
+        } else {
+            ActivateSubscriptionAccessModel(actionHandlers: actionHandlers)
+        }
+    }
 }

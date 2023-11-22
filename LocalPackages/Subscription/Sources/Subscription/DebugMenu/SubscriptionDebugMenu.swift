@@ -72,7 +72,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     @objc
     func simulateSubscriptionActiveState() {
-        accountManager.storeAccount(token: "fake-token", email: "fake@email.com")
+        accountManager.storeAccount(token: "fake-token", email: "fake@email.com", externalID: "123")
     }
 
     @objc

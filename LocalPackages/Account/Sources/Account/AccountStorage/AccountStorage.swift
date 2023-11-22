@@ -25,5 +25,7 @@ public protocol AccountStorage: AnyObject {
     func store(accessToken: String) throws
     func getEmail() throws -> String?
     func store(email: String?) throws
+    func getExternalID() throws -> String?
+    func store(externalID: String?) throws
     func clearAuthenticationState() throws
 }
