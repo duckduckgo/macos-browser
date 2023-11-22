@@ -16,21 +16,25 @@
 //  limitations under the License.
 //
 
+import Common
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct FileImportView: View {
 
     let source: DataImport.Source
     let dataType: DataImport.DataType
-    let action: (() -> Void)
+    let action: () -> Void
+    let onFileDrop: (URL) -> Void
     private let instructions: [[FileImportInstructionsItem]]
 
     private var isButtonDisabled: Bool
 
-    init(source: DataImport.Source, dataType: DataImport.DataType, isButtonDisabled: Bool, action: (() -> Void)? = nil) {
+    init(source: DataImport.Source, dataType: DataImport.DataType, isButtonDisabled: Bool, action: (() -> Void)? = nil, onFileDrop: ((URL) -> Void)? = nil) {
         self.source = source
         self.dataType = dataType
         self.action = action ?? {}
+        self.onFileDrop = onFileDrop ?? { _ in }
         self.instructions = Self.instructions(for: source, dataType: dataType)
         self.isButtonDisabled = isButtonDisabled
     }
@@ -191,12 +195,52 @@ struct FileImportView: View {
                             Text(localizedStringKey)
                         case .button(let localizedTitleKey):
                             Button(localizedTitleKey, action: action)
+                                .onDrop(of: dataType.allowedFileTypes, isTargeted: nil, perform: onDrop)
                                 .disabled(isButtonDisabled)
                         }
                     }
                 }
             }
         }
+    }
+
+    private func onDrop(_ providers: [NSItemProvider], _ location: CGPoint) -> Bool {
+        let allowedTypeIdentifiers = providers.reduce(into: Set<String>()) {
+            $0.formUnion($1.registeredTypeIdentifiers)
+        }.intersection(dataType.allowedFileTypes.map(\.identifier))
+
+        guard let typeIdentifier = allowedTypeIdentifiers.first,
+              let provider = providers.first(where: {
+                  $0.hasItemConformingToTypeIdentifier(typeIdentifier)
+              }) else {
+            os_log(.error, log: .dataImportExport, "invalid type identifiers: \(allowedTypeIdentifiers)")
+            return false
+        }
+
+        provider.loadItem(forTypeIdentifier: typeIdentifier) { data, error in
+            guard let data else {
+                os_log(.error, log: .dataImportExport, "error loading \(typeIdentifier): \(error?.localizedDescription ?? "?")")
+                return
+            }
+            let url: URL
+            switch data {
+            case let value as URL:
+                url = value
+            case let data as Data:
+                guard let value = URL(dataRepresentation: data, relativeTo: nil) else {
+                    os_log(.error, log: .dataImportExport, "could not decode data: \(data.debugDescription)")
+                    return
+                }
+                url = value
+            default:
+                os_log(.error, log: .dataImportExport, "unsupported data: \(data)")
+                return
+            }
+
+            onFileDrop(url)
+        }
+
+        return true
     }
 
 }

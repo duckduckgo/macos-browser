@@ -102,6 +102,8 @@ struct DataImportView: View {
                 // manual file import instructions for CSV/HTML
                 FileImportView(source: viewModel.importSource, dataType: dataType, isButtonDisabled: viewModel.isSelectFileButtonDisabled) {
                     viewModel.selectFile()
+                } onFileDrop: { url in
+                    viewModel.initiateImport(fileURL: url)
                 }
 
             case .fileImportSummary(let dataType):
