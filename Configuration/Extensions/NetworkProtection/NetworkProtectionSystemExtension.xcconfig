@@ -14,7 +14,7 @@
 //
 
 #include "../ExtensionBase.xcconfig"
-#include "../../NetworkProtectionDeveloperID.xcconfig"
+#include "../../DeveloperID.xcconfig"
 
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension_Debug.entitlements

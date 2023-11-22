@@ -397,7 +397,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func delete(_ profileQuery: ProfileQueryDB) throws {
         guard let profileQueryID = profileQuery.id else { throw DataBrokerProtectionDatabaseErrors.elementNotFound }
-        try db.write { db in
+        _ = try db.write { db in
             try ProfileQueryDB
                 .filter(Column(ProfileQueryDB.Columns.id.name) == profileQueryID)
                 .deleteAll(db)

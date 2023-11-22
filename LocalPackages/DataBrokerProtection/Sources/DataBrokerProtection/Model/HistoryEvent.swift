@@ -45,16 +45,12 @@ public struct HistoryEvent: Identifiable, Sendable {
                 let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.ErrorCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.error)
                 self = HistoryEvent.EventType.error(error: try nestedContainer.decode(DataBrokerProtectionError.self, forKey: HistoryEvent.EventType.ErrorCodingKeys.error))
             case .optOutStarted:
-                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.OptOutStartedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.optOutStarted)
                 self = HistoryEvent.EventType.optOutStarted
             case .optOutRequested:
-                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.OptOutRequestedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.optOutRequested)
                 self = HistoryEvent.EventType.optOutRequested
             case .optOutConfirmed:
-                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.OptOutConfirmedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.optOutConfirmed)
                 self = HistoryEvent.EventType.optOutConfirmed
             case .scanStarted:
-                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.ScanStartedCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.scanStarted)
                 self = HistoryEvent.EventType.scanStarted
             }
         }
