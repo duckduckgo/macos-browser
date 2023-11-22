@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "shane/css-dbp",
-        "revision" : "75d8aeb663b3c99a92954daa649b4e10427ec2c1"
+        "revision" : "fe57c7c00a6515f1b520d9a0449ed8be73ab2e42"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "branch" : "11-22-compiled_assets_test_for_dbp_release",
-        "revision" : "51bbc262009cbd93ae1e8b168e4ca479026799b5"
+        "revision" : "b7ad9843e70cede0c2ca9c4260d970f62cb28156",
+        "version" : "4.52.0"
       }
     },
     {
