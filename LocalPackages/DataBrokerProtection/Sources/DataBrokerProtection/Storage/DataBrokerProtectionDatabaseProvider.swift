@@ -215,7 +215,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                           references: ProfileQueryDB.databaseTableName,
                           onDelete: .cascade)
 
-            $0.foreignKey([OptOutDB.Columns.extractedProfileId.name], 
+            $0.foreignKey([OptOutDB.Columns.extractedProfileId.name],
                           references: ExtractedProfileDB.databaseTableName,
                           onDelete: .cascade)
 
