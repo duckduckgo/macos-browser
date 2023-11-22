@@ -27,9 +27,9 @@ struct SyncWithServerView: View {
             Image("Sync-Server-96")
             SyncUIConstants.TextHeader(text: UserText.syncWithServerTitle)
             SyncUIConstants.TextDetailMultiline(text: UserText.syncWithServerSubtitle1)
-            SyncUIConstants.TextDetailMultiline(text: "Only your device holds the decryption key; DuckDuckGo cannot access it.")
+            SyncUIConstants.TextDetailMultiline(text: UserText.syncWithServerSubtitle2)
             Spacer()
-            Text(UserText.syncWithServerSubtitle2)
+            Text(UserText.syncWithServerWarning)
                 .font(.system(size: 11))
                 .foregroundColor(Color("BlackWhite60"))
         } buttons: {

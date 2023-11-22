@@ -122,6 +122,7 @@ enum UserText {
     static let syncWithServerTitle = NSLocalizedString("preferences.sync.sync-with-server-title", value: "Sync and Back Up This Device", comment: "Sync with server dialog title")
     static let syncWithServerSubtitle1 = NSLocalizedString("preferences.sync.sync-with-server-subtitle1", value: "Your bookmarks and saved logins will be encrypted and begin syncing with DuckDuckGo's server.", comment: "Sync with server dialog first subtitle")
     static let syncWithServerSubtitle2 = NSLocalizedString("preferences.sync.sync-with-server-subtitle2", value: "Only your device holds the decryption key; DuckDuckGo cannot access it.", comment: "Sync with server dialog second subtitle")
+    static let syncWithServerWarning = NSLocalizedString("preferences.sync.sync-with-server-warning", value: "You can add other devices for syncing later.", comment: "Sync with server dialog warning")
     static let syncWithServerButton = NSLocalizedString("preferences.sync.sync-with-server-button", value: "Turn on Sync", comment: "Sync with server dialog button")
 
     // Device synced dialog
