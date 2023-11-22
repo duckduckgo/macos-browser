@@ -27,33 +27,6 @@ public struct HistoryEvent: Identifiable, Sendable {
         case optOutRequested
         case optOutConfirmed
         case scanStarted
-
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: HistoryEvent.EventType.CodingKeys.self)
-            var allKeys = ArraySlice(container.allKeys)
-            guard let onlyKey = allKeys.popFirst(), allKeys.isEmpty else {
-                throw DecodingError.typeMismatch(HistoryEvent.EventType.self, DecodingError.Context.init(codingPath: container.codingPath, debugDescription: "Invalid number of keys found, expected one.", underlyingError: nil))
-            }
-            switch onlyKey {
-            case .noMatchFound:
-                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.NoMatchFoundCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.noMatchFound)
-                self = HistoryEvent.EventType.noMatchFound
-            case .matchesFound:
-                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.MatchesFoundCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.matchesFound)
-                self = HistoryEvent.EventType.matchesFound(count: try nestedContainer.decodeIfPresent(Int.self, forKey: HistoryEvent.EventType.MatchesFoundCodingKeys.count) ?? 0)
-            case .error:
-                let nestedContainer = try container.nestedContainer(keyedBy: HistoryEvent.EventType.ErrorCodingKeys.self, forKey: HistoryEvent.EventType.CodingKeys.error)
-                self = HistoryEvent.EventType.error(error: try nestedContainer.decode(DataBrokerProtectionError.self, forKey: HistoryEvent.EventType.ErrorCodingKeys.error))
-            case .optOutStarted:
-                self = HistoryEvent.EventType.optOutStarted
-            case .optOutRequested:
-                self = HistoryEvent.EventType.optOutRequested
-            case .optOutConfirmed:
-                self = HistoryEvent.EventType.optOutConfirmed
-            case .scanStarted:
-                self = HistoryEvent.EventType.scanStarted
-            }
-        }
     }
 
     public let extractedProfileId: Int64?
