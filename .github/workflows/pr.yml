@@ -142,7 +142,7 @@ jobs:
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-only-testing:${{ matrix.integration-tests-target }}" \
-          -retry-tests-on-failure=3 \
+          -retry-tests-on-failure \
           | tee ${{ matrix.flavor }}-integrationtests-xcodebuild.log \
           | xcbeautify --report junit --report-path . --junit-report-filename ${{ matrix.flavor }}-integrationtests.xml \
           || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-integrationtests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-integrationtests.xcresult && exit 1; }
