@@ -23,7 +23,7 @@ import UserScript
 import Common
 
 protocol DBPUICommunicationDelegate: AnyObject {
-    func setState() async
+    func saveProfile() async -> Bool
     func getUserProfile() -> DBPUIUserProfile?
     func deleteProfileData()
     func addNameToCurrentUserProfile(_ name: DBPUIUserProfileName) -> Bool
@@ -40,7 +40,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
 
 enum DBPUIReceivedMethodName: String {
     case handshake
-    case setState
+    case saveProfile
     case getCurrentUserProfile
     case deleteUserProfileData
     case addNameToCurrentUserProfile
@@ -82,7 +82,7 @@ struct DBPUICommunicationLayer: Subfeature {
 
         switch actionResult {
         case .handshake: return handshake
-        case .setState: return setState
+        case .saveProfile: return saveProfile
         case .getCurrentUserProfile: return getCurrentUserProfile
         case .deleteUserProfileData: return deleteUserProfileData
         case .addNameToCurrentUserProfile: return addNameToCurrentUserProfile
@@ -115,18 +115,12 @@ struct DBPUICommunicationLayer: Subfeature {
         return DBPUIStandardResponse(version: Constants.version, success: true)
     }
 
-    func setState(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        guard let data = try? JSONSerialization.data(withJSONObject: params),
-                let result = try? JSONDecoder().decode(DBPUISetState.self, from: data) else {
-            os_log("Failed to parse setState message", log: .dataBrokerProtection)
-            throw DBPUIError.malformedRequest
-        }
+    func saveProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        os_log("Web UI requested to save the profile", log: .dataBrokerProtection)
 
-        os_log("Web UI requested new state: \(result.state.rawValue)", log: .dataBrokerProtection)
+        let success = await delegate?.saveProfile()
 
-        await delegate?.setState()
-
-        return nil
+        return DBPUIStandardResponse(version: Constants.version, success: success ?? false)
     }
 
     func getCurrentUserProfile(params: Any, original: WKScriptMessage) async throws -> Encodable? {
