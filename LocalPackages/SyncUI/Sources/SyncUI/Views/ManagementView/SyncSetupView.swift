@@ -26,15 +26,15 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
         return VStack(alignment: .center, spacing: 16) {
             Image("Sync-Pair-96x96")
             VStack(alignment: .center, spacing: 8) {
-                SyncUIConstants.TextHeader(text: "Begin Sync")
-                SyncUIConstants.TextDetailSecondary(text: "Safely synchronize your bookmarks and logins between your devices via DuckDuckGo's secure server.")
+                SyncUIConstants.TextHeader(text: UserText.beginSyncTitle)
+                SyncUIConstants.TextDetailSecondary(text: UserText.beginSyncDescription)
             }
             .padding(.bottom, 16)
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color("LinkBlueColor"))
                     .frame(width: 220, height: 32)
-                Text("Sync with Another Device")
+                Text(UserText.beginSyncButton)
                     .foregroundColor(.white)
                     .bold()
             }
@@ -51,13 +51,13 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
         VStack(alignment: .leading, spacing: 24) {
             syncWithAnotherDeviceView()
             VStack(alignment: .leading, spacing: 12) {
-                SyncUIConstants.TextHeader2(text: "Other Options")
+                SyncUIConstants.TextHeader2(text: UserText.otherOptionsSectionTitle)
                 VStack(alignment: .leading, spacing: 8) {
-                    SyncUIConstants.TextLink(text: "Sync with Server to Back Up")
+                    SyncUIConstants.TextLink(text: UserText.syncThisDeviceLink)
                         .onTapGesture {
                             model.syncWithServerPressed()
                         }
-                    SyncUIConstants.TextLink(text: "Recover Data")
+                    SyncUIConstants.TextLink(text: UserText.recoverDataLink)
                         .onTapGesture {
                             model.recoverDataPressed()
                         }

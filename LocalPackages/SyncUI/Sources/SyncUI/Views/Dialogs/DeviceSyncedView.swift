@@ -19,24 +19,14 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct DeviceSyncedView: View{
+struct DeviceSyncedView: View {
     @EnvironmentObject var model: ManagementDialogModel
-
-    let devices: [SyncDevice]
-    let isSingleDevice: Bool
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-setup-success")
                 SyncUIConstants.TextHeader(text: UserText.deviceSynced)
-                VStack(alignment: .center) {
-                    if isSingleDevice {
-                        SingleDeviceSetTextView()
-                    } else {
-                        NewDeviceSyncedView(devices: devices)
-                    }
-                }
             }
             .frame(width: 320)
         } buttons: {
@@ -48,42 +38,4 @@ struct DeviceSyncedView: View{
         .frame(width: 360)
     }
 
-    struct SingleDeviceSetTextView: View {
-        var body: some View {
-            Text(UserText.deviceSyncedExplanation)
-                .frame(width: 320, alignment: .center)
-                .multilineTextAlignment(.center)
-                .fixedSize()
-        }
-    }
-
-    struct NewDeviceSyncedView: View {
-        let devices: [SyncDevice]
-        var body: some View {
-            if devices.count > 1 {
-                VStack(alignment: .center) {
-                    Text(UserText.multipleDeviceSyncedExplanation)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text("\(devices.count + 1) ")
-                        .fontWeight(.bold)
-                    +
-                    Text(UserText.otherDevices)
-                        .fontWeight(.bold)
-                    +
-                    Text(" via DuckDuckGo's secure server.")
-                }
-            } else {
-                VStack(alignment: .center) {
-                    Text(UserText.multipleDeviceSyncedExplanation)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text("\(devices[0].name)")
-                        .fontWeight(.bold)
-                    +
-                    Text(" via DuckDuckGo's secure server.")
-                }
-            }
-        }
-    }
 }

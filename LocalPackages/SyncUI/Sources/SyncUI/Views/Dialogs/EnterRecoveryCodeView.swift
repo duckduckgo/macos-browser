@@ -31,10 +31,10 @@ public struct EnterRecoveryCodeView: View {
     public var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Lock-Succes-96")
-            SyncUIConstants.TextHeader(text: "Enter Code")
-            SyncUIConstants.TextDetailMultiline(text: "Enter the code on your Recovery PDF, or another synced device, to recover your synced data.")
+            SyncUIConstants.TextHeader(text: UserText.enterRecoveryCodeDialogTitle)
+            SyncUIConstants.TextDetailMultiline(text: UserText.enterRecoveryCodeDialogSubtitle)
             VStack(spacing: 16) {
-                Text("Paste Code Here")
+                Text(UserText.enterRecoveryCodeDialogAction1)
                 HStack(spacing: 10) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
@@ -67,7 +67,7 @@ public struct EnterRecoveryCodeView: View {
             .padding()
             HStack {
                 line()
-                Text("or scan QR code with a device that is still connected")
+                Text(UserText.enterRecoveryCodeDialogAction2)
                     .frame(width: 184)
                     .fixedSize()
                     .multilineTextAlignment(.center)

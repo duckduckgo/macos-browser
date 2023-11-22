@@ -46,13 +46,13 @@ struct SaveRecoveryPDFView: View {
                     Button {
                         viewModel.delegate?.copyCode()
                     } label: {
-                        Text("Copy Code")
+                        Text(UserText.recoveryPDFCopyCodeButton)
                             .frame(width: 155, height: 28)
                     }
                     Button {
                         viewModel.delegate?.saveRecoveryPDF()
                     } label: {
-                        Text("Save PDF")
+                        Text(UserText.recoveryPDFSavePDFButton)
                             .frame(width: 155, height: 28)
                     }
                 }
@@ -62,7 +62,7 @@ struct SaveRecoveryPDFView: View {
             .roundedBorder()
             .padding(20)
 
-            Text("Anyone with access to this code can access your synced data, so please keep it in a safe place.")
+            Text(UserText.recoveryPDFWarning)
                 .foregroundColor(Color("BlackWhite60"))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

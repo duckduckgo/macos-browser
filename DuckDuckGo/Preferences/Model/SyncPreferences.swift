@@ -79,63 +79,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.account?.recoveryCode
     }
 
-//    @MainActor
-//    func presentRecoverSyncAccountDialog() {
-//        presentDialog(for: .recoverAccount)
-//    }
-//
-//    @MainActor
-//    func presentManuallyEnterCodeDialog() {
-//        presentDialog(for: .manuallyEnterCode)
-//    }
-
-//    @MainActor
-//    func presentShowTextCodeDialog() {
-//        let code: String = recoveryCode ?? codeToDisplay ?? ""
-//        presentDialog(for: .showTextCode(code))
-//    }
-
-    @MainActor
-    func turnOffSyncPressed() {
-        presentDialog(for: .turnOffSync)
-    }
-
-    @MainActor
-    func presentDeviceDetails(_ device: SyncDevice) {
-        presentDialog(for: .deviceDetails(device))
-    }
-
-    @MainActor
-    func presentRemoveDevice(_ device: SyncDevice) {
-        presentDialog(for: .removeDevice(device))
-    }
-
-    func turnOffSync() {
-        Task { @MainActor in
-            do {
-                try await syncService.disconnect()
-                managementDialogModel.endFlow()
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
-            } catch {
-                errorMessage = String(describing: error)
-            }
-        }
-    }
-
-    @MainActor
-    func manageBookmarks() {
-        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
-        mainVC.showManageBookmarks(self)
-    }
-
-    @MainActor
-    func manageLogins() {
-        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
-        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
-    }
-
     init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
         self.syncService = syncService
 
@@ -190,6 +133,47 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
             }
             .store(in: &cancellables)
+    }
+
+    @MainActor
+    func turnOffSyncPressed() {
+        presentDialog(for: .turnOffSync)
+    }
+
+    @MainActor
+    func presentDeviceDetails(_ device: SyncDevice) {
+        presentDialog(for: .deviceDetails(device))
+    }
+
+    @MainActor
+    func presentRemoveDevice(_ device: SyncDevice) {
+        presentDialog(for: .removeDevice(device))
+    }
+
+    func turnOffSync() {
+        Task { @MainActor in
+            do {
+                try await syncService.disconnect()
+                managementDialogModel.endFlow()
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+                UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            } catch {
+                errorMessage = String(describing: error)
+            }
+        }
+    }
+
+    @MainActor
+    func manageBookmarks() {
+        guard let mainVC = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController else { return }
+        mainVC.showManageBookmarks(self)
+    }
+
+    @MainActor
+    func manageLogins() {
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
     }
 
     // MARK: - Private
@@ -393,12 +377,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                         .prefix(1)
                         .sink { [weak self] devices in
                             guard let self else { return }
-                            let thisDeviceName = deviceInfo().name
-                            var syncedDevices: [SyncDevice] = []
-                            for device in devices where device.name != thisDeviceName {
-                                syncedDevices.append(device)
-                            }
-                            self.presentDialog(for: .nowSyncing(devices: syncedDevices, isSingleDevice: devices.count == 0))
+                            self.presentDialog(for: .nowSyncing)
                         }.store(in: &cancellables)
 
                     // The UI will update when the devices list changes.
@@ -509,12 +488,9 @@ extension SyncPreferences {
         showDevicesSynced()
     }
 
+    @MainActor 
     private func showDevicesSynced() {
-        Task { @MainActor in
-            let syncedDevices = self.devices.filter { !$0.isCurrent }
-            let isSingleDevice = syncedDevices.count == 0
-            presentDialog(for: .nowSyncing(devices: syncedDevices, isSingleDevice: isSingleDevice))
-        }
+        presentDialog(for: .nowSyncing)
     }
 
     func recoveryCodePasted(_ code: String) {

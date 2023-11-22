@@ -25,11 +25,11 @@ struct SyncWithServerView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Server-96")
-            SyncUIConstants.TextHeader(text: "Sync and Back Up This Device")
-            SyncUIConstants.TextDetailMultiline(text: "Your bookmarks and saved logins will be encrypted and begin syncing with DuckDuckGo's server.")
+            SyncUIConstants.TextHeader(text: UserText.syncWithServerTitle)
+            SyncUIConstants.TextDetailMultiline(text: UserText.syncWithServerSubtitle1)
             SyncUIConstants.TextDetailMultiline(text: "Only your device holds the decryption key; DuckDuckGo cannot access it.")
             Spacer()
-            Text("You can add other devices for syncing later.")
+            Text(UserText.syncWithServerSubtitle2)
                 .font(.system(size: 11))
                 .foregroundColor(Color("BlackWhite60"))
         } buttons: {
@@ -37,7 +37,7 @@ struct SyncWithServerView: View {
                 model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
-            Button("Turn on Sync") {
+            Button(UserText.syncWithServerButton) {
                 model.delegate?.turnOnSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))

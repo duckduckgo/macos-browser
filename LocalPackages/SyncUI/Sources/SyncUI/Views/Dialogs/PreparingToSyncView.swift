@@ -22,11 +22,13 @@ import SwiftUIExtensions
 struct PreparingToSyncView: View {
 
     var body: some View {
-        SyncDialog(spacing: 20.0, bottomText: "Connecting…") {
+        SyncDialog(spacing: 20.0, bottomText: UserText.preparingToSyncDialogAction) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-96")
-                SyncUIConstants.TextHeader(text: "Prepating to Sync")
-                SyncUIConstants.TextDetailMultiline(text: "We're setting up the connection to synchronize your bookmarks and saved logins with the other device.")
+                SyncUIConstants.TextHeader(text: UserText.preparingToSyncDialogTitle)
+                    .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                    .multilineTextAlignment(.center)
+                SyncUIConstants.TextDetailMultiline(text: UserText.preparingToSyncDialogSubTitle)
             }
             .frame(width: 320)
         } buttons: {
@@ -38,11 +40,11 @@ struct PreparingToSyncView: View {
 struct YourDataIsReturningView: View {
 
     var body: some View {
-        SyncDialog(spacing: 20.0, bottomText: "Downloading…") {
+        SyncDialog(spacing: 20.0, bottomText: UserText.yourDataIsReturningDialogAction) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Lock-Succes-96")
-                SyncUIConstants.TextHeader(text: "Your Data is Returning!")
-                SyncUIConstants.TextDetailMultiline(text: "Your bookmarks and logins will now be restored from DuckDuckGo's secure server.")
+                SyncUIConstants.TextHeader(text: UserText.yourDataIsReturningDialogTitle)
+                SyncUIConstants.TextDetailMultiline(text: UserText.yourDataIsReturningDialogSubtitle)
             }
             .frame(width: 320)
         } buttons: {
@@ -58,8 +60,8 @@ struct RecoverSyncedDataView: View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-96")
-                SyncUIConstants.TextHeader(text: "Recover Synced Data")
-                SyncUIConstants.TextDetailMultiline(text: "To restore your synced data, you'll need the \"Recovery Code\" you saved when you first set up the sync. This code may have been saved as a PDF with a QR code or as a text code.")
+                SyncUIConstants.TextHeader(text: UserText.reciverSyncedDataDialogTitle)
+                SyncUIConstants.TextDetailMultiline(text: UserText.reciverSyncedDataDialogSubitle)
             }
             .frame(width: 320)
         } buttons: {
@@ -67,7 +69,7 @@ struct RecoverSyncedDataView: View {
                 model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
-            Button("Enter Code") {
+            Button(UserText.reciverSyncedDataDialogButton) {
                 model.delegate?.enterRecoveryCodePressed()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))

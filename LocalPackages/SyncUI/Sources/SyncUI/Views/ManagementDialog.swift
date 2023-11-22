@@ -26,7 +26,7 @@ public enum ManagementDialogKind: Equatable {
     case syncWithAnotherDevice(code: String)
     case prepareToSync
     case saveRecoveryCode(_ code: String)
-    case nowSyncing(devices: [SyncDevice], isSingleDevice: Bool)
+    case nowSyncing
     case syncWithServer
     case enterRecoveryCode(code: String)
     case recoverSyncedData
@@ -70,8 +70,8 @@ public struct ManagementDialog: View {
                 PreparingToSyncView()
             case .saveRecoveryCode(let code):
                 SaveRecoveryPDFView(code: code)
-            case .nowSyncing(devices: let devices, isSingleDevice: let isSingleDevice):
-                DeviceSyncedView(devices: devices, isSingleDevice: isSingleDevice)
+            case .nowSyncing:
+                DeviceSyncedView()
             case .syncWithServer:
                 SyncWithServerView()
             case .enterRecoveryCode(let code):
