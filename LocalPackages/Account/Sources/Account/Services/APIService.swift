@@ -56,7 +56,7 @@ public extension APIService {
                 }
             } else {
                 if let decodedResponse = decode(ErrorResponse.self, from: data) {
-                    let errorDescription = [method, endpoint, urlResponse.httpStatusCodeAsString ?? "", decodedResponse.error].joined(separator: " ")
+                    let errorDescription = "[\(endpoint)] \(urlResponse.httpStatusCodeAsString ?? ""): \(decodedResponse.error)"
                     return .failure(.serverError(description: errorDescription))
                 } else {
                     return .failure(.unknownServerError)
