@@ -188,7 +188,7 @@ public class AccountManager {
         case .success(let response):
             self.storeAccount(token: accessToken,
                               email: response.account.email)
-        case .failure(let error):
+        case .failure:
             break
         }
     }

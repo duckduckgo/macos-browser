@@ -119,9 +119,24 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let token = AccountManager().authToken ?? ""
-        let subscription = Subscription(token: token)
-        return subscription
+        var authToken = AccountManager().authToken ?? ""
+
+        // Check if auth token if still valid
+        if case let .failure(error) = await AuthService.validateToken(accessToken: authToken) {
+            print(error)
+
+            if #available(macOS 12.0, *) {
+                // In case of invalid token attempt store based authentication to obtain a new one
+                guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return nil }
+
+                if case let .success(response) = await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+                    authToken = response.authToken
+                    AccountManager().storeAuthToken(token: authToken)
+                }
+            }
+        }
+
+        return Subscription(token: authToken)
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
