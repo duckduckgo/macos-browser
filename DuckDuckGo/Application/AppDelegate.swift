@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import CoreData
 import BrowserServicesKit
 import Persistence
 import Configuration
@@ -112,6 +113,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
+
+            let preMigrationErrorHandling = EventMapping<BookmarkFormFactorFavoritesMigration.MigrationErrors> { _, error, _, _ in
+                if let error = error {
+                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
+                } else {
+                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
+                }
+
+                Thread.sleep(forTimeInterval: 1)
+                fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+            }
+
+            BookmarkDatabase.shared.preFormFactorSpecificFavoritesFolderOrder = BookmarkFormFactorFavoritesMigration
+                .getFavoritesOrderFromPreV4Model(
+                    dbContainerLocation: BookmarkDatabase.defaultDBLocation,
+                    dbFileURL: BookmarkDatabase.defaultDBFileURL,
+                    errorEvents: preMigrationErrorHandling
+                )
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
