@@ -43,6 +43,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshOrStopButton: NSButton!
+    @IBOutlet weak var menuButtons: NSStackView!
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
@@ -418,6 +419,20 @@ final class NavigationBarViewController: NSViewController {
                                                selector: #selector(showAutoconsentFeedback(_:)),
                                                name: AutoconsentUserScript.Constants.newSitePopupHidden,
                                                object: nil)
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showVPNUninstalledFeedback(_:)),
+                                               name: Notification.Name("com.duckduckgo.NetworkProtection.uninstalled"),
+                                               object: nil)
+    }
+
+    @objc private func showVPNUninstalledFeedback(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true else { return }
+
+        DispatchQueue.main.async {
+            let viewController = PopoverMessageViewController(message: "Network Protection was uninstalled")
+            viewController.show(onParent: self, rect: self.optionsButton.frame, of: self.menuButtons)
+        }
     }
 
     @objc private func showPrivateEmailCopiedToClipboard(_ sender: Notification) {
@@ -427,7 +442,6 @@ final class NavigationBarViewController: NSViewController {
             let viewController = PopoverMessageViewController(message: UserText.privateEmailCopiedToClipboard)
             viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
-
     }
 
     @objc private func showFireproofingFeedback(_ sender: Notification) {

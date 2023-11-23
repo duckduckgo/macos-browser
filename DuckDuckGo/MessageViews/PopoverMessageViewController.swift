@@ -63,6 +63,17 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
         scheduleAutoDismissTimer()
     }
 
+    func show(onParent parent: NSViewController, rect: NSRect, of view: NSView) {
+        // Set the content size to match the SwiftUI view's intrinsic size
+        self.preferredContentSize = self.view.fittingSize
+
+        parent.present(self,
+                       asPopoverRelativeTo: rect,
+                       of: view,
+                       preferredEdge: .maxY,
+                       behavior: .applicationDefined)
+    }
+
     func show(onParent parent: NSViewController, relativeTo view: NSView) {
         let rect = view.bounds
 
@@ -70,7 +81,7 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
         self.preferredContentSize = self.view.fittingSize
 
         parent.present(self,
-                       asPopoverRelativeTo: rect,
+                       asPopoverRelativeTo: self.view.bounds,
                        of: view,
                        preferredEdge: .maxY,
                        behavior: .applicationDefined)

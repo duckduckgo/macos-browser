@@ -27,7 +27,9 @@ import NetworkProtectionUI
 import SystemExtensions
 
 protocol NetworkProtectionFeatureDisabling {
-    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool)
+    /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
+    ///
+    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
 }
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
@@ -59,39 +61,36 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     ///     - keepAuthToken: If `true`, the auth token will not be removed.
     ///     - includeSystemExtension: Whether this method should uninstall the system extension.
     ///
-    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) {
-        Task {
-            // To disable NetP we need the login item to be running
-            // This should be fine though as we'll disable them further down below
-            enableLoginItems()
+    @discardableResult
+    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool {
+        // To disable NetP we need the login item to be running
+        // This should be fine though as we'll disable them further down below
+        enableLoginItems()
 
-            // Allow some time for the login items to fully launch
-            try? await Task.sleep(interval: 0.5)
+        // Allow some time for the login items to fully launch
+        try? await Task.sleep(interval: 0.5)
 
-            if uninstallSystemExtension {
-                do {
-                    try await removeSystemExtension()
-                } catch {
-                    // If there's an error uninstalling the extension, bail out.
-                    return
-                }
+        if uninstallSystemExtension {
+            do {
+                try await removeSystemExtension()
+            } catch {
+                return false
             }
-
-            try? await removeVPNConfiguration()
-
-            // We want to give some time for the login item to reset state before disabling it
-            try? await Task.sleep(interval: 0.5)
-
-            disableLoginItems()
-
-            resetUserDefaults()
-
-            if !keepAuthToken {
-                try? removeAppAuthToken()
-            }
-
-            unpinNetworkProtection()
         }
+
+        try? await removeVPNConfiguration()
+        // We want to give some time for the login item to reset state before disabling it
+        try? await Task.sleep(interval: 0.5)
+        disableLoginItems()
+        resetUserDefaults()
+
+        if !keepAuthToken {
+            try? removeAppAuthToken()
+        }
+
+        unpinNetworkProtection()
+        postVPNUninstalledNotification()
+        return true
     }
 
     private func enableLoginItems() {
@@ -132,6 +131,14 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func resetUserDefaults() {
         settings.resetToDefaults()
+    }
+
+    private func postVPNUninstalledNotification() {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: NSNotification.Name(rawValue: "com.duckduckgo.NetworkProtection.uninstalled"),
+                object: nil)
+        }
     }
 }
 

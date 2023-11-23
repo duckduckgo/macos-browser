@@ -91,7 +91,9 @@ extension Preferences {
                 if model.showUninstallVPN {
                     PreferencePaneSection {
                         Button(UserText.uninstallVPNButtonTitle) {
-                            model.uninstallVPN()
+                            Task { @MainActor in
+                                await model.uninstallVPN()
+                            }
                         }
                     }
                 }

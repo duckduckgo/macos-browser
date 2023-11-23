@@ -130,7 +130,9 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     }
 
     func disableForAllUsers() {
-        featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        Task {
+            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        }
     }
 
     func disableForWaitlistUsers() {
@@ -138,7 +140,9 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return
         }
 
-        featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        Task {
+            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        }
     }
 }
 

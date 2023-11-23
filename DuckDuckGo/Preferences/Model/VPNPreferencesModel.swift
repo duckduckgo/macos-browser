@@ -83,20 +83,16 @@ final class VPNPreferencesModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func uninstallVPN() {
-        Task { @MainActor in
-            let response = await uninstallVPNConfirmationAlert().runModal()
+    @MainActor
+    func uninstallVPN() async {
+        let response = await uninstallVPNConfirmationAlert().runModal()
 
-            switch response {
-            case .OK:
-                NetworkProtectionFeatureDisabler().disable(keepAuthToken: true, uninstallSystemExtension: true)
-            case .cancel:
-                // intentional no-op
-                break
-            default:
-                // intentional no-op
-                break
-            }
+        switch response {
+        case .OK:
+            await NetworkProtectionFeatureDisabler().disable(keepAuthToken: true, uninstallSystemExtension: true)
+        default:
+            // intentional no-op
+            break
         }
     }
 

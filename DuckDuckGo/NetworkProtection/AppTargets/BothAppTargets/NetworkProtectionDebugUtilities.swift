@@ -56,9 +56,14 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Debug commands for the extension
 
-    func resetAllState(keepAuthToken: Bool) async throws {
+    func resetAllState(keepAuthToken: Bool) async {
+        let uninstalledSuccessfully = await networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
+
+        guard uninstalledSuccessfully else {
+            return
+        }
+
         settings.resetToDefaults()
-        networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
 
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         DefaultWaitlistActivationDateStore().removeDates()
