@@ -27,6 +27,12 @@ public final class BookmarkDatabase {
 
     public let db: CoreDataDatabase
 
+    public static var defaultDBLocation: URL = URL.sandboxApplicationSupportURL
+    public static var defaultDBFileURL: URL = {
+        return defaultDBLocation.appendingPathComponent("Bookmarks.sqlite", conformingTo: .database)
+    }()
+    public var preFormFactorSpecificFavoritesFolderOrder: [String]?
+
     init(db: CoreDataDatabase = make(location: URL.sandboxApplicationSupportURL)) {
         self.db = db
     }
