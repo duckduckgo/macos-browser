@@ -87,8 +87,6 @@ class MockBookmarkManager: BookmarkManager {
 
     func handleFavoritesAfterDisablingSync() {}
 
-    var didMigrateToFormFactorSpecificFavorites: Bool = false
-
     @Published var list: BookmarkList?
 
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
