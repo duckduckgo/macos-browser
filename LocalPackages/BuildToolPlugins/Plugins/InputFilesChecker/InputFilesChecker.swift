@@ -41,7 +41,10 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("DataBrokerProtectionFeatureVisibility.swift", .source),
     .init("DataBrokerProtectionFeatureDisabler.swift", .source),
     .init("DataBrokerProtectionAppEvents.swift", .source),
-    .init("DuckDuckGoDBPBackgroundAgent.app", .unknown)
+    .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
+    .init("DataBrokerDatabaseBrowserViewController.swift", .source),
+    .init("DataBrokerDatabaseBrowserView.swift", .source),
+    .init("DataBrokerDatabaseBrowserViewModel.swift", .source)
 ]
 
 /**

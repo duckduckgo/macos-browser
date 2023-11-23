@@ -138,6 +138,12 @@
 		31C9ADE52AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
 		31C9ADE62AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
 		31C9ADE82AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */; };
+		31CE20592B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE20582B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift */; };
+		31CE205A2B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE20582B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift */; };
+		31CE205D2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE205C2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift */; };
+		31CE205E2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE205C2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift */; };
+		31CE20602B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE205F2B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift */; };
+		31CE20612B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE205F2B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift */; };
 		31CF3432288B0B1B0087244B /* NavigationBarBadgeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */; };
 		31D5375C291D944100407A95 /* PasswordManagementBitwardenItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D5375B291D944100407A95 /* PasswordManagementBitwardenItemView.swift */; };
 		31E163BA293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */; };
@@ -3161,6 +3167,9 @@
 		31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRoundedCornersShape.swift; sourceTree = "<group>"; };
 		31C5FFB82AF64D120008A79F /* DataBrokerProtectionFeatureVisibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionFeatureVisibility.swift; sourceTree = "<group>"; };
 		31C9ADE42AF0564500CEF57D /* WaitlistFeatureSetupHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitlistFeatureSetupHandler.swift; sourceTree = "<group>"; };
+		31CE20582B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerDatabaseBrowserViewController.swift; sourceTree = "<group>"; };
+		31CE205C2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerDatabaseBrowserView.swift; sourceTree = "<group>"; };
+		31CE205F2B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerDatabaseBrowserViewModel.swift; sourceTree = "<group>"; };
 		31CF3431288B0B1B0087244B /* NavigationBarBadgeAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarBadgeAnimator.swift; sourceTree = "<group>"; };
 		31D5375B291D944100407A95 /* PasswordManagementBitwardenItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordManagementBitwardenItemView.swift; sourceTree = "<group>"; };
 		31E163B9293A56F400963C10 /* BrokenSiteReportingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokenSiteReportingReferenceTests.swift; sourceTree = "<group>"; };
@@ -4604,6 +4613,7 @@
 		3192EC862A4DCF0E001E97A5 /* DBP */ = {
 			isa = PBXGroup;
 			children = (
+				31CE205B2B10061400EA85ED /* Debug */,
 				316850712AF3AD58009A2828 /* DataBrokerProtectionDebugMenu.swift */,
 				3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */,
 				3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */,
@@ -4614,6 +4624,16 @@
 				3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */,
 			);
 			path = DBP;
+			sourceTree = "<group>";
+		};
+		31CE205B2B10061400EA85ED /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				31CE20582B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift */,
+				31CE205C2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift */,
+				31CE205F2B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		31E163BB293A577200963C10 /* PrivacyReferenceTests */ = {
@@ -10237,6 +10257,7 @@
 				4B9579932AC7AE700062CA31 /* FBProtectionTabExtension.swift in Sources */,
 				4B9579942AC7AE700062CA31 /* CrashReportReader.swift in Sources */,
 				4B9579952AC7AE700062CA31 /* DataTaskProviding.swift in Sources */,
+				31CE205E2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift in Sources */,
 				4B9579962AC7AE700062CA31 /* FeatureFlag.swift in Sources */,
 				4B9579972AC7AE700062CA31 /* FeedbackViewController.swift in Sources */,
 				4B9579982AC7AE700062CA31 /* FaviconSelector.swift in Sources */,
@@ -10523,6 +10544,7 @@
 				4B957AA32AC7AE700062CA31 /* NSTextFieldExtension.swift in Sources */,
 				4B957AA42AC7AE700062CA31 /* BWManagement.swift in Sources */,
 				4B957AA52AC7AE700062CA31 /* FireproofDomainsContainer.swift in Sources */,
+				31CE205A2B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift in Sources */,
 				4B957AA62AC7AE700062CA31 /* ExternalAppSchemeHandler.swift in Sources */,
 				4B957AA72AC7AE700062CA31 /* GeolocationService.swift in Sources */,
 				4B957AA82AC7AE700062CA31 /* FireproofingURLExtensions.swift in Sources */,
@@ -10607,6 +10629,7 @@
 				4B957AF52AC7AE700062CA31 /* WindowControllersManager.swift in Sources */,
 				4B957AF62AC7AE700062CA31 /* FireAnimationView.swift in Sources */,
 				4B957AF72AC7AE700062CA31 /* FaviconUrlReference.swift in Sources */,
+				31CE20612B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift in Sources */,
 				4B957AF82AC7AE700062CA31 /* BookmarkPopoverViewController.swift in Sources */,
 				4B957AF92AC7AE700062CA31 /* PasswordManagementItemListModel.swift in Sources */,
 				4B957AFA2AC7AE700062CA31 /* SuggestionTableCellView.swift in Sources */,
@@ -10917,6 +10940,7 @@
 				B6DB3AEF278D5C370024C5C4 /* URLSessionExtension.swift in Sources */,
 				4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */,
 				B693955326F04BEC0015B914 /* WindowDraggingView.swift in Sources */,
+				31CE205D2B10062C00EA85ED /* DataBrokerDatabaseBrowserView.swift in Sources */,
 				4B1E6EED27AB5E5100F51793 /* SecureVaultSorting.swift in Sources */,
 				37CD54CE27F2FDD100F1F7B9 /* PreferencesSidebarModel.swift in Sources */,
 				3767190328E724D8003A2A15 /* DuckPlayerURLExtension.swift in Sources */,
@@ -11389,6 +11413,7 @@
 				AA9FF95B24A1EFC20039E328 /* TabViewModel.swift in Sources */,
 				AA9E9A5E25A4867200D1959D /* TabDragAndDropManager.swift in Sources */,
 				4BBD3C00285ACE090047A89D /* NSNotificationName+Favicons.swift in Sources */,
+				31CE20602B10068E00EA85ED /* DataBrokerDatabaseBrowserViewModel.swift in Sources */,
 				4B0DB5E528BD9D08007DD239 /* PinningManager.swift in Sources */,
 				373D9B4829EEAC1B00381FDD /* SyncMetadataDatabase.swift in Sources */,
 				B68458C025C7E9E000DC17B6 /* TabCollectionViewModel+NSSecureCoding.swift in Sources */,
@@ -11468,6 +11493,7 @@
 				7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */,
 				B687B7CA2947A029001DEA6F /* ContentBlockingTabExtension.swift in Sources */,
 				85B7184C27677C6500B4277F /* OnboardingViewController.swift in Sources */,
+				31CE20592B1005C300EA85ED /* DataBrokerDatabaseBrowserViewController.swift in Sources */,
 				4B379C1E27BDB7FF008A968E /* DeviceAuthenticator.swift in Sources */,
 				7BFE95522A9DF1CE0081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */,
 				1456D6E124EFCBC300775049 /* TabBarCollectionView.swift in Sources */,
