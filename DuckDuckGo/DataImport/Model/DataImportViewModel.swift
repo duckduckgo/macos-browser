@@ -165,7 +165,11 @@ struct DataImportViewModel {
     private mutating func handleErrors(_ summary: [DataType: any DataImportError]) -> Bool {
         for error in summary.values {
             switch error {
-            // TODO: Chrome user denied keychain prompt error
+            // chromium user denied keychain prompt error
+            case let error as ChromiumLoginReader.ImportError where error.type == .userDeniedKeychainPrompt:
+                // stay on the same screen
+                return true
+
             // firefox passwords db is master-password protected: request password
             case let error as FirefoxLoginReader.ImportError where error.type == .requiresPrimaryPassword:
 
@@ -225,7 +229,7 @@ struct DataImportViewModel {
     }
 
     /// Skip button press
-    @MainActor private mutating func skipImport() {
+    @MainActor mutating func skipImport() {
         self.screen = nextScreen(skip: true)
     }
 
@@ -238,6 +242,12 @@ struct DataImportViewModel {
         guard let url = openPanelCallback(dataType) else { return }
 
         self.initiateImport(fileURL: url)
+    }
+
+    mutating func goBack() {
+        // reset to initial screen
+        screen = importSource.initialScreen
+        summary.removeAll()
     }
 
     func submitReport() {
@@ -543,9 +553,7 @@ extension DataImportViewModel {
         case .next(let screen):
             self.screen = screen
         case .back:
-            // reset to initial screen
-            screen = importSource.initialScreen
-            summary.removeAll()
+            goBack()
 
         case .initiateImport:
             initiateImport()
@@ -584,29 +592,6 @@ extension DataImportViewModel {
             DataImportReportModel(importSource: importSource, error: summarizedError, text: userReportText, retryNumber: retryNumber)
         } set {
             userReportText = newValue.text
-        }
-    }
-
-}
-
-extension DataImportViewModel.ButtonType {
-
-    var title: String {
-        switch self {
-        case .next:
-            UserText.next
-        case .initiateImport:
-            UserText.initiateImport
-        case .skip:
-            UserText.skipImport
-        case .cancel:
-            UserText.cancel
-        case .back:
-            UserText.navigateBack
-        case .done:
-            UserText.done
-        case .submit:
-            UserText.submitReport
         }
     }
 

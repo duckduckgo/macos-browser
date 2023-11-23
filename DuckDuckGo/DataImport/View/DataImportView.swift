@@ -235,6 +235,29 @@ extension DataImportViewModel.ButtonType {
 
 }
 
+extension DataImportViewModel.ButtonType {
+
+    var title: String {
+        switch self {
+        case .next:
+            UserText.next
+        case .initiateImport:
+            UserText.initiateImport
+        case .skip:
+            UserText.skipImport
+        case .cancel:
+            UserText.cancel
+        case .back:
+            UserText.navigateBack
+        case .done:
+            UserText.done
+        case .submit:
+            UserText.submitReport
+        }
+    }
+
+}
+
 #Preview { {
 
     final class PreviewPreferences: ObservableObject {
