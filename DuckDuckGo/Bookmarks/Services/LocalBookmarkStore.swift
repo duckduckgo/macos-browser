@@ -30,16 +30,24 @@ import PixelKit
 final class LocalBookmarkStore: BookmarkStore {
 
     convenience init(bookmarkDatabase: BookmarkDatabase) {
-        self.init(contextProvider: {
-            let context = bookmarkDatabase.db.makeContext(concurrencyType: .privateQueueConcurrencyType)
-            context.stalenessInterval = 0
-            return context
-        })
+        self.init(
+            contextProvider: {
+                let context = bookmarkDatabase.db.makeContext(concurrencyType: .privateQueueConcurrencyType)
+                context.stalenessInterval = 0
+                return context
+            },
+            preFormFactorSpecificFavoritesOrder: bookmarkDatabase.preFormFactorSpecificFavoritesFolderOrder
+        )
     }
 
     // Directly used in tests
-    init(contextProvider: @escaping () -> NSManagedObjectContext, appearancePreferences: AppearancePreferences = .shared) {
+    init(
+        contextProvider: @escaping () -> NSManagedObjectContext,
+        appearancePreferences: AppearancePreferences = .shared,
+        preFormFactorSpecificFavoritesOrder: [String]? = nil
+    ) {
         self.contextProvider = contextProvider
+        self.preFormFactorSpecificFavoritesOrder = preFormFactorSpecificFavoritesOrder
 
         favoritesDisplayMode = appearancePreferences.favoritesDisplayMode
         migrateToFormFactorSpecificFavoritesFolders()
@@ -61,6 +69,7 @@ final class LocalBookmarkStore: BookmarkStore {
 
     private(set) var favoritesDisplayMode: FavoritesDisplayMode
     private(set) var didMigrateToFormFactorSpecificFavorites: Bool = false
+    private var preFormFactorSpecificFavoritesOrder: [String]?
 
     private let contextProvider: () -> NSManagedObjectContext
 
@@ -212,7 +221,11 @@ final class LocalBookmarkStore: BookmarkStore {
 
         context.performAndWait {
             do {
-                BookmarkUtils.migrateToFormFactorSpecificFavorites(byCopyingExistingTo: .desktop, in: context)
+                BookmarkFormFactorFavoritesMigration.migrateToFormFactorSpecificFavorites(
+                    byCopyingExistingTo: .desktop,
+                    preservingOrderOf: preFormFactorSpecificFavoritesOrder,
+                    in: context
+                )
 
                 if context.hasChanges {
                     try context.save(onErrorFire: .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders)
