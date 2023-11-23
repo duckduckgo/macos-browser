@@ -122,10 +122,7 @@ extension YoutubeOverlayUserScript {
             return nil
         }
         if pixelName == "play.use" {
-            let repetition = Pixel.Event.Repetition(key: Pixel.Event.watchInDuckPlayerInitial.name)
-            if repetition == .initial {
-                Pixel.fire(.watchInDuckPlayerInitial)
-            }
+            PixelExperiment.fireWatchInDuckPlayerPixel()
         }
         return nil
     }

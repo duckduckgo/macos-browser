@@ -70,3 +70,10 @@ AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
 AGENT_PRODUCT_NAME = DuckDuckGo VPN
+
+DBP_BACKGROUND_AGENT_BUNDLE_ID[sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Debug][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=CI][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.debug
+DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Review][sdk=*] = com.duckduckgo.macos.DBP.backgroundAgent.review
+
+DBP_BACKGROUND_AGENT_PRODUCT_NAME = DuckDuckGoDBPBackgroundAgent
