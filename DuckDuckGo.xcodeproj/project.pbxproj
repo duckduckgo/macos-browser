@@ -9983,7 +9983,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n#./lint.sh\n";
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n./lint.sh\n";
 		};
 		B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -14087,9 +14087,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "MacOS Browser Product Review";
 			};
 			name = Review;
 		};
