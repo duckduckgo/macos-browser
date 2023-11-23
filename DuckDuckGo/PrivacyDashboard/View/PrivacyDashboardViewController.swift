@@ -70,7 +70,7 @@ final class PrivacyDashboardViewController: NSViewController {
         super.viewDidLoad()
 
         initWebView()
-        privacyDashboardController.setup(for: webView)
+        privacyDashboardController.setup(for: webView, reportBrokenSiteOnly: false)
 
         setupHeightChangeHandler()
     }
@@ -78,7 +78,9 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        privacyDashboardController.delegate = self
+        privacyDashboardController.privacyDashboardNavigationDelegate = self
+        privacyDashboardController.privacyDashboardDelegate = self
+        privacyDashboardController.privacyDashboardReportBrokenSiteDelegate = self
         privacyDashboardController.preferredLocale = "en" // fixed until app is localised
 
         webView.reload()
@@ -95,7 +97,9 @@ final class PrivacyDashboardViewController: NSViewController {
     override func viewWillDisappear() {
         super.viewWillDisappear()
 
-        privacyDashboardController.delegate = nil
+        privacyDashboardController.privacyDashboardNavigationDelegate = nil
+        privacyDashboardController.privacyDashboardDelegate = nil
+        privacyDashboardController.privacyDashboardReportBrokenSiteDelegate = nil
         shouldAnimateHeightChange = false
     }
 
@@ -167,26 +171,34 @@ final class PrivacyDashboardViewController: NSViewController {
             self.contentHeightConstraint.constant = height
         }
     }
-}
 
-extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
-
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didChangeProtectionSwitch protectionState: ProtectionState) {
+    private func privacyDashboardProtectionSwitchChangeHandler(state: ProtectionState) {
         guard let domain = privacyDashboardController.privacyInfo?.url.host else {
             return
         }
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        if protectionState.isProtected && configuration.isUserUnprotected(domain: domain) {
+        if state.isProtected && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
-            Pixel.fire(.dashboardProtectionAllowlistRemove(triggerOrigin: protectionState.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
+            Pixel.fire(.dashboardProtectionAllowlistRemove(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
         } else {
             configuration.userDisabledProtection(forDomain: domain)
-            Pixel.fire(.dashboardProtectionAllowlistAdd(triggerOrigin: protectionState.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
+            Pixel.fire(.dashboardProtectionAllowlistAdd(triggerOrigin: state.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
         rulesUpdateObserver.didStartCompilation(for: domain, token: completionToken)
+    }
+}
+
+extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
+
+    func privacyDashboardControllerDidRequestShowReportBrokenSite(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController) {
+        // Not present in macOS: Pixel.fire(.privacyDashboardReportBrokenSite)
+    }
+
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didChangeProtectionSwitch protectionState: ProtectionState) {
+        privacyDashboardProtectionSwitchChangeHandler(state: protectionState)
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestOpenUrlInNewTab url: URL) {
@@ -214,14 +226,6 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
         }
     }
 
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetHeight height: Int) {
-        currentContentHeight = height
-    }
-
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
-        websiteBreakageReporter.reportBreakage(category: category, description: description, reportFlow: .privacyDashboard)
-    }
-
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetPermission permissionName: String, to state: PermissionAuthorizationState) {
         guard let domain = self.privacyDashboardController.privacyInfo?.url.host else { return }
 
@@ -231,5 +235,22 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, setPermission permissionName: String, paused: Bool) {
         permissionHandler.setPermission(with: permissionName, paused: paused)
     }
+}
 
+extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
+
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didSetHeight height: Int) {
+        currentContentHeight = height
+    }
+}
+
+extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelegate {
+
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
+        websiteBreakageReporter.reportBreakage(category: category, description: description, reportFlow: .privacyDashboard)
+    }
+
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, reportBrokenSiteDidChangeProtectionSwitch protectionState: PrivacyDashboard.ProtectionState) {
+        privacyDashboardProtectionSwitchChangeHandler(state: protectionState)
+    }
 }
