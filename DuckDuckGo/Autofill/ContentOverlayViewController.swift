@@ -53,6 +53,8 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     lazy var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
 
+    lazy var privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+
     public override func viewDidLoad() {
         initWebView()
         addTrackingArea()
@@ -338,5 +340,18 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         } else {
             autofillPreferencesModel.showAutofillPopover(.logins)
         }
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        let properties = ContentScopeProperties(gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                                sessionKey: topAutofillUserScript?.sessionKey ?? "",
+                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig))
+
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: properties)
+            .build()
+            .buildRuntimeConfigResponse()
+
+        completionHandler(runtimeConfiguration)
     }
 }

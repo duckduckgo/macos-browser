@@ -323,19 +323,19 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func deleteProfileData() throws {
         try db.write { db in
-            try ScanHistoryEventDB
-                .deleteAll(db)
             try OptOutHistoryEventDB
-                .deleteAll(db)
-            try ExtractedProfileDB
-                .deleteAll(db)
-            try ScanDB
                 .deleteAll(db)
             try OptOutDB
                 .deleteAll(db)
-            try BrokerDB
+            try ScanHistoryEventDB
+                .deleteAll(db)
+            try ScanDB
+                .deleteAll(db)
+            try ExtractedProfileDB
                 .deleteAll(db)
             try ProfileQueryDB
+                .deleteAll(db)
+            try BrokerDB
                 .deleteAll(db)
             try NameDB
                 .deleteAll(db)
@@ -397,7 +397,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func delete(_ profileQuery: ProfileQueryDB) throws {
         guard let profileQueryID = profileQuery.id else { throw DataBrokerProtectionDatabaseErrors.elementNotFound }
-        try db.write { db in
+        _ = try db.write { db in
             try ProfileQueryDB
                 .filter(Column(ProfileQueryDB.Columns.id.name) == profileQueryID)
                 .deleteAll(db)

@@ -58,16 +58,16 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         return (regionCode ?? "US") == "US"
     }
 
+    private var isInternalUser: Bool {
+        NSApp.delegateTyped.internalUserDecider.isInternalUser
+    }
+
     private var isWaitlistBetaActive: Bool {
-        // Check privacy config
-        // return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
-        true
+        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlistBetaActive)
     }
 
     private var isWaitlistEnabled: Bool {
-        // Check privacy config
-        // return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
-        true
+        return privacyConfigurationManager.privacyConfig.isSubfeatureEnabled(DBPSubfeature.waitlist)
     }
 
     private var isWaitlistUser: Bool {
@@ -93,7 +93,11 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     /// we should set isWaitlistEnabled to false and isWaitlistBetaActive to true.
     /// To remove it from everyone, isWaitlistBetaActive should be set to false
     func isFeatureVisible() -> Bool {
+        // only US locale should be available
         guard isUserLocaleAllowed else { return false }
+
+        // US internal users should have it available by default
+        guard !isInternalUser else { return true }
 
         if isWaitlistUser {
             return isWaitlistBetaActive
