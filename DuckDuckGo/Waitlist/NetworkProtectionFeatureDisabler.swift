@@ -68,8 +68,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
             // Allow some time for the login items to fully launch
             try? await Task.sleep(interval: 0.5)
 
-            unpinNetworkProtection()
-
             if uninstallSystemExtension {
                 await removeSystemExtension()
             }
@@ -86,6 +84,8 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
             if !keepAuthToken {
                 try? removeAppAuthToken()
             }
+
+            unpinNetworkProtection()
         }
     }
 

@@ -28,6 +28,8 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published var selectedTabIndex: Int = 0
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
 
+    // MARK: - Initializers
+
     init(
         loadSections: @escaping () -> [PreferencesSection],
         tabSwitcherTabs: [Tab.TabContent],
@@ -35,10 +37,11 @@ final class PreferencesSidebarModel: ObservableObject {
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
+
         resetTabSelectionIfNeeded()
         refreshSections()
 
-        privacyConfigCancellable = privacyConfigurationManager.updatesPublisher
+        privacyConfigurationManager.updatesPublisher
             .map { [weak privacyConfigurationManager] in
                 privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
             }
@@ -48,6 +51,9 @@ final class PreferencesSidebarModel: ObservableObject {
             .sink { [weak self] in
                 self?.refreshSections()
             }
+            .store(in: &cancellables)
+
+        setupVPNPaneVisibility()
     }
 
     @MainActor
@@ -57,7 +63,7 @@ final class PreferencesSidebarModel: ObservableObject {
         includeDuckPlayer: Bool
     ) {
         let loadSections = {
-            let includingVPN = DefaultNetworkProtectionVisibility().isEnabled
+            let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
 
             return PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPN: includingVPN)
         }
@@ -66,6 +72,25 @@ final class PreferencesSidebarModel: ObservableObject {
                   tabSwitcherTabs: tabSwitcherTabs,
                   privacyConfigurationManager: privacyConfigurationManager)
     }
+
+    // MARK: - Setup
+
+    private func setupVPNPaneVisibility() {
+        DefaultNetworkProtectionVisibility().onboardStatusPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] onboardingStatus in
+                guard let self else { return }
+
+                if onboardingStatus != .completed && self.selectedPane == .vpn {
+                    self.selectedPane = .general
+                }
+
+                self.refreshSections()
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Refreshing logic
 
     func refreshSections() {
         sections = loadSections()
@@ -89,5 +114,5 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     private let loadSections: () -> [PreferencesSection]
-    private var privacyConfigCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 }
