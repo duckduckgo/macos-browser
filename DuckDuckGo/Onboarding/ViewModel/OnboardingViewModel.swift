@@ -29,9 +29,6 @@ protocol OnboardingDelegate: NSObjectProtocol {
     /// Has finished, but still showing a screen.  This is when to re-enable the UI.
     func onboardingHasFinished()
 
-    /// Loads new tab page.
-    func goToNewTabPage()
-
 }
 
 final class OnboardingViewModel: ObservableObject {
@@ -55,10 +52,6 @@ final class OnboardingViewModel: ObservableObject {
         }
     }
 
-    var isNewOnboarding: Bool {
-        return PixelExperiment.cohort == .onboardingExperiment1
-    }
-
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
     private(set) var onboardingFinished: Bool
 
@@ -68,8 +61,6 @@ final class OnboardingViewModel: ObservableObject {
         delegate: OnboardingDelegate? = nil) {
         self.delegate = delegate
         self.state = onboardingFinished ? .startBrowsing : .startFlow
-
-            NotificationCenter.default.addObserver(self, selector: #selector(onboardingPageLeft(_:)), name: .onboardingPageLeft, object: nil)
     }
 
     func onSplashFinished() {
@@ -77,12 +68,7 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     func onStartPressed() {
-        if isNewOnboarding {
-            finishOnboarding()
-            delegate?.goToNewTabPage()
-        } else {
-            state = .importData
-        }
+        state = .importData
     }
 
     func onImportPressed() {
@@ -125,14 +111,6 @@ final class OnboardingViewModel: ObservableObject {
     func restart() {
         onboardingFinished = false
         state = .startFlow
-    }
-
-    @objc private func onboardingPageLeft(_ notification: Notification) {
-        finishOnboarding()
-    }
-
-    private func finishOnboarding() {
-        onboardingFinished = true
     }
 
 }

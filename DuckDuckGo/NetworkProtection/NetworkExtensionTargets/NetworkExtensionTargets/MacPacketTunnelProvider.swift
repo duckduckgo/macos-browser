@@ -133,6 +133,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionNoAuthTokenFoundError
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
+            case .failedToFetchLocationList,
+                    .failedToParseLocationListResponse:
+                // Needs Privacy triage for macOS Geoswitching pixels
+                return
             }
 
             PixelKit.fire(domainEvent, frequency: .dailyAndContinuous, includeAppVersionParameter: true)

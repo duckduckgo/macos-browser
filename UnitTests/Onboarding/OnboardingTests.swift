@@ -134,6 +134,4 @@ final class MockOnboardingDelegate: NSObject, OnboardingDelegate {
         hasFinishedCalled += 1
     }
 
-    func goToNewTabPage() {}
-
 }

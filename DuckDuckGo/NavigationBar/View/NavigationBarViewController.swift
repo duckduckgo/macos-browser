@@ -35,6 +35,8 @@ final class NavigationBarViewController: NSViewController {
         static let activeDownloadsImage = NSImage(named: "DownloadsActive")
         static let inactiveDownloadsImage = NSImage(named: "Downloads")
         static let autosavePopoverImageName = "PasswordManagement"
+        static let homeButtonSeparatorSpacing: CGFloat = 12
+        static let homeButtonSeparatorHeight: CGFloat = 20
     }
 
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -655,6 +657,19 @@ final class NavigationBarViewController: NSViewController {
                 if Self.homeButtonPosition == .left {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: Self.homeButtonLeftPosition)
                     homeButtonSeparator.isHidden = false
+
+                    // Set spacing/size for the separator
+                    navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[0])
+                    navigationButtons.setCustomSpacing(Constants.homeButtonSeparatorSpacing, after: navigationButtons.views[1])
+                    homeButtonSeparator.heightAnchor.constraint(equalToConstant: Constants.homeButtonSeparatorHeight).isActive = true
+                    homeButtonSeparator.translatesAutoresizingMaskIntoConstraints = false
+                    NSLayoutConstraint.activate([NSLayoutConstraint(item: homeButtonSeparator as Any,
+                                                                        attribute: .centerY,
+                                                                        relatedBy: .equal,
+                                                                        toItem: navigationButtons,
+                                                                        attribute: .centerY,
+                                                                        multiplier: 1,
+                                                                        constant: 0)])
                 } else {
                     navigationButtons.insertArrangedSubview(homeButtonView, at: navigationButtons.arrangedSubviews.count)
                     homeButtonSeparator.isHidden = true

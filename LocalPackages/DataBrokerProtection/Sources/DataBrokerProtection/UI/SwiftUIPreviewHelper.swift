@@ -27,7 +27,7 @@ final class PreviewDataManager: DataBrokerProtectionDataManaging {
 
     init() { }
 
-    func saveProfile(_ profile: DataBrokerProtectionProfile) { }
+    func saveProfile(_ profile: DataBrokerProtectionProfile) -> Bool { return false }
 
     func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile? {
         return nil
