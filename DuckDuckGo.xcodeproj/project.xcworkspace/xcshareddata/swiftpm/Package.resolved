@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "fcappelli/breakage_report_improvements",
-        "revision" : "59125174e049f1ab8e995dbd26378eb2a78eaa38"
+        "revision" : "af63158c03de7a47fb9e2cbcd97fbd28a64ab1fd",
+        "version" : "84.2.0"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "254b23cf292140498650421bb31fd05740f4579b",
-        "version" : "4.40.0"
+        "revision" : "b7ad9843e70cede0c2ca9c4260d970f62cb28156",
+        "version" : "4.52.0"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "59dedf0f4ff1e9147de0806a54c6043861eb0870",
-        "version" : "3.1.0"
+        "revision" : "b4ac92a444e79d5651930482623b9f6dc9265667",
+        "version" : "2.0.0"
       }
     },
     {
