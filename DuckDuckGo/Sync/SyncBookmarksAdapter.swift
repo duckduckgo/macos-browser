@@ -62,6 +62,9 @@ final class SyncBookmarksAdapter {
     @UserDefaultsWrapper(key: .syncIsEligibleForFaviconsFetcherOnboarding, defaultValue: false)
     var isEligibleForFaviconsFetcherOnboarding: Bool
 
+    @UserDefaultsWrapper(key: .syncDidMigrateToImprovedListsHandling, defaultValue: false)
+    private var didMigrateToImprovedListsHandling: Bool
+
     @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
     private var isSyncBookmarksPaused: Bool {
         didSet {
@@ -127,7 +130,8 @@ final class SyncBookmarksAdapter {
             }
         )
 
-        if shouldResetBookmarksSyncTimestamp {
+        if shouldResetBookmarksSyncTimestamp || !didMigrateToImprovedListsHandling {
+            didMigrateToImprovedListsHandling = true
             provider.lastSyncTimestamp = nil
         }
 
