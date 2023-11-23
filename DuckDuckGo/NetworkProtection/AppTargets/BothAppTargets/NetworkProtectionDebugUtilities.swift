@@ -69,16 +69,16 @@ final class NetworkProtectionDebugUtilities {
     }
 
     func removeSystemExtensionAndAgents() async throws {
-        await networkProtectionFeatureDisabler.removeSystemExtension()
+        try await networkProtectionFeatureDisabler.removeSystemExtension()
         networkProtectionFeatureDisabler.disableLoginItems()
     }
 
     func sendTestNotificationRequest() async throws {
-        await ipcClient.debugCommand(.sendTestNotification)
+        try await ipcClient.debugCommand(.sendTestNotification)
     }
 
-    func expireRegistrationKeyNow() async {
-        await ipcClient.debugCommand(.expireRegistrationKey)
+    func expireRegistrationKeyNow() async throws {
+        try await ipcClient.debugCommand(.expireRegistrationKey)
     }
 }
 

@@ -111,26 +111,14 @@ extension TunnelControllerIPCService: IPCServerInterface {
         try? await networkExtensionController.deactivateSystemExtension()
     }
 
-    func debugCommand(_ command: DebugCommand) async {
-        if let activeSession = try? await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID) {
-
-            // First give a chance to the extension to process the command, since some commands
-            // may remove the VPN configuration or deactivate the extension.
-            try? await activeSession.sendProviderRequest(.debugCommand(command))
-        }
+    func debugCommand(_ command: DebugCommand) async throws {
+        let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID)
 
         switch command {
         case .removeSystemExtension:
-            await VPNConfigurationManager().removeVPNConfiguration()
-            defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
-
 #if NETP_SYSTEM_EXTENSION
-            do {
-                try await networkExtensionController.deactivateSystemExtension()
-                defaults.networkProtectionOnboardingStatus = .default
-            } catch {
-                // No-op: for now we're not handling this type of error.
-            }
+            try await networkExtensionController.deactivateSystemExtension()
+            defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
 #endif
         case .expireRegistrationKey:
             // Intentional no-op: handled by the extension
@@ -140,6 +128,10 @@ extension TunnelControllerIPCService: IPCServerInterface {
             break
         case .removeVPNConfiguration:
             await VPNConfigurationManager().removeVPNConfiguration()
+
+            if defaults.networkProtectionOnboardingStatus == .completed {
+                defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
+            }
         }
     }
 }

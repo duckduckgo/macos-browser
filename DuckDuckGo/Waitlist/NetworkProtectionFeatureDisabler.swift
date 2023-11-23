@@ -69,10 +69,15 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
             try? await Task.sleep(interval: 0.5)
 
             if uninstallSystemExtension {
-                await removeSystemExtension()
+                do {
+                    try await removeSystemExtension()
+                } catch {
+                    // If there's an error uninstalling the extension, bail out.
+                    return
+                }
             }
 
-            await removeVPNConfiguration()
+            try? await removeVPNConfiguration()
 
             // We want to give some time for the login item to reset state before disabling it
             try? await Task.sleep(interval: 0.5)
@@ -97,8 +102,8 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
-    func removeSystemExtension() async {
-        await ipcClient.debugCommand(.removeSystemExtension)
+    func removeSystemExtension() async throws {
+        try await ipcClient.debugCommand(.removeSystemExtension)
     }
 
     private func unpinNetworkProtection() {
@@ -109,11 +114,12 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         try NetworkProtectionKeychainTokenStore().deleteToken()
     }
 
-    private func removeVPNConfiguration() async {
+    private func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
-        await ipcClient.debugCommand(.removeVPNConfiguration)
+        try await ipcClient.debugCommand(.removeVPNConfiguration)
 
         // Remove the legacy (local) configuration
+        // We don't care if this fails
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
 
         if let tunnels = tunnels {

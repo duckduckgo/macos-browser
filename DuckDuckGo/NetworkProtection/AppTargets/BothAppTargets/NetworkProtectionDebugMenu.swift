@@ -263,7 +263,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func expireRegistrationKeyNow(_ sender: Any?) {
         Task {
-            await debugUtilities.expireRegistrationKeyNow()
+            try? await debugUtilities.expireRegistrationKeyNow()
         }
     }
 
