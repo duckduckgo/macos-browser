@@ -107,13 +107,16 @@ final class TabViewModel {
     private func subscribeToUrl() {
         tab.$isLoading
             .dropFirst()
-            .filter { !$0 }
-            .sink { [weak self] _ in
-                // Update the address bar only after the tab has finished
-                // to prevent Address Bar Spoofing
-                self?.updateAddressBarStrings()
-                self?.updateCanBeBookmarked()
-                self?.updateFavicon()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.isLoading = isLoading
+                if !isLoading {
+                    // Update the address bar only after the tab has finished
+                    // to prevent Address Bar Spoofing
+                    self?.updateAddressBarStrings()
+                    self?.updateCanBeBookmarked()
+                    self?.updateFavicon()
+                }
             }
             .store(in: &cancellables)
     }
