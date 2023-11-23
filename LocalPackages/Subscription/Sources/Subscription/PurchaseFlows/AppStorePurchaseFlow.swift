@@ -26,13 +26,14 @@ public final class AppStorePurchaseFlow {
 
     public enum Error: Swift.Error {
         case appStoreAuthenticationFailed
+        case activeSubscriptionAlreadyPresent
         case authenticatingWithTransactionFailed
         case accountCreationFailed
         case purchaseFailed
         case somethingWentWrong
     }
 
-    public static func purchaseSubscription(with identifier: String, emailAccessToken: String?) async -> Result<Void, AppStorePurchaseFlow.Error> {
+    public static func purchaseSubscription(with subscriptionIdentifier: String, emailAccessToken: String?) async -> Result<Void, AppStorePurchaseFlow.Error> {
         // Trigger sign in pop-up
         switch await PurchaseManager.shared.syncAppleIDAccount() {
         case .success:
@@ -64,7 +65,7 @@ public final class AppStorePurchaseFlow {
         }
 
         // Make the purchase
-        switch await PurchaseManager.shared.purchaseSubscription(with: identifier, externalID: externalID) {
+        switch await PurchaseManager.shared.purchaseSubscription(with: subscriptionIdentifier, externalID: externalID) {
         case .success:
             return .success(())
         case .failure(let error):

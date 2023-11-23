@@ -135,7 +135,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         await AccountManager().refreshAccountData()
-        
+
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
         }
@@ -266,6 +266,25 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         guard let purchaseInProgressViewController else { return }
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(purchaseInProgressViewController)
         self.purchaseInProgressViewController = nil
+    }
+
+    @MainActor
+    private func showSubscriptionFoundAlert() {
+        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else {
+            assertionFailure("No window")
+            return
+        }
+
+        let alert = NSAlert.subscriptionFoundAlert()
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            if case .alertFirstButtonReturn = response {
+                // restore
+            } else {
+                // clear
+            }
+
+            print("Restore action")
+        })
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
