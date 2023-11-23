@@ -74,7 +74,7 @@ extension Preferences {
                     }.frame(alignment: .topLeading)
                         .frame(idealWidth: .infinity, maxWidth: .infinity)
                         .padding(10)
-                        .background(Color("BlackWhite10"))
+                        .background(Color("BlackWhite1"))
                         .roundedBorder()
                 }
 

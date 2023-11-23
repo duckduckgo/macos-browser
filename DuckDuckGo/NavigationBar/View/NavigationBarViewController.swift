@@ -43,7 +43,6 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshOrStopButton: NSButton!
-    @IBOutlet weak var menuButtons: NSStackView!
     @IBOutlet weak var optionsButton: NSButton!
     @IBOutlet weak var bookmarkListButton: MouseOverButton!
     @IBOutlet weak var passwordManagementButton: MouseOverButton!
@@ -422,7 +421,7 @@ final class NavigationBarViewController: NSViewController {
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showVPNUninstalledFeedback(_:)),
-                                               name: Notification.Name("com.duckduckgo.NetworkProtection.uninstalled"),
+                                               name: NetworkProtectionFeatureDisabler.vpnUninstalledNotificationName,
                                                object: nil)
     }
 
@@ -431,7 +430,7 @@ final class NavigationBarViewController: NSViewController {
 
         DispatchQueue.main.async {
             let viewController = PopoverMessageViewController(message: "Network Protection was uninstalled")
-            viewController.show(onParent: self, rect: self.optionsButton.frame, of: self.menuButtons)
+            viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
     }
 
