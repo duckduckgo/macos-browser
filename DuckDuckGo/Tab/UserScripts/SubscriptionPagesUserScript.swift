@@ -101,6 +101,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case "subscriptionSelected": return subscriptionSelected
         case "activateSubscription": return activateSubscription
         case "featureSelected": return featureSelected
+        case "completeStripePayment": return completeStripePayment
         default:
             return nil
         }
@@ -119,7 +120,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        var authToken = AccountManager().authToken ?? ""
+        let authToken = AccountManager().authToken ?? ""
         return Subscription(token: authToken)
     }
 
@@ -144,36 +145,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        struct SubscriptionOptions: Encodable {
-            let platform: String
-            let options: [SubscriptionOption]
-            let features: [SubscriptionFeature]
+#if STRIPE
+        switch await StripePurchaseFlow.subscriptionOptions() {
+        case .success(let subscriptionOptions):
+            return subscriptionOptions
+        case .failure:
+            // TODO: handle errors
+            return nil
         }
-
-        struct SubscriptionOption: Encodable {
-            let id: String
-            let cost: SubscriptionCost
-
-            struct SubscriptionCost: Encodable {
-                let displayPrice: String
-                let recurrence: String
-            }
-        }
-
-        enum SubscriptionFeatureName: String, CaseIterable {
-            case privateBrowsing = "private-browsing"
-            case privateSearch = "private-search"
-            case emailProtection = "email-protection"
-            case appTrackingProtection = "app-tracking-protection"
-            case vpn = "vpn"
-            case personalInformationRemoval = "personal-information-removal"
-            case identityTheftRestoration = "identity-theft-restoration"
-        }
-
-        struct SubscriptionFeature: Encodable {
-            let name: String
-        }
-
+#else
         let subscriptionOptions: [SubscriptionOption]
 
         if #available(macOS 12.0, *) {
@@ -188,11 +168,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 
-        let message = SubscriptionOptions(platform: "macos",
-                                          options: subscriptionOptions,
-                                          features: SubscriptionFeatureName.allCases.map { SubscriptionFeature(name: $0.rawValue) })
+        subscriptionOptions = SubscriptionOptions(platform: "macos",
+                                                  options: subscriptionOptions,
+                                                  features: SubscriptionFeatureName.allCases.map { SubscriptionFeature(name: $0.rawValue) })
 
-        return message
+        return subscriptionOptions
+#endif
     }
 
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -202,6 +183,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let message = original
 
+#if STRIPE
+        switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: "passemailaccesstokenhere") {
+        case .success(let purchaseUpdate):
+            await pushPurchaseUpdate(webView: message.webView!, purchaseUpdate: purchaseUpdate)
+        case .failure:
+            // TODO: handle errors
+            return nil
+        }
+#else
         if #available(macOS 12.0, *) {
             guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
                 assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
@@ -241,6 +231,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 self.pushAction(method: .onPurchaseUpdate, webView: message.webView!, params: PurchaseUpdate(type: "completed"))
             }
         }
+#endif
 
         return nil
     }
@@ -333,12 +324,23 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return nil
     }
 
+    func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        print(">>> completeStripePayment")
+
+        await showProgress(with: "Completing purchase...")
+        await StripePurchaseFlow.completeSubscriptionPurchase()
+        await hideProgress()
+
+        return [String: String]() // cannot be nil
+    }
+
     enum SubscribeActionName: String {
         case onPurchaseUpdate
     }
 
-    struct PurchaseUpdate: Codable {
-        let type: String
+    @MainActor
+    func pushPurchaseUpdate(webView: WKWebView, purchaseUpdate: PurchaseUpdate) async {
+        pushAction(method: .onPurchaseUpdate, webView: webView, params: purchaseUpdate)
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
