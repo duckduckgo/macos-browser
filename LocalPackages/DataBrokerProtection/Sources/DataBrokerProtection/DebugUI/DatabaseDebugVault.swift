@@ -31,7 +31,6 @@ let DebugSecureVaultFactory: DebugVaultFactory = SecureVaultFactory<DatabaseDebu
     }
 )
 
-
 final class DatabaseDebugSecureVault<T: DataBrokerProtectionDatabaseProvider>: SecureVault {
     typealias DataBrokerProtectionStorageProviders = SecureStorageProviders<T>
 
@@ -44,6 +43,11 @@ final class DatabaseDebugSecureVault<T: DataBrokerProtectionDatabaseProvider>: S
     func fetchAllScans() -> [ScanDB] {
         let scans = try? providers.database.fetchAllScans()
         return scans ?? [ScanDB]()
+    }
+
+    func fetchAllBrokers() -> [BrokerDB] {
+        let brokers = try? providers.database.fetchAllBrokers()
+        return brokers ?? [BrokerDB]()
     }
 
 }

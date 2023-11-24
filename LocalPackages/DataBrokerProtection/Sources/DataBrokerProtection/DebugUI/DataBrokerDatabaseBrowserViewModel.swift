@@ -32,11 +32,13 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
 
     private func updateTables() {
         guard let vault = self.vault else { return }
-        let scans = vault.fetchAllScans()
-        let rows = scans.map { convertToGenericRowData($0) }
-        let table = DataBrokerDatabaseBrowserData.Table(name: "Scans", rows: rows)
+        let scanRows = vault.fetchAllScans().map { convertToGenericRowData($0) }
+        let scanTable = DataBrokerDatabaseBrowserData.Table(name: "Scans", rows: scanRows)
 
-        self.tables = [table]
+        let letBrokerRows = vault.fetchAllBrokers().map { convertToGenericRowData($0) }
+        let brokerTable = DataBrokerDatabaseBrowserData.Table(name: "Brokers", rows: letBrokerRows)
+
+        self.tables = [scanTable, brokerTable]
     }
 
     private func convertToGenericRowData<T>(_ item: T) -> DataBrokerDatabaseBrowserData.Row {
