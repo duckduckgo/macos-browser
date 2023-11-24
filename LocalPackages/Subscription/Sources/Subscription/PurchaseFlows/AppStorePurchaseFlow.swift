@@ -25,12 +25,36 @@ import Account
 public final class AppStorePurchaseFlow {
 
     public enum Error: Swift.Error {
+        case noProductsFound
+
         case appStoreAuthenticationFailed
         case activeSubscriptionAlreadyPresent
         case authenticatingWithTransactionFailed
         case accountCreationFailed
         case purchaseFailed
+
+        case missingEntitlements
+
         case somethingWentWrong
+    }
+
+    public static func subscriptionOptions() async -> Result<SubscriptionOptions, AppStorePurchaseFlow.Error> {
+
+        let products = PurchaseManager.shared.availableProducts
+
+        let monthly = products.first(where: { $0.id.contains("1month") })
+        let yearly = products.first(where: { $0.id.contains("1year") })
+
+        guard let monthly, let yearly else { return .failure(.noProductsFound) }
+
+        let options = [SubscriptionOption(id: monthly.id, cost: .init(displayPrice: monthly.displayPrice, recurrence: "monthly")),
+                       SubscriptionOption(id: yearly.id, cost: .init(displayPrice: yearly.displayPrice, recurrence: "yearly"))]
+
+        let features = SubscriptionFeatureName.allCases.map { SubscriptionFeature(name: $0.rawValue) }
+
+        return .success(SubscriptionOptions(platform: SubscriptionPlatformName.macos.rawValue,
+                                            options: options,
+                                            features: features))
     }
 
     public static func purchaseSubscription(with subscriptionIdentifier: String, emailAccessToken: String?) async -> Result<Void, AppStorePurchaseFlow.Error> {
@@ -73,6 +97,14 @@ public final class AppStorePurchaseFlow {
             AccountManager().signOut()
             return .failure(.purchaseFailed)
         }
+    }
+
+    @discardableResult
+    public static func completeSubscriptionPurchase() async -> Result<PurchaseUpdate, AppStorePurchaseFlow.Error> {
+
+        let result = await checkForEntitlements(wait: 2.0, retry: 15)
+
+        return result ? .success(PurchaseUpdate(type: "completed")) : .failure(.missingEntitlements)
     }
 
     @discardableResult

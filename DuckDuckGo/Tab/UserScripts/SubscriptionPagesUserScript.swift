@@ -154,25 +154,16 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 #else
-        let subscriptionOptions: [SubscriptionOption]
-
         if #available(macOS 12.0, *) {
-            let monthly = PurchaseManager.shared.availableProducts.first(where: { $0.id.contains("1month") })
-            let yearly = PurchaseManager.shared.availableProducts.first(where: { $0.id.contains("1year") })
-
-            guard let monthly, let yearly else { return nil }
-
-            subscriptionOptions = [SubscriptionOption(id: monthly.id, cost: .init(displayPrice: monthly.displayPrice, recurrence: "monthly")),
-                                   SubscriptionOption(id: yearly.id, cost: .init(displayPrice: yearly.displayPrice, recurrence: "yearly"))]
-        } else {
-            return nil
+            switch await AppStorePurchaseFlow.subscriptionOptions() {
+            case .success(let subscriptionOptions):
+                return subscriptionOptions
+            case .failure:
+                // TODO: handle errors
+                return nil
+            }
         }
-
-        subscriptionOptions = SubscriptionOptions(platform: "macos",
-                                                  options: subscriptionOptions,
-                                                  features: SubscriptionFeatureName.allCases.map { SubscriptionFeature(name: $0.rawValue) })
-
-        return subscriptionOptions
+        return nil
 #endif
     }
 
@@ -186,7 +177,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #if STRIPE
         switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: "passemailaccesstokenhere") {
         case .success(let purchaseUpdate):
-            await pushPurchaseUpdate(webView: message.webView!, purchaseUpdate: purchaseUpdate)
+            await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
         case .failure:
             // TODO: handle errors
             return nil
@@ -216,6 +207,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success:
                 break
             case .failure(let error):
+                // TODO: handle errors
                 print("Purchase failed: \(error)")
                 await hideProgress()
                 return nil
@@ -223,13 +215,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             await updateProgressTitle("Completing purchase...")
 
-            await AppStorePurchaseFlow.checkForEntitlements(wait: 2.0, retry: 15)
+            switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
+            case .success(let purchaseUpdate):
+                await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
+            case .failure:
+                // TODO: handle errors
+                return nil
+            }
 
             await hideProgress()
-
-            DispatchQueue.main.async {
-                self.pushAction(method: .onPurchaseUpdate, webView: message.webView!, params: PurchaseUpdate(type: "completed"))
-            }
         }
 #endif
 
@@ -339,8 +333,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     @MainActor
-    func pushPurchaseUpdate(webView: WKWebView, purchaseUpdate: PurchaseUpdate) async {
-        pushAction(method: .onPurchaseUpdate, webView: webView, params: purchaseUpdate)
+    func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) async {
+        pushAction(method: .onPurchaseUpdate, webView: originalMessage.webView!, params: purchaseUpdate)
     }
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
