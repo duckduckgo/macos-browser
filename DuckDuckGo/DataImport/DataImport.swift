@@ -169,13 +169,17 @@ enum DataImport {
         let browser: ThirdPartyBrowser
         let profiles: [BrowserProfile]
 
+        typealias ProfileDataValidator = (BrowserProfile) -> () -> BrowserProfile.ProfileDataValidationResult?
+        private let validateProfileData: ProfileDataValidator
+
         var validImportableProfiles: [BrowserProfile] {
-            return profiles.filter { $0.validateProfileData()?.containsValidData == true }
+            return profiles.filter { validateProfileData($0)()?.containsValidData == true }
         }
 
-        init(browser: ThirdPartyBrowser, profiles: [BrowserProfile]) {
+        init(browser: ThirdPartyBrowser, profiles: [BrowserProfile], validateProfileData: @escaping ProfileDataValidator = BrowserProfile.validateProfileData) {
             self.browser = browser
             self.profiles = profiles
+            self.validateProfileData = validateProfileData
         }
 
         var defaultProfile: BrowserProfile? {

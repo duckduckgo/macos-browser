@@ -398,7 +398,9 @@ extension DataImportViewModel.ButtonType {
                   profileURL: URL(fileURLWithPath: "/test/Profile 1")),
             .init(browser: .chrome,
                   profileURL: URL(fileURLWithPath: "/test/Profile 2")),
-        ])
+        ]) { _ in
+            { .init(logins: .available, bookmarks: .available) }
+        }
     } dataImporterFactory: { source, type, _, _ in
         return MockDataImporter(source: source, dataType: type)
     } requestPrimaryPasswordCallback: { _ in

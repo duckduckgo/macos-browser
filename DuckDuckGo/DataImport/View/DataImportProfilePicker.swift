@@ -58,7 +58,7 @@ struct DataImportProfilePicker: View {
               profileURL: URL(fileURLWithPath: "/test/Profile 1")),
         .init(browser: .chrome,
               profileURL: URL(fileURLWithPath: "/test/Profile 2")),
-    ]), selectedProfile: Binding {
+    ], validateProfileData: { _ in { .init(logins: .available, bookmarks: .available) } }), selectedProfile: Binding {
         .init(browser: .chrome,
               profileURL: URL(fileURLWithPath: "/test/Profile 1"))
     } set: {
