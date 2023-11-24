@@ -27,6 +27,9 @@ public final class PixelKit {
         /// The default frequency for pixels. This fires pixels with the event names as-is.
         case standard
 
+        /// Sent only once ever. The timestamp for this pixel is stored. Name for pixels of this type must end with `_u`.
+        case justOnce
+
         /// Sent once per day. The last timestamp for this pixel is stored and compared to the current date. Pixels of this type will have `_d` appended to their name.
         case dailyOnly
 
@@ -64,6 +67,14 @@ public final class PixelKit {
         var calendar = Calendar.current
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         return calendar
+    }()
+
+    private var dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.calendar = defaultDailyPixelCalendar
+        dateFormatter.timeZone = defaultDailyPixelCalendar.timeZone
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter
     }()
 
     public private(set) static var shared: PixelKit?
@@ -135,13 +146,22 @@ public final class PixelKit {
         switch frequency {
         case .standard:
             fireRequest(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+        case .justOnce:
+            guard pixelName.hasSuffix("_u") else {
+                assertionFailure("Unique pixel: must end with _u")
+                return
+            }
+            if !pixelHasBeenFiredEver(pixelName) {
+                fireRequest(pixelName, headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                updatePixelLastFireDate(pixelName: pixelName)
+            }
         case .dailyOnly:
-            if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
+            if !pixelHasBeenFiredToday(pixelName) {
                 fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
                 updatePixelLastFireDate(pixelName: pixelName)
             }
         case .dailyAndContinuous:
-            if !pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
+            if !pixelHasBeenFiredToday(pixelName) {
                 fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
                 updatePixelLastFireDate(pixelName: pixelName)
             }
@@ -173,7 +193,7 @@ public final class PixelKit {
 
         let pixelName = prefixedName(for: event)
 
-        if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName, dailyPixelStorage: defaults, calendar: self.pixelCalendar) {
+        if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName) {
             onComplete(nil)
             return
         }
@@ -217,16 +237,38 @@ public final class PixelKit {
                           onComplete: onComplete)
     }
 
+    private func dateString(for event: Event) -> String? {
+        let pixelName = prefixedName(for: event)
+
+        guard let dateFired = pixelLastFireDate(pixelName: pixelName) else {
+            return nil
+        }
+
+        return dateFormatter.string(from: dateFired)
+    }
+
+    public static func dateString(for event: Event) -> String {
+        Self.shared?.dateString(for: event) ?? ""
+    }
+
+    public func pixelLastFireDate(pixelName: String) -> Date? {
+        defaults.object(forKey: userDefaultsKeyName(forPixelName: pixelName)) as? Date
+    }
+
     private func updatePixelLastFireDate(pixelName: String) {
         defaults.set(Date(), forKey: userDefaultsKeyName(forPixelName: pixelName))
     }
 
-    private func pixelHasBeenFiredToday(_ name: String, dailyPixelStorage: UserDefaults, calendar: Calendar) -> Bool {
-        if let lastFireDate = dailyPixelStorage.object(forKey: userDefaultsKeyName(forPixelName: name)) as? Date {
-            return calendar.isDate(Date(), inSameDayAs: lastFireDate)
+    private func pixelHasBeenFiredToday(_ name: String) -> Bool {
+        if let lastFireDate = pixelLastFireDate(pixelName: name) {
+            return pixelCalendar.isDate(Date(), inSameDayAs: lastFireDate)
         }
 
         return false
+    }
+
+    private func pixelHasBeenFiredEver(_ name: String) -> Bool {
+        pixelLastFireDate(pixelName: name) != nil
     }
 
     private func userDefaultsKeyName(forPixelName pixelName: String) -> String {

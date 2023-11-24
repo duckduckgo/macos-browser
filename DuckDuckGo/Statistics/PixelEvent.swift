@@ -193,6 +193,7 @@ extension Pixel {
         case homeButtonRight
 
         case dailyPixel(Event, isFirst: Bool)
+        case uniquePixel(Event)
 
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
@@ -522,6 +523,12 @@ extension Pixel.Event {
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
+        case .uniquePixel(let pixel):
+            guard pixel.name.hasSuffix("_u") else {
+                assertionFailure("Unique pixel: must end with _u")
+                return ""
+            }
+            return pixel.name
         }
     }
 }

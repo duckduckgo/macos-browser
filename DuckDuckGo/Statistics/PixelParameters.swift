@@ -65,6 +65,9 @@ extension Pixel.Event {
             guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
+        case .uniquePixel(let pixel):
+            return pixel.parameters
+
         case .dailyPixel(let pixel, isFirst: _):
             return pixel.parameters
 
