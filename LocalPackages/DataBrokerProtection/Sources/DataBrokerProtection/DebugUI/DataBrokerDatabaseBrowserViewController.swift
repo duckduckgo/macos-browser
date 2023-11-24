@@ -21,7 +21,7 @@ import SwiftUI
 
 public final class DataBrokerDatabaseBrowserViewController: NSViewController {
     public override func loadView() {
-        let viewModel = DataBrokerDatabaseBrowserViewModel(tables: [DataBrokerDatabaseBrowserData.Table]())
+        let viewModel = DataBrokerDatabaseBrowserViewModel()
         let contentView = DataBrokerDatabaseBrowserView(viewModel: viewModel)
         let hostingController = NSHostingController(rootView: contentView)
         hostingController.view.autoresizingMask = [.width, .height]

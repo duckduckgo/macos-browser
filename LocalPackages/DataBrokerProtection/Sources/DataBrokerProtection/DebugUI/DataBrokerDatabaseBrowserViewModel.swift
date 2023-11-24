@@ -17,14 +17,26 @@
 //
 
 import Foundation
-import DataBrokerProtection
+import SecureStorage
 
 final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
     @Published var selectedTable: DataBrokerDatabaseBrowserData.Table?
-    let tables: [DataBrokerDatabaseBrowserData.Table]
+    var tables = [DataBrokerDatabaseBrowserData.Table]()
+    let vault: DatabaseDebugSecureVault<DefaultDataBrokerProtectionDatabaseProvider>?
 
-    internal init(tables: [DataBrokerDatabaseBrowserData.Table]) {
-        self.tables = DataBrokerDatabaseBrowserViewModel.createFakeTables()
+    internal init() {
+
+        self.vault = try? DebugSecureVaultFactory.makeVault(errorReporter: nil)
+        updateTables()
+    }
+
+    private func updateTables() {
+        guard let vault = self.vault else { return }
+        let scans = vault.fetchAllScans()
+        let rows = scans.map { convertToGenericRowData($0) }
+        let table = DataBrokerDatabaseBrowserData.Table(name: "Scans", rows: rows)
+
+        self.tables = [table]
     }
 
     private func convertToGenericRowData<T>(_ item: T) -> DataBrokerDatabaseBrowserData.Row {
