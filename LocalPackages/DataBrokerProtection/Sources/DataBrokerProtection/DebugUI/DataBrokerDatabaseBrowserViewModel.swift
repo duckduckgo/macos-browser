@@ -30,15 +30,21 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         updateTables()
     }
 
+    private func createTable(using fetchData: () -> [Any], tableName: String) -> DataBrokerDatabaseBrowserData.Table {
+        let rows = fetchData().map { convertToGenericRowData($0) }
+        let table = DataBrokerDatabaseBrowserData.Table(name: tableName, rows: rows)
+        print("ROW COUNT \(table.rows.count) \(tableName)")
+        return table
+    }
+
     private func updateTables() {
         guard let vault = self.vault else { return }
-        let scanRows = vault.fetchAllScans().map { convertToGenericRowData($0) }
-        let scanTable = DataBrokerDatabaseBrowserData.Table(name: "Scans", rows: scanRows)
 
-        let letBrokerRows = vault.fetchAllBrokers().map { convertToGenericRowData($0) }
-        let brokerTable = DataBrokerDatabaseBrowserData.Table(name: "Brokers", rows: letBrokerRows)
+        let scanTable = createTable(using: vault.fetchAllScans, tableName: "Scans")
+        let brokerTable = createTable(using: vault.fetchAllBrokers, tableName: "Brokers")
+        let optOutTable = createTable(using: vault.fetchAllOptOuts, tableName: "OptOut")
 
-        self.tables = [scanTable, brokerTable]
+        self.tables = [scanTable, brokerTable, optOutTable]
     }
 
     private func convertToGenericRowData<T>(_ item: T) -> DataBrokerDatabaseBrowserData.Row {
@@ -51,7 +57,6 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         }
         return DataBrokerDatabaseBrowserData.Row(data: data)
     }
-
     static func createFakeTables() -> [DataBrokerDatabaseBrowserData.Table] {
        let fakeRows1 = (1...10).map { index in
            DataBrokerDatabaseBrowserData.Row(data: ["Name": "John Doe", "Age": Int.random(in: 20...60), "Email": "john.doe\(index)@example.com"])

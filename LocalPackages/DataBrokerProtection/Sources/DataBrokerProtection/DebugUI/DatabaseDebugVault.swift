@@ -50,4 +50,11 @@ final class DatabaseDebugSecureVault<T: DataBrokerProtectionDatabaseProvider>: S
         return brokers ?? [BrokerDB]()
     }
 
+    func fetchAllOptOuts() -> [OptOutDB] {
+        let list = try? providers.database.fetchAllOptOuts()
+        let optOuts = list?.compactMap {
+            $0.optOutDB
+        }
+        return optOuts ?? [OptOutDB]()
+    }
 }

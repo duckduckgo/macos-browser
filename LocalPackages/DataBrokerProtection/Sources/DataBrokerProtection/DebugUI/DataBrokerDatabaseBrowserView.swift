@@ -48,6 +48,15 @@ struct DatabaseView: View {
     let data: [DataBrokerDatabaseBrowserData.Row]
 
     var body: some View {
+        if data.count > 0 {
+            dataView()
+        } else {
+            Text("No Data")
+        }
+
+    }
+
+    func dataView() -> some View {
         GeometryReader { geometry in
             ScrollView([.horizontal, .vertical]) {
                 VStack(alignment: .leading, spacing: 0) {
