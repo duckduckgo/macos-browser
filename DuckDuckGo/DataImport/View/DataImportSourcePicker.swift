@@ -47,11 +47,12 @@ struct DataImportSourcePicker: View {
                 }
             }
         } label: {}
+            .pickerStyle(.menu)
+            .controlSize(.large)
             .onChange(of: viewModel.selectedSourceIndex) { idx in
                 guard let importSource = importSources[idx] else { return }
                 viewModel.onSelectedSourceChanged(importSource)
             }
-            .pickerStyle(MenuPickerStyle())
     }
 
 }
@@ -60,4 +61,6 @@ struct DataImportSourcePicker: View {
     DataImportSourcePicker(selectedSource: .csv) {
         print("selection:", $0)
     }
+    .padding()
+    .frame(width: 500)
 }

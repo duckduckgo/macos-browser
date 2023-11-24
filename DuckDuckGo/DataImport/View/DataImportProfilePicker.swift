@@ -43,7 +43,8 @@ struct DataImportProfilePicker: View {
                         Text(profiles[idx].profileName)
                     }
                 } label: {}
-                    .pickerStyle(MenuPickerStyle())
+                    .pickerStyle(.menu)
+                    .controlSize(.large)
             }
         }
     }
@@ -64,4 +65,6 @@ struct DataImportProfilePicker: View {
     } set: {
         print("Profile selected:", $0?.profileURL.lastPathComponent ?? "<nil>")
     })
+    .padding()
+    .frame(width: 512)
 }

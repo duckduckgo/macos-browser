@@ -39,6 +39,7 @@ extension DataImportView {
 
 }
 
+@MainActor
 struct DataImportView: View {
 
     @Environment(\.dismiss) private var dismiss
@@ -50,9 +51,33 @@ struct DataImportView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            viewHeader()
+                .padding(.top, 20)
+                .padding(.leading, 20)
+                .padding(.trailing, 20)
+                .padding(.bottom, 24)
+
+            viewBody()
+                .padding(.leading, 20)
+                .padding(.trailing, 20)
+                .padding(.bottom, 32)
+
+            Divider()
+
+            viewFooter()
+                .padding(.top, 16)
+                .padding(.bottom, 16)
+                .padding(.trailing, 20)
+        }
+        .frame(width: 512)
+        .fixedSize()
+    }
+
+    private func viewHeader() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
             Text("Import Browser Data")
                 .font(.headline)
-            Spacer().frame(height: 10)
+                .padding(.bottom, 16)
 
             // browser to import data from picker popup
             if case .feedback = viewModel.screen {} else {
@@ -61,18 +86,20 @@ struct DataImportView: View {
                 }
                 .disabled(viewModel.isImportSourcePickerDisabled)
             }
+        }
+    }
 
-            Spacer().frame(height: 16)
-
+    // swiftlint:disable:next function_body_length
+    private func viewBody() -> some View {
+        VStack(alignment: .leading, spacing: 0) {
             // body
             switch viewModel.screen {
             case .profileAndDataTypesPicker:
                 // Browser Profile picker
                 DataImportProfilePicker(profileList: viewModel.browserProfiles,
                                         selectedProfile: $viewModel.selectedProfile)
-                    .disabled(viewModel.isImportSourcePickerDisabled)
-
-                Spacer().frame(height: 16)
+                .disabled(viewModel.isImportSourcePickerDisabled)
+                .padding(.bottom, 24)
 
                 // Bookmarks/Passwords checkboxes
                 DataImportTypePicker(viewModel: $viewModel)
@@ -134,40 +161,40 @@ struct DataImportView: View {
 
             // Import in progress…
             if let importProgress = viewModel.importProgress {
-                Spacer().frame(height: 24)
-
-                // Progress bar with label: Importing [bookmarks|passwords]…
-                ProgressView(value: progressFraction) {
-                    Text(progressText ?? "")
-                }
-                .task {
-                    // when viewModel.importProgress async sequence not nil
-                    // receive progress updates events and update model on completion
-                    await handleImportProgress(importProgress)
-                }
-
-            }
-
-            Spacer().frame(height: 32)
-            Divider()
-            Spacer().frame(height: 24)
-
-            // under line buttons
-            HStack {
-                Spacer()
-
-                ForEach(viewModel.buttons, id: \.type) { button in
-                    Button(button.type.title) {
-                        viewModel.performAction(for: button.type, dismiss: dismiss.callAsFunction)
-                    }
-                    .keyboardShortcut(button.type.shortcut)
-                    .disabled(button.isDisabled)
-                }
+                progressView(importProgress)
             }
         }
-        .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
-        .frame(width: 512)
-        .fixedSize()
+    }
+
+    private func progressView(_ progress: TaskProgress<DataImportViewModel, Never, DataImportProgressEvent>) -> some View {
+        // Progress bar with label: Importing [bookmarks|passwords]…
+        ProgressView(value: progressFraction) {
+            Text(progressText ?? "")
+        }
+        .padding(.top, 24)
+        .task {
+            // when viewModel.importProgress async sequence not nil
+            // receive progress updates events and update model on completion
+            await handleImportProgress(progress)
+        }
+    }
+
+    // under line buttons
+    private func viewFooter() -> some View {
+        HStack(spacing: 8) {
+            Spacer()
+
+            ForEach(viewModel.buttons, id: \.type) { button in
+                Button {
+                    viewModel.performAction(for: button.type, dismiss: dismiss.callAsFunction)
+                } label: {
+                    Text(button.type.title)
+                        .frame(minWidth: 80 - 16 - 1)
+                }
+                .keyboardShortcut(button.type.shortcut)
+                .disabled(button.isDisabled)
+            }
+        }
     }
 
     private func handleImportProgress(_ progress: TaskProgress<DataImportViewModel, Never, DataImportProgressEvent>) async {
@@ -398,9 +425,9 @@ extension DataImportViewModel.ButtonType {
                   profileURL: URL(fileURLWithPath: "/test/Profile 1")),
             .init(browser: .chrome,
                   profileURL: URL(fileURLWithPath: "/test/Profile 2")),
-        ]) { _ in
-            { .init(logins: .available, bookmarks: .available) }
-        }
+        ], validateProfileData: { _ in
+            { .init(logins: .available, bookmarks: .available) } // swiftlint:disable:this opening_brace
+        })
     } dataImporterFactory: { source, type, _, _ in
         return MockDataImporter(source: source, dataType: type)
     } requestPrimaryPasswordCallback: { _ in
