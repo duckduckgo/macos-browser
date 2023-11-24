@@ -71,8 +71,8 @@ public final class DataBrokerProtectionIPCClient {
 extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
     public func register() {
+        self.pixelHandler.fire(.ipcServerRegister)
         xpc.execute(call: { server in
-            self.pixelHandler.fire(.ipcServerRegister)
             server.register()
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
@@ -81,8 +81,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func startScheduler(showWebView: Bool) {
+        self.pixelHandler.fire(.ipcServerStartScheduler)
         xpc.execute(call: { server in
-            self.pixelHandler.fire(.ipcServerStartScheduler)
             server.startScheduler(showWebView: showWebView)
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
@@ -91,8 +91,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func stopScheduler() {
+        self.pixelHandler.fire(.ipcServerStopScheduler)
         xpc.execute(call: { server in
-            self.pixelHandler.fire(.ipcServerStopScheduler)
             server.stopScheduler()
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
@@ -101,8 +101,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+        self.pixelHandler.fire(.ipcServerOptOutAllBrokers)
         xpc.execute(call: { server in
-            self.pixelHandler.fire(.ipcServerOptOutAllBrokers)
             server.optOutAllBrokers(showWebView: showWebView) { error in
                 self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error?.toEquatableError()))
                 completion(error)
@@ -114,8 +114,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+        self.pixelHandler.fire(.ipcServerScanAllBrokers)
         xpc.execute(call: { server in
-            self.pixelHandler.fire(.ipcServerScanAllBrokers)
             server.scanAllBrokers(showWebView: showWebView) { error in
                 self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error?.toEquatableError()))
                 completion(error)
@@ -127,8 +127,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
+        self.pixelHandler.fire(.ipcServerRunQueuedOperations)
         xpc.execute(call: { server in
-            self.pixelHandler.fire(.ipcServerRunQueuedOperations)
             server.runQueuedOperations(showWebView: showWebView) { error in
                 self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error?.toEquatableError()))
                 completion(error)
@@ -140,8 +140,8 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
     }
 
     public func runAllOperations(showWebView: Bool) {
+        self.pixelHandler.fire(.ipcServerRunAllOperations)
         xpc.execute(call: { server in
-            self.pixelHandler.fire(.ipcServerRunAllOperations)
             server.runAllOperations(showWebView: showWebView)
         }, xpcReplyErrorHandler: { _ in
             // Intentional no-op as there's no completion block
