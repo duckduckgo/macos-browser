@@ -57,4 +57,19 @@ final class DatabaseDebugSecureVault<T: DataBrokerProtectionDatabaseProvider>: S
         }
         return optOuts ?? [OptOutDB]()
     }
+
+    func fetchAllExtractedProfiles() -> [ExtractedProfileDB] {
+        let list = try? providers.database.fetchAllExtractedProfiles()
+        return list ?? [ExtractedProfileDB]()
+    }
+
+    func fetchAllScanHistoryEvents() -> [ScanHistoryEventDB] {
+        let list = try? providers.database.fetchAllScanHistoryEvents()
+        return list ?? [ScanHistoryEventDB]()
+    }
+
+    func fetchAllOptOutHistoryEvents() -> [OptOutHistoryEventDB] {
+        let list = try? providers.database.fetchAllOptOutHistoryEvents()
+        return list ?? [OptOutHistoryEventDB]()
+    }
 }

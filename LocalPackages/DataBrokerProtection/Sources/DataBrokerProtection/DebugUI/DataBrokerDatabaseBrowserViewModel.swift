@@ -43,8 +43,11 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         let scanTable = createTable(using: vault.fetchAllScans, tableName: "Scans")
         let brokerTable = createTable(using: vault.fetchAllBrokers, tableName: "Brokers")
         let optOutTable = createTable(using: vault.fetchAllOptOuts, tableName: "OptOut")
+        let extractedProfile = createTable(using: vault.fetchAllExtractedProfiles, tableName: "ExtractedProfile")
+        let scanHistory = createTable(using: vault.fetchAllScanHistoryEvents, tableName: "ScanHistory")
+        let optOutHistory = createTable(using: vault.fetchAllOptOutHistoryEvents, tableName: "OptOutHistory")
 
-        self.tables = [scanTable, brokerTable, optOutTable]
+        self.tables = [scanTable, brokerTable, optOutTable, extractedProfile, scanHistory, optOutHistory]
     }
 
     private func convertToGenericRowData<T>(_ item: T) -> DataBrokerDatabaseBrowserData.Row {
