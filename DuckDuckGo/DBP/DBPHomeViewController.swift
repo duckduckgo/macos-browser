@@ -141,7 +141,7 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .ipcServerScanAllBrokersCompletion(error: let error),
                     .ipcServerRunQueuedOperationsCompletion(error: let error):
                 // We can't use .debug directly because it modifies the pixel name and clobbers the params
-                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error?.base)))
+                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error)))
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,

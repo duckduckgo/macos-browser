@@ -77,7 +77,7 @@ extension IPCServiceManager: IPCServerInterface {
     func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         pixelHandler.fire(.ipcServerOptOutAllBrokers)
         scheduler.optOutAllBrokers(showWebView: showWebView) { error in
-            self.pixelHandler.fire(.ipcServerOptOutAllBrokersCompletion(error: error?.toEquatableError()))
+            self.pixelHandler.fire(.ipcServerOptOutAllBrokersCompletion(error: error))
             completion(error)
         }
     }
@@ -85,7 +85,7 @@ extension IPCServiceManager: IPCServerInterface {
     func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         pixelHandler.fire(.ipcServerScanAllBrokers)
         scheduler.scanAllBrokers(showWebView: showWebView) { error in
-            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error?.toEquatableError()))
+            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
             completion(error)
         }
     }
@@ -93,7 +93,7 @@ extension IPCServiceManager: IPCServerInterface {
     func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
         pixelHandler.fire(.ipcServerRunQueuedOperations)
         scheduler.runQueuedOperations(showWebView: showWebView) { error in
-            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error?.toEquatableError()))
+            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
             completion(error)
         }
     }

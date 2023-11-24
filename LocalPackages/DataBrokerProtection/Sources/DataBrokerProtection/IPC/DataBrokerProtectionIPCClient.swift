@@ -104,11 +104,11 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         self.pixelHandler.fire(.ipcServerOptOutAllBrokers)
         xpc.execute(call: { server in
             server.optOutAllBrokers(showWebView: showWebView) { error in
-                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error?.toEquatableError()))
+                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
                 completion(error)
             }
         }, xpcReplyErrorHandler: { error in
-            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error.toEquatableError()))
+            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
             completion(error)
         })
     }
@@ -117,11 +117,11 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         self.pixelHandler.fire(.ipcServerScanAllBrokers)
         xpc.execute(call: { server in
             server.scanAllBrokers(showWebView: showWebView) { error in
-                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error?.toEquatableError()))
+                self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
                 completion(error)
             }
         }, xpcReplyErrorHandler: { error in
-            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error.toEquatableError()))
+            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
             completion(error)
         })
     }
@@ -130,11 +130,11 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         self.pixelHandler.fire(.ipcServerRunQueuedOperations)
         xpc.execute(call: { server in
             server.runQueuedOperations(showWebView: showWebView) { error in
-                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error?.toEquatableError()))
+                self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
                 completion(error)
             }
         }, xpcReplyErrorHandler: { error in
-            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error.toEquatableError()))
+            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
             completion(error)
         })
     }
