@@ -104,3 +104,7 @@ OTHER_SWIFT_FLAGS[config=CI][arch=*][sdk=*] = $(inherited) $(DDG_SLOW_COMPILE_CH
 
 // Automatically generate Color and Image asset accessor extensions
 ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES
+
+// Automatically generate localization string catalogs
+LOCALIZATION_PREFERS_STRING_CATALOGS = YES
+SWIFT_EMIT_LOC_STRINGS = YES

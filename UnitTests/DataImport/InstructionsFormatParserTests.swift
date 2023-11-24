@@ -17,3 +17,99 @@
 //
 
 import Foundation
+import XCTest
+@testable import DuckDuckGo_Privacy_Browser
+
+final class InstructionsFormatParserTests: XCTestCase {
+
+    func testOnlyTextLines() throws {
+        let format = """
+          line 1
+        line 2
+        """
+        let parsed = try InstructionsFormatParser().parse(format: format)
+
+        XCTAssertEqual(parsed, [[.text("line 1")], [.text("line 2")]])
+        print(parsed)
+    }
+
+    func testLinesWithEscapedExpressions() throws {
+        let format = """
+          %d line %s %@
+            line %ld
+        %lld%s%@ line 3 %d
+        """
+        let parsed = try InstructionsFormatParser().parse(format: format)
+
+        XCTAssertEqual(parsed, [
+            [.number, .text(" line "), .string(), .text(" "), .object],
+            [.text("line "), .number],
+            [.number, .string(), .object, .text(" line 3 "), .number],
+        ])
+        print(parsed)
+    }
+
+    func testItalicMarkdown() throws {
+        let format = "st_art_ some_text “_italic_text_” text_ __italic_text__ text"
+        let parsed = try InstructionsFormatParser().parse(format: format)
+        XCTAssertEqual(parsed, [[.text("st_art_ some_text “"), .text("italic_text", italic: true), .text("” text_ "), .text("italic_text", italic: true), .text(" text")]])
+    }
+
+    func testItalicMarkdownMultiline() throws {
+        let format = """
+        some_text __italic_text_
+        text_ __non_italic_text__ text
+        """
+        let parsed = try InstructionsFormatParser().parse(format: format)
+        XCTAssertEqual(parsed, [
+            [.text("some_text "), .text("italic_text_", italic: true)],
+            [.text("text_ ", italic: true), .text("non_italic_text__ text", italic: false)]])
+    }
+
+    func testBoldMarkdown() throws {
+        let format = "st*art* some*text *nonbold*text* text* **bold*text** text"
+        let parsed = try InstructionsFormatParser().parse(format: format)
+        XCTAssertEqual(parsed, [[.text("st*art* some*text *nonbold*text* text* "), .text("bold*text", bold: true), .text(" text")]])
+    }
+
+    func testBoldMarkdownMultiline() throws {
+        let format = """
+         *some*text* **bold*text*
+        text* **non*bold*text** text **.csv**
+        """
+        let parsed = try InstructionsFormatParser().parse(format: format)
+        XCTAssertEqual(parsed, [
+            [.text("*some*text* "), .text("bold*text*", bold: true)],
+            [.text("text* ", bold: true), .text("non*bold*text** text", bold: false), .text(".csv", bold: true)]
+        ])
+    }
+
+    func testMarkdownWithExpressions() throws {
+        let format = """
+        %d Open **%s**
+        %d In a fresh tab, click %@ then **Google __Password__ Manager → Settings **
+        %d Find “Export _Passwords_” and click **Download File**
+        %d __Save the* passwords **file** someplace__ you can_find it (e.g. Desktop)
+        %d %@
+        """
+        let parsed = try InstructionsFormatParser().parse(format: format)
+
+        XCTAssertEqual(parsed[safe: 0], [.number, .text(" Open "), .string(bold: true)])
+        XCTAssertEqual(parsed[safe: 1], [.number, .text(" In a fresh tab, click "), .object, .text(" then "), .text("Google ", bold: true), .text("Password", bold: true, italic: true), .text(" Manager → Settings ", bold: true)])
+        XCTAssertEqual(parsed[safe: 2], [.number, .text(" Find “Export "), .text("Passwords", italic: true), .text("” and click "), .text("Download File", bold: true)])
+        XCTAssertEqual(parsed[safe: 3], [.number, .text(" "), .text("Save the* passwords ", italic: true), .text("file", bold: true, italic: true), .text(" someplace", italic: true), .text(" you can_find it (e.g. Desktop)")])
+        XCTAssertEqual(parsed[safe: 4], [.number, .text(" "), .object])
+        XCTAssertNil(parsed[safe: 5])
+    }
+
+    func testInvalidEscapeSequencesThrow() {
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "text with %z escape char"))
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%llld text with invalid digit"))
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%2d unsupported format"))
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%.2d unsupported format"))
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%f unsupported format"))
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "unexpected eof %"))
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "unexpected eol %\nasdf"))
+    }
+
+}

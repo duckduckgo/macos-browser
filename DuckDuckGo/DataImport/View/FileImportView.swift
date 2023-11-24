@@ -26,7 +26,6 @@ struct FileImportView: View {
     let dataType: DataImport.DataType
     let action: () -> Void
     let onFileDrop: (URL) -> Void
-    private let instructions: [[FileImportInstructionsItem]]
 
     private var isButtonDisabled: Bool
 
@@ -35,143 +34,7 @@ struct FileImportView: View {
         self.dataType = dataType
         self.action = action ?? {}
         self.onFileDrop = onFileDrop ?? { _ in }
-        self.instructions = Self.instructions(for: source, dataType: dataType)
         self.isButtonDisabled = isButtonDisabled
-    }
-
-    // swiftlint:disable:next function_body_length
-    private static func instructions(for source: DataImport.Source, dataType: DataImport.DataType) -> [[FileImportInstructionsItem]] {
-        buildInstructions {
-            switch (source, dataType) {
-            case (.brave, .passwords),
-                (.chrome, .passwords),
-                (.chromium, .passwords),
-                (.coccoc, .passwords),
-                (.edge, .passwords),
-                (.vivaldi, .passwords),
-                (.opera, .passwords),
-                (.operaGX, .passwords):
-
-                1; "Open **\(source.importSourceName)**"
-                2; "In a fresh tab, click \(Image(.menuVertical16)) then **\(source == .chrome ? "Google " : "")Password Manager  → Settings**"
-                3; "Find “Export Passwords” and click **Download File**"
-                4; "Save the passwords file someplace you can find it (e.g. Desktop)"
-                5; .button("Select Passwords CSV File…")
-
-            case (.yandex, .passwords):
-                1; "Open **Yandex**"
-                2; "Click \(Image(.menuHamburger16)) to open the application menu then click **Passwords and cards**"
-                3; "Click \(Image(.menuVertical16)) then **Export passwords**"
-                4; "Choose **To a text file (not secure)** and click **Export**"
-                5; "Save the passwords file someplace you can find it (e.g. Desktop)"
-                6; .button("Select Passwords CSV File…")
-
-            case (.brave, .bookmarks),
-                (.chrome, .bookmarks),
-                (.chromium, .bookmarks),
-                (.coccoc, .bookmarks),
-                (.edge, .bookmarks),
-                (.vivaldi, .bookmarks),
-                (.opera, .bookmarks),
-                (.operaGX, .bookmarks):
-                1; "Open **\(source.importSourceName)**"
-                2; "Use the Menu Bar to select **Bookmarks → Bookmark Manager**"
-                3; "Click \(Image(.menuVertical16)) then **Export Bookmarks**"
-                4; "Save the file someplace you can find it (e.g., Desktop)"
-                5; .button("Select Bookmarks HTML File…")
-
-            case (.yandex, .bookmarks):
-                1; "Open **\(source.importSourceName)**"
-                2; "Use the Menu Bar to select **Favorites → Bookmark Manager**"
-                3; "Click \(Image(.menuVertical16)) then **Export bookmarks to HTML file**"
-                4; "Save the file someplace you can find it (e.g., Desktop)"
-                5; .button("Select Bookmarks HTML File…")
-            case (.safari, .passwords), (.safariTechnologyPreview, .passwords):
-                1; "Open **Safari**"
-                2; "Select **File → Export → Passwords**"
-                3; "Save the passwords file someplace you can find it (e.g. Desktop)"
-                4; .button("Select Passwords CSV File…")
-
-            case (.safari, .bookmarks), (.safariTechnologyPreview, .bookmarks):
-                1; "Open **Safari**"
-                2; "Select **File → Export → Bookmarks**"
-                3; "Save the passwords file someplace you can find it (e.g. Desktop)"
-                4; .button("Select Bookmarks HTML File…")
-
-            case (.firefox, .passwords):
-                1; "Open **\(source.importSourceName)**"
-                2; "Click \(Image(.menuHamburger16)) to open the application menu then click **Passwords**"
-                3; "Click \(Image(.menuVertical16)) then **Export Logins…**"
-                4; "Save the passwords file someplace you can find it (e.g. Desktop)"
-                5; .button("Select Passwords CSV File…")
-
-            case (.firefox, .bookmarks), (.tor, .bookmarks):
-                1; "Open **\(source.importSourceName)**"
-                2; "Use the Menu Bar to select **Bookmarks → Manage Bookmarks**"
-                3; "Click \(Image(.importExport16)) then **Export bookmarks to HTML…**"
-                4; "Save the file someplace you can find it (e.g., Desktop)"
-                5; .button("Select Bookmarks HTML File…")
-
-            case (.onePassword8, .passwords):
-                1; "Open and unlock **\(source.importSourceName)**"
-                2; "Select **File → Export** from the Menu Bar and choose the account you want to export"
-                3; "Enter your 1Password account password"
-                4; "Select the File Format: **CSV (Logins and Passwords only)**"
-                5; "Click Export Data and save the file someplace you can find it (e.g. Desktop)"
-                6; .button("Select 1Password CSV File…")
-            case (.onePassword7, .passwords):
-                1; "Open and unlock **\(source.importSourceName)**"
-                2; "Select the vault you want to Export (You cannot export from “All Vaults.”)"
-                3; "Select **File → Export → All Items** from the Menu Bar"
-                4; "Enter your 1Password master or account password"
-                5; "Select the File Format: **iCloud Keychain (.csv)**"
-                6; "Save the passwords file someplace you can find it (e.g. Desktop)"
-                7; .button("Select 1Password CSV File…")
-            case (.bitwarden, .passwords):
-                1; "Open and unlock **\(source.importSourceName)**"
-                2; "Select **File → Export vault** from the Menu Bar"
-                3; "Select the File Format: **.csv**"
-                4; "Enter your Bitwarden Master password"
-                5; "Click \(Image(systemName: "square.and.arrow.down")) and save the file someplace you can find it (e.g. Desktop)"
-                6; .button("Select Bitwarden CSV File…")
-
-            case (.lastPass, .passwords):
-                1; "Click on the **\(source.importSourceName)** icon in your browser and enter your master password"
-                2; "Select **Open My Vault**"
-                3; "From the sidebar select **Advanced Options → Export**"
-                4; "Enter your LastPass master password"
-                5; "Select the File Format: Comma Delimited Text (.csv)"
-                6; .button("Select LastPass CSV File…")
-            case (.csv, .passwords):
-                """
-                The CSV importer will try to match column headers to their position.
-                If there is no header, it supports two formats:
-                """
-                1; "URL, Username, Password"
-                2; "Title, URL, Username, Password";
-
-                .button("Select Passwords CSV File…")
-
-            case (.bookmarksHTML, .bookmarks):
-                1; "Open your old browser"
-                2; "Click \(Image(.menuHamburger16)) then select **Bookmarks → Bookmark Manager**"
-                3; "Click \(Image(.menuVertical16)) then **Export bookmarks to HTML…**"
-                4; "Save the file someplace you can find it (e.g., Desktop)"
-                5; .button("Select Bookmarks HTML File…")
-
-            case (.bookmarksHTML, .passwords),
-                (.tor, .passwords),
-                (.onePassword7, .bookmarks),
-                (.onePassword8, .bookmarks),
-                (.bitwarden, .bookmarks),
-                (.lastPass, .bookmarks),
-                (.csv, .bookmarks):
-                {
-                    assertionFailure("Invalid source/dataType")
-                    return ""
-                }()
-            }
-        }
     }
 
     var body: some View {
@@ -185,23 +48,278 @@ struct FileImportView: View {
                 }
             }().font(.headline)
 
-            ForEach(instructions.indices, id: \.self) { i in
-                HStack(spacing: 4) {
-                    ForEach(instructions[i].indices, id: \.self) { j in
-                        switch instructions[i][j] {
-                        case .number(let number):
-                            CircleNumberView(number: number)
-                        case .text(let localizedStringKey):
-                            Text(localizedStringKey)
-                        case .button(let localizedTitleKey):
-                            Button(localizedTitleKey, action: action)
-                                .onDrop(of: dataType.allowedFileTypes, isTargeted: nil, perform: onDrop)
-                                .disabled(isButtonDisabled)
-                        }
-                    }
+            InstructionsView(fontName: "SF Pro Text", fontSize: 13) {
+
+                switch (source, dataType) {
+                case (.chrome, .passwords):
+                    NSLocalizedString("import.csv.instructions.chrome", value: """
+                    %d Open **%s**
+                    %d In a fresh tab, click %@ then **Google Password Manager → Settings**
+                    %d Find “Export Passwords” and click **Download File**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Google Chrome browser.
+                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuVertical16
+                    button("Select Passwords CSV File…")
+
+                case (.brave, .passwords),
+                    (.chromium, .passwords),
+                    (.coccoc, .passwords),
+                    (.edge, .passwords),
+                    (.vivaldi, .passwords),
+                    (.opera, .passwords),
+                    (.operaGX, .passwords):
+
+                    NSLocalizedString("import.csv.instructions.chromium", value: """
+                    %d Open **%s**
+                    %d In a fresh tab, click %@ then **Password Manager → Settings**
+                    %d Find “Export Passwords” and click **Download File**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Chromium-based browsers.
+                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuVertical16
+                    button("Select Passwords CSV File…")
+
+                case (.yandex, .passwords):
+                    NSLocalizedString("import.csv.instructions.yandex", value: """
+                    %d Open **Yandex**
+                    %d Click %@ to open the application menu then click **Passwords and cards**
+                    %d Click %@ then **Export passwords**
+                    %d Choose **To a text file (not secure)** and click **Export**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Yandex Browser.
+                    %d is a step number; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    NSImage.menuHamburger16
+                    NSImage.menuVertical16
+                    button("Select Passwords CSV File…")
+
+                case (.brave, .bookmarks),
+                    (.chrome, .bookmarks),
+                    (.chromium, .bookmarks),
+                    (.coccoc, .bookmarks),
+                    (.edge, .bookmarks),
+                    (.vivaldi, .bookmarks),
+                    (.opera, .bookmarks),
+                    (.operaGX, .bookmarks):
+                    NSLocalizedString("import.html.instructions.chromium", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **Bookmarks → Bookmark Manager**
+                    %d Click %@ then **Export Bookmarks**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Bookmarks exported as HTML from Chromium-based browsers.
+                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuVertical16
+                    button("Select Bookmarks HTML File…")
+
+                case (.yandex, .bookmarks):
+                    NSLocalizedString("import.html.instructions.yandex", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **Favorites → Bookmark Manager**
+                    %d Click %@ then **Export bookmarks to HTML file**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Bookmarks exported as HTML from Yandex Browser.
+                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuVertical16
+                    button("Select Bookmarks HTML File…")
+
+                case (.safari, .passwords), (.safariTechnologyPreview, .passwords):
+                    NSLocalizedString("import.csv.instructions.safari", value: """
+                    %d Open **Safari**
+                    %d Select **File → Export → Passwords**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Safari.
+                    %d is a step number; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+
+                    button("Select Passwords CSV File…")
+
+                case (.safari, .bookmarks), (.safariTechnologyPreview, .bookmarks):
+                    NSLocalizedString("import.html.instructions.safari", value: """
+                    %d Open **Safari**
+                    %d Select **File → Export → Bookmarks**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Bookmarks exported as HTML from Safari.
+                    %d is a step number; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    button("Select Bookmarks HTML File…")
+
+                case (.firefox, .passwords):
+                    NSLocalizedString("import.csv.instructions.firefox", value: """
+                    %d Open **%s**
+                    %d Click %@ to open the application menu then click **Passwords**
+                    %d Click %@ then **Export Logins…**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Firefox.
+                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuHamburger16
+                    NSImage.menuVertical16
+                    button("Select Passwords CSV File…")
+
+                case (.firefox, .bookmarks), (.tor, .bookmarks):
+                    NSLocalizedString("import.html.instructions.firefox", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **Bookmarks → Manage Bookmarks**
+                    %d Click %@ then **Export bookmarks to HTML…**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Bookmarks exported as HTML from Firefox based browsers.
+                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.importExport16
+                    button("Select Bookmarks HTML File…")
+
+                case (.onePassword8, .passwords):
+                    NSLocalizedString("import.csv.instructions.onePassword8", value: """
+                    %d Open and unlock **%s**
+                    %d Select **File → Export** from the Menu Bar and choose the account you want to export
+                    %d Enter your 1Password account password
+                    %d Select the File Format: **CSV (Logins and Passwords only)**
+                    %d Click Export Data and save the file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from 1Password 8.
+                    %d is a step number; %s is 1Password app name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    button("Select 1Password CSV File…")
+
+                case (.onePassword7, .passwords):
+                    NSLocalizedString("import.csv.instructions.onePassword7", value: """
+                    %d Open and unlock **%s**
+                    %d Select the vault you want to Export (You cannot export from “All Vaults.”)
+                    %d Select **File → Export → All Items** from the Menu Bar
+                    %d Enter your 1Password master or account password
+                    %d Select the File Format: **iCloud Keychain (.csv)**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from 1Password 7.
+                    %d is a step number; %s is 1Password app name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    button("Select 1Password CSV File…")
+
+                case (.bitwarden, .passwords):
+                    NSLocalizedString("import.csv.instructions.bitwarden", value: """
+                    %d Open and unlock **%s**
+                    %d Select **File → Export vault** from the Menu Bar
+                    %d Select the File Format: **.csv**
+                    %d Enter your Bitwarden Master password
+                    %d Click %@ and save the file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Bitwarden.
+                    %d is a step number; %s is Bitwarden app name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: nil) ?? .downloads
+                    button("Select Bitwarden CSV File…")
+
+                case (.lastPass, .passwords):
+                    NSLocalizedString("import.csv.instructions.lastpass", value: """
+                    %d Click on the **%s** icon in your browser and enter your master password
+                    %d Select **Open My Vault**
+                    %d From the sidebar select **Advanced Options → Export**
+                    %d Enter your LastPass master password
+                    %d Select the File Format: **Comma Delimited Text (.csv)**
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from LastPass.
+                    %d is a step number; %s is LastPass app name; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    button("Select LastPass CSV File…")
+
+                case (.csv, .passwords):
+                    NSLocalizedString("import.csv.instructions.generic", value: """
+                    The CSV importer will try to match column headers to their position.
+                    If there is no header, it supports two formats:
+                    %d URL, Username, Password
+                    %d Title, URL, Username, Password
+                    %@
+                    """, comment: """
+                    Instructions to import a generic CSV passwords file.
+                    %d is a step number; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+
+                    button("Select Passwords CSV File…")
+
+                case (.bookmarksHTML, .bookmarks):
+                    NSLocalizedString("import.html.instructions.generic", value: """
+                    %d Open your old browser
+                    %d Click %@ then select **Bookmarks → Bookmark Manager**
+                    %d Click %@ then **Export bookmarks to HTML…**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import a generic HTML Bookmarks file.
+                    %d is a step number; %@ is for a button image to click
+                    **bold text**; _italic text_
+                    """)
+                    NSImage.menuHamburger16
+                    NSImage.menuVertical16
+                    button("Select Bookmarks HTML File…")
+
+                case (.bookmarksHTML, .passwords),
+                    (.tor, .passwords),
+                    (.onePassword7, .bookmarks),
+                    (.onePassword8, .bookmarks),
+                    (.bitwarden, .bookmarks),
+                    (.lastPass, .bookmarks),
+                    (.csv, .bookmarks):
+                    assertionFailure("Invalid source/dataType")
                 }
             }
         }
+    }
+
+    private func button(_ localizedTitleKey: LocalizedStringKey) -> some View {
+        Button(localizedTitleKey, action: action)
+            .onDrop(of: dataType.allowedFileTypes, isTargeted: nil, perform: onDrop)
+            .disabled(isButtonDisabled)
     }
 
     private func onDrop(_ providers: [NSItemProvider], _ location: CGPoint) -> Bool {
@@ -245,6 +363,215 @@ struct FileImportView: View {
 
 }
 
+struct InstructionsView: View {
+
+    enum TextPart {
+        case image(NSImage)
+        case text(text: String, isBold: Bool, isItalic: Bool)
+    }
+    enum InstructionsViewItem {
+        case lineNumber(Int)
+        case textParts([TextPart])
+        case view(AnyView)
+    }
+
+    let fontName: String
+    let fontSize: CGFloat
+
+    private let instructions: [[InstructionsViewItem]]
+
+    // swiftlint:disable:next function_body_length cyclomatic_complexity
+    init(fontName: String, fontSize: CGFloat, @InstructionsBuilder builder: () -> [InstructionsItem]) {
+        self.fontName = fontName
+        self.fontSize = fontSize
+
+        let items = builder()
+
+        guard case .string(let format) = items.first else {
+            assertionFailure("First item should provide instructions format using NSLocalizedString")
+            self.instructions = []
+            return
+        }
+
+        do {
+
+            let formatLines = try InstructionsFormatParser().parse(format: format)
+
+            var result = [[InstructionsViewItem]]()
+            var argIndex = 1
+            var lineNumber = 1
+
+            func fline(_ lineIdx: Int) -> String {
+                format.components(separatedBy: "\n")[safe: lineIdx] ?? "?"
+            }
+
+            for (lineIdx, line) in formatLines.enumerated() {
+                var resultLine = [InstructionsViewItem]()
+                func appendTextPart(_ textPart: TextPart) {
+                    if case .textParts(var parts) = resultLine.last {
+                        parts.append(textPart)
+                        resultLine[resultLine.endIndex - 1] = .textParts(parts)
+                    } else {
+                        resultLine.append(.textParts([textPart]))
+                    }
+                }
+
+                for component in line {
+                    switch component {
+                    case .number:
+                        resultLine.append(.lineNumber(lineNumber))
+                        lineNumber += 1
+                    case .text(let text, bold: let bold, italic: let italic):
+                        appendTextPart(.text(text: text, isBold: bold, isItalic: italic))
+                    case .string(bold: let bold, italic: let italic):
+                        switch items[safe: argIndex] {
+                        case .string(let str):
+                            appendTextPart(.text(text: str, isBold: bold, isItalic: italic))
+                        case .none:
+                            assertionFailure("String argument missing at index \(argIndex) in “\(fline(lineIdx))”")
+                        case .image(let obj as Any), .view(let obj as Any):
+                            assertionFailure("Unexpected object argument “\(obj)”, expected string at index \(argIndex) in “\(fline(lineIdx))”")
+                        }
+                        argIndex += 1
+
+                    case .object:
+                        switch items[safe: argIndex] {
+                        case .image(let image):
+                            appendTextPart(.image(image))
+                        case .view(let view):
+                            resultLine.append(.view(view))
+                        case .none:
+                            assertionFailure("Object argument missing at index \(argIndex) in “\(fline(lineIdx))”")
+                        case .string(let string):
+                            assertionFailure("Unexpected string argument “\(string)”, expected object at index \(argIndex) in “\(fline(lineIdx))”")
+                        }
+
+                        argIndex += 1
+                    }
+                }
+                result.append(resultLine)
+            }
+            if argIndex < items.count {
+                assertionFailure("Argument \(items[argIndex]) not used anywhere")
+            }
+
+            self.instructions = result
+
+        } catch {
+            assertionFailure("Could not build instructions view: \(error)")
+            self.instructions = []
+        }
+    }
+
+    enum InstructionsItem {
+        case string(String)
+        case image(NSImage)
+        case view(AnyView)
+    }
+
+    @resultBuilder
+    struct InstructionsBuilder {
+        static func buildBlock(_ components: [InstructionsItem]...) -> [InstructionsItem] {
+            return components.flatMap { $0 }
+        }
+
+        static func buildOptional(_ components: [InstructionsItem]?) -> [InstructionsItem] {
+            return components ?? []
+        }
+
+        static func buildEither(first component: [InstructionsItem]) -> [InstructionsItem] {
+            component
+        }
+
+        static func buildEither(second component: [InstructionsItem]) -> [InstructionsItem] {
+            component
+        }
+
+        static func buildLimitedAvailability(_ component: [InstructionsItem]) -> [InstructionsItem] {
+            component
+        }
+
+        static func buildArray(_ components: [[InstructionsItem]]) -> [InstructionsItem] {
+            components.flatMap { $0 }
+        }
+
+        static func buildExpression(_ expression: [InstructionsItem]) -> [InstructionsItem] {
+            return expression
+        }
+
+        static func buildExpression(_ value: String) -> [InstructionsItem] {
+            return [.string(value)]
+        }
+
+        static func buildExpression(_ value: NSImage) -> [InstructionsItem] {
+            return [.image(value)]
+        }
+
+        static func buildExpression(_ value: some View) -> [InstructionsItem] {
+            return [.view(AnyView(value))]
+        }
+
+        static func buildExpression(_ expression: Void) -> [InstructionsItem] {
+            return []
+        }
+
+    }
+
+    var body: some View {
+        ForEach(instructions.indices, id: \.self) { i in
+            HStack(spacing: 4) {
+                ForEach(instructions[i].indices, id: \.self) { j in
+                    switch instructions[i][j] {
+                    case .lineNumber(let number):
+                        CircleNumberView(number: number)
+                    case .textParts(let textParts):
+                        Text(textParts, fontName: fontName, fontSize: fontSize)
+                    case .view(let view):
+                        view
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+private extension Text {
+
+    init(_ textPart: InstructionsView.TextPart, fontName: String, fontSize: CGFloat) {
+        switch textPart {
+        case .image(let image):
+            self.init(Image(nsImage: image))
+            self = self.baselineOffset(fontSize - image.size.height)
+        case .text(let text, let isBold, let isItalic):
+            self.init(text)
+            self = self.font(.custom(fontName, size: fontSize))
+            if isBold {
+                self = self.bold()
+            }
+            if isItalic {
+                self = self.italic()
+            }
+        }
+    }
+
+    init(_ textParts: [InstructionsView.TextPart], fontName: String, fontSize: CGFloat) {
+        guard !textParts.isEmpty else {
+            assertionFailure("Empty TextParts")
+            self.init("")
+            return
+        }
+        self.init(textParts[0], fontName: fontName, fontSize: fontSize)
+
+        guard textParts.count > 1 else { return }
+        for textPart in textParts[1...] {
+            // swiftlint:disable:next shorthand_operator
+            self = self + Text(textPart, fontName: fontName, fontSize: fontSize)
+        }
+    }
+
+}
+
 struct CircleNumberView: View {
 
     let number: Int
@@ -257,6 +584,7 @@ struct CircleNumberView: View {
                 Text("\(number)")
                     .foregroundColor(.onboardingActionButton)
                     .font(.headline)
+
             )
     }
 
@@ -268,84 +596,4 @@ struct CircleNumberView: View {
     FileImportView(source: .bitwarden, dataType: .passwords, isButtonDisabled: false)
         .frame(width: 512 - 20)
 
-}
-
-// MARK: - instructions builder helper
-
-private enum FileImportInstructionsItem {
-    case number(Int)
-    case text(LocalizedStringKey)
-    case button(LocalizedStringKey)
-}
-
-@resultBuilder
-private struct FileImportInstructionsBuilder {
-    static func buildBlock(_ components: [FileImportInstructionsItem]...) -> [FileImportInstructionsItem] {
-        return components.flatMap { $0 }
-    }
-
-    static func buildOptional(_ components: [FileImportInstructionsItem]?) -> [FileImportInstructionsItem] {
-        return components ?? []
-    }
-
-    static func buildEither(first component: [FileImportInstructionsItem]) -> [FileImportInstructionsItem] {
-        component
-    }
-
-    static func buildEither(second component: [FileImportInstructionsItem]) -> [FileImportInstructionsItem] {
-        component
-    }
-
-    static func buildLimitedAvailability(_ component: [FileImportInstructionsItem]) -> [FileImportInstructionsItem] {
-        component
-    }
-
-    static func buildArray(_ components: [[FileImportInstructionsItem]]) -> [FileImportInstructionsItem] {
-        components.flatMap { $0 }
-    }
-
-    static func buildExpression(_ expression: [FileImportInstructionsItem]) -> [FileImportInstructionsItem] {
-        return expression
-    }
-
-    static func buildExpression(_ value: Int) -> [FileImportInstructionsItem] {
-        return [.number(value)]
-    }
-
-    static func buildExpression(_ value: LocalizedStringKey) -> [FileImportInstructionsItem] {
-        return [.text(value)]
-    }
-
-    static func buildExpression(_ value: FileImportInstructionsItem) -> [FileImportInstructionsItem] {
-        return [value]
-    }
-
-    static func buildExpression(_ expression: Void) -> [FileImportInstructionsItem] {
-        return []
-    }
-
-}
-
-private func buildInstructions(@FileImportInstructionsBuilder builder: () -> [FileImportInstructionsItem]) -> [[FileImportInstructionsItem]] {
-    let items = builder()
-
-    // zip [1, "text 1", 2, "text 2", "text 3"] to [[1, "text 1"], [2, "text 2"], ["text 3"]]
-    var result: [[FileImportInstructionsItem]] = []
-    var currentNumber: Int?
-
-    for item in items {
-        switch item {
-        case .number(let num):
-            currentNumber = num
-        case .text, .button:
-            if let currentNumber {
-                result.append([.number(currentNumber), item])
-            } else {
-                result.append([item])
-            }
-            currentNumber = nil
-        }
-    }
-
-    return result
 }
