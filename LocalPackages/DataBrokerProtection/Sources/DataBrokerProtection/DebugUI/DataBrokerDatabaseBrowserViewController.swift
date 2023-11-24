@@ -19,8 +19,8 @@
 import Foundation
 import SwiftUI
 
-final class DataBrokerDatabaseBrowserViewController: NSViewController {
-    override func loadView() {
+public final class DataBrokerDatabaseBrowserViewController: NSViewController {
+    public override func loadView() {
         let viewModel = DataBrokerDatabaseBrowserViewModel(tables: [DataBrokerDatabaseBrowserData.Table]())
         let contentView = DataBrokerDatabaseBrowserView(viewModel: viewModel)
         let hostingController = NSHostingController(rootView: contentView)
