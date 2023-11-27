@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1700746434940,
+    "version": 1701100319855,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1623,6 +1623,22 @@
                     "upgrade to flickr pro to hide these ads"
                 ],
                 "domains": [
+                    {
+                        "domain": "3bmeteo.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": "#admasthead",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#ads_container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
                     {
                         "domain": "abc.es",
                         "rules": [
@@ -3465,7 +3481,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "f7159b77a56eda4e99ca452521b4872b"
+            "hash": "cb0d07b1eb9f3d5f48cab971524a0155"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -6876,6 +6892,7 @@
                             {
                                 "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js",
                                 "domains": [
+                                    "azurestandard.com",
                                     "domesticandgeneral.com"
                                 ]
                             }
@@ -7193,7 +7210,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "89f1bcc3af578886467432bfe855bb00"
+            "hash": "eac75f23372b47b682e0c2028080397b"
         },
         "trackingCookies1p": {
             "settings": {
