@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "6dc31cc7e46131d79ce1f96463b36381656d7b2d",
-        "version" : "85.0.0"
+        "branch" : "fcappelli/breakage_report_improvements",
+        "revision" : "3d32d29b1e5a341dfe5395cd8caf714ec207915c"
       }
     },
     {
