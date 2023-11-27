@@ -180,7 +180,20 @@ public final class PurchaseManager: ObservableObject {
         return transactions.first?.jwsRepresentation
     }
 
+    @MainActor
+    public static func hasActiveSubscription() async -> Bool {
+        print(" -- [PurchaseManager] hasActiveSubscription()")
 
+        var transactions: [VerificationResult<Transaction>] = []
+
+        for await result in Transaction.currentEntitlements {
+            transactions.append(result)
+        }
+
+        print(" -- [PurchaseManager] hasActiveSubscription(): fetched \(transactions.count) transactions")
+
+        return !transactions.isEmpty
+    }
 
     @MainActor
     public func purchaseSubscription(with identifier: String, externalID: String) async -> Result<Void, Error> {

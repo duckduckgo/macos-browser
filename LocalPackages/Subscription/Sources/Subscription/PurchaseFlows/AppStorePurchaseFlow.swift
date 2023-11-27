@@ -27,7 +27,6 @@ public final class AppStorePurchaseFlow {
     public enum Error: Swift.Error {
         case noProductsFound
 
-        case appStoreAuthenticationFailed
         case activeSubscriptionAlreadyPresent
         case authenticatingWithTransactionFailed
         case accountCreationFailed
@@ -58,21 +57,13 @@ public final class AppStorePurchaseFlow {
     }
 
     public static func purchaseSubscription(with subscriptionIdentifier: String, emailAccessToken: String?) async -> Result<Void, AppStorePurchaseFlow.Error> {
-        // Trigger sign in pop-up
-        switch await PurchaseManager.shared.syncAppleIDAccount() {
-        case .success:
-            break
-        case .failure(let error):
-            return .failure(.appStoreAuthenticationFailed)
-        }
-
         let externalID: String
 
         // Check for past transactions most recent
         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-        case .success(let existingExternalID):
-            externalID = existingExternalID
-            // TODO: Check if has active subscription
+        case .success(let success):
+            guard !success.isActive else { return .failure(.activeSubscriptionAlreadyPresent)}
+            externalID = success.externalID
         case .failure(let error):
             switch error {
             case .missingAccountOrTransactions:

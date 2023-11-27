@@ -109,16 +109,17 @@ extension Preferences {
                     Task {
                         guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
-                        guard case .success = await AppStoreRestoreFlow.restoreAccountFromPastPurchase() else {
-                            self.showSubscriptionNotFoundAlert()
-                            return
-                        }
-
-                        guard let token = AccountManager().accessToken else { return }
-
-                        if case .success(let response) = await SubscriptionService.getSubscriptionInfo(token: token) {
-                            if response.status == "Expired" {
+                        switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+                        case .success(let success):
+                            if !success.isActive {
                                 self.showSubscriptionInactiveAlert()
+                            }
+                        case .failure(let error):
+                            switch error {
+                            case .missingAccountOrTransactions:
+                                self.showSubscriptionNotFoundAlert()
+                            default:
+                                break
                             }
                         }
                     }

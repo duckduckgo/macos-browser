@@ -184,6 +184,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 #else
         if #available(macOS 12.0, *) {
+            defer {
+                Task {
+                    await hideProgress()
+                }
+            }
+
             guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
                 assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
                 return nil
@@ -192,6 +198,21 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             print("Selected: \(subscriptionSelection.id)")
 
             await showProgress(with: "Purchase in progress...")
+
+            // Trigger sign in pop-up
+            switch await PurchaseManager.shared.syncAppleIDAccount() {
+            case .success:
+                break
+            case .failure(let error):
+                return nil
+            }
+
+            // Check for active subscriptions
+            if await PurchaseManager.hasActiveSubscription() {
+                print("hasActiveSubscription: TRUE")
+                await showSubscriptionFoundAlert()
+                return nil
+            }
 
             // Hide it after some time in case nothing happens
             /*
@@ -207,11 +228,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success:
                 break
             case .failure(let error):
-                if error != .appStoreAuthenticationFailed {
-                    await showSomethingWentWrongAlert()
-                }
-
-                await hideProgress()
                 return nil
             }
 
@@ -224,8 +240,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 // TODO: handle errors - missing entitlements on post purchase check
                 return nil
             }
-
-            await hideProgress()
         }
 #endif
 
@@ -381,12 +395,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         let alert = NSAlert.subscriptionFoundAlert()
         alert.beginSheetModal(for: window, completionHandler: { response in
             if case .alertFirstButtonReturn = response {
-                // restore
+                print("Restore action")
             } else {
-                // clear
+                print("Cancel and do nothing")
             }
-
-            print("Restore action")
         })
     }
 }
