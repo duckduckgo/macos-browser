@@ -67,7 +67,7 @@ final class NetworkProtectionNavBarPopoverManager {
                     })
             ]
 
-            let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
+            let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
 
             let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
             popover.delegate = delegate

@@ -180,7 +180,7 @@ final class NetworkProtectionAppEvents {
             return
         }
 
-        UserDefaults.shared.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
+        UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 
         try? await tunnel.removeFromPreferences()
     }

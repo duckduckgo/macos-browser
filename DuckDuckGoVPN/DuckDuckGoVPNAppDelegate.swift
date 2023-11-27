@@ -68,7 +68,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,
         networkExtensionController: networkExtensionController,
-        settings: .init(defaults: .shared))
+        settings: .init(defaults: .netP))
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -128,7 +128,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             })
         ]
 
-        let onboardingStatusPublisher = UserDefaults.shared.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
+        let onboardingStatusPublisher = UserDefaults.netP.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
 
