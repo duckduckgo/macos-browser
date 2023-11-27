@@ -137,6 +137,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
+                withAdditionalParameters: ["cohort": PixelKit.dateString(for: NetworkProtectionPixelEvent.networkProtectionNewUser)],
                 includeAppVersionParameter: true)
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
             PixelKit.fire(
