@@ -58,6 +58,8 @@ final class TabViewModelTests: XCTestCase {
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
+        tabViewModel.simulateLoadingCompletion()
+
         tabViewModel.$addressBarString.debounce(for: 0.5, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
             addressBarStringExpectation.fulfill()
@@ -70,6 +72,8 @@ final class TabViewModelTests: XCTestCase {
         let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
+
+        tabViewModel.simulateLoadingCompletion()
 
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
@@ -84,6 +88,8 @@ final class TabViewModelTests: XCTestCase {
         let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlString)!)
 
         let addressBarStringExpectation = expectation(description: "Address bar string")
+
+        tabViewModel.simulateLoadingCompletion()
 
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
@@ -196,6 +202,10 @@ extension TabViewModel {
     static func forTabWithURL(_ url: URL) -> TabViewModel {
         let tab = Tab(content: .url(url))
         return TabViewModel(tab: tab)
+    }
+
+    func simulateLoadingCompletion() {
+        self.updateAddressBarStrings()
     }
 
 }

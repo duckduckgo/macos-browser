@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1700485869914,
+    "version": 1700746434940,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -2117,8 +2117,45 @@
                         "domain": "foxnews.com",
                         "rules": [
                             {
+                                "type": "disable-default"
+                            },
+                            {
                                 "selector": ".vendor-unit",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".pre-content",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[class*='rr-ad-']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".ad-h-250",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".sticky-pre-header",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".adhesion-ad",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".sticky-pre-header-inner",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".site-header",
+                                "type": "modify-style",
+                                "values": [
+                                    {
+                                        "property": "min-height",
+                                        "value": "50px"
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2360,6 +2397,22 @@
                             {
                                 "selector": "#contentFor_kbbAdsSimplifiedNativeAd",
                                 "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "kentonline.co.uk",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": "[id*='p_mpu']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[id*='p_dmp']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -2656,6 +2709,15 @@
                             {
                                 "selector": "[id*='pub_pave']",
                                 "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "paypal.com",
+                        "rules": [
+                            {
+                                "selector": "#gslFrame",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -3403,7 +3465,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "0cd1e0751059ab8c2766b958ee11723c"
+            "hash": "f7159b77a56eda4e99ca452521b4872b"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3763,9 +3825,6 @@
             "state": "enabled",
             "exceptions": [
                 {
-                    "domain": "abcnews.go.com"
-                },
-                {
                     "domain": "allegiantair.com"
                 },
                 {
@@ -3814,7 +3873,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "010134a983618c70ffdf4862af8d532b"
+            "hash": "57800fe9cefcdf8ae18bfcbd0b0fb7a4"
         },
         "harmfulApis": {
             "settings": {
@@ -4313,16 +4372,6 @@
                             }
                         ]
                     },
-                    "adserver.adtech.advertising.com": {
-                        "rules": [
-                            {
-                                "rule": "adserver.adtech.advertising.com/pubapi/3.0/1/54669.7/0/0/ADTECH;v=2;cmd=bid;cors=yes",
-                                "domains": [
-                                    "collider.com"
-                                ]
-                            }
-                        ]
-                    },
                     "adswizz.com": {
                         "rules": [
                             {
@@ -4347,6 +4396,16 @@
                                     "adamtheautomator.com",
                                     "gardeningknowhow.com",
                                     "packhacker.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "advertising.com": {
+                        "rules": [
+                            {
+                                "rule": "adserver.adtech.advertising.com/pubapi/3.0/1/54669.7/0/0/ADTECH;v=2;cmd=bid;cors=yes",
+                                "domains": [
+                                    "collider.com"
                                 ]
                             }
                         ]
@@ -4411,6 +4470,7 @@
                                     "cnn.com",
                                     "corriere.it",
                                     "eurogamer.net",
+                                    "foxweather.com",
                                     "kcci.com",
                                     "kcra.com",
                                     "ketv.com",
@@ -4961,6 +5021,12 @@
                                 ]
                             },
                             {
+                                "rule": "pubads.g.doubleclick.net/ssai/pods/",
+                                "domains": [
+                                    "foxweather.com"
+                                ]
+                            },
+                            {
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
                                 "domains": [
                                     "ah.nl",
@@ -5423,6 +5489,7 @@
                                 "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
                                 "domains": [
                                     "bloomberg.com",
+                                    "gamak.tv",
                                     "games.washingtonpost.com",
                                     "metro.co.uk",
                                     "nfl.com",
@@ -5646,6 +5713,22 @@
                                     "wutv29.com",
                                     "wvah.com",
                                     "wwmt.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "gorgias.chat": {
+                        "rules": [
+                            {
+                                "rule": "config.gorgias.chat",
+                                "domains": [
+                                    "help.athleticbrewing.com"
+                                ]
+                            },
+                            {
+                                "rule": "assets.gorgias.chat",
+                                "domains": [
+                                    "help.athleticbrewing.com"
                                 ]
                             }
                         ]
@@ -5933,17 +6016,6 @@
                                 "rule": "cdn.listrakbi.com/scripts/script.js",
                                 "domains": [
                                     "<all>"
-                                ]
-                            }
-                        ]
-                    },
-                    "live.primis.tech": {
-                        "rules": [
-                            {
-                                "rule": "live.primis.tech/live/liveView.php",
-                                "domains": [
-                                    "belfastlive.co.uk",
-                                    "cornwalllive.com"
                                 ]
                             }
                         ]
@@ -6287,6 +6359,17 @@
                             }
                         ]
                     },
+                    "primis.tech": {
+                        "rules": [
+                            {
+                                "rule": "live.primis.tech/live/liveView.php",
+                                "domains": [
+                                    "belfastlive.co.uk",
+                                    "cornwalllive.com"
+                                ]
+                            }
+                        ]
+                    },
                     "privacy-center.org": {
                         "rules": [
                             {
@@ -6416,7 +6499,8 @@
                             {
                                 "rule": "protection-widget.route.com/protect.core.js",
                                 "domains": [
-                                    "littleunicorn.com"
+                                    "littleunicorn.com",
+                                    "olfactif.com"
                                 ]
                             }
                         ]
@@ -6509,6 +6593,16 @@
                                 "rule": "rokt.com/wsdk/integrations/snippet.js",
                                 "domains": [
                                     "pch.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "route.com": {
+                        "rules": [
+                            {
+                                "rule": "protection-widget.route.com/protect.core.js",
+                                "domains": [
+                                    "littleunicorn.com"
                                 ]
                             }
                         ]
@@ -6609,6 +6703,16 @@
                         "rules": [
                             {
                                 "rule": "cdn.shortpixel.ai/assets/js/bundles/spai-lib-bg",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "slickstream.com": {
+                        "rules": [
+                            {
+                                "rule": "app.slickstream.com",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -7089,7 +7193,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "40c0cbd113a9a39e475d6723ddee9be3"
+            "hash": "89f1bcc3af578886467432bfe855bb00"
         },
         "trackingCookies1p": {
             "settings": {
