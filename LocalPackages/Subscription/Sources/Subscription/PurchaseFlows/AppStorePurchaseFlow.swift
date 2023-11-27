@@ -62,7 +62,7 @@ public final class AppStorePurchaseFlow {
         switch await PurchaseManager.shared.syncAppleIDAccount() {
         case .success:
             break
-        case .failure:
+        case .failure(let error):
             return .failure(.appStoreAuthenticationFailed)
         }
 

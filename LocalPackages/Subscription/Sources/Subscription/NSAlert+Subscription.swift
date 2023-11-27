@@ -21,12 +21,11 @@ import AppKit
 
 public extension NSAlert {
 
-    static func somethingWentWrong() -> NSAlert {
+    static func somethingWentWrongAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Something Went Wrong"
         alert.informativeText = "The App Store was not able to process your purchase. Please try again later."
         alert.addButton(withTitle: "OK")
-        alert.runModal()
         return alert
     }
 

@@ -207,8 +207,10 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success:
                 break
             case .failure(let error):
-                // TODO: handle errors
-                print("Purchase failed: \(error)")
+                if error != .appStoreAuthenticationFailed {
+                    await showSomethingWentWrongAlert()
+                }
+
                 await hideProgress()
                 return nil
             }
@@ -219,7 +221,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
             case .failure:
-                // TODO: handle errors
+                // TODO: handle errors - missing entitlements on post purchase check
                 return nil
             }
 
@@ -251,25 +253,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         guard let purchaseInProgressViewController else { return }
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(purchaseInProgressViewController)
         self.purchaseInProgressViewController = nil
-    }
-
-    @MainActor
-    private func showSubscriptionFoundAlert() {
-        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else {
-            assertionFailure("No window")
-            return
-        }
-
-        let alert = NSAlert.subscriptionFoundAlert()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            if case .alertFirstButtonReturn = response {
-                // restore
-            } else {
-                // clear
-            }
-
-            print("Restore action")
-        })
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -328,6 +311,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return [String: String]() // cannot be nil
     }
 
+    // MARK: Push actions
+
     enum SubscribeActionName: String {
         case onPurchaseUpdate
     }
@@ -342,6 +327,32 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         print(">>> Pushing into WebView:", method.rawValue, String(describing: params))
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
+    }
+
+    // MARK: Alerts
+
+    @MainActor
+    private func showSomethingWentWrongAlert() {
+        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+
+        let alert = NSAlert.somethingWentWrongAlert()
+        alert.beginSheetModal(for: window)
+    }
+
+    @MainActor
+    private func showSubscriptionFoundAlert() {
+        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+
+        let alert = NSAlert.subscriptionFoundAlert()
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            if case .alertFirstButtonReturn = response {
+                // restore
+            } else {
+                // clear
+            }
+
+            print("Restore action")
+        })
     }
 }
 
