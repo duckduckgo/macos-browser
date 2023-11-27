@@ -42,9 +42,25 @@ final class InstructionsFormatParserTests: XCTestCase {
         let parsed = try InstructionsFormatParser().parse(format: format)
 
         XCTAssertEqual(parsed, [
-            [.number, .text(" line "), .string(), .text(" "), .object],
-            [.text("line "), .number],
-            [.number, .string(), .object, .text(" line 3 "), .number],
+            [.number(argIndex: 1), .text("line "), .string(argIndex: 2), .text(" "), .object(argIndex: 3)],
+            [.text("line "), .number(argIndex: 4)],
+            [.number(argIndex: 5), .string(argIndex: 6), .object(argIndex: 7), .text(" line 3 "), .number(argIndex: 8)],
+        ])
+        print(parsed)
+    }
+
+    func testLinesWithIndexedEscapedExpressions() throws {
+        let format = """
+          %2$d line %3$s %1$@
+            line %ld
+        %lld%7$s%6$@ line 3 %8$d
+        """
+        let parsed = try InstructionsFormatParser().parse(format: format)
+
+        XCTAssertEqual(parsed, [
+            [.number(argIndex: 2), .text("line "), .string(argIndex: 3), .text(" "), .object(argIndex: 1)],
+            [.text("line "), .number(argIndex: 4)],
+            [.number(argIndex: 5), .string(argIndex: 7), .object(argIndex: 6), .text(" line 3 "), .number(argIndex: 8)],
         ])
         print(parsed)
     }
@@ -80,7 +96,7 @@ final class InstructionsFormatParserTests: XCTestCase {
         let parsed = try InstructionsFormatParser().parse(format: format)
         XCTAssertEqual(parsed, [
             [.text("*some*text* "), .text("bold*text*", bold: true)],
-            [.text("text* ", bold: true), .text("non*bold*text** text", bold: false), .text(".csv", bold: true)]
+            [.text("text* ", bold: true), .text("non*bold*text** text ", bold: false), .text(".csv", bold: true)]
         ])
     }
 
@@ -94,18 +110,18 @@ final class InstructionsFormatParserTests: XCTestCase {
         """
         let parsed = try InstructionsFormatParser().parse(format: format)
 
-        XCTAssertEqual(parsed[safe: 0], [.number, .text(" Open "), .string(bold: true)])
-        XCTAssertEqual(parsed[safe: 1], [.number, .text(" In a fresh tab, click "), .object, .text(" then "), .text("Google ", bold: true), .text("Password", bold: true, italic: true), .text(" Manager → Settings ", bold: true)])
-        XCTAssertEqual(parsed[safe: 2], [.number, .text(" Find “Export "), .text("Passwords", italic: true), .text("” and click "), .text("Download File", bold: true)])
-        XCTAssertEqual(parsed[safe: 3], [.number, .text(" "), .text("Save the* passwords ", italic: true), .text("file", bold: true, italic: true), .text(" someplace", italic: true), .text(" you can_find it (e.g. Desktop)")])
-        XCTAssertEqual(parsed[safe: 4], [.number, .text(" "), .object])
+        XCTAssertEqual(parsed[safe: 0], [.number(argIndex: 1), .text("Open "), .string(argIndex: 2, bold: true)])
+        XCTAssertEqual(parsed[safe: 1], [.number(argIndex: 3), .text("In a fresh tab, click "), .object(argIndex: 4), .text(" then "), .text("Google ", bold: true), .text("Password", bold: true, italic: true), .text(" Manager → Settings ", bold: true)])
+        XCTAssertEqual(parsed[safe: 2], [.number(argIndex: 5), .text("Find “Export "), .text("Passwords", italic: true), .text("” and click "), .text("Download File", bold: true)])
+        XCTAssertEqual(parsed[safe: 3], [.number(argIndex: 6), .text("Save the* passwords ", italic: true), .text("file", bold: true, italic: true), .text(" someplace", italic: true), .text(" you can_find it (e.g. Desktop)")])
+        XCTAssertEqual(parsed[safe: 4], [.number(argIndex: 7), .object(argIndex: 8)])
         XCTAssertNil(parsed[safe: 5])
     }
 
     func testInvalidEscapeSequencesThrow() {
         XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "text with %z escape char"))
         XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%llld text with invalid digit"))
-        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%2d unsupported format"))
+        XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%.2f unsupported format"))
         XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%.2d unsupported format"))
         XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "%f unsupported format"))
         XCTAssertThrowsError(try InstructionsFormatParser().parse(format: "unexpected eof %"))

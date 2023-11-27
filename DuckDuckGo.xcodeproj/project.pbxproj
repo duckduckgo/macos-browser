@@ -3404,10 +3404,10 @@
 		B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */; };
 		B6619EF62B10DFF700CD9186 /* InstructionsFormatParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF52B10DFF700CD9186 /* InstructionsFormatParserTests.swift */; };
 		B6619EF72B10DFF700CD9186 /* InstructionsFormatParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF52B10DFF700CD9186 /* InstructionsFormatParserTests.swift */; };
-		B6619EFB2B111CC500CD9186 /* InstructionsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsParser.swift */; };
-		B6619EFC2B111CC600CD9186 /* InstructionsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsParser.swift */; };
-		B6619EFD2B111CCA00CD9186 /* InstructionsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsParser.swift */; };
-		B6619EFE2B111CCC00CD9186 /* InstructionsParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsParser.swift */; };
+		B6619EFB2B111CC500CD9186 /* InstructionsFormatParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsFormatParser.swift */; };
+		B6619EFC2B111CC600CD9186 /* InstructionsFormatParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsFormatParser.swift */; };
+		B6619EFD2B111CCA00CD9186 /* InstructionsFormatParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsFormatParser.swift */; };
+		B6619EFE2B111CCC00CD9186 /* InstructionsFormatParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6619EF82B111CBE00CD9186 /* InstructionsFormatParser.swift */; };
 		B66260DD29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */; };
 		B66260DE29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */; };
 		B66260E029AC6EBD00E9E3EE /* HistoryTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66260DF29AC6EBD00E9E3EE /* HistoryTabExtension.swift */; };
@@ -4594,8 +4594,6 @@
 		AA80EC68256C4691007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/BrowserTab.storyboard; sourceTree = "<group>"; };
 		AA80EC74256C46A2007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Suggestion.storyboard; sourceTree = "<group>"; };
 		AA80EC7A256C46AA007083E7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/TabBar.storyboard; sourceTree = "<group>"; };
-		AA80EC8A256C49B8007083E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
-		AA80EC90256C49BC007083E7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		AA840A9727319D1600E63CDD /* FirePopoverWrapperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverWrapperViewController.swift; sourceTree = "<group>"; };
 		AA88D14A252A557100980B4E /* URLRequestExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestExtension.swift; sourceTree = "<group>"; };
 		AA8EDF2324923E980071C2E8 /* URLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtension.swift; sourceTree = "<group>"; };
@@ -4781,7 +4779,7 @@
 		B65E6B9D26D9EC0800095F96 /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		B65E6B9F26D9F10600095F96 /* NSBezierPathExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSBezierPathExtension.swift; sourceTree = "<group>"; };
 		B6619EF52B10DFF700CD9186 /* InstructionsFormatParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsFormatParserTests.swift; sourceTree = "<group>"; };
-		B6619EF82B111CBE00CD9186 /* InstructionsParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsParser.swift; sourceTree = "<group>"; };
+		B6619EF82B111CBE00CD9186 /* InstructionsFormatParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstructionsFormatParser.swift; sourceTree = "<group>"; };
 		B66260DC29AC5D4300E9E3EE /* NavigationProtectionTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationProtectionTabExtension.swift; sourceTree = "<group>"; };
 		B66260DF29AC6EBD00E9E3EE /* HistoryTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTabExtension.swift; sourceTree = "<group>"; };
 		B66260E529ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationHotkeyHandler.swift; sourceTree = "<group>"; };
@@ -8500,7 +8498,7 @@
 				B6BCC5222AFCDABB002C5499 /* DataImportSourceViewModel.swift */,
 				B677FC532B064A9C0099EB04 /* DataImportViewModel.swift */,
 				B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */,
-				B6619EF82B111CBE00CD9186 /* InstructionsParser.swift */,
+				B6619EF82B111CBE00CD9186 /* InstructionsFormatParser.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -10191,7 +10189,7 @@
 				3192A00D2A4C4CFF0084EA89 /* ChromiumDataImporter.swift in Sources */,
 				3192A00F2A4C4CFF0084EA89 /* WKBackForwardListItemViewModel.swift in Sources */,
 				1D76760E2A9CE4F000DA0BD7 /* SupportedOsChecker.swift in Sources */,
-				B6619EFD2B111CCA00CD9186 /* InstructionsParser.swift in Sources */,
+				B6619EFD2B111CCA00CD9186 /* InstructionsFormatParser.swift in Sources */,
 				3192A0102A4C4CFF0084EA89 /* BWNotRespondingAlert.swift in Sources */,
 				3192A0112A4C4CFF0084EA89 /* DebugUserScript.swift in Sources */,
 				3192A0122A4C4CFF0084EA89 /* RecentlyClosedTab.swift in Sources */,
@@ -11242,7 +11240,7 @@
 				3706FC06293F65D500E42796 /* OnboardingViewModel.swift in Sources */,
 				3706FC07293F65D500E42796 /* ScriptSourceProviding.swift in Sources */,
 				4B6785402AA7C726008A5004 /* DailyPixel.swift in Sources */,
-				B6619EFC2B111CC600CD9186 /* InstructionsParser.swift in Sources */,
+				B6619EFC2B111CC600CD9186 /* InstructionsFormatParser.swift in Sources */,
 				3706FC08293F65D500E42796 /* CoreDataBookmarkImporter.swift in Sources */,
 				3706FC09293F65D500E42796 /* SuggestionViewModel.swift in Sources */,
 				3706FC0A293F65D500E42796 /* BookmarkManagedObject.swift in Sources */,
@@ -12381,7 +12379,7 @@
 				4B957B452AC7AE700062CA31 /* BookmarkHTMLReader.swift in Sources */,
 				4B957B462AC7AE700062CA31 /* Tab+NSSecureCoding.swift in Sources */,
 				4B957B472AC7AE700062CA31 /* NSNotificationName+EmailManager.swift in Sources */,
-				B6619EFE2B111CCC00CD9186 /* InstructionsParser.swift in Sources */,
+				B6619EFE2B111CCC00CD9186 /* InstructionsFormatParser.swift in Sources */,
 				4B957B482AC7AE700062CA31 /* MouseOverButton.swift in Sources */,
 				4B957B492AC7AE700062CA31 /* FireInfoViewController.swift in Sources */,
 				4B957B4A2AC7AE700062CA31 /* LoginItem+NetworkProtection.swift in Sources */,
@@ -12633,7 +12631,7 @@
 				1D43EB3A292B63B00065E5D6 /* BWRequest.swift in Sources */,
 				B68458CD25C7EB9000DC17B6 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				85AC7ADD27BEB6EE00FFB69B /* HomePageDefaultBrowserModel.swift in Sources */,
-				B6619EFB2B111CC500CD9186 /* InstructionsParser.swift in Sources */,
+				B6619EFB2B111CC500CD9186 /* InstructionsFormatParser.swift in Sources */,
 				AAC30A26268DFEE200D2D9CD /* CrashReporter.swift in Sources */,
 				B60D64492AAF1B7C00B26F50 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */,

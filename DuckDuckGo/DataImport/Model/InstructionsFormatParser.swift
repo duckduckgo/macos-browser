@@ -1,5 +1,5 @@
 //
-//  InstructionsParser.swift
+//  InstructionsFormatParser.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,13 +19,19 @@
 import Common
 import Foundation
 
+/// NSLocalizedString format parser for CSV/HTML data import instructions screen
 struct InstructionsFormatParser {
 
+    // NSLocalizedString("Formatted text %s %d %@")
     enum FormatComponent: Equatable {
+        // String literals: "Formatted text ", " ", " "
         case text(String, bold: Bool = false, italic: Bool = false)
-        case number
-        case string(bold: Bool = false, italic: Bool = false)
-        case object
+        // %d
+        case number(argIndex: Int)
+        // %s
+        case string(argIndex: Int, bold: Bool = false, italic: Bool = false)
+        // %@: represents inline image or button
+        case object(argIndex: Int)
 
         var isNumber: Bool {
             if case .number = self { true } else { false }
@@ -61,16 +67,13 @@ struct InstructionsFormatParser {
     func parse(format: String) throws -> [[FormatComponent]] {
         var parser = Parser()
 
-        // TODO: pull this into parser instead
-        let format = format.replacing(regex("(%)\\d+\\$(\\S)"), with: "$1$2")
-
         var idx: Int!
         do {
             for (index, character) in format.enumerated() {
                 idx = index
                 try parser.accept(character)
             }
-
+            // eof
             try parser.accept(nil)
         } catch let errorType as ParseError.ErrorType {
             throw ParseError(type: errorType, format: format, position: idx + 1,
@@ -81,14 +84,36 @@ struct InstructionsFormatParser {
     }
 
     private struct Parser {
-        var delimiter: Character?
-
         var result: [[FormatComponent]] = [[]]
 
+        // currently collected .text literal
         var currentLiteral = ""
-        var currentEscapeSequence = ""
-        var isBold = false
+        // currently collected escape syntax: %1$, **, __
+        var currentEscapeSequence = "" {
+            didSet {
+                currentArgIndex = 0
+            }
+        }
+        // when a %-escaped component contains argument number: %12$s
+        var currentArgIndex: Int = 0
+        func countCurrentArgIndex() -> Int {
+            var count: Int = 0
+            for line in result {
+                for component in line {
+                    switch component {
+                    case .text: continue
+                    case .number, .string, .object:
+                        count += 1
+                    }
+                }
+            }
+            return count + 1
+        }
+
+        // __italic__ = 2, _italic_ = 1, non-italic = 0
         var isItalic: Int = 0
+        // **bold**
+        var isBold = false
 
         @inline(__always) mutating func append(_ character: Character) {
             currentLiteral.append(character)
@@ -120,20 +145,34 @@ struct InstructionsFormatParser {
         // swiftlint:disable:next cyclomatic_complexity function_body_length
         mutating func accept(_ character: Character?) throws {
             switch (currentEscapeSequence, character) {
+                // beggining of %-escaped seq
             case ("", "%"):
                 currentEscapeSequence.append("%")
 
+            // argument index in %-escaped seq: %12$s
+            case ("%", .some(let character)) where character.isNumber:
+                // append digit to arg index
+                currentArgIndex = currentArgIndex * 10 + (Int(String(character)) ?? 0)
+
+            // arg index ended with $
+            case ("%", "$"):
+                break // ignore
+
+            // %s arg
             case ("%", "s"):
-                append(.string(bold: isBold, italic: isItalic > 0))
+                append(.string(argIndex: currentArgIndex > 0 ? currentArgIndex : countCurrentArgIndex(), bold: isBold, italic: isItalic > 0))
 
+            // %@ arg
             case ("%", "@"):
-                append(.object)
+                append(.object(argIndex: currentArgIndex > 0 ? currentArgIndex : countCurrentArgIndex()))
 
+            // %d %ld %lld args
             case ("%", "l"), ("%l", "l"):
                 currentEscapeSequence.append("l")
             case ("%", "d"), ("%l", "d"), ("%ll", "d"):
-                append(.number)
+                append(.number(argIndex: currentArgIndex > 0 ? currentArgIndex : countCurrentArgIndex()))
 
+            // %% escaped % char
             case ("%", "%"):
                 currentEscapeSequence = ""
                 append("%")
@@ -151,7 +190,7 @@ struct InstructionsFormatParser {
                 append("*")
                 try accept(character)
 
-                // " " follows ** - reset and recurse
+            // " " follows ** - reset and recurse
             case ("**", .some(let character)) where !character.isWordChar && !isBold:
                 append("*")
                 append("*")
@@ -166,12 +205,12 @@ struct InstructionsFormatParser {
                 ("_", "_"):
                 currentEscapeSequence.append("_")
 
-                // one "_" followed by non-alphanumeric – reset and recurse
+            // one "_" followed by non-alphanumeric – reset and recurse
             case ("_", .some(let character)) where !character.isWordChar && isItalic == 0:
                 append("_")
                 try accept(character)
 
-                // one "_" followed by non-alphanumeric when italic == 1: toggle italic
+            // one "_" followed by non-alphanumeric when italic == 1: toggle italic
             case ("_", .some(let character)) where !character.isWordChar && isItalic == 1:
                 flushField()
                 isItalic = 0
@@ -183,11 +222,12 @@ struct InstructionsFormatParser {
                 isItalic = 1
                 try accept(character)
 
-            case ("_", _): // word continues after dash
+            // word continues after dash
+            case ("_", _):
                 append("_")
                 try accept(character)
 
-                // " " follows __ - reset and recurse
+            // " " follows __ - reset and recurse
             case ("__", .some(let character)) where !character.isWordChar && isItalic == 0:
                 append("_")
                 append("_")

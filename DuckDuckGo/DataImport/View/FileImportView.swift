@@ -365,19 +365,32 @@ struct FileImportView: View {
 
 struct InstructionsView: View {
 
-    enum TextPart {
+    // item used in InstructionBuilder: string literal, NSImage or Choose File Button (AnyView)
+    enum InstructionsItem {
+        case string(String)
+        case image(NSImage)
+        case view(AnyView)
+    }
+    // Text item view ViewModel - joined in a line using Text(string).bold().italic() + Text(image).. seq
+    enum TextItem {
         case image(NSImage)
         case text(text: String, isBold: Bool, isItalic: Bool)
     }
+    // Possible InstructionsView line components:
+    // - lineNumber (number in a circle)
+    // - textItems: Text(string).bold().italic() + Text(image).. seq
+    // - view: Choose File Button
     enum InstructionsViewItem {
         case lineNumber(Int)
-        case textParts([TextPart])
+        case textItems([TextItem])
         case view(AnyView)
     }
 
+    // Text font - used to calculate inline image baseline offset and set Text/Font modifier
     let fontName: String
     let fontSize: CGFloat
 
+    // View Model
     private let instructions: [[InstructionsViewItem]]
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
@@ -385,75 +398,99 @@ struct InstructionsView: View {
         self.fontName = fontName
         self.fontSize = fontSize
 
-        let items = builder()
+        var args = builder()
 
-        guard case .string(let format) = items.first else {
+        guard case .string(let format) = args.first else {
             assertionFailure("First item should provide instructions format using NSLocalizedString")
             self.instructions = []
             return
         }
 
         do {
-
+            // parse %12$d, %23$s, %34$@ out of the localized format into component sequence
             let formatLines = try InstructionsFormatParser().parse(format: format)
 
-            var result = [[InstructionsViewItem]]()
-            var argIndex = 1
-            var lineNumber = 1
-
+            // assertion helper
             func fline(_ lineIdx: Int) -> String {
                 format.components(separatedBy: "\n")[safe: lineIdx] ?? "?"
             }
 
+            // arguments are positioned (%42$s %23$@) but lines numbers are auto-incremented
+            // but the line arguments (%12$d) are still indexed.
+            // insert fake components at .line components positions to keep order
+            let lineNumberArgumentIndices = formatLines.reduce(into: IndexSet()) {
+                $0.formUnion($1.reduce(into: IndexSet()) {
+                    if case .number(argIndex: let argIndex) = $1 {
+                        $0.insert(argIndex)
+                    }
+                })
+            }
+            for idx in lineNumberArgumentIndices {
+                args.insert(.string(""), at: idx)
+            }
+
+            // generate instructions view model from localized format
+            var result = [[InstructionsViewItem]]()
+            var lineNumber = 1
+            var usedArgs = IndexSet()
             for (lineIdx, line) in formatLines.enumerated() {
+                // collect view items placed in line
                 var resultLine = [InstructionsViewItem]()
-                func appendTextPart(_ textPart: TextPart) {
-                    if case .textParts(var parts) = resultLine.last {
-                        parts.append(textPart)
-                        resultLine[resultLine.endIndex - 1] = .textParts(parts)
+                func appendTextItem(_ textItem: TextItem) {
+                    // text item should be appended to an ongoing textItem sequence if present
+                    if case .textItems(var items) = resultLine.last {
+                        items.append(textItem)
+                        resultLine[resultLine.endIndex - 1] = .textItems(items)
                     } else {
-                        resultLine.append(.textParts([textPart]))
+                        // previous item is not .textItems - initiate a new textItem sequence
+                        resultLine.append(.textItems([textItem]))
                     }
                 }
 
                 for component in line {
                     switch component {
-                    case .number:
+                    // %d line number argument
+                    case .number(let argIndex):
                         resultLine.append(.lineNumber(lineNumber))
-                        lineNumber += 1
-                    case .text(let text, bold: let bold, italic: let italic):
-                        appendTextPart(.text(text: text, isBold: bold, isItalic: italic))
-                    case .string(bold: let bold, italic: let italic):
-                        switch items[safe: argIndex] {
-                        case .string(let str):
-                            appendTextPart(.text(text: str, isBold: bold, isItalic: italic))
-                        case .none:
-                            assertionFailure("String argument missing at index \(argIndex) in “\(fline(lineIdx))”")
-                        case .image(let obj as Any), .view(let obj as Any):
-                            assertionFailure("Unexpected object argument “\(obj)”, expected string at index \(argIndex) in “\(fline(lineIdx))”")
-                        }
-                        argIndex += 1
+                        usedArgs.insert(argIndex)
+                        lineNumber += 1 // line number is auto-incremented
 
-                    case .object:
-                        switch items[safe: argIndex] {
+                    // text literal [optionally with markdown attributes]
+                    case .text(let text, bold: let bold, italic: let italic):
+                        appendTextItem(.text(text: text, isBold: bold, isItalic: italic))
+
+                    // %s string argument
+                    case .string(let argIndex, bold: let bold, italic: let italic):
+                        switch args[safe: argIndex] {
+                        case .string(let str):
+                            appendTextItem(.text(text: str, isBold: bold, isItalic: italic))
+                        case .none:
+                            assertionFailure("String argument missing at index \(argIndex) in line \(lineIdx + 1):\n“\(fline(lineIdx))”.\nArgs:\n\(args)")
+                        case .image(let obj as Any), .view(let obj as Any):
+                            assertionFailure("Unexpected object argument at index \(argIndex):\n\(obj)\nExpected object in line \(lineIdx + 1):\n“\(fline(lineIdx))”.\nArgs:\n\(args)")
+                        }
+                        usedArgs.insert(argIndex)
+
+                    // %@ object argument - inline image or button (view)
+                    case .object(let argIndex):
+                        switch args[safe: argIndex] {
                         case .image(let image):
-                            appendTextPart(.image(image))
+                            appendTextItem(.image(image))
                         case .view(let view):
                             resultLine.append(.view(view))
                         case .none:
-                            assertionFailure("Object argument missing at index \(argIndex) in “\(fline(lineIdx))”")
+                            assertionFailure("Object argument missing at index \(argIndex) in line \(lineIdx + 1):\n“\(fline(lineIdx))”.\nArgs:\n\(args)")
                         case .string(let string):
-                            assertionFailure("Unexpected string argument “\(string)”, expected object at index \(argIndex) in “\(fline(lineIdx))”")
+                            assertionFailure("Unexpected string argument at index \(argIndex):\n“\(string)”.\nExpected object in line \(lineIdx + 1):\n“\(fline(lineIdx))”.\nArgs:\n\(args)")
                         }
 
-                        argIndex += 1
+                        usedArgs.insert(argIndex)
                     }
                 }
                 result.append(resultLine)
             }
-            if argIndex < items.count {
-                assertionFailure("Argument \(items[argIndex]) not used anywhere")
-            }
+            assert(usedArgs.subtracting(IndexSet(args.indices)).isEmpty,
+                   "Unused arguments at indices \(usedArgs.subtracting(IndexSet(args.indices)))")
 
             self.instructions = result
 
@@ -461,12 +498,6 @@ struct InstructionsView: View {
             assertionFailure("Could not build instructions view: \(error)")
             self.instructions = []
         }
-    }
-
-    enum InstructionsItem {
-        case string(String)
-        case image(NSImage)
-        case view(AnyView)
     }
 
     @resultBuilder
@@ -514,7 +545,6 @@ struct InstructionsView: View {
         static func buildExpression(_ expression: Void) -> [InstructionsItem] {
             return []
         }
-
     }
 
     var body: some View {
@@ -524,7 +554,7 @@ struct InstructionsView: View {
                     switch instructions[i][j] {
                     case .lineNumber(let number):
                         CircleNumberView(number: number)
-                    case .textParts(let textParts):
+                    case .textItems(let textParts):
                         Text(textParts, fontName: fontName, fontSize: fontSize)
                     case .view(let view):
                         view
@@ -538,11 +568,12 @@ struct InstructionsView: View {
 
 private extension Text {
 
-    init(_ textPart: InstructionsView.TextPart, fontName: String, fontSize: CGFloat) {
+    init(_ textPart: InstructionsView.TextItem, fontName: String, fontSize: CGFloat) {
         switch textPart {
         case .image(let image):
             self.init(Image(nsImage: image))
             self = self.baselineOffset(fontSize - image.size.height)
+
         case .text(let text, let isBold, let isItalic):
             self.init(text)
             self = self.font(.custom(fontName, size: fontSize))
@@ -555,7 +586,7 @@ private extension Text {
         }
     }
 
-    init(_ textParts: [InstructionsView.TextPart], fontName: String, fontSize: CGFloat) {
+    init(_ textParts: [InstructionsView.TextItem], fontName: String, fontSize: CGFloat) {
         guard !textParts.isEmpty else {
             assertionFailure("Empty TextParts")
             self.init("")
