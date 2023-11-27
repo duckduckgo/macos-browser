@@ -22,7 +22,7 @@ import SecureStorage
 final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
     @Published var selectedTable: DataBrokerDatabaseBrowserData.Table?
     var tables = [DataBrokerDatabaseBrowserData.Table]()
-    let vault: DatabaseDebugSecureVault<DefaultDataBrokerProtectionDatabaseProvider>?
+    private let vault: DatabaseDebugSecureVault<DefaultDataBrokerProtectionDatabaseProvider>?
 
     internal init() {
 
@@ -54,12 +54,25 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         let mirror = Mirror(reflecting: item)
         var data: [String: CustomStringConvertible] = [:]
         for child in mirror.children {
-            if let label = child.label, let value = child.value as? CustomStringConvertible {
-                data[label] = value
+            var label: String
+            var value: CustomStringConvertible
+
+            if let childLabel = child.label {
+                label = childLabel
+            } else {
+                label = "No label"
             }
+
+            if let childValue = child.value as? CustomStringConvertible {
+                value = childValue
+            } else {
+                value = "No value"
+            }
+            data[label] = value
         }
         return DataBrokerDatabaseBrowserData.Row(data: data)
     }
+
     static func createFakeTables() -> [DataBrokerDatabaseBrowserData.Table] {
        let fakeRows1 = (1...10).map { index in
            DataBrokerDatabaseBrowserData.Row(data: ["Name": "John Doe", "Age": Int.random(in: 20...60), "Email": "john.doe\(index)@example.com"])

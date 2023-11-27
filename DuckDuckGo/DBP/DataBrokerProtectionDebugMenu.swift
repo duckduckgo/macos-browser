@@ -94,8 +94,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
         window.contentViewController = viewController
         window.minSize = NSSize(width: 500, height: 400)
-        window.setFrameOrigin(NSPoint(x: 0, y: 0))
-
+        window.center()
         databaseBrowserWindowController = NSWindowController(window: window)
         databaseBrowserWindowController?.showWindow(nil)
         window.delegate = self
