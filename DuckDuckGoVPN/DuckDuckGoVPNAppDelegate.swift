@@ -164,7 +164,15 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         // Initialize the IPC server
         _ = tunnelControllerIPCService
 
-        PixelKit.setUp(dryRun: false, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+        let dryRun: Bool
+
+#if DEBUG
+        dryRun = true
+#else
+        dryRun = false
+#endif
+
+        PixelKit.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself

@@ -193,9 +193,14 @@ public final class PixelKit {
 
         let pixelName = prefixedName(for: event)
 
-        if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName) {
-            onComplete(nil)
-            return
+        if !dryRun {
+            if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName) {
+                onComplete(nil)
+                return
+            } else if frequency == .justOnce, pixelHasBeenFiredEver(pixelName) {
+                onComplete(nil)
+                return
+            }
         }
 
         let newParams: [String: String]?
