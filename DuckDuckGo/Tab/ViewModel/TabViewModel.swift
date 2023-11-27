@@ -239,6 +239,14 @@ final class TabViewModel {
             return
         }
 
+        if url.isBlobURL {
+            let uuid = UUID().uuidString.lowercased()
+            let strippedUrl = url.stripUnsupportedCredentials()
+            addressBarString = "\(strippedUrl)\(uuid)"
+            passiveAddressBarString = "\(strippedUrl)\(uuid)"
+            return
+        }
+
         guard let hostURL = tabHostURL else {
             // also lands here for about:blank and about:home
             addressBarString = ""

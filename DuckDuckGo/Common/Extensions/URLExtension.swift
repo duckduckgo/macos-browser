@@ -422,4 +422,27 @@ extension URL {
     // MARK: - System Settings
 
     static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+
+    // MARK: - Blob URLs
+
+    var isBlobURL: Bool {
+        guard let scheme = self.scheme?.lowercased() else { return false }
+
+        if scheme == "blob" || scheme.hasPrefix("blob:") {
+            return true
+        }
+
+        return false
+    }
+
+    func stripUnsupportedCredentials() -> String {
+        if let atIndex = self.absoluteString.firstIndex(of: "@") {
+            let atIndexPlusOne = self.absoluteString.index(after: atIndex)
+            let remainingURL = self.absoluteString.suffix(from: atIndexPlusOne)
+            let reconstructedURLString = self.scheme! + "://" + (self.host ?? self.securityOrigin.host) + String(remainingURL)
+            return reconstructedURLString
+        }
+
+        return self.absoluteString // Return the original input if "@" symbol is not found
+    }
 }
