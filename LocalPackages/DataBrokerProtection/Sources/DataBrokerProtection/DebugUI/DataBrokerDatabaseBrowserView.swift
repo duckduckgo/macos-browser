@@ -41,7 +41,7 @@ struct DataBrokerDatabaseBrowserView: View {
                 Text("No selection")
             }
         }
-        .frame(minWidth: 900, minHeight: 700)
+        .frame(minWidth: 1300, minHeight: 800)
     }
 }
 
@@ -52,7 +52,11 @@ struct DatabaseView: View {
 
     var body: some View {
         if data.count > 0 {
-            dataView()
+            VStack {
+                dataView()
+                TextEditor(text: $selectedData)
+                    .frame(height: 100)
+            }
         } else {
             Text("No Data")
         }
@@ -86,7 +90,6 @@ struct DatabaseView: View {
                                         .frame(minWidth: 60)
                                         .onTapGesture {
                                             selectedData = row.data[key]?.description ?? ""
-                                            isPopoverVisible = true
                                         }
                                     Divider()
                                 }
@@ -102,31 +105,8 @@ struct DatabaseView: View {
                 .frame(minWidth: geometry.size.width, minHeight: 0, alignment: .topLeading)
             }
         }
-        .popover(isPresented: Binding(
-                get: { isPopoverVisible },
-                set: { isPopoverVisible = $0; selectedData = "" }
-            )) {
-                PopoverView(data: selectedData)
-            }
-    }
-
-    struct PopoverView: View {
-        let data: String
-
-        var body: some View {
-            ScrollView {
-                VStack {
-                    Text(data)
-                        .padding()
-                }
-                .frame(maxWidth: 400, maxHeight: 600)
-                .frame(minWidth: 200, minHeight: 100)
-
-            }
-        }
     }
 }
-
 
 struct ColumnData: Identifiable {
     var id = UUID()
