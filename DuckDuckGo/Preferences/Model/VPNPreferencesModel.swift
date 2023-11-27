@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import AppKit
 import Combine
 import Foundation
@@ -112,3 +114,5 @@ final class VPNPreferencesModel: ObservableObject {
         return alert
     }
 }
+
+#endif

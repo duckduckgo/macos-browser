@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import SwiftUI
 import SwiftUIExtensions
 
@@ -101,3 +103,5 @@ extension Preferences {
         }
     }
 }
+
+#endif

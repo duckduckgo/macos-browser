@@ -45,9 +45,11 @@ struct PreferencesSection: Hashable, Identifiable {
                 panes.append(.duckPlayer)
             }
 
+#if NETWORK_PROTECTION
             if includingVPN {
                 panes.append(.vpn)
             }
+#endif
 
             return panes
         }()
@@ -69,7 +71,9 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case sync
     case appearance
     case privacy
+#if NETWORK_PROTECTION
     case vpn
+#endif
 #if SUBSCRIPTION
     case subscription
 #endif
@@ -103,8 +107,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.appearance
         case .privacy:
             return UserText.privacy
+#if NETWORK_PROTECTION
         case .vpn:
             return UserText.vpn
+#endif
 #if SUBSCRIPTION
         case .subscription:
             return UserText.subscription
@@ -130,8 +136,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .privacy:
             return "Privacy"
+#if NETWORK_PROTECTION
         case .vpn:
             return "VPN"
+#endif
 #if SUBSCRIPTION
         case .subscription:
             return "Privacy"

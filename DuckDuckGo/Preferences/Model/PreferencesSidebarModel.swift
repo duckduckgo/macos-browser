@@ -53,7 +53,9 @@ final class PreferencesSidebarModel: ObservableObject {
             }
             .store(in: &cancellables)
 
+#if NETWORK_PROTECTION
         setupVPNPaneVisibility()
+#endif
     }
 
     @MainActor
@@ -63,7 +65,11 @@ final class PreferencesSidebarModel: ObservableObject {
         includeDuckPlayer: Bool
     ) {
         let loadSections = {
+#if NETWORK_PROTECTION
             let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
+#else
+            let includingVPN = false
+#endif
 
             return PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPN: includingVPN)
         }
@@ -75,6 +81,7 @@ final class PreferencesSidebarModel: ObservableObject {
 
     // MARK: - Setup
 
+#if NETWORK_PROTECTION
     private func setupVPNPaneVisibility() {
         DefaultNetworkProtectionVisibility().onboardStatusPublisher
             .receive(on: DispatchQueue.main)
@@ -89,6 +96,7 @@ final class PreferencesSidebarModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
+#endif
 
     // MARK: - Refreshing logic
 

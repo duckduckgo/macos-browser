@@ -19,7 +19,10 @@
 import AppKit
 import SwiftUI
 import Combine
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 final class PreferencesViewController: NSViewController {
 

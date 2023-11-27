@@ -419,10 +419,12 @@ final class NavigationBarViewController: NSViewController {
                                                name: AutoconsentUserScript.Constants.newSitePopupHidden,
                                                object: nil)
 
+#if NETWORK_PROTECTION
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showVPNUninstalledFeedback(_:)),
                                                name: NetworkProtectionFeatureDisabler.vpnUninstalledNotificationName,
                                                object: nil)
+#endif
     }
 
     @objc private func showVPNUninstalledFeedback(_ sender: Notification) {

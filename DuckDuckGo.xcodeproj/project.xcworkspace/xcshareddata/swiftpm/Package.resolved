@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "543e1d7ed9b5743d4e6b0ebe18a5fbf8f1441f02",
-        "version" : "85.1.1"
+        "branch" : "diego/vpn-settings",
+        "revision" : "17b017754749363ce95ec4ea623cbdfdf8b75ad7"
       }
     },
     {
