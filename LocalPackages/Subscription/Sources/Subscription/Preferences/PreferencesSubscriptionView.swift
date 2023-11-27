@@ -70,7 +70,8 @@ public struct PreferencesSubscriptionView: View {
                             .padding(4)
                     } content: {
                         TextMenuItemHeader(text: UserText.preferencesSubscriptionActiveHeader)
-                        TextMenuItemCaption(text: UserText.preferencesSubscriptionActiveCaption)
+                        TextMenuItemCaption(text: model.subscriptionDetails ?? UserText.preferencesSubscriptionActiveCaption)
+//                        TextMenuItemCaption(text: UserText.preferencesSubscriptionActiveCaption)
                     } buttons: {
                         Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
 

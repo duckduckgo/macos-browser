@@ -23,6 +23,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
     @Published var hasEntitlements: Bool = false
+    @Published var subscriptionDetails: String?
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
     private let accountManager: AccountManager
@@ -99,6 +100,23 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         print("Entitlements!")
         Task {
             self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
+
+            guard let token = accountManager.accessToken else { return }
+
+            if case .success(let response) = await SubscriptionService.getSubscriptionInfo(token: token) {
+                if response.expiresOrRenewsAt < Date() {
+                    AccountManager().signOut()
+                    return
+                }
+
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateStyle = .medium
+                dateFormatter.timeStyle = .short
+
+                let stringDate = dateFormatter.string(from: response.expiresOrRenewsAt)
+
+                self.subscriptionDetails = "Your monthly Privacy Pro subscription renews on \(stringDate)."
+            }
         }
     }
 }
