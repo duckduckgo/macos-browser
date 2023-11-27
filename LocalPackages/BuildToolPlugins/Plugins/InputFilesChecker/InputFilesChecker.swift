@@ -32,6 +32,7 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("NetworkProtectionAppEvents.swift", .source),
     .init("NetworkProtectionIPCTunnelController.swift", .source),
     .init("NetworkProtectionNavBarPopoverManager.swift", .source),
+    .init("NetworkProtectionSubscriptionEventHandler.swift", .source),
     .init("KeychainType+ClientDefault.swift", .source),
     .init("DBPHomeViewController.swift", .source),
     .init("DataBrokerProtectionManager.swift", .source),

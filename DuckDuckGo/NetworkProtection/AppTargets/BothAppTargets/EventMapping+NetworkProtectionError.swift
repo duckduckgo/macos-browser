@@ -71,7 +71,7 @@ extension EventMapping where Event == NetworkProtectionError {
                 .wireGuardDnsResolution,
                 .wireGuardSetNetworkSettings,
                 .startWireGuardBackend,
-                .failedToRetrieveAuthToken:
+                .failedToRetrieveAuthToken,
                 .failedToFetchLocationList,
                 .failedToParseLocationListResponse:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)
