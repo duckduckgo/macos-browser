@@ -419,6 +419,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         try tunnelManager.connection.startVPNTunnel(options: options)
         try await statusTransitionAwaiter.waitUntilConnectionStarted()
+
+        PixelKit.fire(
+            NetworkProtectionPixelEvent.networkProtectionNewUser,
+            frequency: .justOnce,
+            includeAppVersionParameter: true)
+
         try await enableOnDemand(tunnelManager: tunnelManager)
     }
 
