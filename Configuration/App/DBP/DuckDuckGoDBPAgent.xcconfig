@@ -14,7 +14,7 @@
 //
 
 #include "../AppTargetsBase.xcconfig"
-#include "../../NetworkProtectionDeveloperID.xcconfig"
+#include "../../DeveloperID.xcconfig"
 
 // Override AppTargetsBase.xcconfig until we resolve bundle IDs.
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(DBP_AGENT_BUNDLE_ID)

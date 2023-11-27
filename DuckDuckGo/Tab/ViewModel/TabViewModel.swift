@@ -56,7 +56,6 @@ final class TabViewModel {
     }
     @Published var errorViewState = ErrorViewState() {
         didSet {
-            updateAddressBarStrings()
             updateTitle()
             updateFavicon()
         }
@@ -106,11 +105,20 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateAddressBarStrings()
-            self?.updateCanBeBookmarked()
-            self?.updateFavicon()
-        } .store(in: &cancellables)
+        tab.$isLoading
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.isLoading = isLoading
+                if !isLoading {
+                    // Update the address bar only after the tab has finished
+                    // to prevent Address Bar Spoofing
+                    self?.updateAddressBarStrings()
+                    self?.updateCanBeBookmarked()
+                    self?.updateFavicon()
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToCanGoBackForwardAndReload() {
@@ -239,7 +247,6 @@ final class TabViewModel {
         }
 
         addressBarString = url.absoluteString
-
         updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
     }
 

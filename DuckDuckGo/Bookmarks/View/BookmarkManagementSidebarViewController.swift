@@ -262,7 +262,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 extension BookmarkManagementSidebarViewController: AddFolderModalViewControllerDelegate {
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        LocalBookmarkManager.shared.makeFolder(for: name, parent: nil)
+        LocalBookmarkManager.shared.makeFolder(for: name, parent: nil, completion: { _ in })
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
