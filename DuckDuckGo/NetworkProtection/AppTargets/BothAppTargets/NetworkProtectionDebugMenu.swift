@@ -168,7 +168,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Tunnel Settings
 
-    private let settings = TunnelSettings(defaults: .shared)
+    private let settings = TunnelSettings(defaults: .netP)
 
     // MARK: - Debug Logic
 
@@ -465,7 +465,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func updateNetworkProtectionItems() {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier, keychainAppGroup: NetworkProtectionWaitlist.keychainAppGroup)
         waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
         waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
 
