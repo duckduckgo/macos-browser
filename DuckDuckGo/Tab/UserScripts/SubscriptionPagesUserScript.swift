@@ -203,14 +203,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             switch await PurchaseManager.shared.syncAppleIDAccount() {
             case .success:
                 break
-            case .failure(let error):
+            case .failure:
                 return nil
             }
 
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
                 print("hasActiveSubscription: TRUE")
-                await showSubscriptionFoundAlert()
+                await showSubscriptionFoundAlert(originalMessage: message)
                 return nil
             }
 
@@ -227,7 +227,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
             case .success:
                 break
-            case .failure(let error):
+            case .failure:
                 return nil
             }
 
@@ -289,7 +289,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                             case .failure:
                                 self.showSubscriptionNotFoundAlert()
                             }
-
 
                             message.webView?.reload()
                         }
@@ -386,15 +385,18 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     @MainActor
-    private func showSubscriptionFoundAlert() {
+    private func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
         guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
 
         let alert = NSAlert.subscriptionFoundAlert()
         alert.beginSheetModal(for: window, completionHandler: { response in
             if case .alertFirstButtonReturn = response {
-                print("Restore action")
-            } else {
-                print("Cancel and do nothing")
+                if #available(macOS 12.0, *) {
+                    Task {
+                        _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                        originalMessage.webView?.reload()
+                    }
+                }
             }
         })
     }
