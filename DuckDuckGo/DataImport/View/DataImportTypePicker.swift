@@ -28,7 +28,8 @@ struct DataImportTypePicker: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Select data to import:")
+            Text("Select data to import:",
+                 comment: "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks.")
                 .font(.headline)
 
             ForEach(DataImport.DataType.allCases, id: \.self) { dataType in
@@ -48,7 +49,8 @@ struct DataImportTypePicker: View {
 
                     // subtitle
                     if !viewModel.importSource.supportedDataTypes.contains(dataType) {
-                        Text("\(viewModel.importSource.importSourceName) does not support storing \(dataType.displayName)")
+                        Text("\(viewModel.importSource.importSourceName) does not support storing \(dataType.displayName)",
+                             comment: "Data Import disabled checkbox message about a browser (%1$@) not supporting storing a data type (%2$@ - Bookmarks or Passwords)")
                             .foregroundColor(Color(.disabledControlTextColor))
                     }
                 }

@@ -31,7 +31,7 @@ struct DataImportProfilePicker: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             if profiles.count > 1 {
-                Text("Select Profile:")
+                Text("Select Profile:", comment: "Browser Profile picker title for Data Import")
                     .font(.headline)
 
                 Picker(selection: Binding {

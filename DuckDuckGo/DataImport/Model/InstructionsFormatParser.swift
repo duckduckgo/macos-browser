@@ -22,7 +22,7 @@ import Foundation
 /// NSLocalizedString format parser for CSV/HTML data import instructions screen
 struct InstructionsFormatParser {
 
-    // NSLocalizedString("Formatted text %s %d %@")
+    // Localized String("Formatted text %s %d %@")
     enum FormatComponent: Equatable {
         // String literals: "Formatted text ", " ", " "
         case text(String, bold: Bool = false, italic: Bool = false)

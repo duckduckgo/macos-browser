@@ -75,7 +75,7 @@ struct DataImportView: View {
 
     private func viewHeader() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Import Browser Data")
+            Text(UserText.importDataTitle)
                 .font(.headline)
                 .padding(.bottom, 16)
 
@@ -119,10 +119,12 @@ struct DataImportView: View {
             case .fileImport(let dataType):
                 // if browser importer failed - display error message
                 if viewModel.hasDataTypeImportFailed(dataType) {
-                    Text("We were unable to import directly from \(viewModel.importSource.importSourceName).")
+                    Text("We were unable to import directly from \(viewModel.importSource.importSourceName).",
+                         comment: "Message when data import fails from a browser. %@ - a browser name")
                         .font(.headline)
                     Spacer().frame(height: 8)
-                    Text("Let’s try doing it manually. It won’t take long.")
+                    Text("Let’s try doing it manually. It won’t take long.",
+                         comment: "Suggestion to switch to a Manual File Data Import when data import fails.")
                     Spacer().frame(height: 24)
                 }
 
@@ -135,7 +137,8 @@ struct DataImportView: View {
 
             case .fileImportSummary(let dataType):
                 // present file impoter import summary for one data type
-                Text("\(dataType.displayName) Import Complete")
+                Text("\(dataType.displayName) Import Complete", 
+                     comment: "Passwords or Bookmarks (%@) File Data Import completion message")
                     .font(.headline)
                 Spacer().frame(height: 12)
                 DataImportSummaryView(summary: (
@@ -146,7 +149,8 @@ struct DataImportView: View {
 
             case .summary:
                 // total import summary
-                Text("Import Complete")
+                Text("Import Complete",
+                     comment: "Browser data import completion message")
                     .font(.headline)
                 Spacer().frame(height: 12)
 

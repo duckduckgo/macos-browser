@@ -33,14 +33,22 @@ struct ReportFeedbackView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-            Text(title)
-                .font(.headline)
+            {
+                if model.retryNumber <= 1 {
+                    Text("Please submit a report to help us fix the issue.",
+                         comment: "Data import failure Report dialog title.")
+                } else {
+                    Text("That didn’t work either. Please submit a report to help us fix the issue.",
+                         comment: "Data import failure Report dialog title containing a message that not only automatic data import has failed failed but manual browser data import didn‘t work either.")
+                }
+            }().font(.headline)
+
             Spacer().frame(height: 8)
 
             VStack(alignment: .leading, spacing: 12) {
                 Text("""
                 The following information will be sent to DuckDuckGo. No personally identifiable information will be sent.
-                """)
+                """, comment: "Data import failure Report dialog subtitle about the data being collected with the report.")
 
                 InfoItemView("macOS version", model.osVersion)
                 InfoItemView("DuckDuckGo browser version", model.appVersion)
@@ -59,7 +67,8 @@ struct ReportFeedbackView: View {
 
                 if model.text.isEmpty {
                     HStack {
-                        Text("Add any details that you think may help us fix the problem")
+                        Text("Add any details that you think may help us fix the problem",
+                             comment: "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem.")
                             .font(.custom("SF Pro Text", size: 13))
                             .foregroundColor(Color(.placeholderTextColor))
                         Spacer()

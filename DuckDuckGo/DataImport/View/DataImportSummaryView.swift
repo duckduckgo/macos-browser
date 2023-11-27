@@ -39,30 +39,35 @@ struct DataImportSummaryView: View {
                 case .bookmarks:
                     HStack {
                         successImage()
-                        Text("Bookmarks: \(item.result.successful)")
+                        Text("Bookmarks: \(item.result.successful)",
+                             comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
                     }
                     if item.result.duplicate > 0 {
                         HStack {
                             failureImage()
-                            Text("Duplicate Bookmarks Skipped: \(item.result.duplicate)")
+                            Text("Duplicate Bookmarks Skipped: \(item.result.duplicate)",
+                                 comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.")
                         }
                     }
                     if item.result.failed > 0 {
                         HStack {
                             failureImage()
-                            Text("Bookmark import failed: \(item.result.failed)")
+                            Text("Bookmark import failed: \(item.result.failed)",
+                                 comment: "Data import summary format of how many bookmarks (%lld) failed to import.")
                         }
                     }
 
                 case .passwords:
                     HStack {
                         successImage()
-                        Text("Passwords: \(item.result.successful)")
+                        Text("Passwords: \(item.result.successful)",
+                             comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
                     }
                     if item.result.failed > 0 {
                         HStack {
                             failureImage()
-                            Text("Login import failed: \(item.result.failed)")
+                            Text("Passwords import failed: \(item.result.failed)",
+                                 comment: "Data import summary format of how many passwords (%lld) failed to import.")
                         }
                     }
                 }
