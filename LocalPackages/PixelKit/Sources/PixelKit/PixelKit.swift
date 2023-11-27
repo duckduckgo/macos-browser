@@ -130,9 +130,43 @@ public final class PixelKit {
         var headers = headers ?? defaultHeaders
         headers[Header.moreInfo] = "See " + Self.duckDuckGoMorePrivacyInfo.absoluteString
 
+        switch frequency {
+        case .standard:
+            fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+        case .justOnce:
+            guard pixelName.hasSuffix("_u") else {
+                assertionFailure("Unique pixel: must end with _u")
+                return
+            }
+            if !pixelHasBeenFiredEver(pixelName) {
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                updatePixelLastFireDate(pixelName: pixelName)
+            }
+        case .dailyOnly:
+            if !pixelHasBeenFiredToday(pixelName) {
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                updatePixelLastFireDate(pixelName: pixelName)
+            }
+        case .dailyAndContinuous:
+            if !pixelHasBeenFiredToday(pixelName) {
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                updatePixelLastFireDate(pixelName: pixelName)
+            }
+
+            fireRequestWrapper(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
+        }
+    }
+
+    private func fireRequestWrapper(
+        _ pixelName: String,
+        _ headers: [String: String],
+        _ parameters: [String: String],
+        _ allowedQueryReservedCharacters: CharacterSet?,
+        _ callBackOnMainThread: Bool,
+        _ onComplete: @escaping (Error?) -> Void) {
         guard !dryRun else {
-            let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
-            os_log(.debug, log: log, "%@ %@", pixelName.replacingOccurrences(of: "_", with: "."), params)
+            let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
+            os_log(.debug, log: log, "👾 %{public}s %{public}@", pixelName.replacingOccurrences(of: "_", with: "."), params)
 
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -142,31 +176,7 @@ public final class PixelKit {
             return
         }
 
-        switch frequency {
-        case .standard:
-            fireRequest(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
-        case .justOnce:
-            guard pixelName.hasSuffix("_u") else {
-                assertionFailure("Unique pixel: must end with _u")
-                return
-            }
-            if !pixelHasBeenFiredEver(pixelName) {
-                fireRequest(pixelName, headers, newParams, allowedQueryReservedCharacters, true, { _ in })
-                updatePixelLastFireDate(pixelName: pixelName)
-            }
-        case .dailyOnly:
-            if !pixelHasBeenFiredToday(pixelName) {
-                fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
-                updatePixelLastFireDate(pixelName: pixelName)
-            }
-        case .dailyAndContinuous:
-            if !pixelHasBeenFiredToday(pixelName) {
-                fireRequest(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
-                updatePixelLastFireDate(pixelName: pixelName)
-            }
-
-            fireRequest(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
-        }
+        fireRequest(pixelName, headers, parameters, allowedQueryReservedCharacters, callBackOnMainThread, onComplete)
     }
 
     private func prefixedName(for event: Event) -> String {
@@ -274,7 +284,9 @@ public final class PixelKit {
     }
 
     private func userDefaultsKeyName(forPixelName pixelName: String) -> String {
-        return "com.duckduckgo.network-protection.pixel.\(pixelName)"
+        dryRun
+            ? "com.duckduckgo.network-protection.pixel.\(pixelName).dry-run"
+            : "com.duckduckgo.network-protection.pixel.\(pixelName)"
     }
 
 }
