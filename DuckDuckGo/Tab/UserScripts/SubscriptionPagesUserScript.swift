@@ -150,7 +150,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .success(let subscriptionOptions):
             return subscriptionOptions
         case .failure:
-            // TODO: handle errors
+            // TODO: handle errors - no products found
             return nil
         }
 #else
@@ -159,7 +159,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success(let subscriptionOptions):
                 return subscriptionOptions
             case .failure:
-                // TODO: handle errors
+                // TODO: handle errors - no products found
                 return nil
             }
         }
@@ -179,7 +179,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .success(let purchaseUpdate):
             await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
         case .failure:
-            // TODO: handle errors
+            // TODO: handle errors - failed prepare purchae
             return nil
         }
 #else
@@ -265,12 +265,22 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 restorePurchases: {
                     if #available(macOS 12.0, *) {
                         Task {
-                            switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                            case .success:
-                                message.webView?.reload()
-                            case .failure:
-                                break
+                            guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
+
+                            guard case .success = await AppStoreRestoreFlow.restoreAccountFromPastPurchase() else {
+                                self.showSubscriptionNotFoundAlert()
+                                return
                             }
+
+                            guard let token = AccountManager().accessToken else { return }
+
+                            if case .success(let response) = await SubscriptionService.getSubscriptionInfo(token: token) {
+                                if response.status == "Expired" {
+                                    self.showSubscriptionInactiveAlert()
+                                }
+                            }
+
+                            message.webView?.reload()
                         }
                     }
                 },
@@ -337,6 +347,31 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
         let alert = NSAlert.somethingWentWrongAlert()
         alert.beginSheetModal(for: window)
+    }
+
+    @MainActor
+    private func showSubscriptionNotFoundAlert() {
+        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+
+        let alert = NSAlert.subscriptionNotFoundAlert()
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            if case .alertFirstButtonReturn = response {
+                WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
+            }
+        })
+    }
+
+    @MainActor
+    private func showSubscriptionInactiveAlert() {
+        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+
+        let alert = NSAlert.subscriptionInactiveAlert()
+        alert.beginSheetModal(for: window, completionHandler: { response in
+            if case .alertFirstButtonReturn = response {
+                WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
+                AccountManager().signOut()
+            }
+        })
     }
 
     @MainActor

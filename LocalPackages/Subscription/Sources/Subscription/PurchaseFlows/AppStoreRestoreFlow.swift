@@ -24,6 +24,8 @@ import Account
 @available(macOS 12.0, *)
 public final class AppStoreRestoreFlow {
 
+//    typealias Success = (externalID: String, isActive: Bool, first:String)
+
     public enum Error: Swift.Error {
         case missingAccountOrTransactions
         case pastTransactionAuthenticationFailure

@@ -29,6 +29,25 @@ public extension NSAlert {
         return alert
     }
 
+    static func subscriptionNotFoundAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Subscription Not Found"
+        alert.informativeText = "We couldn’t find a subscription associated with this Apple ID."
+        alert.addButton(withTitle: "View Plans")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+    static func subscriptionInactiveAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Subscription Not Found"
+        alert.informativeText = "The subscription associated with this Apple ID is no longer active."
+        alert.addButton(withTitle: "View Plans")
+        alert.addButton(withTitle: "Cancel")
+        return alert
+    }
+
+
     static func subscriptionFoundAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Subscription Found"

@@ -95,7 +95,7 @@ extension Preferences {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)
             }, manageSubscriptionInAppStore: {
-                NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
+                NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
             }, openVPN: {
                 print("openVPN")
             }, openPersonalInformationRemoval: {
@@ -107,7 +107,20 @@ extension Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
-                        await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                        guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
+
+                        guard case .success = await AppStoreRestoreFlow.restoreAccountFromPastPurchase() else {
+                            self.showSubscriptionNotFoundAlert()
+                            return
+                        }
+
+                        guard let token = AccountManager().accessToken else { return }
+
+                        if case .success(let response) = await SubscriptionService.getSubscriptionInfo(token: token) {
+                            if response.status == "Expired" {
+                                self.showSubscriptionInactiveAlert()
+                            }
+                        }
                     }
                 }
             }, openURLHandler: { url in
@@ -118,6 +131,31 @@ extension Preferences {
 
             let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
             return Subscription.PreferencesSubscriptionView(model: model)
+        }
+
+        @MainActor
+        private func showSubscriptionNotFoundAlert() {
+            guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+
+            let alert = NSAlert.subscriptionNotFoundAlert()
+            alert.beginSheetModal(for: window, completionHandler: { response in
+                if case .alertFirstButtonReturn = response {
+                    WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
+                }
+            })
+        }
+
+        @MainActor
+        private func showSubscriptionInactiveAlert() {
+            guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+
+            let alert = NSAlert.subscriptionInactiveAlert()
+            alert.beginSheetModal(for: window, completionHandler: { response in
+                if case .alertFirstButtonReturn = response {
+                    WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
+                    AccountManager().signOut()
+                }
+            })
         }
 #endif
     }
@@ -134,3 +172,5 @@ struct SyncView: View {
     }
 
 }
+
+
