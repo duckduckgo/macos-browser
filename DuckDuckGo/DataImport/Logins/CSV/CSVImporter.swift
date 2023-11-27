@@ -100,16 +100,11 @@ final class CSVImporter: DataImporter {
     }
 
     func totalValidLogins() -> Int {
-        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else {
-            return 0
-        }
-
-        var seen: [String: Bool] = [:]
+        guard let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) else { return 0 }
 
         let logins = Self.extractLogins(from: fileContents, defaultColumnPositions: self.defaultColumnPositions)
-        let uniqueLogins = logins.filter { seen.updateValue(true, forKey: "\($0.url)-\($0.username)") == nil }
 
-        return uniqueLogins.count
+        return logins.count
     }
 
     static func extractLogins(from fileContents: String,
@@ -138,6 +133,7 @@ final class CSVImporter: DataImporter {
     // This will change to return an array of DataImport.Summary objects, indicating the status of each import type that was requested.
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
         let fileContents: String
         do {

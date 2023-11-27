@@ -18,31 +18,38 @@
 
 import Cocoa
 import SwiftUI
+import BrowserServicesKit
+import WebKit
+import Combine
 
 final public class DataBrokerProtectionViewController: NSViewController {
-    private let navigationViewModel: ContainerNavigationViewModel
-    private let profileViewModel: ProfileViewModel
+
+    private enum Constants {
+        static let dbpUiUrl = "https://use-devtesting18.duckduckgo.com/dbp"
+    }
+
     private let dataManager: DataBrokerProtectionDataManaging
-    private let resultsViewModel: ResultsViewModel
-    private let containerViewModel: ContainerViewModel
     private let scheduler: DataBrokerProtectionScheduler
-    private let notificationCenter: NotificationCenter
+    private var webView: WKWebView?
+
+    private let webUIViewModel: DBPUIViewModel
+
+    private let openURLHandler: (URL?) -> Void
 
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
-                notificationCenter: NotificationCenter = .default) {
+                privacyConfig: PrivacyConfigurationManaging? = nil,
+                prefs: ContentScopeProperties? = nil,
+                openURLHandler: @escaping (URL?) -> Void) {
         self.scheduler = scheduler
         self.dataManager = dataManager
-        self.notificationCenter = notificationCenter
+        self.openURLHandler = openURLHandler
 
-        navigationViewModel = ContainerNavigationViewModel(dataManager: dataManager)
-        profileViewModel = ProfileViewModel(dataManager: dataManager)
+        self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
 
-        resultsViewModel = ResultsViewModel(dataManager: dataManager,
-                                            notificationCenter: notificationCenter)
-
-        containerViewModel = ContainerViewModel(scheduler: scheduler,
-                                                dataManager: dataManager)
+        Task {
+            _ = dataManager.fetchProfile(ignoresCache: true)
+        }
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -52,14 +59,19 @@ final public class DataBrokerProtectionViewController: NSViewController {
     }
 
     override public func loadView() {
-        let containerView = DataBrokerProtectionContainerView(
-            containerViewModel: containerViewModel,
-            navigationViewModel: navigationViewModel,
-            profileViewModel: profileViewModel,
-            resultsViewModel: resultsViewModel)
+        guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
-        let hostingController = NSHostingController(rootView: containerView)
-        view = hostingController.view
+        webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1024, height: 768), configuration: configuration)
+        webView?.uiDelegate = self
+        view = webView!
+
+        webView?.load(URL(string: Constants.dbpUiUrl)!)
     }
+}
 
+extension DataBrokerProtectionViewController: WKUIDelegate {
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        openURLHandler(navigationAction.request.url)
+        return nil
+    }
 }

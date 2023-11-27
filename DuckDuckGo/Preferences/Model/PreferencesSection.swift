@@ -29,7 +29,7 @@ struct PreferencesSection: Hashable, Identifiable {
 #if SUBSCRIPTION
             var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
 
-            if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
+            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 if let generalIndex = panes.firstIndex(of: .general) {
                     panes.insert(.sync, at: generalIndex + 1)
                 }
@@ -37,7 +37,7 @@ struct PreferencesSection: Hashable, Identifiable {
 #else
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
 
-            if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
+            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 panes.insert(.sync, at: 1)
             }
 #endif
@@ -88,6 +88,11 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         case .general:
             return UserText.general
         case .sync:
+            var isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+            var isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            if isSyncBookmarksPaused || isSyncCredentialsPaused {
+                return UserText.sync + " ⚠️"
+            }
             return UserText.sync
         case .appearance:
             return UserText.appearance

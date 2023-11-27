@@ -18,7 +18,6 @@
 
 import XCTest
 @testable import DataBrokerProtection
-
 // https://app.asana.com/0/1204586965688315/1204834439855281/f
 
 final class OperationPreferredDateCalculatorTests: XCTestCase {
@@ -50,6 +49,23 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
+    func testOptOutConfirmedOnDeprecatedProfile_thenScanDateIsNil() throws {
+        let historyEvents = [
+            HistoryEvent(extractedProfileId: 1,
+                         brokerId: 1,
+                         profileQueryId: 1,
+                         type: .optOutConfirmed)]
+
+        let calculator = OperationPreferredDateCalculator()
+
+        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
+                                                                 historyEvents: historyEvents,
+                                                                 extractedProfileID: nil,
+                                                                 schedulingConfig: schedulingConfig,
+                                                                 isDeprecated: true)
+
+        XCTAssertNil(actualScanDate)
+    }
     /*
      If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
      */
@@ -197,98 +213,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
     }
 
-    // If we have a most recent date saved, the calculator should not change it no matter the case.
-
-    func testNoMatchFoundWithRecentDate_thenScanDateDoesNotChange() throws {
-        let expectedScanDate = Date()
-
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .noMatchFound)]
-
-        let calculator = OperationPreferredDateCalculator()
-
-        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
-                                                                  historyEvents: historyEvents,
-                                                                  extractedProfileID: nil,
-                                                                  schedulingConfig: schedulingConfig)
-
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
-    }
-
-    /*
-     If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
-     */
-    func testMatchFoundWithExpiredProfileWithRecentDate_thenScanDateDoesNotChange() throws {
-        let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
-
-        let expectedScanDate = Date()
-
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .optOutRequested,
-                         date: expiredDate),
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .matchesFound(count: 1))]
-
-        let calculator = OperationPreferredDateCalculator()
-
-        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
-                                                                 historyEvents: historyEvents,
-                                                                 extractedProfileID: nil,
-                                                                 schedulingConfig: schedulingConfig)
-
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
-    }
-
-    func testMatchFoundWithoutExpiredProfileWithRecentDate_thenScanDateDoesNotChange() throws {
-        let expectedScanDate = Date()
-
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .optOutRequested),
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .matchesFound(count: 1))]
-
-        let calculator = OperationPreferredDateCalculator()
-
-        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
-                                                                 historyEvents: historyEvents,
-                                                                 extractedProfileID: nil,
-                                                                 schedulingConfig: schedulingConfig)
-
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
-    }
-
-    func testErrorWithRecentDate_thenScanDateDoesNotChange() throws {
-        let expectedScanDate = Date()
-
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .error(error: DataBrokerProtectionError.malformedURL))]
-
-        let calculator = OperationPreferredDateCalculator()
-
-        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
-                                                                 historyEvents: historyEvents,
-                                                                 extractedProfileID: nil,
-                                                                 schedulingConfig: schedulingConfig)
-
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
-    }
-
     func testOptOutStartedWithRecentDate_thenScanDateDoesNotChange() throws {
         let expectedScanDate = Date()
 
@@ -297,44 +221,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          brokerId: 1,
                          profileQueryId: 1,
                          type: .optOutStarted)]
-
-        let calculator = OperationPreferredDateCalculator()
-
-        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
-                                                                 historyEvents: historyEvents,
-                                                                 extractedProfileID: nil,
-                                                                 schedulingConfig: schedulingConfig)
-
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
-    }
-
-    func testOptOutConfirmedWithRecentDate_thenScanDateDoesNotChange() throws {
-        let expectedScanDate = Date()
-
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .optOutConfirmed)]
-
-        let calculator = OperationPreferredDateCalculator()
-
-        let actualScanDate = try calculator.dateForScanOperation(currentPreferredRunDate: Date(),
-                                                                  historyEvents: historyEvents,
-                                                                  extractedProfileID: nil,
-                                                                  schedulingConfig: schedulingConfig)
-
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedScanDate, date2: actualScanDate))
-    }
-
-    func testOptOutRequestedWithRecentDate_thenScanDateDoesNotChange() throws {
-        let expectedScanDate = Date()
-
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .optOutRequested)]
 
         let calculator = OperationPreferredDateCalculator()
 
@@ -473,7 +359,26 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutConfirmed_thenOptOutIsNil() throws {
+    func testOptOutConfirmedWithCurrentPreferredDate_thenOptOutIsNil() throws {
+        let expectedOptOutDate: Date? = nil
+
+        let historyEvents = [
+            HistoryEvent(extractedProfileId: 1,
+                         brokerId: 1,
+                         profileQueryId: 1,
+                         type: .optOutConfirmed)]
+
+        let calculator = OperationPreferredDateCalculator()
+
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: Date(),
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testOptOutConfirmedWithoutCurrentPreferredDate_thenOptOutIsNil() throws {
         let expectedOptOutDate: Date? = nil
 
         let historyEvents = [
@@ -492,7 +397,26 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
 
-    func testOptOutRequested_thenOptOutIsNil() throws {
+    func testOptOutRequestedWithCurrentPreferredDate_thenOptOutIsNil() throws {
+        let expectedOptOutDate: Date? = nil
+
+        let historyEvents = [
+            HistoryEvent(extractedProfileId: 1,
+                         brokerId: 1,
+                         profileQueryId: 1,
+                         type: .optOutRequested)]
+
+        let calculator = OperationPreferredDateCalculator()
+
+        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: Date(),
+                                                                     historyEvents: historyEvents,
+                                                                     extractedProfileID: nil,
+                                                                     schedulingConfig: schedulingConfig)
+
+        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+
+    func testOptOutRequestedWithoutCurrentPreferredDate_thenOptOutIsNil() throws {
         let expectedOptOutDate: Date? = nil
 
         let historyEvents = [
@@ -596,25 +520,6 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                      historyEvents: historyEvents,
                                                                      extractedProfileID: 1,
-                                                                     schedulingConfig: schedulingConfig)
-
-        XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
-    }
-
-    func testErrorWithRecentDate_thenOptOutDateDoesNotChange() throws {
-        let expectedOptOutDate = Date()
-
-        let historyEvents = [
-            HistoryEvent(extractedProfileId: 1,
-                         brokerId: 1,
-                         profileQueryId: 1,
-                         type: .error(error: DataBrokerProtectionError.malformedURL))]
-
-        let calculator = OperationPreferredDateCalculator()
-
-        let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: Date(),
-                                                                     historyEvents: historyEvents,
-                                                                     extractedProfileID: nil,
                                                                      schedulingConfig: schedulingConfig)
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))

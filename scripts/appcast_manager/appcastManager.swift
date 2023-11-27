@@ -111,8 +111,7 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     print("DMG Path: \(dmgPath)")
     print("Release Notes Path: \(releaseNotesPath)")
 
-    // Download appcast and update files
-    AppcastDownloader().download()
+    performCommonChecksAndOperations()
 
     // Handle dmg file
     guard let dmgURL = handleDMGFile(dmgPath: dmgPath, updatesDirectoryURL: specificDir) else {
@@ -141,8 +140,7 @@ case .releaseToPublicChannel:
     print("Action: Release to public channel")
     print("Version: \(version)")
 
-    // Download appcast and update files
-    AppcastDownloader().download()
+    performCommonChecksAndOperations()
 
     // Verify version
     if !verifyVersion(version: version, atDirectory: specificDir) {
@@ -166,8 +164,86 @@ case .releaseToPublicChannel:
     runGenerateAppcast(withVersions: version, rolloutInterval: "43200")
 }
 
+// MARK: - Common
+
+func performCommonChecksAndOperations() {
+    // Check if generate_appcast is recent
+    guard checkSparkleToolRecency(toolName: "generate_appcast"),
+          checkSparkleToolRecency(toolName: "generate_keys"),
+          checkSparkleToolRecency(toolName: "sign_update"),
+          checkSparkleToolRecency(toolName: "BinaryDelta") else {
+        exit(1)
+    }
+
+    // Verify signing keys
+    guard verifySigningKeys() else {
+        exit(1)
+    }
+
+    // Download appcast and update files
+    AppcastDownloader().download()
+}
+
 func getDmgFilename(for version: String) -> String {
     return "duckduckgo-\(version).dmg"
+}
+
+// MARK: - Checking the recency of Sparkle tools
+
+func checkSparkleToolRecency(toolName: String) -> Bool {
+    let binaryPath = shell("which", toolName).trimmingCharacters(in: .whitespacesAndNewlines)
+
+    if binaryPath.isEmpty {
+        print("Failed to find the path for \(toolName).")
+        return false
+    }
+
+    guard let binaryAttributes = try? FileManager.default.attributesOfItem(atPath: binaryPath),
+          let modificationDate = binaryAttributes[.modificationDate] as? Date else {
+        print("Failed to get the modification date for \(toolName).")
+        return false
+    }
+
+    // Get the current script's path and navigate to the root folder to get the release date file
+    let currentScriptPath = URL(fileURLWithPath: #file)
+    let rootDirectory = currentScriptPath.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    let releaseDateFilePath = rootDirectory.appendingPathComponent(".sparkle_tools_release_date")
+
+    guard let releaseDateString = try? String(contentsOf: releaseDateFilePath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
+          let releaseDate = DateFormatter.yyyyMMddUTC.date(from: releaseDateString) else {
+        print("Failed to get the release date from .sparkle_tools_release_date.")
+        return false
+    }
+
+    if modificationDate < releaseDate {
+        print("\(toolName) from Sparkle binary utilities is outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
+        return false
+    }
+
+    return true
+}
+
+extension DateFormatter {
+    static let yyyyMMddUTC: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
+}
+
+// MARK: - Verification of the signing keys
+
+func verifySigningKeys() -> Bool {
+    let publicKeyOutput = shell("generate_keys", "-p").trimmingCharacters(in: .whitespacesAndNewlines)
+    let desiredPublicKey = "ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo="
+
+    if publicKeyOutput == desiredPublicKey {
+        return true
+    } else {
+        print("Incorrect or missing public signing key. Please ensure you have the correct keys installed.")
+        return false
+    }
 }
 
 // MARK: - Downloading of Appcast and Files
@@ -517,8 +593,29 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
         print("Error writing diff to file: \(error)")
     }
 
+    // Move files back to the original location
+    moveFiles(from: specificDir.appendingPathComponent("old_updates"), to: specificDir)
+    print("Old update files moved back to \(specificDir.path)")
+
     // Open specific directory in Finder
     shell("open", specificDir.path)
+}
+
+func moveFiles(from sourceDir: URL, to destinationDir: URL) {
+    let fileManager = FileManager.default
+    do {
+        let fileURLs = try fileManager.contentsOfDirectory(at: sourceDir, includingPropertiesForKeys: nil)
+        for fileURL in fileURLs {
+            let destinationURL = destinationDir.appendingPathComponent(fileURL.lastPathComponent)
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                try fileManager.removeItem(at: destinationURL)
+            }
+            try fileManager.moveItem(at: fileURL, to: destinationURL)
+        }
+    } catch {
+        print("Failed to move files from \(sourceDir.path) to \(destinationDir.path): \(error).")
+        exit(1)
+    }
 }
 
 @discardableResult func shell(_ command: String, _ arguments: String...) -> String {

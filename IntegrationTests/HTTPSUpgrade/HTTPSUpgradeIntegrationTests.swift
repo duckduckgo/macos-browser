@@ -67,7 +67,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel
@@ -124,7 +124,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel

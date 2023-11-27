@@ -26,27 +26,29 @@ extension Notification.Name {
     static let waitlistModalViewControllerShouldDismiss = Notification.Name(rawValue: "waitlistModalViewControllerShouldDismiss")
 }
 
-final class WaitlistModalViewController: NSViewController {
-
-    // Small hack to force the waitlist modal view controller to dismiss all instances of itself whenever the user opens a link from the T&C view.
-    static func dismissWaitlistModalViewControllerIfNecessary(_ url: URL) {
-        if ["https://duckduckgo.com/privacy", "https://duckduckgo.com/terms"].contains(url.absoluteString) {
-            NotificationCenter.default.post(name: .waitlistModalViewControllerShouldDismiss, object: nil)
-        }
-    }
+final class WaitlistModalViewController<ContentView: View>: NSViewController {
 
     private let defaultSize = CGSize(width: 360, height: 650)
     private let model: WaitlistViewModel
+    private let contentView: ContentView
+    private var dismissObserver: NSObjectProtocol?
 
     private var heightConstraint: NSLayoutConstraint?
 
-    init(notificationPermissionState: WaitlistViewModel.NotificationPermissionState) {
-        self.model = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(), notificationPermissionState: notificationPermissionState)
+    init(viewModel: WaitlistViewModel, contentView: ContentView) {
+        self.model = viewModel
+        self.contentView = contentView
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        if let dismissObserver {
+            NotificationCenter.default.removeObserver(dismissObserver)
+        }
     }
 
     public override func loadView() {
@@ -58,9 +60,7 @@ final class WaitlistModalViewController: NSViewController {
 
         self.model.delegate = self
 
-        let waitlistRootView = WaitlistRootView()
-
-        let hostingView = NSHostingView(rootView: waitlistRootView.environmentObject(self.model))
+        let hostingView = NSHostingView(rootView: contentView.environmentObject(self.model))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(hostingView)
 
@@ -76,40 +76,18 @@ final class WaitlistModalViewController: NSViewController {
             hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
 
-        NotificationCenter.default.addObserver(self, selector: #selector(dismissModal), name: .waitlistModalViewControllerShouldDismiss, object: nil)
+        dismissObserver = NotificationCenter.default.addObserver(forName: .waitlistModalViewControllerShouldDismiss, object: nil, queue: .main) { [weak self] _ in
+            self?.dismissModal()
+        }
     }
 
     private func updateViewHeight(height: CGFloat) {
         heightConstraint?.constant = height
     }
-
-    static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            return
-        }
-
-        // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
-        // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
-        // preventing any state changing from occurring.
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let status = settings.authorizationStatus
-            let state = WaitlistViewModel.NotificationPermissionState.from(status)
-
-            DispatchQueue.main.async {
-                let viewController = WaitlistModalViewController(notificationPermissionState: state)
-                windowController.mainViewController.beginSheet(viewController) { _ in
-                    completion?()
-                }
-            }
-        }
-    }
-
 }
 
 extension WaitlistModalViewController: WaitlistViewModelDelegate {
 
-    @objc
     func dismissModal() {
         self.dismiss()
     }
@@ -118,6 +96,16 @@ extension WaitlistModalViewController: WaitlistViewModelDelegate {
         updateViewHeight(height: newHeight)
     }
 
+}
+
+struct WaitlistModalDismisser {
+
+    // Small hack to force the waitlist modal view controller to dismiss all instances of itself whenever the user opens a link from the T&C view.
+    static func dismissWaitlistModalViewControllerIfNecessary(_ url: URL) {
+        if ["https://duckduckgo.com/privacy", "https://duckduckgo.com/terms"].contains(url.absoluteString) {
+            NotificationCenter.default.post(name: .waitlistModalViewControllerShouldDismiss, object: nil)
+        }
+    }
 }
 
 #endif

@@ -66,7 +66,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
 
         let url = URL(string: "https://privacy-test-pages.site/privacy-protections/amp/")!
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
 
         let itemsCount = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li').length") as? Int ?? 0
         XCTAssertTrue(itemsCount > 0, "no items")
@@ -76,7 +76,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             print("processing", i)
             // open test page if needed
             if tab.content.url != url {
-                _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+                _=try await tab.setUrl(url, userEntered: nil)?.result.get()
             }
 
             // extract "Expected" URL
@@ -149,7 +149,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
 
         let url = URL(string: "https://privacy-test-pages.site/privacy-protections/referrer-trimming/")!
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
 
         // run test
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
@@ -204,7 +204,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let url = URL(string: "https://privacy-test-pages.site/privacy-protections/gpc/")!
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
 
         // enable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = true
@@ -273,7 +273,6 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             XCTAssertEqual(results.results, expected)
         }
     }
-
 }
 
 private extension Tab {

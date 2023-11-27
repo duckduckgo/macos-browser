@@ -16,12 +16,24 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 import SwiftUI
 import SwiftUIExtensions
 
+protocol JoinedWaitlistViewData {
+    var headerImageName: String { get }
+    var title: String { get }
+    var joinedWithNoNotificationSubtitle1: String { get }
+    var joinedWithNoNotificationSubtitle2: String { get }
+    var enableNotificationSubtitle: String { get }
+    var buttonConfirmLabel: String { get }
+    var buttonCancelLabel: String { get }
+    var buttonEnableNotificationLabel: String { get }
+}
+
 struct JoinedWaitlistView: View {
+    let viewData: JoinedWaitlistViewData
     @EnvironmentObject var model: WaitlistViewModel
 
     let notificationsAllowed: Bool
@@ -29,41 +41,41 @@ struct JoinedWaitlistView: View {
     var body: some View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
-                Image("JoinedWaitlistHeader")
+                Image(viewData.headerImageName)
 
-                Text(UserText.networkProtectionWaitlistJoinedTitle)
+                Text(viewData.title)
                     .font(.system(size: 17, weight: .bold))
 
                 if notificationsAllowed {
                     VStack(spacing: 16) {
-                        Text(UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle1)
+                        Text(viewData.joinedWithNoNotificationSubtitle1)
                             .multilineTextAlignment(.center)
                             .frame(minHeight: 28) // Hack to force height calculation to work correctly
 
-                        Text(UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle2)
+                        Text(viewData.joinedWithNoNotificationSubtitle2)
                             .multilineTextAlignment(.center)
                     }
 
                 } else {
-                    Text(UserText.networkProtectionWaitlistEnableNotifications)
+                    Text(viewData.enableNotificationSubtitle)
                         .multilineTextAlignment(.center)
                 }
             }
         } buttons: {
             if notificationsAllowed {
-                Button(UserText.networkProtectionWaitlistButtonDone) {
+                Button(viewData.buttonConfirmLabel) {
                     Task {
                         await model.perform(action: .close)
                     }
                 }
             } else {
-                Button(UserText.networkProtectionWaitlistButtonNoThanks) {
+                Button(viewData.buttonCancelLabel) {
                     Task {
                         await model.perform(action: .close)
                     }
                 }
 
-                Button(UserText.networkProtectionWaitlistButtonEnableNotifications) {
+                Button(viewData.buttonEnableNotificationLabel) {
                     Task {
                         await model.perform(action: .requestNotificationPermission)
                     }
@@ -73,6 +85,36 @@ struct JoinedWaitlistView: View {
         }
         .environmentObject(model)
     }
+}
+
+#endif
+
+#if NETWORK_PROTECTION
+
+struct NetworkProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
+    let headerImageName = "JoinedWaitlistHeader"
+    var title = UserText.networkProtectionWaitlistJoinedTitle
+    var joinedWithNoNotificationSubtitle1 = UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle1
+    var joinedWithNoNotificationSubtitle2 = UserText.networkProtectionWaitlistJoinedWithNotificationsSubtitle2
+    var enableNotificationSubtitle = UserText.networkProtectionWaitlistEnableNotifications
+    var buttonConfirmLabel = UserText.networkProtectionWaitlistButtonDone
+    var buttonCancelLabel = UserText.networkProtectionWaitlistButtonNoThanks
+    var buttonEnableNotificationLabel = UserText.networkProtectionWaitlistButtonEnableNotifications
+}
+
+#endif
+
+#if DBP
+
+struct DataBrokerProtectionJoinedWaitlistViewData: JoinedWaitlistViewData {
+    let headerImageName = "JoinedWaitlistHeader"
+    var title = UserText.dataBrokerProtectionWaitlistJoinedTitle
+    var joinedWithNoNotificationSubtitle1 = UserText.dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle1
+    var joinedWithNoNotificationSubtitle2 = UserText.dataBrokerProtectionWaitlistJoinedWithNotificationsSubtitle2
+    var enableNotificationSubtitle = UserText.dataBrokerProtectionWaitlistEnableNotifications
+    var buttonConfirmLabel = UserText.dataBrokerProtectionWaitlistButtonDone
+    var buttonCancelLabel = UserText.dataBrokerProtectionWaitlistButtonNoThanks
+    var buttonEnableNotificationLabel = UserText.dataBrokerProtectionWaitlistButtonEnableNotifications
 }
 
 #endif

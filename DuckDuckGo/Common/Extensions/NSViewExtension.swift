@@ -22,20 +22,11 @@ import Common
 
 extension NSView {
 
-    private static var swizzleVisibleRectOnce: Void = {
-        guard #available(macOS 14.0, *) else { return }
-        let originalVisibleRect = class_getInstanceMethod(NSView.self, #selector(getter: NSView.visibleRect))!
-        let swizzledVisibleRect = class_getInstanceMethod(NSView.self, #selector(NSView.swizzledVisibleRect))!
-        method_exchangeImplementations(originalVisibleRect, swizzledVisibleRect)
-    }()
-    // Sonoma has a weird bug with broken visibleRect
-    @objc dynamic private func swizzledVisibleRect() -> NSRect {
-        var visibleRect = self.swizzledVisibleRect() // call the original
-        let bounds = self.bounds
-        guard visibleRect.origin.x < 0 || visibleRect.origin.y < 0
-                || visibleRect.size.width > bounds.size.width || visibleRect.size.height > bounds.size.height,
-              let superview else { return visibleRect }
+    // Since macOS 14 Sonoma view has clipsToBound == false by default
+    func visibleRectClampedToBounds() -> NSRect {
+        var visibleRect = self.visibleRect
 
+        guard !clipsToBounds, let superview else { return visibleRect }
         let frame = self.frame
         visibleRect = frame
 
@@ -147,8 +138,6 @@ extension NSView {
     }
 
     func withMouseLocationInViewCoordinates<T>(_ point: NSPoint? = nil, convert: (NSPoint) -> T?) -> T? {
-        _=Self.swizzleVisibleRectOnce
-
         guard let mouseLocation = point ?? window?.mouseLocationOutsideOfEventStream else { return nil }
         let locationInView = self.convert(mouseLocation, from: nil)
 
@@ -157,7 +146,7 @@ extension NSView {
 
     func mouseLocationInsideBounds(_ point: NSPoint?) -> NSPoint? {
         withMouseLocationInViewCoordinates(point) { locationInView in
-            guard self.visibleRect.contains(locationInView) else { return nil }
+            guard self.visibleRectClampedToBounds().contains(locationInView) else { return nil }
             return locationInView
         }
     }

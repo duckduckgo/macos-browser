@@ -27,6 +27,7 @@ final class HomePageViewController: NSViewController {
     private var bookmarkManager: BookmarkManager
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
+    private let onboardingViewModel: OnboardingViewModel
 
     private weak var host: NSView?
 
@@ -48,12 +49,14 @@ final class HomePageViewController: NSViewController {
           tabCollectionViewModel: TabCollectionViewModel,
           bookmarkManager: BookmarkManager,
           historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireViewModel: FireViewModel? = nil) {
+          fireViewModel: FireViewModel? = nil,
+          onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
+        self.onboardingViewModel = onboardingViewModel
 
         super.init(coder: coder)
     }
@@ -93,14 +96,11 @@ final class HomePageViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        // Temporary pixel for first time user sees the new tab
-        if Pixel.isNewUser && OnboardingViewModel().onboardingFinished {
-            let repetition = Pixel.Event.Repetition(key: Pixel.Event.newTabInitial.name)
-            if repetition == .initial {
-                Pixel.fire(.newTabInitial)
+        if !PixelExperiment.isExperimentInstalled {
+            if onboardingViewModel.onboardingFinished && Pixel.isNewUser {
+                Pixel.fire(.newTabInitial(), limitTo: .initial)
             }
         }
-
         subscribeToHistory()
     }
 
@@ -129,7 +129,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func refreshModels() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
@@ -144,7 +144,24 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(), networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging())
+#if NETWORK_PROTECTION
+        let vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: tabCollectionViewModel,
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
+            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
+            appGroupUserDefaults: .shared
+        )
+#else
+        let vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: tabCollectionViewModel,
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        )
+#endif
+
         vm.delegate = self
         return vm
     }

@@ -16,15 +16,35 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
 import Common
 import Foundation
-
-#if NETWORK_PROTECTION
+import LoginItems
 import NetworkProtection
+import NetworkProtectionUI
+import NetworkProtectionIPC
+import NetworkExtension
 
 /// Implements the sequence of steps that Network Protection needs to execute when the App starts up.
 ///
 final class NetworkProtectionAppEvents {
+
+    // MARK: - Legacy VPN Item and Extension
+
+#if NETP_SYSTEM_EXTENSION
+#if DEBUG
+    private let legacyAgentBundleID = "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension.agent.debug"
+    private let legacySystemExtensionBundleID = "com.duckduckgo.macos.browser.debug.network-protection-extension"
+#elseif REVIEW
+    private let legacyAgentBundleID = "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension.agent.review"
+    private let legacySystemExtensionBundleID = "com.duckduckgo.macos.browser.review.network-protection-extension"
+#else
+    private let legacyAgentBundleID = "HKE973VLUW.com.duckduckgo.macos.browser.network-protection.system-extension.agent"
+    private let legacySystemExtensionBundleID = "com.duckduckgo.macos.browser.network-protection-extension"
+#endif // DEBUG || REVIEW || RELEASE
+#endif // NETP_SYSTEM_EXTENSION
+
+    // MARK: - Feature Visibility
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
 
@@ -35,16 +55,20 @@ final class NetworkProtectionAppEvents {
     /// Call this method when the app finishes launching, to run the startup logic for NetP.
     ///
     func applicationDidFinishLaunching() {
-        migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
-
-        guard featureVisibility.isNetworkProtectionVisible() else {
-            featureVisibility.disableForAllUsers()
-            return
-        }
-
         let loginItemsManager = LoginItemsManager()
-        restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
-        refreshNetworkProtectionServers()
+
+        Task {
+            await removeLegacyLoginItemAndVPNConfiguration()
+            migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
+
+            guard featureVisibility.isNetworkProtectionVisible() else {
+                featureVisibility.disableForAllUsers()
+                return
+            }
+
+            restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
+            refreshNetworkProtectionServers()
+        }
     }
 
     /// Call this method when the app becomes active to run the associated NetP logic.
@@ -106,22 +130,22 @@ final class NetworkProtectionAppEvents {
         if lastVersionRun != currentVersion {
             os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
             restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
-        } else {
-            // If login items failed to launch (e.g. because of the App bundle rename), launch using NSWorkspace
-            loginItemsManager.ensureLoginItemsAreRunning(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection, condition: .ifLoginItemsAreEnabled, after: 1)
         }
     }
 
     private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
+
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
 
         Task {
-            let provider = NetworkProtectionTunnelController()
+            let machServiceName = Bundle.main.vpnMenuAgentBundleId
+            let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+            let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
 
             // Restart NetP SysEx on app update
-            if await provider.isConnected {
-                await provider.stop()
-                await provider.start()
+            if controller.isConnected {
+                await controller.stop()
+                await controller.start()
             }
         }
     }
@@ -140,6 +164,25 @@ final class NetworkProtectionAppEvents {
 
             os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
+    }
+
+    // MARK: - Legacy Login Item and Extension
+
+    private func removeLegacyLoginItemAndVPNConfiguration() async {
+        LoginItem(bundleId: legacyAgentBundleID).forceStop()
+
+        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
+        let tunnel = tunnels?.first {
+            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == legacySystemExtensionBundleID
+        }
+
+        guard let tunnel else {
+            return
+        }
+
+        UserDefaults.shared.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
+
+        try? await tunnel.removeFromPreferences()
     }
 }
 

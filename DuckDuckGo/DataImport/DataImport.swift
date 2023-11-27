@@ -18,6 +18,7 @@
 
 import AppKit
 import SecureStorage
+import PixelKit
 
 enum DataImport {
 
@@ -242,8 +243,8 @@ enum DataImport {
 
             if profileDirectoryContents.contains(Constants.chromiumPreferencesFileName),
                let chromePreferenceData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)),
-               let chromePreferences = try? JSONDecoder().decode(ChromePreferences.self, from: chromePreferenceData) {
-                return chromePreferences.profile.name
+               let chromePreferences = try? ChromePreferences(from: chromePreferenceData) {
+                return chromePreferences.profileName
             }
 
             return nil
@@ -267,7 +268,7 @@ enum DataImportAction {
     case generic
 }
 
-protocol DataImportError: Error, CustomNSError, ErrorWithParameters {
+protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters {
     associatedtype OperationType: RawRepresentable where OperationType.RawValue == Int
 
     var source: DataImport.Source { get }
@@ -304,8 +305,14 @@ protocol DataImporter {
 
     func importData(types: [DataImport.DataType],
                     from profile: DataImport.BrowserProfile?,
+                    modalWindow: NSWindow?,
                     completion: @escaping (DataImportResult<DataImport.Summary>) -> Void)
 
+}
+extension DataImporter {
+    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
+        self.importData(types: types, from: profile, modalWindow: nil, completion: completion)
+    }
 }
 
 enum DataImportResult<T> {

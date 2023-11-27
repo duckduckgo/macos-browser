@@ -19,18 +19,20 @@ import Foundation
 import WebKit
 import BrowserServicesKit
 import UserScript
+import Common
+import Combine
 
 @MainActor
 final class DataBrokerUserContentController: WKUserContentController {
 
-    let dataBrokerUserScripts: DataBrokerUserScript
+    var dataBrokerUserScripts: DataBrokerUserScript?
 
     init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
         dataBrokerUserScripts = DataBrokerUserScript(privacyConfig: privacyConfigurationManager, prefs: prefs, delegate: delegate)
 
         super.init()
 
-        dataBrokerUserScripts.userScripts.forEach {
+        dataBrokerUserScripts?.userScripts.forEach {
             let userScript = $0.makeWKUserScriptSync()
             self.installUserScripts([userScript], handlers: [$0])
         }
@@ -44,6 +46,20 @@ final class DataBrokerUserContentController: WKUserContentController {
         handlers.forEach { self.addHandler($0) }
         wkUserScripts.forEach(self.addUserScript)
     }
+
+    public func cleanUpBeforeClosing() {
+        os_log("Cleaning up DBP user scripts", log: .dataBrokerProtection)
+
+        self.removeAllUserScripts()
+        self.removeAllScriptMessageHandlers()
+
+        self.removeAllContentRuleLists()
+        dataBrokerUserScripts = nil
+    }
+
+    deinit {
+        os_log("DataBrokerUserContentController Deinit", log: .dataBrokerProtection)
+    }
 }
 
 @MainActor
@@ -54,7 +70,9 @@ final class DataBrokerUserScript: UserScriptsProvider {
     var dataBrokerFeature: DataBrokerProtectionFeature
 
     init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: CCFCommunicationDelegate) {
-        contentScopeUserScriptIsolated = ContentScopeUserScript(privacyConfig, properties: prefs, isIsolated: true)
+        contentScopeUserScriptIsolated = ContentScopeUserScript(privacyConfig.withDataBrokerProtectionFeatureOverride,
+                                                                properties: prefs,
+                                                                isIsolated: true)
         dataBrokerFeature = DataBrokerProtectionFeature(delegate: delegate)
         dataBrokerFeature.broker = contentScopeUserScriptIsolated.broker
         contentScopeUserScriptIsolated.registerSubfeature(delegate: dataBrokerFeature)
@@ -129,5 +147,60 @@ extension WKWebView {
             let request = URLRequest(url: url)
             self.load(request)
         }
+    }
+}
+
+/// This function applies an override for the Data Broker Protection (DBP) feature.
+/// The override is necessary because we only want to inject the DBP feature into detached webViews.
+/// These detached webviews are the ones that run the DBP code inside, and we don't want to enable this feature in standard webViews inside the browser.
+private extension PrivacyConfigurationManaging {
+    var withDataBrokerProtectionFeatureOverride: PrivacyConfigurationManaging {
+        return PrivacyConfigurationDataBrokerProtectionConfigOverride(manager: self)
+    }
+}
+
+private class PrivacyConfigurationDataBrokerProtectionConfigOverride: PrivacyConfigurationManaging {
+    var base: Data
+    var updatesPublisher: AnyPublisher<(), Never>
+    var privacyConfig: PrivacyConfiguration
+
+    var currentConfig: Data {
+        return updateConfigWithBrokerProtection()
+    }
+
+    func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
+        fatalError("reload(etag:data:) has not been implemented")
+    }
+
+    init(manager: PrivacyConfigurationManaging) {
+        base = manager.currentConfig
+        updatesPublisher = manager.updatesPublisher
+        privacyConfig = manager.privacyConfig
+    }
+
+    private func updateConfigWithBrokerProtection() -> Data {
+        let jsonOverride = getJsonOverride()
+
+        guard var original = try? JSONSerialization.jsonObject(with: base, options: []) as? [String: Any],
+              let override = try? JSONSerialization.jsonObject(with: jsonOverride, options: []) as? [String: Any],
+              var features = original["features"] as? [String: Any] else {
+            print("Couldn't deserialize the config")
+            return base
+        }
+
+        features["brokerProtection"] = override
+        original["features"] = features
+
+        return (try? JSONSerialization.data(withJSONObject: original, options: [])) ?? base
+    }
+
+    private func getJsonOverride() -> Data {
+        return """
+        {
+          "exceptions": [],
+          "state": "enabled",
+          "settings": {}
+        }
+        """.data(using: .utf8)!
     }
 }

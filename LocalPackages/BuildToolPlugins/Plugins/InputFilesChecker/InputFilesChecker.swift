@@ -25,17 +25,23 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("BWEncryptionOutput.m", .source),
     .init("BWManager.swift", .source),
     .init("UpdateController.swift", .source),
-    .init("SystemExtensionManager.swift", .source),
-    .init("DuckDuckGo Agent.app", .unknown),
+    .init("DuckDuckGo VPN.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),
-    .init("startVPN.app", .unknown),
-    .init("stopVPN.app", .unknown),
-    .init("enableOnDemand.app", .unknown),
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionBundle.swift", .source),
     .init("NetworkProtectionAppEvents.swift", .source),
+    .init("NetworkProtectionIPCTunnelController.swift", .source),
+    .init("NetworkProtectionNavBarPopoverManager.swift", .source),
     .init("KeychainType+ClientDefault.swift", .source),
-    .init("NetworkProtectionSubscriptionEventHandler.swift", .source)
+    .init("DBPHomeViewController.swift", .source),
+    .init("DataBrokerProtectionManager.swift", .source),
+    .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
+    .init("LoginItem+DataBrokerProtection.swift", .source),
+    .init("DataBrokerProtectionDebugMenu.swift", .source),
+    .init("DataBrokerProtectionFeatureVisibility.swift", .source),
+    .init("DataBrokerProtectionFeatureDisabler.swift", .source),
+    .init("DataBrokerProtectionAppEvents.swift", .source),
+    .init("DuckDuckGoDBPBackgroundAgent.app", .unknown)
 ]
 
 /**
@@ -52,11 +58,6 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
     "DuckDuckGo Privacy Browser": nonSandboxedExtraInputFiles,
 
     "DuckDuckGo Privacy Browser App Store": [],
-
-    "DuckDuckGo DBP": nonSandboxedExtraInputFiles.union([
-        .init("DBPHomeViewController.swift", .source),
-        .init("DataBrokerProtectionManager.swift", .source)
-    ]),
 
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
 
@@ -106,8 +107,6 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
         context.xcodeProject.targets.forEach { target in
             switch target.product?.kind {
             case .application where target.displayName.starts(with: "DuckDuckGo Privacy Browser"):
-                appTargets.append(target)
-            case .application where target.displayName == "DuckDuckGo DBP": // To be removed after the DBP target is deleted
                 appTargets.append(target)
             case .application where target.displayName == "DuckDuckGo Privacy Pro": // To be removed after the target is deleted
                 appTargets.append(target)

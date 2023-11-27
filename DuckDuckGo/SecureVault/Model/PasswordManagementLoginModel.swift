@@ -315,4 +315,4 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
 }
 
-extension PasswordManagementLoginModel: EmailManagerRequestDelegate {}
+extension PasswordManagementLoginModel: EmailManagerRequestDelegate { }
