@@ -46,6 +46,8 @@ struct DataBrokerDatabaseBrowserView: View {
 }
 
 struct DatabaseView: View {
+    @State private var isPopoverVisible = false
+    @State private var selectedData: String = ""
     let data: [DataBrokerDatabaseBrowserData.Row]
 
     var body: some View {
@@ -54,10 +56,9 @@ struct DatabaseView: View {
         } else {
             Text("No Data")
         }
-
     }
 
-    func dataView() -> some View {
+    private func dataView() -> some View {
         GeometryReader { geometry in
             ScrollView([.horizontal, .vertical]) {
                 VStack(alignment: .leading, spacing: 0) {
@@ -66,7 +67,7 @@ struct DatabaseView: View {
                             VStack {
                                 Text(key)
                                     .font(.headline)
-                                    .frame(maxWidth: .infinity)
+                                    .frame(maxWidth: 200)
                                     .frame(height: 35)
                                 Divider()
                             }
@@ -81,7 +82,12 @@ struct DatabaseView: View {
                             ForEach(row.data.keys.sorted(), id: \.self) { key in
                                 VStack {
                                     Text("\(row.data[key]?.description ?? "")")
-                                        .frame(maxWidth: .infinity, maxHeight: 50)
+                                        .frame(maxWidth: 200, maxHeight: 50)
+                                        .frame(minWidth: 60)
+                                        .onTapGesture {
+                                            selectedData = row.data[key]?.description ?? ""
+                                            isPopoverVisible = true
+                                        }
                                     Divider()
                                 }
                                 if key != row.data.keys.sorted().last {
@@ -96,8 +102,31 @@ struct DatabaseView: View {
                 .frame(minWidth: geometry.size.width, minHeight: 0, alignment: .topLeading)
             }
         }
+        .popover(isPresented: Binding(
+                get: { isPopoverVisible },
+                set: { isPopoverVisible = $0; selectedData = "" }
+            )) {
+                PopoverView(data: selectedData)
+            }
+    }
+
+    struct PopoverView: View {
+        let data: String
+
+        var body: some View {
+            ScrollView {
+                VStack {
+                    Text(data)
+                        .padding()
+                }
+                .frame(maxWidth: 400, maxHeight: 600)
+                .frame(minWidth: 200, minHeight: 100)
+
+            }
+        }
     }
 }
+
 
 struct ColumnData: Identifiable {
     var id = UUID()

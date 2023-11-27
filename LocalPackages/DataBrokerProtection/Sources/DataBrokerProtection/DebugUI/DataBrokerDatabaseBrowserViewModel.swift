@@ -21,47 +21,60 @@ import SecureStorage
 
 final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
     @Published var selectedTable: DataBrokerDatabaseBrowserData.Table?
-    var tables: [DataBrokerDatabaseBrowserData.Table]
-    private let vault: DatabaseDebugSecureVault<DefaultDataBrokerProtectionDatabaseProvider>?
+    @Published var tables: [DataBrokerDatabaseBrowserData.Table]
+    private let dataManager: DataBrokerProtectionDataManager?
 
     internal init(tables: [DataBrokerDatabaseBrowserData.Table]? = nil) {
 
         if let tables = tables {
             self.tables = tables
-            self.vault = nil
             self.selectedTable = tables.first
+            self.dataManager = nil
         } else {
-            self.vault = try? DebugSecureVaultFactory.makeVault(errorReporter: nil)
+            self.dataManager = DataBrokerProtectionDataManager()
             self.tables = [DataBrokerDatabaseBrowserData.Table]()
+            self.selectedTable = nil
             updateTables()
         }
     }
 
-    private func createTable(using fetchData: () -> [Any], tableName: String) -> DataBrokerDatabaseBrowserData.Table {
-        let rows = fetchData().map { convertToGenericRowData($0) }
+    private func createTable(using fetchData: [Any], tableName: String) -> DataBrokerDatabaseBrowserData.Table {
+        let rows = fetchData.map { convertToGenericRowData($0) }
         let table = DataBrokerDatabaseBrowserData.Table(name: tableName, rows: rows)
         return table
     }
 
     private func updateTables() {
-        guard let vault = self.vault else { return }
+        guard let dataManager = self.dataManager else { return }
 
-        let scanTable = createTable(using: vault.fetchAllScans, tableName: "Scans")
-        let brokerTable = createTable(using: vault.fetchAllBrokers, tableName: "Brokers")
-        let optOutTable = createTable(using: vault.fetchAllOptOuts, tableName: "OptOut")
-        let extractedProfile = createTable(using: vault.fetchAllExtractedProfiles, tableName: "ExtractedProfile")
-        let scanHistory = createTable(using: vault.fetchAllScanHistoryEvents, tableName: "ScanHistory")
-        let optOutHistory = createTable(using: vault.fetchAllOptOutHistoryEvents, tableName: "OptOutHistory")
+        Task {
+            let data = await dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
 
-        self.tables = [scanTable, brokerTable, optOutTable, extractedProfile, scanHistory, optOutHistory]
-    }
+            let dataBrokers = data.map { $0.dataBroker }
+            let profileQuery = Array(Set(data.map { $0.profileQuery }))
+            let scanOperations = data.map { $0.scanOperationData }
+            let optOutOperations = data.flatMap { $0.optOutOperationsData }
+            let extractedProfiles = data.flatMap { $0.extractedProfiles }
+            let events = data.flatMap { $0.events }
+
+            let brokersTable = createTable(using: dataBrokers, tableName: "DataBrokers")
+            let profileQueriesTable = createTable(using: profileQuery, tableName: "ProfileQuery")
+            let scansTable = createTable(using: scanOperations, tableName: "ScanOperation")
+            let optOutsTable = createTable(using: optOutOperations, tableName: "OptOutOperation")
+            let extractedProfilesTable = createTable(using: extractedProfiles, tableName: "ExtractedProfile")
+            let eventsTable = createTable(using: events, tableName: "Events")
+
+            DispatchQueue.main.async {
+                self.tables = [brokersTable, profileQueriesTable, scansTable, optOutsTable, extractedProfilesTable, eventsTable]
+            }
+        }
+ }
 
     private func convertToGenericRowData<T>(_ item: T) -> DataBrokerDatabaseBrowserData.Row {
         let mirror = Mirror(reflecting: item)
         var data: [String: CustomStringConvertible] = [:]
         for child in mirror.children {
             var label: String
-            var value: CustomStringConvertible
 
             if let childLabel = child.label {
                 label = childLabel
@@ -69,14 +82,22 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
                 label = "No label"
             }
 
-            if let childValue = child.value as? CustomStringConvertible {
-                value = childValue
-            } else {
-                value = "No value"
-            }
-            data[label] = value
+            data[label] = "\(unwrapChildValue(child.value) ?? "-")"
         }
         return DataBrokerDatabaseBrowserData.Row(data: data)
+    }
+
+    private func unwrapChildValue(_ value: Any) -> Any? {
+        let mirror = Mirror(reflecting: value)
+        if mirror.displayStyle != .optional {
+            return value
+        }
+
+        guard let child = mirror.children.first else {
+            return nil
+        }
+
+        return unwrapChildValue(child.value)
     }
 }
 

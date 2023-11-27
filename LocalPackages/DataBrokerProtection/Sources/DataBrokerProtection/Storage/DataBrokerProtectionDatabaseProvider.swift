@@ -660,24 +660,3 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
         }
     }
 }
-
-// Methods for Debug UI
-extension DataBrokerProtectionDatabaseProvider {
-    func fetchAllExtractedProfiles() throws -> [ExtractedProfileDB] {
-        try db.read { db in
-            return try ExtractedProfileDB.fetchAll(db)
-        }
-    }
-
-    func fetchAllScanHistoryEvents() throws -> [ScanHistoryEventDB] {
-        try db.read { db in
-            return try ScanHistoryEventDB.fetchAll(db)
-        }
-    }
-
-    func fetchAllOptOutHistoryEvents() throws -> [OptOutHistoryEventDB] {
-        try db.read { db in
-            return try OptOutHistoryEventDB.fetchAll(db)
-        }
-    }
-}
