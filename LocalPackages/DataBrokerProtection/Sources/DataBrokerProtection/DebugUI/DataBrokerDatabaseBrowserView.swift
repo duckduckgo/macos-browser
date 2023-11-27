@@ -41,6 +41,7 @@ struct DataBrokerDatabaseBrowserView: View {
                 Text("No selection")
             }
         }
+        .frame(minWidth: 900, minHeight: 700)
     }
 }
 

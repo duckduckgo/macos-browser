@@ -25,7 +25,6 @@ public final class DataBrokerDatabaseBrowserViewController: NSViewController {
         let contentView = DataBrokerDatabaseBrowserView(viewModel: viewModel)
         let hostingController = NSHostingController(rootView: contentView)
         hostingController.view.autoresizingMask = [.width, .height]
-        hostingController.view.frame = NSRect(x: 0, y: 0, width: 400, height: 500)
         self.view = hostingController.view
     }
 
