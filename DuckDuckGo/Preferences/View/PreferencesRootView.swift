@@ -112,6 +112,7 @@ extension Preferences {
                         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
                         case .success(let success):
                             if !success.isActive {
+                                AccountManager().signOut()
                                 self.showSubscriptionInactiveAlert()
                             }
                         case .failure(let error):
@@ -154,7 +155,6 @@ extension Preferences {
             alert.beginSheetModal(for: window, completionHandler: { response in
                 if case .alertFirstButtonReturn = response {
                     WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
-                    AccountManager().signOut()
                 }
             })
         }
@@ -173,5 +173,3 @@ struct SyncView: View {
     }
 
 }
-
-
