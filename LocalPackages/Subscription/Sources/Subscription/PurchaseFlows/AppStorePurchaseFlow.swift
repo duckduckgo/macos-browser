@@ -72,6 +72,7 @@ public final class AppStorePurchaseFlow {
         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
         case .success(let existingExternalID):
             externalID = existingExternalID
+            // TODO: Check if has active subscription
         case .failure(let error):
             switch error {
             case .missingAccountOrTransactions:
