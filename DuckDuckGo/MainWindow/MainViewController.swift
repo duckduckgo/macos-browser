@@ -20,7 +20,10 @@ import Cocoa
 import Carbon.HIToolbox
 import Combine
 import Common
+
+#if NETWORK_PROTECTION
 import NetworkProtection
+#endif
 
 final class MainViewController: NSViewController {
 
