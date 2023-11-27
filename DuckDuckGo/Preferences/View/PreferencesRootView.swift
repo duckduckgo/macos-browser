@@ -64,7 +64,7 @@ extension Preferences {
                             case .vpn:
                                 VPNView(model: VPNPreferencesModel())
 #endif
-                          
+
 #if SUBSCRIPTION
                             case .subscription:
                                 makeSubscriptionView()
