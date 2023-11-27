@@ -21,19 +21,25 @@ import SecureStorage
 
 final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
     @Published var selectedTable: DataBrokerDatabaseBrowserData.Table?
-    var tables = [DataBrokerDatabaseBrowserData.Table]()
+    var tables: [DataBrokerDatabaseBrowserData.Table]
     private let vault: DatabaseDebugSecureVault<DefaultDataBrokerProtectionDatabaseProvider>?
 
-    internal init() {
+    internal init(tables: [DataBrokerDatabaseBrowserData.Table]? = nil) {
 
-        self.vault = try? DebugSecureVaultFactory.makeVault(errorReporter: nil)
-        updateTables()
+        if let tables = tables {
+            self.tables = tables
+            self.vault = nil
+            self.selectedTable = tables.first
+        } else {
+            self.vault = try? DebugSecureVaultFactory.makeVault(errorReporter: nil)
+            self.tables = [DataBrokerDatabaseBrowserData.Table]()
+            updateTables()
+        }
     }
 
     private func createTable(using fetchData: () -> [Any], tableName: String) -> DataBrokerDatabaseBrowserData.Table {
         let rows = fetchData().map { convertToGenericRowData($0) }
         let table = DataBrokerDatabaseBrowserData.Table(name: tableName, rows: rows)
-        print("ROW COUNT \(table.rows.count) \(tableName)")
         return table
     }
 
@@ -72,20 +78,6 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
         }
         return DataBrokerDatabaseBrowserData.Row(data: data)
     }
-
-    static func createFakeTables() -> [DataBrokerDatabaseBrowserData.Table] {
-       let fakeRows1 = (1...10).map { index in
-           DataBrokerDatabaseBrowserData.Row(data: ["Name": "John Doe", "Age": Int.random(in: 20...60), "Email": "john.doe\(index)@example.com"])
-       }
-       let fakeTable1 = DataBrokerDatabaseBrowserData.Table(name: "Users", rows: fakeRows1)
-
-       let fakeRows2 = (1...10).map { index in
-           DataBrokerDatabaseBrowserData.Row(data: ["Product": "Product \(index)", "Price": Double.random(in: 10...100), "Quantity": Int.random(in: 1...10)])
-       }
-       let fakeTable2 = DataBrokerDatabaseBrowserData.Table(name: "Products", rows: fakeRows2)
-
-       return [fakeTable1, fakeTable2]
-   }
 }
 
 struct DataBrokerDatabaseBrowserData {
