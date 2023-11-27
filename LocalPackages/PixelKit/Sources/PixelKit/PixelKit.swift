@@ -83,8 +83,8 @@ public final class PixelKit {
     private let log: OSLog
     private let fireRequest: FireRequest
 
-    public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, fireRequest: @escaping FireRequest) {
-        shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, fireRequest: fireRequest)
+    public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, defaults: UserDefaults, fireRequest: @escaping FireRequest) {
+        shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, defaults: defaults, fireRequest: fireRequest)
     }
 
     static func tearDown() {
@@ -99,7 +99,7 @@ public final class PixelKit {
          defaultHeaders: [String: String],
          log: OSLog,
          dailyPixelCalendar: Calendar? = nil,
-         defaults: UserDefaults = .standard,
+         defaults: UserDefaults,
          fireRequest: @escaping FireRequest) {
 
         self.dryRun = dryRun
@@ -117,7 +117,6 @@ public final class PixelKit {
                       withAdditionalParameters params: [String: String]? = nil,
                       allowedQueryReservedCharacters: CharacterSet? = nil,
                       includeAppVersionParameter: Bool = true,
-                      dailyPixelCalendar: Calendar? = nil,
                       onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         var newParams = params ?? [:]
@@ -188,7 +187,6 @@ public final class PixelKit {
                      withAdditionalParameters params: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
-                     dailyPixelCalendar: Calendar? = nil,
                      onComplete: @escaping (Error?) -> Void = {_ in }) {
 
         let pixelName = prefixedName(for: event)
@@ -221,7 +219,6 @@ public final class PixelKit {
              withAdditionalParameters: newParams,
              allowedQueryReservedCharacters: allowedQueryReservedCharacters,
              includeAppVersionParameter: includeAppVersionParameter,
-             dailyPixelCalendar: dailyPixelCalendar,
              onComplete: onComplete)
     }
 

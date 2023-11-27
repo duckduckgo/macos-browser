@@ -326,7 +326,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
                        defaultHeaders: defaultHeaders,
-                       log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+                       log: .networkProtectionPixel, 
+                       defaults: .shared) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
