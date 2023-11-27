@@ -18,7 +18,6 @@
 
 import Foundation
 import StoreKit
-import Purchase
 import Account
 
 public final class AppStoreAccountManagementFlow {

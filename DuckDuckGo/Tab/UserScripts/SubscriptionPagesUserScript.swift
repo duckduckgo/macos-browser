@@ -26,7 +26,6 @@ import Navigation
 import WebKit
 import UserScript
 import Account
-import Purchase
 import Subscription
 
 public extension Notification.Name {

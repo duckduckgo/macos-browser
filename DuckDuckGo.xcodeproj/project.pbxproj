@@ -2612,7 +2612,6 @@
 		4B957BDC2AC7AE700062CA31 /* SwiftUIExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579372AC7AE700062CA31 /* SwiftUIExtensions */; };
 		4B957BDD2AC7AE700062CA31 /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579302AC7AE700062CA31 /* UserScript */; };
 		4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579322AC7AE700062CA31 /* Configuration */; };
-		4B957BDF2AC7AE700062CA31 /* Purchase in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579422AC7AE700062CA31 /* Purchase */; };
 		4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 4B95793A2AC7AE700062CA31 /* Lottie */; };
 		4B957BE12AC7AE700062CA31 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579402AC7AE700062CA31 /* Subscription */; };
 		4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579292AC7AE700062CA31 /* Sparkle */; };
@@ -3841,7 +3840,6 @@
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		1E862A852A9FBD7000F84D4B /* Account */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Account; sourceTree = "<group>"; };
 		1E862A882A9FC01200F84D4B /* Subscription */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Subscription; sourceTree = "<group>"; };
-		1EC88CA22AC1DE82003A4471 /* Purchase */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Purchase; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
@@ -5033,7 +5031,6 @@
 				4B957BDC2AC7AE700062CA31 /* SwiftUIExtensions in Frameworks */,
 				4B957BDD2AC7AE700062CA31 /* UserScript in Frameworks */,
 				4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */,
-				4B957BDF2AC7AE700062CA31 /* Purchase in Frameworks */,
 				4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */,
 				4B957BE12AC7AE700062CA31 /* Subscription in Frameworks */,
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
@@ -5468,7 +5465,6 @@
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
 				7B25FE322AD12C990012AFAB /* NetworkProtectionMac */,
 				4BE15DB12A0B0DD500898243 /* PixelKit */,
-				1EC88CA22AC1DE82003A4471 /* Purchase */,
 				378F44E229B4B7B600899924 /* SwiftUIExtensions */,
 				37BA812B29B3CB8A0053F1A3 /* SyncUI */,
 				1E862A882A9FC01200F84D4B /* Subscription */,
@@ -8819,7 +8815,6 @@
 				4B95793F2AC7AE700062CA31 /* LoginItems */,
 				4B9579402AC7AE700062CA31 /* Subscription */,
 				4B9579412AC7AE700062CA31 /* Account */,
-				4B9579422AC7AE700062CA31 /* Purchase */,
 				7BF770642AD6CA14001C9182 /* PixelKit */,
 			);
 			productName = DuckDuckGo;
@@ -14615,10 +14610,6 @@
 		4B9579412AC7AE700062CA31 /* Account */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Account;
-		};
-		4B9579422AC7AE700062CA31 /* Purchase */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Purchase;
 		};
 		7BF7705E2AD6C999001C9182 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;

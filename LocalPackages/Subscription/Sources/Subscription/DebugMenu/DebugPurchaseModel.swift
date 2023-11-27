@@ -18,7 +18,6 @@
 
 import Foundation
 import StoreKit
-import Purchase
 import Account
 
 @available(macOS 12.0, *)

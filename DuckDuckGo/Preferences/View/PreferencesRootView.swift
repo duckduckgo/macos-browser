@@ -22,7 +22,6 @@ import SyncUI
 
 #if SUBSCRIPTION
 import Account
-import Purchase
 import Subscription
 #endif
 

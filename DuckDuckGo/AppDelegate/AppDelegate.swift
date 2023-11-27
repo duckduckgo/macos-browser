@@ -34,7 +34,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Purchase
+import Account
 #endif
 
 @MainActor

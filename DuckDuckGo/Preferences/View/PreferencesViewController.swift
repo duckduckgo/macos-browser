@@ -20,10 +20,6 @@ import AppKit
 import SwiftUI
 import Combine
 
-#if SUBSCRIPTION
-import Purchase
-#endif
-
 final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?

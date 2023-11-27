@@ -18,7 +18,6 @@
 
 import AppKit
 import Account
-import Purchase
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
