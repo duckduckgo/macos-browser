@@ -50,17 +50,6 @@ final class NetworkProtectionSubscriptionEventHandler {
             return
         }
 
-        // Remove the existing auth token:
-
-        do {
-            try networkProtectionTokenStorage.deleteToken()
-            print("[NetP Subscription] Removed existing token")
-        } catch {
-            print("[NetP Subscription] Failed to remove existing token")
-        }
-
-        // Get the new auth token:
-
         Task {
             do {
                 try await networkProtectionRedemptionCoordinator.exchange(accessToken: token)
