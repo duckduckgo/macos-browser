@@ -240,10 +240,9 @@ final class TabViewModel {
         }
 
         if url.isBlobURL {
-            let uuid = UUID().uuidString.lowercased()
             let strippedUrl = url.stripUnsupportedCredentials()
-            addressBarString = "\(strippedUrl)\(uuid)"
-            passiveAddressBarString = "\(strippedUrl)\(uuid)"
+            addressBarString = strippedUrl
+            passiveAddressBarString = strippedUrl
             return
         }
 

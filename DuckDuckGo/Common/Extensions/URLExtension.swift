@@ -437,12 +437,11 @@ extension URL {
 
     func stripUnsupportedCredentials() -> String {
         if let atIndex = self.absoluteString.firstIndex(of: "@") {
-            let atIndexPlusOne = self.absoluteString.index(after: atIndex)
-            let remainingURL = self.absoluteString.suffix(from: atIndexPlusOne)
-            let reconstructedURLString = self.scheme! + "://" + (self.host ?? self.securityOrigin.host) + String(remainingURL)
-            return reconstructedURLString
+            let authPattern = "([^:]+):\\/\\/[^\\/]*@"
+            let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
+            let uuid = UUID().uuidString.lowercased()
+            return "\(strippedURL)\(uuid)"
         }
-
-        return self.absoluteString // Return the original input if "@" symbol is not found
+        return self.absoluteString
     }
 }
