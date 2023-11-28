@@ -20,7 +20,7 @@ import AppKit
 import SwiftUI
 import Combine
 import StoreKit
-import Account
+import Subscription
 
 @available(macOS 12.0, *)
 public final class DebugPurchaseViewController: NSViewController {

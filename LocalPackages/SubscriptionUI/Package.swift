@@ -12,14 +12,14 @@ let package = Package(
             targets: ["SubscriptionUI"]),
     ],
     dependencies: [
-        .package(path: "../Account"),
+        .package(path: "../Subscription"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
         .target(
             name: "SubscriptionUI",
             dependencies: [
-                .product(name: "Account", package: "Account"),
+                .product(name: "Subscription", package: "Subscription"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
             resources: [

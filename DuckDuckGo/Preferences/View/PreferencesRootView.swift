@@ -21,7 +21,7 @@ import SwiftUIExtensions
 import SyncUI
 
 #if SUBSCRIPTION
-import Account
+import Subscription
 import SubscriptionUI
 #endif
 

@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import Account
+import Subscription
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 

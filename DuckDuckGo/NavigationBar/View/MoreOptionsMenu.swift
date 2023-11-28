@@ -26,7 +26,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Account
+import Subscription
 #endif
 
 protocol OptionsButtonMenuDelegate: AnyObject {

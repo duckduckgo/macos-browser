@@ -1,27 +1,27 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
-    name: "Account",
+    name: "Subscription",
     platforms: [ .macOS(.v11) ],
     products: [
         .library(
-            name: "Account",
-            targets: ["Account"]),
+            name: "Subscription",
+            targets: ["Subscription"]),
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "81.4.0"),
     ],
     targets: [
         .target(
-            name: "Account",
+            name: "Subscription",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
             ]),
         .testTarget(
-            name: "AccountTests",
-            dependencies: ["Account"]),
+            name: "SubscriptionTests",
+            dependencies: ["Subscription"]),
     ]
 )

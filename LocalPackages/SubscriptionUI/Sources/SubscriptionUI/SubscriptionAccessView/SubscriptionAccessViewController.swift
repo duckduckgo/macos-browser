@@ -17,7 +17,7 @@
 //
 
 import AppKit
-import Account
+import Subscription
 import SwiftUI
 
 public final class SubscriptionAccessViewController: NSViewController {

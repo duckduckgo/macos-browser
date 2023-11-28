@@ -18,7 +18,7 @@
 
 import Foundation
 import StoreKit
-import Account
+import Subscription
 
 @available(macOS 12.0, *)
 public final class DebugPurchaseModel: ObservableObject {

@@ -18,7 +18,7 @@
 
 import Foundation
 import StoreKit
-import Account
+import Subscription
 
 public final class AppStoreAccountManagementFlow {
 

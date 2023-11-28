@@ -90,6 +90,7 @@
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		1E7E2E9229029F9B00C01B54 /* WebsiteBreakageReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */; };
 		1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */; };
+		1E934E2B2B167CA80084722B /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 1E934E2A2B167CA80084722B /* Subscription */; };
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
 		1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E402912A10D0051A99B /* PrivacyDashboard */; };
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
@@ -2605,7 +2606,6 @@
 		4B957BD62AC7AE700062CA31 /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 4B95793F2AC7AE700062CA31 /* LoginItems */; };
 		4B957BD72AC7AE700062CA31 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 4B95793E2AC7AE700062CA31 /* NetworkProtection */; };
 		4B957BD82AC7AE700062CA31 /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4B95792B2AC7AE700062CA31 /* BrowserServicesKit */; };
-		4B957BD92AC7AE700062CA31 /* Account in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579412AC7AE700062CA31 /* Account */; };
 		4B957BDA2AC7AE700062CA31 /* Bookmarks in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579342AC7AE700062CA31 /* Bookmarks */; };
 		4B957BDB2AC7AE700062CA31 /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 4B95792E2AC7AE700062CA31 /* ContentBlocking */; };
 		4B957BDC2AC7AE700062CA31 /* SwiftUIExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 4B9579372AC7AE700062CA31 /* SwiftUIExtensions */; };
@@ -3836,8 +3836,8 @@
 		1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockingRulesUpdateObserver.swift; sourceTree = "<group>"; };
 		1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteBreakageReporter.swift; sourceTree = "<group>"; };
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
-		1E862A852A9FBD7000F84D4B /* Account */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Account; sourceTree = "<group>"; };
 		1E862A882A9FC01200F84D4B /* SubscriptionUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SubscriptionUI; sourceTree = "<group>"; };
+		1ECCFCCF2B16837200E81916 /* Subscription */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Subscription; sourceTree = "<group>"; };
 		3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookieConsentUserPermissionViewController.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
@@ -5020,10 +5020,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B957BD52AC7AE700062CA31 /* QuickLookUI.framework in Frameworks */,
+				1E934E2B2B167CA80084722B /* Subscription in Frameworks */,
 				4B957BD62AC7AE700062CA31 /* LoginItems in Frameworks */,
 				4B957BD72AC7AE700062CA31 /* NetworkProtection in Frameworks */,
 				4B957BD82AC7AE700062CA31 /* BrowserServicesKit in Frameworks */,
-				4B957BD92AC7AE700062CA31 /* Account in Frameworks */,
 				4B957BDA2AC7AE700062CA31 /* Bookmarks in Frameworks */,
 				4B957BDB2AC7AE700062CA31 /* ContentBlocking in Frameworks */,
 				4B957BDC2AC7AE700062CA31 /* SwiftUIExtensions in Frameworks */,
@@ -5455,7 +5455,7 @@
 		378E279C2970217400FCADA2 /* LocalPackages */ = {
 			isa = PBXGroup;
 			children = (
-				1E862A852A9FBD7000F84D4B /* Account */,
+				1ECCFCCF2B16837200E81916 /* Subscription */,
 				378E279D2970217400FCADA2 /* BuildToolPlugins */,
 				3192A2702A4C4E330084EA89 /* DataBrokerProtection */,
 				9DB6E7222AA0DA7A00A17F3C /* LoginItems */,
@@ -8809,9 +8809,9 @@
 				4B95793D2AC7AE700062CA31 /* NetworkProtectionUI */,
 				4B95793E2AC7AE700062CA31 /* NetworkProtection */,
 				4B95793F2AC7AE700062CA31 /* LoginItems */,
-				4B9579412AC7AE700062CA31 /* Account */,
 				7BF770642AD6CA14001C9182 /* PixelKit */,
 				1E0068AC2B1673BB00BBF43B /* SubscriptionUI */,
+				1E934E2A2B167CA80084722B /* Subscription */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -14239,6 +14239,10 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
 		};
+		1E934E2A2B167CA80084722B /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Subscription;
+		};
 		1E950E3E2912A10D0051A99B /* ContentBlocking */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
@@ -14592,10 +14596,6 @@
 		4B95793F2AC7AE700062CA31 /* LoginItems */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LoginItems;
-		};
-		4B9579412AC7AE700062CA31 /* Account */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Account;
 		};
 		7BF7705E2AD6C999001C9182 /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
