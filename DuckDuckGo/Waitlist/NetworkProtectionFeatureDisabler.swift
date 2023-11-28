@@ -44,8 +44,8 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
-         userDefaults: UserDefaults = .shared,
-         settings: VPNSettings = .init(defaults: .shared),
+         userDefaults: UserDefaults = .netP,
+         settings: VPNSettings = .init(defaults: .netP),
          ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId),
          log: OSLog = .networkProtection) {
 

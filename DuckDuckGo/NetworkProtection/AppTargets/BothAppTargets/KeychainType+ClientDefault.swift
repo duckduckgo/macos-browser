@@ -26,5 +26,5 @@ import NetworkProtection
 /// This is meant to be a client-specific definition by its own nature.
 ///
 extension KeychainType {
-    static let `default`: KeychainType = .dataProtection(.named(Bundle.main.appGroupName))
+    static let `default`: KeychainType = .dataProtection(.named(Bundle.main.appGroup(bundle: .netP)))
 }

@@ -58,11 +58,10 @@ final class NetworkProtectionNavBarPopoverManager {
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
             )
 
-            let onboardingStatusPublisher = UserDefaults.shared.networkProtectionOnboardingStatusPublisher
-            let settings = VPNSettings(defaults: .shared)
+            let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
+            let settings = VPNSettings(defaults: .netP)
 
             let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter) {
-
                 var menuItems = [
                     NetworkProtectionStatusView.Model.MenuItem(
                         name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {

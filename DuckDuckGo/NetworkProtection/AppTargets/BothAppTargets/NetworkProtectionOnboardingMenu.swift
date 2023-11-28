@@ -38,7 +38,7 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
     private let setStatusAllowVPNConfigurationMenuItem = NSMenuItem(title: "Allow VPN Configuration",
                                                                     action: #selector(NetworkProtectionOnboardingMenu.setStatusAllowVPNConfiguration))
 
-    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     var onboardingStatus: OnboardingStatus.RawValue
 
     init() {

@@ -76,7 +76,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     private(set) var excludedRoutesPreferences: [String: Bool]
      */
 
-    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
     // MARK: - Connection Status
