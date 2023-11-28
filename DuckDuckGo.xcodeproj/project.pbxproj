@@ -92,7 +92,6 @@
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
 		1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E402912A10D0051A99B /* PrivacyDashboard */; };
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
-		1EC88CA12AC1DD63003A4471 /* Account in Frameworks */ = {isa = PBXBuildFile; productRef = 1EC88CA02AC1DD63003A4471 /* Account */; };
 		3106AD76287F000600159FE5 /* CookieConsentUserPermissionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3106AD75287F000600159FE5 /* CookieConsentUserPermissionViewController.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
@@ -5068,7 +5067,6 @@
 				9DB6E7242AA0DC5800A17F3C /* LoginItems in Frameworks */,
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
 				9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */,
-				1EC88CA12AC1DD63003A4471 /* Account in Frameworks */,
 				987799ED299998B1005D8EB6 /* Bookmarks in Frameworks */,
 				1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */,
 				378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */,
@@ -8896,7 +8894,6 @@
 				4B4D60B02A0C83B900BCD287 /* NetworkProtectionUI */,
 				EE7295E22A545B9A008C0991 /* NetworkProtection */,
 				9DB6E7232AA0DC5800A17F3C /* LoginItems */,
-				1EC88CA02AC1DD63003A4471 /* Account */,
 				7BF7705E2AD6C999001C9182 /* PixelKit */,
 			);
 			productName = DuckDuckGo;
@@ -14252,10 +14249,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = UserScript;
-		};
-		1EC88CA02AC1DD63003A4471 /* Account */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Account;
 		};
 		31929F7F2A4C4CFF0084EA89 /* TrackerRadarKit */ = {
 			isa = XCSwiftPackageProductDependency;
