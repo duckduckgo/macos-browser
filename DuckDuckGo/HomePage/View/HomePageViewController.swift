@@ -151,7 +151,7 @@ final class HomePageViewController: NSViewController {
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
             networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
-            appGroupUserDefaults: .shared
+            appGroupUserDefaults: .netP
         )
 #else
         let vm = HomePage.Models.ContinueSetUpModel(
