@@ -102,7 +102,7 @@ final class WaitlistViewModel: ObservableObject {
         let waitlistType = type(of: waitlist)
         self.init(
             waitlistRequest: ProductWaitlistRequest(productName: waitlistType.apiProductName),
-            waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier),
+            waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier, keychainAppGroup: waitlistType.keychainAppGroup),
             notificationService: UNUserNotificationCenter.current(),
             notificationPermissionState: notificationPermissionState,
             termsAndConditionActionHandler: termsAndConditionActionHandler,

@@ -255,7 +255,7 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        bookmarkManager.makeFolder(for: name, parent: nil)
+        bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {

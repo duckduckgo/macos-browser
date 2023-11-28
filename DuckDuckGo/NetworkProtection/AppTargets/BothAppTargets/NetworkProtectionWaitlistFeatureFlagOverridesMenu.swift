@@ -37,7 +37,7 @@ final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
 
     @UserDefaultsWrapper(key: .networkProtectionWaitlistActiveOverrideRawValue,
                          defaultValue: WaitlistOverride.default.rawValue,
-                         defaults: .shared)
+                         defaults: .netP)
     private var waitlistActiveOverrideValue: Int
 
     // MARK: - Waitlist Enabled Properties
@@ -48,7 +48,7 @@ final class NetworkProtectionWaitlistFeatureFlagOverridesMenu: NSMenu {
 
     @UserDefaultsWrapper(key: .networkProtectionWaitlistEnabledOverrideRawValue,
                          defaultValue: WaitlistOverride.default.rawValue,
-                         defaults: .shared)
+                         defaults: .netP)
     private var waitlistEnabledOverrideValue: Int
 
     init() {

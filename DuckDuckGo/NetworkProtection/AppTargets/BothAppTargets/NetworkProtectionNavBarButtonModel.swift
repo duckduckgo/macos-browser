@@ -78,7 +78,6 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
          statusReporter: NetworkProtectionStatusReporter? = nil,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
-        let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
         self.popoverManager = popoverManager
 
         let ipcClient = popoverManager.ipcClient
