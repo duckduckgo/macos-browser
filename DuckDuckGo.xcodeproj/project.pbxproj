@@ -1116,6 +1116,15 @@
 		4B41EDA82B1543C9001EEDF4 /* PreferencesVPNView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDA62B1543C9001EEDF4 /* PreferencesVPNView.swift */; };
 		4B41EDA92B1543C9001EEDF4 /* PreferencesVPNView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDA62B1543C9001EEDF4 /* PreferencesVPNView.swift */; };
 		4B41EDAB2B1544B2001EEDF4 /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 4B41EDAA2B1544B2001EEDF4 /* LoginItems */; };
+		4B41EDAE2B168AFF001EEDF4 /* FeedbackFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */; };
+		4B41EDAF2B168AFF001EEDF4 /* FeedbackFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */; };
+		4B41EDB12B168B1E001EEDF4 /* FeedbackFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */; };
+		4B41EDB22B168B1E001EEDF4 /* FeedbackFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */; };
+		4B41EDB42B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */; };
+		4B41EDB52B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */; };
+		4B41EDB62B169883001EEDF4 /* FeedbackFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */; };
+		4B41EDB72B169887001EEDF4 /* FeedbackFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */; };
+		4B41EDB82B169889001EEDF4 /* FeedbackFormModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */; };
 		4B434690285ED7A100177407 /* BookmarksBarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */; };
 		4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */; };
 		4B4BEC3D2A11B56B001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC382A11B509001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift */; };
@@ -3329,6 +3338,9 @@
 		4B41ED9F2B15437A001EEDF4 /* NetworkProtectionNotificationsPresenterFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNotificationsPresenterFactory.swift; sourceTree = "<group>"; };
 		4B41EDA22B1543B9001EEDF4 /* VPNPreferencesModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNPreferencesModel.swift; sourceTree = "<group>"; };
 		4B41EDA62B1543C9001EEDF4 /* PreferencesVPNView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesVPNView.swift; sourceTree = "<group>"; };
+		4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackFormViewController.swift; sourceTree = "<group>"; };
+		4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackFormView.swift; sourceTree = "<group>"; };
+		4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackFormModel.swift; sourceTree = "<group>"; };
 		4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModelTests.swift; sourceTree = "<group>"; };
 		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
 		4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNotifications.xcconfig; sourceTree = "<group>"; };
@@ -5022,6 +5034,16 @@
 			path = DeviceAuthentication;
 			sourceTree = "<group>";
 		};
+		4B41EDAC2B168A66001EEDF4 /* NetworkProtectionFeedbackForm */ = {
+			isa = PBXGroup;
+			children = (
+				4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */,
+				4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */,
+				4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */,
+			);
+			path = NetworkProtectionFeedbackForm;
+			sourceTree = "<group>";
+		};
 		4B43468D285ED6BD00177407 /* BookmarksBar */ = {
 			isa = PBXGroup;
 			children = (
@@ -6383,6 +6405,7 @@
 				AA97BF4425135CB60014931A /* Menus */,
 				85378D9A274E618C007C5CBF /* MessageViews */,
 				AA86491524D83384001BABEE /* NavigationBar */,
+				4B41EDAC2B168A66001EEDF4 /* NetworkProtectionFeedbackForm */,
 				4B4D60542A0B29FA00BCD287 /* NetworkProtection */,
 				85B7184727677A7D00B4277F /* Onboarding */,
 				1D074B252909A371006E4AC3 /* PasswordManager */,
@@ -9444,6 +9467,7 @@
 				3706FBA4293F65D500E42796 /* ContentOverlayPopover.swift in Sources */,
 				3706FBA5293F65D500E42796 /* TabShadowView.swift in Sources */,
 				3706FBA7293F65D500E42796 /* EncryptedValueTransformer.swift in Sources */,
+				4B41EDAF2B168AFF001EEDF4 /* FeedbackFormViewController.swift in Sources */,
 				3706FBA8293F65D500E42796 /* PasteboardBookmark.swift in Sources */,
 				3706FBA9293F65D500E42796 /* PinnedTabsManager.swift in Sources */,
 				B66260E829ACD0C900E9E3EE /* DuckPlayerTabExtension.swift in Sources */,
@@ -9507,6 +9531,7 @@
 				3706FBDA293F65D500E42796 /* PermissionManager.swift in Sources */,
 				3706FBDB293F65D500E42796 /* DefaultBrowserPreferences.swift in Sources */,
 				3706FBDC293F65D500E42796 /* Permissions.xcdatamodeld in Sources */,
+				4B41EDB52B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */,
 				3706FBDD293F65D500E42796 /* PaddedImageButton.swift in Sources */,
 				37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				4BCF15F02ABBDC010083F6DF /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
@@ -9682,6 +9707,7 @@
 				3706FC69293F65D500E42796 /* UserScripts.swift in Sources */,
 				3706FC6A293F65D500E42796 /* NSWorkspaceExtension.swift in Sources */,
 				B6C0BB6829AEFF8100AE8E3C /* BookmarkExtension.swift in Sources */,
+				4B41EDB22B168B1E001EEDF4 /* FeedbackFormView.swift in Sources */,
 				3706FC6C293F65D500E42796 /* BookmarkViewModel.swift in Sources */,
 				3706FC6D293F65D500E42796 /* DaxSpeech.swift in Sources */,
 				3706FC6E293F65D500E42796 /* DuckPlayerSchemeHandler.swift in Sources */,
@@ -10202,6 +10228,7 @@
 				4B9579652AC7AE700062CA31 /* SecureVaultSorting.swift in Sources */,
 				4B9579662AC7AE700062CA31 /* PreferencesSidebarModel.swift in Sources */,
 				4B9579672AC7AE700062CA31 /* DuckPlayerURLExtension.swift in Sources */,
+				4B41EDB72B169887001EEDF4 /* FeedbackFormView.swift in Sources */,
 				4B9579682AC7AE700062CA31 /* BWEncryptionOutput.m in Sources */,
 				4B9579692AC7AE700062CA31 /* PermissionState.swift in Sources */,
 				4B95796A2AC7AE700062CA31 /* FeedbackPresenter.swift in Sources */,
@@ -10246,6 +10273,7 @@
 				4B9579912AC7AE700062CA31 /* NSNotificationName+PasswordManager.swift in Sources */,
 				4B9579922AC7AE700062CA31 /* RulesCompilationMonitor.swift in Sources */,
 				4B9579932AC7AE700062CA31 /* FBProtectionTabExtension.swift in Sources */,
+				4B41EDB82B169889001EEDF4 /* FeedbackFormModel.swift in Sources */,
 				4B9579942AC7AE700062CA31 /* CrashReportReader.swift in Sources */,
 				4B9579952AC7AE700062CA31 /* DataTaskProviding.swift in Sources */,
 				4B9579962AC7AE700062CA31 /* FeatureFlag.swift in Sources */,
@@ -10285,6 +10313,7 @@
 				4B9579B62AC7AE700062CA31 /* AtbParser.swift in Sources */,
 				4B9579B72AC7AE700062CA31 /* PreferencesDuckPlayerView.swift in Sources */,
 				4B9579B82AC7AE700062CA31 /* AddFolderModalViewController.swift in Sources */,
+				4B41EDB62B169883001EEDF4 /* FeedbackFormViewController.swift in Sources */,
 				4B9579B92AC7AE700062CA31 /* BookmarkSidebarTreeController.swift in Sources */,
 				4B9579BA2AC7AE700062CA31 /* HomePageFavoritesModel.swift in Sources */,
 				4B9579BB2AC7AE700062CA31 /* SequenceExtensions.swift in Sources */,
@@ -10967,6 +10996,7 @@
 				4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */,
 				85D33F1225C82EB3002B91A6 /* ConfigurationManager.swift in Sources */,
 				31F28C4F28C8EEC500119F70 /* YoutubePlayerUserScript.swift in Sources */,
+				4B41EDAE2B168AFF001EEDF4 /* FeedbackFormViewController.swift in Sources */,
 				B6A9E48426146AAB0067D1B9 /* PixelParameters.swift in Sources */,
 				AA5FA697275F90C400DCE9C9 /* FaviconImageCache.swift in Sources */,
 				1430DFF524D0580F00B8978C /* TabBarViewController.swift in Sources */,
@@ -11299,6 +11329,7 @@
 				4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */,
 				4B723E1026B0006700E14D75 /* CSVImporter.swift in Sources */,
 				37A4CEBA282E992F00D75B89 /* StartupPreferences.swift in Sources */,
+				4B41EDB12B168B1E001EEDF4 /* FeedbackFormView.swift in Sources */,
 				7BFE95542A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
 				AA4BBA3B25C58FA200C4FB0F /* MainMenu.swift in Sources */,
 				4B8AC93326B3B06300879451 /* EdgeDataImporter.swift in Sources */,
@@ -11390,6 +11421,7 @@
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,
 				4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */,
 				85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */,
+				4B41EDB42B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */,
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				4B9DB0472A983B24000927DB /* WaitlistRootView.swift in Sources */,

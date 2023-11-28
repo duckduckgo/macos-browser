@@ -94,6 +94,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
                 .targetting(self)
 
+            NSMenuItem(title: "Open Native Feedback Form", action: #selector(NetworkProtectionDebugMenu.openNativeFeedbackForm))
+                .targetting(self)
+
             NSMenuItem(title: "Onboarding")
                 .submenu(NetworkProtectionOnboardingMenu())
 
@@ -231,6 +234,29 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 await NSAlert(error: error).runModal()
             }
         }
+    }
+
+    @objc func openNativeFeedbackForm(_ sender: Any?) {
+        print("TODO")
+        let feedbackFormViewController = FeedbackFormViewController(formOptions: [
+            FeedbackFormViewModel.FeedbackFormOption(id: "first", title: "Testing", components: []),
+            FeedbackFormViewModel.FeedbackFormOption(id: "second", title: "Testing 2", components: []),
+            FeedbackFormViewModel.FeedbackFormOption(id: "third", title: "Testing 3", components: [])
+        ])
+
+        let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
+
+        guard let feedbackFormWindow = feedbackFormWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+        else {
+            assertionFailure("Failed to present native VPN feedback form")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(feedbackFormWindow) { [weak self] _ in
+
+        }
+
     }
 
     /// Sets the selected server.
