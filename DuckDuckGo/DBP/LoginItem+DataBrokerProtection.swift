@@ -22,7 +22,7 @@ import LoginItems
 
 extension LoginItem {
 
-    static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, log: .dbp)
+    static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, defaults: .dbp, log: .dbp)
 
 }
 

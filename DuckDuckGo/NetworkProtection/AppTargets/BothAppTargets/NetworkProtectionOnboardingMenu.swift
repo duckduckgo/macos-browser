@@ -33,7 +33,7 @@ final class NetworkProtectionOnboardingMenu: NSMenu {
                                            action: #selector(NetworkProtectionOnboardingMenu.reset))
     private let setStatusCompletedMenuItem = NSMenuItem(title: "Onboarding Completed",
                                                         action: #selector(NetworkProtectionOnboardingMenu.setStatusCompleted))
-    private let setStatusAllowSystemExtensionMenuItem = NSMenuItem(title: "Allow System Extension",
+    private let setStatusAllowSystemExtensionMenuItem = NSMenuItem(title: "Install VPN System Extension",
                                                                    action: #selector(NetworkProtectionOnboardingMenu.setStatusAllowSystemExtension))
     private let setStatusAllowVPNConfigurationMenuItem = NSMenuItem(title: "Allow VPN Configuration",
                                                                     action: #selector(NetworkProtectionOnboardingMenu.setStatusAllowVPNConfiguration))

@@ -58,18 +58,26 @@ final class NetworkProtectionNavBarPopoverManager {
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
             )
 
-            let menuItems = [
-                NetworkProtectionStatusView.Model.MenuItem(
-                    name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                    action: {
-                        let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
-                        await appLauncher.launchApp(withCommand: .shareFeedback)
-                    })
-            ]
-
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
+            _ = VPNSettings(defaults: .netP)
 
-            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
+            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter) {
+                let menuItems = [
+                    NetworkProtectionStatusView.Model.MenuItem(
+                        name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
+                            let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                            await appLauncher.launchApp(withCommand: .showSettings)
+                        }),
+                    NetworkProtectionStatusView.Model.MenuItem(
+                        name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                        action: {
+                            let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)
+                            await appLauncher.launchApp(withCommand: .shareFeedback)
+                        })
+                ]
+
+                return menuItems
+            }
             popover.delegate = delegate
 
             networkProtectionPopover = popover

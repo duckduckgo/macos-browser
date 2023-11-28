@@ -37,6 +37,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let registrationKeyValidityMenu: NSMenu
     private let registrationKeyValidityAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setRegistrationKeyValidity))
 
+    private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
+
     private let exclusionsMenu = NSMenu()
 
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
@@ -63,17 +65,23 @@ final class NetworkProtectionDebugMenu: NSMenu {
         super.init(title: "Network Protection")
 
         buildItems {
-            NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
-                .targetting(self)
+            NSMenuItem(title: "Reset") {
+                NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
+                    .targetting(self)
 
-            NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
-                .targetting(self)
+                NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
+                    .targetting(self)
 
-            NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
-                .targetting(self)
+                resetToDefaults
+                    .targetting(self)
 
-            NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
-                .targetting(self)
+                NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
+                    .targetting(self)
+
+                NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
+                    .targetting(self)
+            }
+
             NSMenuItem.separator()
 
             connectOnLogInMenuItem
@@ -139,6 +147,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
                 .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Kill Switch (alternative approach)") {
@@ -168,7 +177,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Tunnel Settings
 
-    private let settings = TunnelSettings(defaults: .netP)
+    private let settings = VPNSettings(defaults: .netP)
 
     // MARK: - Debug Logic
 
@@ -181,12 +190,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetAllState(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-
-            do {
-                try await debugUtilities.resetAllState(keepAuthToken: false)
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
+            await debugUtilities.resetAllState(keepAuthToken: false)
         }
     }
 
@@ -195,13 +199,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetAllKeepingInvite(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-
-            do {
-                try await debugUtilities.resetAllState(keepAuthToken: true)
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
+            await debugUtilities.resetAllState(keepAuthToken: true)
         }
+    }
+
+    @objc func resetSettings(_ sender: Any?) {
+        settings.resetToDefaults()
     }
 
     /// Removes the system extension and agents for Network Protection.
@@ -234,7 +237,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func setSelectedServer(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedServer: TunnelSettings.SelectedServer
+        let selectedServer: VPNSettings.SelectedServer
 
         if title == "Automatic" {
             selectedServer = .automatic
@@ -250,7 +253,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func expireRegistrationKeyNow(_ sender: Any?) {
         Task {
-            await debugUtilities.expireRegistrationKeyNow()
+            try? await debugUtilities.expireRegistrationKeyNow()
         }
     }
 
@@ -369,14 +372,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateExclusionsMenuItems() {
         exclusionsMenu.removeAllItems()
 
-        for item in settings.exclusionList {
+        for item in settings.excludedRoutes {
             let menuItem: NSMenuItem
             switch item {
             case .section(let title):
                 menuItem = NSMenuItem(title: title, action: nil, target: nil)
                 menuItem.isEnabled = false
 
-            case .exclusion(range: let range, description: let description, default: _):
+            case .range(let range, let description):
                 menuItem = NSMenuItem(title: "\(range)\(description != nil ? " (\(description!))" : "")",
                                       action: #selector(toggleExclusionAction),
                                       target: self,
@@ -564,7 +567,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     // MARK: Environment
     @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedEnvironment: TunnelSettings.SelectedEnvironment
+        let selectedEnvironment: VPNSettings.SelectedEnvironment
 
         if title == "Staging" {
             selectedEnvironment = .staging

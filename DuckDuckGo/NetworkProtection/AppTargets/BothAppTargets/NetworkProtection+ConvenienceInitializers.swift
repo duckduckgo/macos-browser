@@ -25,7 +25,7 @@ import Common
 extension NetworkProtectionDeviceManager {
 
     static func create() -> NetworkProtectionDeviceManager {
-        let settings = TunnelSettings(defaults: .netP)
+        let settings = VPNSettings(defaults: .netP)
         let keyStore = NetworkProtectionKeychainKeyStore()
         let tokenStore = NetworkProtectionKeychainTokenStore()
         return NetworkProtectionDeviceManager(environment: settings.selectedEnvironment, tokenStore: tokenStore, keyStore: keyStore, errorEvents: .networkProtectionAppDebugEvents)
@@ -34,7 +34,7 @@ extension NetworkProtectionDeviceManager {
 
 extension NetworkProtectionCodeRedemptionCoordinator {
     convenience init() {
-        let settings = TunnelSettings(defaults: .netP)
+        let settings = VPNSettings(defaults: .netP)
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents)
