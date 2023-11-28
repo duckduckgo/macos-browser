@@ -4,12 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "Subscription",
+    name: "SubscriptionUI",
     platforms: [ .macOS(.v11) ],
     products: [
         .library(
-            name: "Subscription",
-            targets: ["Subscription"]),
+            name: "SubscriptionUI",
+            targets: ["SubscriptionUI"]),
     ],
     dependencies: [
         .package(path: "../Account"),
@@ -17,7 +17,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Subscription",
+            name: "SubscriptionUI",
             dependencies: [
                 .product(name: "Account", package: "Account"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
@@ -26,7 +26,7 @@ let package = Package(
                 .process("Resources")
             ]),
         .testTarget(
-            name: "SubscriptionTests",
-            dependencies: ["Subscription"]),
+            name: "SubscriptionUITests",
+            dependencies: ["SubscriptionUI"]),
     ]
 )

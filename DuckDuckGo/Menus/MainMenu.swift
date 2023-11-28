@@ -28,7 +28,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Subscription
+import SubscriptionUI
 #endif
 
 @MainActor

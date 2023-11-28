@@ -22,7 +22,7 @@ import SyncUI
 
 #if SUBSCRIPTION
 import Account
-import Subscription
+import SubscriptionUI
 #endif
 
 fileprivate extension Preferences.Const {
@@ -131,7 +131,7 @@ extension Preferences {
             })
 
             let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
-            return Subscription.PreferencesSubscriptionView(model: model)
+            return SubscriptionUI.PreferencesSubscriptionView(model: model)
         }
 
         @MainActor

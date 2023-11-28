@@ -27,7 +27,7 @@ import NetworkProtectionUI
 #endif
 
 #if SUBSCRIPTION
-import Subscription
+import SubscriptionUI
 #endif
 
 // swiftlint:disable:next type_body_length
