@@ -62,7 +62,7 @@ final class DataBrokerDatabaseBrowserViewModel: ObservableObject {
             let scansTable = createTable(using: scanOperations, tableName: "ScanOperation")
             let optOutsTable = createTable(using: optOutOperations, tableName: "OptOutOperation")
             let extractedProfilesTable = createTable(using: extractedProfiles, tableName: "ExtractedProfile")
-            let eventsTable = createTable(using: events, tableName: "Events")
+            let eventsTable = createTable(using: events.sorted(by: { $0.date < $1.date }), tableName: "Events")
 
             DispatchQueue.main.async {
                 self.tables = [brokersTable, profileQueriesTable, scansTable, optOutsTable, extractedProfilesTable, eventsTable]
