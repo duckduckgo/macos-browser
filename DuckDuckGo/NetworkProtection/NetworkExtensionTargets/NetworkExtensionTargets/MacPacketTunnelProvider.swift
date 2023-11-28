@@ -132,12 +132,18 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
 
+#if NETP_SYSTEM_EXTENSION
+        let settings = VPNSettings(defaults: .standard)
+#else
+        let settings = VPNSettings(defaults: .shared)
+#endif
+
         switch event {
         case .userBecameActive:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
-                withAdditionalParameters: ["cohort": PixelKit.dateString(for: NetworkProtectionPixelEvent.networkProtectionNewUser)],
+                withAdditionalParameters: ["cohort": PixelKit.dateString(for: settings.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
         case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
             PixelKit.fire(
@@ -326,8 +332,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
                        defaultHeaders: defaultHeaders,
-                       log: .networkProtectionPixel, 
-                       defaults: .shared) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+                       log: .networkProtectionPixel,
+                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
@@ -335,7 +341,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             let request = APIRequest(configuration: configuration)
 
             request.fetch { _, error in
-                onComplete(error)
+                onComplete(true, error)
             }
         }
     }

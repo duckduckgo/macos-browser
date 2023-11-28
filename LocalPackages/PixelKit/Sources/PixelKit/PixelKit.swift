@@ -20,6 +20,8 @@ import Foundation
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 public final class PixelKit {
+    /// `true` if a request is fired, `false` otherwise
+    public typealias CompletionBlock = (Bool, Error?) -> Void
 
     /// The frequency with which a pixel is sent to our endpoint.
     ///
@@ -55,7 +57,7 @@ public final class PixelKit {
         _ parameters: [String: String],
         _ allowedQueryReservedCharacters: CharacterSet?,
         _ callBackOnMainThread: Bool,
-        _ onComplete: @escaping (Error?) -> Void) -> Void
+        _ onComplete: @escaping CompletionBlock) -> Void
 
     public typealias Event = PixelKitEvent
 
@@ -117,7 +119,7 @@ public final class PixelKit {
                       withAdditionalParameters params: [String: String]? = nil,
                       allowedQueryReservedCharacters: CharacterSet? = nil,
                       includeAppVersionParameter: Bool = true,
-                      onComplete: @escaping (Error?) -> Void = {_ in }) {
+                      onComplete: @escaping CompletionBlock = { _, _ in }) {
 
         var newParams = params ?? [:]
         if includeAppVersionParameter {
@@ -139,17 +141,17 @@ public final class PixelKit {
                 return
             }
             if !pixelHasBeenFiredEver(pixelName) {
-                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             }
         case .dailyOnly:
             if !pixelHasBeenFiredToday(pixelName) {
-                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             }
         case .dailyAndContinuous:
             if !pixelHasBeenFiredToday(pixelName) {
-                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, { _ in })
+                fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
             }
 
@@ -163,14 +165,14 @@ public final class PixelKit {
         _ parameters: [String: String],
         _ allowedQueryReservedCharacters: CharacterSet?,
         _ callBackOnMainThread: Bool,
-        _ onComplete: @escaping (Error?) -> Void) {
+        _ onComplete: @escaping CompletionBlock) {
         guard !dryRun else {
             let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
             os_log(.debug, log: log, "👾 %{public}s %{public}@", pixelName.replacingOccurrences(of: "_", with: "."), params)
 
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                onComplete(nil)
+                onComplete(true, nil)
             }
 
             return
@@ -197,16 +199,16 @@ public final class PixelKit {
                      withAdditionalParameters params: [String: String]? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
-                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+                     onComplete: @escaping CompletionBlock = { _, _ in }) {
 
         let pixelName = prefixedName(for: event)
 
         if !dryRun {
             if frequency == .dailyOnly, pixelHasBeenFiredToday(pixelName) {
-                onComplete(nil)
+                onComplete(false, nil)
                 return
             } else if frequency == .justOnce, pixelHasBeenFiredEver(pixelName) {
-                onComplete(nil)
+                onComplete(false, nil)
                 return
             }
         }
@@ -238,7 +240,7 @@ public final class PixelKit {
                             withAdditionalParameters parameters: [String: String]? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
                             includeAppVersionParameter: Bool = true,
-                            onComplete: @escaping (Error?) -> Void = {_ in }) {
+                            onComplete: @escaping CompletionBlock = { _, _ in }) {
 
         Self.shared?.fire(event,
                           frequency: frequency,
@@ -249,22 +251,25 @@ public final class PixelKit {
                           onComplete: onComplete)
     }
 
-    private func dateString(for event: Event) -> String? {
-        let pixelName = prefixedName(for: event)
-
-        guard let dateFired = pixelLastFireDate(pixelName: pixelName) else {
-            return nil
-        }
-
-        return dateFormatter.string(from: dateFired)
+    private func dateString(for date: Date?) -> String? {
+        guard let date else { return nil }
+        return dateFormatter.string(from: date)
     }
 
-    public static func dateString(for event: Event) -> String {
-        Self.shared?.dateString(for: event) ?? ""
+    public static func dateString(for date: Date?) -> String {
+        Self.shared?.dateString(for: date) ?? ""
+    }
+
+    public static func pixelLastFireDate(event: Event) -> Date? {
+        Self.shared?.pixelLastFireDate(event: event)
     }
 
     public func pixelLastFireDate(pixelName: String) -> Date? {
         defaults.object(forKey: userDefaultsKeyName(forPixelName: pixelName)) as? Date
+    }
+
+    public func pixelLastFireDate(event: Event) -> Date? {
+        pixelLastFireDate(pixelName: prefixedName(for: event))
     }
 
     private func updatePixelLastFireDate(pixelName: String) {

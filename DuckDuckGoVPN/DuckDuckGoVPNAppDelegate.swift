@@ -133,8 +133,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
 
-        let tunnelSettings = self.tunnelSettings
-
         return StatusBarMenu(
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
@@ -172,7 +170,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         dryRun = false
 #endif
 
-        PixelKit.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel, defaults: .shared) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+        PixelKit.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel, defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
@@ -180,7 +178,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             let request = APIRequest(configuration: configuration)
 
             request.fetch { _, error in
-                onComplete(error)
+                onComplete(true, error)
             }
         }
 
