@@ -294,6 +294,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         } else {
             presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
         }
+        stopPollingForRecoveryKey()
     }
 
     func turnOnSync() {
@@ -332,7 +333,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     }
                     self.recoveryKey = recoveryKey
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: isRecovery)
-                    stopPollingForRecoveryKey()
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
@@ -369,6 +369,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 
                     try await syncService.transmitRecoveryKey(connectKey)
@@ -376,9 +377,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                         .removeDuplicates()
                         .dropFirst()
                         .prefix(1)
-                        .sink { [weak self] devices in
+                        .sink { [weak self] _ in
                             guard let self else { return }
-                            self.presentDialog(for: .nowSyncing)
+                            self.presentDialog(for: .saveRecoveryCode(recoveryCode))
                         }.store(in: &cancellables)
 
                     // The UI will update when the devices list changes.
