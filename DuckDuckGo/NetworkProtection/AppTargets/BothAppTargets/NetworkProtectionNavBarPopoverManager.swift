@@ -59,10 +59,10 @@ final class NetworkProtectionNavBarPopoverManager {
             )
 
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
-            let settings = VPNSettings(defaults: .netP)
+            _ = VPNSettings(defaults: .netP)
 
             let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter) {
-                var menuItems = [
+                let menuItems = [
                     NetworkProtectionStatusView.Model.MenuItem(
                         name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
                             let appLauncher = AppLauncher(appBundleURL: Bundle.main.bundleURL)

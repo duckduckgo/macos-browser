@@ -47,7 +47,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
-         defaults: UserDefaults = .shared,
+         defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection) {
 
         self.privacyConfigurationManager = privacyConfigurationManager

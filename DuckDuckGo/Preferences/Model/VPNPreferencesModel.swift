@@ -65,8 +65,8 @@ final class VPNPreferencesModel: ObservableObject {
     private let settings: VPNSettings
     private var cancellables = Set<AnyCancellable>()
 
-    init(settings: VPNSettings = .init(defaults: .shared),
-         defaults: UserDefaults = .shared) {
+    init(settings: VPNSettings = .init(defaults: .netP),
+         defaults: UserDefaults = .netP) {
         self.settings = settings
 
         connectOnLogin = settings.connectOnLogin

@@ -39,7 +39,7 @@ final class TunnelControllerIPCService {
     init(tunnelController: TunnelController,
          networkExtensionController: NetworkExtensionController,
          statusReporter: NetworkProtectionStatusReporter,
-         defaults: UserDefaults = .shared) {
+         defaults: UserDefaults = .netP) {
 
         self.tunnelController = tunnelController
         self.networkExtensionController = networkExtensionController
@@ -112,7 +112,7 @@ extension TunnelControllerIPCService: IPCServerInterface {
     }
 
     func debugCommand(_ command: DebugCommand) async throws {
-        let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID)
+        _ = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID)
 
         switch command {
         case .removeSystemExtension:

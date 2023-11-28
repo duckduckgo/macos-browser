@@ -44,7 +44,7 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Initializers
 
-    init(loginItemsManager: LoginItemsManager = .init(), settings: VPNSettings = .init(defaults: .shared)) {
+    init(loginItemsManager: LoginItemsManager = .init(), settings: VPNSettings = .init(defaults: .netP)) {
         self.loginItemsManager = loginItemsManager
         self.settings = settings
 

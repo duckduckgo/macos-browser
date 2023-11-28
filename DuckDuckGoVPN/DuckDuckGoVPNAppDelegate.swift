@@ -176,7 +176,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .shared)
+        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
         let launchedOnStartup = launchInformation.wasLaunchedByStartup
         launchInformation.update()
 
