@@ -86,7 +86,6 @@
 		1E2AE4CA2ACB21A000684E0A /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
 		1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9579202AC687170062CA31 /* HardwareModel.swift */; };
 		1E2AE4CC2ACB224A00684E0A /* NetworkProtectionRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DC2ABB8CFC0083F6DF /* NetworkProtectionRemoteMessagingRequest.swift */; };
-		1E3ED4FD2AC1E0290075F60F /* Purchase in Frameworks */ = {isa = PBXBuildFile; productRef = 1E3ED4FC2AC1E0290075F60F /* Purchase */; };
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		1E7E2E9229029F9B00C01B54 /* WebsiteBreakageReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */; };
 		1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */; };
@@ -5075,7 +5074,6 @@
 				378F44E429B4BDE900899924 /* SwiftUIExtensions in Frameworks */,
 				1E950E432912A10D0051A99B /* UserScript in Frameworks */,
 				CBC83E3629B63D380008E19C /* Configuration in Frameworks */,
-				1E3ED4FD2AC1E0290075F60F /* Purchase in Frameworks */,
 				4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
 				7BF7705F2AD6C999001C9182 /* PixelKit in Frameworks */,
@@ -8899,7 +8897,6 @@
 				EE7295E22A545B9A008C0991 /* NetworkProtection */,
 				9DB6E7232AA0DC5800A17F3C /* LoginItems */,
 				1EC88CA02AC1DD63003A4471 /* Account */,
-				1E3ED4FC2AC1E0290075F60F /* Purchase */,
 				7BF7705E2AD6C999001C9182 /* PixelKit */,
 			);
 			productName = DuckDuckGo;
@@ -14240,10 +14237,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Common;
-		};
-		1E3ED4FC2AC1E0290075F60F /* Purchase */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Purchase;
 		};
 		1E950E3E2912A10D0051A99B /* ContentBlocking */ = {
 			isa = XCSwiftPackageProductDependency;
