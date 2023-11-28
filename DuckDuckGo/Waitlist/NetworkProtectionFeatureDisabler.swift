@@ -27,21 +27,25 @@ import NetworkProtectionUI
 import SystemExtensions
 
 protocol NetworkProtectionFeatureDisabling {
-    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool)
+    /// - Returns: `true` if the uninstallation was completed.  `false` if it was cancelled by the user or an error.
+    ///
+    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool
 }
 
 final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling {
+    static let vpnUninstalledNotificationName = NSNotification.Name(rawValue: "com.duckduckgo.NetworkProtection.uninstalled")
+
     private let log: OSLog
     private let loginItemsManager: LoginItemsManager
     private let pinningManager: LocalPinningManager
-    private let settings: TunnelSettings
+    private let settings: VPNSettings
     private let userDefaults: UserDefaults
     private let ipcClient: TunnelControllerIPCClient
 
     init(loginItemsManager: LoginItemsManager = LoginItemsManager(),
          pinningManager: LocalPinningManager = .shared,
-         userDefaults: UserDefaults = .shared,
-         settings: TunnelSettings = .init(defaults: .shared),
+         userDefaults: UserDefaults = .netP,
+         settings: VPNSettings = .init(defaults: .netP),
          ipcClient: TunnelControllerIPCClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId),
          log: OSLog = .networkProtection) {
 
@@ -59,34 +63,36 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     ///     - keepAuthToken: If `true`, the auth token will not be removed.
     ///     - includeSystemExtension: Whether this method should uninstall the system extension.
     ///
-    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) {
-        Task {
-            // To disable NetP we need the login item to be running
-            // This should be fine though as we'll disable them further down below
-            enableLoginItems()
+    @discardableResult
+    func disable(keepAuthToken: Bool, uninstallSystemExtension: Bool) async -> Bool {
+        // To disable NetP we need the login item to be running
+        // This should be fine though as we'll disable them further down below
+        enableLoginItems()
 
-            // Allow some time for the login items to fully launch
-            try? await Task.sleep(interval: 0.5)
+        // Allow some time for the login items to fully launch
+        try? await Task.sleep(interval: 0.5)
 
-            unpinNetworkProtection()
-
-            if uninstallSystemExtension {
-                await removeSystemExtension()
-            }
-
-            await removeVPNConfiguration()
-
-            // We want to give some time for the login item to reset state before disabling it
-            try? await Task.sleep(interval: 0.5)
-
-            disableLoginItems()
-
-            resetUserDefaults()
-
-            if !keepAuthToken {
-                try? removeAppAuthToken()
+        if uninstallSystemExtension {
+            do {
+                try await removeSystemExtension()
+            } catch {
+                return false
             }
         }
+
+        try? await removeVPNConfiguration()
+        // We want to give some time for the login item to reset state before disabling it
+        try? await Task.sleep(interval: 0.5)
+        disableLoginItems()
+        resetUserDefaults()
+
+        if !keepAuthToken {
+            try? removeAppAuthToken()
+        }
+
+        unpinNetworkProtection()
+        postVPNUninstalledNotification()
+        return true
     }
 
     private func enableLoginItems() {
@@ -97,12 +103,8 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         loginItemsManager.disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
     }
 
-    func removeSystemExtension() async {
-        await ipcClient.debugCommand(.removeSystemExtension)
-
-#if NETP_SYSTEM_EXTENSION
-        userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
-#endif
+    func removeSystemExtension() async throws {
+        try await ipcClient.debugCommand(.removeSystemExtension)
     }
 
     private func unpinNetworkProtection() {
@@ -113,11 +115,12 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
         try NetworkProtectionKeychainTokenStore().deleteToken()
     }
 
-    private func removeVPNConfiguration() async {
+    private func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
-        await ipcClient.debugCommand(.removeVPNConfiguration)
+        try await ipcClient.debugCommand(.removeVPNConfiguration)
 
         // Remove the legacy (local) configuration
+        // We don't care if this fails
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
 
         if let tunnels = tunnels {
@@ -130,7 +133,17 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
 
     private func resetUserDefaults() {
         settings.resetToDefaults()
-        userDefaults.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
+    }
+
+    private func postVPNUninstalledNotification() {
+        Task { @MainActor in
+            // Wait a bit since the NetP button is likely being hidden
+            try? await Task.sleep(nanoseconds: 500 * NSEC_PER_MSEC)
+
+            NotificationCenter.default.post(
+                name: Self.vpnUninstalledNotificationName,
+                object: nil)
+        }
     }
 }
 

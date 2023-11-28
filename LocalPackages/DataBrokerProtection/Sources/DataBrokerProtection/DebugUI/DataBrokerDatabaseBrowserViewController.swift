@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionUserDefaultsConstants.swift
+//  DataBrokerDatabaseBrowserViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,15 +17,14 @@
 //
 
 import Foundation
+import SwiftUI
 
-/// Constants representing default values for NetP settings to be both accessible from Controller and Main Menu
-enum NetworkProtectionUserDefaultsConstants {
-
-    static let onDemandActivation = true
-    static let shouldConnectOnLogIn = false
-    static let shouldEnforceRoutes = false
-    static let shouldIncludeAllNetworks = false
-    static let shouldExcludeLocalNetworks = false
-    static let isConnectionTesterEnabled = true
-
+public final class DataBrokerDatabaseBrowserViewController: NSViewController {
+    public override func loadView() {
+        let viewModel = DataBrokerDatabaseBrowserViewModel()
+        let contentView = DataBrokerDatabaseBrowserView(viewModel: viewModel)
+        let hostingController = NSHostingController(rootView: contentView)
+        hostingController.view.autoresizingMask = [.width, .height]
+        self.view = hostingController.view
+    }
 }
