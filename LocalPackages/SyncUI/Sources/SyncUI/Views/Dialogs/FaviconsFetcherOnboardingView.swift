@@ -17,6 +17,7 @@
 //
 
 import SwiftUI
+import SwiftUIExtensions
 
 public struct FaviconsFetcherOnboardingView: View {
 
@@ -28,8 +29,9 @@ public struct FaviconsFetcherOnboardingView: View {
 
     public var body: some View {
         SyncDialog(spacing: 20.0) {
+
             VStack(alignment: .center, spacing: 20) {
-                Image("Sync-setup-success")
+                Image("SyncFetchFavicons")
 
                 Text(UserText.fetchFaviconsOnboardingTitle)
                     .font(.system(size: 17, weight: .bold))
@@ -38,43 +40,24 @@ public struct FaviconsFetcherOnboardingView: View {
                     .frame(width: 320, alignment: .center)
                     .multilineTextAlignment(.center)
                     .fixedSize()
-
-                VStack(spacing: 8) {
-                    Text(UserText.optionsSectionDialogTitle)
-                        .font(.system(size: 11))
-                        .foregroundColor(Color("BlackWhite60"))
-                    VStack {
-                        Toggle(isOn: $model.isFaviconsFetchingEnabled) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(UserText.fetchFaviconsOnboardingOptionTitle)
-                                    .font(.system(size: 13))
-                                    .foregroundColor(Color("BlackWhite80"))
-                                Text(UserText.fetchFaviconsOnboardingOptionCaption)
-                                    .font(.system(size: 11))
-                                    .foregroundColor(Color("BlackWhite60"))
-                                    .frame(width: 254)
-                                    .fixedSize()
-                            }
-                            .frame(width: 254)
-                        }
-                        .padding(.bottom, 13)
-                        .padding(.top, 7)
-                        .padding(.horizontal, 16)
-                        .frame(height: 65)
-                        .toggleStyle(.switch)
-                        .roundedBorder()
-                    }
-                    .frame(width: 320)
-                }
-                .padding(.top, 32)
             }
             .frame(width: 320)
+
         } buttons: {
-            Button("Dismiss") {
+
+            Button(UserText.notNow) {
                 model.onDismiss()
             }
+            .buttonStyle(DismissActionButtonStyle())
+
+            Button(UserText.keepFaviconsUpdated) {
+                model.isFaviconsFetchingEnabled = true
+                model.onDismiss()
+            }
+            .buttonStyle(DefaultActionButtonStyle(enabled: true))
+
         }
         .padding(.vertical, 20)
-        .frame(width: 360, height: 386)
+        .frame(width: 360, height: 290)
     }
 }

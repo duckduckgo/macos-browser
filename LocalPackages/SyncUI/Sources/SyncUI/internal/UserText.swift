@@ -111,8 +111,9 @@ enum UserText {
     static let bookmarksLimitExceededAction = NSLocalizedString("prefrences.sync.bookmarks-limit-exceeded-action", value: "Manage Bookmarks", comment: "Button title for sync bookmarks limits exceeded warning to manage bookmarks")
     static let credentialsLimitExceededAction = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-action", value: "Manage Logins", comment: "Button title for sync credentials limits exceeded warning to manage logins")
 
-    static let fetchFaviconsOnboardingTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-title", value: "Find Missing Icons?", comment: "Title for fetch favicons onboarding dialog")
-    static let fetchFaviconsOnboardingMessage = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-message", value: "Would you like DuckDuckGo to find and download icons for your bookmarks?", comment: "Text for fetch favicons onboarding dialog")
+    static let fetchFaviconsOnboardingTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-title", value: "Download Missing Icons?", comment: "Title for fetch favicons onboarding dialog")
+    static let fetchFaviconsOnboardingMessage = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-message", value: "Do you want this device to automatically download icons for any new bookmarks synced from your other devices? This will expose the download to your network any time a bookmark is synced.", comment: "Text for fetch favicons onboarding dialog")
+    static let keepFaviconsUpdated = NSLocalizedString("prefrences.sync.keep-favicons-updated", value: "Keep Bookmarks Icons Updated", comment: "Title of the confirmation button for favicons fetching")
     static let fetchFaviconsOnboardingOptionTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-option-title", value: "Keep Icons Updated", comment: "Title for fetch favicons option in the onboarding dialog")
     static let fetchFaviconsOnboardingOptionCaption = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-option-caption", value: "Have this device automatically download icons for synced bookmarks.", comment: "Text for fetch favicons option in the onboarding dialog")
 }
