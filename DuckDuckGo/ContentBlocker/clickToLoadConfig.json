@@ -21,6 +21,9 @@
                 "reason": "FB breakage"
             },
             {
+                "domain": "smartypance.com",
+                "reason": "https://app.asana.com/0/1200277586140538/1205348923041541/f"
+            {
                 "domain": "www.standard.co.uk",
                 "reason": "https://app.asana.com/0/1200277586140538/1205326380537958/f"
             }
