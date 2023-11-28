@@ -34,9 +34,6 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     private var databaseBrowserWindowController: NSWindowController?
 
-    deinit {
-        print("BATATA")
-    }
     init() {
         super.init(title: "Personal Information Removal")
 

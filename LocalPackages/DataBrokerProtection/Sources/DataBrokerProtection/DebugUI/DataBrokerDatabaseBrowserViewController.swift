@@ -27,8 +27,4 @@ public final class DataBrokerDatabaseBrowserViewController: NSViewController {
         hostingController.view.autoresizingMask = [.width, .height]
         self.view = hostingController.view
     }
-
-    deinit {
-        print("DataBrokerDatabaseBrowserViewController Deinit")
-    }
 }

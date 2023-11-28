@@ -4612,7 +4612,6 @@
 		3192EC862A4DCF0E001E97A5 /* DBP */ = {
 			isa = PBXGroup;
 			children = (
-				31CE205B2B10061400EA85ED /* Debug */,
 				316850712AF3AD58009A2828 /* DataBrokerProtectionDebugMenu.swift */,
 				3192EC872A4DCF21001E97A5 /* DBPHomeViewController.swift */,
 				3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */,
@@ -4623,13 +4622,6 @@
 				3199C6FC2AF97367002A7BA1 /* DataBrokerProtectionAppEvents.swift */,
 			);
 			path = DBP;
-			sourceTree = "<group>";
-		};
-		31CE205B2B10061400EA85ED /* Debug */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Debug;
 			sourceTree = "<group>";
 		};
 		31E163BB293A577200963C10 /* PrivacyReferenceTests */ = {
