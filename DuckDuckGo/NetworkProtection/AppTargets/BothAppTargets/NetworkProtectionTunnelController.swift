@@ -35,7 +35,7 @@ typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
-    let settings: TunnelSettings
+    let settings: VPNSettings
 
     // MARK: - Combine Cancellables
 
@@ -69,12 +69,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - User Defaults
 
+    /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
     /// Test setting to exclude duckduckgo route from VPN
     @MainActor
     @UserDefaultsWrapper(key: .networkProtectionExcludedRoutes, defaultValue: [:])
     private(set) var excludedRoutesPreferences: [String: Bool]
+     */
 
-    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .shared)
+    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
     // MARK: - Connection Status
@@ -117,7 +119,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
-         settings: TunnelSettings,
+         settings: VPNSettings,
          notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
@@ -150,11 +152,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             .store(in: &cancellables)
     }
 
-    /// This is where the tunnel has a chance to handle the settings change locally.
+    /// This is where the tunnel owner has a chance to handle the settings change locally.
     ///
     /// The extension can also handle these changes so not everything needs to be handled here.
     ///
-    private func handleSettingsChange(_ change: TunnelSettings.Change) async throws {
+    private func handleSettingsChange(_ change: VPNSettings.Change) async throws {
         switch change {
         case .setIncludeAllNetworks(let includeAllNetworks):
             try await handleSetIncludeAllNetworks(includeAllNetworks)
@@ -162,11 +164,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             try await handleSetEnforceRoutes(enforceRoutes)
         case .setExcludeLocalNetworks(let excludeLocalNetworks):
             try await handleSetExcludeLocalNetworks(excludeLocalNetworks)
-        case .setRegistrationKeyValidity,
+        case .setConnectOnLogin,
+                .setNotifyStatusChanges,
+                .setRegistrationKeyValidity,
                 .setSelectedServer,
+                .setSelectedEnvironment,
                 .setSelectedLocation,
-                .setSelectedEnvironment:
-            // Intentional no-op as this is handled by the extension
+                .setShowInMenuBar:
+            // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
         }
     }
@@ -196,10 +201,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 
         try await setupAndSave(tunnelManager)
-        updateRoutes()
     }
 
-    private func relaySettingsChange(_ change: TunnelSettings.Change) async throws {
+    private func relaySettingsChange(_ change: VPNSettings.Change) async throws {
         guard await isConnected,
               let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
 
@@ -229,7 +233,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
             protocolConfiguration.providerConfiguration = [
                 NetworkProtectionOptionKey.defaultPixelHeaders: APIRequest.Headers().httpHeaders,
-                NetworkProtectionOptionKey.excludedRoutes: excludedRoutes().map(\.stringRepresentation) as NSArray,
                 NetworkProtectionOptionKey.includedRoutes: includedRoutes().map(\.stringRepresentation) as NSArray
             ]
 
@@ -237,10 +240,15 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.disconnectOnSleep = false
 
             // kill switch
-            protocolConfiguration.enforceRoutes = settings.enforceRoutes
+            protocolConfiguration.enforceRoutes = true // settings.enforceRoutes
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
-            protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
+
+            // This is intentionally not used but left here for documentation purposes.
+            // The reason for this is that we want to have full control of the routes that
+            // are excluded, so instead of using this setting we're just configuring the
+            // excluded routes through our VPNSettings class, which our extension reads directly.
+            // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
 
             return protocolConfiguration
         }()
@@ -387,7 +395,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         options[NetworkProtectionOptionKey.activationAttemptId] = UUID().uuidString as NSString
         options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
-        options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as? NSString
+        options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
         if case .custom(let keyValidity) = settings.registrationKeyValidity {
@@ -461,9 +469,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         try await tunnelManager.saveToPreferences()
     }
 
+    /* Temporarily disabled until we fix this menu: https://app.asana.com/0/0/1205766100762904/f
     @MainActor
     private func excludedRoutes() -> [NetworkProtection.IPAddressRange] {
-        settings.exclusionList.compactMap { [excludedRoutesPreferences] item -> NetworkProtection.IPAddressRange? in
+        settings.excludedRoutes.compactMap { [excludedRoutesPreferences] item -> NetworkProtection.IPAddressRange? in
             guard case .exclusion(range: let range, description: _, default: let defaultValue) = item,
                   excludedRoutesPreferences[range.stringRepresentation, default: defaultValue] == true
             else { return nil }
@@ -476,7 +485,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
             return range
         }
-    }
+    }*/
 
     /// extra Included Routes appended to 0.0.0.0, ::/0 (peers) and interface.addresses
     @MainActor
@@ -484,10 +493,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         []
     }
 
+    /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
     @MainActor
     func setExcludedRoute(_ route: String, enabled: Bool) {
         excludedRoutesPreferences[route] = enabled
-        updateRoutes()
     }
 
     @MainActor
@@ -507,16 +516,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             return false
         }
         return excludedRoutesPreferences[route, default: defaultValue]
-    }
-
-    func updateRoutes() {
-        Task {
-            guard let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }
-
-            try await activeSession.sendProviderMessage(.setIncludedRoutes(includedRoutes()))
-            try await activeSession.sendProviderMessage(.setExcludedRoutes(excludedRoutes()))
-        }
-    }
+    }*/
 
     struct TunnelFailureError: LocalizedError {
         let errorDescription: String?

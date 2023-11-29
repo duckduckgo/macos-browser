@@ -21,7 +21,8 @@ import Foundation
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
-    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)!
+    static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
+    static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
 }
 
 @propertyWrapper
@@ -144,10 +145,9 @@ public struct UserDefaultsWrapper<T> {
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
-
         case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
+        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // Network Protection: Shared Defaults
         // ---

@@ -273,7 +273,6 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             XCTAssertEqual(results.results, expected)
         }
     }
-
 }
 
 private extension Tab {
