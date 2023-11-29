@@ -175,15 +175,6 @@ extension UserText {
     static let dataBrokerProtectionWaitlistInvitedTitle = NSLocalizedString("data-broker-protection.waitlist.invited.title", value: "You’re invited to try\nPersonal Information Removal beta!", comment: "Title for Personal Information Removal invited screen")
     static let dataBrokerProtectionWaitlistInvitedSubtitle = NSLocalizedString("data-broker-protection.waitlist.invited.subtitle", value: "Automatically find and remove your personal information – such as your name and address – from 17+ sites that store and sell it, reducing the risk of identity theft and spam.", comment: "Subtitle for Personal Information Removal invited screen")
 
-    static let dataBrokerProtectionWaitlistInvitedSection1Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-1.title", value: "Continuous Scan and Removal", comment: "Title for section 1 of the Personal Information Removal invited screen")
-    static let dataBrokerProtectionWaitlistInvitedSection1Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-1.subtitle", value: "Automatically scans for your info, requests its removal, and re-scans regularly to ensure it doesn’t reappear.", comment: "Subtitle for section 1 of the Personal Information Removal invited screen")
-
-    static let dataBrokerProtectionWaitlistInvitedSection2Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-2.title", value: "Private by Design", comment: "Title for section 2 of the Personal Information Removal invited screen")
-    static let dataBrokerProtectionWaitlistInvitedSection2Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-2.subtitle", value: "The removal process is initiated on your device, and the info you provide during setup is stored on your device only.", comment: "Subtitle for section 2 of the Personal Information Removal invited screen")
-
-    static let dataBrokerProtectionWaitlistInvitedSection3Title = NSLocalizedString("data-broker-protection.waitlist.invited.section-3.title", value: "Real-Time Progress Updates", comment: "Title for section 3 of the Personal Information Removal invited screen")
-    static let dataBrokerProtectionWaitlistInvitedSection3Subtitle = NSLocalizedString("data-broker-protection.waitlist.invited.section-3.subtitle", value: "See what information has been removed, and monitor progress of ongoing removals from your dashboard.", comment: "Subtitle for section 3 of the Personal Information Removal invited screen")
-
     static let dataBrokerProtectionWaitlistEnableTitle = NSLocalizedString("data-broker-protection.waitlist.enable.title", value: "Let’s get started", comment: "Title for Personal Information Removal enable screen")
     static let dataBrokerProtectionWaitlistEnableSubtitle = NSLocalizedString("data-broker-protection.waitlist.enable.subtitle", value: "We’ll need your name, address and the year you were born in order to find your personal information on data broker sites\n\nThis info is stored securely on your device, and is never sent to DuckDuckGo.", comment: "Subtitle for Personal Information Removal enable screen")
 
