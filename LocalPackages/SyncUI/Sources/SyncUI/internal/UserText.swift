@@ -37,14 +37,15 @@ enum UserText {
     static let beginSyncTitle = NSLocalizedString("preferences.begin.sync-card-title", value: "Begin Syncing", comment: "Begin Syncing card title in sync settings")
     static let beginSyncDescription = NSLocalizedString("preferences.begin.sync-card-description", value: "Securely sync bookmarks and passwords between your devices.", comment: "Begin Syncing card description in sync settings")
     static let beginSyncButton = NSLocalizedString("preferences.begin.sync-card-button", value: "Sync with Another Device", comment: "Begin Syncing card button in sync settings")
+    static let beginSyncFooter = NSLocalizedString("preferences.begin.sync-card-footer", value: "Your data is end-to-end encrypted, and DuckDuckGo does not have access to the encryption key.", comment: "Begin Syncing card footer in sync settings")
     // Options
     static let otherOptionsSectionTitle = NSLocalizedString("preferences.other-options.section-title", value: "Other Options", comment: "Sync preferences other options section title")
     static let syncThisDeviceLink = NSLocalizedString("preferences.sync-this-device.link-title", value: "Sync and Back Up This Device", comment: "Sync preferences sync this device link title")
     static let recoverDataLink = NSLocalizedString("preferences.recover-data.link-title", value: "Recover Synced Data", comment: "Sync preferences recover data link title")
 
     // Preparing to sync dialog
-    static let preparingToSyncDialogTitle = NSLocalizedString("preferences.preparing-to-sync.dialog-title", value: "Setting Up Sync \nand Backup", comment: "Sync preparing to sync dialog title")
-    static let preparingToSyncDialogSubTitle = NSLocalizedString("preferences.preparing-to-sync.dialog-subtitle", value: "Your bookmarks and passwords are being prepared to sync. This should only take a moment.", comment: "Sync preparing to sync dialog subtitle")
+    static let preparingToSyncDialogTitle = NSLocalizedString("preferences.preparing-to-sync.dialog-title", value: "Preparing to Sync", comment: "Sync preparing to sync dialog title")
+    static let preparingToSyncDialogSubTitle = NSLocalizedString("preferences.preparing-to-sync.dialog-subtitle", value: "We're setting up the connection to synchronize your bookmarks and saved logins with the other device.", comment: "Sync preparing to sync dialog subtitle")
     static let preparingToSyncDialogAction = NSLocalizedString("preferences.preparing-to-sync.dialog-action", value: "Connecting…", comment: "Sync preparing to sync dialog action")
 
     // Enter recovery code dialog
@@ -53,15 +54,10 @@ enum UserText {
     static let enterRecoveryCodeDialogAction1 = NSLocalizedString("preferences.enter-recovery-code.dialog-action1", value: "Paste Code Here", comment: "Sync enter recovery code dialog first possible action")
     static let enterRecoveryCodeDialogAction2 = NSLocalizedString("preferences.enter-recovery-code.dialog-action2", value: "or scan QR code with a device that is still connected", comment: "Sync enter recovery code dialog second possible action")
 
-    // Your data is returning dialog
-    static let yourDataIsReturningDialogTitle = NSLocalizedString("preferences.your-data-is-returning.dialog-title", value: "Your Data is Returning!", comment: "Sync your data is returning dialog title")
-    static let yourDataIsReturningDialogSubtitle = NSLocalizedString("preferences.your-data-is-returning.dialog-subtitle", value: "Your bookmarks and logins will now be restored from DuckDuckGo's secure server.", comment: "Sync your data is returning dialog subtitle")
-    static let yourDataIsReturningDialogAction = NSLocalizedString("preferences.your-data-is-returning.dialog-action", value: "Downloading…", comment: "Sync preparing to sync dialog action")
-
     // Recover synced data dialog
     static let reciverSyncedDataDialogTitle = NSLocalizedString("preferences.recover-synced-data.dialog-title", value: "Recover Synced Data", comment: "Sync recover synced data dialog title")
-    static let reciverSyncedDataDialogSubitle = NSLocalizedString("preferences.recover-synced-data.dialog-subtitle", value: "To restore your synced data, you'll need the \"Recovery Code\" you saved when you first set up the sync. This code may have been saved as a PDF with a QR code or as a text code.", comment: "Sync recover synced data dialog subtitle")
-    static let reciverSyncedDataDialogButton = NSLocalizedString("preferences.recover-synced-data.dialog-button", value: "Enter Code", comment: "Sync recover synced data dialog button")
+    static let reciverSyncedDataDialogSubitle = NSLocalizedString("preferences.recover-synced-data.dialog-subtitle", value: "To restore your synced data, you'll need the Recovery Code you saved when you first set up Sync. This code may have been saved as a PDF on the device you originally used to set up Sync.", comment: "Sync recover synced data dialog subtitle")
+    static let reciverSyncedDataDialogButton = NSLocalizedString("preferences.recover-synced-data.dialog-button", value: "Get Started", comment: "Sync recover synced data dialog button")
 
     // Sync Title
     static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
@@ -103,11 +99,9 @@ enum UserText {
     static let syncWithAnotherDeviceSubtitle3 = NSLocalizedString("preferences.sync.sync-with-another-device.dialog-subtitle3", value: "in the DuckDuckGo Browser on a another device and select Sync with Another Device.", comment: "Sync with another device dialog subtitle thisrd part")
     static let syncWithAnotherDeviceShowCodeButton = NSLocalizedString("preferences.sync.sync-with-another-device.show-code-button", value: "Show Code", comment: "Sync with another device dialog show code button")
     static let syncWithAnotherDeviceEnterCodeButton = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-button", value: "Enter Code", comment: "Sync with another device dialog enter code button")
-    static let syncWithAnotherDeviceShowQRCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.show-qr-code-explanation", value: "Scan this QR code to connect with a mobile device.", comment: "Sync with another device dialog show qr code explanation")
-    static let syncWithAnotherDeviceEnterCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-explanation", value: "Enter the text code in the field below to connect", comment: "Sync with another device dialog enter code explanation")
+    static let syncWithAnotherDeviceShowQRCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.show-qr-code-explanation", value: "Scan this QR code to connect.", comment: "Sync with another device dialog show qr code explanation")
+    static let syncWithAnotherDeviceEnterCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-explanation", value: "Enter the text code in the field below to connect.", comment: "Sync with another device dialog enter code explanation")
     static let syncWithAnotherDeviceShowCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.show-code-explanation", value: "Share this code to connect with a desktop machine.", comment: "Sync with another device dialog show code explanation")
-    static let syncWithAnotherDeviceMobileUsers = NSLocalizedString("preferences.sync.sync-with-another-device.mobile-users", value: "Mobile Users: ", comment: "Sync with another device dialog mobile users section")
-    static let syncWithAnotherDeviceDesktopUsers = NSLocalizedString("preferences.sync.sync-with-another-device.desktop-users", value: "Desktop Users: ", comment: "Sync with another device dialog desktop users section")
     static let syncWithAnotherDeviceViewQRCode = NSLocalizedString("preferences.sync.sync-with-another-device.view-qr-code-link", value: "View QR Code", comment: "Sync with another device dialog view qr code link")
     static let syncWithAnotherDeviceViewTextCode = NSLocalizedString("preferences.sync.sync-with-another-device.view-text-code-link", value: "View Text Code", comment: "Sync with another device dialog view text code link")
 
@@ -120,10 +114,9 @@ enum UserText {
 
     // Sync with server dialog
     static let syncWithServerTitle = NSLocalizedString("preferences.sync.sync-with-server-title", value: "Sync and Back Up This Device", comment: "Sync with server dialog title")
-    static let syncWithServerSubtitle1 = NSLocalizedString("preferences.sync.sync-with-server-subtitle1", value: "Your bookmarks and saved logins will be encrypted and begin syncing with DuckDuckGo's server.", comment: "Sync with server dialog first subtitle")
-    static let syncWithServerSubtitle2 = NSLocalizedString("preferences.sync.sync-with-server-subtitle2", value: "Only your device holds the decryption key; DuckDuckGo cannot access it.", comment: "Sync with server dialog second subtitle")
-    static let syncWithServerWarning = NSLocalizedString("preferences.sync.sync-with-server-warning", value: "You can add other devices for syncing later.", comment: "Sync with server dialog warning")
-    static let syncWithServerButton = NSLocalizedString("preferences.sync.sync-with-server-button", value: "Turn on Sync", comment: "Sync with server dialog button")
+    static let syncWithServerSubtitle1 = NSLocalizedString("preferences.sync.sync-with-server-subtitle1", value: "This creates an encrypted backup of your bookmarks and passwords on DuckDuckGo’s secure server, which can be synced with your other devices.", comment: "Sync with server dialog first subtitle")
+    static let syncWithServerSubtitle2 = NSLocalizedString("preferences.sync.sync-with-server-subtitle2", value: "The encryption key is only stored on your device, DuckDuckGo cannot access it.", comment: "Sync with server dialog second subtitle")
+    static let syncWithServerButton = NSLocalizedString("preferences.sync.sync-with-server-button", value: "Turn on Sync & Backup", comment: "Sync with server dialog button")
 
     // Device synced dialog
     static let deviceSynced = NSLocalizedString("prefrences.sync.device-synced", value: "Your Data is Synced!", comment: "Sync setup dialog title")

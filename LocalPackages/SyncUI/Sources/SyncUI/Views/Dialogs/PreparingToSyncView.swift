@@ -37,29 +37,13 @@ struct PreparingToSyncView: View {
 
 }
 
-struct YourDataIsReturningView: View {
-
-    var body: some View {
-        SyncDialog(spacing: 20.0, bottomText: UserText.yourDataIsReturningDialogAction) {
-            VStack(alignment: .center, spacing: 20) {
-                Image("Lock-Succes-96")
-                SyncUIConstants.TextHeader(text: UserText.yourDataIsReturningDialogTitle)
-                SyncUIConstants.TextDetailMultiline(text: UserText.yourDataIsReturningDialogSubtitle)
-            }
-            .frame(width: 320)
-        } buttons: {
-        }
-    }
-
-}
-
 struct RecoverSyncedDataView: View {
     @EnvironmentObject var model: ManagementDialogModel
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
-                Image("Sync-96")
+                Image("Sync-Pair-96")
                 SyncUIConstants.TextHeader(text: UserText.reciverSyncedDataDialogTitle)
                 SyncUIConstants.TextDetailMultiline(text: UserText.reciverSyncedDataDialogSubitle)
             }

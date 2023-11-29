@@ -30,7 +30,6 @@ public enum ManagementDialogKind: Equatable {
     case syncWithServer
     case enterRecoveryCode(code: String)
     case recoverSyncedData
-    case yourDataIsReturning
 }
 
 public struct ManagementDialog: View {
@@ -78,9 +77,6 @@ public struct ManagementDialog: View {
                 EnterRecoveryCodeView(code: code)
             case .recoverSyncedData:
                 RecoverSyncedDataView()
-            case .yourDataIsReturning:
-                YourDataIsReturningView()
-
             default:
                 EmptyView()
             }

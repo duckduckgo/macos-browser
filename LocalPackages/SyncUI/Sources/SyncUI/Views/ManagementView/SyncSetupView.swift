@@ -24,7 +24,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     fileprivate func syncWithAnotherDeviceView() -> some View {
         return VStack(alignment: .center, spacing: 16) {
-            Image("Sync-Pair-96x96")
+            Image("Sync-Pair-96")
             VStack(alignment: .center, spacing: 8) {
                 SyncUIConstants.TextHeader(text: UserText.beginSyncTitle)
                 SyncUIConstants.TextDetailSecondary(text: UserText.beginSyncDescription)
@@ -49,7 +49,13 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            syncWithAnotherDeviceView()
+            VStack(spacing: 8) {
+                syncWithAnotherDeviceView()
+                SyncUIConstants.TextDetailSecondary(text: UserText.beginSyncFooter)
+                    .padding(.bottom, 24)
+                    .padding(.horizontal, 110)
+                    .font(.system(size: 11))
+            }
             VStack(alignment: .leading, spacing: 12) {
                 SyncUIConstants.TextHeader2(text: UserText.otherOptionsSectionTitle)
                 VStack(alignment: .leading, spacing: 8) {

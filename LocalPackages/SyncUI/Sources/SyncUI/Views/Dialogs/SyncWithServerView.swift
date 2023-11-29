@@ -28,10 +28,6 @@ struct SyncWithServerView: View {
             SyncUIConstants.TextHeader(text: UserText.syncWithServerTitle)
             SyncUIConstants.TextDetailMultiline(text: UserText.syncWithServerSubtitle1)
             SyncUIConstants.TextDetailMultiline(text: UserText.syncWithServerSubtitle2)
-            Spacer()
-            Text(UserText.syncWithServerWarning)
-                .font(.system(size: 11))
-                .foregroundColor(Color("BlackWhite60"))
         } buttons: {
             Button(UserText.cancel) {
                 model.endFlow()

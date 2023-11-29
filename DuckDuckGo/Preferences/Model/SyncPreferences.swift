@@ -326,11 +326,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     self.presentDialog(for: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
                 }
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    if isRecovery {
-                        presentDialog(for: .yourDataIsReturning)
-                    } else {
-                        presentDialog(for: .prepareToSync)
-                    }
+                    presentDialog(for: .prepareToSync)
                     self.recoveryKey = recoveryKey
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: isRecovery)
                 } else {
@@ -357,11 +353,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     managementDialogModel.errorMessage = "Invalid code"
                     return
                 }
-                if fromRecoveryScreen {
-                    presentDialog(for: .yourDataIsReturning)
-                } else {
-                    presentDialog(for: .prepareToSync)
-                }
+                presentDialog(for: .prepareToSync)
                 if let recoveryKey = syncCode.recovery {
                     // This will error if the account already exists, we don't have good UI for this just now
                     try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)

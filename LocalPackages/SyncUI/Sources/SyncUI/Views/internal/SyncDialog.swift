@@ -111,6 +111,7 @@ enum SyncUIConstants {
 
         var body: some View {
             Text(text)
+                .fontWeight(.semibold)
                 .foregroundColor(Color("LinkBlueColor"))
         }
     }

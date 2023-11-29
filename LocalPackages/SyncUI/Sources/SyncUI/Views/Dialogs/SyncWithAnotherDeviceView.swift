@@ -102,21 +102,14 @@ struct SyncWithAnotherDeviceView: View {
 
     fileprivate func scanQRCodeView() -> some View {
         return  Group {
-            Text(UserText.syncWithAnotherDeviceShowCodeExplanation)
+            Text(UserText.syncWithAnotherDeviceShowQRCodeExplanation)
             QRCode(string: code, size: CGSize(width: 164, height: 164))
-            HStack(spacing: 4) {
-                Text(UserText.syncWithAnotherDeviceDesktopUsers)
-                HStack {
-                    Text(UserText.syncWithAnotherDeviceViewTextCode)
-                        .fontWeight(.semibold)
-                    Image("Arrow-Circle-Right-12")
-                }
+            Text(UserText.syncWithAnotherDeviceViewTextCode)
+                .fontWeight(.semibold)
                 .foregroundColor(Color("LinkBlueColor"))
                 .onTapGesture {
                     showQRCode = false
                 }
-            }
-            .frame(alignment: .center)
         }
     }
 
@@ -188,19 +181,12 @@ struct SyncWithAnotherDeviceView: View {
                     }
                 }
                 .frame(width: 348, height: 32)
-                HStack(spacing: 4) {
-                    Text(UserText.syncWithAnotherDeviceMobileUsers)
-                    HStack {
-                        Text(UserText.syncWithAnotherDeviceViewQRCode)
-                            .fontWeight(.semibold)
-                        Image("Arrow-Circle-Right-12")
-                    }
+                Text(UserText.syncWithAnotherDeviceViewQRCode)
+                    .fontWeight(.semibold)
                     .foregroundColor(Color("LinkBlueColor"))
                     .onTapGesture {
                         showQRCode = true
                     }
-                }
-                .frame(alignment: .center)
             }
         }
         .frame(width: 348)
