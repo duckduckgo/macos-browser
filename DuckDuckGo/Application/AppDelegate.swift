@@ -75,6 +75,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private var didFinishLaunching = false
 
+
+
+
 #if SPARKLE
     var updateController: UpdateController!
 #endif
