@@ -49,9 +49,7 @@ protocol NewWindowPolicyDecisionMaker {
         case bookmarks
         case onboarding
         case none
-#if DBP
         case dataBrokerProtection
-#endif
 
         static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
