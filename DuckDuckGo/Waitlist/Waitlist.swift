@@ -171,6 +171,9 @@ struct NetworkProtectionWaitlist: Waitlist {
     let waitlistRequest: WaitlistRequest
     private let networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming
 
+    @UserDefaultsWrapper(key: .networkProtectionWaitlistSignUpPromptDismissed, defaultValue: false)
+    var waitlistSignUpPromptDismissed: Bool
+
     var shouldShowWaitlistViewController: Bool {
         return isOnWaitlist || readyToAcceptTermsAndConditions
     }

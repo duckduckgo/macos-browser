@@ -202,12 +202,14 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 return
             }
 
-            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+            let waitlist = NetworkProtectionWaitlist()
+            let isWaitlistUser = waitlist.waitlistStorage.isWaitlistUser
             let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
 
             // If the user hasn't signed up to the waitlist or doesn't have an auth token through some other method, then show them the badged icon
-            // to get their attention and encourage them to sign up.
-            if !isWaitlistUser && !hasAuthToken {
+            // to get their attention and encourage them to sign up. Also avoid showing the button is the user has opened the waitlist UI but
+            // dismissed it.
+            if !isWaitlistUser && !hasAuthToken && !waitlist.waitlistSignUpPromptDismissed {
                 showButton = true
                 return
             }
