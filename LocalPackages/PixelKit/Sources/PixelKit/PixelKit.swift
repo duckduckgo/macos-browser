@@ -85,6 +85,8 @@ public final class PixelKit {
     private let log: OSLog
     private let fireRequest: FireRequest
 
+    /// `dryRun`: if `true`, simulate requests and "send" them at an accelerated rate
+    /// (once every 2 minutes instead of once a day)
     public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, defaults: UserDefaults, fireRequest: @escaping FireRequest) {
         shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, defaults: defaults, fireRequest: fireRequest)
     }
@@ -277,6 +279,15 @@ public final class PixelKit {
     }
 
     private func pixelHasBeenFiredToday(_ name: String) -> Bool {
+        guard !dryRun else {
+            if let lastFireDate = pixelLastFireDate(pixelName: name),
+               let twoMinsAgo = pixelCalendar.date(byAdding: .minute, value: -2, to: Date()) {
+                return lastFireDate >= twoMinsAgo
+            }
+
+            return false
+        }
+
         if let lastFireDate = pixelLastFireDate(pixelName: name) {
             return pixelCalendar.isDate(Date(), inSameDayAs: lastFireDate)
         }
