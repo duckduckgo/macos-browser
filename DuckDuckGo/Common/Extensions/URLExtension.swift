@@ -444,4 +444,24 @@ extension URL {
         }
         return self.absoluteString
     }
+
+    // MARK: - JavaScript URLs
+
+    var isJavaScriptURL: Bool {
+        guard let scheme = self.scheme?.lowercased() else { return false }
+
+        if scheme == "javascript" || scheme.hasPrefix("javascript:") {
+            return true
+        }
+
+        return false
+    }
+
+    func stripJavaScriptScheme() -> URL {
+        if self.isJavaScriptURL {
+            let cleanUrlString = self.absoluteString.replacingOccurrences(of: "javascript", with: "")
+            return URL(string: cleanUrlString) ?? self
+        }
+        return self
+    }
 }

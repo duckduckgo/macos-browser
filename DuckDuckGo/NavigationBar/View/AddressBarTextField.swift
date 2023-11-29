@@ -300,8 +300,11 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
+        // Block user-entered JavaScript URLs
+        let cleanProvidedUrl = providedUrl.stripJavaScriptScheme()
+
 #if APPSTORE
-        if providedUrl.isFileURL, let window = self.window {
+        if cleanProvidedUrl.isFileURL, let window = self.window {
             let alert = NSAlert.cannotOpenFileAlert()
             alert.beginSheetModal(for: window) { response in
                 switch response {
@@ -316,7 +319,7 @@ final class AddressBarTextField: NSTextField {
         }
 #endif
 
-        selectedTabViewModel.tab.setUrl(providedUrl, userEntered: userEnteredValue)
+        selectedTabViewModel.tab.setUrl(cleanProvidedUrl, userEntered: userEnteredValue)
 
         self.window?.makeFirstResponder(nil)
     }

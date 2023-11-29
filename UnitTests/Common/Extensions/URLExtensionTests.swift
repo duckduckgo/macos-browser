@@ -116,4 +116,18 @@ final class URLExtensionTests: XCTestCase {
         XCTAssertNil(notURL)
     }
 
+    func testWhenJavaScriptUrlIsEntered_ThenItShouldBeStripped() {
+        let data: [(inUrl: URL?, expectedUrl: URL?)] = [
+            (URL(string: "javascript:/duckduckgo.com"), URL(string: ":/duckduckgo.com")),
+            (URL(string: "javascript:alert(1)"), URL(string: ":alert(1)")),
+            (URL(string: "javascript://alert(1)"), URL(string: "://alert(1)")),
+            (URL(string: "javascript.com"), URL(string: "javascript.com")),
+            (URL(string: "https://javascript.com"), URL(string: "https://javascript.com"))
+        ]
+
+        for (inUrl, expectedUrl) in data {
+            XCTAssertEqual(inUrl?.stripJavaScriptScheme(), expectedUrl)
+        }
+    }
+
 }
