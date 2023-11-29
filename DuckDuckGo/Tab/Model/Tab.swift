@@ -88,7 +88,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isDisplayable: Bool {
             switch self {
-            case .preferences, .bookmarks:
+            case .preferences, .bookmarks, .dataBrokerProtection:
                 return true
             default:
                 return false
