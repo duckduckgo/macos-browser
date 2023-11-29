@@ -79,14 +79,16 @@ public final class PixelKit {
         return dateFormatter
     }()
 
+    private let dateGenerator: () -> Date
+
     public private(set) static var shared: PixelKit?
     private let appVersion: String
     private let defaultHeaders: [String: String]
     private let log: OSLog
     private let fireRequest: FireRequest
 
-    /// `dryRun`: if `true`, simulate requests and "send" them at an accelerated rate
-    /// (once every 2 minutes instead of once a day)
+    /// `dryRun`: if `true`, simulate requests and "send" them at an accelerated rate (once every 2 minutes instead of once a day)
+    /// `fireRequest`: this is not triggered when `dryRun` is `true`
     public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, defaults: UserDefaults, fireRequest: @escaping FireRequest) {
         shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, defaults: defaults, fireRequest: fireRequest)
     }
@@ -103,6 +105,7 @@ public final class PixelKit {
          defaultHeaders: [String: String],
          log: OSLog,
          dailyPixelCalendar: Calendar? = nil,
+         dateGenerator: @escaping () -> Date = Date.init,
          defaults: UserDefaults,
          fireRequest: @escaping FireRequest) {
 
@@ -111,6 +114,7 @@ public final class PixelKit {
         self.defaultHeaders = defaultHeaders
         self.log = log
         self.pixelCalendar = dailyPixelCalendar ?? Self.defaultDailyPixelCalendar
+        self.dateGenerator = dateGenerator
         self.defaults = defaults
         self.fireRequest = fireRequest
     }
@@ -173,7 +177,7 @@ public final class PixelKit {
             os_log(.debug, log: log, "👾 %{public}s %{public}@", pixelName.replacingOccurrences(of: "_", with: "."), params)
 
             // simulate server response time for Dry Run mode
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 onComplete(true, nil)
             }
 
@@ -275,13 +279,13 @@ public final class PixelKit {
     }
 
     private func updatePixelLastFireDate(pixelName: String) {
-        defaults.set(Date(), forKey: userDefaultsKeyName(forPixelName: pixelName))
+        defaults.set(dateGenerator(), forKey: userDefaultsKeyName(forPixelName: pixelName))
     }
 
     private func pixelHasBeenFiredToday(_ name: String) -> Bool {
         guard !dryRun else {
             if let lastFireDate = pixelLastFireDate(pixelName: name),
-               let twoMinsAgo = pixelCalendar.date(byAdding: .minute, value: -2, to: Date()) {
+               let twoMinsAgo = pixelCalendar.date(byAdding: .minute, value: -2, to: dateGenerator()) {
                 return lastFireDate >= twoMinsAgo
             }
 
@@ -289,7 +293,7 @@ public final class PixelKit {
         }
 
         if let lastFireDate = pixelLastFireDate(pixelName: name) {
-            return pixelCalendar.isDate(Date(), inSameDayAs: lastFireDate)
+            return pixelCalendar.isDate(dateGenerator(), inSameDayAs: lastFireDate)
         }
 
         return false
