@@ -63,7 +63,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             VStack {
                 Toggle(isOn: $model.isFaviconsFetchingEnabled) {
                     HStack {
-                        IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncFetchFavicons"))
+                        IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncFetchFaviconsIcon"))
                         VStack(alignment: .leading, spacing: 4) {
                             Text(UserText.fetchFaviconsOptionTitle)
                                 .font(Const.Fonts.preferencePaneOptionTitle)

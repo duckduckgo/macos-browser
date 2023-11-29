@@ -24,7 +24,7 @@ struct PreferencesSection: Hashable, Identifiable {
     let panes: [PreferencePaneIdentifier]
 
     @MainActor
-    static func defaultSections(includingDuckPlayer: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool, includingVPN: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
 #if SUBSCRIPTION
             var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
@@ -44,6 +44,12 @@ struct PreferencesSection: Hashable, Identifiable {
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
+
+#if NETWORK_PROTECTION
+            if includingVPN {
+                panes.append(.vpn)
+            }
+#endif
 
             return panes
         }()
@@ -65,6 +71,9 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case sync
     case appearance
     case privacy
+#if NETWORK_PROTECTION
+    case vpn
+#endif
 #if SUBSCRIPTION
     case subscription
 #endif
@@ -98,6 +107,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.appearance
         case .privacy:
             return UserText.privacy
+#if NETWORK_PROTECTION
+        case .vpn:
+            return UserText.vpn
+#endif
 #if SUBSCRIPTION
         case .subscription:
             return UserText.subscription
@@ -123,6 +136,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .privacy:
             return "Privacy"
+#if NETWORK_PROTECTION
+        case .vpn:
+            return "VPN"
+#endif
 #if SUBSCRIPTION
         case .subscription:
             return "Privacy"

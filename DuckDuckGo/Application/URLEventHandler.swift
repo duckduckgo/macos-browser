@@ -121,6 +121,8 @@ final class URLEventHandler {
             Task {
                 await WindowControllersManager.shared.showNetworkProtectionStatus()
             }
+        case AppLaunchCommand.showSettings.launchURL:
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
         default:
             return
         }

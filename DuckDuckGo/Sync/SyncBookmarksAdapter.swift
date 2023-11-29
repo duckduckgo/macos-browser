@@ -36,6 +36,19 @@ public class BookmarksFaviconsFetcherErrorHandler: EventMapping<BookmarksFavicon
     }
 }
 
+enum SyncBookmarksAdapterError: CustomNSError {
+    case unableToAccessFaviconsFetcherStateStoreDirectory
+
+    static let errorDomain: String = "SyncBookmarksAdapterError"
+
+    var errorCode: Int {
+        switch self {
+        case .unableToAccessFaviconsFetcherStateStoreDirectory:
+            return 1
+        }
+    }
+}
+
 final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
@@ -139,7 +152,9 @@ final class SyncBookmarksAdapter {
     private func setUpFaviconsFetcher() -> BookmarksFaviconsFetcher? {
         let stateStore: BookmarksFaviconsFetcherStateStore
         do {
-            let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+                throw SyncBookmarksAdapterError.unableToAccessFaviconsFetcherStateStoreDirectory
+            }
             stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: url)
         } catch {
             Pixel.fire(.debug(event: .bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))

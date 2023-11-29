@@ -32,6 +32,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
     private let waitlistBypassItem = NSMenuItem(title: "Bypass Waitlist", action: #selector(DataBrokerProtectionDebugMenu.toggleBypassWaitlist))
 
+    private var databaseBrowserWindowController: NSWindowController?
+
     init() {
         super.init(title: "Personal Information Removal")
 
@@ -60,6 +62,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 waitlistInviteCodeItem
                 waitlistTermsAndConditionsAcceptedItem
             }
+            NSMenuItem(title: "Debug") {
+                NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+                    .targetting(self)
+
+            }
         }
     }
 
@@ -74,6 +81,21 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     // MARK: - Menu functions
+
+    @objc private func showDatabaseBrowser() {
+        let viewController = DataBrokerDatabaseBrowserViewController()
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+                              styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                              backing: .buffered,
+                              defer: false)
+
+        window.contentViewController = viewController
+        window.minSize = NSSize(width: 500, height: 400)
+        window.center()
+        databaseBrowserWindowController = NSWindowController(window: window)
+        databaseBrowserWindowController?.showWindow(nil)
+        window.delegate = self
+    }
 
     @objc private func resetWaitlistState() {
         DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
@@ -110,7 +132,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     // MARK: - Utility Functions
 
     private func updateWaitlistItems() {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: DataBrokerProtectionWaitlist.identifier)
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: DataBrokerProtectionWaitlist.identifier, keychainAppGroup: Bundle.main.appGroup(bundle: .dbp))
         waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
         waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
 
@@ -124,6 +146,12 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
 
         waitlistBypassItem.state = DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist ? .on : .off
+    }
+}
+
+extension DataBrokerProtectionDebugMenu: NSWindowDelegate {
+    func windowWillClose(_ notification: Notification) {
+        databaseBrowserWindowController = nil
     }
 }
 

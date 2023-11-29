@@ -186,7 +186,12 @@ extension WindowControllersManager {
     }
 
     func showTab(with content: Tab.TabContent) {
-        guard let windowController = self.mainWindowController else { return }
+        guard let windowController = self.mainWindowController else {
+            let tabCollection = TabCollection(tabs: [Tab(content: content)])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+            WindowsManager.openNewWindow(with: tabCollectionViewModel)
+            return
+        }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel

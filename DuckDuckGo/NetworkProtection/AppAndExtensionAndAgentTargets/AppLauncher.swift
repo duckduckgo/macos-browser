@@ -31,6 +31,7 @@ extension AppLaunchCommand {
         case .justOpen: return "justOpen"
         case .shareFeedback: return "shareFeedback"
         case .showStatus: return "showStatus"
+        case .showSettings: return "showSettings"
         case .enableOnDemand: return "enableOnDemand"
         }
     }
@@ -48,7 +49,7 @@ public final class AppLauncher: AppLaunching {
 
     public func launchApp(withCommand command: AppLaunchCommand) async {
         let configuration = NSWorkspace.OpenConfiguration()
-        configuration.allowsRunningApplicationSubstitution = false
+        configuration.allowsRunningApplicationSubstitution = command.allowsRunningApplicationSubstitution
         configuration.arguments = [command.rawValue]
 
         if command.hideApp {
@@ -85,8 +86,19 @@ extension AppLaunchCommand {
             return "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945"
         case .showStatus:
             return "networkprotection://show-status"
+        case .showSettings:
+            return "networkprotection://show-settings"
         default:
             return nil
+        }
+    }
+
+    var allowsRunningApplicationSubstitution: Bool {
+        switch self {
+        case .showSettings:
+            return true
+        default:
+            return false
         }
     }
 

@@ -33,7 +33,7 @@ final class FaviconsFetcherOnboarding {
     }
 
     @MainActor
-    func presentOnboardingIfNeeded() {
+    func presentOnboardingIfNeeded(in targetWindow: NSWindow? = nil) {
         guard case .normal = NSApp.runType, shouldPresentOnboarding else {
             return
         }
@@ -43,7 +43,7 @@ final class FaviconsFetcherOnboarding {
         let windowController = viewController.wrappedInWindowController()
 
         guard let window = windowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
+              let parentWindow = targetWindow ?? WindowControllersManager.shared.lastKeyMainWindowController?.window
         else {
             assertionFailure("Failed to present FaviconsFetcherOnboardingViewController")
             return
@@ -63,7 +63,7 @@ final class FaviconsFetcherOnboarding {
 
         // Dispatching presentation asynchronously makes the UI less glitchy when presentation occurs during scrolling
         Task { @MainActor in
-            parentWindowController.window?.beginSheet(window)
+            parentWindow.beginSheet(window)
         }
     }
 

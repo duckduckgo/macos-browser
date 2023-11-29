@@ -49,9 +49,7 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
-    func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?) -> DuckDuckGo_Privacy_Browser.BookmarkFolder {
-        return BookmarkFolder(id: "", title: "")
-    }
+    func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 
     func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
 
