@@ -49,9 +49,7 @@ protocol NewWindowPolicyDecisionMaker {
         case bookmarks
         case onboarding
         case none
-#if DBP
         case dataBrokerProtection
-#endif
 
         static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
@@ -101,10 +99,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return true
             case (.bookmarks, .bookmarks):
                 return true
-#if DBP
             case (.dataBrokerProtection, .dataBrokerProtection):
                 return true
-#endif
             default:
                 return false
             }
@@ -116,9 +112,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
-#if DBP
             case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
-#endif
             }
         }
 
@@ -148,10 +142,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .blankPage
             case .onboarding:
                 return .welcome
-#if DBP
             case .dataBrokerProtection:
                 return .dataBrokerProtection
-#endif
             case .none:
                 return nil
             }
