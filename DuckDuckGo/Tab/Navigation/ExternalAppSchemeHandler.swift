@@ -86,8 +86,12 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         }
 
         let permissionType = PermissionType.externalScheme(scheme: scheme)
-        // use domain from the url for user-entered app schemes, otherwise use current website domain
-        let domain = navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host
+        // Use domain from the url for user-entered app schemes, otherwise, check for redirects, then use current website domain
+        var previousDomain: String?
+        for nav in navigationAction.redirectHistory!.reversed() {
+            previousDomain = nav.url.host
+        }
+        let domain = previousDomain ?? (navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host)
         permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace] isGranted in
             if isGranted {
                 workspace.open(externalUrl)
