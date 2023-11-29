@@ -613,7 +613,7 @@ extension HomePage.Models {
             case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
-                return NSImage(named: "VPN-Ended")!.resized(to: iconSize)! //TODO: change this
+                return NSImage(named: "VPN-Ended")!.resized(to: iconSize)! // TODO: change this
             }
         }
     }

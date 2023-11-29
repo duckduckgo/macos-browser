@@ -142,7 +142,7 @@ public struct UserDefaultsWrapper<T> {
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
         case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
-        
+
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
