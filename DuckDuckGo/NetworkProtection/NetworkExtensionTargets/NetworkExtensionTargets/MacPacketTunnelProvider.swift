@@ -135,7 +135,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #if NETP_SYSTEM_EXTENSION
         let settings = VPNSettings(defaults: .standard)
 #else
-        let settings = VPNSettings(defaults: .shared)
+        let settings = VPNSettings(defaults: .netP)
 #endif
 
         switch event {
@@ -174,7 +174,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #if NETP_SYSTEM_EXTENSION
         let settings = VPNSettings(defaults: .standard)
 #else
-        let settings = VPNSettings(defaults: .shared)
+        let settings = VPNSettings(defaults: .netP)
 #endif
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
