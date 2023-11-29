@@ -193,7 +193,6 @@ extension Pixel {
         case homeButtonRight
 
         case dailyPixel(Event, isFirst: Bool)
-        case uniquePixel(Event)
 
         enum Debug {
             /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
@@ -345,67 +344,67 @@ extension Pixel.Event {
         switch self {
         case .pixelKitEvent(let event):
             return event.name
-
+            
         case .crash:
             return "m_mac_crash"
-
+            
         case .brokenSiteReport:
             return "epbf_macos_desktop"
-
+            
         case .compileRulesWait(onboardingShown: let onboardingShown, waitTime: let waitTime, result: let result):
             return "m_mac_cbr-wait_\(onboardingShown)_\(waitTime)_\(result)"
-
+            
         case .serp:
             return "m_mac_navigation_search"
-
+            
         case .dailyOsVersionCounter:
             return "m_mac_daily-os-version-counter"
-
+            
         case .dataImportFailed(let error) where error.action == .favicons:
             return "m_mac_favicon-import-failed_\(error.source)"
         case .dataImportFailed(let error):
             return "m_mac_data-import-failed_\(error.action)_\(error.source)"
-
+            
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
-
+            
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
-
+            
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"
-
+            
         case .bitwardenPasswordSaved:
             return "m_mac_bitwarden_save_password"
-
+            
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"
-
+            
         case .autoconsentOptOutFailed:
             return "m_mac_autoconsent_optout_failed"
-
+            
         case .autoconsentSelfTestFailed:
             return "m_mac_autoconsent_selftest_failed"
-
+            
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
-
+            
         case .adClickAttributionDetected:
             return "m_mac_ad_click_detected"
-
+            
         case .adClickAttributionActive:
             return "m_mac_ad_click_active"
-
+            
         case .adClickAttributionPageLoads:
             return "m_mac_ad_click_page_loads"
-
-        // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
+            
+            // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
         case .emailEnabled: return "email_enabled_macos_desktop"
         case .emailDisabled: return "email_disabled_macos_desktop"
         case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
         case .emailUserPressedUseAlias: return "email_filled_random_macos_desktop"
         case .emailUserCreatedAlias: return "email_generated_button_macos_desktop"
-
+            
         case .jsPixel(let pixel):
             // Email pixels deliberately avoid using the `m_mac_` prefix.
             if pixel.isEmailPixel {
@@ -431,13 +430,13 @@ extension Pixel.Event {
             return "m_mac.recent-activity-section-hidden"
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
-
-        // Fire Button
+            
+            // Fire Button
         case .fireButtonFirstBurn:
             return "m_mac_fire_button_first_burn"
         case .fireButton(option: let option):
             return "m_mac_fire_button_\(option)"
-
+            
         case .duckPlayerDailyUniqueView:
             return "m_mac_duck-player_daily-unique-view"
         case .duckPlayerViewFromYoutubeViaMainOverlay:
@@ -456,19 +455,19 @@ extension Pixel.Event {
             return "m_mac_duck-player_setting_never"
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
-
+            
         case .dashboardProtectionAllowlistAdd(let triggerOrigin):
             return "m_mac_mp_wla"
         case .dashboardProtectionAllowlistRemove(let triggerOrigin):
             return "m_mac_mp_wlr"
-
+            
         case .launchInitial:
             return "m.mac.first-launch"
         case .serpInitial:
             return "m.mac.navigation.first-search"
         case .serpDay21to27:
             return "m.mac.search-day-21-27.initial"
-
+            
         case .networkProtectionWaitlistUserActive:
             return "m_mac_netp_waitlist_user_active"
         case .networkProtectionWaitlistEntryPointMenuItemDisplayed:
@@ -491,13 +490,13 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_dismissed_\(messageID)"
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
-
-        // Sync
+            
+            // Sync
         case .syncBookmarksCountLimitExceededDaily: return "m.mac.sync_bookmarks_count_limit_exceeded_daily"
         case .syncCredentialsCountLimitExceededDaily: return "m.mac.sync_credentials_count_limit_exceeded_daily"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m.mac.sync_bookmarks_request_size_limit_exceeded_daily"
         case .syncCredentialsRequestSizeLimitExceededDaily: return "m.mac.sync_credentials_request_size_limit_exceeded_daily"
-
+            
         case .dataBrokerProtectionWaitlistUserActive:
             return "m_mac_dbp_waitlist_user_active"
         case .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed:
@@ -512,23 +511,17 @@ extension Pixel.Event {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-
-        // 28-day Home Button
+            
+            // 28-day Home Button
         case .homeButtonHidden:
             return "m_mac_home_button_hidden"
         case .homeButtonLeft:
             return "m_mac_home_button_left"
         case .homeButtonRight:
             return "m_mac_home_button_right"
-
+            
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
-        case .uniquePixel(let pixel):
-            guard pixel.name.hasSuffix("_u") else {
-                assertionFailure("Unique pixel: must end with _u")
-                return ""
-            }
-            return pixel.name
         }
     }
 }
