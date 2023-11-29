@@ -178,7 +178,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             let request = APIRequest(configuration: configuration)
 
             request.fetch { _, error in
-                onComplete(true, error)
+                onComplete(error == nil, error)
             }
         }
 
