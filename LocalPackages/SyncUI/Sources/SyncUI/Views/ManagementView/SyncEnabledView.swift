@@ -55,6 +55,24 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
+            Toggle(isOn: $model.isFaviconsFetchingEnabled) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(UserText.fetchFaviconsOptionTitle)
+                        Text(UserText.fetchFaviconsOptionCaption)
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("BlackWhite60"))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.leading)
+                    }
+                    Spacer(minLength: 30)
+                }
+            }
+            .padding(.horizontal, 16)
+            .toggleStyle(.switch)
+            .padding(.vertical, 12)
+            .roundedBorder()
+            .frame(width: 513, alignment: .topLeading)
             Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -62,7 +80,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                         Text(UserText.shareFavoritesOptionCaption)
                             .font(Const.Fonts.preferencePaneCaption)
                             .foregroundColor(Color("BlackWhite60"))
-                            .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                            .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.leading)
                     }
                     Spacer(minLength: 30)

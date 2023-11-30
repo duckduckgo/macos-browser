@@ -48,8 +48,7 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionKeychainDeleteError(status: status)
         case .noAuthTokenFound:
             domainEvent = .networkProtectionNoAuthTokenFoundError
-        case
-                .noServerRegistrationInfo,
+        case .noServerRegistrationInfo,
                 .couldNotSelectClosestServer,
                 .couldNotGetPeerPublicKey,
                 .couldNotGetPeerHostName,

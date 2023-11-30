@@ -54,7 +54,7 @@ extension NSMenuItem {
         title = bookmarkViewModel.menuTitle
         image = bookmarkViewModel.menuFavicon
         representedObject = bookmarkViewModel.entity
-        action = #selector(MainViewController.openBookmark(_:))
+        action = bookmarkViewModel.entity.isFolder ? nil : #selector(MainViewController.openBookmark(_:))
     }
 
     convenience init(bookmarkViewModels: [BookmarkViewModel]) {

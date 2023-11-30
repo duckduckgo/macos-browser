@@ -59,6 +59,12 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+
+#if NETWORK_PROTECTION
+                            case .vpn:
+                                VPNView(model: VPNPreferencesModel())
+#endif
+
 #if SUBSCRIPTION
                             case .subscription:
                                 makeSubscriptionView()
@@ -123,8 +129,8 @@ extension Preferences {
 struct SyncView: View {
 
     var body: some View {
-        if let syncService = NSApp.delegateTyped.syncService {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        if let syncService = NSApp.delegateTyped.syncService, let syncDataProviders = NSApp.delegateTyped.syncDataProviders {
+            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService, syncBookmarksAdapter: syncDataProviders.bookmarksAdapter))
                 .onAppear {
                     requestSync()
                 }

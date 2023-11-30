@@ -28,6 +28,7 @@ import Common
 protocol WaitlistConstants {
     static var identifier: String { get }
     static var apiProductName: String { get }
+    static var keychainAppGroup: String { get }
 
     static var notificationIdentifier: String { get }
     static var inviteAvailableNotificationTitle: String { get }
@@ -160,6 +161,7 @@ struct NetworkProtectionWaitlist: Waitlist {
 
     static let identifier: String = "networkprotection"
     static let apiProductName: String = "networkprotection_macos"
+    static let keychainAppGroup: String = Bundle.main.appGroup(bundle: .netP)
 
     static let notificationIdentifier = "com.duckduckgo.macos.browser.network-protection.invite-code-available"
     static let inviteAvailableNotificationTitle = UserText.networkProtectionWaitlistNotificationTitle
@@ -168,6 +170,9 @@ struct NetworkProtectionWaitlist: Waitlist {
     let waitlistStorage: WaitlistStorage
     let waitlistRequest: WaitlistRequest
     private let networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming
+
+    @UserDefaultsWrapper(key: .networkProtectionWaitlistSignUpPromptDismissed, defaultValue: false)
+    var waitlistSignUpPromptDismissed: Bool
 
     var shouldShowWaitlistViewController: Bool {
         return isOnWaitlist || readyToAcceptTermsAndConditions
@@ -188,7 +193,7 @@ struct NetworkProtectionWaitlist: Waitlist {
 
     init() {
         self.init(
-            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
+            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier, keychainAppGroup: Self.keychainAppGroup),
             request: ProductWaitlistRequest(productName: Self.apiProductName),
             networkProtectionCodeRedemption: NetworkProtectionCodeRedemptionCoordinator()
         )
@@ -253,6 +258,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
     static let identifier: String = "databrokerprotection"
     static let apiProductName: String = "dbp"
+    static let keychainAppGroup: String = Bundle.main.appGroup(bundle: .dbp)
 
     static let notificationIdentifier = "com.duckduckgo.macos.browser.data-broker-protection.invite-code-available"
     static let inviteAvailableNotificationTitle = UserText.dataBrokerProtectionWaitlistNotificationTitle
@@ -271,7 +277,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
     init() {
         self.init(
-            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier),
+            store: WaitlistKeychainStore(waitlistIdentifier: Self.identifier, keychainAppGroup: Self.keychainAppGroup),
             request: ProductWaitlistRequest(productName: Self.apiProductName),
             redeemUseCase: RedeemUseCase(),
             redeemAuthenticationRepository: KeychainAuthenticationData()
