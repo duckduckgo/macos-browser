@@ -82,7 +82,17 @@ final class WaitlistViewModel: ObservableObject {
         self.notificationService = notificationService
         self.termsAndConditionActionHandler = termsAndConditionActionHandler
         self.featureSetupHandler = featureSetupHandler
-        viewState = .joiningWaitlist
+        if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
+            viewState = .joinedWaitlist(notificationPermissionState)
+
+            Task { @MainActor in
+                await checkNotificationPermissions()
+            }
+        } else if waitlistStorage.getWaitlistInviteCode() != nil {
+            viewState = .invited
+        } else {
+            viewState = .notOnWaitlist
+        }
     }
 
     convenience init(waitlist: Waitlist,
