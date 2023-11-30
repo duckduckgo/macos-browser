@@ -29,6 +29,14 @@ final class HomePageViewController: NSViewController {
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
 
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
+
     private weak var host: NSView?
 
     var favoritesModel: HomePage.Models.FavoritesModel!
@@ -194,6 +202,8 @@ final class HomePageViewController: NSViewController {
             self?.showAddEditController(for: bookmark)
         }, moveFavorite: { [weak self] (bookmark, index) in
             self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
+        }, onFaviconMissing: { [weak self] in
+            self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
     }
 
