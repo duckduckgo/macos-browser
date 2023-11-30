@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "shane/port-toggle",
-        "revision" : "0cc60feca423f114ab34cd4fbc0e30de4bf60d60"
+        "revision" : "fe6b0097f2f03665475473f7e235eb891ddd2f16",
+        "version" : "87.1.0"
       }
     },
     {
