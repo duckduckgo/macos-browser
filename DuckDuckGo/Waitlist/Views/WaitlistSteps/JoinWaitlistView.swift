@@ -47,9 +47,11 @@ struct JoinWaitlistView: View {
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color("BlackWhite80"))
 
-                Text(viewData.subtitle2)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(Color("BlackWhite80"))
+                if !viewData.subtitle2.isEmpty {
+                    Text(viewData.subtitle2)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(Color("BlackWhite80"))
+                }
 
                 Text(viewData.availabilityDisclaimer)
                     .multilineTextAlignment(.center)
@@ -91,8 +93,8 @@ struct NetworkProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
 struct DataBrokerProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
     let headerImageName = "DBP-JoinWaitlistHeader"
     let title = UserText.dataBrokerProtectionWaitlistJoinTitle
-    let subtitle1 = UserText.dataBrokerProtectionWaitlistJoinSubtitle1
-    let subtitle2 = UserText.dataBrokerProtectionWaitlistJoinSubtitle2
+    let subtitle1 = UserText.dataBrokerProtectionWaitlistInvitedSubtitle
+    let subtitle2 = ""
     let availabilityDisclaimer = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
     let buttonCloseLabel = UserText.dataBrokerProtectionWaitlistButtonClose
     let buttonJoinWaitlistLabel = UserText.dataBrokerProtectionWaitlistButtonJoinWaitlist
