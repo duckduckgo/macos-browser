@@ -272,6 +272,11 @@ extension HomePage.Models {
         // swiftlint:disable cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
+#if DBP
+            if shouldShowDBPWaitlistInvitedCardUI {
+                features.append(.dataBrokerProtectionWaitlistInvited)
+            }
+#endif
 
 #if NETWORK_PROTECTION
 
@@ -290,13 +295,6 @@ extension HomePage.Models {
                     frequency: .dailyOnly,
                     includeAppVersionParameter: true
                 )
-            }
-#endif
-
-#if DBP
-
-            if shouldShowDBPWaitlistInvitedCardUI {
-                features.append(.dataBrokerProtectionWaitlistInvited)
             }
 #endif
 
