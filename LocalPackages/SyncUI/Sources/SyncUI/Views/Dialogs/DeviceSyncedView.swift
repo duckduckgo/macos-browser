@@ -21,6 +21,7 @@ import SwiftUIExtensions
 
 struct DeviceSyncedView: View {
     @EnvironmentObject var model: ManagementDialogModel
+    let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
@@ -36,6 +37,9 @@ struct DeviceSyncedView: View {
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
         .frame(width: 360)
+        .onReceive(timer, perform: { _ in
+            model.endFlow()
+        })
     }
 
 }

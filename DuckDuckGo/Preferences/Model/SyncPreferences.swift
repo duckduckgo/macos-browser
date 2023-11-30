@@ -289,12 +289,14 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let device = deviceInfo()
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
-        if isRecovery {
-            showDevicesSynced()
-        } else {
-            presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if isRecovery {
+                self.showDevicesSynced()
+            } else {
+                self.presentDialog(for: .saveRecoveryCode(self.recoveryCode ?? ""))
+            }
+            self.stopPollingForRecoveryKey()
         }
-        stopPollingForRecoveryKey()
     }
 
     func turnOnSync() {
