@@ -184,7 +184,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
     }
 
-
     private func setUpSyncOptionsObservables(apperancePreferences: AppearancePreferences) {
         syncBookmarksAdapter.$isFaviconsFetchingEnabled
             .removeDuplicates()
