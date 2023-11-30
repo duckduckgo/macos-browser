@@ -317,7 +317,8 @@ final class AddressBarTextField: NSTextField {
 #endif
 
         selectedTabViewModel.tab.setUrl(providedUrl, userEntered: userEnteredValue)
-
+        selectedTabViewModel.updateAddressBarStrings()
+        
         self.window?.makeFirstResponder(nil)
     }
 
