@@ -64,6 +64,8 @@ final class TabViewModel {
     @Published var autofillDataToSave: AutofillData?
 
     var loadingStartTime: CFTimeInterval?
+    
+    var addressBarUpdated: Bool = false
 
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
@@ -105,17 +107,26 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$isLoading
-            .dropFirst()
+        tab.$content
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isLoading in
-                self?.isLoading = isLoading
-                if !isLoading {
-                    // Update the address bar only after the tab has finished
-                    // to prevent Address Bar Spoofing
+            .sink { [weak self] content in
+                self?.waitToUpdateAddressBar(content)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func waitToUpdateAddressBar(_ content: Published<Tab.TabContent>.Publisher.Output) {
+        self.addressBarUpdated = false
+        tab.$loadingProgress
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] progress in
+                // Update the address bar only after the tab has reached 10% loading
+                // to prevent Address Bar Spoofing
+                if progress > 0.1 && !(self?.addressBarUpdated ?? true) {
                     self?.updateAddressBarStrings()
                     self?.updateCanBeBookmarked()
                     self?.updateFavicon()
+                    self?.addressBarUpdated = true
                 }
             }
             .store(in: &cancellables)
