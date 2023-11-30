@@ -39,6 +39,9 @@ struct JoinWaitlistView: View {
         WaitlistDialogView {
             VStack(spacing: 16.0) {
                 Image(viewData.headerImageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 96)
 
                 Text(viewData.title)
                     .font(.system(size: 17, weight: .bold))
@@ -91,7 +94,7 @@ struct NetworkProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
 #if DBP
 
 struct DataBrokerProtectionJoinWaitlistViewData: JoinWaitlistViewViewData {
-    let headerImageName = "DBP-JoinWaitlistHeader"
+    let headerImageName = "DBP-Information-Remover"
     let title = UserText.dataBrokerProtectionWaitlistJoinTitle
     let subtitle1 = UserText.dataBrokerProtectionWaitlistInvitedSubtitle
     let subtitle2 = ""

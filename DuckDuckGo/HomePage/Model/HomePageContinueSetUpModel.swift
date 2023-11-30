@@ -273,7 +273,7 @@ extension HomePage.Models {
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 #if DBP
-            if shouldShowDBPWaitlistInvitedCardUI {
+            if shouldDBPWaitlistCardBeVisible {
                 features.append(.dataBrokerProtectionWaitlistInvited)
             }
 #endif
@@ -611,7 +611,7 @@ extension HomePage.Models {
             case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
-                return NSImage(named: "VPN-Ended")!.resized(to: iconSize)! // TODO: change this
+                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             }
         }
     }
