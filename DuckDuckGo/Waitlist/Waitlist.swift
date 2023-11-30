@@ -351,8 +351,12 @@ struct DataBrokerProtectionWaitlist: Waitlist {
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
 
         os_log("DBP invite code redeemed", log: .dataBrokerProtection)
+        UserDefaults().setValue(true, forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
+
         sendInviteCodeAvailableNotification {
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown,
+                            frequency: .dailyAndCount,
+                            includeAppVersionParameter: true)
         }
     }
 }
