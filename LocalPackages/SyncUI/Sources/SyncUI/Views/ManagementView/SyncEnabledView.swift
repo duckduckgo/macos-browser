@@ -60,22 +60,41 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
-            Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                HStack {
-                    IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(UserText.shareFavoritesOptionTitle)
-                            .font(Const.Fonts.preferencePaneOptionTitle)
-                        Text(UserText.shareFavoritesOptionCaption)
-                            .font(Const.Fonts.preferencePaneCaption)
-                            .foregroundColor(Color("BlackWhite60"))
+            VStack {
+                Toggle(isOn: $model.isFaviconsFetchingEnabled) {
+                    HStack {
+                        IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncFetchFaviconsIcon"))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(UserText.fetchFaviconsOptionTitle)
+                                .font(Const.Fonts.preferencePaneOptionTitle)
+                            Text(UserText.fetchFaviconsOptionCaption)
+                                .font(Const.Fonts.preferencePaneCaption)
+                                .foregroundColor(Color("BlackWhite60"))
+                        }
+                        Spacer(minLength: 30)
                     }
-                    Spacer(minLength: 30)
                 }
+                .padding(.horizontal, 16)
+                .toggleStyle(.switch)
+                .padding(.vertical, 12)
+
+                Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
+                    HStack {
+                        IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(UserText.shareFavoritesOptionTitle)
+                                .font(Const.Fonts.preferencePaneOptionTitle)
+                            Text(UserText.shareFavoritesOptionCaption)
+                                .font(Const.Fonts.preferencePaneCaption)
+                                .foregroundColor(Color("BlackWhite60"))
+                        }
+                        Spacer(minLength: 30)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .toggleStyle(.switch)
+                .padding(.vertical, 12)
             }
-            .padding(.horizontal, 16)
-            .toggleStyle(.switch)
-            .padding(.vertical, 12)
             .roundedBorder()
             .frame(width: 513, alignment: .topLeading)
         }

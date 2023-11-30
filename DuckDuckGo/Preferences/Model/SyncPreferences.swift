@@ -49,16 +49,29 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var codeToDisplay: String?
     let managementDialogModel: ManagementDialogModel
 
-    @Published var devices: [SyncDevice] = []
+    @Published var devices: [SyncDevice] = [] {
+        didSet {
+            syncBookmarksAdapter.isEligibleForFaviconsFetcherOnboarding = devices.count > 1
+        }
+    }
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
 
     @Published var isCreatingAccount: Bool = false
 
+    @Published var isFaviconsFetchingEnabled: Bool {
+        didSet {
+            syncBookmarksAdapter.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+            if isFaviconsFetchingEnabled {
+                syncService.scheduler.notifyDataChanged()
+            }
+        }
+    }
+
     @Published var isUnifiedFavoritesEnabled: Bool {
         didSet {
-            AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
+            appearancePreferences.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
             if shouldRequestSyncOnFavoritesOptionChange {
                 syncService.scheduler.notifyDataChanged()
             } else {
@@ -137,10 +150,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
     }
 
-    init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
+    init(syncService: DDGSyncing, syncBookmarksAdapter: SyncBookmarksAdapter, appearancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
         self.syncService = syncService
+        self.syncBookmarksAdapter = syncBookmarksAdapter
+        self.appearancePreferences = appearancePreferences
 
-        self.isUnifiedFavoritesEnabled = apperancePreferences.favoritesDisplayMode.isDisplayUnified
+        self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
+        self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
         isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
         isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
 
@@ -148,19 +164,11 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.managementDialogModel.delegate = self
         self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
 
-        apperancePreferences.$favoritesDisplayMode
-            .map(\.isDisplayUnified)
-            .sink { [weak self] isUnifiedFavoritesEnabled in
-                guard let self else {
-                    return
-                }
-                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
-                    self.shouldRequestSyncOnFavoritesOptionChange = false
-                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
-                }
-            }
-            .store(in: &cancellables)
+        setUpObservables()
+        setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
+    }
 
+    private func setUpObservables() {
         syncService.authStatePublisher
             .removeDuplicates()
             .asVoid()
@@ -190,6 +198,45 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             .sink { [weak self] _ in
                 self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
                 self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+            }
+            .store(in: &cancellables)
+    }
+
+    private func setUpSyncOptionsObservables(apperancePreferences: AppearancePreferences) {
+        syncBookmarksAdapter.$isFaviconsFetchingEnabled
+            .removeDuplicates()
+            .sink { [weak self] isFaviconsFetchingEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isFaviconsFetchingEnabled != isFaviconsFetchingEnabled {
+                    self.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+                }
+            }
+            .store(in: &cancellables)
+        apperancePreferences.$favoritesDisplayMode
+            .map(\.isDisplayUnified)
+            .sink { [weak self] isUnifiedFavoritesEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                    self.shouldRequestSyncOnFavoritesOptionChange = false
+                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+                }
+            }
+            .store(in: &cancellables)
+
+        apperancePreferences.$favoritesDisplayMode
+            .map(\.isDisplayUnified)
+            .sink { [weak self] isUnifiedFavoritesEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                    self.shouldRequestSyncOnFavoritesOptionChange = false
+                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+                }
             }
             .store(in: &cancellables)
     }
@@ -266,6 +313,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private var onEndFlow: () -> Void = {}
 
     private let syncService: DDGSyncing
+    private let syncBookmarksAdapter: SyncBookmarksAdapter
+    private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
 }
