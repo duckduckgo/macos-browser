@@ -184,6 +184,7 @@ extension Pixel {
         case dataBrokerProtectionWaitlistIntroDisplayed
         case dataBrokerProtectionWaitlistNotificationShown
         case dataBrokerProtectionWaitlistNotificationTapped
+        case dataBrokerProtectionWaitlistCardUITapped
         case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
         case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
 
@@ -509,6 +510,8 @@ extension Pixel.Event {
             return "m_mac_dbp_ev_waitlist_notification_shown"
         case .dataBrokerProtectionWaitlistNotificationTapped:
             return "m_mac_dbp_ev_waitlist_notification_launched"
+        case .dataBrokerProtectionWaitlistCardUITapped:
+            return "m_mac_dbp_ev_waitlist_card_ui_launched"
         case .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed:
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
