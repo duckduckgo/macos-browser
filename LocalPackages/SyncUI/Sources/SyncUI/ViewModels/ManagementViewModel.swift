@@ -30,6 +30,7 @@ public protocol ManagementViewModel: ObservableObject {
     var recoveryCode: String? { get }
     var codeToDisplay: String? { get }
     var devices: [SyncDevice] { get }
+    var isFaviconsFetchingEnabled: Bool { get set }
     var isUnifiedFavoritesEnabled: Bool { get set }
 
     func presentShowTextCodeDialog()

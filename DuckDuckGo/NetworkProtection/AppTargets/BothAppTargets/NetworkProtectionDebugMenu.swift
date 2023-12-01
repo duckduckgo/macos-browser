@@ -522,6 +522,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetNetworkProtectionWaitlistState(_ sender: Any?) {
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionWaitlistSignUpPromptDismissed.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
 
