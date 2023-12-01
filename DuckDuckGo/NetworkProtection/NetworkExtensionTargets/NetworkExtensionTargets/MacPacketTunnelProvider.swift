@@ -262,7 +262,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             return
         }
 
-        let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
+        let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.host.description)
         let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
 
         notificationCenter.post(.serverSelected, object: payload)
