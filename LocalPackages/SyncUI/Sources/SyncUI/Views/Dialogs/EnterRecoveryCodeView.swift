@@ -31,8 +31,8 @@ public struct EnterRecoveryCodeView: View {
     public var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Lock-Succes-96")
-            SyncUIConstants.TextHeader(text: UserText.enterRecoveryCodeDialogTitle)
-            SyncUIConstants.TextDetailMultiline(text: UserText.enterRecoveryCodeDialogSubtitle)
+            SyncUIViews.TextHeader(text: UserText.enterRecoveryCodeDialogTitle)
+            SyncUIViews.TextDetailMultiline(text: UserText.enterRecoveryCodeDialogSubtitle)
             VStack(spacing: 16) {
                 Text(UserText.enterRecoveryCodeDialogAction1)
                 HStack(spacing: 10) {

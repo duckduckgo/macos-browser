@@ -25,10 +25,10 @@ struct PreparingToSyncView: View {
         SyncDialog(spacing: 20.0, bottomText: UserText.preparingToSyncDialogAction) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-96")
-                SyncUIConstants.TextHeader(text: UserText.preparingToSyncDialogTitle)
+                SyncUIViews.TextHeader(text: UserText.preparingToSyncDialogTitle)
                     .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
                     .multilineTextAlignment(.center)
-                SyncUIConstants.TextDetailMultiline(text: UserText.preparingToSyncDialogSubTitle)
+                SyncUIViews.TextDetailMultiline(text: UserText.preparingToSyncDialogSubTitle)
             }
             .frame(width: 320)
         } buttons: {
@@ -44,8 +44,8 @@ struct RecoverSyncedDataView: View {
         SyncDialog(spacing: 20.0) {
             VStack(alignment: .center, spacing: 20) {
                 Image("Sync-Pair-96")
-                SyncUIConstants.TextHeader(text: UserText.reciverSyncedDataDialogTitle)
-                SyncUIConstants.TextDetailMultiline(text: UserText.reciverSyncedDataDialogSubitle)
+                SyncUIViews.TextHeader(text: UserText.reciverSyncedDataDialogTitle)
+                SyncUIViews.TextDetailMultiline(text: UserText.reciverSyncedDataDialogSubitle)
             }
             .frame(width: 320)
         } buttons: {

@@ -18,7 +18,8 @@
 
 import SwiftUI
 
-enum SyncUIConstants {
+enum SyncUIViews {
+
     struct TextHeader: View {
         let text: String
 

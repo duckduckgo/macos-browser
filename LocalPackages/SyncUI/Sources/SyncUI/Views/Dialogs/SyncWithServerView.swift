@@ -25,9 +25,9 @@ struct SyncWithServerView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Server-96")
-            SyncUIConstants.TextHeader(text: UserText.syncWithServerTitle)
-            SyncUIConstants.TextDetailMultiline(text: UserText.syncWithServerSubtitle1)
-            SyncUIConstants.TextDetailMultiline(text: UserText.syncWithServerSubtitle2)
+            SyncUIViews.TextHeader(text: UserText.syncWithServerTitle)
+            SyncUIViews.TextDetailMultiline(text: UserText.syncWithServerSubtitle1)
+            SyncUIViews.TextDetailMultiline(text: UserText.syncWithServerSubtitle2)
         } buttons: {
             Button(UserText.cancel) {
                 model.endFlow()

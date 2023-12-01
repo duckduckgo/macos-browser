@@ -27,8 +27,8 @@ struct SaveRecoveryPDFView: View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRecoveryPDF")
-                SyncUIConstants.TextHeader(text: UserText.saveRecoveryPDF)
-                SyncUIConstants.TextDetailMultiline(text: UserText.recoveryPDFExplanation)
+                SyncUIViews.TextHeader(text: UserText.saveRecoveryPDF)
+                SyncUIViews.TextDetailMultiline(text: UserText.recoveryPDFExplanation)
             }
             VStack(alignment: .leading, spacing: 20) {
                 HStack {

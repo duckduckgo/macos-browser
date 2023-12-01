@@ -26,8 +26,8 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
         return VStack(alignment: .center, spacing: 16) {
             Image("Sync-Pair-96")
             VStack(alignment: .center, spacing: 8) {
-                SyncUIConstants.TextHeader(text: UserText.beginSyncTitle)
-                SyncUIConstants.TextDetailSecondary(text: UserText.beginSyncDescription)
+                SyncUIViews.TextHeader(text: UserText.beginSyncTitle)
+                SyncUIViews.TextDetailSecondary(text: UserText.beginSyncDescription)
             }
             .padding(.bottom, 16)
             ZStack {
@@ -51,19 +51,19 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
         VStack(alignment: .leading, spacing: 24) {
             VStack(spacing: 8) {
                 syncWithAnotherDeviceView()
-                SyncUIConstants.TextDetailSecondary(text: UserText.beginSyncFooter)
+                SyncUIViews.TextDetailSecondary(text: UserText.beginSyncFooter)
                     .padding(.bottom, 24)
                     .padding(.horizontal, 110)
                     .font(.system(size: 11))
             }
             VStack(alignment: .leading, spacing: 12) {
-                SyncUIConstants.TextHeader2(text: UserText.otherOptionsSectionTitle)
+                SyncUIViews.TextHeader2(text: UserText.otherOptionsSectionTitle)
                 VStack(alignment: .leading, spacing: 8) {
-                    SyncUIConstants.TextLink(text: UserText.syncThisDeviceLink)
+                    SyncUIViews.TextLink(text: UserText.syncThisDeviceLink)
                         .onTapGesture {
                             model.syncWithServerPressed()
                         }
-                    SyncUIConstants.TextLink(text: UserText.recoverDataLink)
+                    SyncUIViews.TextLink(text: UserText.recoverDataLink)
                         .onTapGesture {
                             model.recoverDataPressed()
                         }

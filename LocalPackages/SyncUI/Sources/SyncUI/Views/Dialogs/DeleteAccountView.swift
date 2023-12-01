@@ -29,8 +29,8 @@ struct DeleteAccountView: View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRemoveDeviceDesktop")
-                SyncUIConstants.TextHeader(text: UserText.deleteAccountTitle)
-                SyncUIConstants.TextDetailMultiline(text: UserText.deleteAccountMessage)
+                SyncUIViews.TextHeader(text: UserText.deleteAccountTitle)
+                SyncUIViews.TextDetailMultiline(text: UserText.deleteAccountMessage)
             }
 
             ScrollView {

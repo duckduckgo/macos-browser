@@ -33,8 +33,8 @@ struct RemoveDeviceView: View {
         SyncDialog(spacing: 20.0) {
 
             Image(removeImageName)
-            SyncUIConstants.TextHeader(text: UserText.removeDeviceConfirmTitle)
-            SyncUIConstants.TextDetailMultiline(text: UserText.removeDeviceConfirmMessage(device.name))
+            SyncUIViews.TextHeader(text: UserText.removeDeviceConfirmTitle)
+            SyncUIViews.TextDetailMultiline(text: UserText.removeDeviceConfirmMessage(device.name))
 
         } buttons: {
 

@@ -31,7 +31,7 @@ struct SyncWithAnotherDeviceView: View {
     var body: some View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Pair-96")
-            SyncUIConstants.TextHeader(text: UserText.syncWithAnotherDeviceTitle)
+            SyncUIViews.TextHeader(text: UserText.syncWithAnotherDeviceTitle)
             Text("\(Text(UserText.syncWithAnotherDeviceSubtitle1)) \(Text(UserText.syncWithAnotherDeviceSubtitle2).bold()) \(Text(UserText.syncWithAnotherDeviceSubtitle3))")
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.center)
