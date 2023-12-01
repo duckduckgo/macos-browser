@@ -170,7 +170,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 .setSelectedServer,
                 .setSelectedEnvironment,
                 .setSelectedLocation,
-                .setShowInMenuBar:
+                .setShowInMenuBar,
+                .setVPNFirstEnabled:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
         }
@@ -419,6 +420,15 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
         try tunnelManager.connection.startVPNTunnel(options: options)
         try await statusTransitionAwaiter.waitUntilConnectionStarted()
+
+        PixelKit.fire(
+            NetworkProtectionPixelEvent.networkProtectionNewUser,
+            frequency: .justOnce,
+            includeAppVersionParameter: true) { [weak self] fired, error in
+                guard let self, error == nil, fired else { return }
+                self.settings.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
+            }
+
         try await enableOnDemand(tunnelManager: tunnelManager)
     }
 

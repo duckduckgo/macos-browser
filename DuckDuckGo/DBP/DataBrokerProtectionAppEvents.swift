@@ -21,6 +21,11 @@ import LoginItems
 
 struct DataBrokerProtectionAppEvents {
 
+    enum WaitlistNotificationSource {
+        case localPush
+        case cardUI
+    }
+
     func applicationDidFinishLaunching() {
         let loginItemsManager = LoginItemsManager()
         let featureVisibility = DefaultDataBrokerProtectionFeatureVisibility()
@@ -51,11 +56,19 @@ struct DataBrokerProtectionAppEvents {
     }
 
     @MainActor
-    func handleNotification() {
+    func handleWaitlistInvitedNotification(source: WaitlistNotificationSource) {
         if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped,
-                            frequency: .dailyAndCount,
-                            includeAppVersionParameter: true)
+            switch source {
+            case .cardUI:
+                DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistCardUITapped,
+                                frequency: .dailyAndCount,
+                                includeAppVersionParameter: true)
+            case .localPush:
+                DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped,
+                                frequency: .dailyAndCount,
+                                includeAppVersionParameter: true)
+            }
+
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         }
     }

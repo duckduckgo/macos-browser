@@ -98,26 +98,19 @@ final class SyncPreferencesTests: XCTestCase {
     }
 
     @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
-        syncPreferences.presentRecoverSyncAccountDialog()
+        syncPreferences.recoverDataPressed()
 
-        XCTAssertEqual(managementDialogModel.currentDialog, .recoverAccount)
+        XCTAssertEqual(managementDialogModel.currentDialog, .recoverSyncedData)
     }
 
-    @MainActor func testOnPresentManuallyEnterCodeDialogThenManuallyEnterCodeShown() {
-        syncPreferences.presentManuallyEnterCodeDialog()
+    @MainActor func testOnSyncWithServerPressedThenSyncWithServerDialogShown() {
+        syncPreferences.syncWithServerPressed()
 
-        XCTAssertEqual(managementDialogModel.currentDialog, .manuallyEnterCode)
-    }
-
-    @MainActor func testOnPresentShowTextCodeDialogThenShowTextCodeShown() {
-        syncPreferences.codeToDisplay = "adfasdf"
-        syncPreferences.presentShowTextCodeDialog()
-
-        XCTAssertEqual(managementDialogModel.currentDialog, .showTextCode(syncPreferences.codeToDisplay ?? ""))
+        XCTAssertEqual(managementDialogModel.currentDialog, .syncWithServer)
     }
 
     @MainActor func testOnPresentTurnOffSyncConfirmDialogThenTurnOffSyncShown() {
-        syncPreferences.presentTurnOffSyncConfirmDialog()
+        syncPreferences.turnOffSyncPressed()
 
         XCTAssertEqual(managementDialogModel.currentDialog, .turnOffSync)
     }
@@ -245,6 +238,7 @@ struct MockRemoteConnecting: RemoteConnecting {
 }
 
 struct MockPersistor: AppearancePreferencesPersistor {
+
     var homeButtonPosition: HomeButtonPosition = .hidden
 
     var showFullURL: Bool = false
