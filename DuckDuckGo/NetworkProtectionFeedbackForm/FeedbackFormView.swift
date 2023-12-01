@@ -21,19 +21,13 @@ import SwiftUI
 
 struct FeedbackFormView: View {
 
-    private enum Constants {
-        static let headerPadding = 20.0
-        static let bodyPadding = 20.0
-    }
-
     struct ViewSize {
         fileprivate(set) var headerHeight: Double = 0.0
         fileprivate(set) var viewHeight: Double = 0.0
-        fileprivate(set) var spacerHeight: Double = 0.0
         fileprivate(set) var buttonsHeight: Double = 0.0
 
         var totalHeight: Double {
-            headerHeight + viewHeight + spacerHeight + buttonsHeight + 70
+            headerHeight + viewHeight + buttonsHeight + 80
         }
     }
 
@@ -59,7 +53,8 @@ struct FeedbackFormView: View {
             .background(Color.secondary.opacity(0.1))
             .background(
                 GeometryReader { proxy in
-                    Color.green.onAppear {
+                    Color.clear.onAppear {
+                        print("DEBUG: Header height \(proxy.size.height)")
                         viewSize.headerHeight = proxy.size.height
                     }
                 }
@@ -74,7 +69,7 @@ struct FeedbackFormView: View {
                     }
                 }, label: {})
                 .controlSize(.large)
-                .padding(20)
+                .padding(.bottom, 20)
 
                 switch viewModel.selectedFeedbackCategory {
                 case .landingPage:
@@ -96,21 +91,24 @@ struct FeedbackFormView: View {
                     VPNFeedbackFormIssueDescriptionForm()
                 }
             }
-            .padding([.leading, .trailing, .bottom], 20)
+            .padding([.top, .leading, .trailing], 20)
             .background(
                 GeometryReader { proxy in
-                    Color.red.onAppear {
-                        print("DEBUG: Changing body view height")
+                    Color.clear.onAppear {
+                        print("DEBUG: Body height \(proxy.size.height)")
                         viewSize.viewHeight = proxy.size.height
                     }
                 }
             )
 
+            Spacer()
+
             VPNFeedbackFormButtons()
                 .padding(20)
                 .background(
                     GeometryReader { proxy in
-                        Color.blue.onAppear {
+                        Color.clear.onAppear {
+                            print("DEBUG: Button height \(proxy.size.height)")
                             viewSize.buttonsHeight = proxy.size.height
                         }
                     }
@@ -129,17 +127,33 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
             Text("Please describe what's happening, what you expected to happen, and the steps that led to the issue:")
                 .multilineTextAlignment(.leading)
                 .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
 
-            TextField("Your issue goes here...", text: $text)
-                .textFieldStyle(.roundedBorder)
-                .lineLimit(10)
+            TextEditor(text: $text)
+                .frame(height: 80)
+                //.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+//                .background(
+//                    ZStack {
+//                        RoundedRectangle(cornerRadius: cornerRadius).stroke(Color(NSColor.textEditorBorderColor), lineWidth: 1)
+//                        RoundedRectangle(cornerRadius: cornerRadius).fill(Color(NSColor.textEditorBackgroundColor))
+//                    }
+//                )
 
             Text("In addition to the details entered into this form, your app issue report will contain:")
-            Text("• Bullet one")
-            Text("• Bullet two")
-            Text("• Bullet three")
+                .multilineTextAlignment(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading) {
+                Text("• Bullet one")
+                Text("• Bullet two")
+                Text("• Bullet three")
+            }
 
             Text("By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features.")
+                .multilineTextAlignment(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

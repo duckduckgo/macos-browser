@@ -22,7 +22,7 @@ import SwiftUI
 
 final class FeedbackFormViewController: NSViewController {
 
-    private let defaultSize = CGSize(width: 480, height: 280)
+    private let defaultSize = CGSize(width: 480, height: 348)
     private let viewModel: VPNFeedbackFormViewModel
 
     private var heightConstraint: NSLayoutConstraint?
