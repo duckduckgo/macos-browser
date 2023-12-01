@@ -235,7 +235,9 @@ extension HomePage.Models {
                 NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
 #endif
             case .dataBrokerProtectionWaitlistInvited:
+#if DBP
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
+#endif
             }
         }
         // swiftlint:enable cyclomatic_complexity
