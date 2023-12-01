@@ -110,6 +110,9 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageUserInteractedWithSurveyDay0, defaultValue: false)
         private var userInteractedWithSurveyDay0: Bool
 
+        @UserDefaultsWrapper(key: .shouldShowDBPWaitlistInvitedCardUI, defaultValue: false)
+        private var shouldShowDBPWaitlistInvitedCardUI: Bool
+
         @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
         private var shouldShowSurveyDay7: Bool
 
@@ -231,6 +234,10 @@ extension HomePage.Models {
 #if NETWORK_PROTECTION
                 NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
 #endif
+            case .dataBrokerProtectionWaitlistInvited:
+#if DBP
+                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
+#endif
             }
         }
         // swiftlint:enable cyclomatic_complexity
@@ -258,6 +265,8 @@ extension HomePage.Models {
 #endif
             case .networkProtectionSystemExtensionUpgrade:
                 shouldShowNetworkProtectionSystemExtensionUpgradePrompt = false
+            case .dataBrokerProtectionWaitlistInvited:
+                shouldShowDBPWaitlistInvitedCardUI = false
             }
             refreshFeaturesMatrix()
         }
@@ -265,6 +274,11 @@ extension HomePage.Models {
         // swiftlint:disable cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
+#if DBP
+            if shouldDBPWaitlistCardBeVisible {
+                features.append(.dataBrokerProtectionWaitlistInvited)
+            }
+#endif
 
 #if NETWORK_PROTECTION
 
@@ -318,6 +332,8 @@ extension HomePage.Models {
                     }
                 case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                     break // Do nothing, NetP remote messages get appended first
+                case .dataBrokerProtectionWaitlistInvited:
+                    break // Do nothing. The feature is being set for everyone invited in the waitlist
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -383,6 +399,14 @@ extension HomePage.Models {
             shouldShowDuckPlayerSetting &&
             duckPlayerPreferences.duckPlayerModeBool == nil &&
             !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
+        }
+
+        private var shouldDBPWaitlistCardBeVisible: Bool {
+#if DBP
+            shouldShowDBPWaitlistInvitedCardUI
+#else
+            return false
+#endif
         }
 
         private var shouldEmailProtectionCardBeVisible: Bool {
@@ -491,6 +515,7 @@ extension HomePage.Models {
         case surveyDay7
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
         case networkProtectionSystemExtensionUpgrade
+        case dataBrokerProtectionWaitlistInvited
 
         var title: String {
             switch self {
@@ -512,6 +537,8 @@ extension HomePage.Models {
                 return message.cardTitle
             case .networkProtectionSystemExtensionUpgrade:
                 return "VPN Update Available"
+            case .dataBrokerProtectionWaitlistInvited:
+                return "Personal Information Removal"
             }
         }
 
@@ -535,6 +562,8 @@ extension HomePage.Models {
                 return message.cardDescription
             case .networkProtectionSystemExtensionUpgrade:
                 return "Allow VPN system software again to continue testing Network Protection."
+            case .dataBrokerProtectionWaitlistInvited:
+                return "You're invited to try Personal Information Removal beta!"
             }
         }
 
@@ -558,6 +587,8 @@ extension HomePage.Models {
                 return message.action.actionTitle
             case .networkProtectionSystemExtensionUpgrade:
                 return "Update VPN"
+            case .dataBrokerProtectionWaitlistInvited:
+                return "Get Started"
             }
         }
 
@@ -581,6 +612,8 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
+            case .dataBrokerProtectionWaitlistInvited:
+                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             }
         }
     }

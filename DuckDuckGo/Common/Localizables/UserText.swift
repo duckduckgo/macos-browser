@@ -474,7 +474,7 @@ struct UserText {
     static let settings = NSLocalizedString("settings", value: "Settings", comment: "Menu item for opening settings")
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
-    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
     static let syncBookmarkPausedAlertTitle = NSLocalizedString("alert.sync-bookmarks-paused-title", value: "Bookmarks Sync is Paused", comment: "Title for alert shown when sync bookmarks paused for too many items")
     static let syncBookmarkPausedAlertDescription = NSLocalizedString("alert.sync-bookmarks-paused-description", value: "You have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up.", comment: "Description for alert shown when sync bookmarks paused for too many items")
     static let syncCredentialsPausedAlertTitle = NSLocalizedString("alert.sync-credentials-paused-title", value: "Passwords Sync is Paused", comment: "Title for alert shown when sync credentials paused for too many items")
@@ -1026,10 +1026,8 @@ struct UserText {
     static let disableEmailProtectionMessage = NSLocalizedString("disable.email.protection.mesage", value: "This will only disable Autofill for Duck Addresses in this browser. \n\n You can still manually enter Duck Addresses and continue to receive forwarded email.", comment: "Message for alert shown when user disables email protection")
     static let disable = NSLocalizedString("disable", value: "Disable", comment: "Email protection Disable button text")
 
-#if DBP
     static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Personal Information Removal", comment: "Menu item data broker protection feature")
     static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Personal Information Removal", comment: "Tab data broker protection title")
-#endif //DBP
 
     // Bookmarks bar prompt
     static let bookmarksBarPromptTitle = NSLocalizedString("bookmarks.bar.prompt.title", value: "Show Bookmarks Bar?", comment: "Title for bookmarks bar prompt")

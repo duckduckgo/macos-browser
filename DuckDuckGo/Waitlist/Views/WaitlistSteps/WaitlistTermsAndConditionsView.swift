@@ -179,10 +179,17 @@ struct DataBrokerProtectionTermsAndConditionsContentView: View {
 
             Group {
                 Text("• This Privacy Policy is for our waitlist beta service.")
-                if #available(macOS 12.0, *) {
-                    Text("• Our main [Privacy Policy](https://duckduckgo.com/privacy) also applies here.")
-                } else {
-                    Text("• Our main Privacy Policy also applies here.")
+                HStack(spacing: 0) {
+                    Text("• Our main ")
+                    Text("Privacy Policy ")
+                        .foregroundColor(Color.blue)
+                        .underline(color: .blue)
+                        .onTapGesture {
+                            if let url = URL(string: "https://duckduckgo.com/privacy") {
+                                WindowsManager.openNewWindow(with: url, isBurner: false)
+                            }
+                        }
+                    Text("also applies here.")
                 }
                 Text("• This beta product may collect more diagnostic data than our typical products. Examples of such data include: alerts of low memory, application restarts, and user engagement with product features.")
             }

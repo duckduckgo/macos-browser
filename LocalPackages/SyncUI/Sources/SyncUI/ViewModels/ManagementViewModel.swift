@@ -30,22 +30,21 @@ public protocol ManagementViewModel: ObservableObject {
     var recoveryCode: String? { get }
     var codeToDisplay: String? { get }
     var devices: [SyncDevice] { get }
+    var isFaviconsFetchingEnabled: Bool { get set }
     var isUnifiedFavoritesEnabled: Bool { get set }
 
-    func presentShowTextCodeDialog()
-    func presentManuallyEnterCodeDialog()
-    func presentRecoverSyncAccountDialog()
-    func presentTurnOffSyncConfirmDialog()
     func presentDeleteAccount()
     func presentDeviceDetails(_ device: SyncDevice)
     func presentRemoveDevice(_ device: SyncDevice)
 
     func saveRecoveryPDF()
     func refreshDevices()
-    func turnOnSync()
-    func startPollingForRecoveryKey()
-    func stopPollingForRecoveryKey()
 
     func manageBookmarks()
     func manageLogins()
+
+    func syncWithAnotherDevicePressed()
+    func syncWithServerPressed()
+    func recoverDataPressed()
+    func turnOffSyncPressed()
 }

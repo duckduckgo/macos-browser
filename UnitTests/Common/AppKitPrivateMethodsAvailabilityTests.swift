@@ -28,23 +28,21 @@ final class AppKitPrivateMethodsAvailabilityTests: XCTestCase {
             window = NSWindow()
             window.isReleasedWhenClosed = false
 
+            let didAppearExpectation = expectation(description: "view did appear")
             let view = TestHitView(frame: NSRect(x: 0, y: 0, width: 100, height: 100))
-            window.contentView = view
+            let viewController = TestHitViewController(didAppearExpectation: didAppearExpectation, view: view)
+            window.contentViewController = viewController
 
             window.setFrame(NSRect(x: 0, y: 0, width: 100, height: 123), display: false)
             NSApp.activate(ignoringOtherApps: true)
 
-            let didAppearExpectation = expectation(description: "view did appear")
             window.makeKeyAndOrderFront(nil)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                didAppearExpectation.fulfill()
-            }
             waitForExpectations(timeout: 1.0)
 
             view.mouseDownExpectation = expectation(description: "mouseDown received")
 
             let event = NSEvent.mouseEvent(with: .leftMouseDown,
-                                           location: NSPoint(x: 50, y: 50),
+                                           location: view.convert(NSPoint(x: 50, y: 50), to: nil),
                                            modifierFlags: [],
                                            timestamp: CACurrentMediaTime(),
                                            windowNumber: window.windowNumber,
@@ -64,17 +62,32 @@ final class AppKitPrivateMethodsAvailabilityTests: XCTestCase {
             window.close()
             window = nil
         }
-
     }
 
 }
 
+private class TestHitViewController: NSViewController {
+    let didAppearExpectation: XCTestExpectation
+    init(didAppearExpectation: XCTestExpectation, view: NSView) {
+        self.didAppearExpectation = didAppearExpectation
+
+        super.init(nibName: nil, bundle: nil)
+        self.view = view
+    }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    override func viewDidAppear() {
+        DispatchQueue.main.async {
+            self.didAppearExpectation.fulfill()
+        }
+    }
+}
+
 private class TestHitView: NSView {
     var mouseDownExpectation: XCTestExpectation!
-
     override func mouseDown(with event: NSEvent) {
         mouseDownExpectation.fulfill()
         super.mouseDown(with: event)
     }
-
 }

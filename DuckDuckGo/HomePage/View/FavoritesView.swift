@@ -219,7 +219,7 @@ fileprivate struct FavoritesGridAddButton: View {
     var body: some View {
 
         ZStack(alignment: .top) {
-            FavoriteTemplate(title: UserText.addFavorite, url: nil)
+            FavoriteTemplate(title: UserText.addFavorite, url: nil, onFaviconMissing: model.onFaviconMissing)
             ZStack {
                 Image("Add")
                     .resizable()
@@ -254,6 +254,7 @@ struct FavoriteTemplate: View {
 
     let title: String
     let url: URL?
+    let onFaviconMissing: (() -> Void)?
 
     @State var isHovering = false
 
@@ -266,7 +267,7 @@ struct FavoriteTemplate: View {
                     .foregroundColor(isHovering ? Color("HomeFavoritesHoverColor") : Color("HomeFavoritesBackgroundColor"))
 
                 if let url = url {
-                    FaviconView(url: url)
+                    FaviconView(url: url, onFaviconMissing: onFaviconMissing)
                         .frame(width: 32, height: 32)
                         .padding(9)
                 }
@@ -316,7 +317,7 @@ struct Favorite: View {
 
     var body: some View {
 
-        FavoriteTemplate(title: bookmarkTitle, url: bookmark.urlObject)
+        FavoriteTemplate(title: bookmarkTitle, url: bookmark.urlObject, onFaviconMissing: model.onFaviconMissing)
             .link {
                 model.open(bookmark)
             }.contextMenu(ContextMenu(menuItems: {
