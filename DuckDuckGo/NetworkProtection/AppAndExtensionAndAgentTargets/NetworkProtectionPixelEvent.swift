@@ -27,6 +27,10 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionActiveUser
     case networkProtectionNewUser
 
+    case networkProtectionEnableAttemptConnecting
+    case networkProtectionEnableAttemptSuccess
+    case networkProtectionEnableAttemptFailure
+
     case networkProtectionTunnelConfigurationNoServerRegistrationInfo
     case networkProtectionTunnelConfigurationCouldNotSelectClosestServer
     case networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
@@ -70,6 +74,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
+    /// Name of the pixel event
+    /// - Unique pixels must end with `_u`
+    /// - Daily pixels will automatically have `_d` or `_c` appended to their names
     var name: String {
         switch self {
 
@@ -78,6 +85,15 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
         case .networkProtectionNewUser:
             return "m_mac_netp_daily_active_u"
+
+        case .networkProtectionEnableAttemptConnecting:
+            return "m_mac_netp_ev_enable_attempt"
+
+        case .networkProtectionEnableAttemptSuccess:
+            return "m_mac_netp_ev_enable_attempt_success"
+
+        case .networkProtectionEnableAttemptFailure:
+            return "m_mac_netp_ev_enable_attempt_failure"
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo:
             return "m_mac_netp_tunnel_config_error_no_server_registration_info"
@@ -259,7 +275,10 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionWireguardErrorFailedDNSResolution,
              .networkProtectionSystemExtensionUnknownActivationResult,
              .networkProtectionActiveUser,
-             .networkProtectionNewUser:
+             .networkProtectionNewUser,
+             .networkProtectionEnableAttemptConnecting,
+             .networkProtectionEnableAttemptSuccess,
+             .networkProtectionEnableAttemptFailure:
 
             return nil
         }

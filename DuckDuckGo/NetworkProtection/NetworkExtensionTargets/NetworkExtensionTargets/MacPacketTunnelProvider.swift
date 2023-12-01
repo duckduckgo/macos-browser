@@ -208,6 +208,41 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             self?.broadcast(status)
         }
         .store(in: &cancellables)
+
+        notificationCenter.publisher(for: .statusDidChange)
+            .compactMap { try? ConnectionStatusChangeDecoder().decodeObject(from: $0) }
+            .removeDuplicates()
+            .map { $0.status }
+            .scan((old: ConnectionStatus.default, new: ConnectionStatus.default), { ($0.new, $1) })
+            .sink { [weak self] changes in
+                self?.fireConnectionStatusPixel(for: changes)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func fireConnectionStatusPixel(for changes: (old: ConnectionStatus, new: ConnectionStatus)) {
+        /// PixelKit isn't ready until `startTunnel()` is triggered
+        /// so we do a quick setup here so that `networkProtectionEnableAttemptConnecting` can be fired
+        if PixelKit.shared == nil,
+           let options = (protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration {
+            try? loadDefaultPixelHeaders(from: options)
+        }
+
+        os_log("⚫️ Connection Status Change: %{public}s -> %{public}s", log: .networkProtectionPixel, type: .debug, changes.old.description, changes.new.description)
+
+        switch (changes.old, changes.new) {
+        case (_, .connecting), (_, .reasserting):
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionEnableAttemptConnecting,
+                          frequency: .dailyAndContinuous)
+        case (_, .connected):
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionEnableAttemptSuccess,
+                          frequency: .dailyAndContinuous)
+        case (.connecting, _):
+            PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionEnableAttemptFailure,
+                          frequency: .dailyAndContinuous)
+        default:
+            break
+        }
     }
 
     /// Observe server changes to broadcast those changes through distributed notifications.
