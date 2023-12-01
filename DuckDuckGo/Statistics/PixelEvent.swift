@@ -401,7 +401,7 @@ extension Pixel.Event {
         case .adClickAttributionPageLoads:
             return "m_mac_ad_click_page_loads"
 
-        // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
+            // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
         case .emailEnabled: return "email_enabled_macos_desktop"
         case .emailDisabled: return "email_disabled_macos_desktop"
         case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
@@ -434,7 +434,7 @@ extension Pixel.Event {
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
 
-        // Fire Button
+            // Fire Button
         case .fireButtonFirstBurn:
             return "m_mac_fire_button_first_burn"
         case .fireButton(option: let option):
@@ -494,7 +494,7 @@ extension Pixel.Event {
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
 
-        // Sync
+            // Sync
         case .syncBookmarksCountLimitExceededDaily: return "m.mac.sync_bookmarks_count_limit_exceeded_daily"
         case .syncCredentialsCountLimitExceededDaily: return "m.mac.sync_credentials_count_limit_exceeded_daily"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m.mac.sync_bookmarks_request_size_limit_exceeded_daily"
@@ -517,7 +517,7 @@ extension Pixel.Event {
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
 
-        // 28-day Home Button
+            // 28-day Home Button
         case .homeButtonHidden:
             return "m_mac_home_button_hidden"
         case .homeButtonLeft:
