@@ -196,6 +196,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         observeConnectionStatusChanges()
         observeServerChanges()
         observeStatusUpdateRequests()
+        observeTunnelFailures()
     }
 
     // MARK: - Observing Changes & Requests
@@ -265,6 +266,23 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             self?.broadcastLastSelectedServerInfo()
         }
         .store(in: &cancellables)
+    }
+
+    /// Observe tunnel failure
+    ///
+    private func observeTunnelFailures() {
+        tunnelFailureMonitor.publisher
+            .sink { result in
+                switch result {
+                case .failureDetected:
+                    PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTunnelFailureDetected,
+                                  frequency: .dailyAndContinuous)
+                case .failureRecovered:
+                    PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTunnelFailureRecovered,
+                                  frequency: .dailyAndContinuous)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Broadcasting Status and Information

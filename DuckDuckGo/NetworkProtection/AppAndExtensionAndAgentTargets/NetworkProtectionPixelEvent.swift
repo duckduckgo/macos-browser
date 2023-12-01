@@ -31,6 +31,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionEnableAttemptSuccess
     case networkProtectionEnableAttemptFailure
 
+    case networkProtectionTunnelFailureDetected
+    case networkProtectionTunnelFailureRecovered
+
     case networkProtectionTunnelConfigurationNoServerRegistrationInfo
     case networkProtectionTunnelConfigurationCouldNotSelectClosestServer
     case networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey
@@ -94,6 +97,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
         case .networkProtectionEnableAttemptFailure:
             return "m_mac_netp_ev_enable_attempt_failure"
+
+        case .networkProtectionTunnelFailureDetected:
+            return "m_mac_netp_ev_tunnel_failure"
+
+        case .networkProtectionTunnelFailureRecovered:
+            return "m_mac_netp_ev_tunnel_failure_recovered"
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo:
             return "m_mac_netp_tunnel_config_error_no_server_registration_info"
@@ -278,7 +287,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionNewUser,
              .networkProtectionEnableAttemptConnecting,
              .networkProtectionEnableAttemptSuccess,
-             .networkProtectionEnableAttemptFailure:
+             .networkProtectionEnableAttemptFailure,
+             .networkProtectionTunnelFailureDetected,
+             .networkProtectionTunnelFailureRecovered:
 
             return nil
         }
