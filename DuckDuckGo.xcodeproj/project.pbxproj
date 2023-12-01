@@ -1126,11 +1126,11 @@
 		4B41EDAF2B168AFF001EEDF4 /* FeedbackFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */; };
 		4B41EDB12B168B1E001EEDF4 /* FeedbackFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */; };
 		4B41EDB22B168B1E001EEDF4 /* FeedbackFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */; };
-		4B41EDB42B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */; };
-		4B41EDB52B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */; };
+		4B41EDB42B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */; };
+		4B41EDB52B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */; };
 		4B41EDB62B169883001EEDF4 /* FeedbackFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */; };
 		4B41EDB72B169887001EEDF4 /* FeedbackFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */; };
-		4B41EDB82B169889001EEDF4 /* FeedbackFormModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */; };
+		4B41EDB82B169889001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */; };
 		4B434690285ED7A100177407 /* BookmarksBarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */; };
 		4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */; };
 		4B4BEC3D2A11B56B001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC382A11B509001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift */; };
@@ -3348,7 +3348,7 @@
 		4B41EDA62B1543C9001EEDF4 /* PreferencesVPNView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesVPNView.swift; sourceTree = "<group>"; };
 		4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackFormViewController.swift; sourceTree = "<group>"; };
 		4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackFormView.swift; sourceTree = "<group>"; };
-		4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackFormModel.swift; sourceTree = "<group>"; };
+		4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNFeedbackFormViewModel.swift; sourceTree = "<group>"; };
 		4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModelTests.swift; sourceTree = "<group>"; };
 		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
 		4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNotifications.xcconfig; sourceTree = "<group>"; };
@@ -5049,7 +5049,7 @@
 			children = (
 				4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */,
 				4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */,
-				4B41EDB32B168C55001EEDF4 /* FeedbackFormModel.swift */,
+				4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */,
 			);
 			path = NetworkProtectionFeedbackForm;
 			sourceTree = "<group>";
@@ -9542,7 +9542,7 @@
 				3706FBDA293F65D500E42796 /* PermissionManager.swift in Sources */,
 				3706FBDB293F65D500E42796 /* DefaultBrowserPreferences.swift in Sources */,
 				3706FBDC293F65D500E42796 /* Permissions.xcdatamodeld in Sources */,
-				4B41EDB52B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */,
+				4B41EDB52B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */,
 				3706FBDD293F65D500E42796 /* PaddedImageButton.swift in Sources */,
 				37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				4BCF15F02ABBDC010083F6DF /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
@@ -10285,7 +10285,7 @@
 				4B9579912AC7AE700062CA31 /* NSNotificationName+PasswordManager.swift in Sources */,
 				4B9579922AC7AE700062CA31 /* RulesCompilationMonitor.swift in Sources */,
 				4B9579932AC7AE700062CA31 /* FBProtectionTabExtension.swift in Sources */,
-				4B41EDB82B169889001EEDF4 /* FeedbackFormModel.swift in Sources */,
+				4B41EDB82B169889001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */,
 				4B9579942AC7AE700062CA31 /* CrashReportReader.swift in Sources */,
 				4B9579952AC7AE700062CA31 /* DataTaskProviding.swift in Sources */,
 				4B9579962AC7AE700062CA31 /* FeatureFlag.swift in Sources */,
@@ -11437,7 +11437,7 @@
 				4B9292A326670D2A00AD2C21 /* BookmarkManagedObject.swift in Sources */,
 				4B723E1326B0007A00E14D75 /* CSVLoginExporter.swift in Sources */,
 				85C48CCC278D808F00D3263E /* NSAttributedStringExtension.swift in Sources */,
-				4B41EDB42B168C55001EEDF4 /* FeedbackFormModel.swift in Sources */,
+				4B41EDB42B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */,
 				AA7EB6E527E7D6DC00036718 /* AnimationView.swift in Sources */,
 				8562599A269CA0A600EE44BC /* NSRectExtension.swift in Sources */,
 				4B9DB0472A983B24000927DB /* WaitlistRootView.swift in Sources */,

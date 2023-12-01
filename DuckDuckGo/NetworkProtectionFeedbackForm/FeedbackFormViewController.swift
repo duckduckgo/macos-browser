@@ -22,20 +22,21 @@ import SwiftUI
 
 final class FeedbackFormViewController: NSViewController {
 
-    private let defaultSize = CGSize(width: 550, height: 280)
-    private let viewModel: FeedbackFormViewModel
+    private let defaultSize = CGSize(width: 480, height: 280)
+    private let viewModel: VPNFeedbackFormViewModel
 
     private var heightConstraint: NSLayoutConstraint?
 
-    init(formOptions: [FeedbackFormViewModel.FeedbackFormOption]) {
-        self.viewModel = FeedbackFormViewModel(options: formOptions)
+    init() {
+        self.viewModel = VPNFeedbackFormViewModel()
         super.init(nibName: nil, bundle: nil)
+        self.viewModel.delegate = self
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func loadView() {
         view = NSView(frame: NSRect(origin: CGPoint.zero, size: defaultSize))
     }
@@ -65,7 +66,16 @@ final class FeedbackFormViewController: NSViewController {
     }
 
     private func updateViewHeight(height: CGFloat) {
+        print("DEBUG: Updating view height to \(height)")
         heightConstraint?.constant = height
+    }
+
+}
+
+extension FeedbackFormViewController: VPNFeedbackFormViewModelDelegate {
+
+    func vpnFeedbackViewModelDismissedView(_ viewModel: VPNFeedbackFormViewModel) {
+        dismiss()
     }
 
 }

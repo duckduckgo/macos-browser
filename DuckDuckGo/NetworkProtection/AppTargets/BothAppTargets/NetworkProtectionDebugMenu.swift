@@ -238,12 +238,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     @objc func openNativeFeedbackForm(_ sender: Any?) {
         print("TODO")
-        let feedbackFormViewController = FeedbackFormViewController(formOptions: [
-            FeedbackFormViewModel.FeedbackFormOption(id: "first", title: "Testing", components: []),
-            FeedbackFormViewModel.FeedbackFormOption(id: "second", title: "Testing 2", components: []),
-            FeedbackFormViewModel.FeedbackFormOption(id: "third", title: "Testing 3", components: [])
-        ])
-
+        let feedbackFormViewController = FeedbackFormViewController()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window,
@@ -254,7 +249,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
 
         parentWindowController.window?.beginSheet(feedbackFormWindow) { [weak self] _ in
-
+            print("DEBUG: Form closed")
         }
 
     }
