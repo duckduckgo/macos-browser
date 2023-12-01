@@ -16,7 +16,6 @@
 //  limitations under the License.
 //
 
-import BrowserServicesKit
 import Navigation
 import Foundation
 
@@ -26,45 +25,19 @@ struct SerpHeadersNavigationResponder: NavigationResponder {
         "X-DuckDuckGo-Client": "macOS"
     ]
 
-    var internalUserDecider: InternalUserDecider = NSApp.delegateTyped.internalUserDecider
-    var statisticsStore: StatisticsStore = LocalStatisticsStore()
-
-    private var headers: [String: String] {
-        Self.headers
-    }
-
-    private var parameters: [String: String] {
-        // https://app.asana.com/0/0/1205979030848528/f
-        // For internal users only, pass ATB variant to SERP to trigger the privacy reminder.
-        // add `wb` to the atb param, like so: &atb=v444-wb
-        if internalUserDecider.isInternalUser, let atbWithVariant = statisticsStore.atbWithVariant {
-            return [URL.DuckDuckGoParameters.ATB.atb: atbWithVariant + "-wb"]
-        }
-        return [:]
-    }
-
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
-        lazy var headers = self.headers
-        lazy var parameters = self.parameters
-
         guard navigationAction.isForMainFrame,
               navigationAction.url.isDuckDuckGo,
-              !navigationAction.navigationType.isBackForward else { return .next }
+              Self.headers.contains(where: { navigationAction.request.value(forHTTPHeaderField: $0.key) == nil }),
+              !navigationAction.navigationType.isBackForward
+        else {
+            return .next
+        }
 
         var request = navigationAction.request
-        if headers.contains(where: { navigationAction.request.value(forHTTPHeaderField: $0.key) == nil }) {
-            for (key, value) in headers {
-                request.setValue(value, forHTTPHeaderField: key)
-            }
+        for (key, value) in Self.headers {
+            request.setValue(value, forHTTPHeaderField: key)
         }
-
-        if parameters.contains(where: { navigationAction.url.getParameter(named: $0.key) != $0.value }) {
-            request.url = request.url!
-                .removingParameters(named: Set(parameters.keys))
-                .appendingParameters(parameters)
-        }
-
-        guard request != navigationAction.request else { return .next }
 
         return .redirectInvalidatingBackItemIfNeeded(navigationAction) { navigator in
             navigator.load(request)

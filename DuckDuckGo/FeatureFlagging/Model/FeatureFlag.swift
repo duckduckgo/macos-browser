@@ -21,12 +21,15 @@ import BrowserServicesKit
 
 public enum FeatureFlag: String {
     case debugMenu
+    case serpAtbParameter
 }
 
 extension FeatureFlag: FeatureFlagSourceProviding {
     public var source: FeatureFlagSource {
         switch self {
         case .debugMenu:
+            return .internalOnly
+        case .serpAtbParameter:
             return .internalOnly
         }
     }

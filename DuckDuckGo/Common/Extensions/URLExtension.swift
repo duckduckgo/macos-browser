@@ -75,7 +75,15 @@ extension URL {
             return nil
         }
 
-        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+
+        // Add experimental atb parameter to SERP query for internal users
+        if case .normal = NSApp.runType,
+           NSApp.delegateTyped.featureFlagger.isFeatureOn(.serpAtbParameter),
+           let atbWithVariant = LocalStatisticsStore().atbWithVariant {
+            url = url.appendingParameter(name: URL.DuckDuckGoParameters.ATB.atb, value: atbWithVariant + "-wb")
+        }
+        return url
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
