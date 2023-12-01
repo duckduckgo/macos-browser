@@ -1,5 +1,5 @@
 //
-//  RemoveDeviceView.swift
+//  SyncWithServerView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,37 +19,24 @@
 import SwiftUI
 import SwiftUIExtensions
 
-struct RemoveDeviceView: View {
-
+struct SyncWithServerView: View {
     @EnvironmentObject var model: ManagementDialogModel
-
-    let device: SyncDevice
-
-    var removeImageName: String {
-        return device.kind == .mobile ? "SyncRemoveDeviceMobile" : "SyncRemoveDeviceDesktop"
-    }
 
     var body: some View {
         SyncDialog(spacing: 20.0) {
-
-            Image(removeImageName)
-            SyncUIViews.TextHeader(text: UserText.removeDeviceConfirmTitle)
-            SyncUIViews.TextDetailMultiline(text: UserText.removeDeviceConfirmMessage(device.name))
-
+            Image("Sync-Server-96")
+            SyncUIViews.TextHeader(text: UserText.syncWithServerTitle)
+            SyncUIViews.TextDetailMultiline(text: UserText.syncWithServerSubtitle1)
+            SyncUIViews.TextDetailMultiline(text: UserText.syncWithServerSubtitle2)
         } buttons: {
-
             Button(UserText.cancel) {
                 model.endFlow()
             }
             .buttonStyle(DismissActionButtonStyle())
-            Button(UserText.removeDeviceConfirmButton) {
-                model.delegate?.removeDevice(device)
+            Button(UserText.syncWithServerButton) {
+                model.delegate?.turnOnSync()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
-
         }
-        .frame(width: 360, height: 250)
-
     }
-
 }
