@@ -68,6 +68,7 @@ final class TabViewModel {
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
+    private(set) var addressBarHasUpdated: Bool = false
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
@@ -105,17 +106,26 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$isLoading
-            .dropFirst()
+        tab.$content
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] isLoading in
-                self?.isLoading = isLoading
-                if !isLoading {
-                    // Update the address bar only after the tab has finished
-                    // to prevent Address Bar Spoofing
+            .sink { [weak self] content in
+                self?.waitToUpdateAddressBar(content)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func waitToUpdateAddressBar(_ content: Published<Tab.TabContent>.Publisher.Output) {
+        self.addressBarHasUpdated = false
+        tab.$loadingProgress
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] progress in
+                // Update the address bar only after the tab has reached 10% loading
+                // to prevent Address Bar Spoofing
+                if progress > 0.1 && !(self?.addressBarHasUpdated ?? true) {
                     self?.updateAddressBarStrings()
                     self?.updateCanBeBookmarked()
                     self?.updateFavicon()
+                    self?.addressBarHasUpdated = true
                 }
             }
             .store(in: &cancellables)
