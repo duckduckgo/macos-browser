@@ -33,7 +33,7 @@ struct ChromePreferences: Decodable {
     let profile: Profile
 
     init(from data: Data) throws {
-        var decoder = JSONDecoder()
+        let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         self = try decoder.decode(Self.self, from: data)

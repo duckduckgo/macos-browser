@@ -20,24 +20,12 @@ import Foundation
 
 struct WebsiteBreakage {
 
-    enum Category: String, CaseIterable {
-        case cantSignIn = "login"
-        case contentIsMissing = "content"
-        case linksDontWork = "links"
-        case browserIsIncompatible = "unsupported"
-        case theSiteAskedToDisable = "paywall"
-        case videoOrImagesDidntLoad = "images"
-        case videoDidntPlay = "video"
-        case commentsDidntLoad = "comments"
-        case somethingElse = "other"
+    public enum Source: String {
+        case appMenu = "menu"
+        case dashboard
     }
 
-    enum ReportFlow: String {
-        case native
-        case privacyDashboard = "dashboard"
-    }
-
-    let category: Category?
+    let category: String
     let description: String?
     let siteUrlString: String
     let osVersion: String
@@ -49,11 +37,11 @@ struct WebsiteBreakage {
     let ampURL: String
     let urlParametersRemoved: Bool
     let manufacturer: String
-    let reportFlow: ReportFlow
+    let reportFlow: Source
     let protectionsState: Bool
 
     init(
-        category: Category?,
+        category: String,
         description: String?,
         siteUrlString: String,
         osVersion: String,
@@ -66,7 +54,7 @@ struct WebsiteBreakage {
         urlParametersRemoved: Bool,
         protectionsState: Bool,
         manufacturer: String = "Apple",
-        reportFlow: ReportFlow = .native
+        reportFlow: Source
     ) {
         self.category = category
         self.description = description
@@ -86,7 +74,7 @@ struct WebsiteBreakage {
 
     var requestParameters: [String: String] {
         [
-            "category": category?.rawValue ?? "",
+            "category": category,
             "description": description ?? "",
             "siteUrl": siteUrlString,
             "upgradedHttps": upgradedHttps ? "true" : "false",

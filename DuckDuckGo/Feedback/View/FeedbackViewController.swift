@@ -35,12 +35,12 @@ final class FeedbackViewController: NSViewController {
     }
 
     enum FormOption {
-        case websiteBreakage
+//        case websiteBreakage
         case feedback(feedbackCategory: Feedback.Category)
 
         init?(tag: Int) {
             switch tag {
-            case 0: self = FormOption.websiteBreakage
+//            case 0: self = FormOption.websiteBreakage
             case 1: self = FormOption.feedback(feedbackCategory: .bug)
             case 2: self = FormOption.feedback(feedbackCategory: .featureRequest)
             case 3: self = FormOption.feedback(feedbackCategory: .other)
@@ -51,7 +51,7 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var optionPopUpButton: NSPopUpButton!
     @IBOutlet weak var pickOptionMenuItem: NSMenuItem!
-    @IBOutlet weak var websiteIsBrokenMenuItem: NSMenuItem!
+//    @IBOutlet weak var websiteIsBrokenMenuItem: NSMenuItem!
 
     @IBOutlet weak var contentView: ColorView!
     @IBOutlet weak var contentViewHeightContraint: NSLayoutConstraint!
@@ -64,10 +64,10 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var browserFeedbackDisclaimerTextView: NSTextField!
     @IBOutlet weak var unsupportedOsView: NSView!
 
-    @IBOutlet weak var websiteBreakageView: NSView!
-    @IBOutlet weak var websiteBreakageViewTopConstraint: NSLayoutConstraint!
-    @IBOutlet weak var urlTextField: NSTextField!
-    @IBOutlet weak var websiteBreakageCategoryPopUpButton: NSPopUpButton!
+//    @IBOutlet weak var websiteBreakageView: NSView!
+//    @IBOutlet weak var websiteBreakageViewTopConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var urlTextField: NSTextField!
+//    @IBOutlet weak var websiteBreakageCategoryPopUpButton: NSPopUpButton!
 
     @IBOutlet weak var submitButton: NSButton!
 
@@ -100,7 +100,7 @@ final class FeedbackViewController: NSViewController {
                                                selector: #selector(popUpButtonOpened(_:)),
                                                name: NSPopUpButton.willPopUpNotification,
                                                object: nil)
-        updateBrokenWebsiteMenuItem()
+//        updateBrokenWebsiteMenuItem()
     }
 
     override func viewDidDisappear() {
@@ -133,7 +133,7 @@ final class FeedbackViewController: NSViewController {
     @IBAction func submitButtonAction(_ sender: Any) {
         switch selectedFormOption {
         case .none: assertionFailure("Submit shouldn't be enabled"); return
-        case .websiteBreakage: sendWebsiteBreakage()
+//        case .websiteBreakage: sendWebsiteBreakage()
         case .feedback: sendFeedback()
         }
 
@@ -161,7 +161,7 @@ final class FeedbackViewController: NSViewController {
     }
 
     private func setupTextViews() {
-        urlTextField.delegate = self
+//        urlTextField.delegate = self
         browserFeedbackTextView.delegate = self
         browserFeedbackTextView.font = NSFont.systemFont(ofSize: 12)
     }
@@ -174,13 +174,13 @@ final class FeedbackViewController: NSViewController {
         return FormOption(tag: item.tag)
     }
 
-    private var selectedWebsiteBreakageCategory: WebsiteBreakage.Category? {
-        guard let subcategoryItem = websiteBreakageCategoryPopUpButton.selectedItem,
-              let subcategory = WebsiteBreakage.Category(tag: subcategoryItem.tag) else {
-                  return nil
-              }
-        return subcategory
-    }
+//    private var selectedWebsiteBreakageCategory: WebsiteBreakage.Category? {
+//        guard let subcategoryItem = websiteBreakageCategoryPopUpButton.selectedItem,
+//              let subcategory = WebsiteBreakage.Category(tag: subcategoryItem.tag) else {
+//                  return nil
+//              }
+//        return subcategory
+//    }
 
     private func updateViews() {
         defer {
@@ -189,7 +189,7 @@ final class FeedbackViewController: NSViewController {
 
         guard let selectedFormOption = selectedFormOption else {
             browserFeedbackView.isHidden = true
-            websiteBreakageView.isHidden = true
+//            websiteBreakageView.isHidden = true
             setContentViewHeight(Constants.defaultContentHeight, animated: false)
             pickOptionMenuItem.isEnabled = true
             return
@@ -206,14 +206,14 @@ final class FeedbackViewController: NSViewController {
             contentHeight = Constants.feedbackContentHeight + unsupportedOSWarningHeight
             updateBrowserFeedbackDescriptionLabel(for: feedbackCategory)
             browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewTopConstraint + unsupportedOSWarningHeight
-            websiteBreakageView.isHidden = true
-        case .websiteBreakage:
-            contentHeight = Constants.websiteBreakageContentHeight + unsupportedOSWarningHeight
-            websiteBreakageViewTopConstraint.constant = Constants.websiteBreakageTopConstraint + unsupportedOSWarningHeight
-            urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
-            updateBrowserFeedbackDescriptionLabel(for: .bug)
-            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewWebsiteBreakageTopConstraint + unsupportedOSWarningHeight
-            websiteBreakageView.isHidden = false
+//            websiteBreakageView.isHidden = true
+//        case .websiteBreakage:
+//            contentHeight = Constants.websiteBreakageContentHeight + unsupportedOSWarningHeight
+//            websiteBreakageViewTopConstraint.constant = Constants.websiteBreakageTopConstraint + unsupportedOSWarningHeight
+//            urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
+//            updateBrowserFeedbackDescriptionLabel(for: .bug)
+//            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewWebsiteBreakageTopConstraint + unsupportedOSWarningHeight
+//            websiteBreakageView.isHidden = false
         }
         updateBrowserFeedbackDisclaimerLabel(for: selectedFormOption)
         browserFeedbackTextView.makeMeFirstResponder()
@@ -245,8 +245,8 @@ final class FeedbackViewController: NSViewController {
             } else {
                 submitButton.isEnabled = false
             }
-        case .websiteBreakage:
-            submitButton.isEnabled = !urlTextField.stringValue.isEmpty
+//        case .websiteBreakage:
+//            submitButton.isEnabled = !urlTextField.stringValue.isEmpty
         }
 
         submitButton.bezelColor = submitButton.isEnabled ? NSColor.controlAccentColor: nil
@@ -265,16 +265,16 @@ final class FeedbackViewController: NSViewController {
 
     private func updateBrowserFeedbackDisclaimerLabel(for formOption: FormOption) {
         switch formOption {
-        case .websiteBreakage:
-            browserFeedbackDisclaimerTextView.stringValue = UserText.feedbackBreakageDisclaimer
+//        case .websiteBreakage:
+//            browserFeedbackDisclaimerTextView.stringValue = UserText.feedbackBreakageDisclaimer
         case .feedback:
             browserFeedbackDisclaimerTextView.stringValue = UserText.feedbackDisclaimer
         }
     }
 
-    private func updateBrokenWebsiteMenuItem() {
-        websiteIsBrokenMenuItem.isEnabled = currentTab?.content.isUrl ?? false
-    }
+//    private func updateBrokenWebsiteMenuItem() {
+//        websiteIsBrokenMenuItem.isEnabled = currentTab?.content.isUrl ?? false
+//    }
 
     private func sendFeedback() {
         guard let selectedFormOption = selectedFormOption else {
@@ -283,7 +283,7 @@ final class FeedbackViewController: NSViewController {
         }
 
         switch selectedFormOption {
-        case .websiteBreakage: assertionFailure("Wrong method executed")
+//        case .websiteBreakage: assertionFailure("Wrong method executed")
         case .feedback(feedbackCategory: let feedbackCategory):
             let feedback = Feedback(category: feedbackCategory,
                                     comment: browserFeedbackTextView.string,
@@ -293,38 +293,38 @@ final class FeedbackViewController: NSViewController {
         }
     }
 
-    private func sendWebsiteBreakage() {
-        guard let selectedFormOption = selectedFormOption else {
-            assertionFailure("Can't send breakage")
-            return
-        }
-
-        switch selectedFormOption {
-        case .feedback: assertionFailure("Wrong method executed")
-        case .websiteBreakage:
-            let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
-            let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
-            let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
-            let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
-            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-            let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTabUrl?.host)
-
-            let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
-                                                  description: browserFeedbackTextView.string,
-                                                  siteUrlString: urlTextField.stringValue,
-                                                  osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
-                                                  upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
-                                                  tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
-                                                  blockedTrackerDomains: blockedTrackerDomains,
-                                                  installedSurrogates: installedSurrogates,
-                                                  isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
-                                                  ampURL: ampURL,
-                                                  urlParametersRemoved: urlParametersRemoved,
-                                                  protectionsState: protectionsState,
-                                                  reportFlow: .native)
-            websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
-        }
-    }
+//    private func sendWebsiteBreakage() {
+//        guard let selectedFormOption = selectedFormOption else {
+//            assertionFailure("Can't send breakage")
+//            return
+//        }
+//
+//        switch selectedFormOption {
+//        case .feedback: assertionFailure("Wrong method executed")
+//        case .websiteBreakage:
+//            let blockedTrackerDomains = currentTab?.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
+//            let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
+//            let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
+//            let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
+//            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+//            let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTabUrl?.host)
+//
+//            let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
+//                                                  description: browserFeedbackTextView.string,
+//                                                  siteUrlString: urlTextField.stringValue,
+//                                                  osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+//                                                  upgradedHttps: currentTab?.privacyInfo?.connectionUpgradedTo != nil,
+//                                                  tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+//                                                  blockedTrackerDomains: blockedTrackerDomains,
+//                                                  installedSurrogates: installedSurrogates,
+//                                                  isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+//                                                  ampURL: ampURL,
+//                                                  urlParametersRemoved: urlParametersRemoved,
+//                                                  protectionsState: protectionsState,
+//                                                  reportFlow: .native)
+//            websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
+//        }
+//    }
 
     private func showThankYou() {
         setContentViewHeight(Constants.thankYouContentHeight, animated: true)
@@ -348,29 +348,29 @@ final class FeedbackViewController: NSViewController {
 
 }
 
-fileprivate extension WebsiteBreakage.Category {
-
-    init?(tag: Int) {
-        switch tag {
-        case 0: self = .cantSignIn
-        case 1: self = .contentIsMissing
-        case 2: self = .linksDontWork
-        case 3: self = .browserIsIncompatible
-        case 4: self = .theSiteAskedToDisable
-        case 5: self = .videoOrImagesDidntLoad
-        case 6: self = .somethingElse
-
-        default:
-            return nil
-        }
-    }
-
-}
+// fileprivate extension WebsiteBreakage.Category {
+//
+//    init?(tag: Int) {
+//        switch tag {
+//        case 0: self = .cantSignIn
+//        case 1: self = .contentIsMissing
+//        case 2: self = .linksDontWork
+//        case 3: self = .browserIsIncompatible
+//        case 4: self = .theSiteAskedToDisable
+//        case 5: self = .videoOrImagesDidntLoad
+//        case 6: self = .somethingElse
+//
+//        default:
+//            return nil
+//        }
+//    }
+//
+// }
 
 extension FeedbackViewController: NSTextFieldDelegate {
 
     func control(_ control: NSControl, textShouldBeginEditing fieldEditor: NSText) -> Bool {
-        return control != urlTextField
+        return true
     }
 
     func controlTextDidChange(_ notification: Notification) {

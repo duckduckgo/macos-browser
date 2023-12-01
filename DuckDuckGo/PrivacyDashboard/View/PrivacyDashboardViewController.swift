@@ -247,7 +247,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
 extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelegate {
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
-        websiteBreakageReporter.reportBreakage(category: category, description: description, reportFlow: .privacyDashboard)
+        websiteBreakageReporter.reportBreakage(category: category, description: description, reportFlow: .dashboard)
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, reportBrokenSiteDidChangeProtectionSwitch protectionState: PrivacyDashboard.ProtectionState) {
