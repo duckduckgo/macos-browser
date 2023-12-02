@@ -27,7 +27,8 @@ struct FeedbackFormView: View {
         fileprivate(set) var buttonsHeight: Double = 0.0
 
         var totalHeight: Double {
-            headerHeight + viewHeight + buttonsHeight + 80
+            print("DEBUG: Calculating total height, header = \(headerHeight), view = \(viewHeight), buttons = \(buttonsHeight)")
+            return headerHeight + viewHeight + buttonsHeight + 80
         }
     }
 
@@ -37,7 +38,6 @@ struct FeedbackFormView: View {
 
     @State var viewSize: ViewSize = .init() {
         didSet {
-            print("DEBUG: Size changed to \(viewSize.totalHeight)")
             sizeChanged(viewSize.totalHeight)
         }
     }
@@ -53,8 +53,7 @@ struct FeedbackFormView: View {
             .background(Color.secondary.opacity(0.1))
             .background(
                 GeometryReader { proxy in
-                    Color.clear.onAppear {
-                        print("DEBUG: Header height \(proxy.size.height)")
+                    Color.blue.onAppear {
                         viewSize.headerHeight = proxy.size.height
                     }
                 }
@@ -62,53 +61,36 @@ struct FeedbackFormView: View {
 
             Divider()
 
-            Group {
-                Picker(selection: $viewModel.selectedFeedbackCategory, content: {
-                    ForEach(VPNFeedbackFormViewModel.FeedbackCategory.allCases, id: \.self) { option in
-                        Text(option.displayName).tag(option)
+            switch viewModel.viewState {
+            case .feedbackPending, .feedbackSending:
+                VPNFeedbackFormBodyView()
+                .padding([.top, .leading, .trailing], 20)
+                .background(
+                    GeometryReader { proxy in
+                        Color.red.onAppear {
+                            viewSize.viewHeight = proxy.size.height
+                        }
                     }
-                }, label: {})
-                .controlSize(.large)
-                .padding(.bottom, 20)
-
-                switch viewModel.selectedFeedbackCategory {
-                case .landingPage:
-                    Spacer()
-                        .frame(height: 50)
-                case .failsToConnect:
-                    VPNFeedbackFormIssueDescriptionForm()
-                case .tooSlow:
-                    VPNFeedbackFormIssueDescriptionForm()
-                case .issueWithAppOrWebsite:
-                    VPNFeedbackFormIssueDescriptionForm()
-                case .cantConnectToLocalDevice:
-                    VPNFeedbackFormIssueDescriptionForm()
-                case .appCrashesOrFreezes:
-                    VPNFeedbackFormIssueDescriptionForm()
-                case .featureRequest:
-                    VPNFeedbackFormIssueDescriptionForm()
-                case .somethingElse:
-                    VPNFeedbackFormIssueDescriptionForm()
-                }
+                )
+            case .feedbackSent:
+                VPNFeedbackFormSentView()
+                    .padding([.top, .leading, .trailing], 20)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.green.onAppear {
+                                viewSize.viewHeight = proxy.size.height
+                            }
+                        }
+                    )
             }
-            .padding([.top, .leading, .trailing], 20)
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.onAppear {
-                        print("DEBUG: Body height \(proxy.size.height)")
-                        viewSize.viewHeight = proxy.size.height
-                    }
-                }
-            )
 
-            Spacer()
+            Spacer(minLength: 0)
 
             VPNFeedbackFormButtons()
                 .padding(20)
                 .background(
                     GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            print("DEBUG: Button height \(proxy.size.height)")
+                        Color.yellow.onAppear {
                             viewSize.buttonsHeight = proxy.size.height
                         }
                     }
@@ -118,9 +100,47 @@ struct FeedbackFormView: View {
 
 }
 
+private struct VPNFeedbackFormBodyView: View {
+
+    @EnvironmentObject var viewModel: VPNFeedbackFormViewModel
+
+    var body: some View {
+        Group {
+            Picker(selection: $viewModel.selectedFeedbackCategory, content: {
+                ForEach(VPNFeedbackFormViewModel.FeedbackCategory.allCases, id: \.self) { option in
+                    Text(option.displayName).tag(option)
+                }
+            }, label: {})
+            .controlSize(.large)
+            .padding(.bottom, 0)
+
+            switch viewModel.selectedFeedbackCategory {
+            case .landingPage:
+                Spacer()
+                    .frame(height: 50)
+            case .failsToConnect:
+                VPNFeedbackFormIssueDescriptionForm()
+            case .tooSlow:
+                VPNFeedbackFormIssueDescriptionForm()
+            case .issueWithAppOrWebsite:
+                VPNFeedbackFormIssueDescriptionForm()
+            case .cantConnectToLocalDevice:
+                VPNFeedbackFormIssueDescriptionForm()
+            case .appCrashesOrFreezes:
+                VPNFeedbackFormIssueDescriptionForm()
+            case .featureRequest:
+                VPNFeedbackFormIssueDescriptionForm()
+            case .somethingElse:
+                VPNFeedbackFormIssueDescriptionForm()
+            }
+        }
+    }
+
+}
+
 private struct VPNFeedbackFormIssueDescriptionForm: View {
 
-    @State var text = ""
+    @EnvironmentObject var viewModel: VPNFeedbackFormViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -129,15 +149,11 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
 
-            TextEditor(text: $text)
-                .frame(height: 80)
-                //.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-//                .background(
-//                    ZStack {
-//                        RoundedRectangle(cornerRadius: cornerRadius).stroke(Color(NSColor.textEditorBorderColor), lineWidth: 1)
-//                        RoundedRectangle(cornerRadius: cornerRadius).fill(Color(NSColor.textEditorBackgroundColor))
-//                    }
-//                )
+            if #available(macOS 12, *) {
+                FocusableTextEditor(text: $viewModel.feedbackFormText)
+            } else {
+                // TODO: Add macOS 11 editor
+            }
 
             Text("In addition to the details entered into this form, your app issue report will contain:")
                 .multilineTextAlignment(.leading)
@@ -159,30 +175,97 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
 
 }
 
+private struct VPNFeedbackFormSentView: View {
+
+    var body: some View {
+        VStack {
+            Image("JoinWaitlistHeader")
+
+            Text("Thank you!")
+                .font(.system(size: 18, weight: .medium))
+                .padding(.top, 20)
+
+            Text("Your feedback will help us improve the\nDuckDuckGo app.")
+                .multilineTextAlignment(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 10)
+        }
+    }
+
+}
+
+@available(macOS 12, *)
+private struct FocusableTextEditor: View {
+
+    @Binding var text: String
+    @FocusState var isFocused: Bool
+
+    let cornerRadius: CGFloat = 8.0
+    let borderWidth: CGFloat = 0.4
+    let characterLimit: Int = 10000
+
+    var body: some View {
+        TextEditor(text: $text)
+            .frame(height: 150.0)
+            .font(.body)
+            .foregroundColor(.primary)
+            .focused($isFocused)
+            .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .onChange(of: text) {
+                text = String($0.prefix(characterLimit))
+            }
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.accentColor.opacity(0.5), lineWidth: 4).opacity(isFocused ? 1 : 0).scaleEffect(isFocused ? 1 : 1.04)
+                        .animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(Color(NSColor.textEditorBackgroundColor))
+                }
+            )
+    }
+}
+
 private struct VPNFeedbackFormButtons: View {
 
     @EnvironmentObject var viewModel: VPNFeedbackFormViewModel
 
     var body: some View {
         HStack {
-            Button(action: {
-                viewModel.process(action: .cancel)
-            }, label: {
-                Text("Cancel")
-                    .frame(maxWidth: .infinity)
-            })
-            .controlSize(.large)
-            .frame(maxWidth: .infinity)
+            if viewModel.viewState == .feedbackSent {
+                Button(action: {
+                    viewModel.process(action: .cancel)
+                }, label: {
+                    Text("Done")
+                        .frame(maxWidth: .infinity)
+                })
+                .keyboardShortcut(.defaultAction)
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
+            } else {
+                Button(action: {
+                    viewModel.process(action: .cancel)
+                }, label: {
+                    Text("Cancel")
+                        .frame(maxWidth: .infinity)
+                })
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
 
-            Button(action: {
-                viewModel.process(action: .submit)
-            }, label: {
-                Text("Submit")
-                    .frame(maxWidth: .infinity)
-            })
-            .keyboardShortcut(.defaultAction)
-            .controlSize(.large)
-            .frame(maxWidth: .infinity)
+                Button(action: {
+                    viewModel.process(action: .submit)
+                }, label: {
+                    Text(viewModel.viewState == .feedbackSending ? "Submitting..." : "Submit")
+                        .frame(maxWidth: .infinity)
+                })
+                .keyboardShortcut(.defaultAction)
+                .controlSize(.large)
+                .frame(maxWidth: .infinity)
+                .disabled(!viewModel.submitButtonEnabled)
+            }
         }
     }
 

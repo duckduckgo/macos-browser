@@ -510,7 +510,7 @@ private struct NotesView: View {
 }
 
 @available(macOS 12, *)
-struct FocusableTextEditor: View {
+private struct FocusableTextEditor: View {
 
     @EnvironmentObject var model: PasswordManagementLoginModel
     @FocusState var isFocused: Bool

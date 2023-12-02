@@ -36,6 +36,21 @@ final class VPNFeedbackFormViewModel: ObservableObject {
         case featureRequest
         case somethingElse
 
+        var isFeedbackCategory: Bool {
+            switch self {
+            case .landingPage:
+                return false
+            case .failsToConnect,
+                    .tooSlow,
+                    .issueWithAppOrWebsite,
+                    .cantConnectToLocalDevice,
+                    .appCrashesOrFreezes,
+                    .featureRequest,
+                    .somethingElse:
+                return true
+            }
+        }
+
         var displayName: String {
             switch self {
             case .landingPage: return "What's happening?"
@@ -52,6 +67,7 @@ final class VPNFeedbackFormViewModel: ObservableObject {
 
     enum ViewState {
         case feedbackPending
+        case feedbackSending
         case feedbackSent
     }
 
@@ -60,13 +76,20 @@ final class VPNFeedbackFormViewModel: ObservableObject {
         case submit
     }
 
-    @Published var viewState: ViewState
-
-    @Published var selectedFeedbackCategory: FeedbackCategory {
+    @Published var viewState: ViewState {
         didSet {
-            print("DEBUG: Changing option: \(selectedFeedbackCategory)")
+            updateSubmitButtonStatus()
         }
     }
+
+    @Published var feedbackFormText: String = "" {
+        didSet {
+            updateSubmitButtonStatus()
+        }
+    }
+
+    @Published private(set) var submitButtonEnabled: Bool = false
+    @Published var selectedFeedbackCategory: FeedbackCategory
 
     weak var delegate: VPNFeedbackFormViewModelDelegate?
 
@@ -79,8 +102,17 @@ final class VPNFeedbackFormViewModel: ObservableObject {
         switch action {
         case .cancel:
             delegate?.vpnFeedbackViewModelDismissedView(self)
-        case .submit: break
+        case .submit:
+            self.viewState = .feedbackSending
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.viewState = .feedbackSent
+            }
         }
+    }
+
+    private func updateSubmitButtonStatus() {
+        self.submitButtonEnabled = (viewState == .feedbackPending) && !feedbackFormText.isEmpty
     }
 
 }
