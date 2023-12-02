@@ -22,6 +22,12 @@ import SwiftUI
 
 final class FeedbackFormViewController: NSViewController {
 
+    enum Constants {
+        static let landingPageHeight = 260.0
+        static let feedbackFormHeight = 550.0
+        static let feedbackSentHeight = 340.0
+    }
+
     private let defaultSize = CGSize(width: 480, height: 348)
     private let viewModel: VPNFeedbackFormViewModel
 
@@ -66,8 +72,18 @@ final class FeedbackFormViewController: NSViewController {
     }
 
     private func updateViewHeight(height: CGFloat) {
-        print("DEBUG: Updating view height to \(height)")
-        heightConstraint?.constant = height
+        switch viewModel.viewState {
+        case .feedbackPending:
+            if viewModel.selectedFeedbackCategory == .landingPage {
+                heightConstraint?.constant = Constants.landingPageHeight
+            } else {
+                heightConstraint?.constant = Constants.feedbackFormHeight
+            }
+        case .feedbackSending:
+            heightConstraint?.constant = Constants.feedbackFormHeight
+        case .feedbackSent:
+            heightConstraint?.constant = Constants.feedbackSentHeight
+        }
     }
 
 }

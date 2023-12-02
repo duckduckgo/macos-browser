@@ -27,7 +27,6 @@ struct FeedbackFormView: View {
         fileprivate(set) var buttonsHeight: Double = 0.0
 
         var totalHeight: Double {
-            print("DEBUG: Calculating total height, header = \(headerHeight), view = \(viewHeight), buttons = \(buttonsHeight)")
             return headerHeight + viewHeight + buttonsHeight + 80
         }
     }
@@ -53,7 +52,7 @@ struct FeedbackFormView: View {
             .background(Color.secondary.opacity(0.1))
             .background(
                 GeometryReader { proxy in
-                    Color.blue.onAppear {
+                    Color.clear.onAppear {
                         viewSize.headerHeight = proxy.size.height
                     }
                 }
@@ -67,7 +66,7 @@ struct FeedbackFormView: View {
                 .padding([.top, .leading, .trailing], 20)
                 .background(
                     GeometryReader { proxy in
-                        Color.red.onAppear {
+                        Color.clear.onAppear {
                             viewSize.viewHeight = proxy.size.height
                         }
                     }
@@ -77,7 +76,7 @@ struct FeedbackFormView: View {
                     .padding([.top, .leading, .trailing], 20)
                     .background(
                         GeometryReader { proxy in
-                            Color.green.onAppear {
+                            Color.clear.onAppear {
                                 viewSize.viewHeight = proxy.size.height
                             }
                         }
@@ -90,7 +89,7 @@ struct FeedbackFormView: View {
                 .padding(20)
                 .background(
                     GeometryReader { proxy in
-                        Color.yellow.onAppear {
+                        Color.clear.onAppear {
                             viewSize.buttonsHeight = proxy.size.height
                         }
                     }
@@ -178,15 +177,15 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
 private struct VPNFeedbackFormSentView: View {
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             Image("JoinWaitlistHeader")
 
             Text("Thank you!")
                 .font(.system(size: 18, weight: .medium))
-                .padding(.top, 20)
+                .padding(.top, 30)
 
             Text("Your feedback will help us improve the\nDuckDuckGo app.")
-                .multilineTextAlignment(.leading)
+                .multilineTextAlignment(.center)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 10)
