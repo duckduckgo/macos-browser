@@ -237,13 +237,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @objc func openNativeFeedbackForm(_ sender: Any?) {
-        print("TODO")
         let feedbackFormViewController = FeedbackFormViewController()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window,
-              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController
-        else {
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             assertionFailure("Failed to present native VPN feedback form")
             return
         }
@@ -251,7 +249,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
         parentWindowController.window?.beginSheet(feedbackFormWindow) { [weak self] _ in
             print("DEBUG: Form closed")
         }
-
     }
 
     /// Sets the selected server.

@@ -126,6 +126,12 @@ final class MainViewController: NSViewController {
 
     override func viewDidLayout() {
         findInPageContainerView.applyDropShadow()
+
+        Task {
+            let metadataCollector = VPNMetadataCollector()
+            await metadataCollector.collectNetworkInformation()
+            print("done")
+        }
     }
 
     func windowDidBecomeMain() {

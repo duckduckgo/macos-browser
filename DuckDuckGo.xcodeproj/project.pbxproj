@@ -1065,6 +1065,8 @@
 		4B0511CA262CAA5A00F6079C /* FireproofDomainsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */; };
 		4B0511E1262CAA8600F6079C /* NSOpenPanelExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */; };
 		4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */; };
+		4B05265E2B1AE5C70054955A /* VPNMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B05265D2B1AE5C70054955A /* VPNMetadataCollector.swift */; };
+		4B05265F2B1AEFDB0054955A /* VPNMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B05265D2B1AE5C70054955A /* VPNMetadataCollector.swift */; };
 		4B0A63E8289DB58E00378EF7 /* FirefoxFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */; };
 		4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */; };
 		4B0AACAE28BC6FD0001038AC /* SafariFaviconsReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0AACAD28BC6FD0001038AC /* SafariFaviconsReader.swift */; };
@@ -3309,6 +3311,7 @@
 		4B0511B4262CAA5A00F6079C /* FireproofDomainsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FireproofDomainsViewController.swift; sourceTree = "<group>"; };
 		4B0511DF262CAA8600F6079C /* NSOpenPanelExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSOpenPanelExtensions.swift; sourceTree = "<group>"; };
 		4B0511E0262CAA8600F6079C /* NSViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSViewControllerExtension.swift; sourceTree = "<group>"; };
+		4B05265D2B1AE5C70054955A /* VPNMetadataCollector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNMetadataCollector.swift; sourceTree = "<group>"; };
 		4B0A63E7289DB58E00378EF7 /* FirefoxFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxFaviconsReader.swift; sourceTree = "<group>"; };
 		4B0AACAB28BC63ED001038AC /* ChromiumFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromiumFaviconsReader.swift; sourceTree = "<group>"; };
 		4B0AACAD28BC6FD0001038AC /* SafariFaviconsReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariFaviconsReader.swift; sourceTree = "<group>"; };
@@ -4983,6 +4986,14 @@
 			path = Preferences;
 			sourceTree = "<group>";
 		};
+		4B05265C2B1AE5B10054955A /* VPNMetadataCollector */ = {
+			isa = PBXGroup;
+			children = (
+				4B05265D2B1AE5C70054955A /* VPNMetadataCollector.swift */,
+			);
+			path = VPNMetadataCollector;
+			sourceTree = "<group>";
+		};
 		4B18E3222A1D31E4005D0AAA /* NetworkProtection */ = {
 			isa = PBXGroup;
 			children = (
@@ -5050,6 +5061,7 @@
 				4B41EDAD2B168AFF001EEDF4 /* FeedbackFormViewController.swift */,
 				4B41EDB02B168B1E001EEDF4 /* FeedbackFormView.swift */,
 				4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */,
+				4B05265C2B1AE5B10054955A /* VPNMetadataCollector */,
 			);
 			path = NetworkProtectionFeedbackForm;
 			sourceTree = "<group>";
@@ -10366,6 +10378,7 @@
 				4B9579DD2AC7AE700062CA31 /* SpacerNode.swift in Sources */,
 				B62B483C2ADE46FC000DECE5 /* Application.swift in Sources */,
 				4B9579DF2AC7AE700062CA31 /* SyncManagementDialogViewController.swift in Sources */,
+				4B05265F2B1AEFDB0054955A /* VPNMetadataCollector.swift in Sources */,
 				4B9579E02AC7AE700062CA31 /* BookmarkExtension.swift in Sources */,
 				4B9579E12AC7AE700062CA31 /* PasswordManagementCreditCardModel.swift in Sources */,
 				4B9579E22AC7AE700062CA31 /* NSEventExtension.swift in Sources */,
@@ -11409,6 +11422,7 @@
 				4B9292A226670D2A00AD2C21 /* PseudoFolder.swift in Sources */,
 				AA7E919A2875B39300AB6B62 /* Visit.swift in Sources */,
 				4BCF15D92ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift in Sources */,
+				4B05265E2B1AE5C70054955A /* VPNMetadataCollector.swift in Sources */,
 				B6DA44022616B28300DD1EC2 /* PixelDataStore.swift in Sources */,
 				4B9DB0292A983B24000927DB /* WaitlistStorage.swift in Sources */,
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
