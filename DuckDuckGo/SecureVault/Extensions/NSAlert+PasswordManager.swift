@@ -22,7 +22,7 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteLogin() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this Login?"
+        alert.messageText = "Are you sure you want to delete this saved password?"
         alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
@@ -42,8 +42,8 @@ extension NSAlert {
 
     static func passwordManagerDuplicateLogin() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Duplicate login"
-        alert.informativeText = "You already have a login for this username and website."
+        alert.messageText = "Duplicate Password"
+        alert.informativeText = "You already have a password saved for this username and website."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")
         return alert
@@ -51,7 +51,7 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteCard() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this Payment Method from Autofill?"
+        alert.messageText = "Are you sure you want to delete this saved credit card?"
         alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")
@@ -61,7 +61,7 @@ extension NSAlert {
 
     static func passwordManagerConfirmDeleteIdentity() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Are you sure you want to delete this Info from Autofill?"
+        alert.messageText = "Are you sure you want to delete this saved autofill info?"
         alert.informativeText = "This action cannot be undone."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Delete")

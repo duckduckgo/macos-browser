@@ -20,21 +20,21 @@ import Foundation
 
 extension UserText {
 
-    static let pmSaveCredentialsEditableTitle = NSLocalizedString("pm.save-credentials.editable.title", value: "Save Login?", comment: "Title for the editable Save Credentials popover")
-    static let pmSaveCredentialsNonEditableTitle = NSLocalizedString("pm.save-credentials.non-editable.title", value: "New Login Saved", comment: "Title for the non-editable Save Credentials popover")
+    static let pmSaveCredentialsEditableTitle = NSLocalizedString("pm.save-credentials.editable.title", value: "Save password?", comment: "Title for the editable Save Credentials popover")
+    static let pmSaveCredentialsNonEditableTitle = NSLocalizedString("pm.save-credentials.non-editable.title", value: "New Password Saved", comment: "Title for the non-editable Save Credentials popover")
 
-    static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No Logins or Payment Methods saved yet", comment: "Label for default empty state title")
+    static let pmEmptyStateDefaultTitle = NSLocalizedString("pm.empty.default.title", value: "No passwords or credit cards saved yet", comment: "Label for default empty state title")
     static let pmEmptyStateDefaultDescription = NSLocalizedString("pm.empty.default.description",
-                                                                  value: "If your logins are saved in another browser, you can import them into DuckDuckGo.",
+                                                                  value: "If your passwords are saved in another browser, you can import them into DuckDuckGo.",
                                                                   comment: "Label for default empty state description")
 
-    static let pmEmptyStateLoginsTitle = NSLocalizedString("pm.empty.logins.title", value: "No Logins", comment: "Label for logins empty state title")
+    static let pmEmptyStateLoginsTitle = NSLocalizedString("pm.empty.logins.title", value: "No passwords", comment: "Label for logins empty state title")
     static let pmEmptyStateIdentitiesTitle = NSLocalizedString("pm.empty.identities.title", value: "No Identities", comment: "Label for identities empty state title")
     static let pmEmptyStateCardsTitle = NSLocalizedString("pm.empty.cards.title", value: "No Cards", comment: "Label for cards empty state title")
     static let pmEmptyStateNotesTitle = NSLocalizedString("pm.empty.notes.title", value: "No Notes", comment: "Label for notes empty state title")
 
     static let pmNewCard = NSLocalizedString("pm.new.card", value: "Credit Card", comment: "Label for new card title")
-    static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Login", comment: "Label for new login title")
+    static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Title", comment: "Label for new login title")
     static let pmNewIdentity = NSLocalizedString("pm.new.identity", value: "Identity", comment: "Label for new identity title")
     static let pmNewNote = NSLocalizedString("pm.new.note", value: "Note", comment: "Label for new note title")
 
@@ -102,7 +102,7 @@ extension UserText {
 
     static func pmLockScreenDuration(duration: String) -> String {
         let localized = NSLocalizedString("pm.lock-screen.duration",
-                                          value: "Your Autofill info will remain unlocked until your computer is idle for %@.",
+                                          value: "Your autofill info will remain unlocked until your computer is idle for %@.",
                                           comment: "")
         return String(format: localized, duration)
     }
@@ -110,10 +110,10 @@ extension UserText {
     static let pmLockScreenPreferencesLabel = NSLocalizedString("pm.lock-screen.preferences.label", value: "Change in", comment: "Label used for a button that opens preferences")
     static let pmLockScreenPreferencesLink = NSLocalizedString("pm.lock-screen.preferences.link", value: "Settings", comment: "Label used for a button that opens preferences")
 
-    static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock access to your Autofill info", comment: "Label presented when unlocking Autofill")
+    static let pmAutoLockPromptUnlockLogins = NSLocalizedString("pm.lock-screen.prompt.unlock-logins", value: "unlock access to your autofill info", comment: "Label presented when unlocking Autofill")
     static let pmAutoLockPromptExportLogins = NSLocalizedString("pm.lock-screen.prompt.export-logins", value: "export your usernames and passwords", comment: "Label presented when exporting logins")
-    static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change your Autofill info access settings", comment: "Label presented when changing Auto-Lock settings")
-    static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "unlock access to your Autofill info", comment: "Label presented when autofilling credit card information")
+    static let pmAutoLockPromptChangeLoginsSettings = NSLocalizedString("pm.lock-screen.prompt.change-settings", value: "change your autofill info access settings", comment: "Label presented when changing Auto-Lock settings")
+    static let pmAutoLockPromptAutofill = NSLocalizedString("pm.lock-screen.prompt.autofill", value: "unlock access to your autofill info", comment: "Label presented when autofilling credit card information")
 
     static let autoLockThreshold1Minute = NSLocalizedString("pm.lock-screen.threshold.1-minute", value: "1 minute", comment: "Label used when selecting the Auto-Lock threshold")
     static let autoLockThreshold5Minutes = NSLocalizedString("pm.lock-screen.threshold.5-minutes", value: "5 minutes", comment: "Label used when selecting the Auto-Lock threshold")

@@ -366,16 +366,16 @@ struct UserText {
     static let restartBitwardenInfo = NSLocalizedString("restart.bitwarden.info", value: "Bitwarden is not responding. Please restart it to initiate the communication again", comment: "")
 
     static let autofillViewContentButton = NSLocalizedString("autofill.view-autofill-content",  value: "View Autofill Content…", comment: "View Autofill Content Button name in the autofill settings")
-    static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Save and Autofill", comment: "Autofill settings section title")
+    static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Passwords", comment: "Autofill settings section title")
     static let autofillAskToSaveExplanation = NSLocalizedString("autofill.ask-to-save.explanation", value: "Receive prompts to save new information and autofill online forms.", comment: "Description of Autofill autosaving feature - used in settings")
     static let autofillUsernamesAndPasswords = NSLocalizedString("autofill.usernames-and-passwords", value: "Usernames and passwords", comment: "Autofill autosaved data type")
     static let autofillAddresses = NSLocalizedString("autofill.addresses", value: "Addresses", comment: "Autofill autosaved data type")
     static let autofillPaymentMethods = NSLocalizedString("autofill.payment-methods", value: "Payment methods", comment: "Autofill autosaved data type")
     static let autofillAutoLock = NSLocalizedString("autofill.auto-lock", value: "Auto-lock", comment: "Autofill settings section title")
-    static let autofillLockWhenIdle = NSLocalizedString("autofill.lock-when-idle", value: "Lock Autofill after computer is idle for", comment: "Autofill auto-lock setting")
-    static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock Autofill", comment: "Autofill auto-lock setting")
-    static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "Anyone with access to your device will be able to use and modify your Autofill data if not locked.", comment: "Autofill disabled auto-lock warning")
-    static let autolockLocksFormFill = NSLocalizedString("autofill.autolock-locks-form-filling", value: "Also lock access to Login and Credit Card form fill.", comment: "Lock form filling when auto-lock is active text")
+    static let autofillLockWhenIdle = NSLocalizedString("autofill.lock-when-idle", value: "Lock autofill after computer is idle for", comment: "Autofill auto-lock setting")
+    static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock autofill", comment: "Autofill auto-lock setting")
+    static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "Anyone will access to your device will be able to use and modify your autofill data if not locked.", comment: "Autofill disabled auto-lock warning")
+    static let autolockLocksFormFill = NSLocalizedString("autofill.autolock-locks-form-filling", value: "Also lock access to password and credit card form fill.", comment: "Lock form filling when auto-lock is active text")
 
     
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
@@ -384,7 +384,7 @@ struct UserText {
 
     static let passwordManagement = NSLocalizedString("passsword.management", value: "Autofill", comment: "Used as title for password management user interface")
     static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Autofill All Items option")
-    static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Logins", comment: "Used as title for the Autofill Logins option")
+    static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Passwords", comment: "Used as title for the Autofill Logins option")
     static let passwordManagementIdentities = NSLocalizedString("passsword.management.identities", value: "Identities", comment: "Used as title for the Autofill Identities option")
     static let passwordManagementCreditCards = NSLocalizedString("passsword.management.credit-cards", value: "Credit Cards", comment: "Used as title for the Autofill Credit Cards option")
     static let passwordManagementNotes = NSLocalizedString("passsword.management.notes", value: "Notes", comment: "Used as title for the Autofill Notes option")
@@ -552,7 +552,7 @@ struct UserText {
     static let safariPreferences = NSLocalizedString("import.logins.safari.preferences", value: "Preferences", comment: "Title of the Safari Preferences menu (up to and including macOS 12)")
     static let safariSettings = NSLocalizedString("import.logins.safari.settings", value: "Settings", comment: "Title of the Safari Settings menu (macOS 13 and above)")
 
-    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Logins File", comment: "Title text for the CSV importer")
+    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Password File", comment: "Title text for the CSV importer")
     static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File", comment: "Title text for the HTML Bookmarks importer")
     static let importBookmarksSelectHTMLFile = NSLocalizedString("import.bookmarks.select-html-file", value: "Select HTML Bookmarks File…", comment: "Button text for selecting HTML Bookmarks file")
     static let importBookmarksSelectAnotherFile = NSLocalizedString("import.bookmarks.select-another-file", value: "Select Another HTML File…", comment: "Button text for selecting another file")
@@ -576,7 +576,7 @@ struct UserText {
 
     static func importingFile(validLogins: Int) -> String {
         let localized = NSLocalizedString("import.logins.csv.valid-logins",
-                                          value: "Contains %@ valid logins",
+                                          value: "Contains %@ valid passwords",
                                           comment: "Displays the number of the logins being imported")
         return String(format: localized, String(validLogins))
     }
@@ -639,7 +639,7 @@ struct UserText {
 
     static func loginImportSuccessfulCSVImports(totalSuccessfulImports: Int) -> String {
         let localized = NSLocalizedString("import.logins.csv.successful-imports",
-                                          value: "New Logins: %@",
+                                          value: "New passwords: %@",
                                           comment: "Status text indicating the number of successful CSV login imports")
         return String(format: localized, String(totalSuccessfulImports))
     }
@@ -935,7 +935,7 @@ struct UserText {
     }
     
     static func passwordManagerAutosavePopoverText(domain: String) -> String {
-        let localized = NSLocalizedString("autofill.popover.autosave.text", value: "Login saved for %@", comment: "Text confirming a password has been saved for the %@ domain")
+        let localized = NSLocalizedString("autofill.popover.autosave.text", value: "Password saved for %@", comment: "Text confirming a password has been saved for the %@ domain")
         return String(format: localized, domain)
     }
     
