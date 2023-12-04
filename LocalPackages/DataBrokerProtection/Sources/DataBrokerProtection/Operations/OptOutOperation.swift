@@ -87,7 +87,7 @@ final class OptOutOperation: DataBrokerOperation {
 
                 } else {
                     // If we try to run an optout on a broker without an optout step, we throw.
-                    failed(with: .noOptOutStep)
+                    failed(with: DataBrokerProtectionError.noOptOutStep)
                 }
             }
         }

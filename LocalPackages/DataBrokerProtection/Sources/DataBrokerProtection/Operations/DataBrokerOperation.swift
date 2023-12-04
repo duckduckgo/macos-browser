@@ -76,7 +76,7 @@ extension DataBrokerOperation {
                 try await runEmailConfirmationAction(action: emailConfirmationAction)
                 await executeNextStep()
             } catch {
-                await onError(error: .emailError(error as? EmailError))
+                await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
             }
 
             return
@@ -90,7 +90,7 @@ extension DataBrokerOperation {
                 stageCalculator?.fireOptOutCaptchaSolve()
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
-                await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
+                await onError(error: DataBrokerProtectionError.captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
             }
 
             return
@@ -102,7 +102,7 @@ extension DataBrokerOperation {
                 extractedProfile?.email = try await emailService.getEmail()
                 stageCalculator?.fireOptOutEmailGenerate()
             } catch {
-                await onError(error: .emailError(error as? EmailError))
+                await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
                 return
             }
         }
@@ -135,7 +135,13 @@ extension DataBrokerOperation {
             )
             stageCalculator?.fireOptOutEmailReceive()
             stageCalculator?.setStage(.emailReceive)
-            try? await webViewHandler?.load(url: url)
+            do {
+                try await webViewHandler?.load(url: url)
+            } catch {
+                await onError(error: error)
+                return
+            }
+
             stageCalculator?.fireOptOutEmailConfirm()
         } else {
             throw EmailError.cantFindEmail
@@ -147,7 +153,7 @@ extension DataBrokerOperation {
         self.continuation = nil
     }
 
-    func failed(with error: DataBrokerProtectionError) {
+    func failed(with error: Error) {
         self.continuation?.resume(throwing: error)
         self.continuation = nil
     }
@@ -167,8 +173,12 @@ extension DataBrokerOperation {
     // MARK: - CSSCommunicationDelegate
 
     func loadURL(url: URL) async {
-        try? await webViewHandler?.load(url: url)
-        await executeNextStep()
+        do {
+            try await webViewHandler?.load(url: url)
+            await executeNextStep()
+        } catch {
+           await onError(error: error)
+        }
     }
 
     func success(actionId: String, actionType: ActionType) async {
@@ -203,11 +213,11 @@ extension DataBrokerOperation {
 
             await executeNextStep()
         } catch {
-            await onError(error: .solvingCaptchaWithCallbackError)
+            await onError(error: DataBrokerProtectionError.solvingCaptchaWithCallbackError)
         }
     }
 
-    func onError(error: DataBrokerProtectionError) async {
+    func onError(error: Error) async {
         if retriesCountOnError > 0 {
             await executeCurrentAction()
         } else {
@@ -224,7 +234,7 @@ extension DataBrokerOperation {
             retriesCountOnError -= 1
             await runNextAction(currentAction)
         } else {
-            await onError(error: .unknown("No current action to execute"))
+            await onError(error: DataBrokerProtectionError.unknown("No current action to execute"))
         }
     }
 }
