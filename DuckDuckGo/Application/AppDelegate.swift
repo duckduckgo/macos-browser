@@ -426,7 +426,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DataBrokerProtectionAppEvents().handleNotification()
+                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
             }
 #endif
         }
