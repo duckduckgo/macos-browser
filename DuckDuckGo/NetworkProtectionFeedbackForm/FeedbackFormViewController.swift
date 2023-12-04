@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import AppKit
 import SwiftUI
@@ -83,6 +85,8 @@ final class FeedbackFormViewController: NSViewController {
             heightConstraint?.constant = Constants.feedbackFormHeight
         case .feedbackSent:
             heightConstraint?.constant = Constants.feedbackSentHeight
+        case .feedbackSendingFailed:
+            heightConstraint?.constant = Constants.feedbackFormHeight
         }
     }
 
@@ -95,3 +99,5 @@ extension FeedbackFormViewController: VPNFeedbackFormViewModelDelegate {
     }
 
 }
+
+#endif

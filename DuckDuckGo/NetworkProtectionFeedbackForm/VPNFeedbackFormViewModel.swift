@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import Combine
 import SwiftUI
@@ -26,48 +28,10 @@ protocol VPNFeedbackFormViewModelDelegate: AnyObject {
 
 final class VPNFeedbackFormViewModel: ObservableObject {
 
-    enum FeedbackCategory: String, CaseIterable {
-        case landingPage
-        case failsToConnect
-        case tooSlow
-        case issueWithAppOrWebsite
-        case cantConnectToLocalDevice
-        case appCrashesOrFreezes
-        case featureRequest
-        case somethingElse
-
-        var isFeedbackCategory: Bool {
-            switch self {
-            case .landingPage:
-                return false
-            case .failsToConnect,
-                    .tooSlow,
-                    .issueWithAppOrWebsite,
-                    .cantConnectToLocalDevice,
-                    .appCrashesOrFreezes,
-                    .featureRequest,
-                    .somethingElse:
-                return true
-            }
-        }
-
-        var displayName: String {
-            switch self {
-            case .landingPage: return "What's happening?"
-            case .failsToConnect: return "VPN fails to connect"
-            case .tooSlow: return "VPN is too slow"
-            case .issueWithAppOrWebsite: return "Issue with app or website"
-            case .cantConnectToLocalDevice: return "Can't connect to local device"
-            case .appCrashesOrFreezes: return "App crashes or freezes"
-            case .featureRequest: return "Feature request"
-            case .somethingElse: return "Something else"
-            }
-        }
-    }
-
     enum ViewState {
         case feedbackPending
         case feedbackSending
+        case feedbackSendingFailed
         case feedbackSent
     }
 
@@ -89,13 +53,19 @@ final class VPNFeedbackFormViewModel: ObservableObject {
     }
 
     @Published private(set) var submitButtonEnabled: Bool = false
-    @Published var selectedFeedbackCategory: FeedbackCategory
+    @Published var selectedFeedbackCategory: VPNFeedbackCategory
 
     weak var delegate: VPNFeedbackFormViewModelDelegate?
 
-    init() {
+    private let metadataCollector: VPNMetadataCollector
+    private let feedbackSender: VPNFeedbackSender
+
+    init(metadataCollector: VPNMetadataCollector = DefaultVPNMetadataCollector(), feedbackSender: VPNFeedbackSender = DefaultVPNFeedbackSender()) {
         self.viewState = .feedbackPending
         self.selectedFeedbackCategory = .landingPage
+
+        self.metadataCollector = metadataCollector
+        self.feedbackSender = feedbackSender
     }
 
     func process(action: ViewAction) {
@@ -105,8 +75,14 @@ final class VPNFeedbackFormViewModel: ObservableObject {
         case .submit:
             self.viewState = .feedbackSending
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.viewState = .feedbackSent
+            Task { @MainActor in
+                do {
+                    let metadata = await self.metadataCollector.collectMetadata()
+                    try await self.feedbackSender.send(metadata: metadata, category: selectedFeedbackCategory, userText: feedbackFormText)
+                    self.viewState = .feedbackSent
+                } catch {
+                    self.viewState = .feedbackSendingFailed
+                }
             }
         }
     }
@@ -116,3 +92,5 @@ final class VPNFeedbackFormViewModel: ObservableObject {
     }
 
 }
+
+#endif

@@ -19,6 +19,8 @@
 import Foundation
 import SwiftUI
 
+#if NETWORK_PROTECTION
+
 struct FeedbackFormView: View {
 
     struct ViewSize {
@@ -61,7 +63,7 @@ struct FeedbackFormView: View {
             Divider()
 
             switch viewModel.viewState {
-            case .feedbackPending, .feedbackSending:
+            case .feedbackPending, .feedbackSending, .feedbackSendingFailed:
                 VPNFeedbackFormBodyView()
                 .padding([.top, .leading, .trailing], 20)
                 .background(
@@ -106,7 +108,7 @@ private struct VPNFeedbackFormBodyView: View {
     var body: some View {
         Group {
             Picker(selection: $viewModel.selectedFeedbackCategory, content: {
-                ForEach(VPNFeedbackFormViewModel.FeedbackCategory.allCases, id: \.self) { option in
+                ForEach(VPNFeedbackCategory.allCases, id: \.self) { option in
                     Text(option.displayName).tag(option)
                 }
             }, label: {})
@@ -269,3 +271,5 @@ private struct VPNFeedbackFormButtons: View {
     }
 
 }
+
+#endif
