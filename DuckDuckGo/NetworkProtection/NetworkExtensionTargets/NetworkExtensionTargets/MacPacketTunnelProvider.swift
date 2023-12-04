@@ -238,7 +238,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         case (_, .connected):
             PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionEnableAttemptSuccess,
                           frequency: .dailyAndContinuous)
-        case (.connecting, _):
+        case (.connecting, _), (.reasserting, _):
             PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionEnableAttemptFailure,
                           frequency: .dailyAndContinuous)
         default:
