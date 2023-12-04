@@ -29,7 +29,18 @@ struct DefaultVPNFeedbackSender: VPNFeedbackSender {
     func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws {
         let encodedUserText = userText.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? userText
         let pixelEvent = Pixel.Event.vpnBreakageReport(category: category.rawValue, description: encodedUserText, metadata: metadata.toBase64())
-        Pixel.fire(pixelEvent)
+
+        print("[VPN] Sending breakage pixel, with metadata: \(metadata.toPrettyPrintedJSON()!)")
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            Pixel.fire(pixelEvent) { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
     }
 
 }
