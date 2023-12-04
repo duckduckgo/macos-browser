@@ -73,6 +73,12 @@ struct FeedbackFormView: View {
                         }
                     }
                 )
+
+                if viewModel.viewState == .feedbackSendingFailed {
+                    Text("We couldn't send your feedback right now, please try again.")
+                        .foregroundColor(.red)
+                        .padding(.top, 15)
+                }
             case .feedbackSent:
                 VPNFeedbackFormSentView()
                     .padding([.top, .leading, .trailing], 20)
@@ -119,6 +125,8 @@ private struct VPNFeedbackFormBodyView: View {
             case .landingPage:
                 Spacer()
                     .frame(height: 50)
+            case .unableToInstall:
+                VPNFeedbackFormIssueDescriptionForm()
             case .failsToConnect:
                 VPNFeedbackFormIssueDescriptionForm()
             case .tooSlow:
@@ -160,17 +168,20 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
                 .multilineTextAlignment(.leading)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
+                .foregroundColor(.secondary)
 
             VStack(alignment: .leading) {
-                Text("• Bullet one")
-                Text("• Bullet two")
-                Text("• Bullet three")
+                Text("• Whether specific DuckDuckGo features are enabled")
+                    .foregroundColor(.secondary)
+                Text("• Aggregate DuckDuckGo app diagnostics")
+                    .foregroundColor(.secondary)
             }
 
             Text("By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features.")
                 .multilineTextAlignment(.leading)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
+                .foregroundColor(.secondary)
         }
     }
 

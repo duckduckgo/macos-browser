@@ -22,6 +22,7 @@ import Foundation
 
 enum VPNFeedbackCategory: String, CaseIterable {
     case landingPage
+    case unableToInstall
     case failsToConnect
     case tooSlow
     case issueWithAppOrWebsite
@@ -34,7 +35,8 @@ enum VPNFeedbackCategory: String, CaseIterable {
         switch self {
         case .landingPage:
             return false
-        case .failsToConnect,
+        case .unableToInstall,
+                .failsToConnect,
                 .tooSlow,
                 .issueWithAppOrWebsite,
                 .cantConnectToLocalDevice,
@@ -48,6 +50,7 @@ enum VPNFeedbackCategory: String, CaseIterable {
     var displayName: String {
         switch self {
         case .landingPage: return "What's happening?"
+        case .unableToInstall: return "Unable to install VPN"
         case .failsToConnect: return "VPN fails to connect"
         case .tooSlow: return "VPN is too slow"
         case .issueWithAppOrWebsite: return "Issue with app or website"

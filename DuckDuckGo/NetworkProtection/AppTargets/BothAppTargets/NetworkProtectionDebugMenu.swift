@@ -247,7 +247,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
 
         parentWindowController.window?.beginSheet(feedbackFormWindow) { [weak self] _ in
-            print("DEBUG: Form closed")
+            // do something?
         }
     }
 

@@ -88,7 +88,7 @@ final class VPNFeedbackFormViewModel: ObservableObject {
     }
 
     private func updateSubmitButtonStatus() {
-        self.submitButtonEnabled = (viewState == .feedbackPending) && !feedbackFormText.isEmpty
+        self.submitButtonEnabled = (viewState == .feedbackPending || viewState == .feedbackSendingFailed) && !feedbackFormText.isEmpty
     }
 
 }

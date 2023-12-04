@@ -26,8 +26,9 @@ final class FeedbackFormViewController: NSViewController {
 
     enum Constants {
         static let landingPageHeight = 260.0
-        static let feedbackFormHeight = 550.0
+        static let feedbackFormHeight = 535.0
         static let feedbackSentHeight = 340.0
+        static let feedbackErrorHeight = 560.0
     }
 
     private let defaultSize = CGSize(width: 480, height: 348)
@@ -86,7 +87,7 @@ final class FeedbackFormViewController: NSViewController {
         case .feedbackSent:
             heightConstraint?.constant = Constants.feedbackSentHeight
         case .feedbackSendingFailed:
-            heightConstraint?.constant = Constants.feedbackFormHeight
+            heightConstraint?.constant = Constants.feedbackErrorHeight
         }
     }
 
