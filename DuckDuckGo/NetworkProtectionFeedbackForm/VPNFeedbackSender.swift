@@ -27,7 +27,9 @@ protocol VPNFeedbackSender {
 struct DefaultVPNFeedbackSender: VPNFeedbackSender {
 
     func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws {
-        print("[VPN] Sending metadata: \(metadata.toPrettyPrintedJSON() ?? "ERROR")")
+        let encodedUserText = userText.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? userText
+        let pixelEvent = Pixel.Event.vpnBreakageReport(category: category.rawValue, description: encodedUserText, metadata: metadata.toBase64())
+        Pixel.fire(pixelEvent)
     }
 
 }
