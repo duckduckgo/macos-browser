@@ -35,6 +35,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     private var databaseBrowserWindowController: NSWindowController?
 
+    // swiftlint:disable:next function_body_length
     init() {
         super.init(title: "Personal Information Removal")
 
