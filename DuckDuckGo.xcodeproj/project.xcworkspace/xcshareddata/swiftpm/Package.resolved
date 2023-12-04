@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/netp-waitlist-final-touches",
-        "revision" : "cd821ad3b5d62b1341578712d47ea80f9514463f"
+        "revision" : "7b35b4c604f1cf17b48aabf72526b15a2fdcc6ce",
+        "version" : "88.0.0"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"
