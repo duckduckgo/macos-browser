@@ -619,7 +619,7 @@ extension DataImportViewModel {
             switch screen {
             case importSource.initialScreen, .feedback:
                 return .cancel
-            case .moreInfo:
+            case .moreInfo, .getReadPermission, .noData:
                 return .back
             default:
                 return nil
