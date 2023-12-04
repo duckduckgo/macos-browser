@@ -75,11 +75,20 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                     .targetting(self)
             }
 
+            NSMenuItem(title: "Operations") {
+                NSMenuItem(title: "Run queued operations", action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations))
+                    .targetting(self)
+
+                NSMenuItem(title: "Run scan operations", action: #selector(DataBrokerProtectionDebugMenu.runScanOperations))
+                    .targetting(self)
+
+                NSMenuItem(title: "Run opt-out operations", action: #selector(DataBrokerProtectionDebugMenu.runScanOperations))
+                    .targetting(self)
+            }
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
-                .targetting(self)
-            NSMenuItem(title: "Run queued operations", action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations))
                 .targetting(self)
         }
     }
@@ -98,6 +107,35 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     @objc private func runQueuedOperations() {
         os_log("Running queued operations...", log: .dataBrokerProtection)
+        DataBrokerProtectionManager.shared.scheduler.runQueuedOperations(showWebView: false) { error in
+            if let error = error {
+                os_log("Queued operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Queued operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func runScanOperations() {
+        os_log("Running scan operations...", log: .dataBrokerProtection)
+        DataBrokerProtectionManager.shared.scheduler.scanAllBrokers(showWebView: false) { error in
+            if let error = error {
+                os_log("Scan operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Scan operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func runOptoutOperations() {
+        os_log("Running Optout operations...", log: .dataBrokerProtection)
+        DataBrokerProtectionManager.shared.scheduler.optOutAllBrokers(showWebView: false) { error in
+            if let error = error {
+                os_log("Optout operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Optout operations finished", log: .dataBrokerProtection)
+            }
+        }
     }
 
     @objc private func backgroundAgentRestart() {
