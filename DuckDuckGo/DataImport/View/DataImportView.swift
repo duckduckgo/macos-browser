@@ -520,7 +520,7 @@ extension DataImportViewModel.ButtonType {
         DataImportView(model: viewModel)
             // swiftlint:disable:next force_cast
             .environment(\EnvironmentValues.presentationMode as! WritableKeyPath,
-                          Binding<PresentationMode> { 
+                          Binding<PresentationMode> {
                 print("DISMISS!")
             })
 

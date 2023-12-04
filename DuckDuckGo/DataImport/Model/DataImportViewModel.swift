@@ -248,7 +248,6 @@ struct DataImportViewModel {
             }
         }
 
-
         if let nextScreen {
             self.screen = nextScreen
         } else if screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: summary.keys.contains)) == nil, // no next data type manual import screen
