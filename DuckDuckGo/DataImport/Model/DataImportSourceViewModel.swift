@@ -23,9 +23,7 @@ struct DataImportSourceViewModel {
     let importSources: [DataImport.Source?]
     var selectedSourceIndex: Int
 
-    let onSelectedSourceChanged: (DataImport.Source) -> Void
-
-    init(importSources: [DataImport.Source]? = nil, selectedSource: DataImport.Source, onSelectedSourceChanged: @escaping (DataImport.Source) -> Void) {
+    init(importSources: [DataImport.Source]? = nil, selectedSource: DataImport.Source) {
         var importSources: [DataImport.Source?] = (importSources ?? DataImport.Source.allCases.filter(\.canImportData))
 
         // The CSV row is at the bottom of the picker, and requires a separator above it, but only if the item array isn't
@@ -42,8 +40,6 @@ struct DataImportSourceViewModel {
 
         self.selectedSourceIndex = self.importSources.firstIndex(of: selectedSource) ?? 0
         assert(self.importSources.indices.contains(selectedSourceIndex))
-
-        self.onSelectedSourceChanged = onSelectedSourceChanged
     }
 
 }

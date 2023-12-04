@@ -22,14 +22,6 @@ struct ReportFeedbackView: View {
 
     @Binding var model: DataImportReportModel
 
-    private var title: LocalizedStringKey {
-        if model.retryNumber <= 1 {
-            "Please submit a report to help us fix the issue."
-        } else {
-            "That didn’t work either. Please submit a report to help us fix the issue."
-        }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
@@ -41,21 +33,29 @@ struct ReportFeedbackView: View {
                     Text("That didn’t work either. Please submit a report to help us fix the issue.",
                          comment: "Data import failure Report dialog title containing a message that not only automatic data import has failed failed but manual browser data import didn‘t work either.")
                 }
-            }().font(.headline)
-
-            Spacer().frame(height: 8)
+            }()
+                .font(.headline)
+                .padding(.bottom, 8)
 
             VStack(alignment: .leading, spacing: 12) {
                 Text("""
                 The following information will be sent to DuckDuckGo. No personally identifiable information will be sent.
                 """, comment: "Data import failure Report dialog subtitle about the data being collected with the report.")
 
-                InfoItemView("macOS version", model.osVersion)
-                InfoItemView("DuckDuckGo browser version", model.appVersion)
-                InfoItemView("The version of the browser you are trying to import from", model.importSourceDescription)
-                InfoItemView("Error message & code", model.error.localizedDescription)
+                InfoItemView(model.osVersion) {
+                    Text("macOS version", comment: "Data import failure Report dialog description of a report field providing user‘s macOS version")
+                }
+                InfoItemView(model.appVersion) {
+                    Text("DuckDuckGo browser version", comment: "Data import failure Report dialog description of a report field providing current DuckDuckGo Browser version")
+                }
+                InfoItemView(model.importSourceDescription) {
+                    Text("The version of the browser you are trying to import from", comment: "Data import failure Report dialog description of a report field providing version of a browser user is trying to import data from")
+                }
+                InfoItemView(model.error.localizedDescription) {
+                    Text("Error message & code", comment: "")
+                }
             }
-            Spacer().frame(height: 24)
+            .padding(.bottom, 24)
 
             ZStack(alignment: .top) {
                 EditableTextView(text: $model.text,
@@ -82,11 +82,11 @@ struct ReportFeedbackView: View {
 
 private struct InfoItemView: View {
 
-    let text: LocalizedStringKey
+    let text: () -> Text
     let data: String
     @State private var isPopoverVisible = false
 
-    init(_ text: LocalizedStringKey, _ data: String) {
+    init(_ data: String, text: @escaping () -> Text) {
         self.text = text
         self.data = data
     }
@@ -103,7 +103,7 @@ private struct InfoItemView: View {
                 Text(data).padding()
             }
 
-            Text(text)
+            text()
         }
     }
 
@@ -127,6 +127,7 @@ private struct InfoItemView: View {
             }
 
             static var errorDomain: String { "ReportFeedbackPreviewError" }
+            var errorType: DataImport.ErrorType { .noData }
 
             case err(Error)
         }

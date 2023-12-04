@@ -35,6 +35,8 @@ final class ChromiumFaviconsReader {
         var action: DataImportAction { .favicons }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .other }
     }
     func importError(type: ImportError.OperationType, underlyingError: Error) -> ImportError {
         ImportError(type: type, underlyingError: underlyingError)

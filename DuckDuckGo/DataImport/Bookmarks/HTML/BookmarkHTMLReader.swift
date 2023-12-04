@@ -40,6 +40,8 @@ final class BookmarkHTMLReader {
         var action: DataImportAction { .bookmarks }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .dataCorrupted }
     }
 
     private var currentOperationType: ImportError.OperationType = .parseXml

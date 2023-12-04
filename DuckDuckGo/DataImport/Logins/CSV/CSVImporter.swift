@@ -143,9 +143,13 @@ final class CSVImporter: DataImporter {
             case cannotReadFile
         }
 
-        var action: DataImportAction { .logins }
+        var action: DataImportAction { .passwords }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType {
+            .dataCorrupted
+        }
     }
 
     private let fileURL: URL

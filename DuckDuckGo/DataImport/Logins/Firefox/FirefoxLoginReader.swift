@@ -43,9 +43,18 @@ final class FirefoxLoginReader {
             case decryptPassword
         }
 
-        var action: DataImportAction { .logins }
+        var action: DataImportAction { .passwords }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType {
+            switch type {
+            case .couldNotFindLoginsFile, .couldNotReadLoginsFile: .noData
+            case .key3readerStage1, .key3readerStage2, .key3readerStage3, .key4readerStage1, .key4readerStage2, .key4readerStage3, .decryptUsername, .decryptPassword: .decryptionError
+            case .couldNotDetermineFormat: .dataCorrupted
+            case .requiresPrimaryPassword: .other
+            }
+        }
     }
 
     typealias LoginReaderFileLineError = FileLineError<FirefoxLoginReader>

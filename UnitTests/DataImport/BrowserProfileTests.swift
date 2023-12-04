@@ -20,7 +20,7 @@ import Foundation
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-class BrowserProfileListTests: XCTestCase {
+class BrowserProfileTests: XCTestCase {
 
     let mockURL = URL(string: "/Users/Dax/Library/ApplicationSupport/BrowserCompany/Browser/")!
 

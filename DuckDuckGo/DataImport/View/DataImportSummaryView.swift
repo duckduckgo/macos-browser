@@ -23,50 +23,79 @@ struct DataImportSummaryView: View {
     typealias DataType = DataImport.DataType
     typealias Summary = DataImport.DataTypeSummary
 
-    let summary: [DataType: Summary]
+    let model: DataImportSummaryViewModel
 
-    init(summary: [DataType: Summary]) {
-        self.summary = summary
+    init(_ importViewModel: DataImportViewModel, dataTypes: Set<DataType>? = nil) {
+        self.init(model: .init(source: importViewModel.importSource, results: importViewModel.summary, dataTypes: dataTypes))
+    }
+
+    init(model: DataImportSummaryViewModel) {
+        self.model = model
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(DataType.allCases.compactMap {
-                guard let result = summary[$0] else { return nil }
-                return (dataType: $0, result: result)
-            }, id: \.dataType) { (item: (dataType: DataType, result: Summary)) in
-                switch item.dataType {
-                case .bookmarks:
+            {
+                switch model.summaryKind {
+                case .results, .importComplete(.passwords):
+                    Text("Import Results:", comment: "Data Import result summary headline")
+
+                case .importComplete(.bookmarks),
+                     .fileImportComplete(.bookmarks):
+                    Text("Bookmarks Import Complete:", comment: "Bookmarks Data Import result summary headline")
+
+                case .fileImportComplete(.passwords):
+                    Text("Password import complete. You can now delete the saved passwords file.", comment: "message about Passwords Data Import completion")
+                }
+            }().padding(.bottom, 16)
+
+            ForEach(model.results, id: \.dataType) { item in
+                switch (item.dataType, item.result) {
+                case (.bookmarks, .success(let summary)):
                     HStack {
                         successImage()
-                        Text("Bookmarks: \(item.result.successful)",
+                        Text("Bookmarks: \(summary.successful)",
                              comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
                     }
-                    if item.result.duplicate > 0 {
+                    if summary.duplicate > 0 {
                         HStack {
                             failureImage()
-                            Text("Duplicate Bookmarks Skipped: \(item.result.duplicate)",
+                            Text("Duplicate Bookmarks Skipped: \(summary.duplicate)",
                                  comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.")
                         }
                     }
-                    if item.result.failed > 0 {
+                    if summary.failed > 0 {
                         HStack {
                             failureImage()
-                            Text("Bookmark import failed: \(item.result.failed)",
+                            Text("Bookmark import failed: \(summary.failed)",
                                  comment: "Data import summary format of how many bookmarks (%lld) failed to import.")
                         }
                     }
 
-                case .passwords:
+                case (.bookmarks, .failure):
+                    HStack {
+                        failureImage()
+                        Text("Bookmark import failed.",
+                             comment: "Data import summary message of failed bookmarks import.")
+                    }
+
+                case (.passwords, .failure):
+                    HStack {
+                        failureImage()
+                        Text("Passwords import failed.",
+                             comment: "Data import summary message of failed passwords import.")
+                    }
+
+                case (.passwords, .success(let summary)):
                     HStack {
                         successImage()
-                        Text("Passwords: \(item.result.successful)",
+                        Text("Passwords: \(summary.successful)",
                              comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
                     }
-                    if item.result.failed > 0 {
+                    if summary.failed > 0 {
                         HStack {
                             failureImage()
-                            Text("Passwords import failed: \(item.result.failed)",
+                            Text("Passwords import failed: \(summary.failed)",
                                  comment: "Data import summary format of how many passwords (%lld) failed to import.")
                         }
                     }
@@ -88,10 +117,12 @@ private func failureImage() -> some View {
 }
 
 #Preview {
-    DataImportSummaryView(summary: [
-        .bookmarks: .init(successful: 123, duplicate: 456, failed: 7890),
-        .passwords: .init(successful: 123, duplicate: 456, failed: 7890)
-    ])
-    .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+    VStack {
+        DataImportSummaryView(model: .init(source: .chrome, summary: [
+            .bookmarks: .success(.init(successful: 123, duplicate: 456, failed: 7890)),
+            .passwords: .success(.init(successful: 123, duplicate: 456, failed: 7890))
+        ]))
+        .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+    }
     .frame(width: 512)
 }

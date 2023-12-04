@@ -8,6 +8,7 @@
 
     },
     "%@ does not support storing %@" : {
+      "comment" : "Data Import disabled checkbox message about a browser (%1$@) not supporting storing a data type (%2$@ - Bookmarks or Passwords)",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -16,9 +17,6 @@
           }
         }
       }
-    },
-    "%@ Import Complete" : {
-
     },
     "%lld" : {
 
@@ -72,7 +70,7 @@
       "comment" : "Main Menu View item"
     },
     "Add any details that you think may help us fix the problem" : {
-
+      "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
     },
     "add.favorite" : {
       "comment" : "Button for adding a favorite bookmark",
@@ -1058,7 +1056,10 @@
       }
     },
     "Bookmark import failed: %lld" : {
-
+      "comment" : "Data import summary format of how many bookmarks (%lld) failed to import."
+    },
+    "Bookmark import failed." : {
+      "comment" : "Data import summary message of failed bookmarks import."
     },
     "bookmark.page" : {
       "comment" : "Context menu item",
@@ -1108,11 +1109,11 @@
         }
       }
     },
-    "Bookmarks import should fail" : {
-
+    "Bookmarks Import Complete:" : {
+      "comment" : "Bookmarks Data Import result summary headline"
     },
     "Bookmarks: %lld" : {
-
+      "comment" : "Data import summary format of how many bookmarks (%lld) were successfully imported."
     },
     "Bookmarks…" : {
       "comment" : "Main Menu File-Export item"
@@ -2414,12 +2415,13 @@
       }
     },
     "DuckDuckGo browser version" : {
-
+      "comment" : "Data import failure Report dialog description of a report field providing current DuckDuckGo Browser version"
     },
     "DuckDuckGo Help" : {
       "comment" : "Main Menu Help item"
     },
     "DuckDuckGo needs your permission to read the %@ bookmarks file. Select the %@ folder to import bookmarks." : {
+      "comment" : "Data import warning that DuckDuckGo browser requires file reading permissions for another browser name (%1$@), and instruction to select its (same browser name - %2$@) bookmarks folder.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2430,7 +2432,7 @@
       }
     },
     "Duplicate Bookmarks Skipped: %lld" : {
-
+      "comment" : "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import."
     },
     "duplicate.tab" : {
       "comment" : "Menu item. Duplicate as a verb",
@@ -3382,7 +3384,7 @@
       }
     },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
-
+      "comment" : "Warning that Chromium data import would require entering system passwords."
     },
     "Import Bookmarks" : {
 
@@ -3393,11 +3395,11 @@
     "Import Browser Data" : {
 
     },
-    "Import Complete" : {
-
-    },
     "Import Passwords" : {
       "comment" : "my comment"
+    },
+    "Import Results:" : {
+      "comment" : "Data Import result summary headline"
     },
     "import.bookmarks.bookmarks" : {
       "comment" : "Title text for the Bookmarks import option",
@@ -3455,6 +3457,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Select Safari Folder…"
+          }
+        }
+      }
+    },
+    "import.browser.data" : {
+      "comment" : "Import Browser Data dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import Browser Data"
           }
         }
       }
@@ -3639,18 +3653,6 @@
         }
       }
     },
-    "import.data.import-failed.title" : {
-      "comment" : "Alert title when the data import fails",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Sorry, we weren't able to import your data."
-          }
-        }
-      }
-    },
     "import.data.initiate" : {
       "comment" : "Button text for importing data",
       "extractionState" : "extracted_with_value",
@@ -3659,6 +3661,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Import"
+          }
+        }
+      }
+    },
+    "import.data.manual" : {
+      "comment" : "Button text for initiating manual data import using a HTML or CSV file when automatic import has failed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manual import…"
           }
         }
       }
@@ -3847,10 +3861,7 @@
       }
     },
     "Let’s try doing it manually. It won’t take long." : {
-
-    },
-    "Login import failed: %lld" : {
-
+      "comment" : "Suggestion to switch to a Manual File Data Import when data import fails."
     },
     "looking.for.bitwarden" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -3865,7 +3876,7 @@
       }
     },
     "macOS version" : {
-
+      "comment" : "Data import failure Report dialog description of a report field providing user‘s macOS version"
     },
     "main.menu.close.downloads" : {
       "comment" : "Hide Downloads Popover",
@@ -5759,6 +5770,9 @@
         }
       }
     },
+    "Password import complete. You can now delete the saved passwords file." : {
+      "comment" : "message about Passwords Data Import completion"
+    },
     "password.manager" : {
       "comment" : "Section header",
       "extractionState" : "extracted_with_value",
@@ -5771,11 +5785,14 @@
         }
       }
     },
-    "Passwords import should fail" : {
-
+    "Passwords import failed: %lld" : {
+      "comment" : "Data import summary format of how many passwords (%lld) failed to import."
+    },
+    "Passwords import failed." : {
+      "comment" : "Data import summary message of failed passwords import."
     },
     "Passwords: %lld" : {
-
+      "comment" : "Data import summary format of how many passwords (%lld) were successfully imported."
     },
     "Passwords…" : {
       "comment" : "Main Menu File-Export item"
@@ -6195,7 +6212,7 @@
       }
     },
     "Please submit a report to help us fix the issue." : {
-
+      "comment" : "Data import failure Report dialog title."
     },
     "pm.activate" : {
       "comment" : "Activate button",
@@ -7773,7 +7790,7 @@
 
     },
     "Select data to import:" : {
-
+      "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks."
     },
     "Select LastPass CSV File…" : {
 
@@ -7782,7 +7799,7 @@
 
     },
     "Select Profile:" : {
-
+      "comment" : "Browser Profile picker title for Data Import"
     },
     "select.bitwarden.preferences" : {
       "comment" : "Setup of the integration with Bitwarden app (up to and including macOS 12)",
@@ -8049,13 +8066,13 @@
       "comment" : "Main Menu Edit-Substitutions item"
     },
     "That didn’t work either. Please submit a report to help us fix the issue." : {
-
+      "comment" : "Data import failure Report dialog title containing a message that not only automatic data import has failed failed but manual browser data import didn‘t work either."
     },
     "The following information will be sent to DuckDuckGo. No personally identifiable information will be sent." : {
-
+      "comment" : "Data import failure Report dialog subtitle about the data being collected with the report."
     },
     "The version of the browser you are trying to import from" : {
-
+      "comment" : "Data import failure Report dialog description of a report field providing version of a browser user is trying to import data from"
     },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",
@@ -8425,8 +8442,19 @@
     "View" : {
       "comment" : "Main Menu View"
     },
-    "We were unable to import directly from %@." : {
-
+    "We couldn‘t find any %@…" : {
+      "comment" : "Data import error message: Bookmarks or Passwords (%@) weren‘t found."
+    },
+    "We were unable to import %@ directly from %@." : {
+      "comment" : "Message when data import fails from a browser. %1$@ - Bookmarks or Passwords; %2$@ - a browser name",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "We were unable to import %1$@ directly from %2$@."
+          }
+        }
+      }
     },
     "web.tracking.protection.explenation" : {
       "comment" : "feature explanation in settings",
@@ -8455,8 +8483,11 @@
     "Window" : {
       "comment" : "Main Menu "
     },
+    "You could try importing %@ manually." : {
+      "comment" : "Data import error subtitle: suggestion to import Bookmarks or Passwords (%@) manually by selecting a CSV or HTML file."
+    },
     "You'll be asked to enter your Primary Password for %@.\n\nImported passwords are encrypted and only stored on this computer." : {
-
+      "comment" : "Warning that Firefox-based browser name (%@) data import would require entering a Primary Password for the browser."
     },
     "zoom" : {
       "comment" : "Menu with Zooming commands",

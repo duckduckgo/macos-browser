@@ -36,10 +36,18 @@ final class ChromiumLoginReader {
             case createImportedLoginCredentialsFailure
         }
 
-        var action: DataImportAction { .logins }
+        var action: DataImportAction { .passwords }
         let type: OperationType
         var underlyingError: Error?
 
+        var errorType: DataImport.ErrorType {
+            switch type {
+            case .couldNotFindLoginData, .failedToTemporarilyCopyDatabase: .noData
+            case .databaseAccessFailed: .dataCorrupted
+            case .decryptionFailed, .failedToDecodePasswordData, .decryptionKeyAccessFailed, .passwordDataTooShort, .dataToStringConversionError: .decryptionError
+            case .userDeniedKeychainPrompt, .createImportedLoginCredentialsFailure: .other
+            }
+        }
     }
 
     private func decryptionKeyAccessFailed(_ status: OSStatus) -> ImportError {

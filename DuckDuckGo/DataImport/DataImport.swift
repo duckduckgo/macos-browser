@@ -131,7 +131,8 @@ enum DataImport {
 
     }
 
-    enum DataType: String, Hashable, CaseIterable {
+    enum DataType: String, Hashable, CaseIterable, CustomStringConvertible {
+
         case bookmarks
         case passwords
 
@@ -141,6 +142,9 @@ enum DataImport {
             case .passwords: UserText.importLoginsPasswords
             }
         }
+
+        var description: String { rawValue }
+
     }
 
     struct DataTypeSummary: Equatable {
@@ -327,13 +331,30 @@ enum DataImport {
         }
     }
 
+    enum ErrorType: String, CustomStringConvertible, CaseIterable {
+        case noData
+        case decryptionError
+        case dataCorrupted
+        case keychainError
+        case other
+
+        var description: String { rawValue }
+    }
+
 }
 
 enum DataImportAction {
     case bookmarks
-    case logins
+    case passwords
     case favicons
     case generic
+
+    init(_ type: DataImport.DataType) {
+        switch type {
+        case .bookmarks: self = .bookmarks
+        case .passwords: self = .passwords
+        }
+    }
 }
 
 protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters, LocalizedError {
@@ -342,6 +363,8 @@ protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters, Locali
     var action: DataImportAction { get }
     var type: OperationType { get }
     var underlyingError: Error? { get }
+
+    var errorType: DataImport.ErrorType { get }
 
 }
 extension DataImportError /* : CustomNSError */ {
@@ -416,7 +439,7 @@ extension DataImporter {
 
 }
 
-enum DataImportResult<T> {
+enum DataImportResult<T>: CustomStringConvertible {
     case success(T)
     case failure(any DataImportError)
 
@@ -477,6 +500,15 @@ enum DataImportResult<T> {
         }
     }
 
+    var description: String {
+        switch self {
+        case .success(let value):
+            ".success(\(value))"
+        case .failure(let error):
+            ".success(\(error))"
+        }
+    }
+
 }
 
 extension DataImportResult: Equatable where T: Equatable {
@@ -504,14 +536,14 @@ struct LoginImporterError: DataImportError {
     private let error: Error?
     private let _type: OperationType?
 
-    var action: DataImportAction { .logins }
+    var action: DataImportAction { .passwords }
 
     init(error: Error?, type: OperationType? = nil) {
         self.error = error
         self._type = type
     }
 
-    struct OperationType: RawRepresentable {
+    struct OperationType: RawRepresentable, Equatable {
         let rawValue: Int
 
         static let malformedCSV = OperationType(rawValue: -2)
@@ -549,6 +581,34 @@ struct LoginImporterError: DataImportError {
         default:
             return error
         }
+    }
+
+    var errorType: DataImport.ErrorType {
+        if case .malformedCSV = type {
+            return .dataCorrupted
+        }
+        if let secureStorageError = error as? SecureStorageError {
+            switch secureStorageError {
+            case .initFailed,
+                 .authError,
+                 .failedToOpenDatabase,
+                 .databaseError:
+                return .keychainError
+
+            case .keystoreError, .secError:
+                return .keychainError
+
+            case .authRequired,
+                 .invalidPassword,
+                 .noL1Key,
+                 .noL2Key,
+                 .duplicateRecord,
+                 .generalCryptoError,
+                 .encodingFailed:
+                return .decryptionError
+            }
+        }
+        return .other
     }
 
 }

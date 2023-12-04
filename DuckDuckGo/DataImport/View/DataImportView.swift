@@ -44,10 +44,14 @@ struct DataImportView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State var viewModel = DataImportViewModel()
+    @State var model = DataImportViewModel()
 
     @State private var progressText: String?
     @State private var progressFraction: Double?
+
+#if DEBUG || REVIEW
+    @State private var debugViewDisabled: Bool = false
+#endif
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -55,7 +59,6 @@ struct DataImportView: View {
                 .padding(.top, 20)
                 .padding(.leading, 20)
                 .padding(.trailing, 20)
-                .padding(.bottom, 24)
 
             viewBody()
                 .padding(.leading, 20)
@@ -68,6 +71,12 @@ struct DataImportView: View {
                 .padding(.top, 16)
                 .padding(.bottom, 16)
                 .padding(.trailing, 20)
+
+#if DEBUG || REVIEW
+            if !debugViewDisabled {
+                debugView()
+            }
+#endif
         }
         .frame(width: 512)
         .fixedSize()
@@ -80,47 +89,56 @@ struct DataImportView: View {
                 .padding(.bottom, 16)
 
             // browser to import data from picker popup
-            if case .feedback = viewModel.screen {} else {
-                DataImportSourcePicker(selectedSource: viewModel.importSource) { importSource in
-                    viewModel.update(with: importSource)
+            if case .feedback = model.screen {} else {
+                DataImportSourcePicker(selectedSource: model.importSource) { importSource in
+                    model.update(with: importSource)
                 }
-                .disabled(viewModel.isImportSourcePickerDisabled)
+                .disabled(model.isImportSourcePickerDisabled)
+                .padding(.bottom, 24)
             }
         }
     }
 
-    // swiftlint:disable:next function_body_length
     private func viewBody() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             // body
-            switch viewModel.screen {
+            switch model.screen {
             case .profileAndDataTypesPicker:
                 // Browser Profile picker
-                DataImportProfilePicker(profileList: viewModel.browserProfiles,
-                                        selectedProfile: $viewModel.selectedProfile)
-                .disabled(viewModel.isImportSourcePickerDisabled)
+                DataImportProfilePicker(profileList: model.browserProfiles,
+                                        selectedProfile: $model.selectedProfile)
+                .disabled(model.isImportSourcePickerDisabled)
                 .padding(.bottom, 24)
 
                 // Bookmarks/Passwords checkboxes
-                DataImportTypePicker(viewModel: $viewModel)
-                    .disabled(viewModel.isImportSourcePickerDisabled)
+                DataImportTypePicker(viewModel: $model)
+                    .disabled(model.isImportSourcePickerDisabled)
 
             case .moreInfo:
                 // you will be asked for your keychain password blah blah...
-                BrowserImportMoreInfoView(source: viewModel.importSource)
+                BrowserImportMoreInfoView(source: model.importSource)
 
             case .getReadPermission(let url):
                 // give request to Safari folder, select Bookmarks.plist using open panel
-                RequestFilePermissionView(source: viewModel.importSource, url: url, requestDataDirectoryPermission: SafariDataImporter.requestDataDirectoryPermission) { _ in
+                RequestFilePermissionView(source: model.importSource, url: url, requestDataDirectoryPermission: SafariDataImporter.requestDataDirectoryPermission) { _ in
 
-                    viewModel.initiateImport()
+                    model.initiateImport()
                 }
 
-            case .fileImport(let dataType):
+            case .noData(dataType: let dataType):
+                // no #dataType imported [skip], [manual import]
+                DataImportNoDataView(source: model.importSource, dataType: dataType) {
+                    model.manualImport(dataType: dataType)
+                }
+
+            case .fileImport(let dataType, summary: let summaryTypes):
+                if !summaryTypes.isEmpty {
+                    DataImportSummaryView(model, dataTypes: summaryTypes)
+
                 // if browser importer failed - display error message
-                if viewModel.hasDataTypeImportFailed(dataType) {
-                    Text("We were unable to import directly from \(viewModel.importSource.importSourceName).",
-                         comment: "Message when data import fails from a browser. %@ - a browser name")
+                } else if model.hasDataTypeImportFailed(dataType) {
+                    Text("We were unable to import \(dataType.displayName) directly from \(model.importSource.importSourceName).",
+                         comment: "Message when data import fails from a browser. %1$@ - Bookmarks or Passwords; %2$@ - a browser name")
                         .font(.headline)
                     Spacer().frame(height: 8)
                     Text("Let’s try doing it manually. It won’t take long.",
@@ -129,42 +147,24 @@ struct DataImportView: View {
                 }
 
                 // manual file import instructions for CSV/HTML
-                FileImportView(source: viewModel.importSource, dataType: dataType, isButtonDisabled: viewModel.isSelectFileButtonDisabled) {
-                    viewModel.selectFile()
+                FileImportView(source: model.importSource, dataType: dataType, isButtonDisabled: model.isSelectFileButtonDisabled) {
+                    model.selectFile()
                 } onFileDrop: { url in
-                    viewModel.initiateImport(fileURL: url)
+                    model.initiateImport(fileURL: url)
                 }
 
-            case .fileImportSummary(let dataType):
-                // present file impoter import summary for one data type
-                Text("\(dataType.displayName) Import Complete", 
-                     comment: "Passwords or Bookmarks (%@) File Data Import completion message")
-                    .font(.headline)
-                Spacer().frame(height: 12)
-                DataImportSummaryView(summary: (
-                    try? viewModel.summary.last(where: {
-                        $0.dataType == dataType
-                    })?.result.get()
-                ).map { [dataType: $0] } ?? [:])
-
-            case .summary:
-                // total import summary
-                Text("Import Complete",
-                     comment: "Browser data import completion message")
-                    .font(.headline)
-                Spacer().frame(height: 12)
-
-                // import completed
-                DataImportSummaryView(summary: viewModel.summary.reduce(into: [:]) {
-                    $0[$1.dataType] = try? $1.result.get()
-                })
+            case .summary(let dataTypes):
+                DataImportSummaryView(model, dataTypes: dataTypes)
 
             case .feedback:
-                ReportFeedbackView(model: $viewModel.reportModel)
+                DataImportSummaryView(model)
+                .padding(.bottom, 20)
+
+                ReportFeedbackView(model: $model.reportModel)
             }
 
             // Import in progress…
-            if let importProgress = viewModel.importProgress {
+            if let importProgress = model.importProgress {
                 progressView(importProgress)
             }
         }
@@ -177,7 +177,7 @@ struct DataImportView: View {
         }
         .padding(.top, 24)
         .task {
-            // when viewModel.importProgress async sequence not nil
+            // when model.importProgress async sequence not nil
             // receive progress updates events and update model on completion
             await handleImportProgress(progress)
         }
@@ -188,14 +188,14 @@ struct DataImportView: View {
         HStack(spacing: 8) {
             Spacer()
 
-            ForEach(viewModel.buttons, id: \.type) { button in
+            ForEach(model.buttons, id: \.self) { button in
                 Button {
-                    viewModel.performAction(for: button.type, dismiss: dismiss.callAsFunction)
+                    model.performAction(for: button, dismiss: dismiss.callAsFunction)
                 } label: {
-                    Text(button.type.title)
+                    Text(button.title)
                         .frame(minWidth: 80 - 16 - 1)
                 }
-                .keyboardShortcut(button.type.shortcut)
+                .keyboardShortcut(button.shortcut)
                 .disabled(button.isDisabled)
             }
         }
@@ -211,12 +211,65 @@ struct DataImportView: View {
                 progressText = progress.description
                 progressFraction = progress.fraction
 
-            // update view model on completion
-            case .completed(.success(let viewModel)):
-                self.viewModel = viewModel
+                // update view model on completion
+            case .completed(.success(let newModel)):
+                self.model = newModel
             }
         }
     }
+
+#if DEBUG || REVIEW
+    private func debugView() -> some View {
+
+        VStack(alignment: .leading, spacing: 10) {
+            Divider()
+
+            HStack {
+                Text("REVIEW:" as String).bold()
+                    .padding(.top, 10)
+                    .padding(.leading, 20)
+                Spacer()
+                if case .normal = NSApp.runType {
+                    Button("⛌" as String) { debugViewDisabled.toggle() }
+                        .buttonStyle(.borderless)
+                        .padding(.trailing, 20)
+                }
+            }
+
+            ForEach(DataImport.DataType.allCases.filter(model.selectedDataTypes.contains), id: \.self) { selectedDataType in
+                failureReasonPicker(for: selectedDataType)
+                    .padding(.leading, 20)
+                    .padding(.trailing, 20)
+            }
+        }
+        .padding(.bottom, 10)
+        .background(Color(NSColor(red: 1, green: 0, blue: 0, alpha: 0.2)))
+    }
+
+    private var noFailure: String { "No failure" }
+    private var allFailureReasons: [String?] {
+        [noFailure, nil] + DataImport.ErrorType.allCases.map { $0.rawValue }
+    }
+
+    private func failureReasonPicker(for dataType: DataImport.DataType) -> some View {
+        Picker(selection: Binding {
+            allFailureReasons.firstIndex(of: model.testImportFailureReasons[dataType]?.rawValue ?? noFailure)!
+        } set: { newValue in
+            model.testImportFailureReasons[dataType] = DataImport.ErrorType(rawValue: allFailureReasons[newValue]!)
+        }) {
+            ForEach(allFailureReasons.indices, id: \.self) { idx in
+                if let failureReason = allFailureReasons[idx] {
+                    Text(failureReason)
+                } else {
+                    Divider()
+                }
+            }
+        } label: {
+            Text("\(dataType.displayName) import error:" as String)
+                .frame(width: 150, alignment: .leading)
+        }
+    }
+#endif
 
 }
 
@@ -316,6 +369,7 @@ extension DataImportViewModel.ButtonType {
                 }
                 return nil
             }
+            var errorType: DataImport.ErrorType { .noData }
 
             case err(Error)
         }
@@ -403,7 +457,7 @@ extension DataImportViewModel.ButtonType {
                             || (type == .passwords && PreviewPreferences.shared.shouldPasswordsImportFail) {
                             result[type] = .failure(ImportError.err(MockError()))
                         } else {
-                            result[type] = .success(.init(successful: Int.random(in: 0..<100000), duplicate: Int.random(in: 0..<100000), failed: Int.random(in: 0..<100000)))
+                            result[type] = .success(.init(successful: Int.random(in: 0..<100000), duplicate: 0, failed: 0))
                         }
                     }
                     return result
@@ -450,27 +504,28 @@ extension DataImportViewModel.ButtonType {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 10) {
-                Toggle("Bookmarks import should fail", isOn: $prefs.shouldBookmarkImportFail)
-                Toggle("Passwords import should fail", isOn: $prefs.shouldPasswordsImportFail)
-                Toggle("Display progress", isOn: $prefs.shouldDisplayProgress)
+                HStack {
+                    Toggle("Display progress", isOn: $prefs.shouldDisplayProgress)
+                        .padding(.leading, 20)
+                        .padding(.bottom, 20)
+                    Spacer()
+                }
             }
-            .padding(EdgeInsets(top: 0, leading: 20, bottom: 10, trailing: 10))
+            .frame(width: 512)
+            .background(Color(NSColor(red: 1, green: 0, blue: 0, alpha: 0.2)))
         }
     }
 
-    return VStack {
-        DataImportView(viewModel: viewModel)
+    return VStack(alignment: .leading, spacing: 0) {
+        DataImportView(model: viewModel)
             // swiftlint:disable:next force_cast
             .environment(\EnvironmentValues.presentationMode as! WritableKeyPath,
-                          Binding<PresentationMode> { print("DISMISS!") })
+                          Binding<PresentationMode> { 
+                print("DISMISS!")
+            })
 
-        VStack(alignment: .leading, spacing: 10) {
-            Spacer()
-            Divider().frame(width: 512)
-            PreviewPreferencesView()
-
-        }.background(Color(NSColor(red: 1, green: 0, blue: 0, alpha: 0.3)))
+        PreviewPreferencesView()
     }
-    .frame(minHeight: 500)
+    .frame(minHeight: 666)
 
 }() }

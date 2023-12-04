@@ -23,13 +23,16 @@ struct DataImportSourcePicker: View {
 
     @State private var viewModel: DataImportSourceViewModel
 
+    private let onSelectedSourceChanged: (DataImport.Source) -> Void
+
     private var importSources: [DataImport.Source?] {
         viewModel.importSources
     }
 
     init(selectedSource: DataImport.Source,
          onSelectedSourceChanged: @escaping (DataImport.Source) -> Void) {
-        self.viewModel = DataImportSourceViewModel(selectedSource: selectedSource, onSelectedSourceChanged: onSelectedSourceChanged)
+        self.viewModel = DataImportSourceViewModel(selectedSource: selectedSource)
+        self.onSelectedSourceChanged = onSelectedSourceChanged
     }
 
     var body: some View {
@@ -51,7 +54,7 @@ struct DataImportSourcePicker: View {
             .controlSize(.large)
             .onChange(of: viewModel.selectedSourceIndex) { idx in
                 guard let importSource = importSources[idx] else { return }
-                viewModel.onSelectedSourceChanged(importSource)
+                onSelectedSourceChanged(importSource)
             }
     }
 

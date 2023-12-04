@@ -624,7 +624,7 @@ struct CircleNumberView: View {
 // MARK: - Preview
 
 #Preview {
-    FileImportView(source: .bitwarden, dataType: .passwords, isButtonDisabled: false)
+    FileImportView(source: .chrome, dataType: .passwords, isButtonDisabled: false)
         .frame(width: 512 - 20)
 
 }

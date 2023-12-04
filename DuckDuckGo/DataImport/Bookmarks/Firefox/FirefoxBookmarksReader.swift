@@ -49,6 +49,14 @@ final class FirefoxBookmarksReader {
         var action: DataImportAction { .bookmarks }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType {
+            switch type {
+            case .dbOpen: .noData
+            case .fetchRootEntries, .noRootEntries, .fetchTopLevelFolders, .fetchAllBookmarks, .fetchAllFolders: .dataCorrupted
+            case .copyTemporaryFile: .other
+            }
+        }
     }
 
     private let firefoxPlacesDatabaseURL: URL
