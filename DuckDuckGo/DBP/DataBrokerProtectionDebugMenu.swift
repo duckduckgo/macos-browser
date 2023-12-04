@@ -22,6 +22,7 @@ import DataBrokerProtection
 import Foundation
 import AppKit
 import Common
+import LoginItems
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
@@ -62,11 +63,24 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 waitlistInviteCodeItem
                 waitlistTermsAndConditionsAcceptedItem
             }
-            NSMenuItem(title: "Debug") {
-                NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+
+            NSMenuItem(title: "Background Agent") {
+                NSMenuItem(title: "Enable", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentEnable))
                     .targetting(self)
 
+                NSMenuItem(title: "Disable", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentDisable))
+                    .targetting(self)
+
+                NSMenuItem(title: "Restart", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentRestart))
+                    .targetting(self)
             }
+
+            NSMenuItem.separator()
+
+            NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+                .targetting(self)
+            NSMenuItem(title: "Run queued operations", action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations))
+                .targetting(self)
         }
     }
 
@@ -81,6 +95,22 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     // MARK: - Menu functions
+
+    @objc private func runQueuedOperations() {
+        os_log("Running queued operations...", log: .dataBrokerProtection)
+    }
+
+    @objc private func backgroundAgentRestart() {
+        LoginItemsManager().restartLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+    }
+
+    @objc private func backgroundAgentDisable() {
+        LoginItemsManager().disableLoginItems([LoginItem.dbpBackgroundAgent])
+    }
+
+    @objc private func backgroundAgentEnable() {
+        LoginItemsManager().enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+    }
 
     @objc private func showDatabaseBrowser() {
         let viewController = DataBrokerDatabaseBrowserViewController()
