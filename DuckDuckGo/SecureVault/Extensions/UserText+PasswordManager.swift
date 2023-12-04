@@ -34,7 +34,7 @@ extension UserText {
     static let pmEmptyStateNotesTitle = NSLocalizedString("pm.empty.notes.title", value: "No Notes", comment: "Label for notes empty state title")
 
     static let pmNewCard = NSLocalizedString("pm.new.card", value: "Credit Card", comment: "Label for new card title")
-    static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Title", comment: "Label for new login title")
+    static let pmNewLogin = NSLocalizedString("pm.new.login", value: "Password", comment: "Label for new login title")
     static let pmNewIdentity = NSLocalizedString("pm.new.identity", value: "Identity", comment: "Label for new identity title")
     static let pmNewNote = NSLocalizedString("pm.new.note", value: "Note", comment: "Label for new note title")
 
