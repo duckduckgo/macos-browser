@@ -134,6 +134,7 @@ extension Pixel.Event {
              .dataBrokerProtectionWaitlistIntroDisplayed,
              .dataBrokerProtectionWaitlistNotificationShown,
              .dataBrokerProtectionWaitlistNotificationTapped,
+             .dataBrokerProtectionWaitlistCardUITapped,
              .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
              .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
              .homeButtonLeft,
