@@ -20,6 +20,7 @@ import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import NetworkProtectionUI
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
 /// changes that need to be relayed back to IPC clients.
@@ -33,15 +34,18 @@ final class TunnelControllerIPCService {
     private let server: NetworkProtectionIPC.TunnelControllerIPCServer
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
+    private let defaults: UserDefaults
 
     init(tunnelController: TunnelController,
          networkExtensionController: NetworkExtensionController,
-         statusReporter: NetworkProtectionStatusReporter) {
+         statusReporter: NetworkProtectionStatusReporter,
+         defaults: UserDefaults = .netP) {
 
         self.tunnelController = tunnelController
         self.networkExtensionController = networkExtensionController
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
+        self.defaults = defaults
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
@@ -107,11 +111,27 @@ extension TunnelControllerIPCService: IPCServerInterface {
         try? await networkExtensionController.deactivateSystemExtension()
     }
 
-    func debugCommand(_ command: DebugCommand) async {
-        guard let activeSession = try? await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID) else {
-            return
-        }
+    func debugCommand(_ command: DebugCommand) async throws {
+        _ = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID)
 
-        try? await activeSession.sendProviderRequest(.debugCommand(command))
+        switch command {
+        case .removeSystemExtension:
+#if NETP_SYSTEM_EXTENSION
+            try await networkExtensionController.deactivateSystemExtension()
+            defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowExtension)
+#endif
+        case .expireRegistrationKey:
+            // Intentional no-op: handled by the extension
+            break
+        case .sendTestNotification:
+            // Intentional no-op: handled by the extension
+            break
+        case .removeVPNConfiguration:
+            await VPNConfigurationManager().removeVPNConfiguration()
+
+            if defaults.networkProtectionOnboardingStatus == .completed {
+                defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
+            }
+        }
     }
 }

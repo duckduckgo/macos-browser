@@ -23,6 +23,7 @@ import Combine
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SwiftUI
 import WebKit
+import Configuration
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -77,7 +78,8 @@ import Subscription
     let favoritesMenu = NSMenu(title: UserText.favorites)
 
     private var toggleBookmarksBarMenuItem = NSMenuItem(title: "BookmarksBarMenuPlaceholder", action: #selector(MainViewController.toggleBookmarksBarFromMenu), keyEquivalent: "B")
-    let toggleHomeButtonMenuItem = NSMenuItem(title: UserText.mainMenuViewShowHomeShortcut, action: #selector(MainViewController.toggleHomeButton), keyEquivalent: "Y")
+
+    var homeButtonMenuItem = NSMenuItem(title: "HomeButtonPlaceholder")
     let toggleAutofillShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowAutofillShortcut, action: #selector(MainViewController.toggleAutofillShortcut), keyEquivalent: "A")
     let toggleBookmarksShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowBookmarksShortcut, action: #selector(MainViewController.toggleBookmarksShortcut), keyEquivalent: "K")
     let toggleDownloadsShortcutMenuItem = NSMenuItem(title: UserText.mainMenuViewShowDownloadsShortcut, action: #selector(MainViewController.toggleDownloadsShortcut), keyEquivalent: "J")
@@ -92,6 +94,8 @@ import Subscription
     // MARK: - Debug
 
     private var loggingMenu: NSMenu?
+    let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
+    let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
 
     // MARK: - Help
 
@@ -240,7 +244,7 @@ import Subscription
                 NSMenuItem(title: UserText.openDownloads, action: #selector(MainViewController.toggleDownloads), keyEquivalent: "j")
                 NSMenuItem.separator()
 
-                toggleHomeButtonMenuItem
+                homeButtonMenuItem
                 toggleAutofillShortcutMenuItem
                 toggleBookmarksShortcutMenuItem
                 toggleDownloadsShortcutMenuItem
@@ -375,9 +379,11 @@ import Subscription
         toggleNetworkProtectionShortcutMenuItem.isHidden = true
 #endif
 
+        updateHomeButtonMenuItem()
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateRemoteConfigurationInfo()
     }
 
     // MARK: - Bookmarks
@@ -496,6 +502,14 @@ import Subscription
         self.bookmarksMenuToggleBookmarksBarMenuItem = bookmarksMenuToggleBookmarksBarMenuItem
     }
 
+    private func updateHomeButtonMenuItem() {
+        guard let homeButtonMenuItem = HomeButtonMenuFactory.replace(homeButtonMenuItem) else {
+            assertionFailure("Could not replace HomeButtonMenuItem")
+            return
+        }
+        self.homeButtonMenuItem = homeButtonMenuItem
+    }
+
     @MainActor
     @objc
     private func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -507,7 +521,6 @@ import Subscription
         toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
         toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
         toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
-        toggleHomeButtonMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
 
 #if NETWORK_PROTECTION
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
@@ -521,6 +534,7 @@ import Subscription
 
     // MARK: - Debug
 
+    // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
             NSMenuItem(title: "Reset Data") {
@@ -546,10 +560,23 @@ import Subscription
                 NSMenuItem(title: "Show Pop Up Window", action: #selector(MainViewController.showPopUpWindow))
             }
             NSMenuItem(title: "Remote Configuration") {
-                NSMenuItem(title: "Fetch Configuration Now", action: #selector(MainViewController.fetchConfigurationNow))
+                customConfigurationUrlMenuItem
+                configurationDateAndTimeMenuItem
+                NSMenuItem.separator()
+                NSMenuItem(title: "Reload Configuration Now", action: #selector(MainViewController.reloadConfigurationNow))
+                NSMenuItem(title: "Set custom configuration URL…", action: #selector(MainViewController.setCustomConfigurationURL))
+                NSMenuItem(title: "Reset configuration to default", action: #selector(MainViewController.resetConfigurationToDefault))
             }
-            NSMenuItem(title: "Sync")
+            NSMenuItem(title: "User Scripts") {
+                NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
+            }
+            NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
+
+#if DBP
+            NSMenuItem(title: "Personal Information Removal")
+                .submenu(DataBrokerProtectionDebugMenu())
+#endif
 
 #if NETWORK_PROTECTION
             NSMenuItem(title: "Network Protection")
@@ -605,6 +632,12 @@ import Subscription
 
             item.state = enabledCategories.contains(category) ? .on : .off
         }
+    }
+
+    private func updateRemoteConfigurationInfo() {
+        let dateString = DateFormatter.localizedString(from: ConfigurationManager.shared.lastUpdateTime, dateStyle: .short, timeStyle: .medium)
+        configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
     }
 
     @objc private func loggingMenuItemAction(_ sender: NSMenuItem) {

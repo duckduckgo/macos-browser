@@ -124,12 +124,13 @@ final class DataBrokerProtectionStageDurationCalculator {
     }
 }
 
-public enum DataBrokerProtectionPixels: Equatable {
+public enum DataBrokerProtectionPixels {
     struct Consts {
         static let dataBrokerParamKey = "data_broker"
         static let appVersionParamKey = "app_version"
         static let attemptIdParamKey = "attempt_id"
         static let durationParamKey = "duration"
+        static let bundleIDParamKey = "bundle_id"
         static let stageKey = "stage"
     }
 
@@ -152,6 +153,33 @@ public enum DataBrokerProtectionPixels: Equatable {
     case optOutSubmitSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutSuccess(dataBroker: String, attemptId: UUID, duration: Double)
     case optOutFailure(dataBroker: String, attemptId: UUID, duration: Double, stage: String)
+
+    // Backgrond Agent events
+    case backgroundAgentStarted
+    case backgroundAgentStartedStoppingDueToAnotherInstanceRunning
+    case backgroundAgentRunOperationsAndStartSchedulerIfPossible
+    case backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile
+    // There's currently no point firing this because the scheduler never calls the completion with an error
+    // case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackError(error: Error)
+    case backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler
+
+    // IPC server events
+    case ipcServerRegister
+    case ipcServerStartScheduler
+    case ipcServerStopScheduler
+    case ipcServerOptOutAllBrokers
+    case ipcServerOptOutAllBrokersCompletion(error: Error?)
+    case ipcServerScanAllBrokers
+    case ipcServerScanAllBrokersCompletion(error: Error?)
+    case ipcServerRunQueuedOperations
+    case ipcServerRunQueuedOperationsCompletion(error: Error?)
+    case ipcServerRunAllOperations
+
+    // Login Item events
+    case enableLoginItem
+    case restartLoginItem
+    case disableLoginItem
+    case resetLoginItem
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
@@ -179,6 +207,29 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
             // Debug Pixels
         case .error: return "data_broker_error"
+
+        case .backgroundAgentStarted: return "m_mac_dbp_background-agent_started"
+        case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "m_mac_dbp_background-agent_started_stopping-due-to-another-instance-running"
+
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossible: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible"
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_no-saved-profile"
+        case .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler: return "m_mac_dbp_background-agent-run-operations-and-start-scheduler-if-possible_callback_start-scheduler"
+
+        case .ipcServerRegister: return "m_mac_dbp_ipc-server_register"
+        case .ipcServerStartScheduler: return "m_mac_dbp_ipc-server_start-scheduler"
+        case .ipcServerStopScheduler: return "m_mac_dbp_ipc-server_stop-scheduler"
+        case .ipcServerOptOutAllBrokers: return "m_mac_dbp_ipc-server_opt-out-all-brokers"
+        case .ipcServerOptOutAllBrokersCompletion: return "m_mac_dbp_ipc-server_opt-out-all-brokers_completion"
+        case .ipcServerScanAllBrokers: return "m_mac_dbp_ipc-server_scan-all-brokers"
+        case .ipcServerScanAllBrokersCompletion: return "m_mac_dbp_ipc-server_scan-all-brokers_completion"
+        case .ipcServerRunQueuedOperations: return "m_mac_dbp_ipc-server_run-queued-operations"
+        case .ipcServerRunQueuedOperationsCompletion: return "m_mac_dbp_ipc-server_run-queued-operations_completion"
+        case .ipcServerRunAllOperations: return "m_mac_dbp_ipc-server_run-all-operations"
+
+        case .enableLoginItem: return "m_mac_dbp_login-item_enable"
+        case .restartLoginItem: return "m_mac_dbp_login-item_restart"
+        case .disableLoginItem: return "m_mac_dbp_login-item_disable"
+        case .resetLoginItem: return "m_mac_dbp_login-item_reset"
         }
     }
 
@@ -225,6 +276,27 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration)]
         case .optOutFailure(let dataBroker, let attemptId, let duration, let stage):
             return [Consts.dataBrokerParamKey: dataBroker, Consts.attemptIdParamKey: attemptId.uuidString, Consts.durationParamKey: String(duration), Consts.stageKey: stage]
+        case .backgroundAgentStarted,
+                .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
+                .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
+                .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
+                .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
+                .enableLoginItem,
+                .restartLoginItem,
+                .disableLoginItem,
+                .resetLoginItem:
+            return [:]
+        case .ipcServerRegister,
+                .ipcServerStartScheduler,
+                .ipcServerStopScheduler,
+                .ipcServerOptOutAllBrokers,
+                .ipcServerOptOutAllBrokersCompletion,
+                .ipcServerScanAllBrokers,
+                .ipcServerScanAllBrokersCompletion,
+                .ipcServerRunQueuedOperations,
+                .ipcServerRunQueuedOperationsCompletion,
+                .ipcServerRunAllOperations:
+            return [Consts.bundleIDParamKey: Bundle.main.bundleIdentifier ?? "nil"]
         }
     }
 }
@@ -235,6 +307,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         super.init { event, _, _, _ in
             switch event {
             case .error(let error, _):
+                PixelKit.fire(DebugEvent(event, error: error))
+            case .ipcServerOptOutAllBrokersCompletion(error: let error),
+                    .ipcServerScanAllBrokersCompletion(error: let error),
+                    .ipcServerRunQueuedOperationsCompletion(error: let error):
                 PixelKit.fire(DebugEvent(event, error: error))
             case .parentChildMatches,
                     .optOutStart,
@@ -249,7 +325,23 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutFinish,
                     .optOutSubmitSuccess,
                     .optOutSuccess,
-                    .optOutFailure:
+                    .optOutFailure,
+                    .backgroundAgentStarted,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
+                    .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
+                    .ipcServerRegister,
+                    .ipcServerStartScheduler,
+                    .ipcServerStopScheduler,
+                    .ipcServerOptOutAllBrokers,
+                    .ipcServerScanAllBrokers,
+                    .ipcServerRunQueuedOperations,
+                    .ipcServerRunAllOperations,
+                    .enableLoginItem,
+                    .restartLoginItem,
+                    .disableLoginItem,
+                    .resetLoginItem:
                 PixelKit.fire(event)
             }
         }

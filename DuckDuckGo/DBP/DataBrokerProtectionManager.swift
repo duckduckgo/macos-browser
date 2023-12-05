@@ -26,7 +26,8 @@ public final class DataBrokerProtectionManager {
 
     static let shared = DataBrokerProtectionManager()
 
-    private let authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData()
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+    private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
@@ -38,10 +39,10 @@ public final class DataBrokerProtectionManager {
     }()
 
     lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
-        let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId)
+        let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, pixelHandler: pixelHandler)
         let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
 
-        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler)
+        return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler, pixelHandler: pixelHandler)
     }()
 
     private init() {

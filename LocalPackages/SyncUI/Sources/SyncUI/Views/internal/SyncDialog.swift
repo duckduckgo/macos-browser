@@ -21,13 +21,15 @@ import SwiftUI
 struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
 
     let spacing: CGFloat
+    let bottomText: String?
     @ViewBuilder let content: () -> Content
     @ViewBuilder let buttons: () -> Buttons
 
-    init(spacing: CGFloat = 16.0, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
+    init(spacing: CGFloat = 16.0, bottomText: String? = nil, @ViewBuilder content: @escaping () -> Content, @ViewBuilder buttons: @escaping () -> Buttons) {
         self.spacing = spacing
         self.content = content
         self.buttons = buttons
+        self.bottomText = bottomText
     }
 
     var body: some View {
@@ -42,6 +44,11 @@ struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
                 .padding(.bottom, 16.0)
 
             HStack {
+                if let bottomText {
+                    Spacer()
+                    Text(bottomText)
+                        .foregroundColor(Color("BlackWhite60"))
+                }
                 Spacer()
                 buttons()
             }
@@ -49,7 +56,9 @@ struct SyncDialog<Content, Buttons>: View where Content: View, Buttons: View {
         }
         .padding(.top, spacing)
         .padding(.bottom, 16.0)
-        .frame(minWidth: 360, minHeight: 298, idealHeight: 314)
-
+        .frame(minWidth: 360, idealHeight: 314)
+        .background(
+            Color("DialogPanelBackground")
+        )
     }
 }

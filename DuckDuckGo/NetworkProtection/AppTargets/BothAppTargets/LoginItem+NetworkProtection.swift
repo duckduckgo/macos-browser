@@ -21,9 +21,9 @@
 import LoginItems
 
 extension LoginItem {
-    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, log: .networkProtection)
+    static let vpnMenu = LoginItem(bundleId: Bundle.main.vpnMenuAgentBundleId, defaults: .netP, log: .networkProtection)
 #if NETP_SYSTEM_EXTENSION
-    static let notificationsAgent = LoginItem(bundleId: Bundle.main.notificationsAgentBundleId, log: .networkProtection)
+    static let notificationsAgent = LoginItem(bundleId: Bundle.main.notificationsAgentBundleId, defaults: .netP, log: .networkProtection)
 #endif
 
 }

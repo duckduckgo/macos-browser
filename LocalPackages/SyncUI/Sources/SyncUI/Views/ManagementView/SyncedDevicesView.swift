@@ -27,19 +27,31 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
     let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        SyncedDevicesList(devices: model.devices,
-                          presentDeviceDetails: model.presentDeviceDetails,
-                          presentRemoveDevice: model.presentRemoveDevice)
-        .onReceive(timer) { _ in
-            guard isVisible else { return }
-            model.refreshDevices()
+        VStack {
+            SyncedDevicesList(devices: model.devices,
+                              presentDeviceDetails: model.presentDeviceDetails,
+                              presentRemoveDevice: model.presentRemoveDevice)
+            .onReceive(timer) { _ in
+                guard isVisible else { return }
+                model.refreshDevices()
+            }
+            .onAppear {
+                isVisible = true
+            }
+            .onDisappear {
+                isVisible = false
+            }
+            SyncPreferencesRow {
+            } centerContent: {
+                Button {
+                    model.syncWithAnotherDevicePressed()
+                } label: {
+                    Text("Sync with Another Device")
+                        .frame(height: 24)
+                }
+            }
         }
-        .onAppear {
-            isVisible = true
-        }
-        .onDisappear {
-            isVisible = false
-        }
+        .roundedBorder()
     }
 }
 
@@ -54,6 +66,14 @@ struct SyncedDeviceIcon: View {
             return NSImage(imageLiteralResourceName: "SyncedDeviceMobile")
         }
     }
+
+    var body: some View {
+        IconOnBackground(image: image)
+    }
+}
+
+struct IconOnBackground: View {
+    var image: NSImage
 
     var body: some View {
         ZStack {
@@ -125,8 +145,11 @@ struct SyncedDevicesList: View {
                     }
                 }
             }
+            Rectangle()
+                .fill(Color("BlackWhite10"))
+                .frame(height: 1)
+                .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
         }
-        .roundedBorder()
     }
 
 }

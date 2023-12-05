@@ -20,12 +20,14 @@ import Foundation
 import Combine
 
 protocol StartupPreferencesPersistor {
+    var appearancePrefs: AppearancePreferences { get set }
     var restorePreviousSession: Bool { get set }
     var launchToCustomHomePage: Bool { get set }
     var customHomePageURL: String { get set }
 }
 
 struct StartupPreferencesUserDefaultsPersistor: StartupPreferencesPersistor {
+    var appearancePrefs: AppearancePreferences
 
     @UserDefaultsWrapper(key: .restorePreviousSession, defaultValue: false)
     var restorePreviousSession: Bool
@@ -46,14 +48,13 @@ final class StartupPreferences: ObservableObject {
     private var pinnedViewsNotificationCancellable: AnyCancellable?
 
     init(pinningManager: LocalPinningManager = LocalPinningManager.shared,
-         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor()) {
+         persistor: StartupPreferencesPersistor = StartupPreferencesUserDefaultsPersistor(appearancePrefs: AppearancePreferences.shared)) {
         self.pinningManager = pinningManager
         self.persistor = persistor
-        self.isHomeButtonVisible = pinningManager.isPinned(.homeButton)
         restorePreviousSession = persistor.restorePreviousSession
         launchToCustomHomePage = persistor.launchToCustomHomePage
         customHomePageURL = persistor.customHomePageURL
-        updateHomeButtonCheckbox()
+        updateHomeButtonState()
         listenToPinningManagerNotifications()
     }
 
@@ -71,11 +72,17 @@ final class StartupPreferences: ObservableObject {
 
     @Published var customHomePageURL: String {
         didSet {
+            guard let urlWithScheme = urlWithScheme(customHomePageURL) else {
+                return
+            }
+            if customHomePageURL != urlWithScheme {
+                customHomePageURL = urlWithScheme
+            }
             persistor.customHomePageURL = customHomePageURL
         }
     }
 
-    @Published var isHomeButtonVisible: Bool
+    @Published var homeButtonPosition: HomeButtonPosition = .hidden
 
     var formattedCustomHomePageURL: String {
         let trimmedURL = customHomePageURL.trimmingWhitespace()
@@ -86,8 +93,7 @@ final class StartupPreferences: ObservableObject {
     }
 
     var friendlyURL: String {
-        let regexPattern = "https?://"
-        var friendlyURL = customHomePageURL.replacingOccurrences(of: regexPattern, with: "", options: .regularExpression)
+        var friendlyURL = customHomePageURL
         if friendlyURL.count > 30 {
             let index = friendlyURL.index(friendlyURL.startIndex, offsetBy: 27)
             friendlyURL = String(friendlyURL[..<index]) + "..."
@@ -100,12 +106,18 @@ final class StartupPreferences: ObservableObject {
         return !text.isEmpty && url.isValid
     }
 
-    func toggleHomeButton() {
-        pinningManager.togglePinning(for: .homeButton)
+    func updateHomeButton() {
+        persistor.appearancePrefs.homeButtonPosition = homeButtonPosition
+        if homeButtonPosition != .hidden {
+            pinningManager.unpin(.homeButton)
+            pinningManager.pin(.homeButton)
+        } else {
+            pinningManager.unpin(.homeButton)
+        }
     }
 
-    private func updateHomeButtonCheckbox() {
-        isHomeButtonVisible = pinningManager.isPinned(.homeButton)
+    private func updateHomeButtonState() {
+        homeButtonPosition = pinningManager.isPinned(.homeButton) ? persistor.appearancePrefs.homeButtonPosition : .hidden
     }
 
     private func listenToPinningManagerNotifications() {
@@ -113,8 +125,19 @@ final class StartupPreferences: ObservableObject {
             guard let self = self else {
                 return
             }
-            self.updateHomeButtonCheckbox()
+            self.updateHomeButtonState()
         }
+    }
+
+    private func urlWithScheme(_ urlString: String) -> String? {
+        guard var urlWithScheme = urlString.url else {
+            return nil
+        }
+        // Force 'https' if 'http' not explicitly set by user
+        if urlWithScheme.isHttp && !urlString.hasPrefix(URL.NavigationalScheme.http.separated()) {
+            urlWithScheme = urlWithScheme.toHttps() ?? urlWithScheme
+        }
+        return urlWithScheme.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
     }
 
 }

@@ -34,7 +34,7 @@ protocol InvitedToWaitlistViewData {
 
 struct InvitedToWaitlistView: View {
     let viewData: InvitedToWaitlistViewData
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {
@@ -49,15 +49,17 @@ struct InvitedToWaitlistView: View {
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color("BlackWhite80"))
 
-                VStack(spacing: 16.0) {
-                    ForEach(viewData.entryViewViewDataList) { itemData in
-                        WaitlistListEntryView(viewData: itemData)
+                if !viewData.entryViewViewDataList.isEmpty {
+                    VStack(spacing: 16.0) {
+                        ForEach(viewData.entryViewViewDataList) { itemData in
+                            WaitlistListEntryView(viewData: itemData)
+                        }
                     }
+                    .padding(20.0)
+                    .frame(maxWidth: .infinity)
+                    .background(Color("BlackWhite1"))
+                    .border(Color("BlackWhite5"))
                 }
-                .padding(20.0)
-                .frame(maxWidth: .infinity)
-                .background(Color("BlackWhite1"))
-                .border(Color("BlackWhite5"))
 
                 Text(viewData.availabilityDisclaimer)
                     .multilineTextAlignment(.center)
@@ -155,20 +157,7 @@ struct DataBrokerProtectionInvitedToWaitlistViewData: InvitedToWaitlistViewData 
     let buttonDismissLabel = UserText.dataBrokerProtectionWaitlistButtonDismiss
     let buttonGetStartedLabel = UserText.dataBrokerProtectionWaitlistButtonGetStarted
     let availabilityDisclaimer = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
-    let entryViewViewDataList: [WaitlistEntryViewItemViewData] =
-    [
-        .init(imageName: "Shield-16",
-              title: UserText.dataBrokerProtectionWaitlistInvitedSection1Title,
-              subtitle: UserText.dataBrokerProtectionWaitlistInvitedSection1Subtitle),
-
-        .init(imageName: "Rocket-16",
-                  title: UserText.dataBrokerProtectionWaitlistInvitedSection2Title,
-                  subtitle: UserText.dataBrokerProtectionWaitlistInvitedSection2Subtitle),
-
-        .init(imageName: "Card-16",
-                  title: UserText.dataBrokerProtectionWaitlistInvitedSection3Title,
-                  subtitle: UserText.dataBrokerProtectionWaitlistInvitedSection3Subtitle),
-    ]
+    let entryViewViewDataList = [WaitlistEntryViewItemViewData]()
 }
 
 #endif

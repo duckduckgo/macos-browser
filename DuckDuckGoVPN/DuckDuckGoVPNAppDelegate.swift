@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import LoginItems
 import Networking
 import NetworkExtension
 import NetworkProtection
@@ -57,6 +58,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private let appLauncher = AppLauncher()
     private let bouncer = NetworkProtectionBouncer()
 
+    private var cancellables = Set<AnyCancellable>()
+
     var networkExtensionBundleID: String {
         Bundle.main.networkExtensionBundleID
     }
@@ -65,10 +68,12 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
 #endif
 
+    private lazy var tunnelSettings = VPNSettings(defaults: .netP)
+
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,
         networkExtensionController: networkExtensionController,
-        settings: .init(defaults: .shared))
+        settings: tunnelSettings)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
@@ -111,6 +116,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     ///
     @MainActor
     private lazy var networkProtectionMenu: StatusBarMenu = {
+        makeStatusBarMenu()
+    }()
+
+    @MainActor
+    private func makeStatusBarMenu() -> StatusBarMenu {
         #if DEBUG
         let iconProvider = DebugMenuIconProvider()
         #elseif REVIEW
@@ -119,16 +129,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         let iconProvider = MenuIconProvider()
         #endif
 
-        let menuItems = [
-            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
-                await self?.appLauncher.launchApp(withCommand: .shareFeedback)
-            }),
-            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
-                await self?.appLauncher.launchApp(withCommand: .justOpen)
-            })
-        ]
-
-        let onboardingStatusPublisher = UserDefaults.shared.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
+        let onboardingStatusPublisher = UserDefaults.netP.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
 
@@ -136,22 +137,40 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
             controller: tunnelController,
-            iconProvider: iconProvider,
-            menuItems: menuItems)
-    }()
+            iconProvider: iconProvider) {
+                [
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .showSettings)
+                    }),
+                    StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                        await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+                    })
+                ]
+            }
+    }
 
+    @MainActor
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         APIRequest.Headers.setUserAgent(UserAgent.duckDuckGoUserAgent())
 
         os_log("DuckDuckGoVPN started", log: .networkProtectionLoginItemLog, type: .info)
-        networkProtectionMenu.show()
+
+        setupMenuVisibility()
 
         bouncer.requireAuthTokenOrKillApp()
 
         // Initialize the IPC server
         _ = tunnelControllerIPCService
 
-        PixelKit.setUp(dryRun: false, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+        let dryRun: Bool
+
+#if DEBUG
+        dryRun = true
+#else
+        dryRun = false
+#endif
+
+        PixelKit.setUp(dryRun: dryRun, appVersion: AppVersion.shared.versionNumber, defaultHeaders: [:], log: .networkProtectionPixel, defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
@@ -159,9 +178,42 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             let request = APIRequest(configuration: configuration)
 
             request.fetch { _, error in
-                onComplete(error)
+                onComplete(error == nil, error)
             }
         }
+
+        let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
+        let launchedOnStartup = launchInformation.wasLaunchedByStartup
+        launchInformation.update()
+
+        if launchedOnStartup {
+            Task {
+                let isConnected = await tunnelController.isConnected
+
+                if !isConnected && tunnelSettings.connectOnLogin {
+                    await tunnelController.start()
+                }
+            }
+        }
+    }
+
+    @MainActor
+    private func setupMenuVisibility() {
+        if tunnelSettings.showInMenuBar {
+            networkProtectionMenu.show()
+        } else {
+            networkProtectionMenu.hide()
+        }
+
+        tunnelSettings.showInMenuBarPublisher.sink { [weak self] showInMenuBar in
+            Task { @MainActor in
+                if showInMenuBar {
+                    self?.networkProtectionMenu.show()
+                } else {
+                    self?.networkProtectionMenu.hide()
+                }
+            }
+        }.store(in: &cancellables)
     }
 }
 

@@ -24,7 +24,7 @@ public protocol DataBrokerProtectionDataManaging {
     var delegate: DataBrokerProtectionDataManagerDelegate? { get set }
 
     init(fakeBrokerFlag: DataBrokerDebugFlag)
-    func saveProfile(_ profile: DataBrokerProtectionProfile) async
+    func saveProfile(_ profile: DataBrokerProtectionProfile) async -> Bool
     func fetchProfile(ignoresCache: Bool) -> DataBrokerProtectionProfile?
     func fetchBrokerProfileQueryData(ignoresCache: Bool) async -> [BrokerProfileQueryData]
     func hasMatches() -> Bool
@@ -58,10 +58,12 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
         cache.delegate = self
     }
 
-    public func saveProfile(_ profile: DataBrokerProtectionProfile) async {
-        await database.save(profile)
+    public func saveProfile(_ profile: DataBrokerProtectionProfile) async -> Bool {
+        let result = await database.save(profile)
         cache.invalidate()
         cache.profile = profile
+
+        return result
     }
 
     public func fetchProfile(ignoresCache: Bool = false) -> DataBrokerProtectionProfile? {
@@ -96,11 +98,13 @@ public class DataBrokerProtectionDataManager: DataBrokerProtectionDataManaging {
 }
 
 extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
-    public func flushCache(profile: DataBrokerProtectionProfile?) async {
-        guard let profile = profile else { return }
-        await saveProfile(profile)
+    public func flushCache(profile: DataBrokerProtectionProfile?) async -> Bool {
+        guard let profile = profile else { return false }
+        let result = await saveProfile(profile)
 
         delegate?.dataBrokerProtectionDataManagerDidUpdateData()
+
+        return result
     }
 
     public func removeAllData() {
@@ -111,7 +115,7 @@ extension DataBrokerProtectionDataManager: InMemoryDataCacheDelegate {
 }
 
 public protocol InMemoryDataCacheDelegate: AnyObject {
-    func flushCache(profile: DataBrokerProtectionProfile?) async
+    func flushCache(profile: DataBrokerProtectionProfile?) async -> Bool
     func removeAllData()
 }
 
@@ -134,9 +138,10 @@ public final class InMemoryDataCache {
 }
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
-    func setState() async {
-        // other set state tasks
-        await delegate?.flushCache(profile: profile)
+    func saveProfile() async -> Bool {
+        _ = await delegate?.flushCache(profile: profile)
+
+        return true
     }
 
     private func indexForName(matching name: DBPUIUserProfileName, in profile: DataBrokerProtectionProfile) -> Int? {

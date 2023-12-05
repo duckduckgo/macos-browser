@@ -698,5 +698,9 @@ extension ExtractedProfile {
     static var mockWithoutId: ExtractedProfile {
         ExtractedProfile(name: "Some name", profileUrl: "someOtherURL")
     }
+
+    static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date)
+    }
 }
 // swiftlint:enable type_body_length

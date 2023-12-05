@@ -21,6 +21,7 @@ import Common
 import Foundation
 import LoginItems
 import NetworkProtection
+import NetworkProtectionUI
 import NetworkProtectionIPC
 import NetworkExtension
 
@@ -168,7 +169,7 @@ final class NetworkProtectionAppEvents {
     // MARK: - Legacy Login Item and Extension
 
     private func removeLegacyLoginItemAndVPNConfiguration() async {
-        LoginItem(bundleId: legacyAgentBundleID).forceStop()
+        LoginItem(bundleId: legacyAgentBundleID, defaults: .netP).forceStop()
 
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
         let tunnel = tunnels?.first {
@@ -178,6 +179,8 @@ final class NetworkProtectionAppEvents {
         guard let tunnel else {
             return
         }
+
+        UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 
         try? await tunnel.removeFromPreferences()
     }

@@ -21,7 +21,8 @@ import Foundation
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
-    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)!
+    static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
+    static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
 }
 
 @propertyWrapper
@@ -82,6 +83,8 @@ public struct UserDefaultsWrapper<T> {
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
+        case homeButtonPosition = "preferences.appeareance.home-button-position"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
@@ -133,12 +136,19 @@ public struct UserDefaultsWrapper<T> {
         case loggingCategories = "logging.categories"
 
         case firstLaunchDate = "first.app.launch.date"
+        case customConfigurationUrl = "custom.configuration.url"
+
+        // Data Broker Protection
+
+        case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
+        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // Network Protection: Shared Defaults
         // ---
@@ -159,6 +169,14 @@ public struct UserDefaultsWrapper<T> {
         // Sync
 
         case syncEnvironment = "sync.environment"
+        case favoritesDisplayMode = "sync.favorites-display-mode"
+        case syncBookmarksPaused = "sync.bookmarks-paused"
+        case syncCredentialsPaused = "sync.credentials-paused"
+        case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
+        case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
+        case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
+        case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
     }
 
     enum RemovedKeys: String, CaseIterable {

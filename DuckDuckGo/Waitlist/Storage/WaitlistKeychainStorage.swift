@@ -28,9 +28,10 @@ final class WaitlistKeychainStore: WaitlistStorage {
         case inviteCode = "invite-code"
     }
 
-    init(waitlistIdentifier: String, keychainPrefix: String? = Bundle.main.bundleIdentifier) {
+    init(waitlistIdentifier: String, keychainPrefix: String? = Bundle.main.bundleIdentifier, keychainAppGroup: String) {
         self.waitlistIdentifier = waitlistIdentifier
         self.keychainPrefix = keychainPrefix ?? "com.duckduckgo"
+        self.keychainAppGroup = keychainAppGroup
     }
 
     func getWaitlistToken() -> String? {
@@ -123,7 +124,7 @@ final class WaitlistKeychainStore: WaitlistStorage {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrSynchronizable as String: false,
             kSecUseDataProtectionKeychain as String: true,
-            kSecAttrAccessGroup as String: Bundle.main.appGroupName,
+            kSecAttrAccessGroup as String: keychainAppGroup,
             kSecAttrService as String: serviceName,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
         ]
@@ -135,4 +136,5 @@ final class WaitlistKeychainStore: WaitlistStorage {
 
     private let waitlistIdentifier: String
     private let keychainPrefix: String
+    private let keychainAppGroup: String
 }

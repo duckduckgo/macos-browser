@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "71e916d070cedcba9ccb3ce9431797260bf5cbea",
-        "version" : "82.1.0"
+        "revision" : "7b35b4c604f1cf17b48aabf72526b15a2fdcc6ce",
+        "version" : "88.0.0"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "254b23cf292140498650421bb31fd05740f4579b",
-        "version" : "4.40.0"
+        "revision" : "b7ad9843e70cede0c2ca9c4260d970f62cb28156",
+        "version" : "4.52.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "c8e895c8fd50dc76e8d8dc827a636ad77b7f46ff",
-        "version" : "9.0.0"
+        "revision" : "93677cc02cfe650ce7f417246afd0e8e972cd83e",
+        "version" : "10.0.0"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "b4ac92a444e79d5651930482623b9f6dc9265667",
-        "version" : "2.0.0"
+        "revision" : "daa9708223b4b4318fb6448ca44801dfabcddc6f",
+        "version" : "3.0.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "f0ceaf5cc9f3f23daa0ccb6dcebd79fc96ccc7d9",
-        "version" : "2.5.0"
+        "revision" : "1f07f4096e52f19b5e7abaa697b7fc592b7ff57c",
+        "version" : "2.5.1"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
         "revision" : "4684440d03304e7638a2c8086895367e90987463",
         "version" : "1.2.1"

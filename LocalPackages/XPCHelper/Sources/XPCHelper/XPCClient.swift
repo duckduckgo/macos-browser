@@ -18,6 +18,15 @@
 
 import Foundation
 
+/// This actor is meant to support synchronized access to the XPC connection
+///
+@globalActor
+private struct XPCConnectionActor {
+    actor ActorType { }
+
+    static let shared: ActorType = ActorType()
+}
+
 /// An XPC client
 ///
 public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObject> {
@@ -32,10 +41,12 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
 
     /// The internal connection, which may still not have been created.
     ///
+    @XPCConnectionActor
     private var internalConnection: NSXPCConnection?
 
     /// A convenience to access the existing connection or make a new one if it doesn't already exist.
     ///
+    @XPCConnectionActor
     private var connection: NSXPCConnection {
         guard let internalConnection else {
             let newConnection = makeConnection()
@@ -50,7 +61,9 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
     ///
     public weak var delegate: ClientInterface? {
         didSet {
-            connection.exportedObject = delegate
+            Task { @XPCConnectionActor in
+                connection.exportedObject = delegate
+            }
         }
     }
 
@@ -78,11 +91,13 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
         connection.remoteObjectInterface = serverInterface
 
         let closeConnection = { [weak self] in
-           guard let self else {
-               return
-           }
+            guard let self else {
+                return
+            }
 
-           self.internalConnection = nil
+            Task { @XPCConnectionActor in
+                self.internalConnection = nil
+            }
         }
 
         connection.interruptionHandler = closeConnection
@@ -92,40 +107,23 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
         return connection
     }
 
-    /// Returns a proxy for the server object.
-    ///
-    /// It's important to not store the object returned by this method, because calling this method ensures a
-    /// normalized handling of connection issues and reconnection logic.
-    ///
-    /// This is quite obscure, but XPC services with a completion block don't execute their completion block
-    /// if the XPC endpoint isn't running.  The error handler block below detects errors while waiting for a reply.
-    ///
-    /// Refs:
-    ///  https://developer.apple.com/forums/thread/713429?answerId=725930022#725930022
-    ///
-    ///
-    ///
-    public func server(xpcReplyErrorHandler: @escaping (Error) -> Void) -> ServerInterface? {
-        connection.remoteObjectProxyWithErrorHandler({ error in
-            xpcReplyErrorHandler(error)
-        }) as? ServerInterface
-    }
+    public func execute(call: @escaping (ServerInterface) -> Void, xpcReplyErrorHandler: @escaping (Error) -> Void) {
+        Task { @XPCConnectionActor in
+            guard let serverInterface = connection.remoteObjectProxyWithErrorHandler({ error in
+                // This will be called if there's an error while waiting for an XPC response.
+                // Ref: https://developer.apple.com/documentation/foundation/nsxpcproxycreating/1415611-remoteobjectproxywitherrorhandle
+                //
+                // Since when there's an error while waiting for a response a completion callback will not be called, this
+                // allows us to call the completion callback ourselves.
+                xpcReplyErrorHandler(error)
+            }) as? ServerInterface else {
+                // This won't collide with the error handling above, as if this error happens there won't be any XPC
+                // request to begin with.
+                xpcReplyErrorHandler(ConnectionError.noRemoteObjectProxy)
+                return
+            }
 
-    public func execute(call: (ServerInterface) -> Void, xpcReplyErrorHandler: @escaping (Error) -> Void) {
-        guard let serverInterface = connection.remoteObjectProxyWithErrorHandler({ error in
-            // This will be called if there's an error while waiting for an XPC response.
-            // Ref: https://developer.apple.com/documentation/foundation/nsxpcproxycreating/1415611-remoteobjectproxywitherrorhandle
-            //
-            // Since when there's an error while waiting for a response a completion callback will not be called, this
-            // allows us to call the completion callback ourselves.
-            xpcReplyErrorHandler(error)
-        }) as? ServerInterface else {
-            // This won't collide with the error handling above, as if this error happens there won't be any XPC
-            // request to begin with.
-            xpcReplyErrorHandler(ConnectionError.noRemoteObjectProxy)
-            return
+            call(serverInterface)
         }
-
-        call(serverInterface)
     }
 }

@@ -19,16 +19,17 @@
 import SwiftUI
 
 public enum ManagementDialogKind: Equatable {
-    case enableSync
-    case recoverAccount
     case deleteAccount(_ devices: [SyncDevice])
-    case askToSyncAnotherDevice
-    case syncAnotherDevice
-    case deviceSynced(_ devices: [SyncDevice])
-    case saveRecoveryPDF
     case turnOffSync
     case deviceDetails(_ device: SyncDevice)
     case removeDevice(_ device: SyncDevice)
+    case syncWithAnotherDevice(code: String)
+    case prepareToSync
+    case saveRecoveryCode(_ code: String)
+    case nowSyncing
+    case syncWithServer
+    case enterRecoveryCode(code: String)
+    case recoverSyncedData
 }
 
 public struct ManagementDialog: View {
@@ -54,18 +55,6 @@ public struct ManagementDialog: View {
     @ViewBuilder var content: some View {
         Group {
             switch model.currentDialog {
-            case .enableSync:
-                EnableSyncView()
-            case .askToSyncAnotherDevice:
-                AskToSyncAnotherDeviceView()
-            case .recoverAccount:
-                RecoverAccountView()
-            case .syncAnotherDevice:
-                SyncAnotherDeviceView()
-            case .deviceSynced(let devices):
-                SyncSetupCompleteView(devices: devices)
-            case .saveRecoveryPDF:
-                SaveRecoveryPDFView()
             case .turnOffSync:
                 TurnOffSyncView()
             case .deviceDetails(let device):
@@ -74,7 +63,20 @@ public struct ManagementDialog: View {
                 RemoveDeviceView(device: device)
             case .deleteAccount(let devices):
                 DeleteAccountView(devices: devices)
-
+            case .syncWithAnotherDevice(let code):
+                SyncWithAnotherDeviceView(code: code)
+            case .prepareToSync:
+                PreparingToSyncView()
+            case .saveRecoveryCode(let code):
+                SaveRecoveryPDFView(code: code)
+            case .nowSyncing:
+                DeviceSyncedView()
+            case .syncWithServer:
+                SyncWithServerView()
+            case .enterRecoveryCode(let code):
+                EnterRecoveryCodeView(code: code)
+            case .recoverSyncedData:
+                RecoverSyncedDataView()
             default:
                 EmptyView()
             }

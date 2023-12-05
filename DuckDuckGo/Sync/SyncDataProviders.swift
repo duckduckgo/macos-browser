@@ -28,6 +28,7 @@ final class SyncDataProviders: DataProvidersSource {
     public let credentialsAdapter: SyncCredentialsAdapter
     public let settingsAdapter: SyncSettingsAdapter
 
+    @MainActor
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
         guard let syncMetadata else {
@@ -63,6 +64,7 @@ final class SyncDataProviders: DataProvidersSource {
             .removeDuplicates()
 
         syncAuthStateDidChangeCancellable = syncAuthStateDidChangePublisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] isSyncDisabled in
                 self?.bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
                 self?.credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
