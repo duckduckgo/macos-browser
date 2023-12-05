@@ -40,6 +40,9 @@ struct Logging {
 
     fileprivate static let backgroundAgentMemoryManagementLoggingEnabled = true
     fileprivate static let backgroundAgentMemoryManagement: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Background Agent Memory Management")
+
+    fileprivate static let backgroundAgentPixelLoggingEnabled = true
+    fileprivate static let backgroundAgentPixel: OSLog = OSLog(subsystem: subsystem, category: "Data Broker Protection Background Agent Pixel")
 }
 
 extension OSLog {
@@ -66,5 +69,9 @@ extension OSLog {
 
     public static var dbpBackgroundAgentMemoryManagement: OSLog {
         Logging.backgroundAgentMemoryManagementLoggingEnabled ? Logging.backgroundAgentMemoryManagement : .disabled
+    }
+
+    public static var dbpBackgroundAgentPixel: OSLog {
+        Logging.backgroundAgentPixelLoggingEnabled ? Logging.backgroundAgentPixel : .disabled
     }
 }

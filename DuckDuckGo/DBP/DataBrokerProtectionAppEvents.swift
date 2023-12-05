@@ -18,8 +18,11 @@
 
 import Foundation
 import LoginItems
+import Common
+import DataBrokerProtection
 
 struct DataBrokerProtectionAppEvents {
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
 
     enum WaitlistNotificationSource {
         case localPush
@@ -86,6 +89,7 @@ struct DataBrokerProtectionAppEvents {
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
+        pixelHandler.fire(.resetLoginItem)
         loginItemsManager.restartLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
     }
 }
