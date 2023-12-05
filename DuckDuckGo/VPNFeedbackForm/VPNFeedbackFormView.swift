@@ -79,21 +79,14 @@ private struct VPNFeedbackFormBodyView: View {
             case .landingPage:
                 Spacer()
                     .frame(height: 50)
-            case .unableToInstall:
-                VPNFeedbackFormIssueDescriptionForm()
-            case .failsToConnect:
-                VPNFeedbackFormIssueDescriptionForm()
-            case .tooSlow:
-                VPNFeedbackFormIssueDescriptionForm()
-            case .issueWithAppOrWebsite:
-                VPNFeedbackFormIssueDescriptionForm()
-            case .cantConnectToLocalDevice:
-                VPNFeedbackFormIssueDescriptionForm()
-            case .appCrashesOrFreezes:
-                VPNFeedbackFormIssueDescriptionForm()
-            case .featureRequest:
-                VPNFeedbackFormIssueDescriptionForm()
-            case .somethingElse:
+            case .unableToInstall,
+                    .failsToConnect,
+                    .tooSlow,
+                    .issueWithAppOrWebsite,
+                    .cantConnectToLocalDevice,
+                    .appCrashesOrFreezes,
+                    .featureRequest,
+                    .somethingElse:
                 VPNFeedbackFormIssueDescriptionForm()
             }
         }
