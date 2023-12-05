@@ -771,7 +771,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .url(let url, credential: _, userEntered: _):
+        case .url(let url, _, _):
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
@@ -802,7 +802,7 @@ final class AddressBarButtonsViewController: NSViewController {
               let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
         switch selectedTabViewModel.tab.content {
-        case .url(let url, credential: _, userEntered: _):
+        case .url(let url, _, _):
             // Don't play the shield animation if mouse is over
             guard !privacyEntryPointButton.isAnimationViewVisible else {
                 break

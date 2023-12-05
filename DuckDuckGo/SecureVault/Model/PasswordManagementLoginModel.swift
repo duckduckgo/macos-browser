@@ -195,7 +195,7 @@ final class PasswordManagementLoginModel: ObservableObject, PasswordManagementIt
 
     @MainActor
     func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
     }
 
     func togglePrivateEmailStatus() {

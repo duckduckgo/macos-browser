@@ -231,7 +231,7 @@ final class NavigationBarViewController: NSViewController {
            // don‘t open a new tab when the window is cmd-clicked in background
            sender.window?.isKeyWindow == true && NSApp.isActive,
            let backItem = selectedTabViewModel.tab.webView.backForwardList.backItem {
-            openNewChildTab(with: backItem.url)
+            openBackForwardHistoryItemInNewChildTab(with: backItem.url)
         } else {
             selectedTabViewModel.tab.goBack()
         }
@@ -247,14 +247,14 @@ final class NavigationBarViewController: NSViewController {
            // don‘t open a new tab when the window is cmd-clicked in background
            sender.window?.isKeyWindow == true && NSApp.isActive,
            let forwardItem = selectedTabViewModel.tab.webView.backForwardList.forwardItem {
-            openNewChildTab(with: forwardItem.url)
+            openBackForwardHistoryItemInNewChildTab(with: forwardItem.url)
         } else {
             selectedTabViewModel.tab.goForward()
         }
     }
 
-    private func openNewChildTab(with url: URL) {
-        let tab = Tab(content: .url(url), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+    private func openBackForwardHistoryItemInNewChildTab(with url: URL) {
+        let tab = Tab(content: .url(url, source: .historyEntry), parentTab: tabCollectionViewModel.selectedTabViewModel?.tab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.insert(tab, selected: false)
     }
 
@@ -659,7 +659,6 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateHomeButton() {
         let menu = NSMenu()
-        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .homeButton)
 
         homeButton.menu = menu
         homeButton.toolTip = UserText.homeButtonTooltip

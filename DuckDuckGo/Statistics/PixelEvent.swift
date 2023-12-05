@@ -461,9 +461,9 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
-        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+        case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
-        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+        case .dashboardProtectionAllowlistRemove:
             return "m_mac_mp_wlr"
 
         case .launchInitial:

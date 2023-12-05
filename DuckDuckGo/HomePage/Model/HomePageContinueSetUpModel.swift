@@ -206,11 +206,11 @@ extension HomePage.Models {
                 dataImportProvider.showImportWindow(completion: {self.refreshFeaturesMatrix()})
             case .duckplayer:
                 if let videoUrl = URL(string: duckPlayerURL) {
-                    let tab = Tab(content: .url(videoUrl), shouldLoadInBackground: true)
+                    let tab = Tab(content: .url(videoUrl, source: .link), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
                 }
             case .emailProtection:
-                let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
+                let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
             case .cookiePopUp:
                 if !cookiePopUpVisible {
@@ -458,7 +458,7 @@ extension HomePage.Models {
             }
 
             if let url = URL(string: surveyURLString) {
-                let tab = Tab(content: .url(url), shouldLoadInBackground: true)
+                let tab = Tab(content: .url(url, source: .ui), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
                 switch day {
                 case .day0:
@@ -483,7 +483,7 @@ extension HomePage.Models {
                 NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
             case .openSurveyURL, .openURL:
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
-                    let tab = Tab(content: .url(surveyURL), shouldLoadInBackground: true)
+                    let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
                     tabCollectionViewModel.append(tab: tab)
                     Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
 

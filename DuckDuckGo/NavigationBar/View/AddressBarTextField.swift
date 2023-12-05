@@ -306,7 +306,7 @@ final class AddressBarTextField: NSTextField {
             alert.beginSheetModal(for: window) { response in
                 switch response {
                 case .alertSecondButtonReturn:
-                    WindowControllersManager.shared.show(url: URL.ddgLearnMore, newTab: false)
+                    WindowControllersManager.shared.show(url: URL.ddgLearnMore, source: .ui, newTab: false)
                     return
                 default:
                     window.makeFirstResponder(self)
@@ -316,7 +316,7 @@ final class AddressBarTextField: NSTextField {
         }
 #endif
 
-        selectedTabViewModel.tab.setUrl(providedUrl, userEntered: userEnteredValue)
+        selectedTabViewModel.tab.setUrl(providedUrl, source: .userEntered(userEnteredValue))
         selectedTabViewModel.updateAddressBarStrings()
 
         self.window?.makeFirstResponder(nil)
@@ -345,7 +345,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        let tab = Tab(content: .url(url, userEntered: userEnteredValue),
+        let tab = Tab(content: .url(url, source: .userEntered(userEnteredValue)),
                       shouldLoadInBackground: true,
                       burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab, selected: selected)
@@ -561,7 +561,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: pasteboardString)
+        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, source: .userEntered(pasteboardString))
     }
 
     @objc func pasteAndSearch(_ menuItem: NSMenuItem) {
@@ -571,7 +571,7 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(searchURL, userEntered: pasteboardString)
+        tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(searchURL, source: .userEntered(pasteboardString))
     }
 
     @objc func toggleAutocomplete(_ menuItem: NSMenuItem) {
@@ -610,7 +610,7 @@ extension AddressBarTextField {
 
     override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
         if let url = draggingInfo.draggingPasteboard.url {
-            tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, userEntered: draggingInfo.draggingPasteboard.string(forType: .string) ?? url.absoluteString)
+            tabCollectionViewModel.selectedTabViewModel?.tab.setUrl(url, source: .userEntered(draggingInfo.draggingPasteboard.string(forType: .string) ?? url.absoluteString))
 
         } else if let stringValue = draggingInfo.draggingPasteboard.string(forType: .string) {
             self.value = .init(stringValue: stringValue, userTyped: false)

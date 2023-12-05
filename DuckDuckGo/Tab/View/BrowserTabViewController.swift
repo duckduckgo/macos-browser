@@ -146,7 +146,7 @@ final class BrowserTabViewController: NSViewController {
         guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
 
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -614,11 +614,11 @@ extension BrowserTabViewController: NSDraggingDestination {
               let selectedTab = tabCollectionViewModel.selectedTab,
               !selectedTab.isPinned else {
 
-            self.openNewTab(with: .url(url))
+            self.openNewTab(with: .url(url, source: .appOpenUrl))
             return true
         }
 
-        selectedTab.setContent(.url(url))
+        selectedTab.setContent(.url(url, source: .appOpenUrl))
         return true
     }
 

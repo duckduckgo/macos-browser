@@ -127,19 +127,19 @@ extension WindowControllersManager {
         guard let url = bookmark.urlObject else { return }
 
         if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
-            show(url: url, newTab: true)
+            show(url: url, source: .bookmark, newTab: true)
         } else if NSApplication.shared.isCommandPressed && !NSApplication.shared.isOptionPressed {
-            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(url), selected: false)
+            mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: false)
         } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
-            show(url: url, newTab: true)
+            show(url: url, source: .bookmark, newTab: true)
         } else {
-            show(url: url)
+            show(url: url, source: .bookmark)
         }
     }
 
-    func show(url: URL?, newTab: Bool = false) {
+    func show(url: URL?, source: Tab.TabContent.URLSource, newTab: Bool = false) {
 
         func show(url: URL?, in windowController: MainWindowController) {
             let viewController = windowController.mainViewController
@@ -152,12 +152,12 @@ extension WindowControllersManager {
                let firstTab = tabCollection.tabs.first,
                case .homePage = firstTab.content,
                !newTab {
-                firstTab.setContent(url.map { .url($0) } ?? .homePage)
+                firstTab.setContent(url.map { .url($0, source: source) } ?? .homePage)
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.setContent(url.map { .url($0) } ?? .homePage)
+                tab.setContent(url.map { .url($0, source: source) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
-                newTab.setContent(url.map { .url($0) } ?? .homePage)
+                let newTab = Tab(content: url.map { .url($0, source: source) } ?? .homePage, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+                newTab.setContent(url.map { .url($0, source: source) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
         }
@@ -179,7 +179,7 @@ extension WindowControllersManager {
 
         // Open a new window
         if let url = url {
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            WindowsManager.openNewWindow(with: url, source: source, isBurner: false)
         } else {
             WindowsManager.openNewWindow(burnerMode: .regular)
         }

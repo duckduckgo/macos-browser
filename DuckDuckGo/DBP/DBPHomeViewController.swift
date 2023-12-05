@@ -56,7 +56,7 @@ final class DBPHomeViewController: NSViewController {
             privacyConfig: privacyConfigurationManager,
             prefs: prefs,
             openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .link, newTab: true)
             })
     }()
 

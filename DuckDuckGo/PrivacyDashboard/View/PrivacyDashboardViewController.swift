@@ -195,7 +195,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
             assertionFailure("could not access shared tabCollectionViewModel")
             return
         }
-        tabCollection.appendNewTab(with: .url(url), selected: true)
+        tabCollection.appendNewTab(with: .url(url, source: .ui), selected: true)
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController,

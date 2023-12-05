@@ -239,21 +239,21 @@ final class HomePageViewController: NSViewController {
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
-            WindowsManager.openNewWindow(with: url, isBurner: tabCollectionViewModel.isBurner)
+            WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: tabCollectionViewModel.isBurner)
             return
         }
 
         if target == .newTab || NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: true)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: true)
             return
         }
 
         if NSApplication.shared.isCommandPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: false)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: false)
             return
         }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url))
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url, source: .bookmark))
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {

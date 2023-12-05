@@ -96,7 +96,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private(set) var cache = [RecentlyClosedCacheItem]()
 
     private func cacheTabContent(_ tab: Tab, of tabCollection: TabCollection, at tabIndex: TabIndex) {
-        guard !tab.isContentEmpty, !tab.burnerMode.isBurner else {
+        guard !tab.content.isEmpty, !tab.burnerMode.isBurner else {
             // Don't cache empty tabs and burner tabs
             return
         }
@@ -108,7 +108,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func cacheWindowContent(mainWindowController: MainWindowController) {
         let tabCollection = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection
         guard let first = tabCollection.tabs.first,
-              !first.isContentEmpty || tabCollection.tabs.count > 1,
+              !first.content.isEmpty || tabCollection.tabs.count > 1,
               !mainWindowController.mainViewController.tabCollectionViewModel.isBurner else {
             // Don't cache empty window and burner windows
             return
@@ -165,12 +165,12 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
         } else {
             // There is no window available, create a new one
-            let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
+            let tab = Tab(content: recentlyClosedTab.tabContent.loadedFromCache(), interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true)
             WindowsManager.openNewWindow(with: tab)
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent.loadedFromCache(), interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.insert(tab, at: .unpinned(tabIndex), selected: true)
     }
 
@@ -178,7 +178,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         var lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if lastKeyMainWindowController == nil {
             // Create a new window if none exists
-            WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true, shouldLoadFromCache: true))
+            WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true))
             lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         }
 
@@ -186,7 +186,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent.loadedFromCache(), interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
 
         tabCollectionViewModel.insert(tab, at: .pinned(tabIndex), selected: true)
@@ -196,12 +196,11 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         let tabCollection = TabCollection()
         recentlyClosedWindow.tabs.forEach { recentlyClosedTab in
             let tab = Tab(
-                content: recentlyClosedTab.tabContent,
+                content: recentlyClosedTab.tabContent.loadedFromCache(),
                 title: recentlyClosedTab.title,
                 favicon: recentlyClosedTab.favicon,
                 interactionStateData: recentlyClosedTab.interactionData,
-                shouldLoadInBackground: false,
-                shouldLoadFromCache: true
+                shouldLoadInBackground: false
             )
             tabCollection.append(tab: tab)
         }
@@ -233,9 +232,19 @@ private extension RecentlyClosedTab {
     }
 }
 
-private extension Tab {
+extension Tab.TabContent {
 
-    var isContentEmpty: Bool {
-        content == .none || content == .homePage
+    var isEmpty: Bool {
+        self == .none || self == .homePage
     }
+
+    func loadedFromCache() -> Self {
+        switch self {
+        case .url(let url, credential: let credential, source: _):
+            .url(url, credential: credential, source: .stateRestoration)
+        case .homePage, .preferences, .bookmarks, .onboarding, .none, .dataBrokerProtection:
+            self
+        }
+    }
+
 }

@@ -45,7 +45,7 @@ final class ExternalAppSchemeHandler {
         self.permissionModel = permissionModel
 
         cancellable = contentPublisher.sink { [weak self] tabContent in
-            self?.lastUserEnteredValue = if case .url(_, credential: .none, userEntered: .some(let userEnteredValue)) = tabContent { userEnteredValue } else { nil }
+            self?.lastUserEnteredValue = tabContent.userEnteredValue
         }
     }
 
@@ -80,7 +80,8 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         }
 
         // prevent opening twice for session restoration/tab reopening requests
-        guard navigationAction.request.cachePolicy != .returnCacheDataElseLoad else {
+        guard navigationAction.request.cachePolicy != .returnCacheDataElseLoad,
+              navigationAction.mainFrameNavigation?.navigationAction.request.cachePolicy != .returnCacheDataElseLoad else {
             return .cancel
         }
 
