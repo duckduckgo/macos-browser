@@ -34,13 +34,14 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     enum AuthenticationReason {
         case autofill
+        case autofillCreditCards
         case changeLoginsSettings
         case unlockLogins
         case exportLogins
 
         var localizedDescription: String {
             switch self {
-            case .autofill: return UserText.pmAutoLockPromptAutofill
+            case .autofill, .autofillCreditCards: return UserText.pmAutoLockPromptAutofill
             case .changeLoginsSettings: return UserText.pmAutoLockPromptChangeLoginsSettings
             case .unlockLogins: return UserText.pmAutoLockPromptUnlockLogins
             case .exportLogins: return UserText.pmAutoLockPromptExportLogins
@@ -144,7 +145,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
-        guard requiresAuthentication else {
+        guard reason == .autofillCreditCards || requiresAuthentication else {
             result(.success)
             return
         }
