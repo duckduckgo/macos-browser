@@ -33,7 +33,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         await sut.parseActionCompleted(params: params)
 
-        XCTAssertEqual(mockCSSDelegate.lastError, .parsingErrorObjectFailed)
+        XCTAssertEqual(mockCSSDelegate.lastError as! DataBrokerProtectionError, DataBrokerProtectionError.parsingErrorObjectFailed)
     }
 
     func testWhenErrorIsParsed_thenDelegateSendsBackActionFailedError() async {
@@ -42,7 +42,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         await sut.parseActionCompleted(params: params)
 
-        XCTAssertEqual(mockCSSDelegate.lastError, .actionFailed(actionID: "someActionID", message: "some message"))
+        XCTAssertEqual(mockCSSDelegate.lastError as! DataBrokerProtectionError, DataBrokerProtectionError.actionFailed(actionID: "someActionID", message: "some message"))
     }
 
     func testWhenNavigateActionIsParsed_thenDelegateSendsBackURL() async {
@@ -73,7 +73,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         await sut.parseActionCompleted(params: params)
 
-        XCTAssertEqual(mockCSSDelegate.lastError, .parsingErrorObjectFailed)
+        XCTAssertEqual(mockCSSDelegate.lastError as! DataBrokerProtectionError, DataBrokerProtectionError.parsingErrorObjectFailed)
     }
 
     func testWhenClickActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() async {
@@ -107,7 +107,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 }
 
 final class MockCSSCommunicationDelegate: CCFCommunicationDelegate {
-    var lastError: DataBrokerProtectionError?
+    var lastError: Error?
     var profiles: [ExtractedProfile]?
     var url: URL?
     var captchaInfo: GetCaptchaInfoResponse?
@@ -130,7 +130,7 @@ final class MockCSSCommunicationDelegate: CCFCommunicationDelegate {
         self.captchaInfo = captchaInfo
     }
 
-    func onError(error: DataBrokerProtectionError) {
+    func onError(error: Error) {
         self.lastError = error
     }
 
