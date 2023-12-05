@@ -240,7 +240,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @objc func openNativeFeedbackForm(_ sender: Any?) {
-        let feedbackFormViewController = FeedbackFormViewController()
+        let feedbackFormViewController = VPNFeedbackFormViewController()
         let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
 
         guard let feedbackFormWindow = feedbackFormWindowController.window,
@@ -249,9 +249,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return
         }
 
-        parentWindowController.window?.beginSheet(feedbackFormWindow) { [weak self] _ in
-            // do something?
-        }
+        parentWindowController.window?.beginSheet(feedbackFormWindow)
     }
 
     /// Sets the selected server.

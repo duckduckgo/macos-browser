@@ -1,5 +1,5 @@
 //
-//  FeedbackFormView.swift
+//  VPNFeedbackFormView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -21,7 +21,7 @@ import SwiftUI
 
 #if NETWORK_PROTECTION
 
-struct FeedbackFormView: View {
+struct VPNFeedbackFormView: View {
 
     struct ViewSize {
         fileprivate(set) var headerHeight: Double = 0.0

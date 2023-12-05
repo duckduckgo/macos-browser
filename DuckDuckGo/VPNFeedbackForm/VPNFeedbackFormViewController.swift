@@ -1,5 +1,5 @@
 //
-//  FeedbackFormViewController.swift
+//  VPNFeedbackFormViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import Foundation
 import AppKit
 import SwiftUI
 
-final class FeedbackFormViewController: NSViewController {
+final class VPNFeedbackFormViewController: NSViewController {
 
     enum Constants {
         static let landingPageHeight = 260.0
@@ -53,7 +53,7 @@ final class FeedbackFormViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let feedbackFormView = FeedbackFormView { newHeight in
+        let feedbackFormView = VPNFeedbackFormView { newHeight in
             self.updateViewHeight(height: newHeight)
         }
 
@@ -93,7 +93,7 @@ final class FeedbackFormViewController: NSViewController {
 
 }
 
-extension FeedbackFormViewController: VPNFeedbackFormViewModelDelegate {
+extension VPNFeedbackFormViewController: VPNFeedbackFormViewModelDelegate {
 
     func vpnFeedbackViewModelDismissedView(_ viewModel: VPNFeedbackFormViewModel) {
         dismiss()
