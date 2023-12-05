@@ -23,25 +23,7 @@ import SwiftUI
 
 struct VPNFeedbackFormView: View {
 
-    struct ViewSize {
-        fileprivate(set) var headerHeight: Double = 0.0
-        fileprivate(set) var viewHeight: Double = 0.0
-        fileprivate(set) var buttonsHeight: Double = 0.0
-
-        var totalHeight: Double {
-            return headerHeight + viewHeight + buttonsHeight + 80
-        }
-    }
-
     @EnvironmentObject var viewModel: VPNFeedbackFormViewModel
-
-    let sizeChanged: (CGFloat) -> Void
-
-    @State var viewSize: ViewSize = .init() {
-        didSet {
-            sizeChanged(viewSize.totalHeight)
-        }
-    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -52,13 +34,6 @@ struct VPNFeedbackFormView: View {
             .frame(height: 70)
             .frame(maxWidth: .infinity)
             .background(Color.secondary.opacity(0.1))
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.onAppear {
-                        viewSize.headerHeight = proxy.size.height
-                    }
-                }
-            )
 
             Divider()
 
@@ -66,13 +41,6 @@ struct VPNFeedbackFormView: View {
             case .feedbackPending, .feedbackSending, .feedbackSendingFailed:
                 VPNFeedbackFormBodyView()
                 .padding([.top, .leading, .trailing], 20)
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            viewSize.viewHeight = proxy.size.height
-                        }
-                    }
-                )
 
                 if viewModel.viewState == .feedbackSendingFailed {
                     Text("We couldn't send your feedback right now, please try again.")
@@ -82,26 +50,12 @@ struct VPNFeedbackFormView: View {
             case .feedbackSent:
                 VPNFeedbackFormSentView()
                     .padding([.top, .leading, .trailing], 20)
-                    .background(
-                        GeometryReader { proxy in
-                            Color.clear.onAppear {
-                                viewSize.viewHeight = proxy.size.height
-                            }
-                        }
-                    )
             }
 
             Spacer(minLength: 0)
 
             VPNFeedbackFormButtons()
                 .padding(20)
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear.onAppear {
-                            viewSize.buttonsHeight = proxy.size.height
-                        }
-                    }
-                )
         }
     }
 

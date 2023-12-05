@@ -21,9 +21,13 @@
 import Foundation
 import AppKit
 import SwiftUI
+import Combine
 
 final class VPNFeedbackFormViewController: NSViewController {
 
+    // Using a dynamic height in the form was causing layout problems and couldn't be completed in time for the release that needed this form.
+    // As a temporary measure, the heights of each form state are hardcoded.
+    // This should be cleaned up later, and eventually use the `sizingOptions` property of NSHostingController.
     enum Constants {
         static let landingPageHeight = 260.0
         static let feedbackFormHeight = 535.0
@@ -31,10 +35,11 @@ final class VPNFeedbackFormViewController: NSViewController {
         static let feedbackErrorHeight = 560.0
     }
 
-    private let defaultSize = CGSize(width: 480, height: 348)
+    private let defaultSize = CGSize(width: 480, height: Constants.landingPageHeight)
     private let viewModel: VPNFeedbackFormViewModel
 
     private var heightConstraint: NSLayoutConstraint?
+    private var cancellables = Set<AnyCancellable>()
 
     init() {
         self.viewModel = VPNFeedbackFormViewModel()
@@ -53,10 +58,7 @@ final class VPNFeedbackFormViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let feedbackFormView = VPNFeedbackFormView { newHeight in
-            self.updateViewHeight(height: newHeight)
-        }
-
+        let feedbackFormView = VPNFeedbackFormView()
         let hostingView = NSHostingView(rootView: feedbackFormView.environmentObject(self.viewModel))
         hostingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(hostingView)
@@ -72,9 +74,27 @@ final class VPNFeedbackFormViewController: NSViewController {
             hostingView.leftAnchor.constraint(equalTo: view.leftAnchor),
             hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
+
+        subscribeToViewModelChanges()
     }
 
-    private func updateViewHeight(height: CGFloat) {
+    func subscribeToViewModelChanges() {
+        viewModel.$viewState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateViewHeight()
+        }
+        .store(in: &cancellables)
+
+        viewModel.$selectedFeedbackCategory
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateViewHeight()
+        }
+        .store(in: &cancellables)
+    }
+
+    private func updateViewHeight() {
         switch viewModel.viewState {
         case .feedbackPending:
             if viewModel.selectedFeedbackCategory == .landingPage {
