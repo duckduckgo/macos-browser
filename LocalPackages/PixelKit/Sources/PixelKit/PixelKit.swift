@@ -174,7 +174,7 @@ public final class PixelKit {
         _ onComplete: @escaping CompletionBlock) {
         guard !dryRun else {
             let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
-            os_log(.debug, log: log, "👾 %{public}s %{public}@", pixelName.replacingOccurrences(of: "_", with: "."), params)
+            os_log(.debug, log: log, "👾 %{public}@ %{public}@", pixelName.replacingOccurrences(of: "_", with: "."), params)
 
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
