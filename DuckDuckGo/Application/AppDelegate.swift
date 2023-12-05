@@ -70,6 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncService: DDGSyncing?
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
+    private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
@@ -355,6 +356,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
+
+        subscribeSyncQueueToScreenLockedNotifications()
+    }
+
+    private func subscribeSyncQueueToScreenLockedNotifications() {
+        let screenIsLockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
+            .map { _ in true }
+        let screenIsUnlockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
+            .map { _ in false }
+
+        screenLockedCancellable = Publishers.Merge(screenIsLockedPublisher, screenIsUnlockedPublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLocked in
+                guard let syncService = self?.syncService, syncService.authState != .inactive else {
+                    return
+                }
+                if isLocked {
+                    os_log(.debug, log: .sync, "Screen is locked")
+                    syncService.scheduler.cancelSyncAndSuspendSyncQueue()
+                } else {
+                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    syncService.scheduler.resumeSyncQueue()
+                }
+            }
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {
