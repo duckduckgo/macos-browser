@@ -1139,6 +1139,9 @@
 		4B41EDB82B169889001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */; };
 		4B434690285ED7A100177407 /* BookmarksBarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */; };
 		4B43469528655D1400177407 /* FirefoxDataImporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */; };
+		4B44FEF32B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FEF22B1FEF5A000619D8 /* FocusableTextEditor.swift */; };
+		4B44FEF42B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FEF22B1FEF5A000619D8 /* FocusableTextEditor.swift */; };
+		4B44FEF52B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FEF22B1FEF5A000619D8 /* FocusableTextEditor.swift */; };
 		4B4BEC3D2A11B56B001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC382A11B509001D9AC5 /* DuckDuckGoNotificationsAppDelegate.swift */; };
 		4B4BEC3E2A11B56E001D9AC5 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4BEC322A11B509001D9AC5 /* Logging.swift */; };
 		4B4BEC402A11B5B5001D9AC5 /* NetworkProtectionExtensionMachService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4D60782A0B29FA00BCD287 /* NetworkProtectionExtensionMachService.swift */; };
@@ -3361,6 +3364,7 @@
 		4B41EDB32B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNFeedbackFormViewModel.swift; sourceTree = "<group>"; };
 		4B43468F285ED7A100177407 /* BookmarksBarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewModelTests.swift; sourceTree = "<group>"; };
 		4B43469428655D1400177407 /* FirefoxDataImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirefoxDataImporterTests.swift; sourceTree = "<group>"; };
+		4B44FEF22B1FEF5A000619D8 /* FocusableTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusableTextEditor.swift; sourceTree = "<group>"; };
 		4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoNotifications.xcconfig; sourceTree = "<group>"; };
 		4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Notifications.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4BEC322A11B509001D9AC5 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
@@ -5984,6 +5988,7 @@
 				31C3CE0128EDC1E70002C24A /* CustomRoundedCornersShape.swift */,
 				378F44EA29B4C73E00899924 /* View+RoundedCorners.swift */,
 				B690152B2ACBF4DA00AD0BAB /* MenuPreview.swift */,
+				4B44FEF22B1FEF5A000619D8 /* FocusableTextEditor.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -9174,6 +9179,7 @@
 				3706FAA1293F65D500E42796 /* NSAlert+DataImport.swift in Sources */,
 				3706FAA2293F65D500E42796 /* MainWindow.swift in Sources */,
 				3707C727294B5D2900682A9F /* WKWebView+SessionState.swift in Sources */,
+				4B44FEF42B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
 				3706FAA3293F65D500E42796 /* CrashReportPromptViewController.swift in Sources */,
 				3706FAA4293F65D500E42796 /* ContextMenuManager.swift in Sources */,
 				3706FAA5293F65D500E42796 /* GradientView.swift in Sources */,
@@ -10512,6 +10518,7 @@
 				1E2AE4C82ACB216B00684E0A /* HoverTrackingArea.swift in Sources */,
 				4B957A582AC7AE700062CA31 /* PasswordManagementIdentityItemView.swift in Sources */,
 				4B957A592AC7AE700062CA31 /* ProgressExtension.swift in Sources */,
+				4B44FEF52B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
 				4B957A5A2AC7AE700062CA31 /* CSVParser.swift in Sources */,
 				4B957A5B2AC7AE700062CA31 /* PixelDataModel.xcdatamodeld in Sources */,
 				4B957A5C2AC7AE700062CA31 /* PrivacyDashboardWebView.swift in Sources */,
@@ -11349,6 +11356,7 @@
 				569277C129DDCBB500B633EF /* HomePageContinueSetUpModel.swift in Sources */,
 				B68D21CF2ACBC9FC002DA3C2 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				B6A924D92664C72E001A28CA /* WebKitDownloadTask.swift in Sources */,
+				4B44FEF32B1FEF5A000619D8 /* FocusableTextEditor.swift in Sources */,
 				4B59023E26B35F3600489384 /* ChromiumLoginReader.swift in Sources */,
 				85D885B326A5A9DE0077C374 /* NSAlert+PasswordManager.swift in Sources */,
 				983DFB2528B67036006B7E34 /* UserContentUpdating.swift in Sources */,
