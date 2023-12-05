@@ -23,6 +23,32 @@ import DDGSync
 import Persistence
 import SyncDataProviders
 
+public class BookmarksFaviconsFetcherErrorHandler: EventMapping<BookmarksFaviconsFetcherError> {
+
+    public init() {
+        super.init { event, _, _, _ in
+            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherFailed, error: event.underlyingError))
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<BookmarksFaviconsFetcherError>.Mapping) {
+        fatalError("Use init()")
+    }
+}
+
+enum SyncBookmarksAdapterError: CustomNSError {
+    case unableToAccessFaviconsFetcherStateStoreDirectory
+
+    static let errorDomain: String = "SyncBookmarksAdapterError"
+
+    var errorCode: Int {
+        switch self {
+        case .unableToAccessFaviconsFetcherStateStoreDirectory:
+            return 1
+        }
+    }
+}
+
 final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
@@ -32,6 +58,22 @@ final class SyncBookmarksAdapter {
             assert(provider == nil, "Setting this value has no effect after provider has been instantiated")
         }
     }
+
+    @Published
+    var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false).wrappedValue {
+        didSet {
+            var udWrapper = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false)
+            udWrapper.wrappedValue = isFaviconsFetchingEnabled
+            if isFaviconsFetchingEnabled {
+                faviconsFetcher?.initializeFetcherState()
+            } else {
+                faviconsFetcher?.cancelOngoingFetchingIfNeeded()
+            }
+        }
+    }
+
+    @UserDefaultsWrapper(key: .syncIsEligibleForFaviconsFetcherOnboarding, defaultValue: false)
+    var isEligibleForFaviconsFetcherOnboarding: Bool
 
     @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
     private var isSyncBookmarksPaused: Bool {
@@ -63,27 +105,75 @@ final class SyncBookmarksAdapter {
         if shouldEnable {
             databaseCleaner.scheduleRegularCleaning()
             handleFavoritesAfterDisablingSync()
+            isFaviconsFetchingEnabled = false
         } else {
             databaseCleaner.cancelCleaningSchedule()
         }
     }
 
+    @MainActor
     func setUpProviderIfNeeded(database: CoreDataDatabase, metadataStore: SyncMetadataStore) {
         guard provider == nil else {
             return
         }
 
+        let faviconsFetcher = setUpFaviconsFetcher()
+
         let provider = BookmarksProvider(
             database: database,
-            metadataStore: metadataStore) { [weak self] in
+            metadataStore: metadataStore,
+            syncDidUpdateData: { [weak self] in
                 LocalBookmarkManager.shared.loadBookmarks()
                 self?.isSyncBookmarksPaused = false
                 self?.didShowBookmarksSyncPausedError = false
+            },
+            syncDidFinish: { [weak self] faviconsFetcherInput in
+                if let faviconsFetcher, self?.isFaviconsFetchingEnabled == true {
+                    if let faviconsFetcherInput {
+                        faviconsFetcher.updateBookmarkIDs(
+                            modified: faviconsFetcherInput.modifiedBookmarksUUIDs,
+                            deleted: faviconsFetcherInput.deletedBookmarksUUIDs
+                        )
+                    }
+                    faviconsFetcher.startFetching()
+                }
             }
+        )
+
         if shouldResetBookmarksSyncTimestamp {
             provider.lastSyncTimestamp = nil
         }
 
+        bindSyncErrorPublisher(provider)
+
+        self.provider = provider
+        self.faviconsFetcher = faviconsFetcher
+    }
+
+    private func setUpFaviconsFetcher() -> BookmarksFaviconsFetcher? {
+        let stateStore: BookmarksFaviconsFetcherStateStore
+        do {
+            guard let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+                throw SyncBookmarksAdapterError.unableToAccessFaviconsFetcherStateStoreDirectory
+            }
+            stateStore = try BookmarksFaviconsFetcherStateStore(applicationSupportURL: url)
+        } catch {
+            Pixel.fire(.debug(event: .bookmarksFaviconsFetcherStateStoreInitializationFailed, error: error))
+            os_log(.error, log: OSLog.sync, "Failed to initialize BookmarksFaviconsFetcherStateStore: %{public}s", String(reflecting: error))
+            return nil
+        }
+
+        return BookmarksFaviconsFetcher(
+            database: database,
+            stateStore: stateStore,
+            fetcher: FaviconFetcher(),
+            faviconStore: FaviconManager.shared,
+            errorEvents: BookmarksFaviconsFetcherErrorHandler(),
+            log: .sync
+        )
+    }
+
+    private func bindSyncErrorPublisher(_ provider: BookmarksProvider) {
         syncErrorCancellable = provider.syncErrorPublisher
             .sink { [weak self] error in
                 switch error {
@@ -113,8 +203,13 @@ final class SyncBookmarksAdapter {
                 }
                 os_log(.error, log: OSLog.sync, "Bookmarks Sync error: %{public}s", String(reflecting: error))
             }
+    }
 
-        self.provider = provider
+    private func handleFavoritesAfterDisablingSync() {
+        bookmarkManager.handleFavoritesAfterDisablingSync()
+        if appearancePreferences.favoritesDisplayMode.isDisplayUnified {
+            appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
+        }
     }
 
     private func showSyncPausedAlert() {
@@ -136,15 +231,9 @@ final class SyncBookmarksAdapter {
         }
     }
 
-    private func handleFavoritesAfterDisablingSync() {
-        bookmarkManager.handleFavoritesAfterDisablingSync()
-        if appearancePreferences.favoritesDisplayMode.isDisplayUnified {
-            appearancePreferences.favoritesDisplayMode = .displayNative(.desktop)
-        }
-    }
-
     private var syncErrorCancellable: AnyCancellable?
     private let bookmarkManager: BookmarkManager
     private let database: CoreDataDatabase
     private let appearancePreferences: AppearancePreferences
+    private var faviconsFetcher: BookmarksFaviconsFetcher?
 }

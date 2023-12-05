@@ -34,7 +34,7 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
 
     private let userDefaults: UserDefaults
 
-    init(userDefaults: UserDefaults = .shared) {
+    init(userDefaults: UserDefaults = .netP) {
         self.userDefaults = userDefaults
     }
 

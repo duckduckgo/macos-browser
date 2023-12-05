@@ -84,7 +84,7 @@ class PixelExperimentTests: XCTestCase {
     func testEnrollmentPixel() {
         let e = expectation(description: "pixel fired")
         Pixel.setUp(store: self.store) { [unowned self] event in
-            XCTAssertEqual(event, .launchInitial(cohort: cohort!.rawValue))
+            XCTAssertEqual(event, .newTabInitial(cohort: cohort!.rawValue))
             e.fulfill()
         }
 
@@ -106,7 +106,7 @@ class PixelExperimentTests: XCTestCase {
         let e2 = expectation(description: "serp pixel fired")
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
-            case .launchInitial(cohort: cohort.rawValue):
+            case .newTabInitial(cohort: cohort.rawValue):
                 e.fulfill()
             case .serpInitial(cohort: cohort.rawValue):
                 e2.fulfill()
@@ -133,7 +133,7 @@ class PixelExperimentTests: XCTestCase {
         var e: XCTestExpectation!
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
-            case .launchInitial(cohort: cohort.rawValue):
+            case .newTabInitial(cohort: cohort.rawValue):
                 enrollment.fulfill()
             case .serpDay21to27(cohort: cohort.rawValue):
                 e.fulfill()
@@ -175,7 +175,7 @@ class PixelExperimentTests: XCTestCase {
         var e: XCTestExpectation!
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
-            case .launchInitial(cohort: cohort.rawValue):
+            case .newTabInitial(cohort: cohort.rawValue):
                 enrollment.fulfill()
             case .serpDay21to27(cohort: cohort.rawValue):
                 e.fulfill()
@@ -212,7 +212,7 @@ class PixelExperimentTests: XCTestCase {
         let enrollment = expectation(description: "first pixel fired")
         Pixel.setUp(store: self.store) { [unowned self] event in
             switch event {
-            case .launchInitial(cohort: cohort.rawValue):
+            case .newTabInitial(cohort: cohort.rawValue):
                 enrollment.fulfill()
             default:
                 XCTFail("unexpected \(event)")

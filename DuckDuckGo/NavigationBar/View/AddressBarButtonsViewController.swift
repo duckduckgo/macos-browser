@@ -288,7 +288,7 @@ final class AddressBarButtonsViewController: NSViewController {
         if !bookmarkPopover.isShown {
             bookmarkButton.isHidden = false
             bookmarkPopover.isNew = result.isNew
-            bookmarkPopover.viewController.bookmark = bookmark
+            bookmarkPopover.bookmark = bookmark
             bookmarkPopover.show(positionedBelow: bookmarkButton)
         } else {
             updateBookmarkButtonVisibility()
@@ -974,6 +974,16 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 }
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
+
+    func popoverWillClose(_ notification: Notification) {
+        switch notification.object as? NSPopover {
+        case bookmarkPopover:
+            bookmarkPopover?.popoverWillClose()
+
+        default:
+            break
+        }
+    }
 
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {

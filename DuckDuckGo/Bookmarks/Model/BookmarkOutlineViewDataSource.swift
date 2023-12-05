@@ -34,14 +34,21 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     private let contentMode: ContentMode
     private let bookmarkManager: BookmarkManager
+    private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     private var favoritesPseudoFolder = PseudoFolder.favorites
     private var bookmarksPseudoFolder = PseudoFolder.bookmarks
 
-    init(contentMode: ContentMode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, treeController: BookmarkTreeController) {
+    init(
+        contentMode: ContentMode,
+        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        treeController: BookmarkTreeController,
+        presentFaviconsFetcherOnboarding: (() -> Void)? = nil
+    ) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.treeController = treeController
+        self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
 
@@ -118,6 +125,10 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         if let bookmark = node.representedObject as? Bookmark {
             cell.update(from: bookmark)
+
+            if bookmark.favicon(.small) == nil {
+                presentFaviconsFetcherOnboarding?()
+            }
             return cell
         }
 

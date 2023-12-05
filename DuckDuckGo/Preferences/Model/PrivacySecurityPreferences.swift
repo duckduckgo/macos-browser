@@ -46,10 +46,7 @@ final class PrivacySecurityPreferences {
             guard NSApp.runType.requiresEnvironment else { return }
 
             if Pixel.isNewUser && autoconsentEnabled ?? false {
-                let repetition = Pixel.Event.Repetition(key: Pixel.Event.cookieManagementEnabledInitial.name)
-                if repetition == .initial {
-                    Pixel.fire(.cookieManagementEnabledInitial)
-                }
+                PixelExperiment.fireCookieManagementEnabledPixel()
             }
         }
     }

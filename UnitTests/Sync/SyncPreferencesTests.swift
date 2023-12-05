@@ -16,32 +16,66 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DDGSync
+import Bookmarks
 import Combine
-@testable import DuckDuckGo_Privacy_Browser
-@testable import BrowserServicesKit
+import Persistence
 import SyncUI
+import XCTest
+@testable import BrowserServicesKit
+@testable import DDGSync
+@testable import DuckDuckGo_Privacy_Browser
 
 final class SyncPreferencesTests: XCTestCase {
 
     let scheduler = CapturingScheduler()
     let managementDialogModel = ManagementDialogModel()
     var ddgSyncing: MockDDGSyncing!
+    var syncBookmarksAdapter: SyncBookmarksAdapter!
     var appearancePersistor = MockPersistor()
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
     var testRecoveryCode = "some code"
 
+    var bookmarksDatabase: CoreDataDatabase!
+    var location: URL!
+
     override func setUp() {
+        setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
-        syncPreferences = SyncPreferences(syncService: ddgSyncing, apperancePreferences: appearancePreferences, managementDialogModel: managementDialogModel)
+
+        syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences)
+
+        syncPreferences = SyncPreferences(
+            syncService: ddgSyncing,
+            syncBookmarksAdapter: syncBookmarksAdapter,
+            appearancePreferences: appearancePreferences,
+            managementDialogModel: managementDialogModel
+        )
     }
 
     override func tearDown() {
         ddgSyncing = nil
         syncPreferences = nil
+        tearDownDatabase()
+    }
+
+    private func setUpDatabase() {
+        location = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+
+        let bundle = Bookmarks.bundle
+        guard let model = CoreDataDatabase.loadModel(from: bundle, named: "BookmarksModel") else {
+            XCTFail("Failed to load model")
+            return
+        }
+        bookmarksDatabase = CoreDataDatabase(name: className, containerLocation: location, model: model)
+        bookmarksDatabase.loadStore()
+    }
+
+    private func tearDownDatabase() {
+        try? bookmarksDatabase.tearDown(deleteStores: true)
+        bookmarksDatabase = nil
+        try? FileManager.default.removeItem(at: location)
     }
 
     func testOnInitDelegateIsSet() {
