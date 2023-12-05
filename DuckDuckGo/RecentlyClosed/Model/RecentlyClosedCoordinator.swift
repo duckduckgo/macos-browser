@@ -247,4 +247,13 @@ extension Tab.TabContent {
         }
     }
 
+    func forceReload() -> Self {
+        switch self {
+        case .url(let url, credential: let credential, source: _):
+            .url(url, credential: credential, source: .reload)
+        case .homePage, .preferences, .bookmarks, .onboarding, .none, .dataBrokerProtection:
+            self
+        }
+    }
+
 }

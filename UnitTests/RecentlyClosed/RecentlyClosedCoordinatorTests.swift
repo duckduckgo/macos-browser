@@ -41,11 +41,11 @@ final class RecentlyClosedCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(cache.count, 2)
         let tab = try XCTUnwrap(cache[0] as? RecentlyClosedTab)
-        XCTAssertEqual(tab.tabContent, .url("https://site2.com".url!))
+        XCTAssertEqual(tab.tabContent, .url("https://site2.com".url!, source: .link))
 
         let window = try XCTUnwrap(cache[1] as? RecentlyClosedWindow)
         XCTAssertEqual(window.tabs.count, 1)
-        XCTAssertEqual(window.tabs[0].tabContent, .url("https://site2.com".url!))
+        XCTAssertEqual(window.tabs[0].tabContent, .url("https://site2.com".url!, source: .link))
     }
 
     func testWhenDomainsAreBurnedThenInteractionDataIsDeleted() throws {
@@ -77,7 +77,7 @@ final class RecentlyClosedCoordinatorTests: XCTestCase {
 
 private extension RecentlyClosedTab {
     convenience init(_ url: String) {
-        self.init(tabContent: .url(url.url!), favicon: nil, title: nil, interactionData: Data(), index: .unpinned(0))
+        self.init(tabContent: .url(url.url!, source: .link), favicon: nil, title: nil, interactionData: Data(), index: .unpinned(0))
     }
 }
 

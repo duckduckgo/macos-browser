@@ -261,7 +261,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onLogicDidFinish.fulfill()
         }
 
-        tab.setContent(.url(urls.url2))
+        tab.setContent(.url(urls.url2, source: .link))
         waitForExpectations(timeout: 5)
     }
 
@@ -312,7 +312,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
             onLogicDidFinish.fulfill()
         }
 
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
     }
 
@@ -341,7 +341,7 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         }
 
         // skipping server.start
-        tab.setContent(.url(urls.url2))
+        tab.setContent(.url(urls.url2, source: .link))
         waitForExpectations(timeout: 5)
     }
 
@@ -365,10 +365,10 @@ class AdClickAttributionTabExtensionTests: XCTestCase {
         logic.onDidFinish = { _, _ in
             onDidFinish.fulfill()
         }
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
         onDidFinish = expectation(description: "onDidFinish 2")
-        tab.setContent(.url(urls.url2))
+        tab.setContent(.url(urls.url2, source: .link))
         waitForExpectations(timeout: 5)
 
         detection.on2XXResponse = nil /*assert*/

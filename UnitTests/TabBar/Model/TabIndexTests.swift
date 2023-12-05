@@ -225,7 +225,7 @@ final class TabIndexTests: XCTestCase {
     // MARK: -
 
     private func tabCollection(tabsCount: Int) -> TabCollection {
-        let tab = Tab(content: .url("https://duck.com".url!))
+        let tab = Tab(content: .url("https://duck.com".url!, source: .link))
         return TabCollection(tabs: .init(repeating: tab, count: tabsCount))
     }
 

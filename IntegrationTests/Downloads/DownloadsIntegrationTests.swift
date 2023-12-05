@@ -61,7 +61,7 @@ class DownloadsIntegrationTests: XCTestCase {
                                      headers: ["Content-Disposition": "attachment; filename=\"fname_\(suffix).dat\"",
                                                "Content-Type": "text/html"])
         let tab = tabViewModel.tab
-        _=await tab.setUrl(url, userEntered: nil)?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         let fileUrl = try await downloadTaskFuture.get().output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
@@ -78,7 +78,7 @@ class DownloadsIntegrationTests: XCTestCase {
         let tab = tabViewModel.tab
         // load empty page
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
-        _=await tab.setUrl(pageUrl, userEntered: nil)?.result
+        _=await tab.setUrl(pageUrl, source: .link)?.result
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         let suffix = Int.random(in: 0..<Int.max)
@@ -110,7 +110,7 @@ class DownloadsIntegrationTests: XCTestCase {
         let tab = tabViewModel.tab
         // load empty page
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
-        _=await tab.setUrl(pageUrl, userEntered: nil)?.result
+        _=await tab.setUrl(pageUrl, source: .link)?.result
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
         let suffix = Int.random(in: 0..<Int.max)

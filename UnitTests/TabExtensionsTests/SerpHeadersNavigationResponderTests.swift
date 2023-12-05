@@ -90,7 +90,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
                 return .cancel
             }
 
-            tab.setContent(.url(url))
+            tab.setContent(.url(url, source: .link))
             waitForExpectations(timeout: 5)
             tab.stopLoading()
         }
@@ -122,7 +122,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
                 return .cancel
             }
 
-            tab.setContent(.url(url))
+            tab.setContent(.url(url, source: .link))
             waitForExpectations(timeout: 5)
             tab.stopLoading()
         }

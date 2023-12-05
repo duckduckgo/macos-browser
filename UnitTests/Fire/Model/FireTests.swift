@@ -63,9 +63,9 @@ final class FireTests: XCTestCase {
         let faviconManager = FaviconManagerMock()
 
         let pinnedTabs: [Tab] = [
-            .init(content: .url("https://duck.com/".url!)),
-            .init(content: .url("https://spreadprivacy.com/".url!)),
-            .init(content: .url("https://wikipedia.org/".url!))
+            .init(content: .url("https://duck.com/".url!, source: .link)),
+            .init(content: .url("https://spreadprivacy.com/".url!, source: .link)),
+            .init(content: .url("https://wikipedia.org/".url!, source: .link))
         ]
         let pinnedTabsManager = PinnedTabsManager(tabCollection: .init(tabs: pinnedTabs))
 

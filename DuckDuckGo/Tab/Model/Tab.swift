@@ -59,6 +59,7 @@ protocol NewWindowPolicyDecisionMaker {
             case ui
             case link
             case appOpenUrl
+            case reload
 
             case webViewUpdated
 
@@ -74,14 +75,30 @@ protocol NewWindowPolicyDecisionMaker {
                 userEnteredValue != nil
             }
 
-            var shouldLoadFromCache: Bool {
+            var navigationType: NavigationType {
                 switch self {
-                case .stateRestoration, .historyEntry:
-                    true
-                case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
-                    false
+                case .userEntered:
+                    .custom(.userEnteredUrl)
+                case .stateRestoration:
+                    .sessionRestoration
+                case .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
+                    .custom(.tabContentUpdate)
+                case .reload:
+                    .reload
                 }
             }
+
+            var cachePolicy: URLRequest.CachePolicy {
+                switch self {
+                case .stateRestoration, .historyEntry:
+                    .returnCacheDataElseLoad
+                case .reload:
+                    .reloadIgnoringCacheData
+                case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
+                    .useProtocolCachePolicy
+                }
+            }
+
         }
 
         static func contentFromURL(_ url: URL?, source: URLSource) -> TabContent {
@@ -776,6 +793,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         if webView.url == nil, content.isUrl {
+            self.content = content.forceReload()
             // load from cache or interactionStateData when called by lazy loader
             reloadIfNeeded(shouldLoadInBackground: true)
         } else {
@@ -788,35 +806,23 @@ protocol NewWindowPolicyDecisionMaker {
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {
         guard case .url(let url, _, source: let source) = content, url.scheme != "about" else { return nil }
 
-        let userForcedReload = (url.absoluteString == content.userEnteredValue) ? shouldLoadInBackground : false
-
-        if userForcedReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
-            let didRestore = restoreInteractionStateDataIfNeeded()
-            if didRestore { return nil }
-
-            let navigationType: NavigationType = switch source {
-            case .userEntered:
-                .custom(.userEnteredUrl)
-            case .stateRestoration:
-                .sessionRestoration
-            case .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
-                .custom(.tabContentUpdate)
-            }
+        let forceReload = (url.absoluteString == content.userEnteredValue) ? shouldLoadInBackground : (source == .reload)
+        if forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
+            if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
 
             if url.isFileURL {
                 return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: navigationType)
+                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
             }
 
-            var request = URLRequest(url: url, cachePolicy: source.shouldLoadFromCache ? .returnCacheDataElseLoad : .useProtocolCachePolicy)
-            if #available(macOS 12.0, *),
-               content.isUserEnteredUrl {
+            var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
+            if #available(macOS 12.0, *), content.isUserEnteredUrl {
                 request.attribution = .user
             }
             invalidateInteractionStateData()
 
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: navigationType)
+                .load(request, withExpectedNavigationType: source.navigationType)
         }
         return nil
     }
@@ -828,10 +834,7 @@ protocol NewWindowPolicyDecisionMaker {
               webView.superview != nil || shouldLoadInBackground,
               // don‘t reload when already loaded
               webView.url != url,
-              webView.url != (content.isUrl ? content.urlForWebView : nil)
-        else {
-            return false
-        }
+              webView.url != (content.isUrl ? content.urlForWebView : nil) else { return false }
 
         // if content not loaded inspect error
         switch error {
