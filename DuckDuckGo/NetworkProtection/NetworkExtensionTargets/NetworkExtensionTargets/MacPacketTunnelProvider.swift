@@ -307,6 +307,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     }
 
     override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
+        super.prepareToConnect(using: provider)
+        
         guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
         try? loadDefaultPixelHeaders(from: options)
     }
