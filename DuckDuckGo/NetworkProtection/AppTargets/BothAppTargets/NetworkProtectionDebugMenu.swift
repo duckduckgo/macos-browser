@@ -44,6 +44,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
     private let connectOnLogInMenuItem = NSMenuItem(title: "Connect on Log In", action: #selector(NetworkProtectionDebugMenu.toggleConnectOnLogInAction))
+    private let disableRekeyingMenuItem = NSMenuItem(title: "Disable Rekeying", action: #selector(NetworkProtectionDebugMenu.toggleRekeyingDisabled))
 
     private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
 
@@ -107,6 +108,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "Registration Key") {
                 NSMenuItem(title: "Expire Now", action: #selector(NetworkProtectionDebugMenu.expireRegistrationKeyNow))
+                    .targetting(self)
+                disableRekeyingMenuItem
                     .targetting(self)
 
 #if DEBUG
@@ -273,6 +276,10 @@ final class NetworkProtectionDebugMenu: NSMenu {
         Task {
             try? await debugUtilities.expireRegistrationKeyNow()
         }
+    }
+
+    @objc func toggleRekeyingDisabled(_ sender: Any?) {
+        settings.disableRekeying.toggle()
     }
 
     /// Sets the registration key validity.
@@ -483,6 +490,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         shouldEnforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
         shouldIncludeAllNetworksMenuItem.state = settings.includeAllNetworks ? .on : .off
         excludeLocalNetworksMenuItem.state = settings.excludeLocalNetworks ? .on : .off
+        disableRekeyingMenuItem.state = settings.disableRekeying ? .on : .off
     }
 
     private func updateNetworkProtectionItems() {

@@ -37,6 +37,7 @@ public enum DataBrokerProtectionError: Error, Equatable, Codable {
     case cancelled
     case solvingCaptchaWithCallbackError
     case cantCalculatePreferredRunDate
+    case httpError(code: Int)
 
     static func parse(params: Any) -> DataBrokerProtectionError {
         let errorDataResult = try? JSONSerialization.data(withJSONObject: params)
@@ -85,6 +86,8 @@ extension DataBrokerProtectionError {
             return "Solving captcha with callback failed"
         case .cantCalculatePreferredRunDate:
             return "cantCalculatePreferredRunDate"
+        case .httpError:
+            return "httpError"
         }
     }
 }
