@@ -33,7 +33,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         await sut.parseActionCompleted(params: params)
 
-        XCTAssertEqual(mockCSSDelegate.lastError as! DataBrokerProtectionError, DataBrokerProtectionError.parsingErrorObjectFailed)
+        XCTAssertEqual(mockCSSDelegate.lastError as? DataBrokerProtectionError, DataBrokerProtectionError.parsingErrorObjectFailed)
     }
 
     func testWhenErrorIsParsed_thenDelegateSendsBackActionFailedError() async {
@@ -42,7 +42,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         await sut.parseActionCompleted(params: params)
 
-        XCTAssertEqual(mockCSSDelegate.lastError as! DataBrokerProtectionError, DataBrokerProtectionError.actionFailed(actionID: "someActionID", message: "some message"))
+        XCTAssertEqual(mockCSSDelegate.lastError as? DataBrokerProtectionError, DataBrokerProtectionError.actionFailed(actionID: "someActionID", message: "some message"))
     }
 
     func testWhenNavigateActionIsParsed_thenDelegateSendsBackURL() async {
@@ -73,7 +73,7 @@ final class DataBrokerProtectionFeatureTests: XCTestCase {
 
         await sut.parseActionCompleted(params: params)
 
-        XCTAssertEqual(mockCSSDelegate.lastError as! DataBrokerProtectionError, DataBrokerProtectionError.parsingErrorObjectFailed)
+        XCTAssertEqual(mockCSSDelegate.lastError as? DataBrokerProtectionError, DataBrokerProtectionError.parsingErrorObjectFailed)
     }
 
     func testWhenClickActionIsParsed_thenDelegateSendsSuccessWithCorrectActionId() async {
