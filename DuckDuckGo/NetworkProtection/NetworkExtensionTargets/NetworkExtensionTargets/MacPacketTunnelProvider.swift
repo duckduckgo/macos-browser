@@ -145,11 +145,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 frequency: .dailyOnly,
                 withAdditionalParameters: ["cohort": PixelKit.dateString(for: settings.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
-        case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionLatency(ms: ms, server: server, networkType: networkType),
-                frequency: .standard,
-                includeAppVersionParameter: true)
         case .rekeyCompleted:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
@@ -197,6 +192,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         observeServerChanges()
         observeStatusUpdateRequests()
         observeTunnelFailures()
+        observeConnectionQuality()
     }
 
     // MARK: - Observing Changes & Requests
@@ -281,6 +277,28 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionTunnelFailureRecovered,
                                   frequency: .dailyAndContinuous)
                 }
+            }
+            .store(in: &cancellables)
+    }
+
+    /// Observe latency to connected egress server
+    ///
+    private func observeConnectionQuality() {
+        latencyMonitor.publisher
+            .flatMap { result in
+                switch result {
+                case .unknown:
+                    PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionLatencyError,
+                                  frequency: .dailyOnly)
+                    return Empty<NetworkProtectionLatencyMonitor.ConnectionQuality, Never>().eraseToAnyPublisher()
+                case .quality(let quality):
+                    return Just(quality).eraseToAnyPublisher()
+                }
+            }
+            .sink { quality in
+                guard quality != .unknown else { return }
+                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionLatency(quality: quality),
+                              frequency: .dailyAndContinuous)
             }
             .store(in: &cancellables)
     }
