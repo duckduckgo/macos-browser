@@ -228,6 +228,7 @@ extension DataBrokerOperation {
             retriesCountOnError -= 1
             await runNextAction(currentAction)
         } else {
+            retriesCountOnError = 0
             await onError(error: DataBrokerProtectionError.unknown("No current action to execute"))
         }
     }
