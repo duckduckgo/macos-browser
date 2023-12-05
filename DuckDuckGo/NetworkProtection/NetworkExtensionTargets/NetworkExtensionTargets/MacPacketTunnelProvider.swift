@@ -176,11 +176,20 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     frequency: .dailyAndContinuous,
                     includeAppVersionParameter: true)
             }
-        case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionLatency(ms: ms, server: server, networkType: networkType),
-                frequency: .standard,
-                includeAppVersionParameter: true)
+        case .reportLatency(let result):
+            switch result {
+            case .error:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionLatencyError,
+                    frequency: .dailyOnly,
+                    includeAppVersionParameter: true)
+            case .quality(let quality):
+                guard quality != .unknown else { return }
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionLatency(quality: quality),
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
         case .rekeyCompleted:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
@@ -227,7 +236,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         observeConnectionStatusChanges()
         observeServerChanges()
         observeStatusUpdateRequests()
-        observeConnectionQuality()
     }
 
     // MARK: - Observing Changes & Requests
@@ -262,28 +270,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             self?.broadcastLastSelectedServerInfo()
         }
         .store(in: &cancellables)
-    }
-
-    /// Observe latency to connected egress server
-    ///
-    private func observeConnectionQuality() {
-        latencyMonitor.publisher
-            .flatMap { result in
-                switch result {
-                case .unknown:
-                    PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionLatencyError,
-                                  frequency: .dailyOnly)
-                    return Empty<NetworkProtectionLatencyMonitor.ConnectionQuality, Never>().eraseToAnyPublisher()
-                case .quality(let quality):
-                    return Just(quality).eraseToAnyPublisher()
-                }
-            }
-            .sink { quality in
-                guard quality != .unknown else { return }
-                PixelKit.fire(NetworkProtectionPixelEvent.networkProtectionLatency(quality: quality),
-                              frequency: .dailyAndContinuous)
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: - Broadcasting Status and Information
@@ -331,7 +317,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
         super.prepareToConnect(using: provider)
-        
+
         guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
         try? loadDefaultPixelHeaders(from: options)
     }
