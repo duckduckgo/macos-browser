@@ -41,8 +41,7 @@ struct DeviceDetailsView: View {
     var body: some View {
         SyncDialog {
             VStack(spacing: 20) {
-                Text(UserText.deviceDetailsTitle)
-                    .font(.system(size: 17, weight: .bold))
+                SyncUIViews.TextHeader(text: UserText.deviceDetailsTitle)
 
                 HStack {
                     Text(UserText.deviceDetailsLabel)

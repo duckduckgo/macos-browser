@@ -229,7 +229,6 @@ final class LocalBookmarkStore: BookmarkStore {
 
                 if context.hasChanges {
                     try context.save(onErrorFire: .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders)
-                    didMigrateToFormFactorSpecificFavorites = true
                 }
             } catch {
                 Thread.sleep(forTimeInterval: 1)

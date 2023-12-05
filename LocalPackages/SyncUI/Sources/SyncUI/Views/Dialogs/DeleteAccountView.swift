@@ -29,16 +29,13 @@ struct DeleteAccountView: View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRemoveDeviceDesktop")
-                Text(UserText.deleteAccountTitle)
-                    .font(.system(size: 17, weight: .bold))
-                Text(UserText.deleteAccountMessage)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.center)
+                SyncUIViews.TextHeader(text: UserText.deleteAccountTitle)
+                SyncUIViews.TextDetailMultiline(text: UserText.deleteAccountMessage)
             }
 
             ScrollView {
                 SyncedDevicesList(devices: devices)
+                    .roundedBorder()
             }
 
         } buttons: {

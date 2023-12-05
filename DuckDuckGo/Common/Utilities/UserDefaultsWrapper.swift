@@ -141,6 +141,7 @@ public struct UserDefaultsWrapper<T> {
         // Data Broker Protection
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
         // Network Protection
 
@@ -176,6 +177,7 @@ public struct UserDefaultsWrapper<T> {
         case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
         case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
+        case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
     }
 
     enum RemovedKeys: String, CaseIterable {

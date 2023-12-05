@@ -18,8 +18,16 @@
 
 import Foundation
 import LoginItems
+import Common
+import DataBrokerProtection
 
 struct DataBrokerProtectionAppEvents {
+    let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+
+    enum WaitlistNotificationSource {
+        case localPush
+        case cardUI
+    }
 
     func applicationDidFinishLaunching() {
         let loginItemsManager = LoginItemsManager()
@@ -51,11 +59,19 @@ struct DataBrokerProtectionAppEvents {
     }
 
     @MainActor
-    func handleNotification() {
+    func handleWaitlistInvitedNotification(source: WaitlistNotificationSource) {
         if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped,
-                            frequency: .dailyAndCount,
-                            includeAppVersionParameter: true)
+            switch source {
+            case .cardUI:
+                DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistCardUITapped,
+                                frequency: .dailyAndCount,
+                                includeAppVersionParameter: true)
+            case .localPush:
+                DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped,
+                                frequency: .dailyAndCount,
+                                includeAppVersionParameter: true)
+            }
+
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         }
     }
@@ -73,6 +89,7 @@ struct DataBrokerProtectionAppEvents {
     }
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
+        pixelHandler.fire(.resetLoginItem)
         loginItemsManager.restartLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
     }
 }
