@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "diego/fix-vpn-dns-routing",
-        "revision" : "8950aacee05c50792b35bd869836ed31908c1c82"
+        "revision" : "fe577c508ad4ea163075ac8fab20673d0a7565f6",
+        "version" : "92.0.1"
       }
     },
     {
