@@ -9,6 +9,7 @@ disabled_rules:
   - implicit_getter
   - function_parameter_count
   - trailing_comma
+  - nesting
 
 opt_in_rules:
   - file_header
@@ -41,8 +42,6 @@ file_length:
 type_body_length:
   warning: 500
   error: 500
-nesting:
-  type_level: 2
 large_tuple:
   warning: 4
   error: 5
