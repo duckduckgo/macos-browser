@@ -302,7 +302,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
-        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
+        DeviceAuthenticator.shared.authenticateUser(reason: .autofillCreditCards) { authenticationResult in
             handler(authenticationResult.authenticated)
         }
     }

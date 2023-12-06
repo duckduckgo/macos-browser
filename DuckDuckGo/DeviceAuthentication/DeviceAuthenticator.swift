@@ -34,13 +34,14 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     enum AuthenticationReason {
         case autofill
+        case autofillCreditCards
         case changeLoginsSettings
         case unlockLogins
         case exportLogins
 
         var localizedDescription: String {
             switch self {
-            case .autofill: return UserText.pmAutoLockPromptAutofill
+            case .autofill, .autofillCreditCards: return UserText.pmAutoLockPromptAutofill
             case .changeLoginsSettings: return UserText.pmAutoLockPromptChangeLoginsSettings
             case .unlockLogins: return UserText.pmAutoLockPromptUnlockLogins
             case .exportLogins: return UserText.pmAutoLockPromptExportLogins
@@ -50,6 +51,7 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     internal enum Constants {
         static var intervalBetweenIdleChecks: TimeInterval = 1
+        static var intervalBetweenCreditCardAutofillChecks: TimeInterval = 10
     }
 
     static var deviceSupportsBiometrics: Bool {
@@ -144,7 +146,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     }
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
-        guard requiresAuthentication else {
+        guard (reason == .autofillCreditCards && creditCardTimeIntervalExpired()) || requiresAuthentication else {
             result(.success)
             return
         }
@@ -162,6 +164,7 @@ final class DeviceAuthenticator: UserAuthenticating {
             if authenticationResult.authenticated {
                 // Now that the user has unlocked the device, begin the idle timer again.
                 self.beginIdleCheckTimer()
+                self.beginCreditCardAutofillTimer()
             }
 
             result(authenticationResult)
@@ -231,6 +234,38 @@ final class DeviceAuthenticator: UserAuthenticating {
         if interval >= autofillPreferences.autoLockThreshold.seconds {
             self.lock()
         }
+    }
+
+    // MARK: - Credit Card Autofill Timer
+
+    private func beginCreditCardAutofillTimer() {
+        os_log("Beginning credit card autofill timer", log: .autoLock)
+
+        self.timerCreditCard?.invalidate()
+        self.timerCreditCard = nil
+
+        let timer = Timer(timeInterval: Constants.intervalBetweenCreditCardAutofillChecks, repeats: false) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            self.cancelCreditCardAutofillTimer()
+        }
+
+        self.timerCreditCard = timer
+        RunLoop.current.add(timer, forMode: .common)
+    }
+
+    private func cancelCreditCardAutofillTimer() {
+        os_log("Cancelling credit card autofill timer", log: .autoLock)
+        self.timerCreditCard?.invalidate()
+        self.timerCreditCard = nil
+    }
+
+    private func creditCardTimeIntervalExpired() -> Bool {
+        guard let timer = timerCreditCard else {
+            return true
+        }
+        return timer.timeInterval >= Constants.intervalBetweenCreditCardAutofillChecks
     }
 
 }
