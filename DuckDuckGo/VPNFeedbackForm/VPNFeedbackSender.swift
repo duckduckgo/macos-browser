@@ -30,8 +30,6 @@ struct DefaultVPNFeedbackSender: VPNFeedbackSender {
         let encodedUserText = userText.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? userText
         let pixelEvent = Pixel.Event.vpnBreakageReport(category: category.rawValue, description: encodedUserText, metadata: metadata.toBase64())
 
-        print("[VPN] Sending breakage pixel, with metadata: \(metadata.toPrettyPrintedJSON()!)")
-
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             Pixel.fire(pixelEvent) { error in
                 if let error {

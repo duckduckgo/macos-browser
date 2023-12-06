@@ -114,10 +114,6 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         self.statusReporter.forceRefresh()
     }
 
-    deinit {
-        print("DEINIT VPN METADATA COLLECTOR")
-    }
-
     @MainActor
     func collectMetadata() async -> VPNMetadata {
         let appInfoMetadata = collectAppInfoMetadata()
