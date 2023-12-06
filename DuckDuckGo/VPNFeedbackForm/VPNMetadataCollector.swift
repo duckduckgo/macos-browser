@@ -115,7 +115,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     deinit {
-        // print("DEINIT VPN METADATA COLLECTOR")
+        print("DEINIT VPN METADATA COLLECTOR")
     }
 
     @MainActor
