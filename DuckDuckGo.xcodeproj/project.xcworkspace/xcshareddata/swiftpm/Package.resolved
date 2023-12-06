@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "c871e62fd8d07f9e3136948614003fbe7e582963",
-        "version" : "91.0.2"
+        "branch" : "dominik/fix-favicons-fetcher-crash",
+        "revision" : "70c67be570df3ebdcdc1078288db2dcc80f58ce0"
       }
     },
     {
