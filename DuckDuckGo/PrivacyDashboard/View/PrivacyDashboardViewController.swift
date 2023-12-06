@@ -194,7 +194,7 @@ final class PrivacyDashboardViewController: NSViewController {
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
     func privacyDashboardControllerDidRequestShowReportBrokenSite(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController) {
-        // Not present in macOS: Pixel.fire(.privacyDashboardReportBrokenSite)
+        // Not used in macOS: Pixel.fire(.privacyDashboardReportBrokenSite)
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didChangeProtectionSwitch protectionState: ProtectionState) {
