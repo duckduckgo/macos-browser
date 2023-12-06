@@ -24,6 +24,14 @@ class CapturingOptionsButtonMenuDelegate: OptionsButtonMenuDelegate {
     var optionsButtonMenuRequestedPreferencesCalled = false
     var optionsButtonMenuRequestedAppearancePreferencesCalled = false
 
+    func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu) {
+
+    }
+
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu) {
+
+    }
+
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem) {
 
     }

@@ -17,10 +17,12 @@
 //
 
 import Cocoa
+import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
 import NetworkProtectionUI
+import ServiceManagement
 
 @objc(Application)
 final class DuckDuckGoAgentApplication: NSApplication {
@@ -47,14 +49,89 @@ final class DuckDuckGoAgentApplication: NSApplication {
 @main
 final class DuckDuckGoAgentAppDelegate: NSObject, NSApplicationDelegate {
 
+    /// when enabled VPN connection will be automatically initiated on launch even if disconnected manually (Always On rule disabled)
+    @UserDefaultsWrapper(key: .networkProtectionConnectOnLogIn, defaultValue: NetworkProtectionUserDefaultsConstants.shouldConnectOnLogIn, defaults: .shared)
+    private var shouldAutoConnect: Bool
+
+    /// Agent launch time saved by the main app to distinguish between Log In launch and Main App launch to prevent connection when started by the Main App
+    @UserDefaultsWrapper(key: .netpMenuAgentLaunchTime, defaultValue: .distantPast, defaults: .shared)
+    private var netpMenuAgentLaunchTime: Date
+
+    private static let recentThreshold: TimeInterval = 5.0
+
+    private let appLauncher = AppLauncher()
+    private let bouncer = NetworkProtectionBouncer()
+
+    private lazy var tunnelController: FeatureProtectingTunnelController = {
+        FeatureProtectingTunnelController(appLauncher: appLauncher, bouncer: bouncer)
+    }()
+
+    private lazy var statusReporter: NetworkProtectionStatusReporter = {
+        DefaultNetworkProtectionStatusReporter(
+            statusObserver: ConnectionStatusObserverThroughDistributedNotifications(),
+            serverInfoObserver: ConnectionServerInfoObserverThroughDistributedNotifications(),
+            connectionErrorObserver: ConnectionErrorObserverThroughDistributedNotifications(),
+            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications())
+    }()
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
     ///
-    private lazy var networkProtectionMenu = NetworkProtectionUI.StatusBarMenu()
+    @MainActor
+    private lazy var networkProtectionMenu: StatusBarMenu = {
+        #if DEBUG
+        let iconProvider = DebugMenuIconProvider()
+        #elseif REVIEW
+        let iconProvider = ReviewMenuIconProvider()
+        #else
+        let iconProvider = MenuIconProvider()
+        #endif
+
+        let menuItems = [
+            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuShareFeedback, action: { [weak self] in
+                await self?.appLauncher.launchApp(withCommand: .shareFeedback)
+            }),
+            StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuOpenDuckDuckGo, action: { [weak self] in
+                await self?.appLauncher.launchApp(withCommand: .justOpen)
+            })
+        ]
+
+        let onboardingStatusPublisher = UserDefaults.shared.publisher(for: \.networkProtectionOnboardingStatusRawValue).map { rawValue in
+            OnboardingStatus(rawValue: rawValue) ?? .default
+        }.eraseToAnyPublisher()
+
+        return StatusBarMenu(onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, controller: tunnelController, iconProvider: iconProvider, menuItems: menuItems)
+    }()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         os_log("DuckDuckGoAgent started", log: .networkProtectionLoginItemLog, type: .info)
         networkProtectionMenu.show()
+
+        bouncer.requireAuthTokenOrKillApp()
+
+        // Connect on Log In
+        if shouldAutoConnect,
+           // are we launched by the system?
+           netpMenuAgentLaunchTime.addingTimeInterval(Self.recentThreshold) > Date() {
+            Task {
+                await appLauncher.launchApp(withCommand: .startVPN)
+            }
+        }
     }
+}
+
+extension NSApplication {
+
+    enum RunType: Int, CustomStringConvertible {
+        case normal
+        var description: String {
+            switch self {
+            case .normal: return "normal"
+            }
+        }
+    }
+    static var runType: RunType { .normal }
+
 }

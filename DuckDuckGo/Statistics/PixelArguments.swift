@@ -21,65 +21,6 @@ import AppKit
 
 extension Pixel.Event {
 
-    enum AppLaunch: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case initial = "initial"
-        case dailyFirst = "first-in-a-day"
-        case regular = "app-launch"
-        case openURL = "open-url"
-        case openFile = "open-file"
-
-        struct AppLaunchRepetition {
-            let store: PixelDataStore
-            let now: () -> Date
-
-            private static let AppInitiallyLaunchedKey = "init"
-
-            var value: Repetition {
-                Repetition(key: Self.AppInitiallyLaunchedKey, store: store, now: now(), update: false)
-            }
-
-            func update() {
-                _=Repetition(key: Self.AppInitiallyLaunchedKey, store: store, now: now(), update: true)
-            }
-        }
-
-        static func repetition(store: PixelDataStore = LocalPixelDataStore.shared,
-                               now: @autoclosure @escaping () -> Date = Date()) -> AppLaunchRepetition {
-            return AppLaunchRepetition(store: store, now: now)
-        }
-
-        static func autoInitialOrRegular(store: PixelDataStore = LocalPixelDataStore.shared,
-                                         now: @autoclosure @escaping () -> Date = Date()) -> AppLaunch {
-            let repetition = self.repetition(store: store, now: now())
-            switch repetition.value {
-            case .initial:
-                return .initial
-            case .dailyFirst:
-                return .dailyFirst
-            case .repetitive:
-                return .regular
-            }
-        }
-
-    }
-
-    enum IsDefaultBrowser: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case `default` = "as-default"
-        case nonDefault = "as-nondefault"
-
-        init(isDefault: Bool) {
-            self = isDefault ? .default : .nonDefault
-        }
-
-        init() {
-            self.init(isDefault: DefaultBrowserPreferences().isDefault)
-        }
-    }
-
     enum Repetition: String, CustomStringConvertible {
         var description: String { rawValue }
 
@@ -104,114 +45,6 @@ extension Pixel.Event {
             }
             self = .dailyFirst
         }
-    }
-
-    enum AverageTabsCount: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case lessThan6 = "less-than-6-tabs"
-        case moreThan6 = "more-than-6-tabs"
-
-        init(avgTabs: Double) {
-            if avgTabs >= 6 {
-                self = .moreThan6
-                return
-            }
-            self = .lessThan6
-        }
-    }
-
-    enum BurnedTabs: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case lessThan6 = "burn-less-than-6-tabs"
-        case moreThan6 = "burn-more-than-6-tabs"
-
-        init(_ tabs: Int) {
-            if tabs >= 6 {
-                self = .moreThan6
-                return
-            }
-            self = .lessThan6
-        }
-
-        @MainActor
-        init() {
-            let tabCount = WindowControllersManager.shared.mainWindowControllers
-                .reduce(0) { $0 + $1.mainViewController.tabCollectionViewModel.tabCollection.tabs.count }
-            self.init(tabCount)
-        }
-
-    }
-
-    enum BurnedWindows: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case one = "burn-1-window"
-        case moreThan1 = "burn-more-than-1-window"
-
-        init(_ windows: Int) {
-            if windows <= 1 {
-                self = .one
-                return
-            }
-            self = .moreThan1
-        }
-
-        @MainActor
-        init() {
-            let windowCount = WindowControllersManager.shared.mainWindowControllers.count
-            self.init(windowCount)
-        }
-
-    }
-
-    enum FireproofKind: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case bookmarked
-        case favorite
-        case website
-        case pwm
-
-        init(url: URL?, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-            guard let url = url,
-                  let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) else {
-                self = .website
-                return
-            }
-            if bookmark.isFavorite {
-                self = .favorite
-            } else {
-                self = .bookmarked
-            }
-        }
-
-    }
-
-    enum FireproofingSuggested: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case suggested
-        case manual
-        case pwm
-    }
-
-    enum IsBookmarkFireproofed: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case fireproofed = "fireproofed"
-        case nonFireproofed = "non-fireproofed"
-
-        init(url: URL?, fireproofDomains: FireproofDomains = FireproofDomains.shared) {
-            if let host = url?.host,
-               fireproofDomains.isFireproof(fireproofDomain: host) {
-                self = .fireproofed
-            } else {
-                self = .nonFireproofed
-            }
-        }
-
     }
 
     enum AccessPoint: String, CustomStringConvertible {
@@ -259,50 +92,6 @@ extension Pixel.Event {
         case identity
     }
 
-    enum HasBookmark: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case hasBookmark = "has-bookmark"
-        case noBookmarks = "no-bookmarks"
-    }
-
-    enum HasFavorite: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case hasFavorite = "has-favorite"
-        case noFavorites = "no-favorites"
-    }
-
-    enum HasHistoryEntry: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case hasHistoryEntry = "has-history-entry"
-        case noHistoryEntry = "no-history-entry"
-    }
-
-    enum DataImportAction: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case importBookmarks = "bookmarks"
-        case importLogins = "logins"
-        case generic = "generic"
-    }
-
-    enum DataImportSource: String, CustomStringConvertible {
-        var description: String { rawValue }
-
-        case brave = "source-brave"
-        case chrome = "source-chrome"
-        case csv = "source-csv"
-        case lastPass = "source-lastpass"
-        case onePassword7 = "source-1password"
-        case onePassword8 = "source-1password-8"
-        case edge = "source-edge"
-        case firefox = "source-firefox"
-        case safari = "source-safari"
-        case bookmarksHTML = "source-bookmarks-html"
-    }
-
     public enum CompileRulesListType: String, CustomStringConvertible {
 
         public var description: String { rawValue }
@@ -313,5 +102,42 @@ extension Pixel.Event {
         case attributed = "attributed"
         case unknown = "unknown"
 
+    }
+
+    enum FireButtonOption: String, CustomStringConvertible {
+        var description: String { rawValue }
+
+        case tab
+        case window
+        case allSites = "all-sites"
+    }
+}
+
+extension DataImportAction: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .bookmarks: return "bookmarks"
+        case .logins: return "logins"
+        case .favicons: return "favicons"
+        case .generic: return "generic"
+        }
+    }
+}
+
+extension DataImport.Source: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .brave: return "source-brave"
+        case .chrome: return "source-chrome"
+        case .csv: return "source-csv"
+        case .lastPass: return "source-lastpass"
+        case .onePassword7: return "source-1password"
+        case .onePassword8: return "source-1password-8"
+        case .edge: return "source-edge"
+        case .firefox: return "source-firefox"
+        case .safari: return "source-safari"
+        case .safariTechnologyPreview: return "source-safari-technology-preview"
+        case .bookmarksHTML: return "source-bookmarks-html"
+        }
     }
 }

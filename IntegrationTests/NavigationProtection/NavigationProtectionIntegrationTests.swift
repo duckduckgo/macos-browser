@@ -65,8 +65,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/amp/")!
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/amp/")!
+        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
 
         let itemsCount = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('li').length") as? Int ?? 0
         XCTAssertTrue(itemsCount > 0, "no items")
@@ -76,7 +76,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             print("processing", i)
             // open test page if needed
             if tab.content.url != url {
-                _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+                _=try await tab.setUrl(url, userEntered: nil)?.result.get()
             }
 
             // extract "Expected" URL
@@ -148,8 +148,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         let tab = Tab(content: .none, extensionsBuilder: extensionsBuilder)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/referrer-trimming/")!
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/referrer-trimming/")!
+        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
 
         // run test
         _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('start').click(); return true })()")
@@ -188,9 +188,9 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         XCTAssertTrue(results.count > 0)
         for result in results {
             if result.id.hasPrefix("1p") {
-                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.glitch.me/privacy-protections/referrer-trimming/", result.id)
+                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.site/privacy-protections/referrer-trimming/", result.id)
             } else {
-                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.glitch.me/", result.id)
+                XCTAssertEqual(result.value?.string, "https://privacy-test-pages.site/", result.id)
             }
         }
     }
@@ -201,10 +201,10 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: tab)!
         let tabViewModel = (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
 
-        let url = URL(string: "https://privacy-test-pages.glitch.me/privacy-protections/gpc/")!
+        let url = URL(string: "https://privacy-test-pages.site/privacy-protections/gpc/")!
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
-        _=try await tab.setUrl(url, userEntered: nil)?.value?.result.get()
+        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
 
         // enable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = true
@@ -273,7 +273,6 @@ class NavigationProtectionIntegrationTests: XCTestCase {
             XCTAssertEqual(results.results, expected)
         }
     }
-
 }
 
 private extension Tab {

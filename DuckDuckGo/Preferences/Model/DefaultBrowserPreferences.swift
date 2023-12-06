@@ -75,16 +75,10 @@ final class DefaultBrowserPreferences: ObservableObject {
         didSet {
             // Temporary pixel for first time user import data
 #if DEBUG
-            if NSApp.isRunningUnitTests {
-                return
-            }
+            guard NSApp.runType.requiresEnvironment else { return }
 #endif
             if Pixel.isNewUser && isDefault {
-                let repetition = Pixel.Event.Repetition(key: Pixel.Event.setAsDefaultInitial.name)
-                if repetition == .initial {
-                    Pixel.fire(.setAsDefaultInitial)
-                }
-
+                PixelExperiment.fireSetAsDefaultInitialPixel()
             }
         }
     }
@@ -93,8 +87,10 @@ final class DefaultBrowserPreferences: ObservableObject {
     init(defaultBrowserProvider: DefaultBrowserProvider = SystemDefaultBrowserProvider()) {
         self.defaultBrowserProvider = defaultBrowserProvider
 
-        appDidBecomeActiveCancellable = NotificationCenter.default
+        let notificationCenter = NotificationCenter.default
+        appDidBecomeActiveCancellable = notificationCenter
             .publisher(for: NSApplication.didBecomeActiveNotification)
+            .merge(with: notificationCenter.publisher(for: .windowDidBecomeKey))
             .sink { [weak self] _ in
                 self?.checkIfDefault()
             }

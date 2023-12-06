@@ -61,7 +61,7 @@ final class TabCollectionViewModel: NSObject {
         }
     }
 
-    let isBurner: Bool
+    let burnerMode: BurnerMode
 
     var changesEnabled = true
 
@@ -98,40 +98,52 @@ final class TabCollectionViewModel: NSObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    private var startupPreferences: StartupPreferences
+    private var homePage: Tab.TabContent {
+        var homePage: Tab.TabContent = .homePage
+        if startupPreferences.launchToCustomHomePage,
+           let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
+            homePage = Tab.TabContent.contentFromURL(customURL)
+        }
+        return homePage
+    }
+
     init(
         tabCollection: TabCollection,
         selectionIndex: Int = 0,
         pinnedTabsManager: PinnedTabsManager?,
-        isBurner: Bool = false
+        burnerMode: BurnerMode = .regular,
+        startupPreferences: StartupPreferences = StartupPreferences.shared
     ) {
         self.tabCollection = tabCollection
         self.pinnedTabsManager = pinnedTabsManager
-        self.isBurner = isBurner
+        self.burnerMode = burnerMode
+        self.startupPreferences = startupPreferences
         super.init()
 
         subscribeToTabs()
         subscribeToPinnedTabsManager()
 
         if tabCollection.tabs.isEmpty {
-            appendNewTab(with: .homePage)
+            appendNewTab(with: homePage)
         }
         self.selectionIndex = .unpinned(selectionIndex)
     }
 
     convenience init(tabCollection: TabCollection,
                      selectionIndex: Int = 0,
-                     isBurner: Bool = false) {
+                     burnerMode: BurnerMode = .regular) {
         self.init(tabCollection: tabCollection,
                   selectionIndex: selectionIndex,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  isBurner: isBurner)
+                  burnerMode: burnerMode)
     }
 
-    convenience init(isBurner: Bool = false) {
+    convenience init(burnerMode: BurnerMode = .regular) {
         let tabCollection = TabCollection()
         self.init(tabCollection: tabCollection,
                   pinnedTabsManager: WindowControllersManager.shared.pinnedTabsManager,
-                  isBurner: isBurner)
+                  burnerMode: burnerMode)
     }
 
     func setUpLazyLoadingIfNeeded() {
@@ -153,14 +165,17 @@ final class TabCollectionViewModel: NSObject {
         tabLazyLoader?.scheduleLazyLoading()
     }
 
-    func tabViewModel(at index: Int) -> TabViewModel? {
-        guard index >= 0, tabCollection.tabs.count > index else {
-            os_log("TabCollectionViewModel: Index out of bounds", type: .error)
-            return nil
-        }
+    func tabViewModel(at unpinnedIndex: Int) -> TabViewModel? {
+        return tabViewModel(at: .unpinned(unpinnedIndex))
+    }
 
-        let tab = tabCollection.tabs[index]
-        return tabViewModels[tab]
+    func tabViewModel(at index: TabIndex) -> TabViewModel? {
+        switch index {
+        case .unpinned(let index):
+            return tabs[safe: index].flatMap { tabViewModels[$0] }
+        case .pinned(let index):
+            return pinnedTabsManager?.tabViewModel(at: index)
+        }
     }
 
     // MARK: - Selection
@@ -267,7 +282,7 @@ final class TabCollectionViewModel: NSObject {
         if selectDisplayableTabIfPresent(content) {
             return
         }
-        append(tab: Tab(content: content, shouldLoadInBackground: true, isBurner: isBurner), selected: selected, forceChange: forceChange)
+        append(tab: Tab(content: content, shouldLoadInBackground: true, burnerMode: burnerMode), selected: selected, forceChange: forceChange)
     }
 
     func append(tab: Tab, selected: Bool = true, forceChange: Bool = false) {
@@ -346,22 +361,24 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Removal
 
-    func remove(at index: TabIndex, published: Bool = true) {
+    func remove(at index: TabIndex, published: Bool = true, forceChange: Bool = false) {
         switch index {
         case .unpinned(let i):
-            return removeUnpinnedTab(at: i, published: published)
+            return removeUnpinnedTab(at: i, published: published, forceChange: forceChange)
         case .pinned(let i):
             return removePinnedTab(at: i, published: published)
         }
     }
 
-    private func removeUnpinnedTab(at index: Int, published: Bool = true) {
-        guard changesEnabled else { return }
+    private func removeUnpinnedTab(at index: Int, published: Bool = true, forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
 
         let parentTab = tabCollection.tabs[safe: index]?.parentTab
-        guard tabCollection.removeTab(at: index, published: published) else { return }
+        guard tabCollection.removeTab(at: index, published: published, forced: forceChange) else { return }
 
-        didRemoveTab(at: .unpinned(index), withParent: parentTab)
+        didRemoveTab(at: .unpinned(index),
+                     withParent: parentTab,
+                     forced: forceChange)
     }
 
     private func removePinnedTab(at index: Int, published: Bool = true) {
@@ -375,7 +392,7 @@ final class TabCollectionViewModel: NSObject {
         didRemoveTab(at: .pinned(index), withParent: nil)
     }
 
-    private func didRemoveTab(at index: TabIndex, withParent parentTab: Tab?) {
+    private func didRemoveTab(at index: TabIndex, withParent parentTab: Tab?, forced: Bool = false) {
 
         func notifyDelegate() {
             if index.isUnpinnedTab {
@@ -417,7 +434,7 @@ final class TabCollectionViewModel: NSObject {
         }
 
         notifyDelegate()
-        select(at: newSelectionIndex)
+        select(at: newSelectionIndex, forceChange: forced)
     }
 
     func moveTab(at fromIndex: Int, to otherViewModel: TabCollectionViewModel, at toIndex: Int) {
@@ -435,8 +452,8 @@ final class TabCollectionViewModel: NSObject {
         otherViewModel.selectParentOnRemoval = true
     }
 
-    func removeAllTabs(except exceptionIndex: Int? = nil) {
-        guard changesEnabled else { return }
+    func removeAllTabs(except exceptionIndex: Int? = nil, forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
 
         tabCollection.removeAll(andAppend: exceptionIndex.map { tabCollection.tabs[$0] })
 
@@ -463,7 +480,7 @@ final class TabCollectionViewModel: NSObject {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homePage, isBurner: isBurner))
+        tabCollection.removeAll(andAppend: Tab(content: .homePage, burnerMode: burnerMode))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -478,7 +495,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homePage, isBurner: isBurner))
+            tabCollection.append(tab: Tab(content: .homePage, burnerMode: burnerMode))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -494,15 +511,15 @@ final class TabCollectionViewModel: NSObject {
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
     }
 
-    func removeSelected() {
-        guard changesEnabled else { return }
+    func removeSelected(forceChange: Bool = false) {
+        guard changesEnabled || forceChange else { return }
 
         guard let selectionIndex = selectionIndex else {
             os_log("TabCollectionViewModel: No tab selected", type: .error)
             return
         }
 
-        remove(at: selectionIndex)
+        remove(at: selectionIndex, forceChange: forceChange)
     }
 
     // MARK: - Others
@@ -515,7 +532,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, isBurner: isBurner, shouldLoadFromCache: true)
+        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, burnerMode: burnerMode, shouldLoadFromCache: true)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)
@@ -616,7 +633,7 @@ final class TabCollectionViewModel: NSObject {
             self.addTabViewModels(new.subtracting(old))
 
             // Make sure the tab is burner if it is supposed to be
-            if newTabs.first(where: { $0.isBurner != self.isBurner }) != nil {
+            if newTabs.first(where: { $0.burnerMode != self.burnerMode }) != nil {
                 Pixel.fire(.debug(event: .burnerTabMisplaced))
                 fatalError("Error in burner tab management")
             }
@@ -646,9 +663,9 @@ final class TabCollectionViewModel: NSObject {
 
         switch tabCollection {
         case self.tabCollection:
-            selectedTabViewModel = tabViewModel(at: selectionIndex.item)
+            selectedTabViewModel = tabViewModel(at: .unpinned(selectionIndex.item))
         case pinnedTabsCollection:
-            selectedTabViewModel = pinnedTabsManager?.tabViewModel(at: selectionIndex.item)
+            selectedTabViewModel = tabViewModel(at: .pinned(selectionIndex.item))
         default:
             break
         }
@@ -671,7 +688,7 @@ extension TabCollectionViewModel {
         }
     }
 
-    private func indexInAllTabs(of tab: Tab) -> TabIndex? {
+    func indexInAllTabs(of tab: Tab) -> TabIndex? {
         if let index = pinnedTabsCollection?.tabs.firstIndex(of: tab) {
             return .pinned(index)
         }
@@ -692,11 +709,33 @@ extension TabCollectionViewModel {
 }
 
 extension TabCollectionViewModel {
-    var localHistory: Set<String> {
+
+    var localHistory: [Visit] {
         var history = tabCollection.localHistory
-        if let pinnedTabsHistory = pinnedTabsCollection?.localHistory {
-            history.formUnion(pinnedTabsHistory)
+        history += tabCollection.localHistoryOfRemovedTabs
+        if pinnedTabsCollection != nil {
+            history += pinnedTabsCollection?.localHistory ?? []
+            history += pinnedTabsCollection?.localHistoryOfRemovedTabs ?? []
         }
         return history
     }
+
+    var localHistoryDomains: Set<String> {
+        var historyDomains = tabCollection.localHistoryDomains
+        historyDomains.formUnion(tabCollection.localHistoryDomainsOfRemovedTabs)
+        if let pinnedTabs = pinnedTabsCollection {
+            historyDomains.formUnion(pinnedTabs.localHistoryDomains)
+            historyDomains.formUnion(pinnedTabs.localHistoryDomainsOfRemovedTabs)
+        }
+        return historyDomains
+    }
+
+}
+
+extension TabCollectionViewModel {
+
+    var isBurner: Bool {
+        burnerMode.isBurner
+    }
+
 }

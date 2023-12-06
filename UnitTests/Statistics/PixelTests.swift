@@ -38,34 +38,6 @@ class PixelTests: XCTestCase {
         super.tearDown()
     }
 
-    // Temporarily disabled, as this test gets caught in the Run Loop extension:
-    @MainActor
-    func testWhenTimedPixelFiredThenCorrectDurationIsSet() {
-        let expectation = XCTestExpectation()
-
-        let date: CFTimeInterval = 0
-        let now: CFTimeInterval = 1
-
-        stub(condition: { request -> Bool in
-            if let url = request.url {
-                XCTAssertEqual("1.0", url.getParameter(named: "duration"))
-                return true
-            }
-
-            XCTFail("Did not find duration param")
-            return true
-        }, response: { _ -> HTTPStubsResponse in
-            expectation.fulfill()
-            return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
-        })
-
-        let pixel = TimedPixel(.crash, time: date)
-
-        pixel.fire(now)
-
-        wait(for: [expectation], timeout: 1.0)
-    }
-
     func testWhenPixelFiredThenAPIHeadersAreAdded() {
         let expectation = XCTestExpectation()
 
@@ -74,10 +46,8 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        var headers = APIRequest.Headers().default
-        headers[userAgentName] = testAgent
-
-        Pixel.shared!.fire(pixelNamed: "test", withHeaders: headers)
+        let headers = APIRequest.Headers(userAgent: testAgent)
+        Pixel.shared!.fire(.serp, withHeaders: headers)
 
         wait(for: [expectation], timeout: 1.0)
 
@@ -140,7 +110,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
         }
 
-        Pixel.shared!.fire(pixelNamed: "test") { error in
+        Pixel.shared!.fire(.serp) { error in
             XCTAssertNil(error)
             expectation.fulfill()
         }
@@ -155,7 +125,7 @@ class PixelTests: XCTestCase {
             return HTTPStubsResponse(data: Data(), statusCode: 404, headers: nil)
         }
 
-        Pixel.shared!.fire(pixelNamed: "test") { error in
+        Pixel.shared!.fire(.serp) { error in
             XCTAssertNotNil(error)
             expectation.fulfill()
         }

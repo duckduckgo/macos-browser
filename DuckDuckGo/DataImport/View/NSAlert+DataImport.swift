@@ -24,7 +24,7 @@ extension NSAlert {
         return (accessoryView as? NSTextField)?.stringValue
     }
 
-    static func importFailedAlert(source: DataImport.Source, linkDelegate: NSTextViewDelegate) -> NSAlert {
+    static func importFailedAlert(linkDelegate: NSTextViewDelegate) -> NSAlert {
         let alert = NSAlert()
 
         let linkText = UserText.dataImportSubmitFeedback
@@ -61,6 +61,7 @@ extension NSAlert {
         alert.informativeText = UserText.dataImportRequiresPasswordBody(source)
         alert.alertStyle = .warning
         alert.accessoryView = textField
+        alert.window.initialFirstResponder = textField
         alert.addButton(withTitle: UserText.dataImportAlertImport)
         alert.addButton(withTitle: UserText.dataImportAlertCancel)
 

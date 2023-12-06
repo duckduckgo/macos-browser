@@ -49,6 +49,7 @@ protocol NewWindowPolicyDecisionMaker {
         case bookmarks
         case onboarding
         case none
+        case dataBrokerProtection
 
         static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
@@ -85,7 +86,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isDisplayable: Bool {
             switch self {
-            case .preferences, .bookmarks:
+            case .preferences, .bookmarks, .dataBrokerProtection:
                 return true
             default:
                 return false
@@ -98,6 +99,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return true
             case (.bookmarks, .bookmarks):
                 return true
+            case (.dataBrokerProtection, .dataBrokerProtection):
+                return true
             default:
                 return false
             }
@@ -109,6 +112,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .preferences: return UserText.tabPreferencesTitle
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
+            case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
             }
         }
 
@@ -138,6 +142,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .blankPage
             case .onboarding:
                 return .welcome
+            case .dataBrokerProtection:
+                return .dataBrokerProtection
             case .none:
                 return nil
             }
@@ -192,6 +198,8 @@ protocol NewWindowPolicyDecisionMaker {
 
     private let webViewConfiguration: WKWebViewConfiguration
 
+    let startupPreferences: StartupPreferences
+
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
     // allows extending Tab functionality while maintaining encapsulation
@@ -223,21 +231,22 @@ protocol NewWindowPolicyDecisionMaker {
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
-                     isBurner: Bool = false,
+                     burnerMode: BurnerMode = .regular,
                      shouldLoadFromCache: Bool = false,
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
-                     webViewSize: CGSize = CGSize(width: 1024, height: 768)
+                     webViewSize: CGSize = CGSize(width: 1024, height: 768),
+                     startupPreferences: StartupPreferences = StartupPreferences.shared
     ) {
 
         let duckPlayer = duckPlayer
-            ?? (NSApp.isRunningUnitTests ? DuckPlayer.mock(withMode: .enabled) : DuckPlayer.shared)
+            ?? (NSApp.runType.requiresEnvironment ? DuckPlayer.shared : DuckPlayer.mock(withMode: .enabled))
         let statisticsLoader = statisticsLoader
-            ?? (NSApp.isRunningUnitTests ? nil : StatisticsLoader.shared)
+            ?? (NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
-        let internalUserDecider = (NSApp.delegate as? AppDelegate)?.internalUserDecider
+        let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         var faviconManager = faviconManagement
-        if isBurner {
+        if burnerMode.isBurner {
             faviconManager = FaviconManager(cacheType: .inMemory)
         }
 
@@ -262,11 +271,12 @@ protocol NewWindowPolicyDecisionMaker {
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
-                  isBurner: isBurner,
+                  burnerMode: burnerMode,
                   shouldLoadFromCache: shouldLoadFromCache,
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
-                  webViewSize: webViewSize)
+                  webViewSize: webViewSize,
+                  startupPreferences: startupPreferences)
     }
 
     @MainActor
@@ -292,11 +302,12 @@ protocol NewWindowPolicyDecisionMaker {
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
-         isBurner: Bool,
+         burnerMode: BurnerMode,
          shouldLoadFromCache: Bool,
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
-         webViewSize: CGSize
+         webViewSize: CGSize,
+         startupPreferences: StartupPreferences
     ) {
 
         self.content = content
@@ -307,14 +318,15 @@ protocol NewWindowPolicyDecisionMaker {
         self.title = title
         self.favicon = favicon
         self.parentTab = parentTab
-        self.isBurner = isBurner
+        self.burnerMode = burnerMode
         self._canBeClosedWithBack = canBeClosedWithBack
         self.interactionState = (interactionStateData != nil || shouldLoadFromCache) ? .loadCachedFromTabContent(interactionStateData) : .none
         self.lastSelectedAt = lastSelectedAt
+        self.startupPreferences = startupPreferences
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
-                                                 isBurner: isBurner)
+                                                 burnerMode: burnerMode)
         self.webViewConfiguration = configuration
         let userContentController = configuration.userContentController as? UserContentController
         assert(userContentController != nil)
@@ -337,7 +349,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.extensions = extensionsBuilder
             .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
                           isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
-                          isTabBurner: isBurner,
+                          isTabBurner: burnerMode.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
@@ -366,12 +378,14 @@ protocol NewWindowPolicyDecisionMaker {
             handleFavicon()
         }
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onDuckDuckGoEmailSignOut),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        emailDidSignOutCancellable = NotificationCenter.default.publisher(for: .emailDidSignOut)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                self?.onDuckDuckGoEmailSignOut(notification)
+            }
 
         addDeallocationChecks(for: webView)
+
     }
 
 #if DEBUG
@@ -381,14 +395,14 @@ protocol NewWindowPolicyDecisionMaker {
 
         webView.onDeinit { [weak self] in
             // Tab should deallocate with the WebView
-            self?.assertObjectDeallocated(after: 1.0)
+            self?.ensureObjectDeallocated(after: 1.0, do: .interrupt)
 
             // unregister WebView from the ProcessPool
             processPool.webViewsUsingProcessPool.remove(webViewValue)
 
             if processPool.webViewsUsingProcessPool.isEmpty {
                 // when the last WebView is deallocated the ProcessPool should be deallocated
-                processPool.assertObjectDeallocated(after: 1)
+                processPool.ensureObjectDeallocated(after: 1, do: .log)
                 // by the moment the ProcessPool is dead all the UserContentControllers that were using it should be deallocated
                 let knownUserContentControllers = processPool.knownUserContentControllers
                 processPool.onDeinit {
@@ -444,10 +458,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor(unsafe)
     private func cleanUpBeforeClosing(onDeinit: Bool) {
         let job = { [webView, userContentController] in
-            webView.stopLoading()
-            webView.stopMediaCapture()
-            webView.stopAllMediaPlayback()
-            webView.fullscreenWindowController?.close()
+            webView.stopAllMediaAndLoading()
 
             userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
@@ -461,6 +472,10 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
         job()
+    }
+
+    func stopAllMediaAndLoading() {
+        webView.stopAllMediaAndLoading()
     }
 
 #if DEBUG
@@ -489,23 +504,24 @@ protocol NewWindowPolicyDecisionMaker {
 
     var isLazyLoadingInProgress = false
 
-    let isBurner: Bool
+    let burnerMode: BurnerMode
 
     @Published private(set) var content: TabContent {
         didSet {
             if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
-                webView.stopLoading()
-                webView.stopMediaCapture()
-                webView.stopAllMediaPlayback()
+                webView.stopAllMediaAndLoading()
             }
-            handleFavicon()
+            handleFavicon(oldValue: oldValue)
             invalidateInteractionStateData()
+            if navigationDelegate.currentNavigation == nil {
+                updateCanGoBackForward(withCurrentNavigation: nil)
+            }
             error = nil
         }
     }
 
     @discardableResult
-    func setContent(_ newContent: TabContent) -> Task<ExpectedNavigation?, Never>? {
+    func setContent(_ newContent: TabContent) -> ExpectedNavigation? {
         guard contentChangeEnabled else { return nil }
 
         let oldContent = self.content
@@ -530,13 +546,11 @@ protocol NewWindowPolicyDecisionMaker {
             self.title = title
         }
 
-        return Task {
-            await reloadIfNeeded(shouldLoadInBackground: true)
-        }
+        return reloadIfNeeded(shouldLoadInBackground: true)
     }
 
     @discardableResult
-    func setUrl(_ url: URL?, userEntered: String?) -> Task<ExpectedNavigation?, Never>? {
+    func setUrl(_ url: URL?, userEntered: String?) -> ExpectedNavigation? {
         if url == .welcome {
             OnboardingViewModel().restart()
         }
@@ -576,8 +590,6 @@ protocol NewWindowPolicyDecisionMaker {
             if error == nil || error?.isFrameLoadInterrupted == true || error?.isNavigationCancelled == true {
                 return
             }
-            webView.stopLoading()
-            webView.stopMediaCapture()
             webView.stopAllMediaPlayback()
         }
     }
@@ -675,7 +687,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         let canGoBack = webView.canGoBack || self.error != nil
         let canGoForward = webView.canGoForward && self.error == nil
-        let canReload = (self.content.urlForWebView?.scheme ?? URL.NavigationalScheme.about.rawValue) != URL.NavigationalScheme.about.rawValue
+        let canReload = self.content.userEditableUrl != nil
 
         if canGoBack != self.canGoBack {
             self.canGoBack = canGoBack
@@ -718,7 +730,12 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func openHomePage() {
-        content = .homePage
+        if startupPreferences.launchToCustomHomePage,
+           let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
+            webView.load(URLRequest(url: customURL))
+        } else {
+            content = .homePage
+        }
     }
 
     func startOnboarding() {
@@ -727,33 +744,27 @@ protocol NewWindowPolicyDecisionMaker {
 
     func reload() {
         userInteractionDialog = nil
-        if let error = error, let failingUrl = error.failingUrl {
+
+        // In the case of an error only reload web URLs to prevent uxss attacks via redirecting to javascript://
+        if let error = error, let failingUrl = error.failingUrl, failingUrl.isHttp || failingUrl.isHttps {
             webView.load(URLRequest(url: failingUrl, cachePolicy: .reloadIgnoringLocalCacheData))
             return
         }
 
         if webView.url == nil, content.isUrl {
             // load from cache or interactionStateData when called by lazy loader
-            Task { @MainActor [weak self] in
-                await self?.reloadIfNeeded(shouldLoadInBackground: true)
-            }
+            reloadIfNeeded(shouldLoadInBackground: true)
         } else {
             webView.reload()
         }
     }
 
-    @MainActor
+    @MainActor(unsafe)
     @discardableResult
-    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) async -> ExpectedNavigation? {
+    private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {
+        guard case .url(let url, credential: _, userEntered: let userEntered) = content, url.scheme != "about" else { return nil }
 
-        let content = self.content
-        guard let url = content.urlForWebView,
-              url.scheme.map(URL.NavigationalScheme.init) != .about else { return nil }
-
-        var userForcedReload = false
-        if case .url(let url, _, let userEntered) = content, url.absoluteString == userEntered {
-            userForcedReload = shouldLoadInBackground
-        }
+        let userForcedReload = (url.absoluteString == userEntered) ? shouldLoadInBackground : false
 
         if userForcedReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
             let didRestore = restoreInteractionStateDataIfNeeded()
@@ -791,7 +802,7 @@ protocol NewWindowPolicyDecisionMaker {
     private func shouldReload(_ url: URL, shouldLoadInBackground: Bool) -> Bool {
         // don‘t reload in background unless shouldLoadInBackground
         guard url.isValid,
-              (webView.superview != nil || shouldLoadInBackground),
+              webView.superview != nil || shouldLoadInBackground,
               // don‘t reload when already loaded
               webView.url != url,
               webView.url != (content.isUrl ? content.urlForWebView : nil)
@@ -838,7 +849,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private func addHomePageToWebViewIfNeeded() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
         if content == .homePage && webView.url == nil {
             webView.load(URLRequest(url: .homePage))
         }
@@ -857,6 +868,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private var webViewCancellables = Set<AnyCancellable>()
+    private var emailDidSignOutCancellable: AnyCancellable?
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
@@ -872,9 +884,7 @@ protocol NewWindowPolicyDecisionMaker {
         webView.observe(\.superview, options: .old) { [weak self] _, change in
             // if the webView is being added to superview - reload if needed
             if case .some(.none) = change.oldValue {
-                Task { @MainActor [weak self] in
-                    await self?.reloadIfNeeded()
-                }
+                self?.reloadIfNeeded()
             }
         }.store(in: &webViewCancellables)
 
@@ -912,10 +922,10 @@ protocol NewWindowPolicyDecisionMaker {
         }.store(in: &webViewCancellables)
 
         // background tab loading should start immediately
-        Task { @MainActor in
-            await reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
+        DispatchQueue.main.async {
+            self.reloadIfNeeded(shouldLoadInBackground: shouldLoadInBackground)
             if !shouldLoadInBackground {
-                addHomePageToWebViewIfNeeded()
+                self.addHomePageToWebViewIfNeeded()
             }
         }
     }
@@ -934,7 +944,8 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var favicon: NSImage?
     let faviconManagement: FaviconManagement
 
-    private func handleFavicon() {
+    @MainActor(unsafe)
+    private func handleFavicon(oldValue: TabContent? = nil) {
         guard content.isUrl, let url = content.urlForWebView else {
             favicon = nil
             return
@@ -951,7 +962,8 @@ protocol NewWindowPolicyDecisionMaker {
             if cachedFavicon != favicon {
                 favicon = cachedFavicon
             }
-        } else {
+        } else if oldValue?.url?.host != url.host {
+            // If the domain matches the previous value, just keep the same favicon
             favicon = nil
         }
     }
@@ -983,6 +995,7 @@ extension Tab: PageObserverUserScriptDelegate {
 
 extension Tab: FaviconUserScriptDelegate {
 
+    @MainActor(unsafe)
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {
@@ -1122,10 +1135,10 @@ extension Tab: NewWindowPolicyDecisionMaker {
 
 extension Tab: TabDataClearing {
     @MainActor
-    func prepareForDataClearing(caller: TabDataCleaner) {
+    func prepareForDataClearing(caller: TabCleanupPreparer) {
         webViewCancellables.removeAll()
 
-        webView.stopLoading()
+        self.stopAllMediaAndLoading()
         (webView.configuration.userContentController as? UserContentController)?.cleanUpBeforeClosing()
 
         webView.navigationDelegate = caller

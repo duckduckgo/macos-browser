@@ -45,7 +45,7 @@ final class MoreOptionsMenuTests: XCTestCase {
         internalUserDecider = InternalUserDeciderMock()
 
 #if NETWORK_PROTECTION
-        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(activated: false)
+        networkProtectionVisibilityMock = NetworkProtectionVisibilityMock(visible: false)
 
         moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                          passwordManagerCoordinator: passwordManagerCoordinator,
@@ -72,7 +72,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                              passwordManagerCoordinator: passwordManagerCoordinator,
-                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: true),
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(visible: true),
                                              internalUserDecider: internalUserDecider)
 #else
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -84,22 +84,24 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
         XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[4].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[5].title, UserText.zoom)
-        XCTAssertTrue(moreOptionMenu.items[6].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[7].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.passwordManagement)
-        XCTAssertTrue(moreOptionMenu.items[10].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[11].title, UserText.emailOptionsMenuItem)
+        XCTAssertEqual(moreOptionMenu.items[4].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
 
 #if NETWORK_PROTECTION
-        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.networkProtection)
+        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+        XCTAssertTrue(moreOptionMenu.items[14].title.hasPrefix(UserText.networkProtection))
+        XCTAssertTrue(moreOptionMenu.items[15].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[16].title, UserText.settings)
+#else
         XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
-#else
-        XCTAssertTrue(moreOptionMenu.items[12].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[13].title, UserText.settings)
 #endif
     }
 
@@ -107,7 +109,7 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
                                              passwordManagerCoordinator: passwordManagerCoordinator,
-                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(activated: false),
+                                             networkProtectionFeatureVisibility: NetworkProtectionVisibilityMock(visible: false),
                                              internalUserDecider: internalUserDecider)
 #else
         let moreOptionMenu = MoreOptionsMenu(tabCollectionViewModel: tabCollectionViewModel,
@@ -119,16 +121,17 @@ final class MoreOptionsMenuTests: XCTestCase {
         XCTAssertTrue(moreOptionMenu.items[1].isSeparatorItem)
         XCTAssertEqual(moreOptionMenu.items[2].title, UserText.plusButtonNewTabMenuItem)
         XCTAssertEqual(moreOptionMenu.items[3].title, UserText.newWindowMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[4].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[5].title, UserText.zoom)
-        XCTAssertTrue(moreOptionMenu.items[6].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[7].title, UserText.bookmarks)
-        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.downloads)
-        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.passwordManagement)
-        XCTAssertTrue(moreOptionMenu.items[10].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[11].title, UserText.emailOptionsMenuItem)
-        XCTAssertTrue(moreOptionMenu.items[12].isSeparatorItem)
-        XCTAssertEqual(moreOptionMenu.items[13].title, UserText.settings)
+        XCTAssertEqual(moreOptionMenu.items[4].title, UserText.newBurnerWindowMenuItem)
+        XCTAssertTrue(moreOptionMenu.items[5].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[6].title, UserText.zoom)
+        XCTAssertTrue(moreOptionMenu.items[7].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[8].title, UserText.bookmarks)
+        XCTAssertEqual(moreOptionMenu.items[9].title, UserText.downloads)
+        XCTAssertEqual(moreOptionMenu.items[10].title, UserText.passwordManagement)
+        XCTAssertTrue(moreOptionMenu.items[11].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[12].title, UserText.emailOptionsMenuItem)
+        XCTAssertTrue(moreOptionMenu.items[13].isSeparatorItem)
+        XCTAssertEqual(moreOptionMenu.items[14].title, UserText.settings)
     }
 
     // MARK: Zoom
@@ -148,7 +151,7 @@ final class MoreOptionsMenuTests: XCTestCase {
     // MARK: Preferences
 
     func testWhenClickingOnPreferenceMenuItemThenTheActionDelegateIsAlerted() {
-        moreOptionMenu.performActionForItem(at: 13)
+        moreOptionMenu.performActionForItem(at: 14)
 
         XCTAssertTrue(capturingActionDelegate.optionsButtonMenuRequestedPreferencesCalled)
     }
@@ -158,15 +161,22 @@ final class MoreOptionsMenuTests: XCTestCase {
 #if NETWORK_PROTECTION
 final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility {
 
-    var activated: Bool
+    var visible: Bool
 
-    init(activated: Bool) {
-        self.activated = activated
+    init(visible: Bool) {
+        self.visible = visible
     }
 
-    var isFeatureActivated: Bool {
-        return activated
+    func isNetworkProtectionVisible() -> Bool {
+        return visible
     }
 
+    func disableForAllUsers() {
+        // intentional no-op
+    }
+
+    func disableForWaitlistUsers() {
+        // intentional no-op
+    }
 }
 #endif

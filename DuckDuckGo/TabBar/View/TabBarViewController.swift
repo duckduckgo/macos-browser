@@ -44,6 +44,7 @@ final class TabBarViewController: NSViewController {
     @IBOutlet weak var fireButton: MouseOverAnimationButton!
     @IBOutlet weak var draggingSpace: NSView!
     @IBOutlet weak var windowDraggingViewLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var burnerWindowBackgroundView: NSImageView!
 
     @IBOutlet weak var addTabButton: MouseOverButton!
     let tabCollectionViewModel: TabCollectionViewModel
@@ -53,12 +54,9 @@ final class TabBarViewController: NSViewController {
     private let pinnedTabsView: PinnedTabsView?
     private let pinnedTabsHostingView: PinnedTabsHostingView?
 
-    private var tabsCancellable: AnyCancellable?
     private var selectionIndexCancellable: AnyCancellable?
+    private var mouseDownCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
-
-    @IBOutlet weak var burnerWindowButton: MouseOverButton!
-    var burnerWindowPopover: BurnerWindowPopover?
 
     @IBOutlet weak var shadowView: TabShadowView!
 
@@ -82,7 +80,7 @@ final class TabBarViewController: NSViewController {
             let pinnedTabsView = PinnedTabsView(model: pinnedTabsViewModel)
             self.pinnedTabsViewModel = pinnedTabsViewModel
             self.pinnedTabsView = pinnedTabsView
-            self.pinnedTabsHostingView = .init(rootView: pinnedTabsView)
+            self.pinnedTabsHostingView = PinnedTabsHostingView(rootView: pinnedTabsView)
         } else {
             self.pinnedTabsViewModel = nil
             self.pinnedTabsView = nil
@@ -95,7 +93,6 @@ final class TabBarViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupBackgroundView()
         scrollView.updateScrollElasticity(with: tabMode)
         observeToScrollNotifications()
         subscribeToSelectionIndex()
@@ -103,7 +100,7 @@ final class TabBarViewController: NSViewController {
         setupPinnedTabsView()
         subscribeToTabModeChanges()
         setupAddTabButton()
-        setupBurnerWindowButton()
+        setupAsBurnerWindowIfNeeded()
     }
 
     override func viewWillAppear() {
@@ -120,7 +117,8 @@ final class TabBarViewController: NSViewController {
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
-        removeMouseMonitors()
+
+        mouseDownCancellable = nil
     }
 
     override func viewDidLayout() {
@@ -140,15 +138,6 @@ final class TabBarViewController: NSViewController {
         tabCollectionViewModel.appendNewTab(with: .homePage)
     }
 
-    @IBAction func burnerWindowAction(_ sender: NSButton) {
-        if !(burnerWindowPopover?.isShown ?? false) {
-            burnerWindowPopover = BurnerWindowPopover()
-            burnerWindowPopover?.showBelow(sender)
-            burnerWindowPopover?.originatingWindow = view.window
-            burnerWindowPopover?.delegate = self
-        }
-    }
-
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
         collectionView.scrollToEnd()
     }
@@ -163,26 +152,23 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    private func setupBackgroundView() {
-        visualEffectBackgroundView.isHidden = tabCollectionViewModel.isBurner
-        gradientBackgroundView.isHidden = !tabCollectionViewModel.isBurner
-    }
-
     private func setupFireButton() {
-        if tabCollectionViewModel.isBurner {
-            fireButton.isHidden = true
-            return
-        }
         fireButton.toolTip = UserText.clearBrowsingHistoryTooltip
         fireButton.animationNames = MouseOverAnimationButton.AnimationNames(aqua: "flame-mouse-over", dark: "dark-flame-mouse-over")
+        fireButton.sendAction(on: .leftMouseDown)
     }
 
-    private func setupBurnerWindowButton() {
-        burnerWindowButton.isHidden = !tabCollectionViewModel.isBurner
-        burnerWindowButton.toolTip = UserText.burnerWindowButtonTooltip
-        burnerWindowButton.normalTintColor = .alternateSelectedControlTextColor
-        burnerWindowButton.mouseOverColor = .burnerWindowMouseOverColor
-        burnerWindowButton.mouseDownColor = .burnerWindowMouseDownColor
+    private func setupAsBurnerWindowIfNeeded() {
+        if tabCollectionViewModel.isBurner {
+            burnerWindowBackgroundView.isHidden = false
+            fireButton.isAnimationEnabled = false
+            fireButton.backgroundColor = NSColor.fireButtonRedBackgroundColor
+            fireButton.mouseOverColor = NSColor.fireButtonRedHoverColor
+            fireButton.mouseDownColor = NSColor.fireButtonRedPressedColor
+            fireButton.normalTintColor = NSColor.white
+            fireButton.mouseDownTintColor = NSColor.white
+            fireButton.mouseOverTintColor = NSColor.white
+        }
     }
 
     private func setupPinnedTabsView() {
@@ -270,7 +256,7 @@ final class TabBarViewController: NSViewController {
 
     private func subscribeToPinnedTabsHostingView() {
         pinnedTabsHostingView?.middleClickPublisher
-            .compactMap { [weak self] in self?.pinnedTabsView?.itemIndex(for: $0) }
+            .compactMap { [weak self] in self?.pinnedTabsView?.index(forItemAt: $0) }
             .sink { [weak self] index in
                 self?.tabCollectionViewModel.remove(at: .pinned(index))
             }
@@ -351,18 +337,17 @@ final class TabBarViewController: NSViewController {
         }
     }
 
-    private func selectTabWithPoint(_ point: NSPoint) {
-        guard let pointLocationOnPinnedTabsView = pinnedTabsHostingView?.convert(point, from: view) else {
-            return
-        }
+    private func selectTab(with event: NSEvent) {
+        let locationInWindow = event.locationInWindow
 
-        if let index = pinnedTabsView?.itemIndex(for: pointLocationOnPinnedTabsView) {
+        if let point = pinnedTabsHostingView?.mouseLocationInsideBounds(locationInWindow),
+           let index = pinnedTabsView?.index(forItemAt: point) {
+
             tabCollectionViewModel.select(at: .pinned(index))
-        } else {
-            let pointLocationOnCollectionView = collectionView.convert(point, from: view)
-            if let indexPath = collectionView.indexPathForItem(at: pointLocationOnCollectionView) {
-                tabCollectionViewModel.select(at: .unpinned(indexPath.item))
-            }
+
+        } else if let point = collectionView.mouseLocationInsideBounds(locationInWindow),
+                  let indexPath = collectionView.indexPathForItem(at: point) {
+            tabCollectionViewModel.select(at: .unpinned(indexPath.item))
         }
     }
 
@@ -396,7 +381,8 @@ final class TabBarViewController: NSViewController {
     }
 
     private func moveToNewWindow(from index: Int, droppingPoint: NSPoint? = nil, burner: Bool) {
-        guard tabCollectionViewModel.tabCollection.tabs.count > 1 else { return }
+        // only allow dragging Tab out when there‘s tabs (or pinned tabs) left
+        guard tabCollectionViewModel.tabCollection.tabs.count > 1 || pinnedTabsViewModel?.items.isEmpty == false else { return }
         guard let tabViewModel = tabCollectionViewModel.tabViewModel(at: index) else {
             assertionFailure("TabBarViewController: Failed to get tab view model")
             return
@@ -404,34 +390,23 @@ final class TabBarViewController: NSViewController {
 
         let tab = tabViewModel.tab
         tabCollectionViewModel.remove(at: .unpinned(index), published: false)
-        WindowsManager.openNewWindow(with: tab, isBurner: burner, droppingPoint: droppingPoint)
+        WindowsManager.openNewWindow(with: tab, droppingPoint: droppingPoint)
     }
 
     // MARK: - Mouse Monitor
 
-    private var mouseDownMonitor: Any?
-
     private func addMouseMonitors() {
-        guard mouseDownMonitor == nil else { return }
-
-        mouseDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
-            self?.mouseDown(with: event)
+        mouseDownCancellable = NSEvent.addLocalCancellableMonitor(forEventsMatching: .leftMouseDown) { [weak self] event in
+            guard let self else { return event }
+            return self.mouseDown(with: event)
         }
-    }
-
-    private func removeMouseMonitors() {
-        if let monitor = mouseDownMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
-
-        mouseDownMonitor = nil
     }
 
     func mouseDown(with event: NSEvent) -> NSEvent? {
         if event.window === view.window,
-           view.window?.isMainWindow == false,
-           let point = view.mouseLocationInsideBounds(event.locationInWindow) {
-            selectTabWithPoint(point)
+           view.window?.isMainWindow == false {
+
+            selectTab(with: event)
         }
 
         return event
@@ -564,12 +539,6 @@ final class TabBarViewController: NSViewController {
         addTabButton.target = self
         addTabButton.action = #selector(addButtonAction(_:))
         addTabButton.toolTip = UserText.newTabTooltip
-        if tabCollectionViewModel.isBurner {
-            addTabButton.normalTintColor = .alternateSelectedControlTextColor
-            addTabButton.contentTintColor = .alternateSelectedControlTextColor
-            addTabButton.mouseOverColor = .burnerWindowMouseOverColor
-            addTabButton.mouseDownColor = .burnerWindowMouseDownColor
-        }
     }
 
     private func subscribeToTabModeChanges() {
@@ -866,12 +835,6 @@ extension TabBarViewController: NSCollectionViewDataSource {
             footer.addButton?.target = self
             footer.addButton?.action = #selector(addButtonAction(_:))
             footer.toolTip = UserText.newTabTooltip
-            if tabCollectionViewModel.isBurner {
-                footer.addButton.normalTintColor = .alternateSelectedControlTextColor
-                footer.addButton.contentTintColor = .alternateSelectedControlTextColor
-                footer.addButton.mouseOverColor = .burnerWindowMouseOverColor
-                footer.addButton.mouseDownColor = .burnerWindowMouseDownColor
-            }
         }
 
         return view
@@ -945,7 +908,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         if let url = draggingInfo.draggingPasteboard.url {
             // dropping URL or file
             tabCollectionViewModel.insert(Tab(content: .url(url),
-                                              isBurner: tabCollectionViewModel.isBurner),
+                                              burnerMode: tabCollectionViewModel.burnerMode),
                                           at: .unpinned(newIndex),
                                           selected: true)
 
@@ -965,6 +928,9 @@ extension TabBarViewController: NSCollectionViewDelegate {
 
         // dropping a tab, dropping of url handled in collectionView:acceptDrop:
         guard session.draggingPasteboard.types == [TabBarViewItemPasteboardWriter.utiInternalType] else { return }
+
+        // Don't allow drag and drop from Burner Window
+        guard !tabCollectionViewModel.burnerMode.isBurner else { return }
 
         defer {
             TabDragAndDropManager.shared.clear()
@@ -1166,14 +1132,6 @@ final class TabBarViewItemPasteboardWriter: NSObject, NSPasteboardWriting {
 
     func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {
         [String: Any]()
-    }
-
-}
-
-extension TabBarViewController: NSPopoverDelegate {
-
-    func popoverDidClose(_ notification: Notification) {
-        self.burnerWindowPopover = nil
     }
 
 }

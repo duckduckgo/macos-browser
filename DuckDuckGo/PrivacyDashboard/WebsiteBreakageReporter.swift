@@ -26,13 +26,13 @@ final class WebsiteBreakageReporter {
         self.tabViewModel = tabViewModel
     }
 
-    public func reportBreakage(category: String, description: String) {
-        let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab)
+    public func reportBreakage(category: String, description: String, reportFlow: WebsiteBreakage.ReportFlow) {
+        let websiteBreakage = makeWebsiteBreakage(category: category, description: description, currentTab: tabViewModel?.tab, reportFlow: reportFlow)
         let websiteBreakageSender = WebsiteBreakageSender()
         websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
     }
 
-    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?) -> WebsiteBreakage {
+    private func makeWebsiteBreakage(category: String, description: String, currentTab: Tab?, reportFlow: WebsiteBreakage.ReportFlow) -> WebsiteBreakage {
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         let currentURL = currentTab?.content.url?.trimmingQueryItemsAndFragment()?.absoluteString ?? ""
 
@@ -40,6 +40,10 @@ final class WebsiteBreakageReporter {
         let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
         let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
         let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
+
+        // current domain's protection status
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab?.content.url?.host)
 
         let websiteBreakage = WebsiteBreakage(category: WebsiteBreakage.Category(rawValue: category.lowercased()),
                                               description: description,
@@ -51,7 +55,9 @@ final class WebsiteBreakageReporter {
                                               installedSurrogates: installedSurrogates,
                                               isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                               ampURL: ampURL,
-                                              urlParametersRemoved: urlParametersRemoved)
+                                              urlParametersRemoved: urlParametersRemoved,
+                                              protectionsState: protectionsState,
+                                              reportFlow: reportFlow)
         return websiteBreakage
     }
 }

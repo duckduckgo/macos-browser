@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
+	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
 	<key>SYSEX_MACH_SERVICE_NAME</key>
@@ -10,5 +12,7 @@
 	<string>$(MAIN_BUNDLE_IDENTIFIER)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
+	<key>DBP_APP_GROUP</key>
+	<string>$(DBP_APP_GROUP)</string>
 </dict>
 </plist>

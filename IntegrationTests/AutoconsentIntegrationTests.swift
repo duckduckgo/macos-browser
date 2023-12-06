@@ -56,7 +56,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testWhenAutoconsentEnabled_cookieConsentManaged() async throws {
         // enable the feature
         PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/")!
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/")!
 
         let tab = self.tabViewModel.tab
 
@@ -73,7 +73,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged)
@@ -83,11 +83,11 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testWhenAutoconsentDisabled_promptIsDisplayed() async throws {
         // reset the feature setting
         PrivacySecurityPreferences.shared.autoconsentEnabled = nil
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/")!
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/")!
 
         let tab = self.tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         // expect cookieConsent request to be published
         let cookieConsentPromptRequestPromise = tab.cookieConsentPromptRequestPublisher
@@ -113,7 +113,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
         // enable the feature
         PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")!
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
 
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
@@ -130,7 +130,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         do {
             let cookieConsentManaged = try await cookieConsentManagedPromise.value
@@ -164,7 +164,7 @@ class AutoconsentIntegrationTests: XCTestCase {
     func testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden() async throws {
         // enable the feature
         PrivacySecurityPreferences.shared.autoconsentEnabled = true
-        let url = URL(string: "http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")!
+        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/banner.html")!
 
         let tab = self.tabViewModel.tab
         // expect `cosmetic` to be published
@@ -181,8 +181,8 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        os_log("starting navigation to http://privacy-test-pages.glitch.me/features/autoconsent/banner.html")
-        let navigation = await tab.setUrl(url, userEntered: nil)?.value
+        os_log("starting navigation to http://privacy-test-pages.site/features/autoconsent/banner.html")
+        let navigation = tab.setUrl(url, userEntered: nil)
 
         navigation?.appendResponder(navigationResponse: { response in
             os_log("navigationResponse: %s", "\(String(describing: response))")

@@ -18,7 +18,316 @@
 
 import XCTest
 @testable import PixelKit
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 final class PixelKitTests: XCTestCase {
 
+    private func userDefaults() -> UserDefaults {
+        UserDefaults(suiteName: "testing_\(UUID().uuidString)")!
+    }
+
+    /// Test events for convenience
+    ///
+    private enum TestEvent: String, PixelKitEvent {
+        case testEvent
+        case testEventWithoutParameters
+        case dailyEvent
+        case dailyEventWithoutParameters
+        case dailyAndContinuousEvent
+        case dailyAndContinuousEventWithoutParameters
+        case uniqueEvent
+
+        var name: String {
+            switch self {
+            case .uniqueEvent:
+                return "\(rawValue)_u"
+            default:
+                return rawValue
+            }
+        }
+
+        var parameters: [String: String]? {
+            switch self {
+            case .testEvent, .dailyEvent, .dailyAndContinuousEvent, .uniqueEvent:
+                return [
+                    "eventParam1": "eventParamValue1",
+                    "eventParam2": "eventParamValue2"
+                ]
+            case .testEventWithoutParameters, .dailyEventWithoutParameters, .dailyAndContinuousEventWithoutParameters:
+                return nil
+            }
+        }
+
+        var frequency: PixelKit.Frequency {
+            switch self {
+            case .testEvent, .testEventWithoutParameters:
+                return .standard
+            case .uniqueEvent:
+                return .justOnce
+            case .dailyEvent, .dailyEventWithoutParameters:
+                return .dailyOnly
+            case .dailyAndContinuousEvent, .dailyAndContinuousEventWithoutParameters:
+                return .dailyAndContinuous
+            }
+        }
+    }
+
+    /// Test that a dry run won't execute the fire request callback.
+    ///
+    func testDryRunWontExecuteCallback() async {
+        let appVersion = "1.0.5"
+        let headers: [String: String] = [:]
+        let log = OSLog.disabled
+
+        let pixelKit = PixelKit(dryRun: true, appVersion: appVersion, defaultHeaders: headers, log: log, dailyPixelCalendar: nil, defaults: userDefaults()) { _, _, _, _, _, _ in
+
+            XCTFail("This callback should not be executed when doing a dry run")
+        }
+
+        pixelKit.fire(TestEvent.testEvent)
+    }
+
+    /// Tests firing a sample pixel and ensuring that all fields are properly set in the fire request callback.
+    ///
+    func testFiringASamplePixel() {
+        // Prepare test parameters
+        let appVersion = "1.0.5"
+        let headers = ["a": "2", "b": "3", "c": "2000"]
+        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
+        let event = TestEvent.testEvent
+        let userDefaults = userDefaults()
+
+        // Set expectations
+        let expectedPixelName = "m_mac_\(event.name)"
+        let fireCallbackCalled = expectation(description: "Expect the pixel firing callback to be called")
+
+        // Prepare mock to validate expectations
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: appVersion,
+                                defaultHeaders: headers,
+                                log: log,
+                                dailyPixelCalendar: nil,
+                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
+
+            fireCallbackCalled.fulfill()
+
+            XCTAssertEqual(expectedPixelName, firedPixelName)
+            XCTAssertTrue(headers.allSatisfy({ key, value in
+                firedHeaders[key] == value
+            }))
+
+            XCTAssertEqual(firedHeaders[PixelKit.Header.moreInfo], "See \(PixelKit.duckDuckGoMorePrivacyInfo)")
+
+            XCTAssertEqual(parameters[PixelKit.Parameters.appVersion], appVersion)
+#if DEBUG
+            XCTAssertEqual(parameters[PixelKit.Parameters.test], PixelKit.Values.test)
+#else
+            XCTAssertNil(parameters[PixelKit.Parameters.test])
+#endif
+        }
+
+        // Run test
+        pixelKit.fire(event)
+
+        // Wait for expectations to be fulfilled
+        wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+
+    /// We test firing a daily pixel for the first time executes the fire request callback with the right parameters
+    ///
+    func testFiringDailyPixelForTheFirstTime() {
+        // Prepare test parameters
+        let appVersion = "1.0.5"
+        let headers = ["a": "2", "b": "3", "c": "2000"]
+        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
+        let event = TestEvent.dailyEvent
+        let userDefaults = userDefaults()
+
+        // Set expectations
+        let expectedPixelName = "m_mac_\(event.name)_d"
+        let expectedMoreInfoString = "See \(PixelKit.duckDuckGoMorePrivacyInfo)"
+        let fireCallbackCalled = expectation(description: "Expect the pixel firing callback to be called")
+
+        // Prepare mock to validate expectations
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: appVersion,
+                                defaultHeaders: headers,
+                                log: log,
+                                dailyPixelCalendar: nil,
+                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
+
+            fireCallbackCalled.fulfill()
+
+            XCTAssertEqual(expectedPixelName, firedPixelName)
+            XCTAssertTrue(headers.allSatisfy({ key, value in
+                firedHeaders[key] == value
+            }))
+
+            XCTAssertEqual(firedHeaders[PixelKit.Header.moreInfo], expectedMoreInfoString)
+            XCTAssertEqual(parameters[PixelKit.Parameters.appVersion], appVersion)
+#if DEBUG
+            XCTAssertEqual(parameters[PixelKit.Parameters.test], PixelKit.Values.test)
+#else
+            XCTAssertNil(parameters[PixelKit.Parameters.test])
+#endif
+        }
+
+        // Run test
+        pixelKit.fire(event, frequency: .dailyOnly)
+
+        // Wait for expectations to be fulfilled
+        wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+
+    /// We test firing a daily pixel a second time does not execute the fire request callback.
+    ///
+    func testDailyPixelDoubleFiringFrequency() {
+        // Prepare test parameters
+        let appVersion = "1.0.5"
+        let headers = ["a": "2", "b": "3", "c": "2000"]
+        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
+        let event = TestEvent.dailyEvent
+        let userDefaults = userDefaults()
+
+        // Set expectations
+        let expectedPixelName = "m_mac_\(event.name)_d"
+        let expectedMoreInfoString = "See \(PixelKit.duckDuckGoMorePrivacyInfo)"
+        let fireCallbackCalled = expectation(description: "Expect the pixel firing callback to be called")
+        fireCallbackCalled.expectedFulfillmentCount = 1
+        fireCallbackCalled.assertForOverFulfill = true
+
+        // Prepare mock to validate expectations
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: appVersion,
+                                defaultHeaders: headers,
+                                log: log,
+                                dailyPixelCalendar: nil,
+                                defaults: userDefaults) { firedPixelName, firedHeaders, parameters, _, _, _ in
+
+            fireCallbackCalled.fulfill()
+
+            XCTAssertEqual(expectedPixelName, firedPixelName)
+            XCTAssertTrue(headers.allSatisfy({ key, value in
+                firedHeaders[key] == value
+            }))
+
+            XCTAssertEqual(firedHeaders[PixelKit.Header.moreInfo], expectedMoreInfoString)
+            XCTAssertEqual(parameters[PixelKit.Parameters.appVersion], appVersion)
+#if DEBUG
+            XCTAssertEqual(parameters[PixelKit.Parameters.test], PixelKit.Values.test)
+#else
+            XCTAssertNil(parameters[PixelKit.Parameters.test])
+#endif
+        }
+
+        // Run test
+        pixelKit.fire(event, frequency: .dailyOnly)
+        pixelKit.fire(event, frequency: .dailyOnly)
+
+        // Wait for expectations to be fulfilled
+        wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+
+    /// Test firing a daily pixel a few times
+    func testDailyPixelFrequency() {
+        // Prepare test parameters
+        let appVersion = "1.0.5"
+        let headers = ["a": "2", "b": "3", "c": "2000"]
+        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
+        let event = TestEvent.dailyEvent
+        let userDefaults = userDefaults()
+
+        let timeMachine = TimeMachine()
+
+        // Set expectations
+        let fireCallbackCalled = expectation(description: "Expect the pixel firing callback to be called")
+        fireCallbackCalled.expectedFulfillmentCount = 3
+        fireCallbackCalled.assertForOverFulfill = true
+
+        // Prepare mock to validate expectations
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: appVersion,
+                                defaultHeaders: headers,
+                                log: log,
+                                dailyPixelCalendar: nil,
+                                dateGenerator: timeMachine.now,
+                                defaults: userDefaults) { _, _, _, _, _, _ in
+            fireCallbackCalled.fulfill()
+        }
+
+        // Run test
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired
+
+        timeMachine.travel(by: 60 * 60 * 2)
+        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (2 hours since last fire)
+
+        timeMachine.travel(by: 60 * 60 * 24 + 1000)
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours + 1000 seconds since last fire)
+
+        timeMachine.travel(by: 60 * 60 * 10)
+        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (10 hours since last fire)
+
+        timeMachine.travel(by: 60 * 60 * 14)
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours since last fire)
+
+        // Wait for expectations to be fulfilled
+        wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+
+    /// Test firing a unique pixel
+    func testUniquePixel() {
+        // Prepare test parameters
+        let appVersion = "1.0.5"
+        let headers = ["a": "2", "b": "3", "c": "2000"]
+        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
+        let event = TestEvent.uniqueEvent
+        let userDefaults = userDefaults()
+
+        let timeMachine = TimeMachine()
+
+        // Set expectations
+        let fireCallbackCalled = expectation(description: "Expect the pixel firing callback to be called")
+        fireCallbackCalled.expectedFulfillmentCount = 1
+        fireCallbackCalled.assertForOverFulfill = true
+
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: appVersion,
+                                defaultHeaders: headers,
+                                log: log,
+                                dailyPixelCalendar: nil,
+                                dateGenerator: timeMachine.now,
+                                defaults: userDefaults) { _, _, _, _, _, _ in
+            fireCallbackCalled.fulfill()
+        }
+
+        // Run test
+        pixelKit.fire(event, frequency: .justOnce) // Fired
+
+        timeMachine.travel(by: 60 * 60 * 2)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        timeMachine.travel(by: 60 * 60 * 24 + 1000)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        timeMachine.travel(by: 60 * 60 * 10)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        timeMachine.travel(by: 60 * 60 * 14)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        // Wait for expectations to be fulfilled
+        wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+}
+
+private class TimeMachine {
+    private var date = Calendar.current.startOfDay(for: Date())
+
+    func travel(by timeInterval: TimeInterval) {
+        date = date.addingTimeInterval(timeInterval)
+    }
+
+    func now() -> Date {
+        date
+    }
 }

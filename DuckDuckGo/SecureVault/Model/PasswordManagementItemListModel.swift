@@ -99,9 +99,9 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     func item(matches filter: String) -> Bool {
         switch self {
         case .account(let account):
-            return account.domain.lowercased().contains(filter) ||
-                account.username.lowercased().contains(filter) ||
-                account.title?.lowercased().contains(filter) ?? false
+            return account.domain?.lowercased().contains(filter) == true ||
+                account.username?.lowercased().contains(filter) == true ||
+                account.title?.lowercased().contains(filter) == true
         case .card(let card):
             return card.title.localizedCaseInsensitiveContains(filter)
         case .identity(let identity):
@@ -109,7 +109,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
         case .note(let note):
             return note.title.localizedCaseInsensitiveContains(filter) ||
                 note.text.localizedCaseInsensitiveContains(filter) ||
-                (note.associatedDomain?.localizedCaseInsensitiveContains(filter) ?? false)
+                (note.associatedDomain?.localizedCaseInsensitiveContains(filter) == true)
         }
     }
 
@@ -130,7 +130,7 @@ enum SecureVaultItem: Equatable, Identifiable, Comparable {
     var displaySubtitle: String {
         switch self {
         case .account(let account):
-            return account.username
+            return account.username ?? ""
         case .card(let creditCard):
             return creditCard.displayName
         case .identity(let identity):
@@ -238,11 +238,8 @@ final class PasswordManagementItemListModel: ObservableObject {
         didSet {
             updateFilteredData()
             calculateEmptyState()
-            itemCount = items.count
         }
     }
-
-    @Published private(set) var itemCount: Int = 0
 
     @Published var sortDescriptor = SecureVaultSorting.default {
         didSet {
@@ -251,7 +248,11 @@ final class PasswordManagementItemListModel: ObservableObject {
             }
 
             updateFilteredData()
-            selectFirst()
+
+            // Select first item if no previous selection was provided
+            if selected == nil {
+                selectFirst()
+            }
         }
     }
 
@@ -273,11 +274,18 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
+    private let tld: TLD
+    private let urlMatcher: AutofillDomainNameUrlMatcher
+    private static let randomColorsCount = 15
 
     init(passwordManagerCoordinator: PasswordManagerCoordinating,
-         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
+         urlMatcher: AutofillDomainNameUrlMatcher = AutofillDomainNameUrlMatcher(),
+         tld: TLD = ContentBlocking.shared.tld) {
         self.onItemSelected = onItemSelected
         self.passwordManagerCoordinator = passwordManagerCoordinator
+        self.urlMatcher = urlMatcher
+        self.tld = tld
     }
 
     func update(items: [SecureVaultItem]) {
@@ -306,22 +314,30 @@ final class PasswordManagementItemListModel: ObservableObject {
         for section in displayedItems {
             if let first = section.items.first(where: { $0 == item }) {
                 selected(item: first, notify: notify)
+                return
             }
         }
+        selectFirst()
     }
 
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         let websiteAccounts = items
             .compactMap { $0.websiteAccount }
         let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
-        for section in displayedItems {
-            if let account = section.items.first(where: {
-                $0.websiteAccount?.username == bestMatch.first?.username &&
-                $0.websiteAccount?.domain == bestMatch.first?.domain &&
-                $0.websiteAccount?.signature == bestMatch.first?.signature
-            }) {
-                selected(item: account, notify: notify)
-                return
+
+        // If the best match does not include the TLD, just pick the first item in the list
+        if let match = bestMatch.first,
+           tld.eTLDplus1(domain) == tld.eTLDplus1(match.domain) {
+
+            for section in displayedItems {
+                if let account = section.items.first(where: {
+                    $0.websiteAccount?.username == match.username &&
+                    $0.websiteAccount?.domain == match.domain &&
+                    $0.websiteAccount?.signature == match.signature
+                }) {
+                    selected(item: account, notify: notify)
+                    return
+                }
             }
         }
 
@@ -446,6 +462,12 @@ final class PasswordManagementItemListModel: ObservableObject {
         case .logins: emptyState = .logins
         case .identities: emptyState = .identities
         }
+    }
+
+    func tldForAccount(_ account: SecureVaultModels.WebsiteAccount) -> String {
+        let name = account.name(tld: tld, autofillDomainNameUrlMatcher: urlMatcher)
+        let title = (account.title?.isEmpty == false) ? account.title! : "#"
+        return tld.eTLDplus1(name) ?? title
     }
 
 }

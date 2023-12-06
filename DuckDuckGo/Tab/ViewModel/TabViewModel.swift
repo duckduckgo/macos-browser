@@ -27,6 +27,7 @@ final class TabViewModel {
         static let burnerHome = NSImage(named: "BurnerTabFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
+        static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
     }
 
     private(set) var tab: Tab
@@ -53,7 +54,6 @@ final class TabViewModel {
     }
     @Published var errorViewState = ErrorViewState() {
         didSet {
-            updateAddressBarStrings()
             updateTitle()
             updateFavicon()
         }
@@ -66,7 +66,7 @@ final class TabViewModel {
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
-    var lastHomePageTextFieldValue: AddressBarTextField.Value?
+    private(set) var addressBarHasUpdated: Bool = false
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
@@ -74,6 +74,14 @@ final class TabViewModel {
 
     @Published private(set) var usedPermissions = Permissions()
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
+
+    var canPrint: Bool {
+        self.canReload && tab.webView.canPrint
+    }
+
+    var canSaveContent: Bool {
+        self.canReload && !tab.webView.isInFullScreenMode
+    }
 
     init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
         self.tab = tab
@@ -96,11 +104,29 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateAddressBarStrings()
-            self?.updateCanBeBookmarked()
-            self?.updateFavicon()
-        } .store(in: &cancellables)
+        tab.$content
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] content in
+                self?.waitToUpdateAddressBar(content)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func waitToUpdateAddressBar(_ content: Published<Tab.TabContent>.Publisher.Output) {
+        self.addressBarHasUpdated = false
+        tab.$loadingProgress
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] progress in
+                // Update the address bar only after the tab has reached 10% loading
+                // to prevent Address Bar Spoofing
+                if progress > 0.1 && !(self?.addressBarHasUpdated ?? true) {
+                    self?.updateAddressBarStrings()
+                    self?.updateCanBeBookmarked()
+                    self?.updateFavicon()
+                    self?.addressBarHasUpdated = true
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToCanGoBackForwardAndReload() {
@@ -187,7 +213,7 @@ final class TabViewModel {
     }
 
     private var tabURL: URL? {
-        return tab.content.url ?? tab.parentTab?.content.url
+        return tab.content.url
     }
 
     private var tabHostURL: URL? {
@@ -197,8 +223,9 @@ final class TabViewModel {
     func updateAddressBarStrings() {
         guard !errorViewState.isVisible else {
             let failingUrl = tab.error?.failingUrl
+            let failingUrlHost = failingUrl?.host?.droppingWwwPrefix() ?? ""
             addressBarString = failingUrl?.absoluteString ?? ""
-            passiveAddressBarString = failingUrl?.host?.droppingWwwPrefix() ?? ""
+            passiveAddressBarString = appearancePreferences.showFullURL ? addressBarString : failingUrlHost
             return
         }
 
@@ -220,6 +247,13 @@ final class TabViewModel {
             return
         }
 
+        if url.isBlobURL {
+            let strippedUrl = url.stripUnsupportedCredentials()
+            addressBarString = strippedUrl
+            passiveAddressBarString = strippedUrl
+            return
+        }
+
         guard let hostURL = tabHostURL else {
             // also lands here for about:blank and about:home
             addressBarString = ""
@@ -228,7 +262,6 @@ final class TabViewModel {
         }
 
         addressBarString = url.absoluteString
-
         updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
     }
 
@@ -236,7 +269,7 @@ final class TabViewModel {
         if showURL {
             passiveAddressBarString = url.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
         } else {
-            passiveAddressBarString = hostURL.toString(decodePunycode: true, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
+            passiveAddressBarString = hostURL.toString(decodePunycode: true, dropScheme: true, dropTrailingSlash: true).droppingWwwPrefix()
         }
     }
 
@@ -247,12 +280,14 @@ final class TabViewModel {
         }
 
         switch tab.content {
+        case .dataBrokerProtection:
+            title = UserText.tabDataBrokerProtectionTitle
         case .preferences:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
             title = UserText.tabBookmarksTitle
         case .homePage:
-            if tab.isBurner {
+            if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
             } else {
                 title = UserText.tabHomeTitle
@@ -278,8 +313,11 @@ final class TabViewModel {
         }
 
         switch tab.content {
+        case .dataBrokerProtection:
+            favicon = Favicon.dataBrokerProtection
+            return
         case .homePage:
-            if tab.isBurner {
+            if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome
             } else {
                 favicon = Favicon.home
@@ -309,10 +347,12 @@ final class TabViewModel {
     // MARK: - Privacy icon animation
 
     let trackersAnimationTriggerPublisher = PassthroughSubject<Void, Never>()
+    let privacyEntryPointIconUpdateTrigger = PassthroughSubject<Void, Never>()
 
     private var trackerAnimationTimer: Timer?
 
     private func sendAnimationTrigger() {
+        privacyEntryPointIconUpdateTrigger.send()
         if self.tab.privacyInfo?.trackerInfo.trackersBlocked.count ?? 0 > 0 {
             self.trackersAnimationTriggerPublisher.send()
         }
@@ -343,7 +383,7 @@ extension TabViewModel {
 extension TabViewModel: TabDataClearing {
 
     @MainActor
-    func prepareForDataClearing(caller: TabDataCleaner) {
+    func prepareForDataClearing(caller: TabCleanupPreparer) {
         tab.prepareForDataClearing(caller: caller)
     }
 

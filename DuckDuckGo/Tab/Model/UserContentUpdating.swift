@@ -23,13 +23,22 @@ import BrowserServicesKit
 import UserScript
 import Configuration
 
+extension ContentBlockerRulesIdentifier.Difference {
+    static let notification = ContentBlockerRulesIdentifier.Difference(rawValue: 1 << 8)
+}
+
 final class UserContentUpdating {
 
+    private typealias Update = ContentBlockerRulesManager.UpdateEvent
     struct NewContent: UserContentControllerNewContent {
         let rulesUpdate: ContentBlockerRulesManager.UpdateEvent
         let sourceProvider: ScriptSourceProviding
-        @MainActor
-        var makeUserScripts: @MainActor (ScriptSourceProviding) -> UserScripts { return UserScripts.init(with:) }
+
+        var makeUserScripts: @MainActor (ScriptSourceProviding) -> UserScripts {
+            { sourceProvider in
+                UserScripts(with: sourceProvider)
+            }
+        }
     }
 
     @Published private var bufferedValue: NewContent?
@@ -44,7 +53,7 @@ final class UserContentUpdating {
          privacySecurityPreferences: PrivacySecurityPreferences,
          tld: TLD) {
 
-        let makeValue: (ContentBlockerRulesManager.UpdateEvent) -> NewContent = { rulesUpdate in
+        let makeValue: (Update) -> NewContent = { rulesUpdate in
             let sourceProvider = ScriptSourceProvider(configStorage: configStorage,
                                                       privacyConfigurationManager: privacyConfigurationManager,
                                                       privacySettings: privacySecurityPreferences,
@@ -54,11 +63,24 @@ final class UserContentUpdating {
             return NewContent(rulesUpdate: rulesUpdate, sourceProvider: sourceProvider)
         }
 
+        func onNotificationWithInitial(_ name: Notification.Name) -> AnyPublisher<Notification, Never> {
+            return NotificationCenter.default.publisher(for: name)
+                .prepend([Notification(name: .init(rawValue: "initial"))])
+                .eraseToAnyPublisher()
+        }
+
+        func combine(_ update: Update, _ notification: Notification) -> Update {
+            var changes = update.changes
+            changes[notification.name.rawValue] = .notification
+            return Update(rules: update.rules, changes: changes, completionTokens: update.completionTokens)
+        }
+
         // 1. Collect updates from ContentBlockerRulesManager and generate UserScripts based on its output
         cancellable = contentBlockerRulesManager.updatesPublisher
             // regenerate UserScripts on gpcEnabled preference updated
             .combineLatest(privacySecurityPreferences.$gpcEnabled)
             .map { $0.0 } // drop gpcEnabled value: $0.1
+            .combineLatest(onNotificationWithInitial(.autofillUserSettingsDidChange), combine)
             // DefaultScriptSourceProvider instance should be created once per rules/config change and fed into UserScripts initialization
             .map(makeValue)
             .assign(to: \.bufferedValue, onWeaklyHeld: self) // buffer latest update value

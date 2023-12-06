@@ -48,7 +48,6 @@ final class SavePaymentMethodViewController: NSViewController {
     weak var delegate: SavePaymentMethodDelegate?
 
     private var paymentMethod: SecureVaultModels.CreditCard?
-    private var appearanceCancellable: AnyCancellable?
 
     // MARK: - Public
 
@@ -84,23 +83,16 @@ final class SavePaymentMethodViewController: NSViewController {
         paymentMethod.title = CreditCardValidation.type(for: paymentMethod.cardNumber).displayName
 
         do {
-            try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeCreditCard(paymentMethod)
+            try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeCreditCard(paymentMethod)
         } catch {
             os_log("%s:%s: failed to store payment method %s", type: .error, className, #function, error.localizedDescription)
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 
     @IBAction func onOpenPreferencesClicked(sender: NSButton) {
         WindowControllersManager.shared.showPreferencesTab()
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
-    }
-
-    // MARK: -
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
     }
 
 }

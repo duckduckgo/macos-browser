@@ -18,14 +18,14 @@
 
 #if NETWORK_PROTECTION
 
+import Common
 import Foundation
 import NetworkProtection
-import Common
+import PixelKit
 
 extension EventMapping where Event == NetworkProtectionError {
     static var networkProtectionAppDebugEvents: EventMapping<NetworkProtectionError> = .init { event, _, _, _ in
-
-        let domainEvent: Pixel.Event.Debug
+        let domainEvent: NetworkProtectionPixelEvent
 
         switch event {
         case .failedToEncodeRedeemRequest:
@@ -48,8 +48,7 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionKeychainDeleteError(status: status)
         case .noAuthTokenFound:
             domainEvent = .networkProtectionNoAuthTokenFoundError
-        case
-                .noServerRegistrationInfo,
+        case .noServerRegistrationInfo,
                 .couldNotSelectClosestServer,
                 .couldNotGetPeerPublicKey,
                 .couldNotGetPeerHostName,
@@ -65,7 +64,15 @@ extension EventMapping where Event == NetworkProtectionError {
                 .failedToDecodeServerList,
                 .failedToWriteServerList,
                 .couldNotCreateServerListDirectory,
-                .failedToReadServerList:
+                .failedToReadServerList,
+                .wireGuardCannotLocateTunnelFileDescriptor,
+                .wireGuardInvalidState,
+                .wireGuardDnsResolution,
+                .wireGuardSetNetworkSettings,
+                .startWireGuardBackend,
+                // Needs Privacy triage for macOS Geoswitching pixels
+                .failedToFetchLocationList,
+                .failedToParseLocationListResponse:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)
             return
         case .unhandledError(function: let function, line: let line, error: let error):
@@ -73,7 +80,9 @@ extension EventMapping where Event == NetworkProtectionError {
 
             return
         }
-        Pixel.fire(.debug(event: domainEvent))
+
+        let debugEvent = DebugEvent(eventType: .custom(domainEvent))
+        PixelKit.fire(debugEvent, frequency: .standard, includeAppVersionParameter: true)
     }
 }
 

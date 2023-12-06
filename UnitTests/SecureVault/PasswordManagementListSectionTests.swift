@@ -112,7 +112,7 @@ final class PasswordManagementListSectionTests: XCTestCase {
         }
     }
 
-    func testWhenSortingItemsByDate_AndMonthsAreDifferent_AndThereAreMultipleYears_ThenMultipleSectionsAreReturned() {
+    func testWhenSortingItemsByDate_AndMonthsAreDifferent_AndThereAreMultipleYears_ThenMultipleSectionsAreReturnedSortedAscending() {
         let months = 1...12
         let firstYearAccounts = months.map { login(named: "Login", month: $0, year: 2000) }
         let secondYearAccounts = months.map { login(named: "Login", month: $0, year: 2001) }
@@ -124,6 +124,10 @@ final class PasswordManagementListSectionTests: XCTestCase {
         for section in sections {
             XCTAssertEqual(section.items.count, 1)
         }
+
+        let expectedTitles = ["Dec 2001", "Nov 2001", "Oct 2001", "Sep 2001", "Aug 2001", "Jul 2001", "Jun 2001", "May 2001", "Apr 2001", "Mar 2001", "Feb 2001", "Jan 2001", "Dec 2000", "Nov 2000", "Oct 2000", "Sep 2000", "Aug 2000", "Jul 2000", "Jun 2000", "May 2000", "Apr 2000", "Mar 2000", "Feb 2000", "Jan 2000"]
+        let actualTitles = sections.map(\.title)
+        XCTAssertEqual(actualTitles, expectedTitles)
     }
 
     private func login(named name: String, month: Int = 1, year: Int = 2000) -> SecureVaultItem {

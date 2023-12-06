@@ -63,21 +63,16 @@ final class FireViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-#if DEBUG
-        let isRunningTests = NSApp.isRunningUnitTests
-#else
-        let isRunningTests = false
-#endif
-
-        fireAnimationViewLoadingTask = isRunningTests ? nil : Task.detached(priority: .userInitiated) {
-            await self.setupFireAnimationView()
+        if case .normal = NSApp.runType {
+            fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
+                await self.setupFireAnimationView()
+            }
         }
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        self.view.superview?.isHidden = true
         subscribeToFireAnimationEvents()
         progressIndicator.startAnimation(self)
     }
@@ -114,6 +109,8 @@ final class FireViewController: NSViewController {
         NSLayoutConstraint.activate(constraints)
         fireAnimationView = animationView
 
+        animationView.animationSpeed = fireAnimationSpeed
+
         fakeFireButton.wantsLayer = true
         fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
 
@@ -128,8 +125,13 @@ final class FireViewController: NSViewController {
                         return
                     }
 
-                Task {
-                    await self.animateFire(burningData: burningData)
+                switch burningData {
+                case .all, .specificDomains(_, shouldPlayFireAnimation: true):
+                    Task {
+                        await self.animateFire(burningData: burningData)
+                    }
+                case .specificDomains(_, shouldPlayFireAnimation: false):
+                    break
                 }
             })
             .store(in: &cancellables)
@@ -139,6 +141,10 @@ final class FireViewController: NSViewController {
         presentAsModalWindow(fireDialogViewController)
     }
 
+    private let fireAnimationSpeed = 1.2
+    private let fireAnimationBeginning = 0.1
+    private let fireAnimationEnd = 0.63
+
     func animateFireWhenClosing() async {
         await waitForFireAnimationViewIfNeeded()
         await withUnsafeContinuation { (continuation: UnsafeContinuation<Void, Never>) in
@@ -146,7 +152,8 @@ final class FireViewController: NSViewController {
             fakeFireButton.isHidden = true
             fireViewModel.isAnimationPlaying = true
 
-            fireAnimationView?.play(toProgress: 0.63) { [weak self] _ in
+            fireAnimationView?.currentProgress = 0
+            fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self] _ in
                 guard let self = self else { return }
 
                 self.fireViewModel.isAnimationPlaying = false
@@ -161,20 +168,10 @@ final class FireViewController: NSViewController {
     private func animateFire(burningData: Fire.BurningData) async {
         var playFireAnimation = true
 
-        // Don't animate on other windows
+        // Animate just on the active window
         let lastKeyWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if view.window?.windowController !== lastKeyWindowController {
             playFireAnimation = false
-        }
-
-        switch burningData {
-        case .all: break
-        case .specificDomains(let burningDomains):
-            let localHistory = tabCollectionViewModel.selectedTab?.localHistory ?? Set()
-            if localHistory.isDisjoint(with: burningDomains) {
-                // Do not play if current tab isn't affected
-                playFireAnimation = false
-            }
         }
 
         if playFireAnimation {
@@ -183,13 +180,22 @@ final class FireViewController: NSViewController {
             progressIndicatorWrapper.isHidden = true
             fireViewModel.isAnimationPlaying = true
 
-            fireAnimationView?.play { [weak self] _ in
+            fireViewModel.fire.fireAnimationDidStart()
+            fireAnimationView?.currentProgress = 0
+            fireAnimationView?.play(fromProgress: fireAnimationBeginning, toProgress: fireAnimationEnd) { [weak self] _ in
                 guard let self = self else { return }
 
                 self.fireViewModel.isAnimationPlaying = false
+                fireViewModel.fire.fireAnimationDidFinish()
+
+                // If not finished yet, present the progress indicator
                 if self.fireViewModel.fire.burningData != nil {
-                    self.progressIndicatorWrapper.isHidden = false
-                    self.progressIndicatorWrapperBG.applyDropShadow()
+
+                    // Waits until windows are closed in Fire.swift
+                    DispatchQueue.main.async {
+                        self.progressIndicatorWrapper.isHidden = false
+                        self.progressIndicatorWrapperBG.applyDropShadow()
+                    }
                 }
             }
         }

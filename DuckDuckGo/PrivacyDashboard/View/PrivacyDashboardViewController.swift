@@ -171,16 +171,18 @@ final class PrivacyDashboardViewController: NSViewController {
 
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didChangeProtectionSwitch isEnabled: Bool) {
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didChangeProtectionSwitch protectionState: ProtectionState) {
         guard let domain = privacyDashboardController.privacyInfo?.url.host else {
             return
         }
 
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
-        if isEnabled && configuration.isUserUnprotected(domain: domain) {
+        if protectionState.isProtected && configuration.isUserUnprotected(domain: domain) {
             configuration.userEnabledProtection(forDomain: domain)
+            Pixel.fire(.dashboardProtectionAllowlistRemove(triggerOrigin: protectionState.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
         } else {
             configuration.userDisabledProtection(forDomain: domain)
+            Pixel.fire(.dashboardProtectionAllowlistAdd(triggerOrigin: protectionState.eventOrigin.screen.rawValue), includeAppVersionParameter: false)
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
@@ -217,7 +219,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
-        websiteBreakageReporter.reportBreakage(category: category, description: description)
+        websiteBreakageReporter.reportBreakage(category: category, description: description, reportFlow: .privacyDashboard)
     }
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboardController, didSetPermission permissionName: String, to state: PermissionAuthorizationState) {

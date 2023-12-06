@@ -26,18 +26,29 @@ final class DataImportViewController: NSViewController {
     @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: nil)
     var successfulImportHappened: Bool?
 
-    enum Constants {
+    private enum Constants {
         static let storyboardName = "DataImport"
         static let identifier = "DataImportViewController"
     }
 
-    enum InteractionState: Equatable {
+    private enum InteractionState: Equatable {
         case unableToImport
         case permissionsRequired([DataImport.DataType])
         case ableToImport
         case moreInfoAvailable
-        case failedToImport
         case completedImport(DataImport.Summary)
+    }
+
+    private struct ImportError: DataImportError {
+        enum OperationType: Int {
+            case secureVaultError
+            case selectProfile
+        }
+
+        let source: DataImport.Source
+        let action: DataImportAction
+        let type: OperationType
+        let underlyingError: Error?
     }
 
     private struct ViewState: Equatable {
@@ -47,7 +58,7 @@ final class DataImportViewController: NSViewController {
         static func defaultState() -> ViewState {
             if let firstInstalledBrowser = ThirdPartyBrowser.installedBrowsers.first {
                 return ViewState(selectedImportSource: firstInstalledBrowser.importSource,
-                                 interactionState: firstInstalledBrowser.importSource == .safari ? .ableToImport : .moreInfoAvailable)
+                                 interactionState: [.safari, .safariTechnologyPreview].contains(firstInstalledBrowser.importSource) ? .ableToImport : .moreInfoAvailable)
             } else {
                 return ViewState(selectedImportSource: .csv, interactionState: .ableToImport)
             }
@@ -55,9 +66,9 @@ final class DataImportViewController: NSViewController {
     }
 
     static func show(completion: (() -> Void)? = nil) {
-        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController,
-              windowController.window?.isKeyWindow == true else {
-            return
+        guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
+        if windowController.window?.isKeyWindow != true {
+            windowController.window?.makeKeyAndOrderFront(nil)
         }
 
         let viewController = DataImportViewController.create()
@@ -66,54 +77,27 @@ final class DataImportViewController: NSViewController {
         }
     }
 
-    static func create() -> DataImportViewController {
+    private static func create() -> DataImportViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
         return storyboard.instantiateController(identifier: Constants.identifier)
     }
 
     private func secureVaultImporter() throws -> SecureVaultLoginImporter {
-        let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+        let secureVault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
         return SecureVaultLoginImporter(secureVault: secureVault)
     }
 
     private var viewState: ViewState = .defaultState() {
         didSet {
             renderCurrentViewState()
-
-            let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
-
-            do {
-                switch viewState.selectedImportSource {
-                case .brave:
-                    self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .chrome:
-                    self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .edge:
-                    self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
-                case .firefox:
-                    self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
-                                                                bookmarkImporter: bookmarkImporter,
-                                                                faviconManager: FaviconManager.shared)
-                case .safari where !(currentChildViewController is FileImportViewController):
-                    self.dataImporter = SafariDataImporter(bookmarkImporter: bookmarkImporter, faviconManager: FaviconManager.shared)
-                case .bookmarksHTML:
-                    if !(self.dataImporter is BookmarkHTMLImporter) {
-                        self.dataImporter = nil
-                    }
-                case .csv, .onePassword7, .onePassword8, .lastPass, .safari /* csv only */:
-                    if !(self.dataImporter is CSVImporter) {
-                        self.dataImporter = nil
-                    }
-                }
-            } catch {
-                os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
-                self.presentAlert(for: .generic(.cannotAccessSecureVault))
-            }
+            refreshDataImporter()
         }
     }
 
     private weak var currentChildViewController: NSViewController?
     private var browserImportViewController: BrowserImportViewController?
+
+    private var bookmarkCount = 0
 
     private var dataImporter: DataImporter?
     private var selectedImportSourceCancellable: AnyCancellable?
@@ -136,21 +120,21 @@ final class DataImportViewController: NSViewController {
     @IBAction func actionButtonClicked(_ sender: Any) {
         switch viewState.interactionState {
         // Import click on first screen with Bookmarks checkmark: Can't read bookmarks: request permission
-        case .ableToImport where viewState.selectedImportSource == .safari
+        case .ableToImport where [.safari, .safariTechnologyPreview].contains(viewState.selectedImportSource)
                 && selectedImportOptions.contains(.bookmarks)
-                && !SafariDataImporter.canReadBookmarksFile():
+                && (dataImporter as? DataDirectoryPermissionAuthorization)?.canReadBookmarksFile() == false:
 
             self.viewState = ViewState(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.bookmarks]))
 
         // Import click on first screen with Passwords bookmark or Next click on Bookmarks Import Done screen: show CSV Import
-        case .ableToImport where viewState.selectedImportSource == .safari
+        case .ableToImport where [.safari, .safariTechnologyPreview].contains(viewState.selectedImportSource)
                 && selectedImportOptions.contains(.logins)
                 && (dataImporter is CSVImporter || selectedImportOptions == [.logins])
                 && !(currentChildViewController is FileImportViewController):
             // Only Safari Passwords selected, switch to CSV select
             self.viewState = .init(selectedImportSource: viewState.selectedImportSource, interactionState: .permissionsRequired([.logins]))
 
-        case .ableToImport, .failedToImport:
+        case .ableToImport:
             completeImport()
         case .completedImport(let summary) where summary.loginsResult == .awaited:
             // Safari bookmarks import finished, switch to CSV select
@@ -171,9 +155,17 @@ final class DataImportViewController: NSViewController {
 
         importSourcePopUpButton.displayImportSources()
         renderCurrentViewState()
+        refreshDataImporter()
 
         selectedImportSourceCancellable = importSourcePopUpButton.selectionPublisher.sink { [weak self] _ in
             self?.refreshViewState()
+        }
+    }
+
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        if bookmarkCount > 0 {
+            NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
         }
     }
 
@@ -190,10 +182,12 @@ final class DataImportViewController: NSViewController {
         case .csv, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML:
             self.viewState = ViewState(selectedImportSource: source, interactionState: .unableToImport)
 
-        case .chrome, .firefox, .brave, .edge, .safari:
+        case .chrome, .firefox, .brave, .edge, .safari, .safariTechnologyPreview:
             let interactionState: InteractionState
             switch (source, loginsSelected) {
-            case (.safari, _), (_, false):
+            case (.safari, _),
+                 (.safariTechnologyPreview, _),
+                 (_, false):
                 interactionState = .ableToImport
             case (.firefox, _):
                 if FirefoxDataImporter.loginDatabaseRequiresPrimaryPassword(profileURL: selectedProfile?.profileURL) {
@@ -211,10 +205,53 @@ final class DataImportViewController: NSViewController {
                 self.viewState = newState
             }
         }
-
     }
 
-    var loginsSelected: Bool {
+    private func refreshDataImporter() {
+        do {
+            try throwingRefreshDataImporter()
+        } catch {
+            os_log("dataImporter initialization failed: %{public}s", type: .error, error.localizedDescription)
+            self.presentAlert(for: ImportError(source: viewState.selectedImportSource, action: .generic, type: .secureVaultError, underlyingError: error))
+        }
+    }
+
+    private func throwingRefreshDataImporter() throws {
+        let bookmarkImporter = CoreDataBookmarkImporter(bookmarkManager: LocalBookmarkManager.shared)
+
+        switch viewState.selectedImportSource {
+        case .brave:
+            self.dataImporter = try BraveDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .chrome:
+            self.dataImporter = try ChromeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .edge:
+            self.dataImporter = try EdgeDataImporter(loginImporter: secureVaultImporter(), bookmarkImporter: bookmarkImporter)
+        case .firefox:
+            self.dataImporter = try FirefoxDataImporter(loginImporter: secureVaultImporter(),
+                                                        bookmarkImporter: bookmarkImporter,
+                                                        faviconManager: FaviconManager.shared)
+        case .safari where !(currentChildViewController is FileImportViewController),
+             .safariTechnologyPreview where !(currentChildViewController is FileImportViewController):
+
+            self.dataImporter = try SafariDataImporter(importSource: viewState.selectedImportSource,
+                                                       bookmarkImporter: bookmarkImporter,
+                                                       faviconManager: FaviconManager.shared) ?? {
+                throw ImportError(source: viewState.selectedImportSource, action: .generic, type: .selectProfile, underlyingError: nil)
+            }()
+
+        case .bookmarksHTML:
+            if !(self.dataImporter is BookmarkHTMLImporter) {
+                self.dataImporter = nil
+            }
+        case .csv, .onePassword7, .onePassword8, .lastPass,
+             .safari, .safariTechnologyPreview /* csv only */:
+            if !(self.dataImporter is CSVImporter) {
+                self.dataImporter = nil
+            }
+        }
+    }
+
+    private var loginsSelected: Bool {
         if let browserViewController = self.currentChildViewController as? BrowserImportViewController {
             return browserViewController.selectedImportOptions.contains(.logins)
         }
@@ -264,17 +301,12 @@ final class DataImportViewController: NSViewController {
             importButton.title = UserText.doneImporting
             importButton.isEnabled = true
             cancelButton.isHidden = true
-        case .failedToImport:
-            importSourcePopUpButton.isHidden = false
-            importButton.title = UserText.initiateImport
-            importButton.isEnabled = true
-            cancelButton.isHidden = false
         }
     }
 
     private func newChildViewController(for importSource: DataImport.Source, interactionState: InteractionState) -> NSViewController? {
         switch importSource {
-        case .safari:
+        case .safari, .safariTechnologyPreview:
             if case .permissionsRequired([.logins]) = interactionState {
                 let viewController = FileImportViewController.create(importSource: .safari)
                 viewController.delegate = self
@@ -282,7 +314,7 @@ final class DataImportViewController: NSViewController {
                 return viewController
             } else if case .ableToImport = interactionState,
                       let fileImportViewController = currentChildViewController as? FileImportViewController,
-                      fileImportViewController.importSource == .safari {
+                      [.safari, .safariTechnologyPreview].contains(fileImportViewController.importSource) {
                 fileImportViewController.importSource = importSource
 
                 return nil
@@ -293,7 +325,12 @@ final class DataImportViewController: NSViewController {
             if case let .completedImport(summary) = interactionState {
                 return BrowserImportSummaryViewController.create(importSummary: summary)
             } else if case let .permissionsRequired(types) = interactionState {
-                let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types)
+                guard let safariDataImporter = dataImporter as? DataDirectoryPermissionAuthorization else {
+                    assertionFailure("Unexpected data importer kind: \(dataImporter.map(String.init(describing:)) ?? "<nil>")")
+                    return nil
+                }
+
+                let filePermissionViewController =  RequestFilePermissionViewController.create(importSource: importSource, permissionsRequired: types, permissionAuthorization: safariDataImporter)
                 filePermissionViewController.delegate = self
                 return filePermissionViewController
             } else if browserImportViewController?.browser == importSource {
@@ -364,11 +401,11 @@ final class DataImportViewController: NSViewController {
         cancelButton.title = UserText.navigateBack
     }
 
-    var selectedProfile: DataImport.BrowserProfile? {
+    private var selectedProfile: DataImport.BrowserProfile? {
         return browserImportViewController?.selectedProfile
     }
 
-    var selectedImportOptions: [DataImport.DataType] {
+    private var selectedImportOptions: [DataImport.DataType] {
         guard let importer = self.dataImporter else {
             assertionFailure("\(#file): No data importer or profile found")
             return []
@@ -386,55 +423,71 @@ final class DataImportViewController: NSViewController {
         let profile = selectedProfile
         let importTypes = selectedImportOptions
 
-        importer.importData(types: importTypes, from: profile) { result in
+        self.importButton.isEnabled = false
+        self.cancelButton.isEnabled = false
+
+        importer.importData(types: importTypes, from: profile, modalWindow: view.window) { result in
+            self.importButton.isEnabled = true
+            self.cancelButton.isEnabled = true
+
             switch result {
             case .success(let summary):
                 self.successfulImportHappened = true
                 if summary.isEmpty {
                     self.dismiss()
                 } else {
+                    self.bookmarkCount += summary.bookmarksResult?.successful ?? 0
                     self.viewState.interactionState = .completedImport(summary)
+                    self.requestSync()
                 }
 
                 NotificationCenter.default.post(name: .dataImportComplete, object: nil)
+
+            case .failure(let error as ChromiumLoginReader.ImportError) where error.type == .userDeniedKeychainPrompt:
+                // user denied Keychain prompt: keep current screen
+                Pixel.fire(.dataImportFailed(error))
+
+            case .failure(let error as FirefoxLoginReader.ImportError) where error.type == .requiresPrimaryPassword:
+                self.requestPrimaryPassword()
+
             case .failure(let error):
-                switch error.errorType {
-                case .needsLoginPrimaryPassword:
-                    self.presentAlert(for: error)
-                default:
-                    self.viewState.interactionState = .failedToImport
-                    self.presentAlert(for: error)
+                if (error as? FirefoxLoginReader.ImportError)?.type != .requiresPrimaryPassword {
+                    os_log("import failed: %{public}s", type: .error, error.localizedDescription)
+                    self.viewState.interactionState = .ableToImport
                 }
+                self.presentAlert(for: error)
             }
         }
     }
 
-    private func presentAlert(for error: DataImportError) {
+    private func requestPrimaryPassword() {
+        let alert = NSAlert.passwordRequiredAlert(source: viewState.selectedImportSource)
+        let response = alert.runModal()
+
+        if response == .alertFirstButtonReturn {
+            // Assume Firefox, as it's the only supported option that uses a password
+            let password = (alert.accessoryView as? NSSecureTextField)?.stringValue
+            (dataImporter as? FirefoxDataImporter)?.primaryPassword = password
+
+            completeImport()
+        }
+    }
+
+    private func presentAlert(for error: any DataImportError) {
         guard let window = view.window else { return }
 
-        switch error.errorType {
-        case .needsLoginPrimaryPassword:
-            let alert = NSAlert.passwordRequiredAlert(source: viewState.selectedImportSource)
-            let response = alert.runModal()
+        Pixel.fire(.dataImportFailed(error))
 
-            if response == .alertFirstButtonReturn {
-                // Assume Firefox, as it's the only supported option that uses a password
-                let password = (alert.accessoryView as? NSSecureTextField)?.stringValue
-                (dataImporter as? FirefoxDataImporter)?.primaryPassword = password
+        let alert = NSAlert.importFailedAlert(linkDelegate: self)
+        alert.beginSheetModal(for: window, completionHandler: nil)
+    }
 
-                completeImport()
-            }
-        default:
-            let pixel = Pixel.Event.dataImportFailed(
-                action: error.actionType.pixelEventAction,
-                source: viewState.selectedImportSource.pixelEventSource
-            )
-
-            Pixel.fire(pixel, withAdditionalParameters: error.errorType.errorParameters)
-
-            let alert = NSAlert.importFailedAlert(source: viewState.selectedImportSource, linkDelegate: self)
-            alert.beginSheetModal(for: window, completionHandler: nil)
+    private func requestSync() {
+        guard let syncService = NSApp.delegateTyped.syncService else {
+            return
         }
+        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+        syncService.scheduler.requestSyncImmediately()
     }
 
 }
@@ -442,7 +495,7 @@ final class DataImportViewController: NSViewController {
 extension DataImportViewController: FileImportViewControllerDelegate {
 
     func fileImportViewController(_ viewController: FileImportViewController, didSelectBookmarksFileWithURL url: URL?) {
-        guard let url = url else {
+        guard let url else {
             self.viewState.interactionState = .unableToImport
             return
         }
@@ -454,21 +507,22 @@ extension DataImportViewController: FileImportViewControllerDelegate {
     }
 
     func fileImportViewController(_ viewController: FileImportViewController, didSelectCSVFileWithURL url: URL?) {
-        guard let url = url else {
+        guard let url else {
             self.viewState.interactionState = .unableToImport
             return
         }
 
         do {
-            let secureVault = try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared)
+            let secureVault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
             let secureVaultImporter = SecureVaultLoginImporter(secureVault: secureVault)
             self.dataImporter = CSVImporter(fileURL: url,
                                             loginImporter: secureVaultImporter,
                                             defaultColumnPositions: .init(source: self.viewState.selectedImportSource))
             self.viewState.interactionState = .ableToImport
         } catch {
+            os_log("file import failed: %{public}s", type: .error, error.localizedDescription)
             self.viewState.interactionState = .unableToImport
-            self.presentAlert(for: .logins(.cannotAccessSecureVault))
+            self.presentAlert(for: ImportError(source: self.viewState.selectedImportSource, action: .logins, type: .secureVaultError, underlyingError: error))
         }
     }
 
@@ -509,7 +563,7 @@ extension DataImportViewController: BrowserImportViewControllerDelegate {
 extension DataImportViewController: RequestFilePermissionViewControllerDelegate {
 
     func requestFilePermissionViewControllerDidReceivePermission(_ viewController: RequestFilePermissionViewController) {
-        if viewState.selectedImportSource == .safari
+        if [.safari, .safariTechnologyPreview].contains(viewState.selectedImportSource)
             && selectedImportOptions.contains(.bookmarks) {
 
             self.completeImport()

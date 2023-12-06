@@ -1,0 +1,790 @@
+//
+//  Mocks.swift
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+import Combine
+import BrowserServicesKit
+import Common
+import SecureStorage
+import GRDB
+@testable import DataBrokerProtection
+
+extension BrokerProfileQueryData {
+    static func mock(with steps: [Step] = [Step](),
+                     dataBrokerName: String = "test",
+                     lastRunDate: Date? = nil,
+                     preferredRunDate: Date? = nil,
+                     extractedProfile: ExtractedProfile? = nil,
+                     scanHistoryEvents: [HistoryEvent] = [HistoryEvent](),
+                     mirrorSites: [MirrorSite] = [MirrorSite](),
+                     deprecated: Bool = false) -> BrokerProfileQueryData {
+        BrokerProfileQueryData(
+            dataBroker: DataBroker(
+                name: dataBrokerName,
+                steps: steps,
+                version: "1.0.0",
+                schedulingConfig: DataBrokerScheduleConfig.mock,
+                mirrorSites: mirrorSites
+            ),
+            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: deprecated),
+            scanOperationData: ScanOperationData(brokerId: 1,
+                                                 profileQueryId: 1,
+                                                 preferredRunDate: preferredRunDate,
+                                                 historyEvents: scanHistoryEvents,
+                                                 lastRunDate: lastRunDate),
+            optOutOperationsData: extractedProfile != nil ? [.mock(with: extractedProfile!)] : [OptOutOperationData]()
+        )
+    }
+}
+
+extension DataBrokerScheduleConfig {
+    static var mock: DataBrokerScheduleConfig {
+        DataBrokerScheduleConfig(retryError: 1, confirmOptOutScan: 2, maintenanceScan: 3)
+    }
+}
+
+final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
+    var currentConfig: Data = Data()
+
+    var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
+
+    var privacyConfig: BrowserServicesKit.PrivacyConfiguration = PrivacyConfigurationMock()
+
+    func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
+        .downloaded
+    }
+}
+
+final class PrivacyConfigurationMock: PrivacyConfiguration {
+    var identifier: String = "mock"
+
+    var userUnprotectedDomains = [String]()
+
+    var tempUnprotectedDomains = [String]()
+
+    var trackerAllowlist = BrowserServicesKit.PrivacyConfigurationData.TrackerAllowlist(entries: [String: [PrivacyConfigurationData.TrackerAllowlist.Entry]](), state: "mock")
+
+    func isEnabled(featureKey: BrowserServicesKit.PrivacyFeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
+        false
+    }
+
+    func isSubfeatureEnabled(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
+        false
+    }
+
+    func exceptionsList(forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> [String] {
+        [String]()
+    }
+
+    func isFeature(_ feature: BrowserServicesKit.PrivacyFeature, enabledForDomain: String?) -> Bool {
+        false
+    }
+
+    func isProtected(domain: String?) -> Bool {
+        false
+    }
+
+    func isUserUnprotected(domain: String?) -> Bool {
+        false
+    }
+
+    func isTempUnprotected(domain: String?) -> Bool {
+        false
+    }
+
+    func isInExceptionList(domain: String?, forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> Bool {
+        false
+    }
+
+    func settings(for feature: BrowserServicesKit.PrivacyFeature) -> BrowserServicesKit.PrivacyConfigurationData.PrivacyFeature.FeatureSettings {
+        [String: Any]()
+    }
+
+    func userEnabledProtection(forDomain: String) {
+
+    }
+
+    func userDisabledProtection(forDomain: String) {
+
+    }
+
+    func isSubfeatureEnabled(_ subfeature: any BrowserServicesKit.PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> Bool {
+        false
+    }
+}
+
+extension ContentScopeProperties {
+    static var mock: ContentScopeProperties {
+        ContentScopeProperties(
+            gpcEnabled: false,
+            sessionKey: "sessionKey",
+            featureToggles: ContentScopeFeatureToggles.mock
+        )
+    }
+}
+
+extension ContentScopeFeatureToggles {
+
+    static var mock: ContentScopeFeatureToggles {
+        ContentScopeFeatureToggles(
+            emailProtection: false,
+            emailProtectionIncontextSignup: false,
+            credentialsAutofill: false,
+            identitiesAutofill: false,
+            creditCardsAutofill: false,
+            credentialsSaving: false,
+            passwordGeneration: false,
+            inlineIconCredentials: false,
+            thirdPartyCredentialsProvider: false
+        )
+    }
+}
+
+final class WebViewHandlerMock: NSObject, WebViewHandler {
+    var wasInitializeWebViewCalled = false
+    var wasLoadCalledWithURL: URL?
+    var wasWaitForWebViewLoadCalled = false
+    var wasFinishCalled = false
+    var wasExecuteCalledForExtractedProfile = false
+    var wasExecuteCalledForProfileData = false
+    var wasExecuteCalledForSolveCaptcha = false
+    var wasExecuteJavascriptCalled = false
+
+    func initializeWebView(showWebView: Bool) async {
+        wasInitializeWebViewCalled = true
+    }
+
+    func load(url: URL) async throws {
+        wasLoadCalledWithURL = url
+    }
+
+    func waitForWebViewLoad(timeoutInSeconds: Int) async throws {
+        wasWaitForWebViewLoadCalled = true
+    }
+
+    func finish() async {
+        wasFinishCalled = true
+    }
+
+    func execute(action: DataBrokerProtection.Action, data: DataBrokerProtection.CCFRequestData) async {
+        switch data {
+        case .profile:
+            wasExecuteCalledForExtractedProfile = false
+            wasExecuteCalledForSolveCaptcha = false
+            wasExecuteCalledForProfileData = true
+        case .solveCaptcha:
+            wasExecuteCalledForExtractedProfile = false
+            wasExecuteCalledForSolveCaptcha = true
+            wasExecuteCalledForProfileData = false
+        case.extractedProfile:
+            wasExecuteCalledForExtractedProfile = true
+            wasExecuteCalledForSolveCaptcha = false
+            wasExecuteCalledForProfileData = false
+        }
+    }
+
+    func evaluateJavaScript(_ javaScript: String) async throws {
+        wasExecuteJavascriptCalled = true
+    }
+
+    func reset() {
+        wasInitializeWebViewCalled = false
+        wasLoadCalledWithURL = nil
+        wasWaitForWebViewLoadCalled = false
+        wasFinishCalled = false
+        wasExecuteCalledForExtractedProfile = false
+        wasExecuteCalledForSolveCaptcha = false
+        wasExecuteCalledForProfileData = false
+        wasExecuteJavascriptCalled = false
+    }
+}
+
+final class EmailServiceMock: EmailServiceProtocol {
+
+    var shouldThrow: Bool = false
+
+    func getEmail() async throws -> String {
+        if shouldThrow {
+            throw DataBrokerProtectionError.emailError(nil)
+        }
+
+        return "test@duck.com"
+    }
+
+    func getConfirmationLink(from email: String, numberOfRetries: Int, pollingIntervalInSeconds: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> URL {
+        if shouldThrow {
+            throw DataBrokerProtectionError.emailError(nil)
+        }
+
+        return URL(string: "https://www.duckduckgo.com")!
+    }
+
+    func reset() {
+        shouldThrow = false
+    }
+}
+
+final class CaptchaServiceMock: CaptchaServiceProtocol {
+
+    var wasSubmitCaptchaInformationCalled = false
+    var wasSubmitCaptchaToBeResolvedCalled = false
+    var shouldThrow = false
+
+    func submitCaptchaInformation(_ captchaInfo: GetCaptchaInfoResponse, retries: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaTransactionId {
+        if shouldThrow {
+            throw CaptchaServiceError.errorWhenSubmittingCaptcha
+        }
+
+        wasSubmitCaptchaInformationCalled = true
+
+        return "transactionID"
+    }
+
+    func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId, retries: Int, pollingInterval: Int, shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
+        if shouldThrow {
+            throw CaptchaServiceError.errorWhenFetchingCaptchaResult
+        }
+
+        wasSubmitCaptchaToBeResolvedCalled = true
+
+        return CaptchaResolveData()
+    }
+
+    func reset() {
+        wasSubmitCaptchaInformationCalled = false
+        wasSubmitCaptchaToBeResolvedCalled = false
+    }
+}
+
+final class MockRedeemUseCase: DataBrokerProtectionRedeemUseCase {
+
+    func shouldAskForInviteCode() -> Bool {
+        false
+    }
+
+    func redeem(inviteCode: String) async throws {
+
+    }
+
+    func getAuthHeader() async throws -> String {
+        return "auth header"
+    }
+}
+
+final class MockAuthenticationService: DataBrokerProtectionAuthenticationService {
+
+    var wasRedeemCalled = false
+    var shouldThrow = false
+
+    func redeem(inviteCode: String) async throws -> String {
+        wasRedeemCalled = true
+        if shouldThrow {
+            throw AuthenticationError.issueRedeemingInviteCode(error: "mock")
+        }
+
+        return "accessToken"
+    }
+
+    func reset() {
+        wasRedeemCalled = false
+        shouldThrow = false
+    }
+}
+
+final class MockAuthenticationRepository: AuthenticationRepository {
+
+    var shouldSendNilInviteCode = false
+    var shouldSendNilAccessToken = false
+    var wasInviteCodeSaveCalled = false
+    var wasAccessTokenSaveCalled = false
+
+    func getInviteCode() -> String? {
+        if shouldSendNilInviteCode {
+            return nil
+        }
+
+        return "inviteCode"
+    }
+
+    func getAccessToken() -> String? {
+        if shouldSendNilAccessToken {
+            return nil
+        }
+
+        return "accessToken"
+    }
+
+    func save(inviteCode: String) {
+        wasInviteCodeSaveCalled = true
+    }
+
+    func save(accessToken: String) {
+        wasAccessTokenSaveCalled = true
+    }
+
+    func reset() {
+        shouldSendNilInviteCode = false
+        shouldSendNilAccessToken = false
+        wasInviteCodeSaveCalled = false
+        wasAccessTokenSaveCalled = false
+    }
+}
+
+final class BrokerUpdaterRepositoryMock: BrokerUpdaterRepository {
+    var wasSaveLastRunDateCalled = false
+    var lastRunDate: Date?
+
+    func saveLastRunDate(date: Date) {
+        wasSaveLastRunDateCalled = true
+    }
+
+    func getLastRunDate() -> Date? {
+        return lastRunDate
+    }
+
+    func reset() {
+        wasSaveLastRunDateCalled = false
+        lastRunDate = nil
+    }
+}
+
+final class ResourcesRepositoryMock: ResourcesRepository {
+    var wasFetchBrokerFromResourcesFilesCalled = false
+    var brokersList: [DataBroker]?
+
+    func fetchBrokerFromResourceFiles() -> [DataBroker]? {
+        wasFetchBrokerFromResourcesFilesCalled = true
+        return brokersList
+    }
+
+    func reset() {
+        wasFetchBrokerFromResourcesFilesCalled = false
+        brokersList?.removeAll()
+        brokersList = nil
+    }
+}
+
+final class EmptySecureStorageKeyStoreProviderMock: SecureStorageKeyStoreProvider {
+    var generatedPasswordEntryName: String = ""
+
+    var l1KeyEntryName: String = ""
+
+    var l2KeyEntryName: String = ""
+
+    var keychainServiceName: String = ""
+
+    func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
+        return [String: Any]()
+    }
+}
+
+final class EmptySecureStorageCryptoProviderMock: SecureStorageCryptoProvider {
+    var passwordSalt: Data = Data()
+
+    var keychainServiceName: String = ""
+
+    var keychainAccountName: String = ""
+}
+
+final class SecureStorageDatabaseProviderMock: SecureStorageDatabaseProvider {
+    let db: DatabaseWriter
+
+    init() throws {
+        do {
+            self.db = try DatabaseQueue()
+        } catch {
+            throw DataBrokerProtectionError.unknown("")
+        }
+    }
+}
+
+final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault {
+
+    var shouldReturnOldVersionBroker = false
+    var shouldReturnNewVersionBroker = false
+    var wasBrokerUpdateCalled = false
+    var wasBrokerSavedCalled = false
+    var wasUpdateProfileQueryCalled = false
+    var wasDeleteProfileQueryCalled = false
+    var wasSaveProfileQueryCalled = false
+    var profile: DataBrokerProtectionProfile?
+    var profileQueries = [ProfileQuery]()
+    var brokers = [DataBroker]()
+    var scanOperationData = [ScanOperationData]()
+    var optOutOperationData = [OptOutOperationData]()
+    var lastPreferredRunDateOnScan: Date?
+
+    typealias DatabaseProvider = SecureStorageDatabaseProviderMock
+
+    required init(providers: SecureStorageProviders<SecureStorageDatabaseProviderMock>) {
+    }
+
+    func reset() {
+        shouldReturnOldVersionBroker = false
+        shouldReturnNewVersionBroker = false
+        wasBrokerUpdateCalled = false
+        wasBrokerSavedCalled = false
+        wasUpdateProfileQueryCalled = false
+        wasDeleteProfileQueryCalled = false
+        wasSaveProfileQueryCalled = false
+        profile = nil
+        profileQueries.removeAll()
+        brokers.removeAll()
+        scanOperationData.removeAll()
+        optOutOperationData.removeAll()
+        lastPreferredRunDateOnScan = nil
+    }
+
+    func save(profile: DataBrokerProtectionProfile) throws -> Int64 {
+        return 1
+    }
+
+    func fetchProfile(with id: Int64) throws -> DataBrokerProtectionProfile? {
+        profile
+    }
+
+    func deleteProfileData() throws {
+        return
+    }
+
+    func save(broker: DataBroker) throws -> Int64 {
+        wasBrokerSavedCalled = true
+        return 1
+    }
+
+    func update(_ broker: DataBroker, with id: Int64) throws {
+        wasBrokerUpdateCalled = true
+    }
+
+    func fetchBroker(with id: Int64) throws -> DataBroker? {
+        return nil
+    }
+
+    func fetchBroker(with name: String) throws -> DataBroker? {
+        if shouldReturnOldVersionBroker {
+            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
+        } else if shouldReturnNewVersionBroker {
+            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
+        }
+
+        return nil
+    }
+
+    func fetchAllBrokers() throws -> [DataBroker] {
+        return brokers
+    }
+
+    func save(profileQuery: ProfileQuery, profileId: Int64) throws -> Int64 {
+        wasSaveProfileQueryCalled = true
+        return 1
+    }
+
+    func fetchProfileQuery(with id: Int64) throws -> ProfileQuery? {
+        return nil
+    }
+
+    func fetchAllProfileQueries(for profileId: Int64) throws -> [ProfileQuery] {
+        return profileQueries
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+        lastPreferredRunDateOnScan = preferredRunDate
+    }
+
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) throws {
+    }
+
+    func fetchScan(brokerId: Int64, profileQueryId: Int64) throws -> ScanOperationData? {
+        scanOperationData.first
+    }
+
+    func fetchAllScans() throws -> [ScanOperationData] {
+        return scanOperationData
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfile: ExtractedProfile, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    }
+
+    func save(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64, lastRunDate: Date?, preferredRunDate: Date?) throws {
+    }
+
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func fetchOptOut(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws -> OptOutOperationData? {
+        optOutOperationData.first
+    }
+
+    func fetchOptOuts(brokerId: Int64, profileQueryId: Int64) throws -> [OptOutOperationData] {
+        return optOutOperationData
+    }
+
+    func fetchAllOptOuts() throws -> [OptOutOperationData] {
+        return optOutOperationData
+    }
+
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64) throws {
+    }
+
+    func save(historyEvent: HistoryEvent, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) throws {
+    }
+
+    func fetchEvents(brokerId: Int64, profileQueryId: Int64) throws -> [HistoryEvent] {
+        return [HistoryEvent]()
+    }
+
+    func save(extractedProfile: ExtractedProfile, brokerId: Int64, profileQueryId: Int64) throws -> Int64 {
+        return 1
+    }
+
+    func fetchExtractedProfile(with id: Int64) throws -> ExtractedProfile? {
+        return nil
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64, with profileQueryId: Int64) throws -> [ExtractedProfile] {
+        return [ExtractedProfile]()
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) throws -> [ExtractedProfile] {
+        return [ExtractedProfile]()
+    }
+
+    func updateRemovedDate(for extractedProfileId: Int64, with date: Date?) throws {
+    }
+
+    func hasMatches() throws -> Bool {
+        false
+    }
+
+    func fetchChildBrokers(for parentBroker: String) throws -> [DataBroker] {
+        return [DataBroker]()
+    }
+
+    func update(profile: DataBrokerProtection.DataBrokerProtectionProfile) throws -> Int64 {
+        return 1
+    }
+
+    func delete(profileQuery: DataBrokerProtection.ProfileQuery, profileId: Int64) throws {
+        wasDeleteProfileQueryCalled = true
+    }
+
+    func update(_ profileQuery: DataBrokerProtection.ProfileQuery, brokerIDs: [Int64], profileId: Int64) throws -> Int64 {
+        wasUpdateProfileQueryCalled = true
+        return 1
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) throws -> AttemptInformation? {
+        return nil
+    }
+
+    func save(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) throws {
+    }
+}
+
+public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
+
+    static var lastPixelFired: DataBrokerProtectionPixels?
+
+    public init() {
+        super.init { event, _, _, _ in
+            MockDataBrokerProtectionPixelsHandler.lastPixelFired = event
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<DataBrokerProtectionPixels>.Mapping) {
+        fatalError("Use init()")
+    }
+
+    func clear() {
+        MockDataBrokerProtectionPixelsHandler.lastPixelFired = nil
+    }
+}
+
+final class MockDatabase: DataBrokerProtectionRepository {
+    var wasSaveProfileCalled = false
+    var wasFetchProfileCalled = false
+    var wasDeleteProfileDataCalled = false
+    var wasSaveOptOutOperationCalled = false
+    var wasBrokerProfileQueryDataCalled = false
+    var wasFetchAllBrokerProfileQueryDataCalled = false
+    var wasUpdatedPreferredRunDateForScanCalled = false
+    var wasUpdatedPreferredRunDateForOptOutCalled = false
+    var wasUpdateLastRunDateForScanCalled = false
+    var wasUpdateLastRunDateForOptOutCalled = false
+    var wasUpdateRemoveDateCalled = false
+    var wasAddHistoryEventCalled = false
+    var wasFetchLastHistoryEventCalled = false
+
+    var eventsAdded = [HistoryEvent]()
+    var lastHistoryEventToReturn: HistoryEvent?
+    var lastPreferredRunDateOnScan: Date?
+    var lastPreferredRunDateOnOptOut: Date?
+    var extractedProfileRemovedDate: Date?
+    var extractedProfilesFromBroker = [ExtractedProfile]()
+    var childBrokers = [DataBroker]()
+    var lastParentBrokerWhereChildSitesWhereFetched: String?
+    var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
+    var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
+
+    lazy var callsList: [Bool] = [
+        wasSaveProfileCalled,
+        wasFetchProfileCalled,
+        wasDeleteProfileDataCalled,
+        wasSaveOptOutOperationCalled,
+        wasBrokerProfileQueryDataCalled,
+        wasFetchAllBrokerProfileQueryDataCalled,
+        wasUpdatedPreferredRunDateForScanCalled,
+        wasUpdatedPreferredRunDateForOptOutCalled,
+        wasUpdateLastRunDateForScanCalled,
+        wasUpdateLastRunDateForOptOutCalled,
+        wasUpdateRemoveDateCalled,
+        wasAddHistoryEventCalled,
+        wasFetchLastHistoryEventCalled]
+
+    var wasDatabaseCalled: Bool {
+        callsList.filter { $0 }.count > 0 // If one value is true. The database was called
+    }
+
+    func save(_ profile: DataBrokerProtectionProfile) -> Bool {
+        wasSaveProfileCalled = true
+
+        return true
+    }
+
+    func fetchProfile() -> DataBrokerProtectionProfile? {
+        wasFetchProfileCalled = true
+        return nil
+    }
+
+    func deleteProfileData() {
+        wasDeleteProfileDataCalled = true
+    }
+
+    func saveOptOutOperation(optOut: OptOutOperationData, extractedProfile: ExtractedProfile) throws {
+        wasSaveOptOutOperationCalled = true
+    }
+
+    func brokerProfileQueryData(for brokerId: Int64, and profileQueryId: Int64) -> BrokerProfileQueryData? {
+        wasBrokerProfileQueryDataCalled = true
+
+        if !brokerProfileQueryDataToReturn.isEmpty {
+            return brokerProfileQueryDataToReturn.first
+        }
+
+        if let lastHistoryEventToReturn = self.lastHistoryEventToReturn {
+            let scanOperationData = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, historyEvents: [lastHistoryEventToReturn])
+
+            return BrokerProfileQueryData(dataBroker: .mock, profileQuery: .mock, scanOperationData: scanOperationData)
+        } else {
+            return nil
+        }
+    }
+
+    func fetchAllBrokerProfileQueryData() -> [BrokerProfileQueryData] {
+        wasFetchAllBrokerProfileQueryDataCalled = true
+        return brokerProfileQueryDataToReturn
+    }
+
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
+        lastPreferredRunDateOnScan = date
+        lastProfileQueryIdOnScanUpdatePreferredRunDate = profileQueryId
+        wasUpdatedPreferredRunDateForScanCalled = true
+    }
+
+    func updatePreferredRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
+        lastPreferredRunDateOnOptOut = date
+        wasUpdatedPreferredRunDateForOptOutCalled = true
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64) {
+        wasUpdateLastRunDateForScanCalled = true
+    }
+
+    func updateLastRunDate(_ date: Date?, brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64) {
+        wasUpdateLastRunDateForOptOutCalled = true
+    }
+
+    func updateRemovedDate(_ date: Date?, on extractedProfileId: Int64) {
+        extractedProfileRemovedDate = date
+        wasUpdateRemoveDateCalled = true
+    }
+
+    func add(_ historyEvent: HistoryEvent) {
+        wasAddHistoryEventCalled = true
+        eventsAdded.append(historyEvent)
+    }
+
+    func fetchLastEvent(brokerId: Int64, profileQueryId: Int64) -> HistoryEvent? {
+        wasFetchLastHistoryEventCalled = true
+        if let event = brokerProfileQueryDataToReturn.first?.events.last {
+            return event
+        }
+        return lastHistoryEventToReturn
+    }
+
+    func hasMatches() -> Bool {
+        false
+    }
+
+    func fetchExtractedProfiles(for brokerId: Int64) -> [ExtractedProfile] {
+        return extractedProfilesFromBroker
+    }
+
+    func fetchAttemptInformation(for extractedProfileId: Int64) -> AttemptInformation? {
+        return nil
+    }
+
+    func addAttempt(extractedProfileId: Int64, attemptUUID: UUID, dataBroker: String, lastStageDate: Date, startTime: Date) {
+    }
+
+    func fetchChildBrokers(for parentBroker: String) -> [DataBroker] {
+        lastParentBrokerWhereChildSitesWhereFetched = parentBroker
+        return childBrokers
+    }
+
+    func clear() {
+        wasSaveProfileCalled = false
+        wasFetchProfileCalled = false
+        wasSaveOptOutOperationCalled = false
+        wasBrokerProfileQueryDataCalled = false
+        wasFetchAllBrokerProfileQueryDataCalled = false
+        wasUpdatedPreferredRunDateForScanCalled = false
+        wasUpdatedPreferredRunDateForOptOutCalled = false
+        wasUpdateLastRunDateForScanCalled = false
+        wasUpdateLastRunDateForOptOutCalled = false
+        wasUpdateRemoveDateCalled = false
+        wasAddHistoryEventCalled = false
+        wasFetchLastHistoryEventCalled = false
+        eventsAdded.removeAll()
+        lastHistoryEventToReturn = nil
+        lastPreferredRunDateOnScan = nil
+        lastPreferredRunDateOnOptOut = nil
+        extractedProfileRemovedDate = nil
+        extractedProfilesFromBroker.removeAll()
+        childBrokers.removeAll()
+        lastParentBrokerWhereChildSitesWhereFetched = nil
+        lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
+        brokerProfileQueryDataToReturn.removeAll()
+    }
+}

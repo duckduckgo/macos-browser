@@ -75,10 +75,20 @@ extension URL {
             return nil
         }
 
-        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+
+        // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
+        // https://app.asana.com/0/1199230911884351/1205979030848528/f
+        if case .normal = NSApp.runType,
+           NSApp.delegateTyped.featureFlagger.isFeatureOn(.appendAtbToSerpQueries),
+           let atbWithVariant = LocalStatisticsStore().atbWithVariant {
+            url = url.appendingParameter(name: URL.DuckDuckGoParameters.ATB.atb, value: atbWithVariant + "-wb")
+        }
+        return url
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
+
         let trimmed = addressBarString.trimmingWhitespace()
 
         if let addressBarUrl = URL(trimmedAddressBarString: trimmed), addressBarUrl.isValid {
@@ -120,6 +130,10 @@ extension URL {
         return URL(string: "about:preferences")!
     }
 
+    static var dataBrokerProtection: URL {
+        return URL(string: "about:dbp")!
+    }
+
     static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
     }
@@ -127,18 +141,6 @@ extension URL {
     var isHypertextURL: Bool {
         guard let scheme = self.scheme.map(NavigationalScheme.init(rawValue:)) else { return false }
         return NavigationalScheme.validSchemes.contains(scheme)
-    }
-
-    // MARK: Pixel
-
-    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
-
-    static func pixelUrl(forPixelNamed pixelName: String) -> URL {
-        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
-        let url = URL(string: urlString)!
-        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
-        // https://app.asana.com/0/1177771139624306/1199951074455863/f
-        return url
     }
 
     // MARK: ATB
@@ -201,8 +203,14 @@ extension URL {
 
     func toString(decodePunycode: Bool,
                   dropScheme: Bool,
-                  needsWWW: Bool? = nil,
                   dropTrailingSlash: Bool) -> String {
+        toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
+    }
+
+    private func toString(decodePunycode: Bool,
+                          dropScheme: Bool,
+                          needsWWW: Bool? = nil,
+                          dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
@@ -255,8 +263,7 @@ extension URL {
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww
-                                && !hasInputHost,
+                                && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
 
@@ -314,6 +321,10 @@ extension URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
     }
 
+    static var ddgLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/get-duckduckgo/get-duckduckgo-browser-on-mac/")!
+    }
+
     static var theFireButton: URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#the-fire-button")!
     }
@@ -323,6 +334,7 @@ extension URL {
     }
 
     static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
+    static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
 
     static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
 
@@ -412,5 +424,31 @@ extension URL {
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
 
+    }
+
+    // MARK: - System Settings
+
+    static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+
+    // MARK: - Blob URLs
+
+    var isBlobURL: Bool {
+        guard let scheme = self.scheme?.lowercased() else { return false }
+
+        if scheme == "blob" || scheme.hasPrefix("blob:") {
+            return true
+        }
+
+        return false
+    }
+
+    func stripUnsupportedCredentials() -> String {
+        if let atIndex = self.absoluteString.firstIndex(of: "@") {
+            let authPattern = "([^:]+):\\/\\/[^\\/]*@"
+            let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
+            let uuid = UUID().uuidString.lowercased()
+            return "\(strippedURL)\(uuid)"
+        }
+        return self.absoluteString
     }
 }

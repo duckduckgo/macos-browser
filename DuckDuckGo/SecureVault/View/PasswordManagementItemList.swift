@@ -20,6 +20,7 @@ import Foundation
 import SwiftUI
 import BrowserServicesKit
 import Combine
+import SwiftUIExtensions
 
 struct ScrollOffsetKey: PreferenceKey {
     typealias Value = CGFloat
@@ -38,6 +39,17 @@ struct PasswordManagementItemListView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
     @State var autoSelected = false
 
+    private func selectItem(id: String, proxy: ScrollViewProxy) {
+        // Selection/scroll wont work until list is fully rendered
+        // so give it a few milis before auto-selecting
+        if !autoSelected {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                proxy.scrollTo(id, anchor: .center)
+                autoSelected = true
+            }
+        }
+    }
+
     var body: some View {
 
         VStack(spacing: 0) {
@@ -50,28 +62,14 @@ struct PasswordManagementItemListView: View {
 
             Divider()
 
-            if #available(macOS 11.0, *) {
-                ScrollView {
-                    ScrollViewReader { proxy in
-                        PasswordManagementItemListStackView()
-                            // Selection/scroll wont work until list is fully rendered
-                            // so give it a few milis based on element count before auto-selecting
-                            .onChange(of: model.selected?.id) { itemId in
-                                if !autoSelected {
-                                    let delay = TimeInterval(model.itemCount) * 0.0001
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                                        if let selectionID = itemId {
-                                            proxy.scrollTo(selectionID, anchor: .center)
-                                            autoSelected = true
-                                        }
-                                    }
-                                }
-                            }
-                    }
-                }
-            } else {
-                ScrollView {
+            ScrollView {
+                ScrollViewReader { proxy in
                     PasswordManagementItemListStackView()
+                        .onChange(of: model.selected?.id) { itemId in
+                            if let id = itemId {
+                                selectItem(id: id, proxy: proxy)
+                            }
+                        }
                 }
             }
         }
@@ -142,17 +140,9 @@ struct PasswordManagementItemListStackView: View {
     @EnvironmentObject var model: PasswordManagementItemListModel
 
     var body: some View {
-
-        if #available(macOS 11.0, *) {
-            LazyVStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
-            }
-        } else {
-            VStack(alignment: .leading) {
-                PasswordManagementItemStackContentsView()
-            }
+        LazyVStack(alignment: .leading) {
+            PasswordManagementItemStackContentsView()
         }
-
     }
 
 }
@@ -263,6 +253,13 @@ private struct ItemView: View {
     let item: SecureVaultItem
     let action: () -> Void
 
+    func getIconLetters(account: SecureVaultModels.WebsiteAccount) -> String {
+        if let title = account.title, !title.isEmpty {
+            return title
+        }
+        return model.tldForAccount(account)
+    }
+
     var body: some View {
 
         let selected = model.selected == item
@@ -273,9 +270,12 @@ private struct ItemView: View {
             HStack(spacing: 2) {
 
                 switch item {
-                case .account(let account):
-                    LoginFaviconView(domain: account.domain)
-                        .padding(.leading, 6)
+                case .account:
+                    if let account = item.websiteAccount, let domain = account.domain {
+                        LoginFaviconView(domain: domain, generatedIconLetters: getIconLetters(account: account))
+                    } else {
+                        LetterIconView(title: "#")
+                    }
                 case .card:
                     Image("Card")
                         .frame(width: 32)

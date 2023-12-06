@@ -16,25 +16,30 @@
 //  limitations under the License.
 //
 
-import Foundation
 import AppKit
 import Combine
+import Common
+import Foundation
 
 final class BookmarksBarViewController: NSViewController {
 
     @IBOutlet private var bookmarksBarCollectionView: NSCollectionView!
     @IBOutlet private var clippedItemsIndicator: NSButton!
+    @IBOutlet private var promptAnchor: NSView!
 
     private let bookmarkManager = LocalBookmarkManager.shared
     private let viewModel: BookmarksBarViewModel
     private let tabCollectionViewModel: TabCollectionViewModel
 
-    private var viewModelCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     fileprivate var clipThreshold: CGFloat {
         let viewWidthWithoutClipIndicator = view.frame.width - clippedItemsIndicator.frame.minX
         return view.frame.width - viewWidthWithoutClipIndicator - 3
     }
+
+    @UserDefaultsWrapper(key: .bookmarksBarPromptShown, defaultValue: false)
+    var bookmarksBarPromptShown: Bool
 
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -81,33 +86,25 @@ final class BookmarksBarViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
+
         subscribeToEvents()
         refreshFavicons()
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        frameChangeNotification()
+
+        frameDidChangeNotification()
     }
 
-    private func subscribeToViewModel() {
-        guard viewModelCancellable.isNil else {
-            assertionFailure("Tried to subscribe to view model while it is already subscribed")
-            return
-        }
-
-        viewModelCancellable = viewModel.$clippedItems.receive(on: RunLoop.main).sink { [weak self] _ in
-            self?.refreshClippedIndicator()
-        }
+    func showBookmarksBarPrompt() {
+        BookmarksBarPromptPopover().show(relativeTo: promptAnchor.bounds, of: promptAnchor, preferredEdge: .minY)
+        self.bookmarksBarPromptShown = true
     }
 
-    @objc
-    private func frameChangeNotification() {
-        // Wait until the frame change has taken effect for subviews before calculating changes to the list of items.
-        DispatchQueue.main.async {
-            self.viewModel.clipOrRestoreBookmarksBarItems()
-            self.refreshClippedIndicator()
-        }
+    private func frameDidChangeNotification() {
+        self.viewModel.clipOrRestoreBookmarksBarItems()
+        self.refreshClippedIndicator()
     }
 
     override func removeFromParent() {
@@ -116,25 +113,32 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     private func subscribeToEvents() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(frameChangeNotification),
-                                               name: NSView.frameDidChangeNotification,
-                                               object: view)
+        guard cancellables.isEmpty else { return }
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(refreshFavicons),
-                                               name: .faviconCacheUpdated,
-                                               object: nil)
+        NotificationCenter.default.publisher(for: NSView.frameDidChangeNotification, object: view)
+            // Wait until the frame change has taken effect for subviews before calculating changes to the list of items.
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.frameDidChangeNotification()
+            }
+            .store(in: &cancellables)
 
-        subscribeToViewModel()
+        NotificationCenter.default.publisher(for: .faviconCacheUpdated)
+            .sink { [weak self] _ in
+                self?.refreshFavicons()
+            }
+            .store(in: &cancellables)
+
+        viewModel.$clippedItems
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.refreshClippedIndicator()
+            }
+            .store(in: &cancellables)
     }
 
     private func unsubscribeFromEvents() {
-        NotificationCenter.default.removeObserver(self, name: NSView.frameDidChangeNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .faviconCacheUpdated, object: nil)
-
-        viewModelCancellable?.cancel()
-        viewModelCancellable = nil
+        cancellables.removeAll()
     }
 
     // MARK: - Layout
@@ -154,8 +158,8 @@ final class BookmarksBarViewController: NSViewController {
         self.clippedItemsIndicator.isHidden = viewModel.clippedItems.isEmpty
     }
 
-    @objc
     private func refreshFavicons() {
+        dispatchPrecondition(condition: .onQueue(.main))
         bookmarksBarCollectionView.reloadData()
     }
 
@@ -165,6 +169,20 @@ final class BookmarksBarViewController: NSViewController {
         let location = NSPoint(x: 0, y: sender.frame.height + 5)
 
         menu.popUp(positioning: nil, at: location, in: sender)
+    }
+
+    @IBAction func mouseClickViewMouseUp(_ sender: MouseClickView) {
+        // when collection view reloaded we may receive mouseUp event from a wrong bookmarks bar item
+        // get actual item based on the event coordinates
+        guard let indexPath = bookmarksBarCollectionView.withMouseLocationInViewCoordinates(convert: { point in
+            self.bookmarksBarCollectionView.indexPathForItem(at: point)
+        }),
+              let item = bookmarksBarCollectionView.item(at: indexPath.item) as? BookmarksBarCollectionViewItem else {
+            os_log("Item at mouseUp point not found.", type: .error)
+            return
+        }
+
+        viewModel.bookmarksBarCollectionViewItemClicked(item)
     }
 
 }
@@ -252,6 +270,7 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
     private func bookmarkFolderMenu(items: [NSMenuItem]) -> NSMenu {
         let menu = NSMenu()
         menu.items = items.isEmpty ? [NSMenuItem.empty] : items
+        menu.autoenablesItems = false
         return menu
     }
 
@@ -263,17 +282,7 @@ extension BookmarksBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-
-        if PersistentAppInterfaceSettings.shared.showBookmarksBar {
-            menu.addItem(withTitle: UserText.hideBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
-        } else {
-            menu.addItem(withTitle: UserText.showBookmarksBar, action: #selector(toggleBookmarksBar), keyEquivalent: "")
-        }
-    }
-
-    @objc
-    private func toggleBookmarksBar(_ sender: NSMenuItem) {
-        PersistentAppInterfaceSettings.shared.showBookmarksBar.toggle()
+        BookmarksBarMenuFactory.addToMenu(menu)
     }
 
 }
@@ -298,5 +307,11 @@ extension BookmarksBarViewController: AddBookmarkModalViewControllerDelegate, Ad
         bookmarkManager.update(bookmark: bookmark)
         _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
+
+}
+
+extension Notification.Name {
+
+    static let bookmarkPromptShouldShow = Notification.Name(rawValue: "bookmarkPromptShouldShow")
 
 }

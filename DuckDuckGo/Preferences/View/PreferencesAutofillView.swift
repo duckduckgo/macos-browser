@@ -122,19 +122,25 @@ extension Preferences {
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.autofillAutoLock)
                     Picker(selection: isAutoLockEnabledBinding, content: {
-                        HStack {
-                            Text(UserText.autofillLockWhenIdle)
-                            NSPopUpButtonView(selection: autoLockThresholdBinding) {
-                                let button = NSPopUpButton()
-                                button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text(UserText.autofillLockWhenIdle)
+                                NSPopUpButtonView(selection: autoLockThresholdBinding) {
+                                    let button = NSPopUpButton()
+                                    button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-                                for threshold in AutofillAutoLockThreshold.allCases {
-                                    let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
-                                    item?.representedObject = threshold
-                                }
-                                return button
+                                    for threshold in AutofillAutoLockThreshold.allCases {
+                                        let item = button.menu?.addItem(withTitle: threshold.title, action: nil, keyEquivalent: "")
+                                        item?.representedObject = threshold
+                                    }
+                                    return button
+                                }.disabled(!model.isAutoLockEnabled)
                             }
-                            .disabled(!model.isAutoLockEnabled)
+                            // We have to use a custom toggle here, as with a SwiftUI Toggle on macOS 10.x to 13.x, the checkbox gets rendered
+                            // to the right when inside a picker 🤷
+                            NativeCheckboxToggle(isOn: $model.autolockLocksFormFilling, label: UserText.autolockLocksFormFill)
+                                .disabled(!model.isAutoLockEnabled)
+                                .padding(.bottom, 6)
                         }.tag(true)
                         Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})
@@ -183,6 +189,11 @@ extension Preferences {
                 BitwardenStatusView(iconType: .error,
                                     title: UserText.bitwardenWaitingForHandshake,
                                     buttonValue: .init(title: UserText.bitwardenPreferencesCompleteSetup, action: { model.presentBitwardenSetupFlow() }))
+                .offset(x: Preferences.Const.autoLockWarningOffset)
+            case .accessToContainersNotApproved:
+                BitwardenStatusView(iconType: .error,
+                                    title: UserText.bitwardenCantAccessContainer,
+                                    buttonValue: .init(title: UserText.openSystemSettings, action: { model.openSettings() }))
                 .offset(x: Preferences.Const.autoLockWarningOffset)
             case .handshakeNotApproved:
                 BitwardenStatusView(iconType: .error,
@@ -252,10 +263,14 @@ private struct BitwardenStatusView: View {
 
     var body: some View {
 
-        HStack {
-            HStack {
+        VStack(alignment: .leading) {
+            HStack(alignment: .top) {
                 Image(iconType.imageName)
+                    .padding(.top, 2)
                 Text(title)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding([.top, .bottom], 2)
             }
             .padding([.leading, .trailing], 6)
             .padding([.top, .bottom], 2)

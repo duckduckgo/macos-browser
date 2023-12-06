@@ -24,15 +24,33 @@ struct PreferencesSection: Hashable, Identifiable {
     let panes: [PreferencePaneIdentifier]
 
     @MainActor
-    static func defaultSections(includingDuckPlayer: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool, includingVPN: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
+#if SUBSCRIPTION
+            var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
+
+            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
+                if let generalIndex = panes.firstIndex(of: .general) {
+                    panes.insert(.sync, at: generalIndex + 1)
+                }
+            }
+#else
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
+
+            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
+                panes.insert(.sync, at: 1)
+            }
+#endif
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
-            if (NSApp.delegate as? AppDelegate)?.internalUserDecider?.isInternalUser == true {
-                panes.insert(.sync, at: 1)
+
+#if NETWORK_PROTECTION
+            if includingVPN {
+                panes.append(.vpn)
             }
+#endif
+
             return panes
         }()
 
@@ -53,6 +71,12 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case sync
     case appearance
     case privacy
+#if NETWORK_PROTECTION
+    case vpn
+#endif
+#if SUBSCRIPTION
+    case subscription
+#endif
     case autofill
     case downloads
     case duckPlayer = "duckplayer"
@@ -73,11 +97,24 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         case .general:
             return UserText.general
         case .sync:
+            var isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+            var isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            if isSyncBookmarksPaused || isSyncCredentialsPaused {
+                return UserText.sync + " ⚠️"
+            }
             return UserText.sync
         case .appearance:
             return UserText.appearance
         case .privacy:
             return UserText.privacy
+#if NETWORK_PROTECTION
+        case .vpn:
+            return UserText.vpn
+#endif
+#if SUBSCRIPTION
+        case .subscription:
+            return UserText.subscription
+#endif
         case .autofill:
             return UserText.autofill
         case .downloads:
@@ -99,6 +136,14 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .privacy:
             return "Privacy"
+#if NETWORK_PROTECTION
+        case .vpn:
+            return "VPN"
+#endif
+#if SUBSCRIPTION
+        case .subscription:
+            return "Privacy"
+#endif
         case .autofill:
             return "Autofill"
         case .downloads:

@@ -19,6 +19,7 @@
 import BrowserServicesKit
 import Combine
 import Foundation
+import SecureStorage
 
 final class AutofillTabExtension: TabExtension {
 
@@ -50,12 +51,20 @@ final class AutofillTabExtension: TabExtension {
             autofillScript?.currentOverlayTab = self.delegate
         }
     }
+    private lazy var cachedRuntimeConfigurationForDomain: [String: String?] = [:]
+
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
+    private var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+    private let privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
+    private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
 
-    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>) {
+    init(autofillUserScriptPublisher: some Publisher<WebsiteAutofillUserScript?, Never>,
+         isBurner: Bool) {
+        self.isBurner = isBurner
+
         autofillUserScriptCancellable = autofillUserScriptPublisher.sink { [weak self] autofillScript in
             guard let self, let autofillScript else { return }
 
@@ -75,11 +84,25 @@ final class AutofillTabExtension: TabExtension {
 
 extension AutofillTabExtension: SecureVaultManagerDelegate {
 
-    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
-        return true
+    func secureVaultManagerIsEnabledStatus(_ manager: SecureVaultManager, forType type: AutofillType?) -> Bool {
+        let prefs = AutofillPreferences()
+        switch type {
+        case .card:
+            return prefs.askToSavePaymentMethods
+        case .identity:
+            return prefs.askToSaveAddresses
+        case.password:
+            return prefs.askToSaveUsernamesAndPasswords
+        case .none:
+            return prefs.askToSaveAddresses || prefs.askToSavePaymentMethods || prefs.askToSaveUsernamesAndPasswords
+        }
     }
 
-    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
+    func secureVaultManagerShouldSaveData(_: BrowserServicesKit.SecureVaultManager) -> Bool {
+        return !isBurner
+    }
+
+    func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         self.autofillDataToSave = data
     }
 
@@ -95,8 +118,42 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
+    public func secureVaultManager(_: SecureVaultManager,
+                                   isAuthenticatedFor type: AutofillType,
+                                   completionHandler: @escaping (Bool) -> Void) {
+
+        switch type {
+
+        // Require bio authentication for filling sensitive data via DDG password manager
+        case .card, .password:
+            let autofillPrefs = AutofillPreferences()
+            if DeviceAuthenticator.shared.requiresAuthentication &&
+                autofillPrefs.autolockLocksFormFilling &&
+                autofillPrefs.passwordManager == .duckduckgo {
+                DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
+                    if case .success = result {
+                        completionHandler(true)
+                    } else {
+                        completionHandler(false)
+                    }
+                }
+            } else {
+                completionHandler(true)
+            }
+
+        default:
+            completionHandler(true)
+        }
+
+    }
+
     func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
+
+        if type.formAutofillKind == .password &&
+            passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.reportPasswordAutofill()
+        }
     }
 
     func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
@@ -105,24 +162,12 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
         }
     }
 
-    func secureVaultInitFailed(_ error: SecureVaultError) {
+    func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 
     public func secureVaultManager(_: BrowserServicesKit.SecureVaultManager, didReceivePixel pixel: AutofillUserScript.JSPixel) {
         Pixel.fire(.jsPixel(pixel))
-    }
-
-    func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
-        return true
-    }
-
-    func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
-        return false
-    }
-
-    func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {
-        // no-op on macOS
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
@@ -135,6 +180,27 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
         // no-op
+    }
+
+    func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        if let runtimeConfigurationForDomain = cachedRuntimeConfigurationForDomain[domain] as? String {
+            completionHandler(runtimeConfigurationForDomain)
+            return
+        }
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: buildContentScopePropertiesForDomain(domain))
+            .build()
+            .buildRuntimeConfigResponse()
+
+        cachedRuntimeConfigurationForDomain = [domain: runtimeConfiguration]
+        completionHandler(runtimeConfiguration)
+    }
+
+    private func buildContentScopePropertiesForDomain(_ domain: String) -> ContentScopeProperties {
+        return ContentScopeProperties(gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                      sessionKey: autofillScript?.sessionKey ?? "",
+                                      featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig)
+        )
     }
 }
 

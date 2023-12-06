@@ -35,6 +35,7 @@ enum ThirdPartyBrowser: CaseIterable {
     case edge
     case firefox
     case safari
+    case safariTechnologyPreview
     case lastPass
     case onePassword7
     case onePassword8
@@ -43,6 +44,7 @@ enum ThirdPartyBrowser: CaseIterable {
         return allCases.filter(\.isInstalled)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
         case .brave: return .brave
@@ -50,6 +52,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return .edge
         case .firefox: return .firefox
         case .safari: return .safari
+        case .safariTechnologyPreview: return .safariTechnologyPreview
         case .lastPass: return .lastPass
         case .onePassword7: return .onePassword7
         case .onePassword8: return .onePassword8
@@ -76,6 +79,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return .edge
         case .firefox: return .firefox
         case .safari: return .safari
+        case .safariTechnologyPreview: return .safariTechnologyPreview
         case .onePassword7: return .onePassword7
         case .onePassword8: return .onePassword8
         case .lastPass: return .lastPass
@@ -105,15 +109,7 @@ enum ThirdPartyBrowser: CaseIterable {
     // Firefox Nightly build.
     private var applicationPath: String? {
         for bundleID in bundleIdentifiers.all {
-            let path: String? = {
-                if #available(macOS 11.0, *) {
-                    return NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path
-                } else {
-                    return NSWorkspace.shared.absolutePathForApplication(withBundleIdentifier: bundleID)
-                }
-            }()
-
-            if let path = path {
+            if let path = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path {
                 return path
             }
         }
@@ -131,6 +127,7 @@ enum ThirdPartyBrowser: CaseIterable {
             "org.mozilla.firefoxdeveloperedition"
         ])
         case .safari: return BundleIdentifiers(productionBundleID: "com.apple.safari", relatedBundleIDs: [])
+        case .safariTechnologyPreview: return BundleIdentifiers(productionBundleID: "com.apple.SafariTechnologyPreview", relatedBundleIDs: [])
         case .onePassword7: return BundleIdentifiers(productionBundleID: "com.agilebits.onepassword7", relatedBundleIDs: [
             "com.agilebits.onepassword",
             "com.agilebits.onepassword4"
@@ -153,18 +150,18 @@ enum ThirdPartyBrowser: CaseIterable {
     func browserProfiles(supportDirectoryURL: URL? = nil) -> DataImport.BrowserProfileList? {
         let applicationSupportURL = supportDirectoryURL ?? URL.nonSandboxApplicationSupportDirectoryURL
 
+        // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
+        // return the profile anyway and check the file system permissions when preparing to import.
+        if [.safari, .safariTechnologyPreview].contains(self),
+           let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL) {
+            return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
+        }
+
         guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL),
               let potentialProfileURLs = try? FileManager.default.contentsOfDirectory(at: profilePath,
                                                                                       includingPropertiesForKeys: nil,
                                                                                       options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath) else {
-            // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
-            // return the profile anyway and check the file system permissions when preparing to import.
-            if self == .safari,
-               let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL) {
-                return DataImport.BrowserProfileList(browser: self, profileURLs: [profilePath])
-            } else {
-                return nil
-            }
+            return nil
         }
 
         return DataImport.BrowserProfileList(browser: self, profileURLs: potentialProfileURLs)
@@ -189,6 +186,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
         case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
         case .safari: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
+        case .safariTechnologyPreview: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("SafariTechnologyPreview/")
         case .lastPass, .onePassword7, .onePassword8: return nil
         }
     }

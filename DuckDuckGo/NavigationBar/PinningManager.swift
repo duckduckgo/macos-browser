@@ -27,6 +27,7 @@ enum PinnableView: String {
     case bookmarks
     case downloads
     case networkProtection
+    case homeButton
 }
 
 protocol PinningManager {
@@ -34,12 +35,14 @@ protocol PinningManager {
     func togglePinning(for view: PinnableView)
     func isPinned(_ view: PinnableView) -> Bool
     func wasManuallyToggled(_ view: PinnableView) -> Bool
+    func pin(_ view: PinnableView)
+    func unpin(_ view: PinnableView)
 }
 
 final class LocalPinningManager: PinningManager {
 
 #if NETWORK_PROTECTION
-    static let shared = LocalPinningManager(networkProtectionFeatureVisibility: NetworkProtectionKeychainTokenStore())
+    static let shared = LocalPinningManager(networkProtectionFeatureActivation: NetworkProtectionKeychainTokenStore())
 #else
     static let shared = LocalPinningManager()
 #endif
@@ -53,10 +56,10 @@ final class LocalPinningManager: PinningManager {
     private var manuallyToggledPinnedViewsStrings: [String]
 
 #if NETWORK_PROTECTION
-    private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
+    private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 
-    init(networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility) {
-        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
+    init(networkProtectionFeatureActivation: NetworkProtectionFeatureActivation) {
+        self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
     }
 #endif
 
@@ -68,6 +71,21 @@ final class LocalPinningManager: PinningManager {
         } else {
             pinnedViewStrings.append(view.rawValue)
         }
+
+        NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
+            Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue
+        ])
+    }
+
+    /// Do not call this for user-initiated toggling.  This is only meant to be used for scenarios in which certain conditions
+    /// may require a view to be pinned.
+    ///
+    func pin(_ view: PinnableView) {
+        guard !isPinned(view) else {
+            return
+        }
+
+        pinnedViewStrings.append(view.rawValue)
 
         NotificationCenter.default.post(name: .PinnedViewsChanged, object: nil, userInfo: [
             Self.pinnedViewChangedNotificationViewTypeKey: view.rawValue
@@ -98,9 +116,10 @@ final class LocalPinningManager: PinningManager {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
+        case .homeButton: return ""
         case .networkProtection:
 #if NETWORK_PROTECTION
-            if !networkProtectionFeatureVisibility.isFeatureActivated {
+            if !networkProtectionFeatureActivation.isFeatureActivated {
                 assertionFailure("Tried to toggle Network Protection when it was not activated")
             }
 

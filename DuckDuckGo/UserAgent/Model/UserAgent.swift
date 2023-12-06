@@ -20,7 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Common
 
-enum UserAgent {
+extension UserAgent {
 
     // MARK: - Fallback versions
 
@@ -61,15 +61,12 @@ enum UserAgent {
     static let webViewDefault = ""
 
     static let localUserAgentConfiguration: KeyValuePairs<RegEx, String> = [
-        // Use safari agent or else nginx gets a truncated user agent and ends it ends up blank
-        regex("https://duckduckgo\\.com/.*"): UserAgent.safari
-    ]
+        // use safari when serving up PDFs from duckduckgo directly
+        regex("https://duckduckgo\\.com/[^?]*\\.pdf"): UserAgent.safari,
 
-    static func duckDuckGoUserAgent(appVersion: String = AppVersion.shared.versionNumber,
-                                    appID: String = AppVersion.shared.identifier,
-                                    systemVersion: String = ProcessInfo.processInfo.operatingSystemVersionString) -> String {
-        return "ddg_mac/\(appVersion) (\(appID); macOS \(systemVersion))"
-    }
+        // use default WKWebView user agent for duckduckgo domain to remove CTA
+        regex("https://duckduckgo\\.com/.*"): UserAgent.webViewDefault
+    ]
 
     static func `for`(_ url: URL?,
                       privacyConfig: PrivacyConfiguration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig) -> String {

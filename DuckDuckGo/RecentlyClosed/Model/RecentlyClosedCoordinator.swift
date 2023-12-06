@@ -18,6 +18,7 @@
 
 import Foundation
 import Combine
+import Common
 
 @MainActor
 protocol RecentlyClosedCoordinating: AnyObject {
@@ -25,7 +26,7 @@ protocol RecentlyClosedCoordinating: AnyObject {
     var cache: [RecentlyClosedCacheItem] { get }
 
     func reopenItem(_ cacheItem: RecentlyClosedCacheItem?)
-    func burnCache(domains: Set<String>?)
+    func burnCache(baseDomains: Set<String>?, tld: TLD)
 
 }
 
@@ -39,9 +40,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     init(windowControllerManager: WindowControllersManagerProtocol) {
         self.windowControllerManager = windowControllerManager
 
-        guard !NSApp.isRunningUnitTests else {
-            return
-        }
+        guard NSApp.runType.requiresEnvironment else { return }
         subscribeToWindowControllersManager()
     }
 
@@ -97,7 +96,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private(set) var cache = [RecentlyClosedCacheItem]()
 
     private func cacheTabContent(_ tab: Tab, of tabCollection: TabCollection, at tabIndex: TabIndex) {
-        guard !tab.isContentEmpty, !tab.isBurner else {
+        guard !tab.isContentEmpty, !tab.burnerMode.isBurner else {
             // Don't cache empty tabs and burner tabs
             return
         }
@@ -109,7 +108,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
     private func cacheWindowContent(mainWindowController: MainWindowController) {
         let tabCollection = mainWindowController.mainViewController.tabCollectionViewModel.tabCollection
         guard let first = tabCollection.tabs.first,
-              (!first.isContentEmpty || tabCollection.tabs.count > 1),
+              !first.isContentEmpty || tabCollection.tabs.count > 1,
               !mainWindowController.mainViewController.tabCollectionViewModel.isBurner else {
             // Don't cache empty window and burner windows
             return
@@ -118,7 +117,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         let tabCacheItems = tabCollection.tabs.enumerated().map {
             RecentlyClosedTab(tab: $0.element, originalTabCollection: tabCollection, tabIndex: .unpinned($0.offset))
         }
-        let droppingPoint = mainWindowController.window?.frame.origin
+        let droppingPoint = mainWindowController.window?.frame.droppingPoint
         let contentSize = mainWindowController.window?.frame.size
         let cacheItem = RecentlyClosedWindow(tabs: tabCacheItems, droppingPoint: droppingPoint, contentSize: contentSize)
         cache.append(cacheItem)
@@ -166,12 +165,12 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
 
         } else {
             // There is no window available, create a new one
-            let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true)
-            WindowsManager.openNewWindow(with: tab, isBurner: false)
+            let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, shouldLoadFromCache: true)
+            WindowsManager.openNewWindow(with: tab)
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode, shouldLoadFromCache: true)
         tabCollectionViewModel.insert(tab, at: .unpinned(tabIndex), selected: true)
     }
 
@@ -179,7 +178,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         var lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if lastKeyMainWindowController == nil {
             // Create a new window if none exists
-            WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true, isBurner: false, shouldLoadFromCache: true), isBurner: false)
+            WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true, shouldLoadFromCache: true))
             lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         }
 
@@ -187,7 +186,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
             return
         }
 
-        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner, shouldLoadFromCache: true)
+        let tab = Tab(content: recentlyClosedTab.tabContent, interactionStateData: recentlyClosedTab.interactionData, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode, shouldLoadFromCache: true)
         let tabIndex = min(recentlyClosedTab.index.item, windowControllerManager.pinnedTabsManager.tabCollection.tabs.count)
 
         tabCollectionViewModel.insert(tab, at: .pinned(tabIndex), selected: true)
@@ -202,7 +201,6 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
                 favicon: recentlyClosedTab.favicon,
                 interactionStateData: recentlyClosedTab.interactionData,
                 shouldLoadInBackground: false,
-                isBurner: false,
                 shouldLoadFromCache: true
             )
             tabCollection.append(tab: tab)
@@ -214,9 +212,9 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         cache.removeAll(where: { $0 === recentlyClosedWindow })
     }
 
-    func burnCache(domains: Set<String>? = nil) {
-        if let domains = domains {
-            cache.burn(for: domains)
+    func burnCache(baseDomains: Set<String>? = nil, tld: TLD) {
+        if let baseDomains = baseDomains {
+            cache.burn(for: baseDomains, tld: tld)
         } else {
             cache.removeAll()
         }

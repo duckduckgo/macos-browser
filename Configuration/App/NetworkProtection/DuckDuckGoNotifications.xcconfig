@@ -14,7 +14,7 @@
 //
 
 #include "../AppTargetsBase.xcconfig"
-#include "../../NetworkProtectionDeveloperID.xcconfig"
+#include "../../DeveloperID.xcconfig"
 
 BUNDLE_IDENTIFIER_PREFIX = $(NOTIFICATIONS_AGENT_BUNDLE_ID)
 
@@ -29,9 +29,8 @@ GENERATE_INFOPLIST_FILE = YES
 INFOPLIST_KEY_LSUIElement = YES
 INFOPLIST_KEY_NSPrincipalClass = Application
 
-// Left empty intentionally as we currently only support debug and release builds
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] =
-CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGoNotifications/DuckDuckGoNotifications.entitlements
+CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] = DuckDuckGoNotifications/DuckDuckGoNotifications.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGoNotifications/DuckDuckGoNotifications.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGoNotifications/DuckDuckGoNotifications.entitlements
 

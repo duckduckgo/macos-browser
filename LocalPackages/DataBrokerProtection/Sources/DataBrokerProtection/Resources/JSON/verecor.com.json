@@ -1,0 +1,138 @@
+{
+  "name": "verecor.com",
+  "version": "0.1.2",
+  "addedDatetime": 1677128400000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "6f53d146-af6a-4bce-970d-f1dcbc496037",
+          "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "e8c09200-030c-492a-8e54-22bc6bdb6829",
+          "selector": ".search-item",
+          "profile": {
+            "name": {
+              "selector": "h4"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-16 name']//li",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 location']//li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='col-sm-24 col-md-8 relatives']//li",
+              "findElements": true,
+              "beforeText": ","
+            },
+            "profileUrl": {
+              "selector": "a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "f4bbe480-a6ff-40a5-aa25-8ff9ac40c9bf",
+          "url": "https://verecor.com/ng/control/privacy"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "1e6302e1-daf9-49d6-951f-506ea5e266a0",
+          "selector": ".ahm",
+          "elements": [
+            {
+              "type": "fullName",
+              "selector": "#user_name"
+            },
+            {
+              "type": "email",
+              "selector": "#user_email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#url"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "6a3dc470-3bf7-4b8b-bb44-f77ef1a2c540",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "83157244-c5bf-44a9-979c-679e1404d67d",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "15c50d7f-0e72-4509-be2b-40cde34b48e6",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn-sbmt"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "2ed336a2-a7a9-4cbd-933c-cd463df4f553",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your removal request has been received"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "88c09081-e848-4e75-a7b9-3ee28e95a459",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "dd03cf9f-8227-4881-86bf-09ce158bf151",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Your information control request has been confirmed."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

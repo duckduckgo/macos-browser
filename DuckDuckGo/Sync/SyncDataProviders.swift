@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
+import Combine
 import Common
 import DDGSync
 import Persistence
@@ -23,7 +25,10 @@ import SyncDataProviders
 
 final class SyncDataProviders: DataProvidersSource {
     public let bookmarksAdapter: SyncBookmarksAdapter
+    public let credentialsAdapter: SyncCredentialsAdapter
+    public let settingsAdapter: SyncSettingsAdapter
 
+    @MainActor
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
         guard let syncMetadata else {
@@ -32,12 +37,51 @@ final class SyncDataProviders: DataProvidersSource {
         }
 
         bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
-        return [bookmarksAdapter.provider].compactMap { $0 }
+        credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
+        settingsAdapter.setUpProviderIfNeeded(metadataDatabase: syncMetadataDatabase.db, metadataStore: syncMetadata)
+
+        let providers: [Any] = [
+            bookmarksAdapter.provider as Any,
+            credentialsAdapter.provider as Any,
+            settingsAdapter.provider as Any
+        ]
+
+        return providers.compactMap { $0 as? DataProviding }
     }
 
-    init(bookmarksDatabase: CoreDataDatabase) {
+    func setUpDatabaseCleaners(syncService: DDGSync) {
+        bookmarksAdapter.databaseCleaner.isSyncActive = { [weak syncService] in
+            syncService?.authState == .active
+        }
+
+        credentialsAdapter.databaseCleaner.isSyncActive = { [weak syncService] in
+            syncService?.authState == .active
+        }
+
+        let syncAuthStateDidChangePublisher = syncService.authStatePublisher
+            .dropFirst()
+            .map { $0 == .inactive }
+            .removeDuplicates()
+
+        syncAuthStateDidChangeCancellable = syncAuthStateDidChangePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isSyncDisabled in
+                self?.bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
+                self?.credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
+            }
+
+        if syncService.authState == .inactive {
+            bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
+            credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: true)
+        }
+    }
+
+    init(bookmarksDatabase: CoreDataDatabase, secureVaultFactory: AutofillVaultFactory = AutofillSecureVaultFactory) {
         self.bookmarksDatabase = bookmarksDatabase
-        bookmarksAdapter = SyncBookmarksAdapter()
+        self.secureVaultFactory = secureVaultFactory
+        bookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase)
+        credentialsAdapter = SyncCredentialsAdapter(secureVaultFactory: secureVaultFactory)
+        settingsAdapter = SyncSettingsAdapter()
     }
 
     private func initializeMetadataDatabaseIfNeeded() {
@@ -54,7 +98,7 @@ final class SyncDataProviders: DataProvidersSource {
                 }
 
                 Thread.sleep(forTimeInterval: 1)
-                fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+                fatalError("Could not create Sync Metadata database stack: \(error?.localizedDescription ?? "err")")
             }
         }
         syncMetadata = LocalSyncMetadataStore(database: syncMetadataDatabase.db)
@@ -63,7 +107,9 @@ final class SyncDataProviders: DataProvidersSource {
 
     private var isSyncMetadaDatabaseLoaded: Bool = false
     private var syncMetadata: SyncMetadataStore?
+    private var syncAuthStateDidChangeCancellable: AnyCancellable?
 
     private let syncMetadataDatabase: SyncMetadataDatabase = SyncMetadataDatabase()
     private let bookmarksDatabase: CoreDataDatabase
+    private let secureVaultFactory: AutofillVaultFactory
 }

@@ -17,6 +17,7 @@
 //
 
 import Cocoa
+import Combine
 import Common
 import BrowserServicesKit
 
@@ -24,11 +25,14 @@ import BrowserServicesKit
 import NetworkProtection
 #endif
 
+#if SUBSCRIPTION
+import Account
+#endif
+
 protocol OptionsButtonMenuDelegate: AnyObject {
 
     func optionsButtonMenuRequestedBookmarkThisPage(_ sender: NSMenuItem)
     func optionsButtonMenuRequestedBookmarkPopover(_ menu: NSMenu)
-    func optionsButtonMenuRequestedToggleBookmarksBar(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkManagementInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu)
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu)
@@ -39,7 +43,12 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedPrint(_ menu: NSMenu)
     func optionsButtonMenuRequestedPreferences(_ menu: NSMenu)
     func optionsButtonMenuRequestedAppearancePreferences(_ menu: NSMenu)
-
+#if DBP
+    func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
+#endif
+#if SUBSCRIPTION
+    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
+#endif
 }
 
 @MainActor
@@ -51,6 +60,7 @@ final class MoreOptionsMenu: NSMenu {
     private let emailManager: EmailManager
     private let passwordManagerCoordinator: PasswordManagerCoordinating
     private let internalUserDecider: InternalUserDecider
+    private lazy var sharingMenu = SharingMenu(title: UserText.shareMenuItem)
 
 #if NETWORK_PROTECTION
     private let networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility
@@ -64,13 +74,13 @@ final class MoreOptionsMenu: NSMenu {
     init(tabCollectionViewModel: TabCollectionViewModel,
          emailManager: EmailManager = EmailManager(),
          passwordManagerCoordinator: PasswordManagerCoordinator,
-         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = NetworkProtectionKeychainTokenStore(),
+         networkProtectionFeatureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
          internalUserDecider: InternalUserDecider) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.emailManager = emailManager
         self.passwordManagerCoordinator = passwordManagerCoordinator
-        self.networkProtectionFeatureVisibility =  networkProtectionFeatureVisibility
+        self.networkProtectionFeatureVisibility = networkProtectionFeatureVisibility
         self.internalUserDecider = internalUserDecider
 
         super.init(title: "")
@@ -102,16 +112,16 @@ final class MoreOptionsMenu: NSMenu {
 
     private func setupMenuItems() {
 
-        #if FEEDBACK
+#if FEEDBACK
 
         addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
-        #if !APPSTORE
+#if !APPSTORE
             .withImage(NSImage(named: "BetaLabel"))
-        #endif // !APPSTORE
+#endif // !APPSTORE
 
         addItem(NSMenuItem.separator())
 
-        #endif // FEEDBACK
+#endif // FEEDBACK
 
         addWindowItems()
 
@@ -125,15 +135,9 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "OptionsButtonMenuEmail"))
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
-#if NETWORK_PROTECTION
-        if networkProtectionFeatureVisibility.isFeatureActivated {
-            addItem(withTitle: UserText.networkProtection, action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
-                .targetting(self)
-                .withImage(.image(for: .vpnIcon))
-        }
-#endif
-
         addItem(NSMenuItem.separator())
+
+        addSubscriptionItems()
 
         addPageItems()
 
@@ -142,6 +146,16 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "Preferences"))
         addItem(preferencesItem)
     }
+
+#if DBP
+    @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
+        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist &&  DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
+            DataBrokerProtectionWaitlistViewControllerPresenter.show()
+        } else {
+            actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+        }
+    }
+#endif // DBP
 
     @objc func showNetworkProtectionStatus(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedNetworkProtectionPopover(self)
@@ -152,11 +166,11 @@ final class MoreOptionsMenu: NSMenu {
     }
 
     @objc func newWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: false)
+        WindowsManager.openNewWindow()
     }
 
     @objc func newBurnerWindow(_ sender: NSMenuItem) {
-        WindowsManager.openNewWindow(isBurner: true)
+        WindowsManager.openNewWindow(burnerMode: BurnerMode(isBurner: true))
     }
 
     @objc func toggleFireproofing(_ sender: NSMenuItem) {
@@ -178,10 +192,6 @@ final class MoreOptionsMenu: NSMenu {
 
     @objc func openBookmarksManagementInterface(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedBookmarkManagementInterface(self)
-    }
-
-    @objc func toggleBookmarksBar(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedToggleBookmarksBar(self)
     }
 
     @objc func openBookmarkImportInterface(_ sender: NSMenuItem) {
@@ -224,6 +234,12 @@ final class MoreOptionsMenu: NSMenu {
         actionDelegate?.optionsButtonMenuRequestedAppearancePreferences(self)
     }
 
+#if SUBSCRIPTION
+    @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
+    }
+#endif
+
     @objc func findInPage(_ sender: NSMenuItem) {
         tabCollectionViewModel.selectedTabViewModel?.showFindInPage()
     }
@@ -244,15 +260,13 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "NewWindow"))
 
         // New Burner Window
-        if internalUserDecider.isInternalUser {
-            let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
-                                                  action: #selector(newBurnerWindow(_:)),
-                                                  target: self)
-            burnerWindowItem.keyEquivalent = "n"
-            burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
-            burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
-            addItem(burnerWindowItem)
-        }
+        let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
+                                          action: #selector(newBurnerWindow(_:)),
+                                          target: self)
+        burnerWindowItem.keyEquivalent = "n"
+        burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
+        burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+        addItem(burnerWindowItem)
 
         addItem(NSMenuItem.separator())
     }
@@ -280,6 +294,98 @@ final class MoreOptionsMenu: NSMenu {
         addItem(NSMenuItem.separator())
     }
 
+    private func addSubscriptionItems() {
+        var items: [NSMenuItem] = []
+
+#if SUBSCRIPTION
+        items.append(contentsOf: AccountManager().isSignedIn ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+#else
+        items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
+#endif
+
+        if !items.isEmpty {
+            items.forEach { addItem($0) }
+            addItem(NSMenuItem.separator())
+        }
+    }
+
+    private func makeActiveSubscriptionItems() -> [NSMenuItem] {
+        var items: [NSMenuItem] = []
+
+#if NETWORK_PROTECTION
+        if networkProtectionFeatureVisibility.isNetworkProtectionVisible() {
+            let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+
+            // If the user can see the Network Protection option but they haven't joined the waitlist or don't have an auth token, show the "New"
+            // badge to bring it to their attention.
+            if !isWaitlistUser && !hasAuthToken {
+                items.append(makeNetworkProtectionItem(showNewLabel: true))
+            } else {
+                items.append(makeNetworkProtectionItem(showNewLabel: false))
+            }
+
+            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        } else {
+            networkProtectionFeatureVisibility.disableForWaitlistUsers()
+        }
+#endif // NETWORK_PROTECTION
+
+#if DBP
+        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() {
+            let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
+                                                      action: #selector(openDataBrokerProtection),
+                                                      keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "DBP-Icon"))
+            items.append(dataBrokerProtectionItem)
+
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+
+        } else {
+            DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
+        }
+
+#endif // DBP
+
+#if SUBSCRIPTION
+        let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+        items.append(item1)
+
+        let item2  = NSMenuItem(title: "Placeholder B", action: #selector(openPreferences(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+        items.append(item2)
+#endif
+
+        return items
+    }
+
+#if SUBSCRIPTION
+    private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
+        let privacyProItem = NSMenuItem(title: "",
+                                        action: #selector(openSubscriptionPreferences(_:)),
+                                        keyEquivalent: "")
+            .targetting(self)
+            .withImage(NSImage(named: "SubscriptionIcon"))
+
+        let attributedText = NSMutableAttributedString(string: UserText.subscriptionOptionsMenuItem)
+        attributedText.append (NSAttributedString(string: "  "))
+
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = NSImage(named: "NewLabel")
+        imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
+
+        attributedText.append(NSAttributedString(attachment: imageAttachment))
+
+        privacyProItem.attributedTitle = attributedText
+
+        return [privacyProItem]
+    }
+#endif
+
     private func addPageItems() {
         guard let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url else { return }
 
@@ -302,7 +408,7 @@ final class MoreOptionsMenu: NSMenu {
         addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "Share"))
-            .withSubmenu(SharingMenu())
+            .withSubmenu(sharingMenu)
 
         addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
             .targetting(self)
@@ -312,6 +418,31 @@ final class MoreOptionsMenu: NSMenu {
 
     }
 
+#if NETWORK_PROTECTION
+    private func makeNetworkProtectionItem(showNewLabel: Bool) -> NSMenuItem {
+        let networkProtectionItem = NSMenuItem(title: "", action: #selector(showNetworkProtectionStatus(_:)), keyEquivalent: "")
+            .targetting(self)
+            .withImage(.image(for: .vpnIcon))
+
+        if showNewLabel {
+            let attributedText = NSMutableAttributedString(string: UserText.networkProtection)
+            attributedText.append(NSAttributedString(string: "  "))
+
+            let imageAttachment = NSTextAttachment()
+            imageAttachment.image = NSImage(named: "NewLabel")
+            imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
+
+            attributedText.append(NSAttributedString(attachment: imageAttachment))
+
+            networkProtectionItem.attributedTitle = attributedText
+        } else {
+            networkProtectionItem.title = UserText.networkProtection
+        }
+
+        return networkProtectionItem
+    }
+#endif
+
 }
 
 @MainActor
@@ -319,6 +450,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
     private let tabCollectionViewModel: TabCollectionViewModel
     private let emailManager: EmailManager
+    private var emailProtectionDidChangeCancellable: AnyCancellable?
 
     init(tabCollectionViewModel: TabCollectionViewModel, emailManager: EmailManager) {
         self.tabCollectionViewModel = tabCollectionViewModel
@@ -327,14 +459,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
 
         updateMenuItems()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignInNotification(_:)),
-                                               name: .emailDidSignIn,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(emailDidSignOutNotification(_:)),
-                                               name: .emailDidSignOut,
-                                               object: nil)
+        emailProtectionDidChangeCancellable = Publishers
+            .Merge(
+                NotificationCenter.default.publisher(for: .emailDidSignIn),
+                NotificationCenter.default.publisher(for: .emailDidSignOut)
+            )
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateMenuItems()
+            }
     }
 
     required init(coder: NSCoder) {
@@ -348,9 +481,15 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .targetting(self)
                 .withImage(NSImage(named: "OptionsButtonMenuEmailGenerateAddress"))
 
+            addItem(withTitle: UserText.emailOptionsMenuManageAccountSubItem, action: #selector(manageAccountAction(_:)), keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "Identity-16"))
+
+            addItem(.separator())
+
             addItem(withTitle: UserText.emailOptionsMenuTurnOffSubItem, action: #selector(turnOffEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmailDisabled"))
+                .withImage(NSImage(named: "Email-Disabled-16"))
 
         } else {
             addItem(withTitle: UserText.emailOptionsMenuTurnOnSubItem, action: #selector(turnOnEmailAction(_:)), keyEquivalent: "")
@@ -358,6 +497,11 @@ final class EmailOptionsButtonSubMenu: NSMenu {
                 .withImage(NSImage(named: "OptionsButtonMenuEmail"))
 
         }
+    }
+
+    @objc func manageAccountAction(_ sender: NSMenuItem) {
+        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        tabCollectionViewModel.append(tab: tab)
     }
 
     @objc func createAddressAction(_ sender: NSMenuItem) {
@@ -381,23 +525,20 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOffEmailAction(_ sender: NSMenuItem) {
-        emailManager.signOut()
+        let alert = NSAlert.disableEmailProtection()
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            try? emailManager.signOut()
+        }
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
-    }
-
-    @objc func emailDidSignInNotification(_ notification: Notification) {
-        updateMenuItems()
-    }
-
-    @objc func emailDidSignOutNotification(_ notification: Notification) {
-        updateMenuItems()
     }
 }
 
+@MainActor
 final class ZoomSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
@@ -413,18 +554,18 @@ final class ZoomSubMenu: NSMenu {
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
-        let fullScreenItem = (NSApplication.shared.mainMenuTyped.toggleFullscreenMenuItem?.copy() as? NSMenuItem)!
+        let fullScreenItem = (NSApp.mainMenuTyped.toggleFullscreenMenuItem.copy() as? NSMenuItem)!
         addItem(fullScreenItem)
 
         addItem(.separator())
 
-        let zoomInItem = (NSApplication.shared.mainMenuTyped.zoomInMenuItem?.copy() as? NSMenuItem)!
+        let zoomInItem = (NSApp.mainMenuTyped.zoomInMenuItem.copy() as? NSMenuItem)!
         addItem(zoomInItem)
 
-        let zoomOutItem = (NSApplication.shared.mainMenuTyped.zoomOutMenuItem?.copy() as? NSMenuItem)!
+        let zoomOutItem = (NSApp.mainMenuTyped.zoomOutMenuItem.copy() as? NSMenuItem)!
         addItem(zoomOutItem)
 
-        let actualSizeItem = (NSApplication.shared.mainMenuTyped.actualSizeMenuItem?.copy() as? NSMenuItem)!
+        let actualSizeItem = (NSApp.mainMenuTyped.actualSizeMenuItem.copy() as? NSMenuItem)!
         addItem(actualSizeItem)
 
         addItem(.separator())
@@ -441,14 +582,14 @@ final class BookmarksSubMenu: NSMenu {
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.passwordManagement)
         self.autoenablesItems = false
-        updateMenuItems(with: tabCollectionViewModel, target: target)
+        addMenuItems(with: tabCollectionViewModel, target: target)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
+    private func addMenuItems(with tabCollectionViewModel: TabCollectionViewModel, target: AnyObject) {
         let bookmarkPageItem = addItem(withTitle: UserText.bookmarkThisPage, action: #selector(MoreOptionsMenu.bookmarkPage(_:)), keyEquivalent: "d")
             .withModifierMask([.command])
             .targetting(target)
@@ -459,6 +600,8 @@ final class BookmarksSubMenu: NSMenu {
 
         addItem(withTitle: UserText.bookmarksShowToolbarPanel, action: #selector(MoreOptionsMenu.openBookmarks(_:)), keyEquivalent: "")
             .targetting(target)
+
+        BookmarksBarMenuFactory.addToMenu(self)
 
         addItem(NSMenuItem.separator())
 
@@ -574,32 +717,4 @@ final class LoginsSubMenu: NSMenu {
 
 }
 
-extension NSMenuItem {
-
-    @discardableResult
-    func withImage(_ image: NSImage?) -> NSMenuItem {
-        self.image = image
-        return self
-    }
-
-    @discardableResult
-    func targetting(_ target: AnyObject) -> NSMenuItem {
-        self.target = target
-        return self
-    }
-
-    @discardableResult
-    func withSubmenu(_ submenu: NSMenu) -> NSMenuItem {
-        self.submenu = submenu
-        return self
-    }
-
-    @discardableResult
-    func withModifierMask(_ mask: NSEvent.ModifierFlags) -> NSMenuItem {
-        self.keyEquivalentModifierMask = mask
-        return self
-    }
-
-}
-
-extension MoreOptionsMenu: EmailManagerRequestDelegate { }
+extension MoreOptionsMenu: EmailManagerRequestDelegate {}

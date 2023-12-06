@@ -18,15 +18,15 @@
 
 import Foundation
 import BrowserServicesKit
+import SecureStorage
 
 final class SecureVaultErrorReporter: SecureVaultErrorReporting {
     static let shared = SecureVaultErrorReporter()
     private init() {}
 
-    func secureVaultInitFailed(_ error: SecureVaultError) {
-#if DEBUG
-        guard !NSApp.isRunningUnitTests else { return }
-#endif
+    func secureVaultInitFailed(_ error: SecureStorageError) {
+        guard NSApp.runType.requiresEnvironment else { return }
+
         switch error {
         case .initFailed, .failedToOpenDatabase:
             Pixel.fire(.debug(event: .secureVaultInitError, error: error))

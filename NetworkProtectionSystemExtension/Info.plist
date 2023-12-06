@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
+	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
 	<key>NetworkExtension</key>
@@ -11,7 +13,7 @@
 		<key>NEProviderClasses</key>
 		<dict>
 			<key>com.apple.networkextension.packet-tunnel</key>
-			<string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
+			<string>$(PRODUCT_MODULE_NAME).MacPacketTunnelProvider</string>
 		</dict>
 		<key>MAIN_BUNDLE_IDENTIFIER</key>
 		<string>$(MAIN_BUNDLE_IDENTIFIER)</string>

@@ -18,8 +18,6 @@
 
 import Foundation
 import UserNotifications
-import AppKit
-import AppIntents
 import NetworkProtection
 
 extension UNNotificationAction {
@@ -30,15 +28,15 @@ extension UNNotificationAction {
 
     /// "Reconnect" notification action button
     static let reconnectAction = UNNotificationAction(identifier: Identifier.reconnect.rawValue,
-                                                      title: UserText.networkProtectionSupercededReconnectActionTitle,
+                                                      title: UserText.networkProtectionSupersededReconnectActionTitle,
                                                       options: [.authenticationRequired])
 
 }
 
 extension UNNotificationCategory {
 
-    /// Actions for `superceded` (by another app) notification category
-    static let superceded = UNNotificationCategory(identifier: "supercededActionCategory",
+    /// Actions for `superseded` (by another app) notification category
+    static let superseded = UNNotificationCategory(identifier: "supersededActionCategory",
                                                    actions: [.reconnectAction],
                                                    intentIdentifiers: [],
                                                    options: [])
@@ -68,7 +66,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
     }
 
     private lazy var registerNotificationCategoriesOnce: Void = {
-        userNotificationCenter.setNotificationCategories([.superceded])
+        userNotificationCenter.setNotificationCategories([.superseded])
     }()
 
     // MARK: - Notification Utility methods
@@ -102,7 +100,9 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 
     // MARK: - Presenting user notifications
 
-    func showReconnectedNotification() {
+    func showConnectedNotification(serverLocation: String?) {
+        // Should include the serverLocation in the subtitle, but due to a bug with the current server in the PacketTunnelProvider
+        // this is not currently working on macOS. Add the necessary copy as on iOS when this is fixed.
         let content = notificationContent(title: UserText.networkProtectionConnectionSuccessNotificationTitle,
                                           subtitle: UserText.networkProtectionConnectionSuccessNotificationSubtitle)
         showNotification(content)
@@ -120,10 +120,17 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(content)
     }
 
-    func showSupercededNotification() {
-        let content = notificationContent(title: UserText.networkProtectioSupercededNotificationTitle,
-                                          subtitle: UserText.networkProtectionSupercededNotificationSubtitle,
-                                          category: .superceded)
+    func showSupersededNotification() {
+        let content = notificationContent(title: UserText.networkProtectionSupersededNotificationTitle,
+                                          subtitle: UserText.networkProtectionSupersededNotificationSubtitle,
+                                          category: .superseded)
+        showNotification(content)
+    }
+
+    func showTestNotification() {
+        // These strings are deliberately hardcoded as we don't want them localized, they're only for debugging:
+        let content = notificationContent(title: "Test notification",
+                                          subtitle: "Test notification")
         showNotification(content)
     }
 
@@ -145,12 +152,7 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
 extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-
-        if #available(macOS 11, *) {
-            return .banner
-        } else {
-            return .alert
-        }
+        return .banner
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {

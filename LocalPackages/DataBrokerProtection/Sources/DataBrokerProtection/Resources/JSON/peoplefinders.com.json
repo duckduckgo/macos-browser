@@ -1,0 +1,142 @@
+{
+  "name": "peoplefinders.com",
+  "version": "0.1.0",
+  "addedDatetime": 1677128400000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "aafba5bd-a157-4e35-b653-0797a732d94c",
+          "url": "https://www.peoplefinders.com/people/${firstName}-${lastName}/${state}/${city}?landing=all&age=${age}"
+        },
+        {
+          "actionType": "extract",
+          "id": "b8f10f20-3363-4781-a03b-c4958b6269c7",
+          "selector": ".record",
+          "profile": {
+            "name": {
+              "selector": ".//h4[@class='record__title']"
+            },
+            "alternativeNamesList": {
+              "selector": "(.//ul[@class='clean-list mb-0 mt-2'])[1]//li//li[@class='text-dark']",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".col-lg-1"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='col-lg-2 col-xl-3']//li[@class='text-dark']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='col-lg-3 col-md-2']//li//li[@class='text-dark']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "f5fbd4f5-23f7-45ed-a9ce-3e9b0a5a7a0a",
+          "url": "https://www.peoplefinders.com/opt-out"
+        },
+        {
+          "actionType": "click",
+          "id": "7b33cd1b-3948-4454-8434-e703cc235123",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-success opt-out-button']"
+            }
+          ]
+        },
+        {
+          "actionType": "fillForm",
+          "id": "32056b7a-dc80-4d5d-b9cc-dccd32cb56be",
+          "selector": ".opt-out-form",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#Email"
+            },
+            {
+              "type": "profileUrl",
+              "selector": "#Url"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "5d5068aa-5c16-4fdc-8f3b-e412ad4eabed",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "3443e060-8aee-4bd0-ab2c-ea03f8b8f93c",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "cb9ef5b0-0155-42f1-a766-145b3c14586b",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-primary mt-3']"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "5cc7cfa5-e8ab-4dc1-b58b-973af3d3f364",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "3a44c15d-1dd0-4e92-beba-bf3d8544c6e9",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "d2566371-8b02-4414-9a24-1f9d2761eb1d",
+          "selector": ".g-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "259d8895-ac58-46b0-a209-7f209171e13c",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "//button[@class='btn btn-primary mt-3']"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "ed02f55b-67b3-4efc-a3cc-ce6b6c7ceeed",
+          "expectations": [
+            {
+              "type": "url",
+              "expect": "https://www.peoplefinders.com/opt-out/confirmation"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

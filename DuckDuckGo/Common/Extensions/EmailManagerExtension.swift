@@ -18,17 +18,28 @@
 
 import Foundation
 import BrowserServicesKit
+import PixelKit
 
 extension EmailManager {
+
+    @UserDefaultsWrapper(key: .emailKeychainMigration, defaultValue: false)
+    private static var emailKeychainMigrationDone: Bool
+
+    convenience init() {
+        defer {
+            Self.emailKeychainMigrationDone = true
+        }
+        self.init(storage: EmailKeychainManager(needsMigration: !Self.emailKeychainMigrationDone))
+    }
 
     var emailPixelParameters: [String: String] {
         var pixelParameters: [String: String] = [:]
 
         if let cohort = self.cohort {
-            pixelParameters[Pixel.Parameters.emailCohort] = cohort
+            pixelParameters[PixelKit.Parameters.emailCohort] = cohort
         }
 
-        pixelParameters[Pixel.Parameters.emailLastUsed] = self.lastUseDate
+        pixelParameters[PixelKit.Parameters.emailLastUsed] = self.lastUseDate
 
         return pixelParameters
     }

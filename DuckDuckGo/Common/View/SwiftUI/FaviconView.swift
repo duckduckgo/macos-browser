@@ -23,27 +23,40 @@ struct FaviconView: View {
 
     let faviconManagement: FaviconManagement = FaviconManager.shared
 
-    let domain: String
+    let url: URL?
     let size: CGFloat
+    let onFaviconMissing: (() -> Void)?
+
+    var domain: String {
+        url?.host ?? ""
+    }
 
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(domain: String, size: CGFloat = 32) {
-        self.domain = domain
+    init(url: URL?, size: CGFloat = 32, onFaviconMissing: (() -> Void)? = nil) {
+        self.url = url
         self.size = size
+        self.onFaviconMissing = onFaviconMissing
     }
 
+    @MainActor(unsafe)
     func refreshImage() {
         if let duckPlayerImage = DuckPlayer.shared.image(for: self) {
             image = duckPlayerImage
             return
         }
 
-        let image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .medium)?.image
-        if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
-            self.image = image
+        if faviconManagement.areFaviconsLoaded, let url = url {
+            let image = faviconManagement.getCachedFavicon(for: url, sizeCategory: .medium)?.image
+            if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
+                self.image = image
+                return
+            }
+            onFaviconMissing?()
         }
+
+        image = nil
     }
 
     var body: some View {
@@ -62,9 +75,10 @@ struct FaviconView: View {
             } else {
 
                 ZStack {
+                    let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain
                     Rectangle()
-                        .foregroundColor(Color.forDomain(domain.droppingWwwPrefix()))
-                    Text(String(domain.droppingWwwPrefix().capitalized.first ?? "?"))
+                        .foregroundColor(Color.forString(eTLDplus1))
+                    Text(String(eTLDplus1.capitalized.first ?? "?"))
                         .font(.title)
                         .foregroundColor(Color.white)
                 }

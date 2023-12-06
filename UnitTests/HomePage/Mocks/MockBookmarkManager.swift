@@ -20,9 +20,6 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockBookmarkManager: BookmarkManager {
-    func cleanUpBookmarksDatabase() {}
-
-    func updateBookmarkDatabaseCleanupSchedule(shouldEnable: Bool) {}
 
     func isUrlFavorited(url: URL) -> Bool {
         return false
@@ -32,8 +29,8 @@ class MockBookmarkManager: BookmarkManager {
         return false
     }
 
-    func isHostInBookmarks(host: String) -> Bool {
-        return false
+    func allHosts() -> Set<String> {
+        return []
     }
 
     func getBookmark(for url: URL) -> DuckDuckGo_Privacy_Browser.Bookmark? {
@@ -52,9 +49,7 @@ class MockBookmarkManager: BookmarkManager {
         return nil
     }
 
-    func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?) -> DuckDuckGo_Privacy_Browser.BookmarkFolder {
-        return BookmarkFolder(id: "", title: "")
-    }
+    func makeFolder(for title: String, parent: DuckDuckGo_Privacy_Browser.BookmarkFolder?, completion: (DuckDuckGo_Privacy_Browser.BookmarkFolder) -> Void) {}
 
     func remove(bookmark: DuckDuckGo_Privacy_Browser.Bookmark) {}
 
@@ -87,6 +82,8 @@ class MockBookmarkManager: BookmarkManager {
     func importBookmarks(_ bookmarks: DuckDuckGo_Privacy_Browser.ImportedBookmarks, source: DuckDuckGo_Privacy_Browser.BookmarkImportSource) -> DuckDuckGo_Privacy_Browser.BookmarkImportResult {
         BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
     }
+
+    func handleFavoritesAfterDisablingSync() {}
 
     @Published var list: BookmarkList?
 

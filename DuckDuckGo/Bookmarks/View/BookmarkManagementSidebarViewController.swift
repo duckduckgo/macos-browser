@@ -251,7 +251,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
         tabCollection.append(tabs: tabs)
     }
 
@@ -262,7 +262,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 extension BookmarkManagementSidebarViewController: AddFolderModalViewControllerDelegate {
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        LocalBookmarkManager.shared.makeFolder(for: name, parent: nil)
+        LocalBookmarkManager.shared.makeFolder(for: name, parent: nil, completion: { _ in })
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {

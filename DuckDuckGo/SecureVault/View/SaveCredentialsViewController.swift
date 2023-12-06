@@ -71,8 +71,6 @@ final class SaveCredentialsViewController: NSViewController {
 
     private var saveButtonAction: (() -> Void)?
 
-    private var appearanceCancellable: AnyCancellable?
-
     var passwordData: Data {
         let string = hiddenPasswordField.isHidden ? visiblePasswordField.stringValue : hiddenPasswordField.stringValue
         return string.data(using: .utf8)!
@@ -81,7 +79,6 @@ final class SaveCredentialsViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
         visiblePasswordField.isHidden = true
         saveButton.becomeFirstResponder()
     }
@@ -100,16 +97,20 @@ final class SaveCredentialsViewController: NSViewController {
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
     func update(credentials: SecureVaultModels.WebsiteCredentials, automaticallySaved: Bool) {
         self.credentials = credentials
-        self.domainLabel.stringValue = credentials.account.domain
-        self.usernameField.stringValue = credentials.account.username
-        self.hiddenPasswordField.stringValue = String(data: credentials.password, encoding: .utf8) ?? ""
+        self.domainLabel.stringValue = credentials.account.domain ?? ""
+        self.usernameField.stringValue = credentials.account.username ?? ""
+        self.hiddenPasswordField.stringValue = String(data: credentials.password ?? Data(), encoding: .utf8) ?? ""
         self.visiblePasswordField.stringValue = self.hiddenPasswordField.stringValue
         self.loadFaviconForDomain(credentials.account.domain)
 
-        fireproofCheck.state = FireproofDomains.shared.isFireproof(fireproofDomain: credentials.account.domain) ? .on : .off
+        if let domain = credentials.account.domain, FireproofDomains.shared.isFireproof(fireproofDomain: domain) {
+            fireproofCheck.state = .on
+        } else {
+            fireproofCheck.state = .off
+        }
 
         // Only use the non-editable state if a credential was automatically saved and it didn't already exist.
-        let condition = credentials.account.id != nil && !credentials.account.username.isEmpty && automaticallySaved
+        let condition = credentials.account.id != nil && !(credentials.account.username?.isEmpty ?? true) && automaticallySaved
         updateViewState(editable: !condition)
     }
 
@@ -172,19 +173,29 @@ final class SaveCredentialsViewController: NSViewController {
                     }
                 }
             } else {
-                try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
+                _ = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeWebsiteCredentials(credentials)
+                NSApp.delegateTyped.syncService?.scheduler.notifyDataChanged()
+                os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
             }
         } catch {
             os_log("%s:%s: failed to store credentials %s", type: .error, className, #function, error.localizedDescription)
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
 
         Pixel.fire(.autofillItemSaved(kind: .password))
-        if self.fireproofCheck.state == .on {
-            FireproofDomains.shared.add(domain: account.domain)
-        } else {
-            // If the Fireproof checkbox has been unchecked, and the domain is Fireproof, then un-Fireproof it.
-            guard FireproofDomains.shared.isFireproof(fireproofDomain: account.domain) else { return }
-            FireproofDomains.shared.remove(domain: account.domain)
+
+        if passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.reportPasswordSave()
+        }
+
+        if let domain = account.domain {
+            if self.fireproofCheck.state == .on {
+                FireproofDomains.shared.add(domain: domain)
+            } else {
+                // If the Fireproof checkbox has been unchecked, and the domain is Fireproof, then un-Fireproof it.
+                guard FireproofDomains.shared.isFireproof(fireproofDomain: domain) else { return }
+                FireproofDomains.shared.remove(domain: domain)
+            }
         }
     }
 
@@ -241,7 +252,11 @@ final class SaveCredentialsViewController: NSViewController {
         updatePasswordFieldVisibility(visible: !hiddenPasswordField.isHidden)
     }
 
-    func loadFaviconForDomain(_ domain: String) {
+    func loadFaviconForDomain(_ domain: String?) {
+        guard let domain else {
+            faviconImage.image = NSImage(named: NSImage.Name("Web"))
+            return
+        }
         faviconImage.image = faviconManagement.getCachedFavicon(for: domain, sizeCategory: .small)?.image
             ?? NSImage(named: NSImage.Name("Web"))
     }

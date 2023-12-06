@@ -54,19 +54,19 @@ class DownloadsIntegrationTests: XCTestCase {
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
-
+        let suffix = Int.random(in: 0..<Int.max)
         let url = URL.testsServer
-            .appendingPathComponent("fname.dat")
+            .appendingPathComponent("fname_\(suffix).dat")
             .appendingTestParameters(data: data.html,
-                                     headers: ["Content-Disposition": "attachment; filename=\"fname.dat\"",
+                                     headers: ["Content-Disposition": "attachment; filename=\"fname_\(suffix).dat\"",
                                                "Content-Type": "text/html"])
         let tab = tabViewModel.tab
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         let fileUrl = try await downloadTaskFuture.get().output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
-        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("fname.dat"))
+        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("fname_\(suffix).dat"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.html)
     }
 
@@ -78,15 +78,15 @@ class DownloadsIntegrationTests: XCTestCase {
         let tab = tabViewModel.tab
         // load empty page
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
-        _=await tab.setUrl(pageUrl, userEntered: nil)?.value?.result
+        _=await tab.setUrl(pageUrl, userEntered: nil)?.result
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
-
+        let suffix = Int.random(in: 0..<Int.max)
         let js = """
         (function() {
             var link = document.createElement("a");
             link.href = 'data:application/octet-stream;charset=utf-8,\(data.testData.utf8String()!)';
-            link.download = "helloWorld.txt";
+            link.download = "helloWorld_\(suffix).txt";
             link.target = "_blank";
             link.click();
             document.body.appendChild(link);
@@ -96,9 +96,9 @@ class DownloadsIntegrationTests: XCTestCase {
         try! await tab.webView.evaluateJavaScript(js)
 
         let fileUrl = try await downloadTaskFuture.get().output
-            .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
+            .timeout(5, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
-        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("helloWorld.txt"))
+        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("helloWorld_\(suffix).txt"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
     }
 
@@ -110,16 +110,16 @@ class DownloadsIntegrationTests: XCTestCase {
         let tab = tabViewModel.tab
         // load empty page
         let pageUrl = URL.testsServer.appendingTestParameters(data: data.html)
-        _=await tab.setUrl(pageUrl, userEntered: nil)?.value?.result
+        _=await tab.setUrl(pageUrl, userEntered: nil)?.result
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
-
+        let suffix = Int.random(in: 0..<Int.max)
         let js = """
         (function() {
             var blob = new Blob(['\(data.testData.utf8String()!)'], { type: 'application/octet-stream' });
             var link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "blobdload.json";
+            link.download = "blobdload_\(suffix).json";
             link.target = "_blank";
             link.click();
             document.body.appendChild(link);
@@ -131,7 +131,7 @@ class DownloadsIntegrationTests: XCTestCase {
         let fileUrl = try await downloadTaskFuture.get().output
             .timeout(1, scheduler: DispatchQueue.main) { .init(TimeoutError() as NSError, isRetryable: false) }.first().promise().get()
 
-        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("blobdload.json"))
+        XCTAssertEqual(fileUrl, FileManager.default.temporaryDirectory.appendingPathComponent("blobdload_\(suffix).json"))
         XCTAssertEqual(try? Data(contentsOf: fileUrl), data.testData)
     }
 

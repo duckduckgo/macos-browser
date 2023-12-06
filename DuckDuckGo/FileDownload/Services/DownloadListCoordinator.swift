@@ -25,7 +25,7 @@ import Navigation
 private func getFirstAvailableWebView() -> WKWebView? {
     let wcm = WindowControllersManager.shared
     if wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController == nil {
-        WindowsManager.openNewWindow(isBurner: false)
+        WindowsManager.openNewWindow()
     }
 
     guard let tab = wcm.lastKeyMainWindowController?.mainViewController.browserTabViewController.tabViewModel?.tab else {
@@ -267,12 +267,10 @@ final class DownloadListCoordinator {
                 struct ThrowableError: Error {}
                 throw ThrowableError()
             }
-            try webView.resumeDownload(from: resumeData,
-                                       to: tempURL,
-                                       completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
+            webView.resumeDownload(fromResumeData: resumeData, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
         } catch {
             let request = item.createRequest()
-            webView.startDownload(request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
+            webView.startDownload(using: request, completionHandler: self.downloadRestartedCallback(for: item, webView: webView))
         }
     }
 
@@ -287,10 +285,12 @@ final class DownloadListCoordinator {
     }
 
     @MainActor
-    func cleanupInactiveDownloads(for domains: Set<String>) {
+    func cleanupInactiveDownloads(for baseDomains: Set<String>, tld: TLD) {
         for (id, item) in self.items where item.progress == nil {
-            if domains.contains(item.websiteURL?.host ?? "") ||
-                domains.contains(item.url.host ?? "") {
+            let websiteUrlBaseDomain = tld.eTLDplus1(item.websiteURL?.host) ?? ""
+            let itemUrlBaseDomain = tld.eTLDplus1(item.url.host) ?? ""
+            if baseDomains.contains(websiteUrlBaseDomain) ||
+                baseDomains.contains(itemUrlBaseDomain) {
                 self.items[id] = nil
                 self.updatesSubject.send((.removed, item))
                 store.remove(item)

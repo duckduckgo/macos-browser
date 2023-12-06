@@ -77,7 +77,7 @@ extension HomePage.Views {
                 }
 
                 MoreOrLess(isExpanded: $model.shouldShowAllFeatures)
-                    .padding(.top, 4)
+                    .padding(.top, -3)
                     .visibility(model.isMoreOrLessButtonNeeded ? .visible : .invisible)
             }
         }
@@ -181,11 +181,7 @@ extension HomePage.Views {
             private let titleWidth: Double
 
             @State var isHovering = false
-            @Binding var isHoveringOnCard: Bool {
-                didSet {
-                    print(isHoveringOnCard)
-                }
-            }
+            @Binding var isHoveringOnCard: Bool
 
             init(title: String, isHoveringOnCard: Binding<Bool>, action: @escaping () -> Void) {
                 self.title = title

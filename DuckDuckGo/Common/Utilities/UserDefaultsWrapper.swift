@@ -19,10 +19,18 @@
 import AppKit
 import Foundation
 
+extension UserDefaults {
+    /// The app group's shared UserDefaults
+    static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
+    static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
+}
+
 @propertyWrapper
 public struct UserDefaultsWrapper<T> {
 
     public enum Key: String, CaseIterable {
+        /// system setting defining window title double-click action
+        case appleActionOnDoubleClick = "AppleActionOnDoubleClick"
 
         case configLastUpdated = "config.last.updated"
         case configStorageTrackerRadarEtag = "config.storage.trackerradar.etag"
@@ -34,6 +42,7 @@ public struct UserDefaultsWrapper<T> {
         case configFBConfigEtag = "config.storage.fbconfig.etag"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
+        case areDomainsMigratedToETLDPlus1 = "com.duckduckgo.are-domains-migrated-to-etldplus1"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
         case contentBlockingRulesCache = "com.duckduckgo.contentblocker.rules.cache"
 
@@ -57,6 +66,7 @@ public struct UserDefaultsWrapper<T> {
         case askToSaveUsernamesAndPasswords = "preferences.ask-to-save.usernames-passwords"
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
+        case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
@@ -65,10 +75,15 @@ public struct UserDefaultsWrapper<T> {
         case fireInfoPresentedOnce = "fire.info.presented.once"
 
         case restorePreviousSession = "preferences.startup.restore-previous-session"
+        case launchToCustomHomePage = "preferences.startup.launch-to-custom-home-page"
+        case customHomePageURL = "preferences.startup.customHomePageURL"
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
+        case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
+
+        case homeButtonPosition = "preferences.appeareance.home-button-position"
 
         // ATB
         case installDate = "statistics.installdate.key"
@@ -92,6 +107,9 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
         case homePageShowCookie = "home.page.show.cookie"
+        case homePageShowSurveyDay0 = "home.page.show.survey.0"
+        case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
+        case homePageShowSurveyDay7 = "home.page.show.survey.7"
         case homePageShowPageTitles = "home.page.show.page.titles"
         case homePageShowRecentlyVisited = "home.page.show.recently.visited"
         case homePageContinueSetUpImport = "home.page.continue.set.up.import"
@@ -103,7 +121,9 @@ public struct UserDefaultsWrapper<T> {
         case appIsRelaunchingAutomatically = "app-relaunching-automatically"
 
         case historyV5toV6Migration = "history.v5.to.v6.migration.2"
+        case emailKeychainMigration = "email.keychain.migration"
 
+        case bookmarksBarPromptShown = "bookmarks.bar.prompt.shown"
         case showBookmarksBar = "bookmarks.bar.show"
         case lastBookmarksBarUsagePixelSendDate = "bookmarks.bar.last-usage-pixel-send-date"
 
@@ -115,12 +135,62 @@ public struct UserDefaultsWrapper<T> {
         case loggingEnabledDate = "logging.enabled.date"
         case loggingCategories = "logging.categories"
 
-        // Temporary for activetion pixel
         case firstLaunchDate = "first.app.launch.date"
+        case customConfigurationUrl = "custom.configuration.url"
+
+        // Data Broker Protection
+
+        case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
+
+        // Network Protection
+
+        case networkProtectionExcludedRoutes = "netp.excluded-routes"
+        case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
+        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
+
+        // Network Protection: Shared Defaults
+        // ---
+        // Please note that shared defaults MUST have a name that matches exactly their value,
+        // or else KVO will just not work as of 2023-08-07
+
+        case networkProtectionOnboardingStatusRawValue = "networkProtectionOnboardingStatusRawValue"
+        case networkProtectionWaitlistActiveOverrideRawValue = "networkProtectionWaitlistActiveOverrideRawValue"
+        case networkProtectionWaitlistEnabledOverrideRawValue = "networkProtectionWaitlistEnabledOverrideRawValue"
+
+        // Experiments
+        case pixelExperimentInstalled = "pixel.experiment.installed"
+        case pixelExperimentCohort = "pixel.experiment.cohort"
+        case pixelExperimentEnrollmentDate = "pixel.experiment.enrollment.date"
+        case pixelExperimentFiredPixels = "pixel.experiment.pixels.fired"
+        case campaignVariant = "campaign.variant"
+
+        // Sync
+
+        case syncEnvironment = "sync.environment"
+        case favoritesDisplayMode = "sync.favorites-display-mode"
+        case syncBookmarksPaused = "sync.bookmarks-paused"
+        case syncCredentialsPaused = "sync.credentials-paused"
+        case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
+        case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
+        case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
+        case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
+        case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
     }
 
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
+        case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
+        case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
+
+        // NetP removed keys
+        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
+        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
+        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
+        case networkProtectionShouldExcludeLocalNetworks = "netp.exclude-local-routes"
+        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
     }
 
     private let key: Key
@@ -134,11 +204,11 @@ public struct UserDefaultsWrapper<T> {
     }
 
     static var sharedDefaults: UserDefaults {
-#if DEBUG && !NETP_SYSTEM_EXTENSION
-        if case .normal = NSApp.runType {
+#if DEBUG && !(NETP_SYSTEM_EXTENSION && NETWORK_EXTENSION) // Avoid looking up special user defaults when running inside the system extension
+        if case .normal = NSApplication.runType {
             return .standard
         } else {
-            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApp.runType.description)!
+            return UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
         }
 #else
         return .standard
@@ -154,24 +224,49 @@ public struct UserDefaultsWrapper<T> {
 
     public var wrappedValue: T {
         get {
-            if let storedValue = defaults.object(forKey: key.rawValue),
-               let typedValue = storedValue as? T {
+            guard let storedValue = defaults.object(forKey: key.rawValue) else {
+                if setIfEmpty {
+                    setValue(defaultValue)
+                }
+
+                return defaultValue
+            }
+
+            if let typedValue = storedValue as? T {
                 return typedValue
             }
 
-            if setIfEmpty {
-                defaults.set(defaultValue, forKey: key.rawValue)
+            guard let rawRepresentableType = T.self as? any RawRepresentable.Type,
+                  let value = rawRepresentableType.init(anyRawValue: storedValue) as? T else {
+                return defaultValue
             }
 
-            return defaultValue
+            return value
         }
         set {
-            if (newValue as? AnyOptional)?.isNil == true {
-                defaults.removeObject(forKey: key.rawValue)
-            } else {
-                defaults.set(newValue, forKey: key.rawValue)
-            }
+            setValue(newValue)
         }
+    }
+
+    private func setValue(_ value: T) {
+        guard (value as? AnyOptional)?.isNil != true else {
+            defaults.removeObject(forKey: key.rawValue)
+            return
+        }
+
+        if PropertyListSerialization.propertyList(value, isValidFor: .binary) {
+            defaults.set(value, forKey: key.rawValue)
+            return
+        }
+
+        guard let rawRepresentable = value as? any RawRepresentable,
+              PropertyListSerialization.propertyList(rawRepresentable.rawValue, isValidFor: .binary) else {
+            assertionFailure("\(value) cannot be stored in UserDefaults")
+            return
+        }
+
+        defaults.set(rawRepresentable.rawValue, forKey: key.rawValue)
+
     }
 
     static func clearAll() {
@@ -190,6 +285,30 @@ public struct UserDefaultsWrapper<T> {
 
     static func clear(_ key: Key) {
         sharedDefaults.removeObject(forKey: key.rawValue)
+    }
+
+    func clear() {
+        defaults.removeObject(forKey: key.rawValue)
+    }
+
+}
+
+extension UserDefaultsWrapper where T: OptionalProtocol {
+
+    init(key: Key, defaults: UserDefaults? = nil) {
+        self.init(key: key, defaultValue: .none, defaults: defaults)
+    }
+
+}
+
+private extension RawRepresentable {
+
+    init?(anyRawValue: Any) {
+        guard let rawValue = anyRawValue as? RawValue else {
+            assertionFailure("\(anyRawValue) is not \(RawValue.self)")
+            return nil
+        }
+        self.init(rawValue: rawValue)
     }
 
 }

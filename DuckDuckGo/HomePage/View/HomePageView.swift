@@ -25,7 +25,7 @@ extension HomePage.Views {
     struct RootView: View {
 
         let backgroundColor = Color("NewTabPageBackgroundColor")
-        let targetWidth: CGFloat = 482
+        static let targetWidth: CGFloat = 508
         let isBurner: Bool
 
         @EnvironmentObject var model: AppearancePreferences
@@ -36,62 +36,73 @@ extension HomePage.Views {
 
         var body: some View {
             if isBurner {
-
                 BurnerHomePageView()
-
             } else {
-                ZStack(alignment: .top) {
+                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isNoCardExperimentOn: PixelExperiment.isNoCardsExperimentOn)
+                    .contextMenu(ContextMenu(menuItems: {
+                        if model.isContinueSetUpAvailable {
+                            Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
+                                .toggleStyle(.checkbox)
+                                .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                        }
+                        Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
+                            .toggleStyle(.checkbox)
+                        Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
+                            .toggleStyle(.checkbox)
+                    }))
+            }
+        }
 
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            Group {
-                                ContinueSetUpView()
-                                    .padding(.top, 72)
-                                    .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+        func regularHomePageView(includingContinueSetUpCards: Bool, isNoCardExperimentOn: Bool) -> some View {
+            ZStack(alignment: .top) {
 
-                                Favorites()
-                                    .padding(.top, 72)
-                                    .visibility(model.isFavoriteVisible ? .visible : .gone)
-
-                                RecentlyVisited()
-                                    .padding(.top, 66)
-                                    .padding(.bottom, 16)
-                                    .visibility(model.isRecentActivityVisible ? .visible : .gone)
-
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Group {
+                            if isNoCardExperimentOn {
+                                DefaultBrowserPrompt()
                             }
-                            .frame(width: 508)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
-                                .padding(.bottom, 14)
-                                .padding(.trailing, 14)
-                                .popover(isPresented: $isHomeContentPopoverVisible, content: {
-                                    HomeContentPopoverView()
-                                        .padding()
-                                })
-                        }
-                    }
+                            if includingContinueSetUpCards {
+                                ContinueSetUpView()
+                                    .padding(.top, 64)
+                                    .visibility(model.isContinueSetUpVisible ? .visible : .gone)
+                            }
+                            Favorites()
+                                .padding(.top, 24)
+                                .visibility(model.isFavoriteVisible ? .visible : .gone)
 
+                            RecentlyVisited()
+                                .padding(.top, 24)
+                                .padding(.bottom, 16)
+                                .visibility(model.isRecentActivityVisible ? .visible : .gone)
+
+                        }
+                        .frame(width: Self.targetWidth)
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
-                .background(backgroundColor)
-                .onAppear {
-                    LocalBookmarkManager.shared.requestSync()
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        HomeContentButtonView(isHomeContentPopoverVisible: $isHomeContentPopoverVisible)
+                            .padding(.bottom, 14)
+                            .padding(.trailing, 14)
+                            .popover(isPresented: $isHomeContentPopoverVisible, content: {
+                                HomeContentPopoverView(includeContinueSetUpCards: includingContinueSetUpCards)
+                                    .padding()
+                                    .environmentObject(model)
+                                    .environmentObject(continueSetUpModel)
+                                    .environmentObject(favoritesModel)
+                            })
+                    }
                 }
-                .contextMenu(ContextMenu(menuItems: {
-                    Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
-                        .toggleStyle(.checkbox)
-                        .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                    Toggle(UserText.newTabMenuItemShowFavorite, isOn: $model.isFavoriteVisible)
-                        .toggleStyle(.checkbox)
-                    Toggle(UserText.newTabMenuItemShowRecentActivity, isOn: $model.isRecentActivityVisible)
-                        .toggleStyle(.checkbox)
-                }))
+
+            }
+            .frame(maxWidth: .infinity)
+            .background(backgroundColor)
+            .onAppear {
+                LocalBookmarkManager.shared.requestSync()
             }
         }
 
@@ -137,6 +148,7 @@ extension HomePage.Views {
     }
 
     struct HomeContentPopoverView: View {
+        let includeContinueSetUpCards: Bool
         @EnvironmentObject var model: AppearancePreferences
         @EnvironmentObject var continueSetUpModel: HomePage.Models.ContinueSetUpModel
         @EnvironmentObject var favoritesModel: HomePage.Models.FavoritesModel
@@ -147,16 +159,18 @@ extension HomePage.Views {
                 .bold()
                 .font(.custom("SFProText-Regular", size: 13))
             Divider()
-            HStack {
-                Toggle(isOn: $model.isContinueSetUpVisible, label: {
-                    HStack {
-                        Image("RocketNoColor")
-                            .frame(width: iconSize, height: iconSize)
-                        Text(UserText.newTabSetUpSectionTitle)
-                    }
-                })
-                .visibility(continueSetUpModel.hasContent ? .visible : .gone)
-                Spacer()
+            if includeContinueSetUpCards {
+                HStack {
+                    Toggle(isOn: $model.isContinueSetUpVisible, label: {
+                        HStack {
+                            Image("RocketNoColor")
+                                .frame(width: iconSize, height: iconSize)
+                            Text(UserText.newTabSetUpSectionTitle)
+                        }
+                    })
+                    .visibility(continueSetUpModel.hasContent ? .visible : .gone)
+                    Spacer()
+                }
             }
             HStack {
                 Toggle(isOn: $model.isFavoriteVisible, label: {

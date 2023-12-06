@@ -18,16 +18,37 @@
 
 import Foundation
 import BrowserServicesKit
+import SecureStorage
+import GRDB
 
-final class MockSecureVault: SecureVault {
+typealias MockVaultFactory = SecureVaultFactory<MockSecureVault<MockDatabaseProvider>>
+
+let MockSecureVaultFactory = SecureVaultFactory<MockSecureVault>(
+    makeCryptoProvider: {
+        return MockCryptoProvider()
+    }, makeKeyStoreProvider: {
+        let provider = MockKeyStoreProvider()
+        provider._l1Key = "key".data(using: .utf8)
+        return provider
+    }, makeDatabaseProvider: { key in
+        return try MockDatabaseProvider(key: key)
+    }
+)
+
+final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
+
+    public typealias MockSecureVaultDatabaseProviders = SecureStorageProviders<T>
 
     var storedAccounts: [SecureVaultModels.WebsiteAccount] = []
     var storedCredentials: [Int64: SecureVaultModels.WebsiteCredentials] = [:]
+    var storedNeverPromptWebsites = [SecureVaultModels.NeverPromptWebsites]()
     var storedNotes: [SecureVaultModels.Note] = []
     var storedIdentities: [SecureVaultModels.Identity] = []
     var storedCards: [SecureVaultModels.CreditCard] = []
 
-    func authWith(password: Data) throws -> SecureVault {
+    public required init(providers: MockSecureVaultDatabaseProviders) {}
+
+    func authWith(password: Data) throws -> any AutofillSecureVault {
         return self
     }
 
@@ -41,8 +62,8 @@ final class MockSecureVault: SecureVault {
         return storedAccounts.filter { $0.domain == domain }
     }
 
-    func accountsWithPartialMatchesFor(eTLDplus1: String) throws -> [BrowserServicesKit.SecureVaultModels.WebsiteAccount] {
-        return storedAccounts.filter { $0.domain.contains(eTLDplus1) }
+    func accountsWithPartialMatchesFor(eTLDplus1: String) throws -> [SecureVaultModels.WebsiteAccount] {
+        return storedAccounts.filter { $0.domain?.contains(eTLDplus1) ?? false }
     }
 
     func websiteCredentialsFor(accountId: Int64) throws -> SecureVaultModels.WebsiteCredentials? {
@@ -58,6 +79,29 @@ final class MockSecureVault: SecureVault {
 
     func deleteWebsiteCredentialsFor(accountId: Int64) throws {
         storedCredentials[accountId] = nil
+    }
+
+    func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
+        return storedNeverPromptWebsites
+    }
+
+    func hasNeverPromptWebsitesFor(domain: String) throws -> Bool {
+        return !storedNeverPromptWebsites.filter { $0.domain == domain }.isEmpty
+    }
+
+    func storeNeverPromptWebsites(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws -> Int64 {
+        if let neverPromptWebsiteId = neverPromptWebsite.id {
+            storedNeverPromptWebsites.append(neverPromptWebsite)
+            return neverPromptWebsiteId
+        } else {
+            storedNeverPromptWebsites.append(neverPromptWebsite)
+            return -1
+        }
+
+    }
+
+    func deleteAllNeverPromptWebsites() throws {
+        storedNeverPromptWebsites = []
     }
 
     func notes() throws -> [SecureVaultModels.Note] {
@@ -117,6 +161,372 @@ final class MockSecureVault: SecureVault {
 
     func existingCardForAutofill(matching proposedCard: SecureVaultModels.CreditCard) throws -> SecureVaultModels.CreditCard? {
         return nil
+    }
+
+    func inDatabaseTransaction(_ block: @escaping (Database) throws -> Void) throws {}
+
+    func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func deleteSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
+        if let accountId = syncableCredentials.metadata.objectId {
+            try deleteWebsiteCredentialsFor(accountId: accountId)
+        }
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, clearModifiedAt: Bool) throws -> Int64 {
+        try storeWebsiteCredentials(credentials)
+    }
+
+    func storeSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {}
+
+    func syncableCredentialsForSyncIds(_ syncIds: any Sequence<String>, in database: Database) throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func syncableCredentialsForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.SyncableCredentials? {
+        nil
+    }
+
+    func accountsForDomain(_ domain: String, in database: Database) throws -> [SecureVaultModels.WebsiteAccount] {
+        try accountsFor(domain: domain)
+    }
+
+    func getEncryptionKey() throws -> Data {
+        Data()
+    }
+
+    func encrypt(_ data: Data, using key: Data) throws -> Data {
+        data
+    }
+
+    func decrypt(_ data: Data, using key: Data) throws -> Data {
+        data
+    }
+
+    func hasAccountFor(username: String?, domain: String?) throws -> Bool {
+        storedAccounts.contains(where: { $0.username == username && $0.domain == domain })
+    }
+
+    func getHashingSalt() throws -> Data? {
+        nil
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, in database: Database, encryptedUsing l2Key: Data, hashedUsing salt: Data?) throws -> Int64 {
+        1
+    }
+
+    func storeSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database, encryptedUsing l2Key: Data, hashedUsing salt: Data?) throws {
+    }
+
+}
+
+// MARK: - Mock Providers
+
+class MockDatabaseProvider: AutofillDatabaseProvider {
+
+    // swiftlint:disable identifier_name
+    var _accounts = [SecureVaultModels.WebsiteAccount]()
+    var _notes = [SecureVaultModels.Note]()
+    var _identities = [Int64: SecureVaultModels.Identity]()
+    var _creditCards = [Int64: SecureVaultModels.CreditCard]()
+    var _forDomain = [String]()
+    var _credentialsDict = [Int64: SecureVaultModels.WebsiteCredentials]()
+    var _note: SecureVaultModels.Note?
+    var _neverPromptWebsites = [SecureVaultModels.NeverPromptWebsites]()
+
+    var db: GRDB.DatabaseWriter
+    // swiftlint:enable identifier_name
+
+    required init(file: URL = URL(string: "https://duckduckgo.com/")!, key: Data = Data()) throws {
+        db = try! DatabaseQueue(named: "TestQueue")
+    }
+
+    static func recreateDatabase(withKey key: Data) throws -> Self {
+        return try MockDatabaseProvider(file: URL(string: "https://duck.com")!, key: Data()) as! Self
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials) throws -> Int64 {
+        if let accountIdString = credentials.account.id, let accountID = Int64(accountIdString) {
+            _credentialsDict[accountID] = credentials
+            return accountID
+        } else {
+            _credentialsDict[-1] = credentials
+            return -1
+        }
+    }
+
+    func websiteCredentialsForAccountId(_ accountId: Int64) throws -> SecureVaultModels.WebsiteCredentials? {
+        return _credentialsDict[accountId]
+    }
+
+    func websiteAccountsForDomain(_ domain: String) throws -> [SecureVaultModels.WebsiteAccount] {
+        self._forDomain.append(domain)
+        return _accounts
+    }
+
+    func websiteAccountsForTopLevelDomain(_ eTLDplus1: String) throws -> [SecureVaultModels.WebsiteAccount] {
+        self._forDomain.append(eTLDplus1)
+        return _accounts
+    }
+
+    func deleteWebsiteCredentialsForAccountId(_ accountId: Int64) throws {
+        self._accounts = self._accounts.filter { $0.id != String(accountId) }
+    }
+
+    func accounts() throws -> [SecureVaultModels.WebsiteAccount] {
+        return _accounts
+    }
+
+    func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
+        return _neverPromptWebsites
+    }
+
+    func hasNeverPromptWebsitesFor(domain: String) throws -> Bool {
+        return false
+    }
+
+    func storeNeverPromptWebsite(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws -> Int64 {
+        if let neverPromptWebsiteId = neverPromptWebsite.id {
+            _neverPromptWebsites.append(neverPromptWebsite)
+            return neverPromptWebsiteId
+        } else {
+            return -1
+        }
+    }
+
+    func deleteAllNeverPromptWebsites() throws {
+        _neverPromptWebsites.removeAll()
+    }
+
+    func updateNeverPromptWebsite(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws {
+    }
+
+    func insertNeverPromptWebsite(_ neverPromptWebsite: SecureVaultModels.NeverPromptWebsites) throws {
+    }
+
+    func notes() throws -> [SecureVaultModels.Note] {
+        return _notes
+    }
+
+    func noteForNoteId(_ noteId: Int64) throws -> SecureVaultModels.Note? {
+        return _note
+    }
+
+    func deleteNoteForNoteId(_ noteId: Int64) throws {
+        self._notes = self._notes.filter { $0.id != noteId }
+    }
+
+    func storeNote(_ note: SecureVaultModels.Note) throws -> Int64 {
+        _note = note
+        return note.id ?? -1
+    }
+
+    func identities() throws -> [SecureVaultModels.Identity] {
+        return Array(_identities.values)
+    }
+
+    func identityForIdentityId(_ identityId: Int64) throws -> SecureVaultModels.Identity? {
+        return _identities[identityId]
+    }
+
+    func storeIdentity(_ identity: SecureVaultModels.Identity) throws -> Int64 {
+        if let identityID = identity.id {
+            _identities[identityID] = identity
+            return identityID
+        } else {
+            return -1
+        }
+    }
+
+    func deleteIdentityForIdentityId(_ identityId: Int64) throws {
+        _identities.removeValue(forKey: identityId)
+    }
+
+    func creditCards() throws -> [SecureVaultModels.CreditCard] {
+        return Array(_creditCards.values)
+    }
+
+    func creditCardForCardId(_ cardId: Int64) throws -> SecureVaultModels.CreditCard? {
+        return _creditCards[cardId]
+    }
+
+    func storeCreditCard(_ creditCard: SecureVaultModels.CreditCard) throws -> Int64 {
+        if let cardID = creditCard.id {
+            _creditCards[cardID] = creditCard
+            return cardID
+        } else {
+            return -1
+        }
+    }
+
+    func deleteCreditCardForCreditCardId(_ cardId: Int64) throws {
+        _creditCards.removeValue(forKey: cardId)
+    }
+
+    func hasAccountFor(username: String?, domain: String?) throws -> Bool {
+        _accounts.contains(where: { $0.username == username && $0.domain == domain })
+    }
+
+    func inTransaction(_ block: @escaping (Database) throws -> Void) throws {
+        try db.write(block)
+    }
+
+    func storeWebsiteCredentials(_ credentials: SecureVaultModels.WebsiteCredentials, in database: Database) throws -> Int64 {
+        1
+    }
+
+    func modifiedSyncableCredentials() throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func syncableCredentialsForSyncIds(_ syncIds: any Sequence<String>, in database: Database) throws -> [SecureVaultModels.SyncableCredentials] {
+        []
+    }
+
+    func websiteCredentialsForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.WebsiteCredentials? {
+        nil
+    }
+
+    func syncableCredentialsForAccountId(_ accountId: Int64, in database: Database) throws -> SecureVaultModels.SyncableCredentials? {
+        nil
+    }
+
+    func storeSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
+    }
+
+    func deleteSyncableCredentials(_ syncableCredentials: SecureVaultModels.SyncableCredentials, in database: Database) throws {
+    }
+
+    func updateSyncTimestamp(in database: Database, tableName: String, objectId: Int64, timestamp: Date?) throws {
+    }
+}
+
+class MockCryptoProvider: SecureStorageCryptoProvider {
+
+    var passwordSalt: Data {
+        return Data()
+    }
+
+    var keychainServiceName: String {
+        return "service"
+    }
+
+    var keychainAccountName: String {
+        return "account"
+    }
+
+    // swiftlint:disable identifier_name
+    var _derivedKey: Data?
+    var _decryptedData: Data?
+    var _lastDataToDecrypt: Data?
+    var _lastDataToEncrypt: Data?
+    var _lastKey: Data?
+    var hashingSalt: Data?
+    // swiftlint:enable identifier_name
+
+    func generateSecretKey() throws -> Data {
+        return Data()
+    }
+
+    func generatePassword() throws -> Data {
+        return Data()
+    }
+
+    func deriveKeyFromPassword(_ password: Data) throws -> Data {
+        return _derivedKey!
+    }
+
+    func generateNonce() throws -> Data {
+        return Data()
+    }
+
+    func encrypt(_ data: Data, withKey key: Data) throws -> Data {
+        _lastDataToEncrypt = data
+        _lastKey = key
+        return data
+    }
+
+    func decrypt(_ data: Data, withKey key: Data) throws -> Data {
+        _lastDataToDecrypt = data
+        _lastKey = key
+
+        guard let data = _decryptedData else {
+            throw SecureStorageError.invalidPassword
+        }
+
+        return data
+    }
+
+    func generateSalt() throws -> Data {
+        return Data()
+    }
+
+    func hashData(_ data: Data) throws -> String? {
+        return ""
+    }
+
+    func hashData(_ data: Data, salt: Data?) throws -> String? {
+        return ""
+    }
+
+}
+
+class MockKeyStoreProvider: SecureStorageKeyStoreProvider {
+
+    // swiftlint:disable identifier_name
+    var _l1Key: Data?
+    var _encryptedL2Key: Data?
+    var _generatedPassword: Data?
+    var _generatedPasswordCleared = false
+    var _lastEncryptedL2Key: Data?
+    // swiftlint:enable identifier_name
+
+    var generatedPasswordEntryName: String {
+        return ""
+    }
+
+    var l1KeyEntryName: String {
+        return ""
+    }
+
+    var l2KeyEntryName: String {
+        return ""
+    }
+
+    var keychainServiceName: String {
+        return ""
+    }
+
+    func attributesForEntry(named: String, serviceName: String) -> [String: Any] {
+        return [:]
+    }
+
+    func storeGeneratedPassword(_ password: Data) throws {
+    }
+
+    func generatedPassword() throws -> Data? {
+        return _generatedPassword
+    }
+
+    func clearGeneratedPassword() throws {
+        _generatedPasswordCleared = true
+    }
+
+    func storeL1Key(_ data: Data) throws {
+    }
+
+    func l1Key() throws -> Data? {
+        return _l1Key
+    }
+
+    func storeEncryptedL2Key(_ data: Data) throws {
+        _lastEncryptedL2Key = data
+    }
+
+    func encryptedL2Key() throws -> Data? {
+        return _encryptedL2Key
     }
 
 }

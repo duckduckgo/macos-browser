@@ -19,6 +19,7 @@
 import Combine
 import Foundation
 import Navigation
+import UniformTypeIdentifiers
 import WebKit
 
 extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
@@ -83,22 +84,25 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
             // proceed to web view creation
             completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
             return
-        // action doesn‘t require Popup Permission as it‘s user-initiated
-        // TO BE FIXED: this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation:
-        // https://app.asana.com/0/1177771139624306/1203798645462846/f
-        case .none where navigationAction.isUserInitiated == true:
-            // try to guess popup kind from provided windowFeatures
-            let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
-            let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: isBurner)
-            // proceed to web view creation
-            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
-            return
         case .cancel:
             // navigation action was handled before and cancelled
             completionHandler(nil)
             return
         case .none:
             break
+        }
+
+        let shouldSelectNewTab = !NSApp.isCommandPressed // this is actually not correct, to be fixed later
+        // try to guess popup kind from provided windowFeatures
+        let targetKind = NewWindowPolicy(windowFeatures, shouldSelectNewTab: shouldSelectNewTab, isBurner: burnerMode.isBurner)
+
+        // action doesn‘t require Popup Permission as it‘s user-initiated
+        // TO BE FIXED: this also opens a new window when a popup ad is shown on click simultaneously with the main frame navigation:
+        // https://app.asana.com/0/1177771139624306/1203798645462846/f
+        if navigationAction.isUserInitiated == true {
+            // proceed to web view creation
+            completionHandler(self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind))
+            return
         }
 
         let url = navigationAction.request.url
@@ -113,7 +117,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                 completionHandler(nil)
                 return
             }
-            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: .popup(size: windowFeatures.windowContentSize))
+            let webView = self.createWebView(from: webView, with: configuration, for: navigationAction, of: targetKind)
 
             completionHandler(webView)
         }
@@ -133,7 +137,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         // allow popups opened from an empty window console
         let sourceUrl = navigationAction.safeSourceFrame?.safeRequest?.url ?? self.url ?? .empty
         if sourceUrl.isEmpty || sourceUrl.scheme == URL.NavigationalScheme.about.rawValue {
-            return .allow(.tab(selected: true, burner: isBurner))
+            return .allow(.tab(selected: true, burner: burnerMode.isBurner))
         }
 
         return nil
@@ -147,7 +151,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
         let tab = Tab(content: .none,
                       webViewConfiguration: configuration,
                       parentTab: self,
-                      isBurner: isBurner,
+                      burnerMode: burnerMode,
                       canBeClosedWithBack: kind.isSelectedTab,
                       webViewSize: webView.superview?.bounds.size ?? .zero)
         delegate.tab(self, createdChild: tab, of: kind)

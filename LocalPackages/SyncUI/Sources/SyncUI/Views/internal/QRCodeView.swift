@@ -37,10 +37,7 @@ struct QRCode: View {
 
     func generateQRCode(from text: String, size: CGSize) -> NSImage {
         var qrImage: NSImage = {
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: nil) ?? NSImage()
-            }
-            return NSImage()
+            return NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: nil) ?? NSImage()
         }()
         let data = Data(text.utf8)
         let qrCodeFilter: CIFilter = CIFilter.init(name: "CIQRCodeGenerator")!

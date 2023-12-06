@@ -108,6 +108,12 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
 
 extension WindowControllersManager {
 
+#if DBP
+    func showDataBrokerProtectionTab() {
+        showTab(with: .dataBrokerProtection)
+    }
+#endif
+
     func showBookmarksTab() {
         showTab(with: .bookmarks)
     }
@@ -124,7 +130,7 @@ extension WindowControllersManager {
             WindowsManager.openNewWindow(with: url, isBurner: false)
         } else if mainWindowController?.mainViewController.view.window?.isPopUpWindow ?? false {
             show(url: url, newTab: true)
-        } else if NSApplication.shared.isCommandPressed {
+        } else if NSApplication.shared.isCommandPressed && !NSApplication.shared.isOptionPressed {
             mainWindowController?.mainViewController.tabCollectionViewModel.appendNewTab(with: .url(url), selected: false)
         } else if selectedTab?.isPinned ?? false { // When selecting a bookmark with a pinned tab active, always open the URL in a new tab
             show(url: url, newTab: true)
@@ -150,7 +156,7 @@ extension WindowControllersManager {
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
                 tab.setContent(url.map { .url($0) } ?? .homePage)
             } else {
-                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, isBurner: tabCollectionViewModel.isBurner)
+                let newTab = Tab(content: url.map { .url($0) } ?? .homePage, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
                 newTab.setContent(url.map { .url($0) } ?? .homePage)
                 tabCollectionViewModel.append(tab: newTab)
             }
@@ -175,12 +181,17 @@ extension WindowControllersManager {
         if let url = url {
             WindowsManager.openNewWindow(with: url, isBurner: false)
         } else {
-            WindowsManager.openNewWindow(isBurner: false)
+            WindowsManager.openNewWindow(burnerMode: .regular)
         }
     }
 
     func showTab(with content: Tab.TabContent) {
-        guard let windowController = self.mainWindowController else { return }
+        guard let windowController = self.mainWindowController else {
+            let tabCollection = TabCollection(tabs: [Tab(content: content)])
+            let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
+            WindowsManager.openNewWindow(with: tabCollectionViewModel)
+            return
+        }
 
         let viewController = windowController.mainViewController
         let tabCollectionViewModel = viewController.tabCollectionViewModel
@@ -216,4 +227,27 @@ extension Tab {
     var isPinned: Bool {
         return self.pinnedTabsManager.isTabPinned(self)
     }
+}
+
+// MARK: - Accessing all TabCollectionViewModels
+extension WindowControllersManager {
+
+    var allTabCollectionViewModels: [TabCollectionViewModel] {
+        return mainWindowControllers.map {
+            $0.mainViewController.tabCollectionViewModel
+        }
+    }
+
+    var allTabViewModels: [TabViewModel] {
+        return allTabCollectionViewModels.flatMap {
+            Array($0.tabViewModels.values)
+        }
+    }
+
+    func windowController(for tabCollectionViewModel: TabCollectionViewModel) -> MainWindowController? {
+        return mainWindowControllers.first(where: {
+            tabCollectionViewModel === $0.mainViewController.tabCollectionViewModel
+        })
+    }
+
 }

@@ -20,21 +20,33 @@ import BrowserServicesKit
 
 extension EmailManagerRequestDelegate {
 
+    public var activeTask: URLSessionTask? {
+        get { return nil }
+        set {}
+    }
+
     // swiftlint:disable function_parameter_count
     func emailManager(_ emailManager: EmailManager, requested url: URL, method: String, headers: [String: String], parameters: [String: String]?, httpBody: Data?, timeoutInterval: TimeInterval) async throws -> Data {
-
         let finalURL = url.appendingParameters(parameters ?? [:])
-
         var request = URLRequest(url: finalURL, timeoutInterval: timeoutInterval)
         request.allHTTPHeaderFields = headers
         request.httpMethod = method
         request.httpBody = httpBody
 
-        return try await URLSession.default.data(for: request).0
+        activeTask?.cancel() // Cancel active request (if any)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        activeTask = URLSession.shared.dataTask(with: request)
+
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode >= 300 {
+            throw EmailManagerRequestDelegateError.serverError(statusCode: httpResponse.statusCode)
+        }
+
+        return data
     }
     // swiftlint:enable function_parameter_count
 
-    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+    public func emailManagerKeychainAccessFailed(_ emailManager: EmailManager, accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription

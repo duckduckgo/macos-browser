@@ -19,6 +19,7 @@
 import XCTest
 import os.log
 @testable import DuckDuckGo_Privacy_Browser
+import Common
 
 final class FireproofingReferenceTests: XCTestCase {
     private var referenceTests = [Test]()
@@ -37,13 +38,14 @@ final class FireproofingReferenceTests: XCTestCase {
 
     private func sanitizedSite(_ site: String) -> String {
         let url = URL(string: site)!
-        return url.host!
+        return url.host ?? site
     }
 
     override func tearDownWithError() throws {
         referenceTests.removeAll()
     }
 
+    /// Test disabled until Privacy Reference Tests contain the new Fire Button and Fireproofing logic
     func testFireproofing() throws {
         referenceTests = testData.fireButtonFireproofing.tests.filter {
             $0.exceptPlatforms.contains("macos-browser") == false
@@ -66,7 +68,7 @@ final class FireproofingReferenceTests: XCTestCase {
         os_log("Testing %s", test.name)
 
         let loginDomains = testData.fireButtonFireproofing.fireproofedSites.map { sanitizedSite($0) }
-        let logins = MockPreservedLogins(domains: loginDomains)
+        let logins = MockPreservedLogins(domains: loginDomains, tld: ContentBlocking.shared.tld)
 
         let webCacheManager = WebCacheManager(fireproofDomains: logins, websiteDataStore: dataStore)
 
@@ -114,11 +116,15 @@ final class FireproofingReferenceTests: XCTestCase {
 
     private class MockPreservedLogins: FireproofDomains {
 
-        init(domains: [String]) {
+        init(domains: [String], tld: TLD) {
             super.init(store: FireproofDomainsStoreMock())
 
             for domain in domains {
-                super.add(domain: domain)
+                guard let eTLDPlusOne = tld.eTLDplus1(domain) else {
+                    XCTFail("Can't create eTLD+1 domain for \(domain). TLDs: \(Mirror(reflecting: tld).children.first(where: { $0.label == "tlds" }).map { String(describing: $0.value) } ?? "<nil>")")
+                    return
+                }
+                super.add(domain: eTLDPlusOne)
             }
         }
     }

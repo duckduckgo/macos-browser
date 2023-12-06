@@ -23,9 +23,9 @@ import BrowserServicesKit
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, isBurner: Bool) {
-        if isBurner, websiteDataStore.isPersistent {
-            websiteDataStore = .nonPersistent()
+    func applyStandardConfiguration(contentBlocking: some ContentBlockingProtocol, burnerMode: BurnerMode) {
+        if case .burner(let websiteDataStore) = burnerMode {
+            self.websiteDataStore = websiteDataStore
         }
         allowsAirPlayForMediaPlayback = true
         if #available(macOS 12.3, *) {
@@ -39,8 +39,10 @@ extension WKWebViewConfiguration {
         preferences.javaScriptCanOpenWindowsAutomatically = true
         preferences.isFraudulentWebsiteWarningEnabled = false
 
-        if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
-            setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
+        if SupportedOSChecker.isCurrentOSReceivingUpdates {
+            if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
+                setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
+            }
         }
 
         let userContentController = UserContentController(assetsPublisher: contentBlocking.contentBlockingAssetsPublisher,
@@ -48,9 +50,6 @@ extension WKWebViewConfiguration {
 
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
-#if !APPSTORE
-        self.processPool.setDownloadDelegateIfNeeded(using: LegacyWebKitDownloadDelegate.init)
-#endif
      }
 
 }

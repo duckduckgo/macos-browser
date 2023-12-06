@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
@@ -26,24 +27,36 @@ struct AppearancePreferencesPersistorMock: AppearancePreferencesPersistor {
     var showFullURL: Bool
     var showAutocompleteSuggestions: Bool
     var currentThemeName: String
+    var favoritesDisplayMode: String?
     var defaultPageZoom: CGFloat
+    var showBookmarksBar: Bool
+    var bookmarksBarAppearance: BookmarksBarAppearance
+    var homeButtonPosition: HomeButtonPosition
 
     init(
         showFullURL: Bool = false,
         showAutocompleteSuggestions: Bool = true,
         currentThemeName: String = ThemeName.systemDefault.rawValue,
+        favoritesDisplayMode: String? = FavoritesDisplayMode.displayNative(.desktop).description,
         defaultPageZoom: CGFloat = DefaultZoomValue.percent100.rawValue,
         isContinueSetUpVisible: Bool = true,
         isFavoriteVisible: Bool = true,
-        isRecentActivityVisible: Bool = true
+        isRecentActivityVisible: Bool = true,
+        showBookmarksBar: Bool = true,
+        bookmarksBarAppearance: BookmarksBarAppearance = .alwaysOn,
+        homeButtonPosition: HomeButtonPosition = .right
     ) {
         self.showFullURL = showFullURL
         self.showAutocompleteSuggestions = showAutocompleteSuggestions
         self.currentThemeName = currentThemeName
+        self.favoritesDisplayMode = favoritesDisplayMode
         self.defaultPageZoom = defaultPageZoom
         self.isContinueSetUpVisible = isContinueSetUpVisible
         self.isFavoriteVisible = isFavoriteVisible
         self.isRecentActivityVisible = isRecentActivityVisible
+        self.showBookmarksBar = showBookmarksBar
+        self.bookmarksBarAppearance = bookmarksBarAppearance
+        self.homeButtonPosition = homeButtonPosition
     }
 }
 
@@ -55,39 +68,47 @@ final class AppearancePreferencesTests: XCTestCase {
                 showFullURL: false,
                 showAutocompleteSuggestions: true,
                 currentThemeName: ThemeName.systemDefault.rawValue,
+                favoritesDisplayMode: FavoritesDisplayMode.displayNative(.desktop).description,
                 defaultPageZoom: DefaultZoomValue.percent100.rawValue,
                 isContinueSetUpVisible: true,
                 isFavoriteVisible: true,
-                isRecentActivityVisible: true
+                isRecentActivityVisible: true,
+                homeButtonPosition: .left
             )
         )
 
         XCTAssertEqual(model.showFullURL, false)
         XCTAssertEqual(model.showAutocompleteSuggestions, true)
         XCTAssertEqual(model.currentThemeName, ThemeName.systemDefault)
+        XCTAssertEqual(model.favoritesDisplayMode, .displayNative(.desktop))
         XCTAssertEqual(model.defaultPageZoom, DefaultZoomValue.percent100)
         XCTAssertEqual(model.isFavoriteVisible, true)
         XCTAssertEqual(model.isContinueSetUpVisible, true)
         XCTAssertEqual(model.isRecentActivityVisible, true)
+        XCTAssertEqual(model.homeButtonPosition, .left)
 
         model = AppearancePreferences(
             persistor: AppearancePreferencesPersistorMock(
                 showFullURL: true,
                 showAutocompleteSuggestions: false,
                 currentThemeName: ThemeName.light.rawValue,
+                favoritesDisplayMode: FavoritesDisplayMode.displayUnified(native: .desktop).description,
                 defaultPageZoom: DefaultZoomValue.percent50.rawValue,
                 isContinueSetUpVisible: false,
                 isFavoriteVisible: false,
-                isRecentActivityVisible: false
+                isRecentActivityVisible: false,
+                homeButtonPosition: .left
             )
         )
         XCTAssertEqual(model.showFullURL, true)
         XCTAssertEqual(model.showAutocompleteSuggestions, false)
         XCTAssertEqual(model.currentThemeName, ThemeName.light)
+        XCTAssertEqual(model.favoritesDisplayMode, .displayUnified(native: .desktop))
         XCTAssertEqual(model.defaultPageZoom, DefaultZoomValue.percent50)
         XCTAssertEqual(model.isFavoriteVisible, false)
         XCTAssertEqual(model.isContinueSetUpVisible, false)
         XCTAssertEqual(model.isRecentActivityVisible, false)
+        XCTAssertEqual(model.homeButtonPosition, .left)
     }
 
     func testWhenInitializedWithGarbageThenThemeIsSetToSystemDefault() throws {

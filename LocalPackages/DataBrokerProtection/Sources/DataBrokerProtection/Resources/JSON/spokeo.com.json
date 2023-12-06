@@ -1,0 +1,122 @@
+{
+  "name": "spokeo.com",
+  "version": "0.1.2",
+  "addedDatetime": 1692590400000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "169c9600-433e-4de9-b357-8c659b113556",
+          "url": "https://www.spokeo.com/${firstName}-${lastName}/${state|stateFull}/${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "4bb496d5-63d4-4d36-bab5-e923387f8c75",
+          "selector": ".single-column-list-item",
+          "profile": {
+            "name": {
+              "selector": ".title",
+              "beforeText": ","
+            },
+            "age": {
+              "selector": ".title",
+              "afterText": ","
+            },
+            "addressCityState": {
+              "selector": ".//div[@type='display']",
+              "afterText": "RESIDES IN"
+            },
+            "relativesList": {
+              "selector": ".//a[contains(@id, 'relative')]",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".title"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "cc521fcb-a8ea-4820-8bc1-0ccce9dbd8fd",
+          "url": "https://www.spokeo.com/optout"
+        },
+        {
+          "actionType": "fillForm",
+          "id": "147ebdbd-e96a-4c39-b1d6-7f7e77e6369d",
+          "selector": ".optout_container",
+          "elements": [
+            {
+              "type": "email",
+              "selector": ".//input[@name='email']"
+            },
+            {
+              "type": "profileUrl",
+              "selector": ".//input[@name='url']"
+            }
+          ]
+        },
+        {
+          "actionType": "getCaptchaInfo",
+          "id": "2e4b92a1-12ab-482d-b83e-e9de82c2b992",
+          "selector": "#g-recaptcha"
+        },
+        {
+          "actionType": "solveCaptcha",
+          "id": "4a0bbc9a-a717-4b1d-b3a6-af8131621f52",
+          "selector": "#g-recaptcha"
+        },
+        {
+          "actionType": "click",
+          "id": "79cb3967-20d9-46c5-b4ec-f2da86b481fb",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".responsive-button"
+            }
+          ]
+        },
+        {
+          "actionType": "expectation",
+          "id": "990e3970-6d50-4bbc-9c34-c26929646083",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "Please check your inbox for a confirmation email"
+            }
+          ]
+        },
+        {
+          "actionType": "emailConfirmation",
+          "id": "8993da43-4b9b-4d5b-b59a-efcc609d2583",
+          "pollingTime": 30
+        },
+        {
+          "actionType": "expectation",
+          "id": "69810d0a-8de0-4613-ad63-f549ea72ef29",
+          "expectations": [
+            {
+              "type": "text",
+              "selector": "body",
+              "expect": "We've received your request to remove this listing"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

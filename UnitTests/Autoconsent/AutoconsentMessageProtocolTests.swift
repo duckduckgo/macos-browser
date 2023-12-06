@@ -21,7 +21,6 @@ import Common
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-@available(macOS 11, *)
 class AutoconsentMessageProtocolTests: XCTestCase {
 
     let userScript = AutoconsentUserScript(
@@ -134,7 +133,6 @@ class AutoconsentMessageProtocolTests: XCTestCase {
     }
 }
 
-@available(macOS 11, *)
 class MockWKScriptMessage: WKScriptMessage {
 
     let mockedName: String

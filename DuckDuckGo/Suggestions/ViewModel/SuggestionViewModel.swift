@@ -19,7 +19,7 @@
 import Cocoa
 import BrowserServicesKit
 
-final class SuggestionViewModel {
+struct SuggestionViewModel: Equatable {
 
     let isHomePage: Bool
     let suggestion: Suggestion
@@ -39,21 +39,33 @@ final class SuggestionViewModel {
         return style
     }()
 
-    lazy var tableRowViewStandardAttributes: [NSAttributedString.Key: Any] = {
-        let size: CGFloat = isHomePage ? 15 : 13
-        return [
-            .font: NSFont.systemFont(ofSize: size, weight: .regular),
-            .paragraphStyle: Self.paragraphStyle
-        ]
-    }()
+    private static let homePageTableRowViewStandardAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 15, weight: .regular),
+        .paragraphStyle: Self.paragraphStyle
+    ]
 
-    lazy var tableRowViewBoldAttributes: [NSAttributedString.Key: Any] = {
-        let size: CGFloat = isHomePage ? 15 : 13
-        return [
-            NSAttributedString.Key.font: NSFont.systemFont(ofSize: size, weight: .bold),
-            .paragraphStyle: Self.paragraphStyle
-        ]
-    }()
+    private static let regularTableRowViewStandardAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 13, weight: .regular),
+        .paragraphStyle: Self.paragraphStyle
+    ]
+
+    private static let homePageTableRowViewBoldAttributes: [NSAttributedString.Key: Any] = [
+        NSAttributedString.Key.font: NSFont.systemFont(ofSize: 15, weight: .bold),
+        .paragraphStyle: Self.paragraphStyle
+    ]
+
+    private static let regularTableRowViewBoldAttributes: [NSAttributedString.Key: Any] = [
+        NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .bold),
+        .paragraphStyle: Self.paragraphStyle
+    ]
+
+    var tableRowViewStandardAttributes: [NSAttributedString.Key: Any] {
+        isHomePage ? Self.homePageTableRowViewStandardAttributes : Self.regularTableRowViewStandardAttributes
+    }
+
+    var tableRowViewBoldAttributes: [NSAttributedString.Key: Any] {
+        isHomePage ? Self.homePageTableRowViewBoldAttributes : Self.regularTableRowViewBoldAttributes
+    }
 
     var tableCellViewAttributedString: NSAttributedString {
         var firstPart = ""
@@ -130,7 +142,7 @@ final class SuggestionViewModel {
         switch suggestion {
         // for punycoded urls display real url as a suffix
         case .website(url: let url) where url.toString(forUserInput: userStringValue, decodePunycode: false) != self.string:
-            return " – " + url.toString(decodePunycode: false, dropScheme: true, needsWWW: false, dropTrailingSlash: true)
+            return " – " + url.toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: true)
 
         case .phrase, .unknown, .website:
             return ""
@@ -141,7 +153,6 @@ final class SuggestionViewModel {
             } else {
                 return " – " + url.toString(decodePunycode: true,
                                               dropScheme: true,
-                                              needsWWW: false,
                                               dropTrailingSlash: true)
             }
         }

@@ -97,7 +97,7 @@ final class AppContentBlocking {
     }
 
     private static let debugEvents = EventMapping<ContentBlockerDebugEvents> { event, error, parameters, onComplete in
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         let domainEvent: Pixel.Event.Debug
         switch event {
@@ -156,6 +156,8 @@ final class AppContentBlocking {
             domainEvent = .adClickAttributionDetected
         case .adAttributionActive:
             domainEvent = .adClickAttributionActive
+        case .adAttributionPageLoads:
+            domainEvent = .adClickAttributionPageLoads
         }
 
         Pixel.fire(domainEvent, withAdditionalParameters: parameters ?? [:])

@@ -19,78 +19,105 @@
 import Foundation
 import Networking
 import Common
+import PixelKit
 
 final class Pixel {
 
     static private(set) var shared: Pixel?
 
     static func setUp(dryRun: Bool = false) {
-        shared = Pixel(dryRun: dryRun)
+#if DEBUG
+        if dryRun {
+            shared = Pixel(store: LocalPixelDataStore.shared) { event, params, _, _, onComplete in
+                let params = params.filter { key, _ in !["appVersion", "test"].contains(key) }
+                os_log(.debug, log: .pixel, "%{public}@ %{public}@", event.name.replacingOccurrences(of: "_", with: "."), params)
+                // simulate server response time for Dry Run mode
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    onComplete(nil)
+                }
+            }
+            return
+        }
+#endif
+        shared = Pixel(store: LocalPixelDataStore.shared, requestSender: Pixel.defaultRequestSender)
     }
 
+#if DEBUG
+    static func setUp(store: @escaping @autoclosure () -> PixelDataStore = { fatalError("provide test store") }(),
+                      pixelFired: @escaping (Pixel.Event) -> Void) {
+        shared = Pixel(store: store()) { event, _, _, _, onComplete in
+            pixelFired(event)
+            onComplete(nil)
+        }
+    }
+#endif
+
     static func tearDown() {
+        shared?.store = nil
         shared = nil
     }
 
-    private var dryRun: Bool
+    typealias RequestSender = (Pixel.Event, [String: String], CharacterSet?, APIRequest.Headers, @escaping (Error?) -> Void) -> Void
+    private let sendRequest: RequestSender
+
+    private var store: (() -> PixelDataStore)!
+
     static var isNewUser: Bool {
         let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
         return firstLaunchDate >= oneWeekAgo
     }
 
-    init(dryRun: Bool) {
-        self.dryRun = dryRun
+    static var defaultRequestSender: RequestSender {
+        { event, params, allowedQueryReservedCharacters, headers, onComplete in
+            let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: event.name),
+                                                         queryParameters: params,
+                                                         allowedQueryReservedCharacters: allowedQueryReservedCharacters,
+                                                         headers: headers)
+            let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
+            request.fetch { (_, error) in
+                onComplete(error)
+            }
+        }
     }
+
+    private let appVersion: String
+
+    init(appVersion: String = AppVersion.shared.versionNumber,
+         store: @escaping @autoclosure () -> PixelDataStore,
+         requestSender: @escaping RequestSender) {
+
+        self.appVersion = appVersion
+        self.store = store
+        self.sendRequest = requestSender
+    }
+
+    private static let moreInfoHeader: HTTPHeaders = [APIRequest.HTTPHeaderField.moreInfo: "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString]
 
     // Temporary for activation pixels
     static private var aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
     @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: aMonthAgo)
     static var firstLaunchDate: Date
 
-    func fire(pixelNamed pixelName: String,
-              withAdditionalParameters params: [String: String]? = nil,
+    func fire(_ event: Pixel.Event,
+              limitTo limit: Pixel.Event.Repetition = .repetitive,
+              withAdditionalParameters parameters: [String: String]? = nil,
               allowedQueryReservedCharacters: CharacterSet? = nil,
               includeAppVersionParameter: Bool = true,
-              withHeaders headers: HTTPHeaders = APIRequest.Headers().default,
+              withHeaders headers: APIRequest.Headers = APIRequest.Headers(additionalHeaders: moreInfoHeader),
               onComplete: @escaping (Error?) -> Void = {_ in }) {
 
-        var newParams = params ?? [:]
-        if includeAppVersionParameter {
-            newParams[Parameters.appVersion] = AppVersion.shared.versionNumber
+        func repetition() -> Event.Repetition {
+            Event.Repetition(key: event.name, store: self.store())
         }
-        #if DEBUG
-            newParams[Parameters.test] = Values.test
-        #endif
-
-        var headers = headers
-        headers[APIRequest.HTTPHeaderField.moreInfo] = "See " + URL.duckDuckGoMorePrivacyInfo.absoluteString
-
-        guard !dryRun else {
-            let params = params?.filter { key, _ in !["appVersion", "test"].contains(key) } ?? [:]
-            os_log(.debug, log: .pixel, "%@ %@", pixelName.replacingOccurrences(of: "_", with: "."), params)
-            // simulate server response time for Dry Run mode
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                onComplete(nil)
-            }
-            return
+        switch limit {
+        case .initial:
+            if repetition() != .initial { return }
+        case .dailyFirst:
+            if repetition() == .repetitive { return } // Pixel alredy fired today
+        case .repetitive: break
         }
 
-        let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: pixelName),
-                                                     queryParameters: newParams,
-                                                     allowedQueryReservedCharacters: allowedQueryReservedCharacters,
-                                                     headers: headers)
-        let request = APIRequest(configuration: configuration, urlSession: URLSession.session(useMainThreadCallbackQueue: true))
-        request.fetch { (_, error) in
-            onComplete(error)
-        }
-    }
-
-    static func fire(_ event: Pixel.Event,
-                     withAdditionalParameters parameters: [String: String]? = nil,
-                     allowedQueryReservedCharacters: CharacterSet? = nil,
-                     includeAppVersionParameter: Bool = true,
-                     onComplete: @escaping (Error?) -> Void = {_ in }) {
-        let newParams: [String: String]?
+        var newParams: [String: String]
         switch (event.parameters, parameters) {
         case (.some(let parameters), .none):
             newParams = parameters
@@ -99,11 +126,29 @@ final class Pixel {
         case (.some(let params1), .some(let params2)):
             newParams = params1.merging(params2) { $1 }
         case (.none, .none):
-            newParams = nil
+            newParams = [:]
         }
 
-        Self.shared?.fire(pixelNamed: event.name,
-                          withAdditionalParameters: newParams,
+        if includeAppVersionParameter {
+            newParams[PixelKit.Parameters.appVersion] = appVersion
+        }
+#if DEBUG
+        newParams[PixelKit.Parameters.test] = PixelKit.Values.test
+#endif
+
+        sendRequest(event, newParams, allowedQueryReservedCharacters, headers, onComplete)
+    }
+
+    static func fire(_ event: Pixel.Event,
+                     limitTo limit: Pixel.Event.Repetition = .repetitive,
+                     withAdditionalParameters parameters: [String: String]? = nil,
+                     allowedQueryReservedCharacters: CharacterSet? = nil,
+                     includeAppVersionParameter: Bool = true,
+                     onComplete: @escaping (Error?) -> Void = {_ in }) {
+
+        Self.shared?.fire(event,
+                          limitTo: limit,
+                          withAdditionalParameters: parameters,
                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                           includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)

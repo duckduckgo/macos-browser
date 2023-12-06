@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
 import Combine
 import Common
@@ -168,6 +169,7 @@ final class AddressBarButtonsViewController: NSViewController {
     private var effectiveAppearanceCancellable: AnyCancellable?
     private var permissionsCancellables = Set<AnyCancellable>()
     private var trackerAnimationTriggerCancellable: AnyCancellable?
+    private var privacyEntryPointIconUpdateCancellable: AnyCancellable?
     private var isMouseOverAnimationVisibleCancellable: AnyCancellable?
     private var privacyInfoCancellable: AnyCancellable?
 
@@ -200,10 +202,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
     override func viewWillAppear() {
         setupButtons()
-    }
-
-    override func viewDidAppear() {
-        super.viewDidAppear()
     }
 
     func showBadgeNotification(_ type: NavigationBarBadgeAnimationView.AnimationType) {
@@ -280,7 +278,8 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func openBookmarkPopover(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) {
-        guard let bookmark = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint) else {
+        let result = bookmarkForCurrentUrl(setFavorite: setFavorite, accessPoint: accessPoint)
+        guard let bookmark = result.bookmark else {
             assertionFailure("Failed to get a bookmark for the popover")
             return
         }
@@ -288,8 +287,9 @@ final class AddressBarButtonsViewController: NSViewController {
         let bookmarkPopover = bookmarkPopoverCreatingIfNeeded()
         if !bookmarkPopover.isShown {
             bookmarkButton.isHidden = false
-            bookmarkPopover.viewController.bookmark = bookmark
-            bookmarkPopover.show(relativeTo: bookmarkButton.bounds, of: bookmarkButton, preferredEdge: .maxY)
+            bookmarkPopover.isNew = result.isNew
+            bookmarkPopover.bookmark = bookmark
+            bookmarkPopover.show(positionedBelow: bookmarkButton)
         } else {
             updateBookmarkButtonVisibility()
             bookmarkPopover.close()
@@ -320,9 +320,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 button = popupsButton
                 popover = popupBlockedPopoverCreatingIfNeeded()
             case .externalScheme:
-                guard !query.wasShownOnce else { return }
                 button = externalSchemeButton
-                popover.behavior = .transient
                 query.shouldShowAlwaysAllowCheckbox = true
                 query.shouldShowCancelInsteadOfDeny = true
             default:
@@ -355,7 +353,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
         privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
-        privacyDashboardPopover.show(relativeTo: privacyDashboardPositioningView.bounds, of: privacyDashboardPositioningView, preferredEdge: .maxY)
+        privacyDashboardPopover.show(positionedBelow: privacyDashboardPositioningView)
 
         privacyEntryPointButton.state = .on
 
@@ -379,7 +377,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !(textFieldValue?.isEmpty ?? true))
 
-        updatePrivacyEntryPoint()
+        updatePrivacyEntryPointButton()
         updateImageButton()
         updatePermissionButtons()
         updateBookmarkButtonVisibility()
@@ -549,11 +547,11 @@ final class AddressBarButtonsViewController: NSViewController {
             animationView?.removeFromSuperview()
 
             let newAnimationView: AnimationView
-            if NSApp.isRunningUnitTests {
-                newAnimationView = AnimationView()
-            } else {
-                // For unknown reason, this caused infinite execution of various unit tests.
+            // For unknown reason, this caused infinite execution of various unit tests.
+            if NSApp.runType.requiresEnvironment {
                 newAnimationView = getAnimationView(for: animationName) ?? AnimationView()
+            } else {
+                newAnimationView = AnimationView()
             }
             animationWrapperView.addAndLayout(newAnimationView)
             newAnimationView.isHidden = true
@@ -579,8 +577,10 @@ final class AddressBarButtonsViewController: NSViewController {
             self?.stopAnimations()
             self?.subscribeToUrl()
             self?.subscribeToPermissions()
+            self?.subscribeToPrivacyEntryPointIconUpdateTrigger()
             self?.subscribeToTrackerAnimationTrigger()
             self?.closePopover()
+            self?.updatePrivacyEntryPointIcon()
         }
     }
 
@@ -623,6 +623,15 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
+    private func subscribeToPrivacyEntryPointIconUpdateTrigger() {
+        privacyEntryPointIconUpdateCancellable?.cancel()
+
+        privacyEntryPointIconUpdateCancellable = tabCollectionViewModel.selectedTabViewModel?.privacyEntryPointIconUpdateTrigger
+            .sink { [weak self] _ in
+                self?.updatePrivacyEntryPointIcon()
+        }
+    }
+
     private func subscribeToBookmarkList() {
         bookmarkListCancellable = bookmarkManager.listPublisher.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateBookmarkButtonImage()
@@ -632,7 +641,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func subscribePrivacyDashboardPendingUpdates(privacyDashboardPopover: PrivacyDashboardPopover) {
         privacyDashboadPendingUpdatesCancellable?.cancel()
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         privacyDashboadPendingUpdatesCancellable = privacyDashboardPopover.viewController.rulesUpdateObserver
             .$pendingUpdates.dropFirst().receive(on: DispatchQueue.main).sink { [weak privacyDashboardPopover] _ in
@@ -726,11 +735,6 @@ final class AddressBarButtonsViewController: NSViewController {
 
     }
 
-    private func updatePrivacyEntryPoint() {
-        self.updatePrivacyEntryPointButton()
-        self.updatePrivacyEntryPointIcon()
-    }
-
     private func updatePrivacyEntryPointButton() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
@@ -738,30 +742,31 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let urlScheme = selectedTabViewModel.tab.content.url?.scheme
         let isHypertextUrl = urlScheme == "http" || urlScheme == "https"
-        let isDuckDuckGoUrl = selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false
         let isEditingMode = controllerMode?.isEditing ?? false
         let isTextFieldValueText = textFieldValue?.isText ?? false
+        let isLocalUrl = selectedTabViewModel.tab.content.url?.isLocalURL ?? false
 
         // Privacy entry point button
         privacyEntryPointButton.isHidden = isEditingMode ||
             isTextFieldEditorFirstResponder ||
-            isDuckDuckGoUrl ||
             !isHypertextUrl ||
             selectedTabViewModel.errorViewState.isVisible ||
-            isTextFieldValueText
+            isTextFieldValueText ||
+            isLocalUrl
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying
     }
 
     private func updatePrivacyEntryPointIcon() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
+        privacyEntryPointButton.image = nil
+
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             return
         }
 
         guard !isAnyShieldAnimationPlaying else {
-            privacyEntryPointButton.image = nil
             return
         }
 
@@ -893,11 +898,11 @@ final class AddressBarButtonsViewController: NSViewController {
         }
     }
 
-    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> Bookmark? {
+    private func bookmarkForCurrentUrl(setFavorite: Bool, accessPoint: Pixel.Event.AccessPoint) -> (bookmark: Bookmark?, isNew: Bool) {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
               let url = selectedTabViewModel.tab.content.url else {
             assertionFailure("No URL for bookmarking")
-            return nil
+            return (nil, false)
         }
 
         if let bookmark = bookmarkManager.getBookmark(forUrl: url.absoluteString) {
@@ -906,7 +911,7 @@ final class AddressBarButtonsViewController: NSViewController {
                 bookmarkManager.update(bookmark: bookmark)
             }
 
-            return bookmark
+            return (bookmark, false)
         }
 
         let bookmark = bookmarkManager.makeBookmark(for: url,
@@ -914,7 +919,7 @@ final class AddressBarButtonsViewController: NSViewController {
                                                     isFavorite: setFavorite)
         updateBookmarkButtonImage(isUrlBookmarked: bookmark != nil)
 
-        return bookmark
+        return (bookmark, true)
     }
 
     private func subscribeToEffectiveAppearance() {
@@ -970,9 +975,22 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
+    func popoverWillClose(_ notification: Notification) {
+        switch notification.object as? NSPopover {
+        case bookmarkPopover:
+            bookmarkPopover?.popoverWillClose()
+
+        default:
+            break
+        }
+    }
+
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
         case bookmarkPopover:
+            if bookmarkPopover?.isNew == true {
+                NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
+            }
             updateBookmarkButtonVisibility()
 
         case privacyDashboardPopover:
@@ -999,4 +1017,40 @@ final class TrackerAnimationImageProvider: AnimationImageProvider {
         }
     }
 
+}
+
+extension URL {
+    private static let localPatterns = [
+        "^localhost$",
+        "^::1$",
+        "^.+\\.local$",
+        "^localhost\\.localhost$",
+        "^127\\.0\\.0\\.1$",
+        "^10\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^172\\.(1[6-9]|2[0-9]|3[0-1])\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^192\\.168\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^169\\.254\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]?|0)$",
+        "^fc[0-9a-fA-F]{2}:.+",
+        "^fe80:.+"
+    ]
+
+    private static var compiledRegexes: [NSRegularExpression] = {
+        var regexes: [NSRegularExpression] = []
+        for pattern in localPatterns {
+            if let newRegex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
+                regexes.append(newRegex)
+            }
+        }
+        return regexes
+    }()
+
+    var isLocalURL: Bool {
+        if let host = self.host {
+            for regex in Self.compiledRegexes
+            where regex.firstMatch(in: host, options: [], range: host.fullRange) != nil {
+                return true
+            }
+        }
+        return false
+    }
 }

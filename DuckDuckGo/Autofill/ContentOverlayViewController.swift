@@ -20,6 +20,7 @@ import Cocoa
 import WebKit
 import Combine
 import BrowserServicesKit
+import SecureStorage
 import Autofill
 
 @MainActor
@@ -49,6 +50,10 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         let model = AutofillPreferencesModel()
         return model
     }()
+
+    lazy var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+
+    lazy var privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
 
     public override func viewDidLoad() {
         initWebView()
@@ -165,7 +170,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
     }
 
     nonisolated
-    public func emailManagerKeychainAccessFailed(accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
+    public func emailManagerKeychainAccessFailed(_ emailManager: EmailManager, accessType: EmailKeychainAccessType, error: EmailKeychainAccessError) {
         var parameters = [
             "access_type": accessType.rawValue,
             "error": error.errorDescription
@@ -186,7 +191,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
             parameters["keychain_operation"] = "save"
         }
 
-        Pixel.fire(.debug(event: .emailAutofillKeychainError), withAdditionalParameters: parameters)
+        Pixel.fire(.debug(event: .emailAutofillKeychainError, error: error), withAdditionalParameters: parameters)
     }
 
     private enum Constants {
@@ -205,6 +210,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
         }
         self.preferredContentSize = CGSize(width: widthOut, height: heightOut)
     }
+
 }
 
 extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDelegate {
@@ -219,11 +225,27 @@ extension ContentOverlayViewController: OverlayAutofillUserScriptPresentationDel
 
 extension ContentOverlayViewController: SecureVaultManagerDelegate {
 
-    public func secureVaultManagerIsEnabledStatus(_: SecureVaultManager) -> Bool {
+    public func secureVaultManagerIsEnabledStatus(_ manager: SecureVaultManager, forType type: AutofillType?) -> Bool {
+        let prefs = AutofillPreferences()
+        switch type {
+        case .card:
+            return prefs.askToSavePaymentMethods
+        case .identity:
+            return prefs.askToSaveAddresses
+        case.password:
+            return prefs.askToSaveUsernamesAndPasswords
+        case .none:
+            return prefs.askToSaveAddresses || prefs.askToSavePaymentMethods || prefs.askToSaveUsernamesAndPasswords
+        }
+    }
+
+    public func secureVaultManagerShouldSaveData(_: SecureVaultManager) -> Bool {
         return true
     }
 
-    public func secureVaultManager(_: SecureVaultManager, promptUserToStoreAutofillData data: AutofillData, hasGeneratedPassword generatedPassword: Bool, withTrigger trigger: AutofillUserScript.GetTriggerType?) {
+    public func secureVaultManager(_: SecureVaultManager,
+                                   promptUserToStoreAutofillData data: AutofillData,
+                                   withTrigger trigger: AutofillUserScript.GetTriggerType?) {
         // No-op, the content overlay view controller should not be prompting the user to store data
     }
 
@@ -241,16 +263,42 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         // no-op on macOS
     }
 
+    public func secureVaultManager(_: SecureVaultManager,
+                                   isAuthenticatedFor type: AutofillType,
+                                   completionHandler: @escaping (Bool) -> Void) {
+
+        switch type {
+
+        // Require bio authentication for filling sensitive data via DDG password manager
+        case .card, .password:
+            let autofillPrefs = AutofillPreferences()
+            if DeviceAuthenticator.shared.requiresAuthentication &&
+                autofillPrefs.autolockLocksFormFilling &&
+                autofillPrefs.passwordManager == .duckduckgo {
+                DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { result in
+                    if case .success = result {
+                        completionHandler(true)
+                    } else {
+                        completionHandler(false)
+                    }
+                }
+            } else {
+                completionHandler(true)
+            }
+
+        default:
+            completionHandler(true)
+        }
+
+    }
+
     public func secureVaultManager(_: SecureVaultManager, didAutofill type: AutofillType, withObjectId objectId: String) {
         Pixel.fire(.formAutofilled(kind: type.formAutofillKind))
-    }
 
-    public func secureVaultManagerShouldAutomaticallyUpdateCredentialsWithoutUsername(_: SecureVaultManager, shouldSilentlySave: Bool) -> Bool {
-        return true
-    }
-
-    public func secureVaultManagerShouldSilentlySaveGeneratedPassword(_: SecureVaultManager) -> Bool {
-        return false
+        if type.formAutofillKind == .password &&
+            passwordManagerCoordinator.isEnabled {
+            passwordManagerCoordinator.reportPasswordAutofill()
+        }
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
@@ -259,7 +307,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
-    public func secureVaultInitFailed(_ error: SecureVaultError) {
+    public func secureVaultInitFailed(_ error: SecureStorageError) {
         SecureVaultErrorReporter.shared.secureVaultInitFailed(error)
     }
 
@@ -277,10 +325,6 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         }
     }
 
-    public func secureVaultManager(_: SecureVaultManager, promptUserToUseGeneratedPasswordForDomain: String, withGeneratedPassword generatedPassword: String, completionHandler: @escaping (Bool) -> Void) {
-        // no-op on macOS
-    }
-
     public func secureVaultManager(_: SecureVaultManager, didRequestCreditCardsManagerForDomain domain: String) {
         autofillPreferencesModel.showAutofillPopover(.cards)
     }
@@ -296,5 +340,18 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
         } else {
             autofillPreferencesModel.showAutofillPopover(.logins)
         }
+    }
+
+    public func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        let properties = ContentScopeProperties(gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                                sessionKey: topAutofillUserScript?.sessionKey ?? "",
+                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig))
+
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: properties)
+            .build()
+            .buildRuntimeConfigResponse()
+
+        completionHandler(runtimeConfiguration)
     }
 }

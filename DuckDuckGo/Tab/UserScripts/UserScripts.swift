@@ -29,6 +29,9 @@ final class UserScripts: UserScriptsProvider {
     let printingUserScript = PrintingUserScript()
     let hoverUserScript = HoverUserScript()
     let debugScript = DebugUserScript()
+#if SUBSCRIPTION
+    let subscriptionPagesUserScript = SubscriptionPagesUserScript()
+#endif
     let clickToLoadScript: ClickToLoadUserScript
 
     let contentBlockerRulesScript: ContentBlockerRulesUserScript
@@ -56,12 +59,8 @@ final class UserScripts: UserScriptsProvider {
 
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
 
-        if #available(macOS 11, *) {
-            autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
-                                                          config: sourceProvider.privacyConfigurationManager.privacyConfig)
-        } else {
-            autoconsentUserScript = nil
-        }
+        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
+                                                      config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
@@ -86,6 +85,11 @@ final class UserScripts: UserScriptsProvider {
                 userScripts.append(specialPages)
             }
         }
+
+#if SUBSCRIPTION
+        subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseEmailFeature())
+        userScripts.append(subscriptionPagesUserScript)
+#endif
     }
 
     lazy var userScripts: [UserScript] = [

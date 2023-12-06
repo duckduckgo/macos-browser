@@ -41,7 +41,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
 
         window = WindowsManager.openNewWindow(with: .none)!
 
-        XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.glitch.me"))
+        XCTAssertTrue(AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager.privacyConfig.isFeature(.httpsUpgrade, enabledForDomain: "privacy-test-pages.site"))
         await ConfigurationManager.shared.refreshIfNeeded()?.value
     }
 
@@ -59,7 +59,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = URL(string: "http://privacy-test-pages.glitch.me/privacy-protections/https-upgrades/")!
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-upgrades/")!
         let upgradableUrl = URL(string: "http://good.third-party.site/privacy-protections/https-upgrades/frame.html")!
         let upgradedUrl = try? await AppPrivacyFeatures.shared.httpsUpgrade.upgrade(url: upgradableUrl).get()
         XCTAssertEqual(upgradedUrl, upgradableUrl.toHttps()!, "URL not upgraded")
@@ -67,7 +67,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel
@@ -119,12 +119,12 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         var persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
-        let url = URL(string: "http://privacy-test-pages.glitch.me/privacy-protections/https-loop-protection/")!
+        let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-loop-protection/")!
 
         let tabViewModel = self.tabViewModel
         let tab = tabViewModel.tab
 
-        _=await tab.setUrl(url, userEntered: nil)?.value?.result
+        _=await tab.setUrl(url, userEntered: nil)?.result
 
         // expect popup to open and then close
         var oldValue: TabViewModel! = self.tabViewModel

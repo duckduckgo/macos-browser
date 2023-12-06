@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import SwiftUI
 
 final class FeedbackViewController: NSViewController {
 
@@ -27,7 +28,10 @@ final class FeedbackViewController: NSViewController {
         static let feedbackContentHeight: CGFloat = 338
         static let websiteBreakageContentHeight: CGFloat = 472
         static let thankYouContentHeight: CGFloat = 262
-
+        static let browserFeedbackViewTopConstraint: CGFloat = 53
+        static let browserFeedbackViewWebsiteBreakageTopConstraint: CGFloat = 153
+        static let unsupportedOSWarningHeight: CGFloat = 200
+        static let websiteBreakageTopConstraint: CGFloat = 53
     }
 
     enum FormOption {
@@ -53,11 +57,15 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var contentViewHeightContraint: NSLayoutConstraint!
 
     @IBOutlet weak var browserFeedbackView: NSView!
+    @IBOutlet weak var browserFeedbackViewTopConstraint: NSLayoutConstraint!
+
     @IBOutlet weak var browserFeedbackDescriptionLabel: NSTextField!
     @IBOutlet weak var browserFeedbackTextView: NSTextView!
     @IBOutlet weak var browserFeedbackDisclaimerTextView: NSTextField!
+    @IBOutlet weak var unsupportedOsView: NSView!
 
     @IBOutlet weak var websiteBreakageView: NSView!
+    @IBOutlet weak var websiteBreakageViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var urlTextField: NSTextField!
     @IBOutlet weak var websiteBreakageCategoryPopUpButton: NSPopUpButton!
 
@@ -65,9 +73,6 @@ final class FeedbackViewController: NSViewController {
 
     @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
-
-    private var browserFeedbackConstraint: NSLayoutConstraint?
-    private var browserFeedbackBreakageConstraint: NSLayoutConstraint?
 
     var currentTab: Tab?
     var currentTabUrl: URL? {
@@ -86,11 +91,6 @@ final class FeedbackViewController: NSViewController {
         super.viewDidLoad()
         setContentViewHeight(Constants.defaultContentHeight, animated: false)
         setupTextViews()
-
-        browserFeedbackConstraint = browserFeedbackView.topAnchor.constraint(equalTo: optionPopUpButton.bottomAnchor, constant: 8)
-        browserFeedbackBreakageConstraint = browserFeedbackView.topAnchor.constraint(equalTo: websiteBreakageView.bottomAnchor)
-
-        browserFeedbackConstraint?.isActive = true
     }
 
     override func viewDidAppear() {
@@ -197,20 +197,22 @@ final class FeedbackViewController: NSViewController {
 
         browserFeedbackView.isHidden = false
 
+        showUnsupportedOsViewIfNeeded()
+        let unsupportedOSWarningHeight = isOsUnsupported ? Constants.unsupportedOSWarningHeight : 0
+
         let contentHeight: CGFloat
         switch selectedFormOption {
         case .feedback(let feedbackCategory):
-            contentHeight = Constants.feedbackContentHeight
+            contentHeight = Constants.feedbackContentHeight + unsupportedOSWarningHeight
             updateBrowserFeedbackDescriptionLabel(for: feedbackCategory)
-            browserFeedbackBreakageConstraint?.isActive = false
-            browserFeedbackConstraint?.isActive = true
+            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewTopConstraint + unsupportedOSWarningHeight
             websiteBreakageView.isHidden = true
         case .websiteBreakage:
-            contentHeight = Constants.websiteBreakageContentHeight
+            contentHeight = Constants.websiteBreakageContentHeight + unsupportedOSWarningHeight
+            websiteBreakageViewTopConstraint.constant = Constants.websiteBreakageTopConstraint + unsupportedOSWarningHeight
             urlTextField.stringValue = currentTabUrl?.absoluteString ?? ""
             updateBrowserFeedbackDescriptionLabel(for: .bug)
-            browserFeedbackConstraint?.isActive = false
-            browserFeedbackBreakageConstraint?.isActive = true
+            browserFeedbackViewTopConstraint.constant = Constants.browserFeedbackViewWebsiteBreakageTopConstraint + unsupportedOSWarningHeight
             websiteBreakageView.isHidden = false
         }
         updateBrowserFeedbackDisclaimerLabel(for: selectedFormOption)
@@ -304,6 +306,9 @@ final class FeedbackViewController: NSViewController {
             let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
             let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
             let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
+            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+            let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTabUrl?.host)
+
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   description: browserFeedbackTextView.string,
                                                   siteUrlString: urlTextField.stringValue,
@@ -314,7 +319,9 @@ final class FeedbackViewController: NSViewController {
                                                   installedSurrogates: installedSurrogates,
                                                   isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                                   ampURL: ampURL,
-                                                  urlParametersRemoved: urlParametersRemoved)
+                                                  urlParametersRemoved: urlParametersRemoved,
+                                                  protectionsState: protectionsState,
+                                                  reportFlow: .native)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }
     }
@@ -324,6 +331,21 @@ final class FeedbackViewController: NSViewController {
         contentView.isHidden = true
         thankYouView.isHidden = false
     }
+
+    var isOsUnsupported: Bool {
+        return !SupportedOSChecker.isCurrentOSReceivingUpdates
+    }
+
+    private weak var unsupportedOsChildView: NSView?
+    private func showUnsupportedOsViewIfNeeded() {
+        if isOsUnsupported && unsupportedOsChildView == nil {
+            let view = NSHostingView(rootView: Preferences.UnsupportedDeviceInfoBox(wide: false))
+            unsupportedOsView.addAndLayout(view)
+            unsupportedOsView.isHidden = false
+            unsupportedOsChildView = view
+        }
+    }
+
 }
 
 fileprivate extension WebsiteBreakage.Category {

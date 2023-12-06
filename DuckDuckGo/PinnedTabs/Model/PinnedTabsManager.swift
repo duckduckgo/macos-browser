@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Combine
 import Common
+import Foundation
 
 final class PinnedTabsManager {
 
@@ -67,7 +68,7 @@ final class PinnedTabsManager {
     }
 
     var pinnedDomains: Set<String> {
-        Set(tabCollection.tabs.compactMap { $0.url?.host?.droppingWwwPrefix() })
+        Set(tabCollection.tabs.compactMap { $0.url?.host })
     }
 
     func setUp(with collection: TabCollection) {
@@ -91,7 +92,7 @@ final class PinnedTabsManager {
             .asVoid()
             .sink { [weak self] in
                 if NSApp.windows.filter({ $0 is MainWindow }).count == 1 {
-                    self?.tabCollection.tabs.forEach { $0.cleanUpBeforeClosing() }
+                    self?.tabCollection.tabs.forEach { $0.stopAllMediaAndLoading() }
                 }
             }
     }

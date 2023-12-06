@@ -43,7 +43,6 @@ struct OnboardingFlow: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
 
                 ZStack {
-
                     CallToAction(text: UserText.onboardingWelcomeText,
                                  cta: UserText.onboardingStartButton) {
                         model.onStartPressed()

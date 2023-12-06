@@ -59,11 +59,9 @@ public struct HoverButton: View {
                 if NSImage(named: imageName) != nil {
                     Image(imageName)
                         .resizable()
-                } else if #available(macOS 11, *) {
+                } else {
                     Image(systemName: imageName)
                         .resizable()
-                } else {
-                    FailedAssertionView("Unable to find image \(imageName)")
                 }
             }
             .frame(width: imageSize ?? size, height: imageSize ?? size)

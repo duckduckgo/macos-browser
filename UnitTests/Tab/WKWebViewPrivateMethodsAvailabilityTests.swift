@@ -22,43 +22,16 @@ import WebKit
 
 final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
 
-    func testWebViewRespondsTo_sessionStateData() throws {
-        if #available(macOS 12.0, *) {
-            throw XCTSkip("sessionStateData was replaced with interactionStateData public API in macOS 12")
-        } else {
-            let webView = WebView.init(frame: CGRect(), configuration: .init())
-            XCTAssertNoThrow(try XCTAssertNotNil(webView.sessionStateData()))
-        }
-    }
-
-    func testWebViewRespondsTo_restoreFromSessionStateData() throws {
-        if #available(macOS 12.0, *) {
-            throw XCTSkip("sessionStateData was replaced with interactionStateData public API in macOS 12")
-        } else {
-            let webView = WebView(frame: CGRect(), configuration: .init())
-            XCTAssertNoThrow(try webView.restoreSessionState(from: Data()))
-        }
-    }
-
-    func testWebViewRespondsTo_createWebArchiveDataWithCompletionHandler() throws {
-        if #available(macOS 11.1, *) {
-            throw XCTSkip("createWebArchiveData has been made public in macOS 11.1")
-        } else {
-            XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createWebArchiveData(completionHandler:))))
-        }
-    }
-
-    func testWebViewRespondsTo_createPDFWithConfiguration() {
-        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView.createPDF(withConfiguration:completionHandler:))))
-    }
-
     func testWebViewRespondsTo_printOperationWithPrintInfo() {
-        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView._printOperation(with:))))
-        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView._printOperation(with:forFrame:))))
+        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.printOperationWithPrintInfoForFrame))
     }
 
     func testWebViewRespondsTo_fullScreenPlaceholderView() {
-        XCTAssertTrue(WKWebView.instancesRespond(to: #selector(WKWebView._fullScreenPlaceholderView)))
+        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.fullScreenPlaceholderView))
+    }
+
+    func testWKBackForwardListRespondsTo_removeAllItems() {
+        XCTAssertTrue(WKBackForwardList.instancesRespond(to: WKBackForwardList.removeAllItemsSelector))
     }
 
 }

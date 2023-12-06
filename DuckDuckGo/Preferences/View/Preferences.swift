@@ -30,47 +30,16 @@ enum Preferences {
             }
         }()
 
+        enum Spacing {
+            static let groupedCheckboxesSeparation: CGFloat = 10
+        }
+
         enum Fonts {
-
-            static let popUpButton: NSFont = {
-                if #available(macOS 11.0, *) {
-                    return .preferredFont(forTextStyle: .title1, options: [:])
-                } else {
-                    return .systemFont(ofSize: 22)
-                }
-            }()
-
-            static let sideBarItem: Font = {
-                if #available(macOS 11.0, *) {
-                    return .body
-                } else {
-                    return .system(size: 13)
-                }
-            }()
-
-            static let preferencePaneTitle: Font = {
-                if #available(macOS 11.0, *) {
-                    return .title2.weight(.semibold)
-                } else {
-                    return .system(size: 17, weight: .semibold)
-                }
-            }()
-
-            static let preferencePaneSectionHeader: Font = {
-                if #available(macOS 11.0, *) {
-                    return .title3.weight(.semibold)
-                } else {
-                    return .system(size: 15, weight: .semibold)
-                }
-            }()
-
-            static let preferencePaneDisclaimer: Font = {
-                if #available(macOS 11.0, *) {
-                    return .subheadline
-                } else {
-                    return .system(size: 10)
-                }
-            }()
+            static let popUpButton: NSFont = .preferredFont(forTextStyle: .title1, options: [:])
+            static let sideBarItem: Font = .body
+            static let preferencePaneTitle: Font = .title2.weight(.semibold)
+            static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
+            static let preferencePaneDisclaimer: Font = .subheadline
         }
     }
 
@@ -110,6 +79,35 @@ enum Preferences {
         var body: some View {
             Toggle(title, isOn: isOn)
                 .fixMultilineScrollableText()
+                .toggleStyle(.checkbox)
+        }
+    }
+
+    struct ToggleMenuItemWithDescription: View {
+        let title: String
+        let description: String
+        let isOn: Binding<Bool>
+        let spacing: CGFloat
+
+        var body: some View {
+            Toggle(isOn: isOn) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .fixMultilineScrollableText()
+
+                    TextMenuItemCaption(text: description)
+                }
+            }.toggleStyle(.checkbox)
+        }
+    }
+
+    struct SpacedCheckbox<Content>: View where Content: View {
+        @ViewBuilder let content: () -> Content
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                content()
+            }.padding(.bottom, Const.Spacing.groupedCheckboxesSeparation)
         }
     }
 }

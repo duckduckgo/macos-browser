@@ -94,16 +94,22 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AutoconsentMessageProtocolTests/testEval()">
+                  Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
                </Test>
                <Test
                   Identifier = "CBRCompileTimeReporterTests">
+               </Test>
+               <Test
+                  Identifier = "FireproofingReferenceTests/testFireproofing()">
                </Test>
                <Test
                   Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
                </Test>
                <Test
                   Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
+               </Test>
+               <Test
+                  Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -118,10 +124,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayedAndScriptsAreReloaded_bannerIsHidden()">
-               </Test>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden()">
+                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
                </Test>
                <Test
                   Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
@@ -131,6 +134,12 @@
                </Test>
                <Test
                   Identifier = "HTTPSUpgradeIntegrationTests">
+               </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
+               </Test>
+               <Test
+                  Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -142,6 +151,16 @@
                BuildableName = "SyncUITests"
                BlueprintName = "SyncUITests"
                ReferencedContainer = "container:LocalPackages/SyncUI">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PixelKitTests"
+               BuildableName = "PixelKitTests"
+               BlueprintName = "PixelKitTests"
+               ReferencedContainer = "container:LocalPackages/PixelKit">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -176,6 +195,18 @@
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "OS_ACTIVITY_DT_MODE"
+            value = "YES"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "OS_ACTIVITY_MODE"
+            value = "debug"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

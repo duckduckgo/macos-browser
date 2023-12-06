@@ -33,11 +33,11 @@ extension Bundle {
         static let notificationsAgentBundleId = "NOTIFICATIONS_AGENT_BUNDLE_ID"
         static let notificationsAgentProductName = "NOTIFICATIONS_AGENT_PRODUCT_NAME"
 #endif
-    }
 
-    var displayName: String? {
-        object(forInfoDictionaryKey: Keys.displayName) as? String ??
-            object(forInfoDictionaryKey: Keys.name) as? String
+#if DBP
+        static let dbpBackgroundAgentBundleId = "DBP_BACKGROUND_AGENT_BUNDLE_ID"
+        static let dbpBackgroundAgentProductName = "DBP_BACKGROUND_AGENT_PRODUCT_NAME"
+#endif
     }
 
     var versionNumber: String? {
@@ -78,4 +78,41 @@ extension Bundle {
     }
 #endif
 
+#if DBP
+    var dbpBackgroundAgentBundleId: String {
+        guard let bundleID = object(forInfoDictionaryKey: Keys.dbpBackgroundAgentBundleId) as? String else {
+            fatalError("Info.plist is missing \(Keys.dbpBackgroundAgentBundleId)")
+        }
+        return bundleID
+    }
+
+    var dbpBackgroundAgentURL: URL {
+        guard let productName = object(forInfoDictionaryKey: Keys.dbpBackgroundAgentProductName) as? String else {
+            fatalError("Info.plist is missing \(Keys.dbpBackgroundAgentProductName)")
+        }
+        return loginItemsURL.appendingPathComponent(productName + ".app")
+    }
+#endif
+
+    func appGroup(bundle: BundleGroup) -> String {
+        var appGroupName: String
+
+        switch bundle {
+        case .dbp:
+            appGroupName = "DBP_APP_GROUP"
+        case .netP:
+            appGroupName = "NETP_APP_GROUP"
+        }
+
+        guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
+            fatalError("Info.plist is missing \(appGroupName)")
+        }
+        return appGroup
+    }
+
+}
+
+enum BundleGroup {
+    case netP
+    case dbp
 }

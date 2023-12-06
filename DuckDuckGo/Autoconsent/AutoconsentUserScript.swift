@@ -31,7 +31,6 @@ protocol UserScriptWithAutoconsent: UserScript {
     var delegate: AutoconsentUserScriptDelegate? { get set }
 }
 
-@available(macOS 11, *)
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
@@ -79,7 +78,6 @@ final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, Us
     }
 }
 
-@available(macOS 11, *)
 extension AutoconsentUserScript {
     enum MessageName: String, CaseIterable {
         case `init`
@@ -157,7 +155,6 @@ extension AutoconsentUserScript {
     }
 }
 
-@available(macOS 11, *)
 extension AutoconsentUserScript {
     @MainActor
     func handleMessage(replyHandler: @escaping (Any?, String?) -> Void,
@@ -217,7 +214,8 @@ extension AutoconsentUserScript {
             return
         }
 
-        guard config.isFeature(.autoconsent, enabledForDomain: url.host) else {
+        let topURLDomain = message.webView?.url?.host
+        guard config.isFeature(.autoconsent, enabledForDomain: topURLDomain) else {
             os_log("disabled for site: %s", log: .autoconsent, type: .info, String(describing: url.absoluteString))
             replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
             return
@@ -247,7 +245,8 @@ extension AutoconsentUserScript {
                 // the very first time (autoconsentEnabled = nil), make sure the popup is visible
                 "enablePrehide": preferences.autoconsentEnabled ?? false,
                 "enableCosmeticRules": true,
-                "detectRetries": 20
+                "detectRetries": 20,
+                "isMainWorld": false
             ] as [String: Any?]
         ] as [String: Any?], nil)
     }

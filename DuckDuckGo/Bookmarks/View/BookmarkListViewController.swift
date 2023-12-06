@@ -64,7 +64,16 @@ final class BookmarkListViewController: NSViewController {
     }()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, treeController: treeController)
+        BookmarkOutlineViewDataSource(
+            contentMode: .bookmarksAndFolders,
+            treeController: treeController,
+            presentFaviconsFetcherOnboarding: { [weak self] in
+                guard let self, let window = self.view.window else {
+                    return
+                }
+                self.faviconsFetcherOnboarding?.presentOnboardingIfNeeded(in: window)
+            }
+        )
     }()
 
     private var selectedNodes: [BookmarkNode] {
@@ -74,10 +83,17 @@ final class BookmarkListViewController: NSViewController {
         return [BookmarkNode]()
     }
 
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.subscribeForAppApperanceUpdates()?.store(in: &cancellables)
         preferredContentSize = CGSize(width: 420, height: 500)
 
         outlineView.register(BookmarkOutlineViewCell.nib, forIdentifier: BookmarkOutlineViewCell.identifier)
@@ -256,7 +272,7 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        bookmarkManager.makeFolder(for: name, parent: nil)
+        bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
@@ -406,7 +422,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, isBurner: tabCollection.isBurner) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
         tabCollection.append(tabs: tabs)
     }
 

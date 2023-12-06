@@ -25,29 +25,32 @@ import Common
 extension NetworkProtectionDeviceManager {
 
     static func create() -> NetworkProtectionDeviceManager {
+        let settings = VPNSettings(defaults: .netP)
         let keyStore = NetworkProtectionKeychainKeyStore()
         let tokenStore = NetworkProtectionKeychainTokenStore()
-        return NetworkProtectionDeviceManager(tokenStore: tokenStore, keyStore: keyStore, errorEvents: .networkProtectionAppDebugEvents)
+        return NetworkProtectionDeviceManager(environment: settings.selectedEnvironment, tokenStore: tokenStore, keyStore: keyStore, errorEvents: .networkProtectionAppDebugEvents)
     }
 }
 
 extension NetworkProtectionCodeRedemptionCoordinator {
     convenience init() {
-        self.init(tokenStore: NetworkProtectionKeychainTokenStore(),
+        let settings = VPNSettings(defaults: .netP)
+        self.init(environment: settings.selectedEnvironment,
+                  tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents)
     }
 }
 
 extension NetworkProtectionKeychainTokenStore {
     convenience init() {
-        self.init(useSystemKeychain: false,
+        self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
     }
 }
 
 extension NetworkProtectionKeychainKeyStore {
     convenience init() {
-        self.init(useSystemKeychain: false,
+        self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents)
     }
 }

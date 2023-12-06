@@ -47,7 +47,6 @@ final class SaveIdentityViewController: NSViewController {
     weak var delegate: SaveIdentityDelegate?
 
     private var identity: SecureVaultModels.Identity?
-    private var appearanceCancellable: AnyCancellable?
 
     // MARK: - Actions
 
@@ -68,10 +67,11 @@ final class SaveIdentityViewController: NSViewController {
         identity.title = UserText.pmDefaultIdentityAutofillTitle
 
         do {
-            try SecureVaultFactory.default.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
+            try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared).storeIdentity(identity)
             Pixel.fire(.autofillItemSaved(kind: .identity))
         } catch {
             os_log("%s:%s: failed to store identity %s", type: .error, className, #function, error.localizedDescription)
+            Pixel.fire(.debug(event: .secureVaultError, error: error))
         }
     }
 
@@ -86,14 +86,6 @@ final class SaveIdentityViewController: NSViewController {
         self.identity = identity
 
         buildStackView(from: identity)
-    }
-
-    // MARK: -
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        appearanceCancellable = view.subscribeForAppApperanceUpdates()
     }
 
     // MARK: - Private
