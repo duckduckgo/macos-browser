@@ -108,7 +108,7 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
             if #available(macOS 12, *) {
                 FocusableTextEditor(text: $viewModel.feedbackFormText)
             } else {
-                // TODO: Add macOS 11 editor
+                // TODO: Add macOS 11 support. Using the approach from Autofill is causing obscure compilation errors here.
             }
 
             Text("In addition to the details entered into this form, your app issue report will contain:")
