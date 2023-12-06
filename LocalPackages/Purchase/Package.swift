@@ -9,16 +9,22 @@ let package = Package(
     products: [
         .library(
             name: "Purchase",
-            targets: ["Purchase"]),
+            targets: ["Purchase"]
+        ),
     ],
     dependencies: [
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "90.0.0"),
     ],
     targets: [
         .target(
             name: "Purchase",
-            dependencies: []),
+            dependencies: [],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
         .testTarget(
             name: "PurchaseTests",
-            dependencies: ["Purchase"]),
+            dependencies: ["Purchase"],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )

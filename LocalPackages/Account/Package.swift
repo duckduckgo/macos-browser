@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "90.0.0"),
-        .package(path: "../Purchase")
+        .package(path: "../Purchase"),
     ],
     targets: [
         .target(
@@ -21,9 +21,13 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "Purchase", package: "Purchase")
-            ]),
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
         .testTarget(
             name: "AccountTests",
-            dependencies: ["Account"]),
+            dependencies: ["Account"],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )

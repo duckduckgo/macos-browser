@@ -9,12 +9,17 @@ let package = Package(
     products: [
         .library(
             name: "SwiftUIExtensions",
-            targets: ["SwiftUIExtensions"]),
+            targets: ["SwiftUIExtensions"]
+        ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "90.0.0"),
+    ],
     targets: [
         .target(
             name: "SwiftUIExtensions",
-            dependencies: []),
+            dependencies: [],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )

@@ -14,7 +14,8 @@ let package = Package(
     dependencies: [
         .package(path: "../Account"),
         .package(path: "../Purchase"),
-        .package(path: "../SwiftUIExtensions")
+        .package(path: "../SwiftUIExtensions"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "90.0.0"),
     ],
     targets: [
         .target(
@@ -26,9 +27,13 @@ let package = Package(
             ],
             resources: [
                 .process("Resources")
-            ]),
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
         .testTarget(
             name: "SubscriptionTests",
-            dependencies: ["Subscription"]),
+            dependencies: ["Subscription"],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )
