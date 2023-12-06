@@ -106,6 +106,7 @@ platform :mac do
   #
   # @option [String] version (default: nil) Marketing version string
   # @option [Boolean] resume (default: false) If true, the lane can run from a release/ branch and will run dedicated prechecks.
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
   #
   desc 'Executes the release preparation work in the repository'
   lane :code_freeze do |options|
@@ -137,6 +138,7 @@ platform :mac do
   # Updates marketing version to the specified one and increments build number by 1.
   #
   # @option [String] version Marketing version string.
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
   #
   desc 'Executes the release preparation work in the repository'
   lane :set_version do |options|
@@ -254,15 +256,19 @@ platform :mac do
   # and prompts the user to confirm
   #
   # @option [String] version (default: nil) Marketing version string
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
   #
   private_lane :validate_new_version do |options|
     current_version = macos_current_version
     user_version = format_user_version(options[:version])
     new_version = user_version.nil? ? macos_bump_minor_version(current_version) : user_version
-    unless UI.confirm(
-      "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
-    )
-    UI.abort_with_message!('Aborted by user.')
+    force = options[:force].nil? ? false : options[:force]
+    unless force
+      unless UI.confirm(
+        "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
+      )
+      UI.abort_with_message!('Aborted by user.')
+      end
     end
     new_version
   end
