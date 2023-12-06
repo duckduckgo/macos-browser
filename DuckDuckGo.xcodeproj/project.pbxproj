@@ -12739,6 +12739,14 @@
 				version = 3.1.2000;
 			};
 		};
+		4B95793B2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/duckduckgo/lottie-ios.git";
+			requirement = {
+				kind = exactVersion;
+				version = 3.3.0;
+			};
+		};
 		9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
@@ -13037,6 +13045,7 @@
 		};
 		4B95793A2AC7AE700062CA31 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 4B95793B2AC7AE700062CA31 /* XCRemoteSwiftPackageReference "lottie-ios" */;
 			productName = Lottie;
 		};
 		4B95793C2AC7AE700062CA31 /* SyncDataProviders */ = {
