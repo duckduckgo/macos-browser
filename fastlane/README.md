@@ -55,6 +55,14 @@ Updates App Store metadata
 
 Executes the release preparation work in the repository
 
+### mac set_version
+
+```sh
+[bundle exec] fastlane mac set_version
+```
+
+Executes the release preparation work in the repository
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

@@ -13,7 +13,7 @@ RELEASE_BRANCH = 'release'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 INFO_PLIST = File.join(PROJECT_ROOT_FOLDER, 'DuckDuckGo/Info.plist')
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
-BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
+BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/BuildNumber.xcconfig')
 VERSION_CONFIG_DEFINITION = 'MARKETING_VERSION'
 BUILD_NUMBER_CONFIG_DEFINITION = 'CURRENT_PROJECT_VERSION'
 UPGRADABLE_EMBEDDED_FILES = [
@@ -105,7 +105,6 @@ platform :mac do
   # - Updates submodules and embedded files
   #
   # @option [String] version (default: nil) Marketing version string
-  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
   # @option [Boolean] resume (default: false) If true, the lane can run from a release/ branch and will run dedicated prechecks.
   #
   desc 'Executes the release preparation work in the repository'
@@ -113,7 +112,7 @@ platform :mac do
     begin
       options[:resume]? macos_codefreeze_resume_prechecks : macos_codefreeze_prechecks
       new_version = validate_new_version(options)
-      build_number = increment_app_store_build_number(options)
+      build_number = increment_current_build_number(options)
       macos_create_release_branch(version: new_version) unless options[:resume]
       macos_update_embedded_files
       macos_update_version_and_build_number_config(
@@ -133,6 +132,23 @@ platform :mac do
         raise exception
       end
     end
+  end
+
+  # Updates marketing version to the specified one and increments build number by 1.
+  #
+  # @option [String] version Marketing version string.
+  #
+  desc 'Executes the release preparation work in the repository'
+  lane :set_version do |options|
+    unless options[:version]
+      UI.user_error! 'You must provide a version.'
+    end
+    new_version = validate_new_version(options)
+    build_number = increment_current_build_number(options)
+    macos_update_version_and_build_number_config(
+      version: new_version,
+      build_number: build_number
+    )
   end
 
   #################################################
@@ -233,7 +249,7 @@ platform :mac do
     end
   end
 
-  # Calculates the new version or validate the provided one, if it exists
+  # Calculates the new version or validates the provided one, if it exists
   # and prompts the user to confirm
   #
   # @option [String] version (default: nil) Marketing version string
@@ -252,8 +268,8 @@ platform :mac do
 
   # Checks current build number and increments it by 1.
   #
-  desc 'Increment App Store build number'
-  private_lane :increment_app_store_build_number do
+  desc 'Increment build number'
+  private_lane :increment_current_build_number do
     macos_current_build_number = [fetch_testflight_build_number, fetch_appcast_build_number].max
     macos_current_build_number + 1
   end

@@ -14,7 +14,7 @@
 //
 
 #include "Version.xcconfig"
-#include "AppStoreBuildNumber.xcconfig"
+#include "BuildNumber.xcconfig"
 
 COMBINE_HIDPI_IMAGES = YES
 
