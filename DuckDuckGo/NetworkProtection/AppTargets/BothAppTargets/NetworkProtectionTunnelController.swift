@@ -242,7 +242,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.disconnectOnSleep = false
 
             // kill switch
-            protocolConfiguration.enforceRoutes = true // settings.enforceRoutes
+            protocolConfiguration.enforceRoutes = settings.enforceRoutes
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 
