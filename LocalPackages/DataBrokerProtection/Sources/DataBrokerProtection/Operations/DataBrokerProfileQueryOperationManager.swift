@@ -110,14 +110,17 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
 
+        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             database.add(event)
-            let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+
             let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
+                stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 database.add(event)
 
@@ -158,6 +161,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     }
                 }
             } else {
+                stageCalculator.fireScanFailed()
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .noMatchFound)
                 database.add(event)
             }
@@ -209,6 +213,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             }
 
         } catch {
+            stageCalculator.fireScanError(error: error)
             handleOperationError(origin: .scan,
                                  brokerId: brokerId,
                                  profileQueryId: profileQueryId,
