@@ -19,6 +19,7 @@
 import Foundation
 import DDGSync
 import Combine
+import Common
 import SystemConfiguration
 import SyncUI
 import SwiftUI
@@ -49,23 +50,33 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var codeToDisplay: String?
     let managementDialogModel: ManagementDialogModel
 
-    @Published var devices: [SyncDevice] = []
+    @Published var devices: [SyncDevice] = [] {
+        didSet {
+            syncBookmarksAdapter.isEligibleForFaviconsFetcherOnboarding = devices.count > 1
+        }
+    }
 
     @Published var shouldShowErrorMessage: Bool = false
     @Published private(set) var errorMessage: String?
 
     @Published var isCreatingAccount: Bool = false
 
+    @Published var isFaviconsFetchingEnabled: Bool {
+        didSet {
+            syncBookmarksAdapter.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+            if isFaviconsFetchingEnabled {
+                syncService.scheduler.notifyDataChanged()
+            }
+        }
+    }
+
     @Published var isUnifiedFavoritesEnabled: Bool {
         didSet {
-            AppearancePreferences.shared.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
+            appearancePreferences.favoritesDisplayMode = isUnifiedFavoritesEnabled ? .displayUnified(native: .desktop) : .displayNative(.desktop)
             if shouldRequestSyncOnFavoritesOptionChange {
                 syncService.scheduler.notifyDataChanged()
             } else {
                 shouldRequestSyncOnFavoritesOptionChange = true
-            }
-            if managementDialogModel.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
-                managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
             }
         }
     }
@@ -75,29 +86,78 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isSyncCredentialsPaused: Bool
 
     private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
+    private var isScreenLocked: Bool = false
+    private var recoveryKey: SyncCode.RecoveryKey?
 
     var recoveryCode: String? {
         syncService.account?.recoveryCode
     }
 
-    @MainActor
-    func presentRecoverSyncAccountDialog() {
-        presentDialog(for: .recoverAccount)
+    init(syncService: DDGSyncing, syncBookmarksAdapter: SyncBookmarksAdapter, appearancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
+        self.syncService = syncService
+        self.syncBookmarksAdapter = syncBookmarksAdapter
+        self.appearancePreferences = appearancePreferences
+
+        self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
+        self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
+        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+
+        self.managementDialogModel = managementDialogModel
+        self.managementDialogModel.delegate = self
+
+        setUpObservables()
+        setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
+    }
+
+    private func setUpObservables() {
+        syncService.authStatePublisher
+            .removeDuplicates()
+            .asVoid()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.updateState()
+            }
+            .store(in: &cancellables)
+
+        $errorMessage
+            .map { $0 != nil }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.shouldShowErrorMessage, onWeaklyHeld: self)
+            .store(in: &cancellables)
+
+        managementDialogModel.$currentDialog
+            .removeDuplicates()
+            .filter { $0 == nil }
+            .asVoid()
+            .sink { [weak self] _ in
+                self?.onEndFlow()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
+                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+            }
+            .store(in: &cancellables)
+
+        let screenIsLockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
+            .map { _ in true }
+        let screenIsUnlockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
+            .map { _ in false }
+
+        Publishers.Merge(screenIsLockedPublisher, screenIsUnlockedPublisher)
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.isScreenLocked, onWeaklyHeld: self)
+            .store(in: &cancellables)
     }
 
     @MainActor
-    func presentManuallyEnterCodeDialog() {
-        presentDialog(for: .manuallyEnterCode)
-    }
-
-    @MainActor
-    func presentShowTextCodeDialog() {
-        let code: String = recoveryCode ?? codeToDisplay ?? ""
-        presentDialog(for: .showTextCode(code))
-    }
-
-    @MainActor
-    func presentTurnOffSyncConfirmDialog() {
+    func turnOffSyncPressed() {
         presentDialog(for: .turnOffSync)
     }
 
@@ -137,17 +197,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
     }
 
-    init(syncService: DDGSyncing, apperancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
-        self.syncService = syncService
-
-        self.isUnifiedFavoritesEnabled = apperancePreferences.favoritesDisplayMode.isDisplayUnified
-        isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-        isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
-
-        self.managementDialogModel = managementDialogModel
-        self.managementDialogModel.delegate = self
-        self.managementDialogModel.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
-
+    private func setUpSyncOptionsObservables(apperancePreferences: AppearancePreferences) {
+        syncBookmarksAdapter.$isFaviconsFetchingEnabled
+            .removeDuplicates()
+            .sink { [weak self] isFaviconsFetchingEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isFaviconsFetchingEnabled != isFaviconsFetchingEnabled {
+                    self.isFaviconsFetchingEnabled = isFaviconsFetchingEnabled
+                }
+            }
+            .store(in: &cancellables)
         apperancePreferences.$favoritesDisplayMode
             .map(\.isDisplayUnified)
             .sink { [weak self] isUnifiedFavoritesEnabled in
@@ -161,35 +222,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
             .store(in: &cancellables)
 
-        syncService.authStatePublisher
-            .removeDuplicates()
-            .asVoid()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                self?.updateState()
-            }
-            .store(in: &cancellables)
-
-        $errorMessage
-            .map { $0 != nil }
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.shouldShowErrorMessage, onWeaklyHeld: self)
-            .store(in: &cancellables)
-
-        managementDialogModel.$currentDialog
-            .removeDuplicates()
-            .filter { $0 == nil }
-            .asVoid()
-            .sink { [weak self] _ in
-                self?.onEndFlow()
-            }
-            .store(in: &cancellables)
-
-        NotificationCenter.default.publisher(for: Self.Consts.syncPausedStateChanged)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
-                self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
+        apperancePreferences.$favoritesDisplayMode
+            .map(\.isDisplayUnified)
+            .sink { [weak self] isUnifiedFavoritesEnabled in
+                guard let self else {
+                    return
+                }
+                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
+                    self.shouldRequestSyncOnFavoritesOptionChange = false
+                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
+                }
             }
             .store(in: &cancellables)
     }
@@ -212,6 +254,10 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     func refreshDevices() {
+        guard !isScreenLocked else {
+            os_log(.debug, log: .sync, "Screen is locked, skipping devices refresh")
+            return
+        }
         guard syncService.account != nil else {
             devices = []
             return
@@ -221,7 +267,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
-                print("error", error.localizedDescription)
+                os_log(.error, log: .sync, "Failed to refresh devices: \(error)")
             }
         }
     }
@@ -266,6 +312,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private var onEndFlow: () -> Void = {}
 
     private let syncService: DDGSyncing
+    private let syncBookmarksAdapter: SyncBookmarksAdapter
+    private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
 }
@@ -274,9 +322,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func deleteAccount() {
         Task { @MainActor in
-            managementDialogModel.endFlow()
             do {
                 try await syncService.deleteAccount()
+                managementDialogModel.endFlow()
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
@@ -303,41 +351,52 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey, isActiveDevice: Bool) async throws {
+    private func loginAndShowPresentedDialog(_ recoveryKey: SyncCode.RecoveryKey, isRecovery: Bool) async throws {
         let device = deviceInfo()
-        let knownDevices = Set(self.devices.map { $0.id })
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
-        let syncedDevices = self.devices.filter { !knownDevices.contains($0.id) && !$0.isCurrent }
-        let isSecondDevice = syncedDevices.count == 1
-
-        managementDialogModel.endFlow()
-        presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: isActiveDevice && isSecondDevice))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if isRecovery {
+                self.showDevicesSynced()
+            } else {
+                self.presentDialog(for: .saveRecoveryCode(self.recoveryCode ?? ""))
+            }
+            self.stopPollingForRecoveryKey()
+        }
     }
 
     func turnOnSync() {
         Task { @MainActor in
+            managementDialogModel.endFlow()
             isCreatingAccount = true
             defer {
                 isCreatingAccount = false
             }
             do {
                 let device = deviceInfo()
+                presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
-                confirmSetupComplete()
+                presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
     }
 
-    func startPollingForRecoveryKey() {
+    func startPollingForRecoveryKey(isRecovery: Bool) {
         Task { @MainActor in
             do {
                 self.connector = try syncService.remoteConnect()
                 self.codeToDisplay = connector?.code
+                if isRecovery {
+                    self.presentDialog(for: .enterRecoveryCode(code: codeToDisplay ?? ""))
+                } else {
+                    self.presentDialog(for: .syncWithAnotherDevice(code: codeToDisplay ?? ""))
+                }
                 if let recoveryKey = try await connector?.pollForRecoveryKey() {
-                    try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: false)
+                    presentDialog(for: .prepareToSync)
+                    self.recoveryKey = recoveryKey
+                    try await loginAndShowPresentedDialog(recoveryKey, isRecovery: isRecovery)
                 } else {
                     // Polling was likeley cancelled elsewhere (e.g. dialog closed)
                     return
@@ -355,20 +414,22 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         self.connector = nil
     }
 
-    func recoverDevice(using recoveryCode: String, isActiveDevice: Bool) {
+    func recoverDevice(recoveryCode: String, fromRecoveryScreen: Bool) {
         Task { @MainActor in
             do {
                 guard let syncCode = try? SyncCode.decodeBase64String(recoveryCode) else {
                     managementDialogModel.errorMessage = "Invalid code"
                     return
                 }
+                presentDialog(for: .prepareToSync)
                 if let recoveryKey = syncCode.recovery {
                     // This will error if the account already exists, we don't have good UI for this just now
-                    try await loginAndShowPresentedDialog(recoveryKey, isActiveDevice: isActiveDevice)
+                    try await loginAndShowPresentedDialog(recoveryKey, isRecovery: fromRecoveryScreen)
                 } else if let connectKey = syncCode.connect {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 
                     try await syncService.transmitRecoveryKey(connectKey)
@@ -376,16 +437,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                         .removeDuplicates()
                         .dropFirst()
                         .prefix(1)
-                        .sink { [weak self] devices in
+                        .sink { [weak self] _ in
                             guard let self else { return }
-                            let thisDeviceName = deviceInfo().name
-                            var syncedDevices: [SyncDevice] = []
-                            for device in devices where device.name != thisDeviceName {
-                                syncedDevices.append(device)
-                            }
-
-                            self.managementDialogModel.endFlow()
-                            presentDialog(for: .deviceSynced(syncedDevices, shouldShowOptions: devices.count == 2))
+                            self.presentDialog(for: .saveRecoveryCode(recoveryCode))
                         }.store(in: &cancellables)
 
                     // The UI will update when the devices list changes.
@@ -405,18 +459,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    func confirmSetupComplete() {
-        presentDialog(for: .firstDeviceSetup)
-    }
-
-    @MainActor
-    func presentSaveRecoveryPDF() {
-        presentDialog(for: .saveRecoveryPDF)
-    }
-
-    @MainActor
     func saveRecoveryPDF() {
-
         guard let recoveryCode = syncService.account?.recoveryCode else {
             assertionFailure()
             return
@@ -446,12 +489,73 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         Task { @MainActor in
             do {
                 try await syncService.disconnect(deviceId: device.id)
-                managementDialogModel.endFlow()
                 refreshDevices()
+                managementDialogModel.endFlow()
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
             }
         }
+    }
+
+    @MainActor
+    func enterRecoveryCodePressed() {
+        startPollingForRecoveryKey(isRecovery: true)
+    }
+
+    @MainActor
+    func syncWithAnotherDevicePressed() {
+        if isSyncEnabled {
+            presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
+        } else {
+            self.startPollingForRecoveryKey(isRecovery: false)
+        }
+    }
+
+    @MainActor
+    func syncWithServerPressed() {
+        presentDialog(for: .syncWithServer)
+    }
+
+    @MainActor
+    func recoverDataPressed() {
+        presentDialog(for: .recoverSyncedData)
+    }
+
+    @MainActor
+    func downloadDDGPressed() {
+
+    }
+
+    @MainActor
+    func copyCode() {
+        var code: String?
+        if isSyncEnabled {
+            code = recoveryCode
+        } else {
+            code = codeToDisplay
+        }
+        guard let code else { return }
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.setString(code, forType: .string)
+    }
+
+    @MainActor
+    func recoveryCodeNextPressed() {
+        showDevicesSynced()
+    }
+
+    @MainActor
+    private func showDevicesSynced() {
+        presentDialog(for: .nowSyncing)
+    }
+
+    func recoveryCodePasted(_ code: String) {
+        recoverDevice(recoveryCode: code, fromRecoveryScreen: true)
+    }
+
+    func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {
+        recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
 
 }
