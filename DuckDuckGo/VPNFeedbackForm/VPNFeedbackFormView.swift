@@ -105,11 +105,7 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if #available(macOS 12, *) {
-                FocusableTextEditor(text: $viewModel.feedbackFormText)
-            } else {
-                // TODO: Add macOS 11 support. Using the approach from Autofill is causing obscure compilation errors here.
-            }
+            textEditor()
 
             Text("In addition to the details entered into this form, your app issue report will contain:")
                 .multilineTextAlignment(.leading)
@@ -130,6 +126,36 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.secondary)
         }
+    }
+
+    @ViewBuilder
+    func textEditor() -> some View {
+#if APPSTORE
+            FocusableTextEditor(text: $model.notes)
+#else
+            if #available(macOS 12, *) {
+                FocusableTextEditor(text: $viewModel.feedbackFormText)
+            } else {
+                TextEditor(text: $viewModel.feedbackFormText)
+                    .frame(height: 197.0)
+                    .font(.body)
+                    .foregroundColor(.primary)
+                    .onChange(of: viewModel.feedbackFormText) {
+                        viewModel.feedbackFormText = String($0.prefix(10000))
+                    }
+                    .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
+                    // .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                    // .background(
+                    //     ZStack {
+                    //         RoundedRectangle(cornerRadius: cornerRadius)
+                    //             .stroke(Color(NSColor.textEditorBorderColor), lineWidth: 0.4)
+                    //         RoundedRectangle(cornerRadius: cornerRadius)
+                    //             .fill(Color(NSColor.textEditorBackgroundColor))
+                    //     }
+                    // )
+                    // ^ the code above is failing to compile with "failed to produce diagnostic for expression", need to debug it further.
+            }
+#endif
     }
 
 }
