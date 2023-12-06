@@ -93,6 +93,7 @@ final class DeviceAuthenticator: UserAuthenticating {
     private let queue = DispatchQueue(label: "Device Authenticator Queue")
 
     private var timer: Timer?
+    private var timerCreditCard: Timer?
 
     private var _isAuthenticating: Bool = false
     private var _deviceIsLocked: Bool = false
