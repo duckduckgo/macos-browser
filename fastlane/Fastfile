@@ -147,7 +147,8 @@ platform :mac do
     build_number = increment_current_build_number(options)
     macos_update_version_and_build_number_config(
       version: new_version,
-      build_number: build_number
+      build_number: build_number,
+      push: false
     )
   end
 
@@ -343,11 +344,14 @@ platform :mac do
 
   # Updates version in the config file
   #
-  # @option [String] version (default: nil) Marketing version string
+  # @option [String] version Marketing version string
+  # @option [String] build_number Build number
+  # @option [Boolean] push (default: true) Push to git remote if true, otherwise skip pushing.
   #
   private_lane :macos_update_version_and_build_number_config do |options|
     version = options[:version]
     build_number = options[:build_number]
+    push = options[:push].nil? ? true : options[:push]
     File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
     File.write(BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
     git_commit(
@@ -357,7 +361,9 @@ platform :mac do
       ],
       message: "Bump version to #{version} (#{build_number})"
     )
-    sh('git', 'push')
+    if push
+      sh('git', 'push')
+    end
   end
 
   # Updates version in the config file
