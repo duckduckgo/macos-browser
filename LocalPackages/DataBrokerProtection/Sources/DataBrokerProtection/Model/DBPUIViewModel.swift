@@ -34,14 +34,17 @@ final class DBPUIViewModel {
     private let prefs: ContentScopeProperties?
     private var communicationLayer: DBPUICommunicationLayer?
     private var webView: WKWebView?
+    private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
 
     init(dataManager: DataBrokerProtectionDataManaging,
          scheduler: DataBrokerProtectionScheduler,
+         webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
          privacyConfig: PrivacyConfigurationManaging? = nil,
          prefs: ContentScopeProperties? = nil,
          webView: WKWebView? = nil) {
         self.dataManager = dataManager
         self.scheduler = scheduler
+        self.webUISettings = webUISettings
         self.privacyConfig = privacyConfig
         self.prefs = prefs
         self.webView = webView
@@ -52,7 +55,10 @@ final class DBPUIViewModel {
         guard let prefs = prefs else { return nil }
 
         let configuration = WKWebViewConfiguration()
-        configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig, prefs: prefs, delegate: dataManager.cache)
+        configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig, 
+                                              prefs: prefs,
+                                              delegate: dataManager.cache,
+                                              webUISettings: webUISettings)
         dataManager.cache.scanDelegate = self
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 

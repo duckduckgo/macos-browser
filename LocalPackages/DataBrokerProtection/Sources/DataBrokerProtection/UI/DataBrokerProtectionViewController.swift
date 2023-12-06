@@ -23,15 +23,10 @@ import WebKit
 import Combine
 
 final public class DataBrokerProtectionViewController: NSViewController {
-
-    private enum Constants {
-        static let dbpUiUrl = "https://duckduckgo.com/dbp"
-    }
-
     private let dataManager: DataBrokerProtectionDataManaging
     private let scheduler: DataBrokerProtectionScheduler
     private var webView: WKWebView?
-
+    private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
     private let webUIViewModel: DBPUIViewModel
 
     private let openURLHandler: (URL?) -> Void
@@ -40,12 +35,18 @@ final public class DataBrokerProtectionViewController: NSViewController {
                 dataManager: DataBrokerProtectionDataManaging,
                 privacyConfig: PrivacyConfigurationManaging? = nil,
                 prefs: ContentScopeProperties? = nil,
+                webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
                 openURLHandler: @escaping (URL?) -> Void) {
         self.scheduler = scheduler
         self.dataManager = dataManager
         self.openURLHandler = openURLHandler
-
-        self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
+        self.webUISettings = webUISettings
+        self.webUIViewModel = DBPUIViewModel(dataManager: dataManager,
+                                             scheduler: scheduler,
+                                             webUISettings: webUISettings,
+                                             privacyConfig: privacyConfig,
+                                             prefs: prefs,
+                                             webView: webView)
 
         Task {
             _ = dataManager.fetchProfile(ignoresCache: true)
@@ -65,7 +66,12 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView?.uiDelegate = self
         view = webView!
 
-        webView?.load(URL(string: Constants.dbpUiUrl)!)
+        if let url = URL(string: webUISettings.selectedURL) {
+            webView?.load(url)
+        } else {
+            assertionFailure("Selected URL is not valid \(webUISettings.selectedURL)")
+        }
+
     }
 }
 

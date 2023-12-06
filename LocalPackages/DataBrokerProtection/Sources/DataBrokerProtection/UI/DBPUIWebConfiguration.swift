@@ -26,8 +26,15 @@ final class DBPUIUserContentController: WKUserContentController {
 
     let dbpUIUserScripts: DBPUIUserScript
 
-    init(with privacyConfigurationManager: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: DBPUICommunicationDelegate) {
-        dbpUIUserScripts = DBPUIUserScript(privacyConfig: privacyConfigurationManager, prefs: prefs, delegate: delegate)
+    init(with privacyConfigurationManager: PrivacyConfigurationManaging,
+         prefs: ContentScopeProperties,
+         delegate: DBPUICommunicationDelegate,
+         webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
+
+        dbpUIUserScripts = DBPUIUserScript(privacyConfig: privacyConfigurationManager,
+                                           prefs: prefs,
+                                           delegate: delegate,
+                                           webUISettings: webUISettings)
 
         super.init()
 
@@ -53,11 +60,16 @@ final class DBPUIUserScript: UserScriptsProvider {
 
     let contentScopeUserScriptIsolated: ContentScopeUserScript
     var dbpUICommunicationLayer: DBPUICommunicationLayer
+    private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
 
-    init(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: DBPUICommunicationDelegate) {
+    init(privacyConfig: PrivacyConfigurationManaging, 
+         prefs: ContentScopeProperties,
+         delegate: DBPUICommunicationDelegate,
+         webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
+        self.webUISettings = webUISettings
         contentScopeUserScriptIsolated = ContentScopeUserScript(privacyConfig, properties: prefs, isIsolated: false)
         contentScopeUserScriptIsolated.messageNames = ["dbpui"]
-        dbpUICommunicationLayer = DBPUICommunicationLayer()
+        dbpUICommunicationLayer = DBPUICommunicationLayer(webURLSettings: webUISettings)
         dbpUICommunicationLayer.delegate = delegate
         dbpUICommunicationLayer.broker = contentScopeUserScriptIsolated.broker
         contentScopeUserScriptIsolated.registerSubfeature(delegate: dbpUICommunicationLayer)
@@ -84,9 +96,15 @@ final class DBPUIUserScript: UserScriptsProvider {
 extension WKWebViewConfiguration {
 
     @MainActor
-    func applyDBPUIConfiguration(privacyConfig: PrivacyConfigurationManaging, prefs: ContentScopeProperties, delegate: DBPUICommunicationDelegate) {
+    func applyDBPUIConfiguration(privacyConfig: PrivacyConfigurationManaging,
+                                 prefs: ContentScopeProperties,
+                                 delegate: DBPUICommunicationDelegate,
+                                 webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
         preferences.isFraudulentWebsiteWarningEnabled = false
-        let userContentController = DBPUIUserContentController(with: privacyConfig, prefs: prefs, delegate: delegate)
+        let userContentController = DBPUIUserContentController(with: privacyConfig,
+                                                               prefs: prefs,
+                                                               delegate: delegate,
+                                                               webUISettings: webUISettings)
         self.userContentController = userContentController
      }
 }

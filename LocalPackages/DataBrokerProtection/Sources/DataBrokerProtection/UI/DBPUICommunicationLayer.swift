@@ -60,10 +60,9 @@ enum DBPUISendableMethodName: String {
 }
 
 struct DBPUICommunicationLayer: Subfeature {
-    var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
-        .exact(hostname: "use-devtesting18.duckduckgo.com"),
-        .exact(hostname: "duckduckgo.com")
-    ])
+    private let webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable
+
+    var messageOriginPolicy: MessageOriginPolicy
     var featureName: String = "dbpuiCommunication"
     weak var broker: UserScriptMessageBroker?
 
@@ -71,6 +70,13 @@ struct DBPUICommunicationLayer: Subfeature {
 
     private enum Constants {
         static let version = 1
+    }
+
+    internal init(webURLSettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
+        self.webURLSettings = webURLSettings
+        self.messageOriginPolicy = .only(rules: [
+            .exact(hostname: webURLSettings.selectedURLHostname)
+        ])
     }
 
     // swiftlint:disable:next cyclomatic_complexity

@@ -33,7 +33,14 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
     private let waitlistBypassItem = NSMenuItem(title: "Bypass Waitlist", action: #selector(DataBrokerProtectionDebugMenu.toggleBypassWaitlist))
 
+    private let productionURLMenuItem = NSMenuItem(title: "Use Production URL", action: #selector(DataBrokerProtectionDebugMenu.useWebUIProductionURL))
+
+    private let customURLMenuItem = NSMenuItem(title: "Use Custom URL", action: #selector(DataBrokerProtectionDebugMenu.useWebUICustomURL))
+
     private var databaseBrowserWindowController: NSWindowController?
+    private let customURLLabelMenuItem = NSMenuItem(title: "")
+
+    private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
 
     // swiftlint:disable:next function_body_length
     init() {
@@ -106,6 +113,20 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 }
             }
 
+            NSMenuItem(title: "Web UI") {
+                productionURLMenuItem.targetting(self)
+                customURLMenuItem.targetting(self)
+
+                NSMenuItem.separator()
+
+                NSMenuItem(title: "Set Custom URL", action: #selector(DataBrokerProtectionDebugMenu.setWebUICustomURL))
+                    .targetting(self)
+                NSMenuItem(title: "Reset Custom URL", action: #selector(DataBrokerProtectionDebugMenu.resetCustomURL))
+                    .targetting(self)
+
+                customURLLabelMenuItem
+            }
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
@@ -121,16 +142,32 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     override func update() {
         updateWaitlistItems()
-    }
-
-    func menuItem(withTitle title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
-        let menuItem = NSMenuItem(title: title, action: action, keyEquivalent: "")
-        menuItem.target = self
-        menuItem.representedObject = representedObject
-        return menuItem
+        updateWebUIMenuItemsState()
     }
 
     // MARK: - Menu functions
+
+    @objc private func useWebUIProductionURL() {
+        webUISettings.setURLType(.production)
+    }
+
+    @objc private func useWebUICustomURL() {
+        webUISettings.setURLType(.custom)
+    }
+
+    @objc private func resetCustomURL() {
+        webUISettings.setURLType(.production)
+        webUISettings.setCustomURL("")
+    }
+
+    @objc private func setWebUICustomURL() {
+        showCustomURLAlert { [weak self] value in
+            if let url = value {
+                let modifiedURL = url.hasPrefix("https://") ? url : "https://\(url)"
+                self?.webUISettings.setCustomURL(modifiedURL)
+            }
+        }
+    }
 
     @objc private func runQueuedOperations(_ sender: NSMenuItem) {
         os_log("Running queued operations...", log: .dataBrokerProtection)
@@ -233,6 +270,37 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     // MARK: - Utility Functions
+
+    func showCustomURLAlert(callback: @escaping (String?) -> Void) {
+        let alert = NSAlert()
+        alert.messageText = "Enter URL"
+        alert.addButton(withTitle: "Accept")
+        alert.addButton(withTitle: "Cancel")
+
+        let inputTextField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        alert.accessoryView = inputTextField
+
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            callback(inputTextField.stringValue)
+        } else {
+            callback(nil)
+        }
+    }
+
+    private func updateWebUIMenuItemsState() {
+        productionURLMenuItem.state = webUISettings.selectedURLType == .custom ? .off : .on
+        customURLMenuItem.state = webUISettings.selectedURLType == .custom ? .on : .off
+
+        customURLLabelMenuItem.title = "Custom URL: [\(webUISettings.customURL ?? "")]"
+    }
+
+    func menuItem(withTitle title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
+        let menuItem = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        menuItem.target = self
+        menuItem.representedObject = representedObject
+        return menuItem
+    }
 
     private func updateWaitlistItems() {
         let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: DataBrokerProtectionWaitlist.identifier, keychainAppGroup: Bundle.main.appGroup(bundle: .dbp))
