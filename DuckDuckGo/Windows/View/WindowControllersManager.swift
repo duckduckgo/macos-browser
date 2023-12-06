@@ -219,6 +219,19 @@ extension WindowControllersManager {
 
         windowController.mainViewController.navigationBarViewController.showNetworkProtectionStatus()
     }
+
+    func showShareFeedbackModal() {
+        let feedbackFormViewController = VPNFeedbackFormViewController()
+        let feedbackFormWindowController = feedbackFormViewController.wrappedInWindowController()
+
+        guard let feedbackFormWindow = feedbackFormWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            assertionFailure("Failed to present native VPN feedback form")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(feedbackFormWindow)
+    }
 #endif
 
 }
