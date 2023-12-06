@@ -52,10 +52,10 @@ enum VPNFeedbackCategory: String, CaseIterable {
         case .landingPage: return "What's happening?"
         case .unableToInstall: return "Unable to install VPN"
         case .failsToConnect: return "VPN fails to connect"
-        case .tooSlow: return "VPN is too slow"
-        case .issueWithAppOrWebsite: return "Issue with app or website"
+        case .tooSlow: return "VPN connection is too slow"
+        case .issueWithAppOrWebsite: return "Issue with other apps or websites"
         case .cantConnectToLocalDevice: return "Can't connect to local device"
-        case .appCrashesOrFreezes: return "App crashes or freezes"
+        case .appCrashesOrFreezes: return "Browser crashes or freezes"
         case .featureRequest: return "Feature request"
         case .somethingElse: return "Something else"
         }

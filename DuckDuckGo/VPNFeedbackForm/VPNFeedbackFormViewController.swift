@@ -31,7 +31,7 @@ final class VPNFeedbackFormViewController: NSViewController {
     enum Constants {
         static let landingPageHeight = 260.0
         static let feedbackFormHeight = 535.0
-        static let feedbackSentHeight = 340.0
+        static let feedbackSentHeight = 350.0
         static let feedbackErrorHeight = 560.0
     }
 

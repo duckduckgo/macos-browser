@@ -164,7 +164,8 @@ private struct VPNFeedbackFormSentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image("JoinWaitlistHeader")
+            Image("VPNFeedbackSent")
+                .padding(.top, 20)
 
             Text("Thank you!")
                 .font(.system(size: 18, weight: .medium))
