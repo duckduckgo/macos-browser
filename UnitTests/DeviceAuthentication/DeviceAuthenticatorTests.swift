@@ -96,7 +96,7 @@ class DeviceAuthenticatorTests: XCTestCase {
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
     }
 
-    func testWhenAutoLockIsEnabled_AndDeviceIsUnlocked_AndDeviceIsIdleForLongerThanTheThreshold_ThenDeviceBecomesLocked() {
+    func testWhenAutoLockIsEnabled_AndDeviceIsUnlocked_AndDeviceIsIdleForLongerThanTheThreshold_ThenDeviceBecomesLocked() async {
         let mockStatisticsStore = MockStatisticsStore()
         let idleStateProvider = MockIdleStateProvider(idleDuration: 60 * 20) // 20 minute idle duration, to be safe
         let authenticationService = MockDeviceAuthenticatorService.alwaysAuthenticate
@@ -110,11 +110,7 @@ class DeviceAuthenticatorTests: XCTestCase {
                                                       authenticationService: authenticationService,
                                                       autofillPreferences: preferences)
 
-        let unlockedExpectation = expectation(description: "Wait for unlockLogins")
-        deviceAuthenticator.authenticateUser(reason: .unlockLogins) { _ in
-            unlockedExpectation.fulfill()
-        }
-        waitForExpectations(timeout: 0.2)
+        _ = await deviceAuthenticator.authenticateUser(reason: .unlockLogins)
 
         XCTAssertFalse(deviceAuthenticator.requiresAuthentication)
 
