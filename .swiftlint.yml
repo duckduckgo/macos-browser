@@ -10,6 +10,7 @@ disabled_rules:
   - function_parameter_count
   - trailing_comma
   - nesting
+  - opening_brace
 
 opt_in_rules:
   - file_header

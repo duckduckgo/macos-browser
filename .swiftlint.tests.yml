@@ -6,6 +6,7 @@ disabled_rules:
   - block_based_kvo
   - compiler_protocol_init
   - unused_setter_value
+  - unused_closure_parameter
   - line_length
   - type_name
   - force_cast
@@ -17,6 +18,9 @@ disabled_rules:
   - trailing_comma
   - blanket_disable_command
   - nesting
+  - type_body_length
+  - opening_brace
+  - function_parameter_count
 
 opt_in_rules:
   - file_header
@@ -25,9 +29,6 @@ opt_in_rules:
 file_length:
   warning: 1800
   error: 2000
-type_body_length:
-  warning: 1000
-  error: 1500
 large_tuple:
   warning: 6
   error: 10
