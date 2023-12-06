@@ -29,7 +29,8 @@ struct VPNFeedbackFormView: View {
         VStack(spacing: 0) {
             Group {
                 Text("Report an Issue")
-                    .font(.title2)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.secondary)
             }
             .frame(height: 70)
             .frame(maxWidth: .infinity)
