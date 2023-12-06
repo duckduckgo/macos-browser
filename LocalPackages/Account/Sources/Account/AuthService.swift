@@ -52,7 +52,6 @@ public struct AuthService {
         await executeAPICall(method: "GET", endpoint: "validate-token", headers: makeAuthorizationHeader(for: accessToken))
     }
 
-    // swiftlint:disable nesting
     public struct ValidateTokenResponse: Decodable {
         public let account: Account
 
@@ -72,7 +71,6 @@ public struct AuthService {
             let product: String
         }
     }
-    // swiftlint:enable nesting
 
     // MARK: -
 

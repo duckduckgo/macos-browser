@@ -8106,7 +8106,6 @@
 				4B9579432AC7AE700062CA31 /* Assert Xcode version */,
 				4B9579442AC7AE700062CA31 /* Check Embedded Config URLs */,
 				4B9579452AC7AE700062CA31 /* Sources */,
-				4B957BD32AC7AE700062CA31 /* Swift Lint */,
 				4B957BD42AC7AE700062CA31 /* Frameworks */,
 				4B957BEC2AC7AE700062CA31 /* Resources */,
 				4B957C322AC7AE700062CA31 /* Make /Applications symlink, remove app on Clean build */,
@@ -8251,8 +8250,6 @@
 			);
 			dependencies = (
 				B69D060A2A4B19470032D14D /* PBXTargetDependency */,
-				B69D05F42A4AF1A30032D14D /* PBXTargetDependency */,
-				B69D05F22A4AF18F0032D14D /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
 			);
@@ -8964,25 +8961,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/ContentScopeScripts_ContentScopeScripts.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/DataBrokerProtection_DataBrokerProtection.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
-		};
-		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Swift Lint";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/zsh;
-			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n./lint.sh\n";
 		};
 		B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -12748,7 +12726,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = 2f78f34ec5f82478bf76427dc61cb886e40f5707;
+				revision = ff86a39a2acb9044cd2e12a9a209f867dca1dcc6;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
