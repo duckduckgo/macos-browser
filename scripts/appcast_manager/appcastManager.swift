@@ -143,7 +143,7 @@ case .releaseToPublicChannel:
     print("Action: Release to public channel")
     print("Version: \(versionIdentifier)")
 
-    // performCommonChecksAndOperations()
+    performCommonChecksAndOperations()
 
     guard let dmgFileName = findDMG(for: versionIdentifier, in: specificDir) else {
         print("Version \(versionIdentifier) does not exist in the downloaded appcast items.")
