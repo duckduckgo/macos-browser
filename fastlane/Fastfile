@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+fastlane_require 'httparty'
+fastlane_require 'rexml/document'
+
 UI.abort_with_message!('Please run fastlane via `bundle exec`') unless FastlaneCore::Helper.bundler?
 
 ########################################################################
@@ -8,8 +11,9 @@ UI.abort_with_message!('Please run fastlane via `bundle exec`') unless FastlaneC
 DEFAULT_BRANCH = 'develop'
 RELEASE_BRANCH = 'release'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
+INFO_PLIST = File.join(PROJECT_ROOT_FOLDER, 'DuckDuckGo/Info.plist')
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
-APP_STORE_BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
+BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
 VERSION_CONFIG_DEFINITION = 'MARKETING_VERSION'
 BUILD_NUMBER_CONFIG_DEFINITION = 'CURRENT_PROJECT_VERSION'
 UPGRADABLE_EMBEDDED_FILES = [
@@ -109,12 +113,12 @@ platform :mac do
     begin
       options[:resume]? macos_codefreeze_resume_prechecks : macos_codefreeze_prechecks
       new_version = validate_new_version(options)
-      app_store_build_number = increment_app_store_build_number(options)
+      build_number = increment_app_store_build_number(options)
       macos_create_release_branch(version: new_version) unless options[:resume]
       macos_update_embedded_files
       macos_update_version_and_build_number_config(
         version: new_version,
-        build_number: app_store_build_number
+        build_number: build_number
       )
     rescue => exception
       if exception.message == "Tests have failed"
@@ -250,7 +254,25 @@ platform :mac do
   #
   desc 'Increment App Store build number'
   private_lane :increment_app_store_build_number do
+    macos_current_build_number = [fetch_testflight_build_number, fetch_appcast_build_number].max
     macos_current_build_number + 1
+  end
+
+  private_lane :fetch_testflight_build_number do |options|
+    build_number = latest_testflight_build_number(
+      api_key: get_api_key,
+      username: get_username(options),
+      platform: 'osx'
+    )
+    build_number
+  end
+
+  private_lane :fetch_appcast_build_number do |options|
+    url = sh("plutil -extract SUFeedURL raw #{INFO_PLIST}").chomp
+    xml = HTTParty.get(url).body
+    xml_data = REXML::Document.new(xml)
+    versions = xml_data.get_elements('//rss/channel/item/sparkle:version').map { |e| e.text.split('.')[0].to_i }
+    versions.max
   end
 
   # Checks out a new branch from the current commit and pushes it
@@ -311,30 +333,15 @@ platform :mac do
     version = options[:version]
     build_number = options[:build_number]
     File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
-    File.write(APP_STORE_BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
+    File.write(BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
     git_commit(
       path: [
         VERSION_CONFIG_PATH,
-        APP_STORE_BUILD_NUMBER_CONFIG_PATH
+        BUILD_NUMBER_CONFIG_PATH
       ],
       message: "Bump version to #{version} (#{build_number})"
     )
     sh('git', 'push')
-  end
-
-  # Reads App Store build number from the config file
-  #
-  # @return [String] build number read from the file, or nil in case of failure
-  #
-  def macos_current_build_number
-    current_build_number = 0
-
-    file_data = File.read(APP_STORE_BUILD_NUMBER_CONFIG_PATH).split("\n")
-    file_data.each do |line|
-      current_build_number = line.split('=')[1].strip.to_i if line.start_with?(BUILD_NUMBER_CONFIG_DEFINITION)
-    end
-
-    current_build_number
   end
 
   # Updates version in the config file
