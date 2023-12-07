@@ -108,16 +108,15 @@ final class MoreOptionsMenu: NSMenu {
     }
 #endif
 
-    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
-
     private func setupMenuItems() {
 
 #if FEEDBACK
-
-        addItem(withTitle: "Send Feedback", action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
+        let feedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: nil, keyEquivalent: "")
 #if !APPSTORE
             .withImage(NSImage(named: "BetaLabel"))
 #endif // !APPSTORE
+        feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
+        addItem(feedbackMenuItem)
 
         addItem(NSMenuItem.separator())
 
@@ -125,8 +124,10 @@ final class MoreOptionsMenu: NSMenu {
 
         addWindowItems()
 
+        let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
         zoomMenuItem.submenu = ZoomSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(zoomMenuItem)
+
         addItem(NSMenuItem.separator())
 
         addUtilityItems()
@@ -535,6 +536,33 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
         let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
+    }
+}
+
+@MainActor
+final class FeedbackSubMenu: NSMenu {
+
+    init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
+        super.init(title: UserText.sendFeedback)
+
+        updateMenuItems(with: tabCollectionViewModel, targetting: target)
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
+        removeAllItems()
+
+        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite, action: #selector(AppDelegate.openReportBrokenSite(_:)), keyEquivalent: "")
+            .withImage(NSImage(named: "Feedback"))
+//            .targetting(target)
+        addItem(reportBrokenSiteItem)
+
+        let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback, action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
+            .withImage(NSImage(named: "Feedback"))
+        addItem(browserFeedbackItem)
     }
 }
 

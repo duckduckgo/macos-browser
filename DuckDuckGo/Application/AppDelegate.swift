@@ -74,6 +74,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
+    var privacyDashboardWindow: NSWindow?
+
     private var didFinishLaunching = false
 
 #if SPARKLE

@@ -43,11 +43,8 @@
                                 <rect key="frame" x="0.0" y="700" width="360" height="69"/>
                                 <subviews>
                                     <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
-                                        <rect key="frame" x="43" y="25" width="274" height="19"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="270" id="WpG-jC-P2k"/>
-                                        </constraints>
-                                        <textFieldCell key="cell" alignment="center" title="Help Improve the DuckDuckGo App" id="M7g-24-ECG">
+                                        <rect key="frame" x="18" y="25" width="324" height="19"/>
+                                        <textFieldCell key="cell" alignment="center" title="Help Improve the DuckDuckGo Browser" id="M7g-24-ECG">
                                             <font key="font" metaFont="systemSemibold" size="15"/>
                                             <color key="textColor" name="GreyTextColor"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -68,9 +65,11 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="69" id="0od-R2-dBY"/>
                                     <constraint firstItem="7KM-rJ-r28" firstAttribute="centerX" secondItem="B4Q-yT-nKT" secondAttribute="centerX" id="B3c-lB-0Ee"/>
+                                    <constraint firstItem="7KM-rJ-r28" firstAttribute="leading" secondItem="B4Q-yT-nKT" secondAttribute="leading" constant="20" symbolic="YES" id="Ena-5P-iwD"/>
                                     <constraint firstItem="7KM-rJ-r28" firstAttribute="centerY" secondItem="B4Q-yT-nKT" secondAttribute="centerY" id="EyM-8M-vKg"/>
                                     <constraint firstItem="gmY-Cl-KRc" firstAttribute="leading" secondItem="B4Q-yT-nKT" secondAttribute="leading" constant="8" id="JCT-9z-jBi"/>
                                     <constraint firstItem="gmY-Cl-KRc" firstAttribute="top" secondItem="B4Q-yT-nKT" secondAttribute="top" constant="8" id="aj3-d1-Icj"/>
+                                    <constraint firstAttribute="trailing" secondItem="7KM-rJ-r28" secondAttribute="trailing" constant="20" symbolic="YES" id="h7Q-W2-knl"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -154,7 +153,7 @@ DQ
                                                 <items>
                                                     <menuItem title="Select a category" state="on" tag="-1" id="z2T-3Y-jPK"/>
                                                     <menuItem isSeparatorItem="YES" id="K5Z-td-X6u"/>
-                                                    <menuItem title="Report problem with the DuckDuckGo App" tag="1" id="Yti-fm-YMV"/>
+                                                    <menuItem title="Report a problem" tag="1" id="Yti-fm-YMV"/>
                                                     <menuItem title="Request a feature" tag="2" id="I6J-ps-0Vy"/>
                                                     <menuItem title="General feedback" tag="3" id="GSM-nJ-01d"/>
                                                 </items>

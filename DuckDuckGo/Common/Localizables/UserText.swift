@@ -408,6 +408,9 @@ struct UserText {
     static let bookmarksManageBookmarks = NSLocalizedString("bookmarks.manage-bookmarks", value: "Manage Bookmarks", comment: "Menu item for opening the bookmarks management interface")
     static let bookmarkImportedFromFolder = NSLocalizedString("bookmarks.imported.from.folder", value: "Imported from", comment: "Name of the folder the imported bookmarks are saved into")
 
+    static let reportBrokenSite = NSLocalizedString("report.broken.site", value: "Report Broken Site", comment: "Menu with feedback commands")
+    static let browserFeedback = NSLocalizedString("browser.feedback", value: "Browser Feedback", comment: "Menu with feedback commands")
+    
     static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
 
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")

@@ -27,22 +27,21 @@ final class PrivacyDashboardPopover: NSPopover {
         guard let addressBar,
               let window = addressBar.window else { return .infinite }
         var frame = window.convertToScreen(addressBar.convert(addressBar.bounds, to: nil))
-
         frame = frame.insetBy(dx: -36, dy: -window.frame.size.height)
-
         return frame
+    }
+
+    var viewController: PrivacyDashboardViewController? {
+        contentViewController as? PrivacyDashboardViewController
     }
 
     override init() {
         super.init()
-
-        self.animates = false
 #if DEBUG
         self.behavior = .semitransient
 #else
         self.behavior = .transient
 #endif
-
         setupContentController()
     }
 
@@ -50,26 +49,29 @@ final class PrivacyDashboardPopover: NSPopover {
         fatalError("PrivacyDashboardPopover: Bad initializer")
     }
 
-    // swiftlint:disable force_cast
-    var viewController: PrivacyDashboardViewController { contentViewController as! PrivacyDashboardViewController }
-    // swiftlint:enable force_cast
-
-    // swiftlint:disable force_cast
     private func setupContentController() {
         let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
-        let controller = storyboard
-            .instantiateController(withIdentifier: "PrivacyDashboardViewController") as! PrivacyDashboardViewController
+        guard let controller = storyboard.instantiateController(withIdentifier: "PrivacyDashboardViewController") as? PrivacyDashboardViewController else {
+            assertionFailure("PrivacyDashboard is missing PrivacyDashboardViewController")
+            return
+        }
+        controller.sizeDelegate = self
         contentViewController = controller
     }
-    // swiftlint:enable force_cast
 
     func setPreferredMaxHeight(_ height: CGFloat) {
-        viewController.setPreferredMaxHeight(height - 40) // Account for popover arrow height
+        viewController?.setPreferredMaxHeight(height - 40) // Account for popover arrow height
     }
 
     override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
         self.addressBar = positioningView.superview
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
+}
 
+extension PrivacyDashboardPopover: PrivacyDashboardViewControllerSizeDelegate {
+
+    func privacyDashboardViewControllerDidChange(size: NSSize) {
+        self.contentSize = size
+    }
 }

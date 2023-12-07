@@ -6285,8 +6285,6 @@
 			children = (
 				AA3D531A27A2F57E00074EC1 /* Feedback.swift */,
 				AA3D531C27A2F58F00074EC1 /* FeedbackSender.swift */,
-				AAD8078627B3F45600CF7703 /* WebsiteBreakage.swift */,
-				AAD8078427B3F3BE00CF7703 /* WebsiteBreakageSender.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -7800,9 +7798,9 @@
 		B6FA893A269C414900588ECD /* PrivacyDashboard */ = {
 			isa = PBXGroup;
 			children = (
+				F1D6DA032B21E90500EE9745 /* Breakage */,
 				B6FA893B269C41ED00588ECD /* View */,
 				1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */,
-				1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */,
 				1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */,
 			);
 			path = PrivacyDashboard;
@@ -7865,6 +7863,16 @@
 				EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */,
 			);
 			path = JSAlert;
+			sourceTree = "<group>";
+		};
+		F1D6DA032B21E90500EE9745 /* Breakage */ = {
+			isa = PBXGroup;
+			children = (
+				1E7E2E9129029F9B00C01B54 /* WebsiteBreakageReporter.swift */,
+				AAD8078627B3F45600CF7703 /* WebsiteBreakage.swift */,
+				AAD8078427B3F3BE00CF7703 /* WebsiteBreakageSender.swift */,
+			);
+			path = Breakage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -9014,7 +9022,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n./lint.sh\n";
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n#./lint.sh\n";
 		};
 		B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;

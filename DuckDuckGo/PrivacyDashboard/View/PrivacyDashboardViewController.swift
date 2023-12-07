@@ -22,28 +22,35 @@ import Combine
 import BrowserServicesKit
 import PrivacyDashboard
 
+protocol PrivacyDashboardViewControllerSizeDelegate {
+
+    func privacyDashboardViewControllerDidChange(size: NSSize)
+}
+
 final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
-        static let initialContentHeight: CGFloat = 499
+        static let initialContentHeight: CGFloat = 489
+    }
+
+    /// Type of web page displayed
+    enum Mode {
+        case privacyDashboard
+        case reportBrokenSite
     }
 
     private var webView: WKWebView!
-    private var contentHeightConstraint: NSLayoutConstraint!
+    let width: CGFloat = 360.0
+    private let initMode: Mode
+
+    var source: WebsiteBreakage.Source {
+        initMode == .reportBrokenSite ? .appMenu : .dashboard
+    }
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
     public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
     private let websiteBreakageReporter = WebsiteBreakageReporter()
     private let permissionHandler = PrivacyDashboardPermissionHandler()
-
-    /// Running the resize animation block during the popover animation causes frame hitching.
-    /// The animation only needs to run when transitioning between views in the popover, so this is used to track when to run the animation.
-    /// This should be set to true any time the popover is displayed (i.e., reset to true when dismissing the popover), and false after the initial resize pass is complete.
-    @Published private var shouldAnimateHeightChange: Bool = false
-
-    @Published private var currentContentHeight: Int = Int(Constants.initialContentHeight)
-    private var currentContentHeightCancellable: AnyCancellable?
-
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
         guard height > Constants.initialContentHeight else { return }
@@ -51,16 +58,26 @@ final class PrivacyDashboardViewController: NSViewController {
         preferredMaxHeight = height
     }
 
+    var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
+
+    required init?(coder: NSCoder,
+          initMode: Mode) {
+        self.initMode = initMode
+        super.init(coder: coder)
+    }
+
+    required init?(coder: NSCoder) {
+        self.initMode = .privacyDashboard
+        super.init(coder: coder)
+    }
+
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
 
         privacyDashboardController.updatePrivacyInfo(tabViewModel.tab.privacyInfo)
-
         rulesUpdateObserver.updateTabViewModel(tabViewModel, onPendingUpdates: { [weak self] in
             self?.sendPendingUpdates()
         })
-
         websiteBreakageReporter.updateTabViewModel(tabViewModel)
-
         permissionHandler.updateTabViewModel(tabViewModel) { [weak self] allowedPermissions in
             self?.privacyDashboardController.allowedPermissions = allowedPermissions
         }
@@ -70,43 +87,11 @@ final class PrivacyDashboardViewController: NSViewController {
         super.viewDidLoad()
 
         initWebView()
-        privacyDashboardController.setup(for: webView, reportBrokenSiteOnly: false)
-
-        setupHeightChangeHandler()
-    }
-
-    override func viewWillAppear() {
-        super.viewWillAppear()
-
+        privacyDashboardController.setup(for: webView, reportBrokenSiteOnly: initMode == .reportBrokenSite ? true : false)
         privacyDashboardController.privacyDashboardNavigationDelegate = self
         privacyDashboardController.privacyDashboardDelegate = self
         privacyDashboardController.privacyDashboardReportBrokenSiteDelegate = self
         privacyDashboardController.preferredLocale = "en" // fixed until app is localised
-
-        webView.reload()
-    }
-
-    override func viewDidAppear() {
-        super.viewDidAppear()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-            self.shouldAnimateHeightChange = true
-        }
-    }
-
-    override func viewWillDisappear() {
-        super.viewWillDisappear()
-
-        privacyDashboardController.privacyDashboardNavigationDelegate = nil
-        privacyDashboardController.privacyDashboardDelegate = nil
-        privacyDashboardController.privacyDashboardReportBrokenSiteDelegate = nil
-        shouldAnimateHeightChange = false
-    }
-
-    override func viewDidDisappear() {
-        super.viewDidDisappear()
-
-        currentContentHeight = Int(Constants.initialContentHeight)
     }
 
     private func initWebView() {
@@ -120,21 +105,10 @@ final class PrivacyDashboardViewController: NSViewController {
         self.webView = webView
         view.addAndLayout(webView)
 
-        view.topAnchor.constraint(equalTo: webView.topAnchor).isActive = true
-
-        contentHeightConstraint = view.heightAnchor.constraint(equalToConstant: Constants.initialContentHeight)
-        contentHeightConstraint.isActive = true
-    }
-
-    private func setupHeightChangeHandler() {
-        currentContentHeightCancellable = $currentContentHeight
-            .combineLatest($shouldAnimateHeightChange)
-            .removeDuplicates { prev, current in
-                prev.0 == current.0
-            }
-            .sink(receiveValue: { [weak self] (height, shouldAnimate) in
-                self?.onHeightChange(height, shouldAnimate: shouldAnimate)
-            })
+        webView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+        webView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
+        webView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
+        webView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
     }
 
     public func isPendingUpdates() -> Bool {
@@ -155,24 +129,10 @@ final class PrivacyDashboardViewController: NSViewController {
         return rulesUpdateObserver.pendingUpdates.values.contains(domain)
     }
 
-    private func onHeightChange(_ height: Int, shouldAnimate: Bool) {
-        var height = CGFloat(height)
-        if height > self.preferredMaxHeight {
-            height = self.preferredMaxHeight
-        }
-
-        if shouldAnimate {
-            NSAnimationContext.runAnimationGroup { [weak self] context in
-                context.duration = 1/3
-                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-                self?.contentHeightConstraint.animator().constant = height
-            }
-        } else {
-            self.contentHeightConstraint.constant = height
-        }
-    }
-
     private func privacyDashboardProtectionSwitchChangeHandler(state: ProtectionState) {
+
+        dismiss()
+
         guard let domain = privacyDashboardController.privacyInfo?.url.host else {
             return
         }
@@ -187,9 +147,11 @@ final class PrivacyDashboardViewController: NSViewController {
         }
 
         let completionToken = ContentBlocking.shared.contentBlockingManager.scheduleCompilation()
-        rulesUpdateObserver.didStartCompilation(for: domain, token: completionToken)
+        rulesUpdateObserver.startCompilation(for: domain, token: completionToken)
     }
 }
+
+// MARK: - PrivacyDashboardControllerDelegate
 
 extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 
@@ -237,17 +199,20 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
     }
 }
 
+// MARK: - PrivacyDashboardNavigationDelegate
+
 extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didSetHeight height: Int) {
-        currentContentHeight = height
+        sizeDelegate?.privacyDashboardViewControllerDidChange(size: NSSize(width: width, height: CGFloat(height)))
     }
 }
+
+// MARK: - PrivacyDashboardReportBrokenSiteDelegate
 
 extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelegate {
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
-
         websiteBreakageReporter.reportBreakage(category: category, description: description, reportFlow: .dashboard)
     }
 

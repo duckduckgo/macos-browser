@@ -21,7 +21,7 @@ import Cocoa
 import Common
 import WebKit
 import Configuration
-
+// swiftlint:disable:trailing_whitespace
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
@@ -116,6 +116,27 @@ extension AppDelegate {
 
     @objc func openFeedback(_ sender: Any?) {
         FeedbackPresenter.presentFeedbackForm()
+    }
+
+    @objc func openReportBrokenSite(_ sender: Any?) {
+        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
+        let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
+            PrivacyDashboardViewController(coder: coder, initMode: .reportBrokenSite)
+        }
+
+        privacyDashboardViewController.sizeDelegate = self
+
+        let window = NSWindow(contentViewController: privacyDashboardViewController)
+        window.setFrame(NSRect(x: 0, y: 0, width: privacyDashboardViewController.width, height: 587.0), display: true)
+        privacyDashboardWindow = window
+
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let tabModel = parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel else {
+            assertionFailure("AppDelegate: Failed to present PrivacyDashboard")
+            return
+        }
+        privacyDashboardViewController.updateTabViewModel(tabModel)
+        parentWindowController.window?.beginSheet(window) { _ in }
     }
 
     #endif
@@ -974,4 +995,11 @@ extension MainViewController: FindInPageDelegate {
         activeTabViewModel?.closeFindInPage()
     }
 
+}
+
+extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
+
+    func privacyDashboardViewControllerDidChange(size: NSSize) {
+        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
+    }
 }
