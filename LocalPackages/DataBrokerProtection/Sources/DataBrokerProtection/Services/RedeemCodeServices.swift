@@ -99,7 +99,12 @@ public final class KeychainAuthenticationData: AuthenticationRepository {
         case inviteCodeKey = "dbp:inviteCodeKey"
     }
 
-    let keychainPrefix = Bundle.main.bundleIdentifier ?? "com.duckduckgo"
+    /// Hack to stop the bleeding on https://app.asana.com/0/1203581873609357/1206097441142301/f
+    lazy var keychainPrefix: String = {
+        let originalString = Bundle.main.bundleIdentifier ?? "com.duckduckgo"
+        let replacedString = originalString.replacingOccurrences(of: "DBP.backgroundAgent", with: "browser")
+        return replacedString
+    }()
 
     // Initialize this constant with the DBP API Dev Access Token on Bitwarden if you do not want to use the redeem endpoint.
     private let developmentToken: String? = nil

@@ -12,7 +12,7 @@ let package = Package(
             targets: ["Account"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "87.2.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "92.0.3"),
         .package(path: "../Purchase")
     ],
     targets: [

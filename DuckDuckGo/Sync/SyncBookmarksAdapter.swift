@@ -53,11 +53,6 @@ final class SyncBookmarksAdapter {
 
     private(set) var provider: BookmarksProvider?
     let databaseCleaner: BookmarkDatabaseCleaner
-    var shouldResetBookmarksSyncTimestamp: Bool = false {
-        willSet {
-            assert(provider == nil, "Setting this value has no effect after provider has been instantiated")
-        }
-    }
 
     @Published
     var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false).wrappedValue {
@@ -74,6 +69,9 @@ final class SyncBookmarksAdapter {
 
     @UserDefaultsWrapper(key: .syncIsEligibleForFaviconsFetcherOnboarding, defaultValue: false)
     var isEligibleForFaviconsFetcherOnboarding: Bool
+
+    @UserDefaultsWrapper(key: .syncDidMigrateToImprovedListsHandling, defaultValue: false)
+    private var didMigrateToImprovedListsHandling: Bool
 
     @UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false)
     private var isSyncBookmarksPaused: Bool {
@@ -140,7 +138,8 @@ final class SyncBookmarksAdapter {
             }
         )
 
-        if shouldResetBookmarksSyncTimestamp {
+        if !didMigrateToImprovedListsHandling {
+            didMigrateToImprovedListsHandling = true
             provider.lastSyncTimestamp = nil
         }
 

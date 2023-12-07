@@ -321,7 +321,7 @@ final class PixelKitTests: XCTestCase {
 }
 
 private class TimeMachine {
-    private var date = Date()
+    private var date = Calendar.current.startOfDay(for: Date())
 
     func travel(by timeInterval: TimeInterval) {
         date = date.addingTimeInterval(timeInterval)
