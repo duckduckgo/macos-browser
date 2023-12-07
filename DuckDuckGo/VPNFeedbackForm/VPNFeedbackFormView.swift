@@ -188,37 +188,27 @@ private struct VPNFeedbackFormButtons: View {
     var body: some View {
         HStack {
             if viewModel.viewState == .feedbackSent {
-                Button(action: {
-                    viewModel.process(action: .cancel)
-                }, label: {
-                    Text("Done")
-                        .frame(maxWidth: .infinity)
-                })
-                .keyboardShortcut(.defaultAction)
-                .controlSize(.large)
-                .frame(maxWidth: .infinity)
+                button(text: "Done", action: .cancel)
+                    .keyboardShortcut(.defaultAction)
             } else {
-                Button(action: {
-                    viewModel.process(action: .cancel)
-                }, label: {
-                    Text("Cancel")
-                        .frame(maxWidth: .infinity)
-                })
-                .controlSize(.large)
-                .frame(maxWidth: .infinity)
-
-                Button(action: {
-                    viewModel.process(action: .submit)
-                }, label: {
-                    Text(viewModel.viewState == .feedbackSending ? "Submitting..." : "Submit")
-                        .frame(maxWidth: .infinity)
-                })
-                .keyboardShortcut(.defaultAction)
-                .controlSize(.large)
-                .frame(maxWidth: .infinity)
-                .disabled(!viewModel.submitButtonEnabled)
+                button(text: "Cancel", action: .cancel)
+                button(text: viewModel.viewState == .feedbackSending ? "Submitting..." : "Submit", action: .submit)
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(!viewModel.submitButtonEnabled)
             }
         }
+    }
+
+    @ViewBuilder
+    func button(text: String, action: VPNFeedbackFormViewModel.ViewAction) -> some View {
+        Button(action: {
+            viewModel.process(action: action)
+        }, label: {
+            Text(text)
+                .frame(maxWidth: .infinity)
+        })
+        .controlSize(.large)
+        .frame(maxWidth: .infinity)
     }
 
 }
