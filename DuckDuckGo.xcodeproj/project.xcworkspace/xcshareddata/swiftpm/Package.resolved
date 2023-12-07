@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "fcappelli/breakage_report_improvements",
-        "revision" : "14a78c7931c0b5230b4d07d3a26d3a702e5fb4bc"
+        "revision" : "c871e62fd8d07f9e3136948614003fbe7e582963",
+        "version" : "91.0.2"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "59dedf0f4ff1e9147de0806a54c6043861eb0870",
-        "version" : "3.1.0"
+        "revision" : "38336a574e13090764ba09a6b877d15ee514e371",
+        "version" : "3.1.1"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
-        "version" : "0.5.0"
+        "revision" : "8f4d2753f0e4778c76d5f05ad16c74f707390531",
+        "version" : "1.2.3"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
-        "revision" : "4684440d03304e7638a2c8086895367e90987463",
-        "version" : "1.2.1"
+        "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
+        "version" : "1.2.2"
       }
     },
     {

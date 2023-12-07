@@ -141,14 +141,14 @@ public struct UserDefaultsWrapper<T> {
         // Data Broker Protection
 
         case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
-
         case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
+        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // Network Protection: Shared Defaults
         // ---
@@ -174,6 +174,10 @@ public struct UserDefaultsWrapper<T> {
         case syncCredentialsPaused = "sync.credentials-paused"
         case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
         case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
+        case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
+        case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
+        case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
     }
 
     enum RemovedKeys: String, CaseIterable {

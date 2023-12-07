@@ -1,5 +1,5 @@
 //
-//  ArrayExtensions.swift
+//  FaviconsFetcherOnboardingViewModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,16 +18,10 @@
 
 import Foundation
 
-extension Array: Identifiable where Element == Character {
-    public var id: String {
-        UUID().uuidString
-    }
-}
+final public class FaviconsFetcherOnboardingViewModel: ObservableObject {
+    @Published public var isFaviconsFetchingEnabled: Bool = false
 
-extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0 ..< Swift.min($0 + size, count)])
-        }
-    }
+    public var onDismiss: () -> Void = {}
+
+    public init() {}
 }

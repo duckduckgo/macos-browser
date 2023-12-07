@@ -92,9 +92,7 @@ private extension Tab.TabContent {
         case homePage = 3
         case onboarding = 4
         case duckPlayer = 5
-#if DBP
         case dataBrokerProtection = 6
-#endif
     }
 
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
@@ -113,10 +111,8 @@ private extension Tab.TabContent {
         case .duckPlayer:
             guard let videoID = videoID else { return nil }
             self = .url(.duckPlayer(videoID, timestamp: timestamp))
-#if DBP
         case .dataBrokerProtection:
             self = .dataBrokerProtection
-#endif
         }
     }
 
@@ -128,9 +124,7 @@ private extension Tab.TabContent {
         case .preferences: return .preferences
         case .onboarding: return .onboarding
         case .none: return .homePage
-#if DBP
         case .dataBrokerProtection: return .dataBrokerProtection
-#endif
         }
     }
 
