@@ -40,7 +40,7 @@ struct QRCode: View {
             return NSImage(systemSymbolName: "xmark.circle", accessibilityDescription: nil) ?? NSImage()
         }()
         let data = Data(text.utf8)
-        let qrCodeFilter: CIFilter = CIFilter.init(name: "CIQRCodeGenerator")!
+        let qrCodeFilter: CIFilter = CIFilter(name: "CIQRCodeGenerator")!
         qrCodeFilter.setValue(data, forKey: "inputMessage")
         qrCodeFilter.setValue("H", forKey: "inputCorrectionLevel")
 

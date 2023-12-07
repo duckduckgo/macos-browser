@@ -51,7 +51,7 @@ final class UserScripts: UserScriptsProvider {
         let privacySettings = PrivacySecurityPreferences.shared
         let privacyConfig = sourceProvider.privacyConfigurationManager.privacyConfig
         let sessionKey = sourceProvider.sessionKey ?? ""
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
                                                 sessionKey: sessionKey,
                                                 featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig))
         contentScopeUserScript = ContentScopeUserScript(sourceProvider.privacyConfigurationManager, properties: prefs)

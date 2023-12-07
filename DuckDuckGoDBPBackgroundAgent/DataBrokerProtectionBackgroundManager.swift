@@ -52,7 +52,7 @@ public final class DataBrokerProtectionBackgroundManager {
                                                   thirdPartyCredentialsProvider: false)
 
         let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties.init(gpcEnabled: false,
+        let prefs = ContentScopeProperties(gpcEnabled: false,
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 

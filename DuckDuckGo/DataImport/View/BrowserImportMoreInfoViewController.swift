@@ -29,7 +29,7 @@ final class BrowserImportMoreInfoViewController: NSViewController {
         let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
 
         return storyboard.instantiateController(identifier: Constants.identifier) { (coder) -> Self? in
-            return Self.init(coder: coder, source: source)
+            return Self(coder: coder, source: source)
         }
     }
 
