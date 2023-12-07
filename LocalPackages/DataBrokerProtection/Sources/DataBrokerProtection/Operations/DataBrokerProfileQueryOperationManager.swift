@@ -243,6 +243,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return
         }
 
+        guard let optOutStep = brokerProfileQueryData.dataBroker.optOutStep(), optOutStep.optOutType != .parentSiteOptOut else {
+            os_log("Broker opts out in parent, skipping...", log: .dataBrokerProtection)
+            return
+        }
+
         let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))

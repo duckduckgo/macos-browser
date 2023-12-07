@@ -2,7 +2,7 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop, "release/**" ]
+    branches: [ main, "release/**" ]
   pull_request:
 
 
@@ -226,7 +226,7 @@ jobs:
         retention-days: 7
 
     - name: Fetch latest commit author
-      if: always() && github.ref_name == 'develop'
+      if: always() && github.ref_name == 'main'
       id: fetch_commit_author
       env:
         GH_TOKEN: ${{ github.token }}
@@ -353,7 +353,7 @@ jobs:
     name: Create Asana Task
     needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
 
-    if: failure() && github.ref_name == 'develop' && github.run_attempt == 1
+    if: failure() && github.ref_name == 'main' && github.run_attempt == 1
 
     runs-on: ubuntu-latest
 
@@ -370,7 +370,7 @@ jobs:
     name: Close Asana Task
     needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
 
-    if: success() && github.ref_name == 'develop' && github.run_attempt > 1
+    if: success() && github.ref_name == 'main' && github.run_attempt > 1
 
     runs-on: ubuntu-latest
 
