@@ -55,7 +55,7 @@ final class DBPUIViewModel {
         guard let prefs = prefs else { return nil }
 
         let configuration = WKWebViewConfiguration()
-        configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig, 
+        configuration.applyDBPUIConfiguration(privacyConfig: privacyConfig,
                                               prefs: prefs,
                                               delegate: dataManager.cache,
                                               webUISettings: webUISettings)
