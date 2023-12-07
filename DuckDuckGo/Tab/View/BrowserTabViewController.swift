@@ -448,7 +448,6 @@ final class BrowserTabViewController: NSViewController {
         bookmarksViewController?.removeCompletely()
 #if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
-        dataBrokerProtectionHomeViewController = nil
 #endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
@@ -681,6 +680,12 @@ extension BrowserTabViewController: TabDelegate {
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
         case .tab(selected: let selected, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
+        }
+    }
+
+    func tabWillClose(_ tab: Tab) {
+        if tab.content == .dataBrokerProtection {
+            dataBrokerProtectionHomeViewController = nil
         }
     }
 
