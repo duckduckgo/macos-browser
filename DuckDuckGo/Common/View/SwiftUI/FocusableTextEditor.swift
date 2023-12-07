@@ -26,7 +26,7 @@ struct FocusableTextEditor: View {
 
     let cornerRadius: CGFloat = 8.0
     let borderWidth: CGFloat = 0.4
-    let characterLimit: Int = 10000
+    var characterLimit: Int = 10000
 
     var body: some View {
         TextEditor(text: $text)

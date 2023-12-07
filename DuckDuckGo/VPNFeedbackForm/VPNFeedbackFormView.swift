@@ -135,26 +135,25 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
             FocusableTextEditor(text: $model.notes)
 #else
             if #available(macOS 12, *) {
-                FocusableTextEditor(text: $viewModel.feedbackFormText)
+                FocusableTextEditor(text: $viewModel.feedbackFormText, characterLimit: 1000)
             } else {
                 TextEditor(text: $viewModel.feedbackFormText)
                     .frame(height: 197.0)
                     .font(.body)
                     .foregroundColor(.primary)
                     .onChange(of: viewModel.feedbackFormText) {
-                        viewModel.feedbackFormText = String($0.prefix(10000))
+                        viewModel.feedbackFormText = String($0.prefix(1000))
                     }
                     .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
-                    // .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                    // .background(
-                    //     ZStack {
-                    //         RoundedRectangle(cornerRadius: cornerRadius)
-                    //             .stroke(Color(NSColor.textEditorBorderColor), lineWidth: 0.4)
-                    //         RoundedRectangle(cornerRadius: cornerRadius)
-                    //             .fill(Color(NSColor.textEditorBackgroundColor))
-                    //     }
-                    // )
-                    // ^ the code above is failing to compile with "failed to produce diagnostic for expression", need to debug it further.
+                    .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+                    .background(
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8.0)
+                                .stroke(Color(NSColor.textEditorBorderColor), lineWidth: 0.4)
+                            RoundedRectangle(cornerRadius: 8.0)
+                                .fill(Color(NSColor.textEditorBackgroundColor))
+                        }
+                    )
             }
 #endif
     }
