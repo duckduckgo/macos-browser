@@ -595,7 +595,9 @@ extension DataImportViewModel {
             return nil
         case .fileImport(dataType: let dataType, summary: _)
             // exlude all skipped datatypes that are ordered before
-            where selectedDataTypes.subtracting(DataType.dataTypes(before: dataType, inclusive: true)).isEmpty:
+            where selectedDataTypes.subtracting(DataType.dataTypes(before: dataType, inclusive: true)).isEmpty
+            // and no failures recorded - otherwise will skip to Feedback
+            && !summary.contains(where: { !$0.result.isSuccess }):
             // no other data types to skip:
             return .cancel
         case .fileImport:
