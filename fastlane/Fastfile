@@ -115,16 +115,65 @@ platform :mac do
       new_version = validate_new_version(options)
       build_number = increment_current_build_number(options)
       macos_create_release_branch(version: new_version) unless options[:resume]
-      macos_update_embedded_files
+      macos_update_embedded_files(push: false)
       macos_update_version_and_build_number_config(
         version: new_version,
-        build_number: build_number
+        build_number: build_number,
+        force: options[:force]
       )
     rescue => exception
       if exception.message == "Tests have failed"
         UI.user_error! %{Tests have failed.
 * If you believe the failing test is flaky, please retry the same fastlane command,
   appending `resume:true`.
+* If the failure looks legitimate, try to fix it, commit the fix (be sure to only
+  include the files you've changed while making a fix and leave other changed files
+  unmodified), and run the command again appending `resume:true`.
+        }
+      else
+        raise exception
+      end
+    end
+  end
+
+  # Bumps build number for the current version and updates embedded files.
+  #
+  # - Should be called on an existing internal release branch.
+  # - Also runs unit tests after updating embedded files.
+  #
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
+  #
+  desc 'Prepares new internal release on top of an existing one'
+  lane :bump_internal_release do |options|
+    begin
+      unless git_branch.start_with?(RELEASE_BRANCH)
+        UI.abort_with_message!("Incorrect branch. Branch name must start with '#{RELEASE_BRANCH}/'.")
+      end
+
+      force = options[:force].nil? ? false : options[:force]
+      current_version = macos_current_version
+      current_build_number = macos_current_build_number
+      build_number = increment_current_build_number(options)
+
+      UI.important("Current version is #{current_version} (#{current_build_number}).")
+      UI.important("Will update to #{current_version} (#{build_number}).")
+
+      unless force
+        unless UI.confirm("Do you want to continue?")
+          UI.abort_with_message!('Aborted by user.')
+        end
+      end
+
+      macos_update_embedded_files(push: false)
+      macos_update_version_and_build_number_config(
+        version: current_version,
+        build_number: build_number,
+        force: true
+      )
+    rescue => exception
+      if exception.message == "Tests have failed"
+        UI.user_error! %{Tests have failed.
+* If you believe the failing test is flaky, please retry the same fastlane command.
 * If the failure looks legitimate, try to fix it, commit the fix (be sure to only
   include the files you've changed while making a fix and leave other changed files
   unmodified), and run the command again appending `resume:true`.
@@ -324,8 +373,12 @@ platform :mac do
   # - Runs automated tests
   # - Commits and pushes
   #
-  private_lane :macos_update_embedded_files do
+  # @option [Boolean] push (default: true) Push to git remote if true, otherwise skip pushing.
+  #
+  private_lane :macos_update_embedded_files do |options|
     sh("cd #{PROJECT_ROOT_FOLDER} && ./scripts/update_embedded.sh")
+
+    push = options[:push].nil? ? true : options[:push]
 
     # Verify no unexpected files were modified
     result = sh('git', 'status')
@@ -345,7 +398,9 @@ platform :mac do
     modified_files.each { |modified_file| sh('git', 'add', modified_file.to_s) }
     sh('git', 'commit', '-m', 'Update embedded files')
     ensure_git_status_clean
-    sh('git', 'push')
+    if push
+      sh('git', 'push')
+    end
   end
 
   # Updates version in the config file
@@ -370,6 +425,21 @@ platform :mac do
     if push
       sh('git', 'push')
     end
+  end
+
+  # Reads build number from the config file
+  #
+  # @return [String] build number read from the file, or nil in case of failure
+  #
+  def macos_current_build_number
+    current_build_number = 0
+
+    file_data = File.read(BUILD_NUMBER_CONFIG_PATH).split("\n")
+    file_data.each do |line|
+      current_build_number = line.split('=')[1].strip.to_i if line.start_with?(BUILD_NUMBER_CONFIG_DEFINITION)
+    end
+
+    current_build_number
   end
 
   # Updates version in the config file

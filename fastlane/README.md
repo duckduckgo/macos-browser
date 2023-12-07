@@ -55,6 +55,14 @@ Updates App Store metadata
 
 Executes the release preparation work in the repository
 
+### mac bump_internal_release
+
+```sh
+[bundle exec] fastlane mac bump_internal_release
+```
+
+Prepares new internal release on top of an existing one
+
 ### mac set_version
 
 ```sh
