@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Subscription
 
 public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
     public var title = UserText.shareModalTitle
