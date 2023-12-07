@@ -243,8 +243,8 @@ struct DataImportViewModel {
                 // show "no data to import" screen when no bookmarks|passwords found
                 if case .noData = error.errorType, nextScreen == nil, screen != .fileImport(dataType: dataType) {
                     nextScreen = .fileImport(dataType: dataType)
-                } else if nextScreen == nil, screen != .fileImport(dataType: dataType, summary: DataType.dataTypes(before: dataType)) {
-                    nextScreen = .fileImport(dataType: dataType, summary: DataType.dataTypes(before: dataType))
+                } else if nextScreen == nil, screen != .fileImport(dataType: dataType, summary: Set(DataType.dataTypes(before: dataType))) {
+                    nextScreen = .fileImport(dataType: dataType, summary: Set(DataType.dataTypes(before: dataType)))
                 }
                 Pixel.fire(.dataImportFailed(source: importSource, error: error))
             }
