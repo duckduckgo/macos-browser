@@ -49,15 +49,15 @@ enum VPNFeedbackCategory: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .landingPage: return "What's happening?"
-        case .unableToInstall: return "Unable to install VPN"
-        case .failsToConnect: return "VPN fails to connect"
-        case .tooSlow: return "VPN connection is too slow"
-        case .issueWithAppOrWebsite: return "Issue with other apps or websites"
-        case .cantConnectToLocalDevice: return "Can't connect to local device"
-        case .appCrashesOrFreezes: return "Browser crashes or freezes"
-        case .featureRequest: return "Feature request"
-        case .somethingElse: return "Something else"
+        case .landingPage: return UserText.vpnFeedbackFormCategorySelect
+        case .unableToInstall: return UserText.vpnFeedbackFormCategoryUnableToInstall
+        case .failsToConnect: return UserText.vpnFeedbackFormCategoryFailsToConnect
+        case .tooSlow: return UserText.vpnFeedbackFormCategoryTooSlow
+        case .issueWithAppOrWebsite: return UserText.vpnFeedbackFormCategoryIssuesWithApps
+        case .cantConnectToLocalDevice: return UserText.vpnFeedbackFormCategoryLocalDeviceConnectivity
+        case .appCrashesOrFreezes: return UserText.vpnFeedbackFormCategoryBrowserCrashOrFreeze
+        case .featureRequest: return UserText.vpnFeedbackFormCategoryFeatureRequest
+        case .somethingElse: return UserText.vpnFeedbackFormCategoryOther
         }
     }
 }

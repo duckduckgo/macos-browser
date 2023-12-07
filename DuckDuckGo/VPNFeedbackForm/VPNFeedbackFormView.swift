@@ -28,7 +28,7 @@ struct VPNFeedbackFormView: View {
     var body: some View {
         VStack(spacing: 0) {
             Group {
-                Text("Report an Issue")
+                Text(UserText.vpnFeedbackFormTitle)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.secondary)
             }
@@ -172,7 +172,7 @@ private struct VPNFeedbackFormSentView: View {
                 .font(.system(size: 18, weight: .medium))
                 .padding(.top, 30)
 
-            Text("Your feedback will help us improve the\nDuckDuckGo app.")
+            Text("Your feedback will help us improve the\nDuckDuckGo VPN.")
                 .multilineTextAlignment(.center)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
