@@ -26,6 +26,9 @@ let package = Package(
         .target(
             name: "PixelKit",
             dependencies: [],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),
         .testTarget(

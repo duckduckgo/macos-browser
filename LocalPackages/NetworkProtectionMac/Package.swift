@@ -43,6 +43,9 @@ let package = Package(
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "XPCHelper", package: "XPCHelper")
             ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),
 
@@ -56,6 +59,9 @@ let package = Package(
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),

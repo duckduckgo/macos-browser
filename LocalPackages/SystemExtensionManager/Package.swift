@@ -23,6 +23,9 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SystemExtensionManager",
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         )
     ]

@@ -19,6 +19,9 @@ let package = Package(
         .target(
             name: "SwiftUIExtensions",
             dependencies: [],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),
     ]

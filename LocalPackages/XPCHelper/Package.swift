@@ -38,6 +38,9 @@ let package = Package(
         .target(
             name: "XPCHelper",
             dependencies: [],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         )
     ]

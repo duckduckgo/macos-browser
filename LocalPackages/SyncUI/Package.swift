@@ -21,6 +21,9 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),
         .testTarget(
