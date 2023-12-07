@@ -109,8 +109,8 @@ extension Preferences {
                         guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
                         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                        case .success(let success):
-                            if !success.isActive {
+                        case .success(let subscription):
+                            if !subscription.isActive {
                                 AccountManager().signOut()
                                 self.showSubscriptionInactiveAlert()
                             }

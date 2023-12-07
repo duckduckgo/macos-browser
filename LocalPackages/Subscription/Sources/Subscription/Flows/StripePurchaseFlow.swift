@@ -18,7 +18,6 @@
 
 import Foundation
 import StoreKit
-import Subscription
 
 public final class StripePurchaseFlow {
 

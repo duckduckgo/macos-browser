@@ -281,8 +281,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                             guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
                             switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                            case .success(let success):
-                                if !success.isActive {
+                            case .success(let subscription):
+                                if !subscription.isActive {
                                     self.showSubscriptionInactiveAlert()
                                 }
                             case .failure:

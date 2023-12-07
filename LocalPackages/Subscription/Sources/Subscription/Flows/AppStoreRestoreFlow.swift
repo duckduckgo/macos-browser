@@ -18,12 +18,11 @@
 
 import Foundation
 import StoreKit
-import Subscription
 
 @available(macOS 12.0, *)
 public final class AppStoreRestoreFlow {
 
-    public typealias Success = (externalID: String, isActive: Bool)
+    public typealias Subscription = (externalID: String, isActive: Bool)
 
     public enum Error: Swift.Error {
         case missingAccountOrTransactions
@@ -33,7 +32,7 @@ public final class AppStoreRestoreFlow {
         case somethingWentWrong
     }
 
-    public static func restoreAccountFromPastPurchase() async -> Result<AppStoreRestoreFlow.Success, AppStoreRestoreFlow.Error> {
+    public static func restoreAccountFromPastPurchase() async -> Result<AppStoreRestoreFlow.Subscription, AppStoreRestoreFlow.Error> {
         guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return .failure(.missingAccountOrTransactions) }
 
         // Do the store login to get short-lived token
