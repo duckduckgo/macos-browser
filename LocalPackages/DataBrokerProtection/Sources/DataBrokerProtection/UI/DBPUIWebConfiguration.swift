@@ -62,7 +62,7 @@ final class DBPUIUserScript: UserScriptsProvider {
     var dbpUICommunicationLayer: DBPUICommunicationLayer
     private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
 
-    init(privacyConfig: PrivacyConfigurationManaging, 
+    init(privacyConfig: PrivacyConfigurationManaging,
          prefs: ContentScopeProperties,
          delegate: DBPUICommunicationDelegate,
          webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable) {
