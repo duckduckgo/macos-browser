@@ -20,8 +20,6 @@ import SwiftUI
 import CoreImage
 
 struct QRCode: View {
-    @Environment(\.colorScheme) var colorScheme
-
     let string: String
     let size: CGSize
 
@@ -58,8 +56,8 @@ struct QRCode: View {
         }
 
         let colorParameters: [String: Any] = [
-            "inputColor0": CIColor(color: colorScheme == .light ? NSColor.black : NSColor.white)!,
-            "inputColor1": CIColor(color: NSColor.clear)!
+            "inputColor0": CIColor(color: NSColor.black)!,
+            "inputColor1": CIColor(color: NSColor.white)!
         ]
         let coloredImage = outputImage.applyingFilter("CIFalseColor", parameters: colorParameters)
 
