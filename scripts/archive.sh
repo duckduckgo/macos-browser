@@ -67,7 +67,7 @@ read_command_line_arguments() {
 		subscription)
 			app_name="DuckDuckGo Privacy Pro"
 			scheme="DuckDuckGo Privacy Pro"
-			configuration="Release"
+			configuration="Review"
 			;;
 		clear-keychain)
 			clear_keychain
