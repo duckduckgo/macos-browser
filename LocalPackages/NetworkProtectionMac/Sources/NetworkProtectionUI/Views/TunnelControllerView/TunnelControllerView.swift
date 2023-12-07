@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionStatusView.swift
+//  TunnelControllerView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //

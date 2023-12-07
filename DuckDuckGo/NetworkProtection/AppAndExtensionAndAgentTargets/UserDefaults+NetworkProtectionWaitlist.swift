@@ -1,5 +1,5 @@
 //
-//  PrivacyFeatureOverrideStore.swift
+//  UserDefaults+NetworkProtectionWaitlist.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
