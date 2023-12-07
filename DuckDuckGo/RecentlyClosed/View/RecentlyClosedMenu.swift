@@ -64,11 +64,9 @@ private extension NSMenuItem {
         self.init()
 
         switch recentlyClosedTab.tabContent {
-#if DBP
         case .dataBrokerProtection:
             image = TabViewModel.Favicon.dataBrokerProtection
             title = UserText.tabDataBrokerProtectionTitle
-#endif
         case .homePage:
             image = TabViewModel.Favicon.home
             title = UserText.tabHomeTitle

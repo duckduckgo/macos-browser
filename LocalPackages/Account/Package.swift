@@ -5,14 +5,14 @@ import PackageDescription
 
 let package = Package(
     name: "Account",
-    platforms: [ .macOS(.v11) ],
+    platforms: [ .macOS("11.4") ],
     products: [
         .library(
             name: "Account",
             targets: ["Account"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "84.1.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "92.0.3"),
         .package(path: "../Purchase")
     ],
     targets: [

@@ -30,7 +30,7 @@ protocol BookmarkManager: AnyObject {
     func getBookmark(forUrl url: String) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
     func remove(objectsWithUUIDs uuids: [String])
@@ -46,7 +46,6 @@ protocol BookmarkManager: AnyObject {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
 
     func handleFavoritesAfterDisablingSync()
-    var didMigrateToFormFactorSpecificFavorites: Bool { get }
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -81,10 +80,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
-
-    var didMigrateToFormFactorSpecificFavorites: Bool {
-        bookmarkStore.didMigrateToFormFactorSpecificFavorites
-    }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
@@ -211,6 +206,7 @@ final class LocalBookmarkManager: BookmarkManager {
         bookmarkStore.update(bookmark: bookmark)
         loadBookmarks()
         requestSync()
+
     }
 
     func update(folder: BookmarkFolder) {
@@ -240,19 +236,18 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Folders
 
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder {
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void) {
+
         let folder = BookmarkFolder(id: UUID().uuidString, title: title, parentFolderUUID: parent?.id, children: [])
 
         bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
             guard success else {
                 return
             }
-
             self?.loadBookmarks()
             self?.requestSync()
+            completion(folder)
         }
-
-        return folder
     }
 
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
@@ -290,6 +285,7 @@ final class LocalBookmarkManager: BookmarkManager {
                 self?.requestSync()
             }
             completion(error)
+
         }
     }
 
@@ -300,6 +296,7 @@ final class LocalBookmarkManager: BookmarkManager {
                 self?.requestSync()
             }
             completion(error)
+
         }
     }
 
@@ -350,6 +347,7 @@ final class LocalBookmarkManager: BookmarkManager {
         store.resetBookmarks { [self] _ in
             self.loadBookmarks()
             self.requestSync()
+
         }
     }
 }

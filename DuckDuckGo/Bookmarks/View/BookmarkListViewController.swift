@@ -64,7 +64,16 @@ final class BookmarkListViewController: NSViewController {
     }()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, treeController: treeController)
+        BookmarkOutlineViewDataSource(
+            contentMode: .bookmarksAndFolders,
+            treeController: treeController,
+            presentFaviconsFetcherOnboarding: { [weak self] in
+                guard let self, let window = self.view.window else {
+                    return
+                }
+                self.faviconsFetcherOnboarding?.presentOnboardingIfNeeded(in: window)
+            }
+        )
     }()
 
     private var selectedNodes: [BookmarkNode] {
@@ -73,6 +82,14 @@ final class BookmarkListViewController: NSViewController {
         }
         return [BookmarkNode]()
     }
+
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -255,7 +272,7 @@ extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, Ad
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        bookmarkManager.makeFolder(for: name, parent: nil)
+        bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })
     }
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {

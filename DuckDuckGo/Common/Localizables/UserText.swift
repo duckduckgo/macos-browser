@@ -38,6 +38,7 @@ struct UserText {
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
     static let removeFavorite = NSLocalizedString("remove-favorite", value: "Remove Favorite", comment: "Remove Favorite button")
     static let quit = NSLocalizedString("quit", value: "Quit", comment: "Quit button")
+    static let uninstall = NSLocalizedString("uninstall", value: "Uninstall", comment: "Uninstall button")
     static let dontQuit = NSLocalizedString("dont.quit", value: "Don’t Quit", comment: "Don’t Quit button")
     static let next = NSLocalizedString("next", value: "Next", comment: "Next button")
     static let pasteAndGo = NSLocalizedString("paste.and.go", value: "Paste & Go", comment: "Paste & Go button")
@@ -300,6 +301,53 @@ struct UserText {
     static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Automatically handle cookie pop-ups", comment: "Autoconsent settings checkbox title")
     static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
 
+    // VPN Setting Titles
+
+    static let vpnGeneralTitle = NSLocalizedString("vpn.general.title", value: "General", comment: "General section title in VPN settings")
+    static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "Notifications", comment: "Notifications section title in VPN settings")
+    static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced", comment: "VPN Advanced section title in VPN settings")
+
+    // VPN Settings
+
+    static let vpnConnectOnLoginSettingTitle = NSLocalizedString(
+        "vpn.setting.title.connect.on.login",
+        value: "Connect on login",
+        comment: "Connect on Login setting title")
+    static let vpnShowInMenuBarSettingTitle = NSLocalizedString(
+        "vpn.setting.title.connect.on.login",
+        value: "Show VPN in menu bar",
+        comment: "Display VPN status in the menu bar.")
+    static let vpnAlwaysOnSettingDescription = NSLocalizedString(
+        "vpn.setting.description.always.on",
+        value: "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled.",
+        comment: "Always ON setting description")
+    static let vpnExcludeLocalNetworksSettingTitle = NSLocalizedString(
+        "vpn.setting.title.exclude.local.networks",
+        value: "Exclude local networks",
+        comment: "Exclude Local Networks setting title")
+    static let vpnExcludeLocalNetworksSettingDescription = NSLocalizedString(
+        "vpn.setting.description.exclude.local.networks",
+        value: "Bypass the VPN for local network connections, like to a printer.",
+        comment: "Exclude Local Networks setting description")
+    static let vpnSecureDNSSettingDescription = NSLocalizedString(
+        "vpn.setting.description.secure.dns",
+        value: "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit.",
+        comment: "Secure DNS setting description")
+    static let uninstallVPNButtonTitle = NSLocalizedString(
+        "vpn.button.title.uninstall.vpn",
+        value: "Uninstall DuckDuckGo VPN...",
+        comment: "Uninstall VPN button title")
+
+    // VPN Settings Alerts
+
+    static let uninstallVPNAlertTitle = NSLocalizedString("vpn.uninstall.alert.title", value: "Are you sure you want to uninstall the VPN?", comment: "Alert title when the user selects to uninstall our VPN")
+    static let uninstallVPNInformativeText = NSLocalizedString(
+        "vpn.uninstall.alert.informative.text",
+        value: "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device.",
+        comment: "Informative text for the alert that comes up when the user decides to uninstall our VPN")
+
+    // Misc
+
     static let duckPlayerSettingsTitle = NSLocalizedString("duck-player.title", value: "Duck Player", comment: "Private YouTube Player settings title")
     static let duckPlayerAlwaysOpenInPlayer = NSLocalizedString("duck-player.always-open-in-player", value: "Always open YouTube videos in Duck Player", comment: "Private YouTube Player option")
     static let duckPlayerShowPlayerButtons = NSLocalizedString("duck-player.show-buttons", value: "Show option to use Duck Player over YouTube previews on hover", comment: "Private YouTube Player option")
@@ -430,7 +478,7 @@ struct UserText {
     static let settings = NSLocalizedString("settings", value: "Settings", comment: "Menu item for opening settings")
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
-    static let sync = NSLocalizedString("preferences.sync", value: "Sync", comment: "Show sync preferences")
+    static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
     static let syncBookmarkPausedAlertTitle = NSLocalizedString("alert.sync-bookmarks-paused-title", value: "Bookmarks Sync is Paused", comment: "Title for alert shown when sync bookmarks paused for too many items")
     static let syncBookmarkPausedAlertDescription = NSLocalizedString("alert.sync-bookmarks-paused-description", value: "You have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up.", comment: "Description for alert shown when sync bookmarks paused for too many items")
     static let syncCredentialsPausedAlertTitle = NSLocalizedString("alert.sync-credentials-paused-title", value: "Passwords Sync is Paused", comment: "Title for alert shown when sync credentials paused for too many items")
@@ -438,6 +486,7 @@ struct UserText {
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
+    static let vpn = NSLocalizedString("preferences.vpn", value: "VPN", comment: "Show VPN preferences")
     static let duckPlayer = NSLocalizedString("preferences.duck-player", value: "Duck Player", comment: "Show Duck Player browser preferences")
     static let about = NSLocalizedString("preferences.about", value: "About", comment: "Show about screen")
 
@@ -890,10 +939,8 @@ struct UserText {
     static let disableEmailProtectionMessage = NSLocalizedString("disable.email.protection.mesage", value: "This will only disable Autofill for Duck Addresses in this browser. \n\n You can still manually enter Duck Addresses and continue to receive forwarded email.", comment: "Message for alert shown when user disables email protection")
     static let disable = NSLocalizedString("disable", value: "Disable", comment: "Email protection Disable button text")
 
-#if DBP
     static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Personal Information Removal", comment: "Menu item data broker protection feature")
     static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Personal Information Removal", comment: "Tab data broker protection title")
-#endif //DBP
 
     // Bookmarks bar prompt
     static let bookmarksBarPromptTitle = NSLocalizedString("bookmarks.bar.prompt.title", value: "Show Bookmarks Bar?", comment: "Title for bookmarks bar prompt")

@@ -43,6 +43,7 @@ extension HomePage.Models {
 
 #if NETWORK_PROTECTION
         let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
+        let appGroupUserDefaults: UserDefaults
 #endif
 
         var isDay0SurveyEnabled: Bool {
@@ -109,6 +110,9 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .homePageUserInteractedWithSurveyDay0, defaultValue: false)
         private var userInteractedWithSurveyDay0: Bool
 
+        @UserDefaultsWrapper(key: .shouldShowDBPWaitlistInvitedCardUI, defaultValue: false)
+        private var shouldShowDBPWaitlistInvitedCardUI: Bool
+
         @UserDefaultsWrapper(key: .homePageShowSurveyDay7, defaultValue: true)
         private var shouldShowSurveyDay7: Bool
 
@@ -150,6 +154,7 @@ extension HomePage.Models {
              cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
+             appGroupUserDefaults: UserDefaults,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
@@ -159,6 +164,7 @@ extension HomePage.Models {
             self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
+            self.appGroupUserDefaults = appGroupUserDefaults
             self.privacyConfigurationManager = privacyConfigurationManager
             refreshFeaturesMatrix()
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
@@ -228,6 +234,10 @@ extension HomePage.Models {
 #if NETWORK_PROTECTION
                 NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
 #endif
+            case .dataBrokerProtectionWaitlistInvited:
+#if DBP
+                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
+#endif
             }
         }
         // swiftlint:enable cyclomatic_complexity
@@ -255,6 +265,8 @@ extension HomePage.Models {
 #endif
             case .networkProtectionSystemExtensionUpgrade:
                 shouldShowNetworkProtectionSystemExtensionUpgradePrompt = false
+            case .dataBrokerProtectionWaitlistInvited:
+                shouldShowDBPWaitlistInvitedCardUI = false
             }
             refreshFeaturesMatrix()
         }
@@ -262,13 +274,18 @@ extension HomePage.Models {
         // swiftlint:disable cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
+#if DBP
+            if shouldDBPWaitlistCardBeVisible {
+                features.append(.dataBrokerProtectionWaitlistInvited)
+            }
+#endif
 
 #if NETWORK_PROTECTION
 
             // Only show the upgrade card to users who have used the VPN before:
             let activationStore = DefaultWaitlistActivationDateStore()
             if shouldShowNetworkProtectionSystemExtensionUpgradePrompt,
-               UserDefaults.shared.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
+               appGroupUserDefaults.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
                activationStore.daysSinceActivation() != nil {
                 features.append(.networkProtectionSystemExtensionUpgrade)
             }
@@ -315,6 +332,8 @@ extension HomePage.Models {
                     }
                 case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                     break // Do nothing, NetP remote messages get appended first
+                case .dataBrokerProtectionWaitlistInvited:
+                    break // Do nothing. The feature is being set for everyone invited in the waitlist
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -364,34 +383,48 @@ extension HomePage.Models {
         }
 
         private var shouldMakeDefaultCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowMakeDefaultSetting &&
             !defaultBrowserProvider.isDefault
         }
 
         private var shouldImportCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowImportSetting &&
             !dataImportProvider.didImport
         }
 
         private var shouldDuckPlayerCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowDuckPlayerSetting &&
             duckPlayerPreferences.duckPlayerModeBool == nil &&
             !duckPlayerPreferences.youtubeOverlayAnyButtonPressed
         }
 
+        private var shouldDBPWaitlistCardBeVisible: Bool {
+#if DBP
+            shouldShowDBPWaitlistInvitedCardUI
+#else
+            return false
+#endif
+        }
+
         private var shouldEmailProtectionCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowEmailProtectionSetting &&
             !emailManager.isSignedIn
         }
 
         private var shouldCookieCardBeVisible: Bool {
+            !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowCookieSetting &&
             privacyPreferences.autoconsentEnabled != true
         }
 
         private var shouldSurveyDay0BeVisible: Bool {
             let oneDayAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: Date())!
-            return isDay0SurveyEnabled &&
+            return !PixelExperiment.isNoCardsExperimentOn &&
+            isDay0SurveyEnabled &&
             shouldShowSurveyDay0 &&
             !userInteractedWithSurveyDay0 &&
             firstLaunchDate > oneDayAgo
@@ -399,7 +432,8 @@ extension HomePage.Models {
 
         private var shouldSurveyDay7BeVisible: Bool {
             let oneWeekAgo = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: Date())!
-            return isDay7SurveyEnabled &&
+            return !PixelExperiment.isNoCardsExperimentOn &&
+            isDay7SurveyEnabled &&
             shouldShowSurveyDay0 &&
             shouldShowSurveyDay7 &&
             !userInteractedWithSurveyDay0 &&
@@ -481,6 +515,7 @@ extension HomePage.Models {
         case surveyDay7
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
         case networkProtectionSystemExtensionUpgrade
+        case dataBrokerProtectionWaitlistInvited
 
         var title: String {
             switch self {
@@ -502,6 +537,8 @@ extension HomePage.Models {
                 return message.cardTitle
             case .networkProtectionSystemExtensionUpgrade:
                 return "VPN Update Available"
+            case .dataBrokerProtectionWaitlistInvited:
+                return "Personal Information Removal"
             }
         }
 
@@ -525,6 +562,8 @@ extension HomePage.Models {
                 return message.cardDescription
             case .networkProtectionSystemExtensionUpgrade:
                 return "Allow VPN system software again to continue testing Network Protection."
+            case .dataBrokerProtectionWaitlistInvited:
+                return "You're invited to try Personal Information Removal beta!"
             }
         }
 
@@ -548,6 +587,8 @@ extension HomePage.Models {
                 return message.action.actionTitle
             case .networkProtectionSystemExtensionUpgrade:
                 return "Update VPN"
+            case .dataBrokerProtectionWaitlistInvited:
+                return "Get Started"
             }
         }
 
@@ -571,6 +612,8 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
+            case .dataBrokerProtectionWaitlistInvited:
+                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             }
         }
     }

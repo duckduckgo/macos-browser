@@ -20,15 +20,18 @@ import Foundation
 import Combine
 
 public protocol ManagementDialogModelDelegate: AnyObject {
-    var isUnifiedFavoritesEnabled: Bool { get set }
-
-    func recoverDevice(using recoveryCode: String, isActiveDevice: Bool)
-    func saveRecoveryPDF()
+    func recoverDevice(recoveryCode: String, fromRecoveryScreen: Bool)
     func turnOffSync()
     func updateDeviceName(_ name: String)
     func removeDevice(_ device: SyncDevice)
     func deleteAccount()
-    func presentSaveRecoveryPDF()
+    func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool)
+    func saveRecoveryPDF()
+    func recoveryCodeNextPressed()
+    func turnOnSync()
+    func recoveryCodePasted(_ code: String)
+    func enterRecoveryCodePressed()
+    func copyCode()
 }
 
 public final class ManagementDialogModel: ObservableObject {
@@ -38,13 +41,6 @@ public final class ManagementDialogModel: ObservableObject {
 
     @Published public var shouldShowErrorMessage: Bool = false
     @Published public var errorMessage: String?
-    @Published public var isUnifiedFavoritesEnabled: Bool = false {
-        didSet {
-            if delegate?.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
-                delegate?.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
-            }
-        }
-    }
 
     public weak var delegate: ManagementDialogModelDelegate?
 

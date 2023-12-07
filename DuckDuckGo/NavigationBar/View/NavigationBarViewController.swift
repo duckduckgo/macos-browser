@@ -418,6 +418,22 @@ final class NavigationBarViewController: NSViewController {
                                                selector: #selector(showAutoconsentFeedback(_:)),
                                                name: AutoconsentUserScript.Constants.newSitePopupHidden,
                                                object: nil)
+
+#if NETWORK_PROTECTION
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showVPNUninstalledFeedback(_:)),
+                                               name: NetworkProtectionFeatureDisabler.vpnUninstalledNotificationName,
+                                               object: nil)
+#endif
+    }
+
+    @objc private func showVPNUninstalledFeedback(_ sender: Notification) {
+        guard view.window?.isKeyWindow == true else { return }
+
+        DispatchQueue.main.async {
+            let viewController = PopoverMessageViewController(message: "Network Protection was uninstalled")
+            viewController.show(onParent: self, relativeTo: self.optionsButton)
+        }
     }
 
     @objc private func showPrivateEmailCopiedToClipboard(_ sender: Notification) {
@@ -427,7 +443,6 @@ final class NavigationBarViewController: NSViewController {
             let viewController = PopoverMessageViewController(message: UserText.privateEmailCopiedToClipboard)
             viewController.show(onParent: self, relativeTo: self.optionsButton)
         }
-
     }
 
     @objc private func showFireproofingFeedback(_ sender: Notification) {

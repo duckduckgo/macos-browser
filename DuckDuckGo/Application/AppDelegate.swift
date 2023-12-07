@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import CoreData
 import BrowserServicesKit
 import Persistence
 import Configuration
@@ -69,6 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncService: DDGSyncing?
     private var syncStateCancellable: AnyCancellable?
     private var bookmarksSyncErrorCancellable: AnyCancellable?
+    private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
@@ -112,6 +114,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
+
+            let preMigrationErrorHandling = EventMapping<BookmarkFormFactorFavoritesMigration.MigrationErrors> { _, error, _, _ in
+                if let error = error {
+                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
+                } else {
+                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
+                }
+
+                Thread.sleep(forTimeInterval: 1)
+                fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+            }
+
+            BookmarkDatabase.shared.preFormFactorSpecificFavoritesFolderOrder = BookmarkFormFactorFavoritesMigration
+                .getFavoritesOrderFromPreV4Model(
+                    dbContainerLocation: BookmarkDatabase.defaultDBLocation,
+                    dbFileURL: BookmarkDatabase.defaultDBFileURL,
+                    errorEvents: preMigrationErrorHandling
+                )
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
@@ -177,9 +197,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         _ = DownloadListCoordinator.shared
         _ = RecentlyClosedCoordinator.shared
 
+        // Clean up previous experiment
+        if PixelExperiment.allocatedCohortDoesNotMatchCurrentCohorts {
+            PixelExperiment.cleanup()
+        }
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
+            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -315,9 +340,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let environment = defaultEnvironment
 #endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        if bookmarksManager.didMigrateToFormFactorSpecificFavorites {
-            syncDataProviders.bookmarksAdapter.shouldResetBookmarksSyncTimestamp = true
-        }
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
         syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
@@ -332,13 +354,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
 
-        NotificationCenter.default.addObserver(self, selector: #selector(onDataImportComplete), name: .dataImportComplete, object: nil)
+        subscribeSyncQueueToScreenLockedNotifications()
     }
 
-    @objc private func onDataImportComplete() {
-        guard let syncService else { return }
-        os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-        syncService.scheduler.requestSyncImmediately()
+    private func subscribeSyncQueueToScreenLockedNotifications() {
+        let screenIsLockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
+            .map { _ in true }
+        let screenIsUnlockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
+            .map { _ in false }
+
+        screenLockedCancellable = Publishers.Merge(screenIsLockedPublisher, screenIsUnlockedPublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLocked in
+                guard let syncService = self?.syncService, syncService.authState != .inactive else {
+                    return
+                }
+                if isLocked {
+                    os_log(.debug, log: .sync, "Screen is locked")
+                    syncService.scheduler.cancelSyncAndSuspendSyncQueue()
+                } else {
+                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    syncService.scheduler.resumeSyncQueue()
+                }
+            }
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {
@@ -363,10 +403,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
-        let repetition = Pixel.Event.Repetition(key: Pixel.Event.emailEnabledInitial.name)
-        // Temporary pixel for first time user enables email protection
-        if Pixel.isNewUser && repetition == .initial {
-            Pixel.fire(.emailEnabledInitial)
+        if Pixel.isNewUser {
+            PixelExperiment.fireEmailProtectionEnabledPixel()
         }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
@@ -382,10 +420,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
-        // Temporary pixel for first time user import data
-        let repetition = Pixel.Event.Repetition(key: Pixel.Event.importDataInitial.name)
-        if Pixel.isNewUser && repetition == .initial {
-            Pixel.fire(.importDataInitial)
+        if Pixel.isNewUser {
+            PixelExperiment.fireImportDataInitialPixel()
         }
     }
 
@@ -417,7 +453,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DataBrokerProtectionAppEvents().handleNotification()
+                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
             }
 #endif
         }

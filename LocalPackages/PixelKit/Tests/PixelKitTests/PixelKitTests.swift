@@ -35,14 +35,20 @@ final class PixelKitTests: XCTestCase {
         case dailyEventWithoutParameters
         case dailyAndContinuousEvent
         case dailyAndContinuousEventWithoutParameters
+        case uniqueEvent
 
         var name: String {
-            rawValue
+            switch self {
+            case .uniqueEvent:
+                return "\(rawValue)_u"
+            default:
+                return rawValue
+            }
         }
 
         var parameters: [String: String]? {
             switch self {
-            case .testEvent, .dailyEvent, .dailyAndContinuousEvent:
+            case .testEvent, .dailyEvent, .dailyAndContinuousEvent, .uniqueEvent:
                 return [
                     "eventParam1": "eventParamValue1",
                     "eventParam2": "eventParamValue2"
@@ -56,6 +62,8 @@ final class PixelKitTests: XCTestCase {
             switch self {
             case .testEvent, .testEventWithoutParameters:
                 return .standard
+            case .uniqueEvent:
+                return .justOnce
             case .dailyEvent, .dailyEventWithoutParameters:
                 return .dailyOnly
             case .dailyAndContinuousEvent, .dailyAndContinuousEventWithoutParameters:
@@ -71,7 +79,7 @@ final class PixelKitTests: XCTestCase {
         let headers: [String: String] = [:]
         let log = OSLog.disabled
 
-        let pixelKit = PixelKit(dryRun: true, appVersion: appVersion, defaultHeaders: headers, log: log, dailyPixelCalendar: nil) { _, _, _, _, _, _ in
+        let pixelKit = PixelKit(dryRun: true, appVersion: appVersion, defaultHeaders: headers, log: log, dailyPixelCalendar: nil, defaults: userDefaults()) { _, _, _, _, _, _ in
 
             XCTFail("This callback should not be executed when doing a dry run")
         }
@@ -173,7 +181,7 @@ final class PixelKitTests: XCTestCase {
 
     /// We test firing a daily pixel a second time does not execute the fire request callback.
     ///
-    func testDailyPixelFrequency() {
+    func testDailyPixelDoubleFiringFrequency() {
         // Prepare test parameters
         let appVersion = "1.0.5"
         let headers = ["a": "2", "b": "3", "c": "2000"]
@@ -218,5 +226,108 @@ final class PixelKitTests: XCTestCase {
 
         // Wait for expectations to be fulfilled
         wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+
+    /// Test firing a daily pixel a few times
+    func testDailyPixelFrequency() {
+        // Prepare test parameters
+        let appVersion = "1.0.5"
+        let headers = ["a": "2", "b": "3", "c": "2000"]
+        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
+        let event = TestEvent.dailyEvent
+        let userDefaults = userDefaults()
+
+        let timeMachine = TimeMachine()
+
+        // Set expectations
+        let fireCallbackCalled = expectation(description: "Expect the pixel firing callback to be called")
+        fireCallbackCalled.expectedFulfillmentCount = 3
+        fireCallbackCalled.assertForOverFulfill = true
+
+        // Prepare mock to validate expectations
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: appVersion,
+                                defaultHeaders: headers,
+                                log: log,
+                                dailyPixelCalendar: nil,
+                                dateGenerator: timeMachine.now,
+                                defaults: userDefaults) { _, _, _, _, _, _ in
+            fireCallbackCalled.fulfill()
+        }
+
+        // Run test
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired
+
+        timeMachine.travel(by: 60 * 60 * 2)
+        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (2 hours since last fire)
+
+        timeMachine.travel(by: 60 * 60 * 24 + 1000)
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours + 1000 seconds since last fire)
+
+        timeMachine.travel(by: 60 * 60 * 10)
+        pixelKit.fire(event, frequency: .dailyOnly) // Skipped (10 hours since last fire)
+
+        timeMachine.travel(by: 60 * 60 * 14)
+        pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours since last fire)
+
+        // Wait for expectations to be fulfilled
+        wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+
+    /// Test firing a unique pixel
+    func testUniquePixel() {
+        // Prepare test parameters
+        let appVersion = "1.0.5"
+        let headers = ["a": "2", "b": "3", "c": "2000"]
+        let log = OSLog(subsystem: "TestSubsystem", category: "TestCategory")
+        let event = TestEvent.uniqueEvent
+        let userDefaults = userDefaults()
+
+        let timeMachine = TimeMachine()
+
+        // Set expectations
+        let fireCallbackCalled = expectation(description: "Expect the pixel firing callback to be called")
+        fireCallbackCalled.expectedFulfillmentCount = 1
+        fireCallbackCalled.assertForOverFulfill = true
+
+        let pixelKit = PixelKit(dryRun: false,
+                                appVersion: appVersion,
+                                defaultHeaders: headers,
+                                log: log,
+                                dailyPixelCalendar: nil,
+                                dateGenerator: timeMachine.now,
+                                defaults: userDefaults) { _, _, _, _, _, _ in
+            fireCallbackCalled.fulfill()
+        }
+
+        // Run test
+        pixelKit.fire(event, frequency: .justOnce) // Fired
+
+        timeMachine.travel(by: 60 * 60 * 2)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        timeMachine.travel(by: 60 * 60 * 24 + 1000)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        timeMachine.travel(by: 60 * 60 * 10)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        timeMachine.travel(by: 60 * 60 * 14)
+        pixelKit.fire(event, frequency: .justOnce) // Skipped (already fired)
+
+        // Wait for expectations to be fulfilled
+        wait(for: [fireCallbackCalled], timeout: 0.5)
+    }
+}
+
+private class TimeMachine {
+    private var date = Calendar.current.startOfDay(for: Date())
+
+    func travel(by timeInterval: TimeInterval) {
+        date = date.addingTimeInterval(timeInterval)
+    }
+
+    func now() -> Date {
+        date
     }
 }

@@ -83,7 +83,16 @@ extension URL {
             return nil
         }
 
-        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+
+        // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
+        // https://app.asana.com/0/1199230911884351/1205979030848528/f
+        if case .normal = NSApp.runType,
+           NSApp.delegateTyped.featureFlagger.isFeatureOn(.appendAtbToSerpQueries),
+           let atbWithVariant = LocalStatisticsStore().atbWithVariant {
+            url = url.appendingParameter(name: URL.DuckDuckGoParameters.ATB.atb, value: atbWithVariant + "-wb")
+        }
+        return url
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
@@ -129,11 +138,9 @@ extension URL {
         return URL(string: "about:preferences")!
     }
 
-#if DBP
     static var dataBrokerProtection: URL {
         return URL(string: "about:dbp")!
     }
-#endif
 
     static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
@@ -430,4 +437,26 @@ extension URL {
     // MARK: - System Settings
 
     static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+
+    // MARK: - Blob URLs
+
+    var isBlobURL: Bool {
+        guard let scheme = self.scheme?.lowercased() else { return false }
+
+        if scheme == "blob" || scheme.hasPrefix("blob:") {
+            return true
+        }
+
+        return false
+    }
+
+    func stripUnsupportedCredentials() -> String {
+        if let atIndex = self.absoluteString.firstIndex(of: "@") {
+            let authPattern = "([^:]+):\\/\\/[^\\/]*@"
+            let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
+            let uuid = UUID().uuidString.lowercased()
+            return "\(strippedURL)\(uuid)"
+        }
+        return self.absoluteString
+    }
 }
