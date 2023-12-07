@@ -171,7 +171,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 .setSelectedEnvironment,
                 .setSelectedLocation,
                 .setShowInMenuBar,
-                .setVPNFirstEnabled:
+                .setVPNFirstEnabled,
+                .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
         }
@@ -241,7 +242,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             protocolConfiguration.disconnectOnSleep = false
 
             // kill switch
-            protocolConfiguration.enforceRoutes = true // settings.enforceRoutes
+            protocolConfiguration.enforceRoutes = settings.enforceRoutes
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 

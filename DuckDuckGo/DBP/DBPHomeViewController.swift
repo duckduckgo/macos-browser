@@ -171,7 +171,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .enableLoginItem,
                     .restartLoginItem,
                     .disableLoginItem,
-                    .resetLoginItem:
+                    .resetLoginItem,
+                    .scanSuccess,
+                    .scanFailed,
+                    .scanError:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }
