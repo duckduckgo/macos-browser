@@ -559,7 +559,7 @@ struct UserText {
     static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")
 
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
-    static let skipImport = NSLocalizedString("import.data.skip", value: "Skip", comment: "Button text to skip a kind of imported data")
+    static let skipImportFormat = NSLocalizedString("import.data.skip.format", value: "Skip %@", comment: "Button text to skip a kind of imported data (Bookmarks or Passwords - %@)")
     static let done = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
     static let manualImport = NSLocalizedString("import.data.manual", value: "Manual import…", comment: "Button text for initiating manual data import using a HTML or CSV file when automatic import has failed")
 

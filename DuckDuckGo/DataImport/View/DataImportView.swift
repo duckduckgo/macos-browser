@@ -125,25 +125,22 @@ struct DataImportView: View {
                     model.initiateImport()
                 }
 
-            case .noData(dataType: let dataType):
-                // no #dataType imported [skip], [manual import]
-                DataImportNoDataView(source: model.importSource, dataType: dataType) {
-                    model.manualImport(dataType: dataType)
-                }
-
             case .fileImport(let dataType, summary: let summaryTypes):
                 if !summaryTypes.isEmpty {
                     DataImportSummaryView(model, dataTypes: summaryTypes)
+                        .padding(.bottom, 24)
+
+                // if no data to import
+                } else if model.summary(for: dataType)?.isEmpty == true
+                            || model.error(for: dataType)?.errorType == .noData {
+
+                    DataImportNoDataView(source: model.importSource, dataType: dataType)
+                        .padding(.bottom, 24)
 
                 // if browser importer failed - display error message
-                } else if model.hasDataTypeImportFailed(dataType) {
-                    Text("We were unable to import \(dataType.displayName) directly from \(model.importSource.importSourceName).",
-                         comment: "Message when data import fails from a browser. %1$@ - Bookmarks or Passwords; %2$@ - a browser name")
-                        .font(.headline)
-                    Spacer().frame(height: 8)
-                    Text("Let’s try doing it manually. It won’t take long.",
-                         comment: "Suggestion to switch to a Manual File Data Import when data import fails.")
-                    Spacer().frame(height: 24)
+                } else if model.error(for: dataType) != nil {
+                    DataImportErrorView(source: model.importSource, dataType: dataType)
+                        .padding(.bottom, 24)
                 }
 
                 // manual file import instructions for CSV/HTML
@@ -192,7 +189,7 @@ struct DataImportView: View {
                 Button {
                     model.performAction(for: button, dismiss: dismiss.callAsFunction)
                 } label: {
-                    Text(button.title)
+                    Text(button.title(dataType: model.screen.fileImportDataType))
                         .frame(minWidth: 80 - 16 - 1)
                 }
                 .keyboardShortcut(button.shortcut)
@@ -321,14 +318,14 @@ extension DataImportViewModel.ButtonType {
 
 extension DataImportViewModel.ButtonType {
 
-    var title: String {
+    func title(dataType: DataImport.DataType?) -> String {
         switch self {
         case .next:
             UserText.next
         case .initiateImport:
             UserText.initiateImport
         case .skip:
-            UserText.skipImport
+            String(format: UserText.skipImportFormat, dataType?.displayName ?? "")
         case .cancel:
             UserText.cancel
         case .back:
@@ -345,10 +342,7 @@ extension DataImportViewModel.ButtonType {
 #Preview { {
 
     final class PreviewPreferences: ObservableObject {
-        @Published var shouldBookmarkImportFail = false
-        @Published var shouldPasswordsImportFail = false
         @Published var shouldDisplayProgress = false
-
         static let shared = PreviewPreferences()
     }
 
@@ -453,12 +447,7 @@ extension DataImportViewModel.ButtonType {
 
                     var result = DataImportSummary()
                     for type in types {
-                        if (type == .bookmarks && PreviewPreferences.shared.shouldBookmarkImportFail)
-                            || (type == .passwords && PreviewPreferences.shared.shouldPasswordsImportFail) {
-                            result[type] = .failure(ImportError.err(MockError()))
-                        } else {
-                            result[type] = .success(.init(successful: Int.random(in: 0..<100000), duplicate: 0, failed: 0))
-                        }
+                        result[type] = .success(.init(successful: Int.random(in: 0..<100000), duplicate: 0, failed: 0))
                     }
                     return result
 

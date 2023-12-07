@@ -152,6 +152,10 @@ enum DataImport {
         let duplicate: Int
         let failed: Int
 
+        var isEmpty: Bool {
+            successful == 0 && duplicate == 0 && failed == 0
+        }
+
         init(successful: Int, duplicate: Int, failed: Int) {
             self.successful = successful
             self.duplicate = duplicate

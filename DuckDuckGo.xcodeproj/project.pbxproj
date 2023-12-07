@@ -2566,6 +2566,10 @@
 		B603FD9F2A02712E00F3FCA9 /* CIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B603FD9D2A02712E00F3FCA9 /* CIImageExtension.swift */; };
 		B6040856274B830F00680351 /* DictionaryExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6040855274B830F00680351 /* DictionaryExtension.swift */; };
 		B604085C274B8FBA00680351 /* UnprotectedDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B604085A274B8CA300680351 /* UnprotectedDomains.xcdatamodeld */; };
+		B6080BC52B21E78100B418EF /* DataImportErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6080BC42B21E78100B418EF /* DataImportErrorView.swift */; };
+		B6080BC62B21E78100B418EF /* DataImportErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6080BC42B21E78100B418EF /* DataImportErrorView.swift */; };
+		B6080BC72B21E78100B418EF /* DataImportErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6080BC42B21E78100B418EF /* DataImportErrorView.swift */; };
+		B6080BC82B21E78100B418EF /* DataImportErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6080BC42B21E78100B418EF /* DataImportErrorView.swift */; };
 		B6085D062743905F00A9C456 /* CoreDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6085D052743905F00A9C456 /* CoreDataStore.swift */; };
 		B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B6085D072743993C00A9C456 /* FireproofDomains.xcdatamodeld */; };
 		B60C6F7729B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F7629B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift */; };
@@ -3961,6 +3965,7 @@
 		B603FD9D2A02712E00F3FCA9 /* CIImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIImageExtension.swift; sourceTree = "<group>"; };
 		B6040855274B830F00680351 /* DictionaryExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryExtension.swift; sourceTree = "<group>"; };
 		B604085B274B8CA400680351 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
+		B6080BC42B21E78100B418EF /* DataImportErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportErrorView.swift; sourceTree = "<group>"; };
 		B6085D052743905F00A9C456 /* CoreDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStore.swift; sourceTree = "<group>"; };
 		B6085D082743993D00A9C456 /* Permissions.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Permissions.xcdatamodel; sourceTree = "<group>"; };
 		B60C6F7629B0E286007BFAA8 /* SearchNonexistentDomainNavigationResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNonexistentDomainNavigationResponder.swift; sourceTree = "<group>"; };
@@ -5354,6 +5359,7 @@
 				B62B48552ADE730D000DECE5 /* FileImportView.swift */,
 				B6B5F5882B03673B008DB58A /* BrowserImportMoreInfoView.swift */,
 				B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */,
+				B6080BC42B21E78100B418EF /* DataImportErrorView.swift */,
 				B6B4D1CE2B0E0DD000C26286 /* DataImportNoDataView.swift */,
 				4B8AC93426B3B2FD00879451 /* NSAlert+DataImport.swift */,
 				B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */,
@@ -9620,6 +9626,7 @@
 				3706FBFE293F65D500E42796 /* History.xcdatamodeld in Sources */,
 				B68D21C92ACBC96E002DA3C2 /* MockPrivacyConfiguration.swift in Sources */,
 				3706FBFF293F65D500E42796 /* PermissionStore.swift in Sources */,
+				B6080BC62B21E78100B418EF /* DataImportErrorView.swift in Sources */,
 				3706FC00293F65D500E42796 /* PrivacyIconViewModel.swift in Sources */,
 				3706FC01293F65D500E42796 /* ChromiumBookmarksReader.swift in Sources */,
 				3706FC02293F65D500E42796 /* Downloads.xcdatamodeld in Sources */,
@@ -10560,6 +10567,7 @@
 				4B957A6F2AC7AE700062CA31 /* DuckPlayerTabExtension.swift in Sources */,
 				4B957A702AC7AE700062CA31 /* RecentlyClosedCoordinator.swift in Sources */,
 				4B957A712AC7AE700062CA31 /* URLRequestExtension.swift in Sources */,
+				B6080BC82B21E78100B418EF /* DataImportErrorView.swift in Sources */,
 				4B957A722AC7AE700062CA31 /* FaviconHostReference.swift in Sources */,
 				4B957A732AC7AE700062CA31 /* DownloadsTabExtension.swift in Sources */,
 				4B957A742AC7AE700062CA31 /* WebsiteBreakageSender.swift in Sources */,
@@ -11306,6 +11314,7 @@
 				B6C0B23C26E87D900031CB7F /* NSAlert+ActiveDownloadsTermination.swift in Sources */,
 				AAECA42024EEA4AC00EFA63A /* IndexPathExtension.swift in Sources */,
 				4B9579212AC687170062CA31 /* HardwareModel.swift in Sources */,
+				B6080BC52B21E78100B418EF /* DataImportErrorView.swift in Sources */,
 				4BE65478271FCD41008D1D63 /* PasswordManagementNoteItemView.swift in Sources */,
 				AA5C8F632591021700748EB7 /* NSApplicationExtension.swift in Sources */,
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,

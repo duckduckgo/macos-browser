@@ -3710,14 +3710,14 @@
         }
       }
     },
-    "import.data.skip" : {
-      "comment" : "Button text to skip a kind of imported data",
+    "import.data.skip.format" : {
+      "comment" : "Button text to skip a kind of imported data (Bookmarks or Passwords - %@)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Skip"
+            "value" : "Skip %@"
           }
         }
       }

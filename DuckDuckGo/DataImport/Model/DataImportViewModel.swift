@@ -27,6 +27,7 @@ struct DataImportViewModel {
     typealias BrowserProfileList = DataImport.BrowserProfileList
     typealias BrowserProfile = DataImport.BrowserProfile
     typealias DataType = DataImport.DataType
+    typealias DataTypeSummary = DataImport.DataTypeSummary
 
     @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: nil)
     var successfulImportHappened: Bool?
@@ -66,7 +67,6 @@ struct DataImportViewModel {
         case getReadPermission(URL)
         case fileImport(dataType: DataType, summary: Set<DataType> = [])
         case summary(Set<DataType>)
-        case noData(DataType)
         case feedback
 
         var isFileImport: Bool {
@@ -74,8 +74,7 @@ struct DataImportViewModel {
         }
         var fileImportDataType: DataType? {
             switch self {
-            case .fileImport(dataType: let dataType, summary: _),
-                 .noData(let dataType):
+            case .fileImport(dataType: let dataType, summary: _):
                 return dataType
             default:
                 return nil
@@ -96,8 +95,8 @@ struct DataImportViewModel {
 
     struct DataTypeImportResult: Equatable {
         let dataType: DataImport.DataType
-        let result: DataImportResult<DataImport.DataTypeSummary>
-        init(_ dataType: DataImport.DataType, _ result: DataImportResult<DataImport.DataTypeSummary>) {
+        let result: DataImportResult<DataTypeSummary>
+        init(_ dataType: DataImport.DataType, _ result: DataImportResult<DataTypeSummary>) {
             self.dataType = dataType
             self.result = result
         }
@@ -199,7 +198,7 @@ struct DataImportViewModel {
         }
 
         guard dataTypes.compactMap({ testImportFailureReasons[$0] }).isEmpty else {
-            importTask = .detachedWithProgress { [testImportFailureReasons] progressUpdate in
+            importTask = .detachedWithProgress { [testImportFailureReasons] _ in
                 var result = DataImportSummary()
                 let selectedDataTypesWithoutFailureReasons = dataTypes.intersection(importer.importableTypes).subtracting(testImportFailureReasons.keys)
                 var realSummary = DataImportSummary()
@@ -237,12 +236,15 @@ struct DataImportViewModel {
 
             switch result {
             case .success(let summary):
-                if summary.successful == 0 && summary.duplicate == 0 && summary.failed == 0, nextScreen == nil {
-                    nextScreen = .noData(dataType)
+                if summary.isEmpty, nextScreen == nil {
+                    nextScreen = .fileImport(dataType: dataType)
                 }
             case .failure(let error):
+                // show "no data to import" screen when no bookmarks|passwords found
                 if case .noData = error.errorType, nextScreen == nil {
-                    nextScreen = .noData(dataType)
+                    nextScreen = .fileImport(dataType: dataType)
+                } else if  nextScreen == nil {
+                    nextScreen = .fileImport(dataType: dataType, summary: Set(summary.keys).subtracting([dataType]))
                 }
                 Pixel.fire(.dataImportFailed(source: importSource, error: error))
             }
@@ -316,11 +318,6 @@ struct DataImportViewModel {
             // display total summary
             self.screen = .summary(selectedDataTypes)
         }
-    }
-
-    /// Open Manual File Import screen action
-    mutating func manualImport(dataType: DataType) {
-        screen = .fileImport(dataType: dataType)
     }
 
     /// Select CSV/HTML file for import button press
@@ -444,10 +441,15 @@ extension DataImportViewModel {
         selectedDataTypes.allSatisfy(isDataTypeSuccessfullyImported)
     }
 
-    private func isDataTypeSuccessfullyImported(_ dataType: DataType) -> Bool {
-        summary.reversed().contains(where: { dataTypeImportResult in
-            dataType == dataTypeImportResult.dataType && dataTypeImportResult.result.isSuccess
-        })
+    func summary(for dataType: DataType) -> DataTypeSummary? {
+        if case .success(let summary) = self.summary.last(where: { $0.dataType == dataType })?.result {
+            return summary
+        }
+        return nil
+    }
+
+    func isDataTypeSuccessfullyImported(_ dataType: DataType) -> Bool {
+        summary(for: dataType) != nil
     }
 
     private func screenForNextDataTypeRemainingToImport(after currentDataType: DataType? = nil) -> Screen? {
@@ -456,9 +458,9 @@ extension DataImportViewModel {
             // if some of selected data types failed to import or not imported yet
             switch summary.last(where: { $0.dataType == dataType })?.result {
             case .success(let summary) where summary.successful == 0 && summary.duplicate == 0 && summary.failed == 0:
-                return .noData(dataType)
+                return .fileImport(dataType: dataType)
             case .failure(let error) where error.errorType == .noData:
-                return .noData(dataType)
+                return .fileImport(dataType: dataType)
             case .failure, .none:
                 return .fileImport(dataType: dataType)
             case .success:
@@ -468,7 +470,7 @@ extension DataImportViewModel {
         return nil
     }
 
-    private func error(for dataType: DataType) -> (any DataImportError)? {
+    func error(for dataType: DataType) -> (any DataImportError)? {
         if case .failure(let error) = summary.last(where: { $0.dataType == dataType })?.result {
             return error
         }
@@ -491,19 +493,6 @@ extension DataImportViewModel {
             return errors[0]
         }
         return DataImportViewSummarizedError(errors: errors)
-    }
-
-    func hasDataTypeImportFailed(_ dataType: DataType) -> Bool {
-        var failureFound = false
-        for dataTypeImportResult in summary.reversed() where dataTypeImportResult.dataType == dataType {
-            switch dataTypeImportResult.result {
-            case .success:
-                return false
-            case .failure:
-                failureFound = true
-            }
-        }
-        return failureFound
     }
 
     private static func requestPrimaryPasswordCallback(_ source: DataImport.Source) -> String? {
@@ -609,7 +598,7 @@ extension DataImportViewModel {
             where selectedDataTypes.subtracting(DataType.dataTypes(before: dataType, inclusive: true)).isEmpty:
             // no other data types to skip:
             return .cancel
-        case .fileImport, .noData:
+        case .fileImport:
             return .skip
 
         case .summary(let dataTypes):
@@ -629,7 +618,7 @@ extension DataImportViewModel {
             switch screen {
             case importSource.initialScreen, .feedback:
                 return .cancel
-            case .moreInfo, .getReadPermission, .noData:
+            case .moreInfo, .getReadPermission:
                 return .back
             default:
                 return nil
