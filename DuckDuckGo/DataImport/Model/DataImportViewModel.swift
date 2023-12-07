@@ -415,6 +415,15 @@ extension DataImport.Source {
 
 extension DataImport.DataType {
 
+    static func dataTypes(before dataType: DataImport.DataType, inclusive: Bool) -> [Self].SubSequence {
+        let index = Self.allCases.firstIndex(of: dataType)!
+        if inclusive {
+            return Self.allCases[...index]
+        } else {
+            return Self.allCases[..<index]
+        }
+    }
+
     static func dataTypes(after dataType: DataImport.DataType) -> [Self].SubSequence {
         let nextIndex = Self.allCases.firstIndex(of: dataType)! + 1
         return Self.allCases[nextIndex...]
@@ -595,7 +604,9 @@ extension DataImportViewModel {
         case .fileImport where screen == importSource.initialScreen:
             // no default action for File Import sources
             return nil
-        case .fileImport(dataType: let dataType, summary: _) where selectedDataTypes.subtracting([dataType]).isEmpty:
+        case .fileImport(dataType: let dataType, summary: _)
+            // exlude all skipped datatypes that are ordered before
+            where selectedDataTypes.subtracting(DataType.dataTypes(before: dataType, inclusive: true)).isEmpty:
             // no other data types to skip:
             return .cancel
         case .fileImport, .noData:

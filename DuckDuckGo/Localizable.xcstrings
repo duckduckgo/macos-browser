@@ -4,6 +4,33 @@
     "" : {
 
     },
+    "\nTerms of Service" : {
+
+    },
+    "\nThe service cannot remove all of your information from the Internet." : {
+
+    },
+    "\nThe service is for limited and personal use only." : {
+
+    },
+    "\nWe don’t save your personal information for this service to function." : {
+
+    },
+    "\nWe may terminate access at any time." : {
+
+    },
+    "\nWe provide this beta service as-is, and without warranty." : {
+
+    },
+    "\nWe submit removal requests to data broker sites on your behalf." : {
+
+    },
+    "\nYou give DuckDuckGo authority to act on your Here's an updated version with the remaining content:" : {
+
+    },
+    "\nYour personal information is stored locally on your device." : {
+
+    },
     "**%lld** tracking attempts blocked" : {
 
     },
@@ -22,6 +49,69 @@
 
     },
     "%lld tracking attempts blocked" : {
+
+    },
+    "• Because data broker sites often have multi-step processes required to have information removed, and because they regularly update their databases with new personal information, this authorization includes ongoing action on your behalf solely to perform the service." : {
+
+    },
+    "• Our main " : {
+
+    },
+    "• The information you provide when you sign-up to use this service, for example your name, age, address, and phone number is stored on your device." : {
+
+    },
+    "• The only personal information we may receive is a confirmation email from data broker sites which is deleted within 72 hours." : {
+
+    },
+    "• The service is available for your personal use only. You represent and warrant that you will only initiate removal of your own personal information." : {
+
+    },
+    "• This beta product may collect more diagnostic data than our typical products. Examples of such data include: alerts of low memory, application restarts, and user engagement with product features." : {
+
+    },
+    "• This Privacy Policy is for our waitlist beta service." : {
+
+    },
+    "• This service is available on one device only." : {
+
+    },
+    "• This service is in beta, and your access to it is temporary." : {
+
+    },
+    "• This service is provided as-is and without warranties or guarantees of any kind." : {
+
+    },
+    "• This service requests removal from a limited number of data broker sites only. You understand that we cannot guarantee that the third-party sites will honor the requests, or that your personal information will not reappear in the future." : {
+
+    },
+    "• To the extent possible under applicable law, DuckDuckGo will not be liable for any damage or loss arising from your use of the service. In any event, the total aggregate liability of DuckDuckGo shall not exceed $25 or the equivalent in your local currency." : {
+
+    },
+    "• To use this service, you must be 18 or older." : {
+
+    },
+    "• We may find additional information on data broker sites through this scanning process, like alternative names or phone numbers, or the names of your relatives. This information is also stored locally on your device." : {
+
+    },
+    "• We may in the future transfer responsibility for the service to a subsidiary of DuckDuckGo. If that happens, you agree that references to “DuckDuckGo” will refer to our subsidiary, which will then become responsible for providing the service and for any liabilities relating to it." : {
+
+    },
+    "• We regularly re-scan data broker sites to check on the removal status of your information. If it has reappeared, we resubmit the removal request." : {
+
+    },
+    "• We reserve the right to terminate access at any time in our sole discretion, including for violation of these terms or our DuckDuckGo Terms of Service, which are incorporated by reference." : {
+
+    },
+    "• We submit removal requests to the data broker sites directly from your device, unlike other services where the removal process is initiated on remote servers." : {
+
+    },
+    "• We then scan data brokers from your device to check if any sites contain your personal information." : {
+
+    },
+    "• You hereby authorize DuckDuckGo to act on your behalf to request removal of your personal information from data broker sites." : {
+
+    },
+    "• You understand that we will only be able to request the removal of information based upon the information you provide to us." : {
 
     },
     "••••••••••••" : {
@@ -218,6 +308,9 @@
           }
         }
       }
+    },
+    "also applies here." : {
+
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
@@ -1694,7 +1787,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Personal Information Removal is free to use during the beta."
+            "value" : "Personal Information Removal is free during the beta.\nJoin the waitlist and we'll notify you when ready."
           }
         }
       }
@@ -1855,78 +1948,6 @@
         }
       }
     },
-    "data-broker-protection.waitlist.invited.section-1.subtitle" : {
-      "comment" : "Subtitle for section 1 of the Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically scans for your info, requests its removal, and re-scans regularly to ensure it doesn’t reappear."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.invited.section-1.title" : {
-      "comment" : "Title for section 1 of the Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Continuous Scan and Removal"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.invited.section-2.subtitle" : {
-      "comment" : "Subtitle for section 2 of the Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The removal process is initiated on your device, and the info you provide during setup is stored on your device only."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.invited.section-2.title" : {
-      "comment" : "Title for section 2 of the Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Private by Design"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.invited.section-3.subtitle" : {
-      "comment" : "Subtitle for section 3 of the Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "See what information has been removed, and monitor progress of ongoing removals from your dashboard."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.invited.section-3.title" : {
-      "comment" : "Title for section 3 of the Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Real-Time Progress Updates"
-          }
-        }
-      }
-    },
     "data-broker-protection.waitlist.invited.subtitle" : {
       "comment" : "Subtitle for Personal Information Removal invited screen",
       "extractionState" : "extracted_with_value",
@@ -1959,18 +1980,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Automatically scan and remove your data from 17+ sites that sell personal information with DuckDuckGo’s Personal Information Removal."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.join.subtitle.2" : {
-      "comment" : "Second subtitle for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Join the waitlist, and we’ll notify you when it’s your turn."
           }
         }
       }
@@ -4812,7 +4821,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Share Feedback..."
+            "value" : "Share Feedback…"
           }
         }
       }
@@ -4825,6 +4834,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Network Protection"
+          }
+        }
+      }
+    },
+    "network.protection.status.menu.vpn.settings" : {
+      "comment" : "The status menu 'VPN Settings' menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN Settings…"
           }
         }
       }
@@ -7601,7 +7622,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Sync"
+            "value" : "Sync & Backup"
+          }
+        }
+      }
+    },
+    "preferences.vpn" : {
+      "comment" : "Show VPN preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN"
           }
         }
       }
@@ -7617,6 +7650,9 @@
           }
         }
       }
+    },
+    "Privacy Policy " : {
+
     },
     "quit" : {
       "comment" : "Quit button",
@@ -8404,6 +8440,18 @@
     "Undo" : {
       "comment" : "Main Menu Edit item"
     },
+    "uninstall" : {
+      "comment" : "Uninstall button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Uninstall"
+          }
+        }
+      }
+    },
     "unpin.tab" : {
       "comment" : "Menu item. Unpin as a verb",
       "extractionState" : "extracted_with_value",
@@ -8441,6 +8489,138 @@
     },
     "View" : {
       "comment" : "Main Menu View"
+    },
+    "vpn.advanced.settings.title" : {
+      "comment" : "VPN Advanced section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Advanced"
+          }
+        }
+      }
+    },
+    "vpn.button.title.uninstall.vpn" : {
+      "comment" : "Uninstall VPN button title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Uninstall DuckDuckGo VPN..."
+          }
+        }
+      }
+    },
+    "vpn.general.title" : {
+      "comment" : "General section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "General"
+          }
+        }
+      }
+    },
+    "vpn.notifications.settings.title" : {
+      "comment" : "Notifications section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Notifications"
+          }
+        }
+      }
+    },
+    "vpn.setting.description.always.on" : {
+      "comment" : "Always ON setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled."
+          }
+        }
+      }
+    },
+    "vpn.setting.description.exclude.local.networks" : {
+      "comment" : "Exclude Local Networks setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bypass the VPN for local network connections, like to a printer."
+          }
+        }
+      }
+    },
+    "vpn.setting.description.secure.dns" : {
+      "comment" : "Secure DNS setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit."
+          }
+        }
+      }
+    },
+    "vpn.setting.title.connect.on.login" : {
+      "comment" : "Connect on Login setting title\n   Display VPN status in the menu bar.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connect on login"
+          }
+        }
+      }
+    },
+    "vpn.setting.title.exclude.local.networks" : {
+      "comment" : "Exclude Local Networks setting title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Exclude local networks"
+          }
+        }
+      }
+    },
+    "vpn.uninstall.alert.informative.text" : {
+      "comment" : "Informative text for the alert that comes up when the user decides to uninstall our VPN",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device."
+          }
+        }
+      }
+    },
+    "vpn.uninstall.alert.title" : {
+      "comment" : "Alert title when the user selects to uninstall our VPN",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to uninstall the VPN?"
+          }
+        }
+      }
     },
     "We couldn‘t find any %@…" : {
       "comment" : "Data import error message: Bookmarks or Passwords (%@) weren‘t found."
@@ -8485,6 +8665,9 @@
     },
     "You could try importing %@ manually." : {
       "comment" : "Data import error subtitle: suggestion to import Bookmarks or Passwords (%@) manually by selecting a CSV or HTML file."
+    },
+    "You must be eligible to use this service." : {
+
     },
     "You'll be asked to enter your Primary Password for %@.\n\nImported passwords are encrypted and only stored on this computer." : {
       "comment" : "Warning that Firefox-based browser name (%@) data import would require entering a Primary Password for the browser."
