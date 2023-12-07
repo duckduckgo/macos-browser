@@ -16,6 +16,7 @@ disabled_rules:
 
 opt_in_rules:
   - file_header
+  - explicit_init
 
 custom_rules:
   explicit_non_final_class:
@@ -71,10 +72,7 @@ file_header:
 # General Config
 excluded:
   - DuckDuckGo/Common/Localizables/UserText.swift
-  - UnitTests
-  - IntegrationTests
   - LocalPackages/*/Package.swift
   - release
-  - UITests
   - vendor
   - DerivedData
