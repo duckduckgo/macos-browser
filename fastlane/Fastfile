@@ -10,6 +10,7 @@ UI.abort_with_message!('Please run fastlane via `bundle exec`') unless FastlaneC
 ########################################################################
 DEFAULT_BRANCH = 'main'
 RELEASE_BRANCH = 'release'
+HOTFIX_BRANCH = 'hotfix'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 INFO_PLIST = File.join(PROJECT_ROOT_FOLDER, 'DuckDuckGo/Info.plist')
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
@@ -190,6 +191,32 @@ platform :mac do
     end
   end
 
+  # Executes the hotfix release preparation work in the repository
+  #
+  # - Creates a new hotfix release branch
+  # - Updates version and build number
+  # - Pushes changes to remote
+  #
+  # @option [String] version Marketing version string to be hotfixed (must be equal to an existing tag)
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
+  #
+  desc 'Executes the hotfix release preparation work in the repository'
+  lane :prepare_hotfix do |options|
+    UI.user_error! 'You must provide a version you want to hotfix.' unless options[:version]
+
+    source_version = validate_version_exists(options)
+    new_version = validate_hotfix_version(source_version: source_version)
+
+    build_number = increment_current_build_number(options)
+    macos_create_hotfix_branch(source_version: source_version, new_version: new_version)
+    macos_update_version_and_build_number_config(
+      version: new_version,
+      build_number: build_number,
+      force: options[:force]
+    )
+    sh('git', 'push')
+  end
+
   # Updates marketing version to the specified one and increments build number by 1.
   #
   # @option [String] version Marketing version string.
@@ -299,11 +326,9 @@ platform :mac do
       git_changes = git_status.split("\n").select { |line| line.include?('modified:')}.join("\n")
       message = "Current branch contains these changes:\n #{git_changes}."
     end
-    unless UI.confirm(
-      "#{message}\nDo you want to continue?"
-    )
-      UI.abort_with_message!('Aborted by user.')
-    end
+
+    UI.important(message)
+    UI.abort_with_message!('Aborted by user.') unless UI.confirm("Do you want to continue?")
   end
 
   # Calculates the new version or validates the provided one, if it exists
@@ -316,14 +341,47 @@ platform :mac do
     current_version = macos_current_version
     user_version = format_user_version(options[:version])
     new_version = user_version.nil? ? macos_bump_minor_version(current_version) : user_version
+
+    UI.important("Current version is #{current_version}.")
+    UI.important("New version is #{new_version}.")
+
     force = options[:force].nil? ? false : options[:force]
     unless force
-      unless UI.confirm(
-        "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
-      )
-      UI.abort_with_message!('Aborted by user.')
+      UI.abort_with_message!('Aborted by user.') unless UI.confirm("Do you want to continue?")
+    end
+    new_version
+  end
+
+  private_lane :validate_version_exists do |options|
+    user_version = format_user_version(options[:version])
+    UI.user_error! "Incorrect version provided: #{options[:version]}. Expected x.y.z format." unless user_version
+
+    Action.sh('git', 'fetch', '--tags')
+    existing_tag = sh('git', 'tag', '--list', user_version).chomp
+    existing_tag = existing_tag.empty? ? nil : existing_tag
+
+    UI.user_error! "Release #{user_version} not found. Make sure you've passed the version you want to make hotfix for, not the upcoming hotfix version." unless existing_tag
+    existing_tag
+  end
+
+  # Bumps provided version for hotfixing and presents to the user for confirmation.
+  #
+  # @option [String] source_version Marketing version string of the release that needs to be hotfixed.
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
+  #
+  private_lane :validate_hotfix_version do |options|
+    source_version = options[:source_version]
+    new_version = macos_bump_patch_version(source_version)
+
+    UI.important("Release #{source_version} will be hotfixed as #{new_version}.")
+
+    force = options[:force].nil? ? false : options[:force]
+    unless force
+      unless UI.confirm("Do you want to continue?")
+        UI.abort_with_message!('Aborted by user.')
       end
     end
+
     new_version
   end
 
@@ -368,6 +426,27 @@ platform :mac do
 
     # Create the branch and push
     Action.sh('git', 'checkout', '-b', release_branch)
+    Action.sh('git', 'push', '-u', 'origin', release_branch)
+  end
+
+  # Checks out a new branch from the current commit and pushes it
+  #
+  # @option [String] version (default: nil) Marketing version string
+  #
+  private_lane :macos_create_hotfix_branch do |options|
+    source_version = options[:source_version]
+    version = options[:new_version]
+    UI.message("Creating new hotfix release branch for #{version}")
+    release_branch = "#{HOTFIX_BRANCH}/#{version}"
+
+    # Abort if the branch already exists
+    UI.abort_with_message!("Branch #{release_branch} already exists in this repository. Aborting.") unless Action.sh(
+      'git', 'branch', '--list', release_branch
+    ).empty?
+
+    # Create the branch and push
+    Action.sh('git', 'fetch', '--tags')
+    Action.sh('git', 'checkout', '-b', release_branch, source_version)
     Action.sh('git', 'push', '-u', 'origin', release_branch)
   end
 
@@ -459,6 +538,17 @@ platform :mac do
     current_version_array = current_version.split('.')
     new_minor_number = current_version_array[1].to_i + 1
     "#{current_version_array[0]}.#{new_minor_number}.0"
+  end
+
+  # Updates version in the config file by bumping the patch (third) number
+  #
+  # @param [String] current version
+  # @return [String] updated version
+  #
+  def macos_bump_patch_version(current_version)
+    current_version_array = current_version.split('.')
+    new_patch_number = current_version_array[2].to_i + 1
+    "#{current_version_array[0]}.#{current_version_array[1]}.#{new_patch_number}"
   end
 
   # Formats the version provided by the user to be Major.Minor.Patch
