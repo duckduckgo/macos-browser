@@ -1,5 +1,5 @@
 //
-//  DuckDuckGoPrivacyPro.xcconfig
+//  SubscriptionPurchaseEnvironment.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,10 +16,13 @@
 //  limitations under the License.
 //
 
-// Configuration settings file format documentation can be found at:
-// https://help.apple.com/xcode/#/dev745c5c974
+import Foundation
 
-#include "DuckDuckGo.xcconfig"
+public final class SubscriptionPurchaseEnvironment {
 
-FEATURE_FLAGS = FEEDBACK SPARKLE SUBSCRIPTION STRIPE
-PRODUCT_NAME = $(PRODUCT_NAME_PREFIX) Privacy Pro
+    public enum Environment {
+        case appStore, stripe
+    }
+
+    public static var current: Environment = .appStore
+}

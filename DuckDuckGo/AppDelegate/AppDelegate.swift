@@ -231,7 +231,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if SUBSCRIPTION
         if #available(macOS 12.0, *) {
             Task {
+    #if STRIPE
+                SubscriptionPurchaseEnvironment.current = .stripe
+    #else
+                SubscriptionPurchaseEnvironment.current = .appStore
                 await PurchaseManager.shared.updateAvailableProducts()
+    #endif
             }
         }
 #endif

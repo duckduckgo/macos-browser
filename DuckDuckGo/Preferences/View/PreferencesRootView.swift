@@ -107,7 +107,13 @@ extension Preferences {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)
             }, manageSubscriptionInAppStore: {
-                NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
+                switch SubscriptionPurchaseEnvironment.current {
+                case .appStore:
+                    NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
+                case .stripe:
+                    // fetch the management url and open in new tab
+                    break
+                }
             }, openVPN: {
                 print("openVPN")
             }, openPersonalInformationRemoval: {

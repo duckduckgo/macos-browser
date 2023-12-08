@@ -26,12 +26,13 @@ public struct SubscriptionAccessView: View {
 
     private let dismissAction: (() -> Void)?
 
-    @State private var selection: AccessChannel? = .appleID
+    @State private var selection: AccessChannel?
     @State var fullHeight: CGFloat = 0.0
 
     public init(model: SubscriptionAccessModel, dismiss: (() -> Void)? = nil) {
         self.model = model
         self.dismissAction = dismiss
+        _selection = State(initialValue: model.items.first)
     }
 
     public var body: some View {

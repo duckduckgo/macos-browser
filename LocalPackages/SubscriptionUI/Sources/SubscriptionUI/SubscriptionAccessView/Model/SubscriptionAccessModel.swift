@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Subscription
 
 public protocol SubscriptionAccessModel {
     var items: [AccessChannel] { get }
@@ -31,7 +32,7 @@ public protocol SubscriptionAccessModel {
 }
 
 extension SubscriptionAccessModel {
-    public var items: [AccessChannel] { AccessChannel.allCases }
+    public var items: [AccessChannel] { SubscriptionPurchaseEnvironment.current == .appStore ? [.appleID, .email] : [.email] }
 
     public func descriptionHeader(for channel: AccessChannel) -> String? { nil }
 }
