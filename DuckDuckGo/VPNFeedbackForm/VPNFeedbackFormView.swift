@@ -44,7 +44,7 @@ struct VPNFeedbackFormView: View {
                 .padding([.top, .leading, .trailing], 20)
 
                 if viewModel.viewState == .feedbackSendingFailed {
-                    Text("We couldn't send your feedback right now, please try again.")
+                    Text(UserText.vpnFeedbackFormSendingConfirmationError)
                         .foregroundColor(.red)
                         .padding(.top, 15)
                 }
