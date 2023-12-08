@@ -79,6 +79,9 @@ extension Pixel.Event {
             guard let trigger = triggerOrigin else { return nil }
             return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
 
+        case .syncSuccessRateDaily:
+            return nil
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,
@@ -125,6 +128,14 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
+             .syncSignupDirect,
+             .syncSignupConnect,
+             .syncLogin,
+             .syncDaily,
+             .syncDuckAddressOverride,
+             .syncBookmarksLocalTimestampResolutionTriggered,
+             .syncCredentialsLocalTimestampResolutionTriggered,
+             .syncSettingsLocalTimestampResolutionTriggered,
              .syncBookmarksCountLimitExceededDaily,
              .syncCredentialsCountLimitExceededDaily,
              .syncBookmarksRequestSizeLimitExceededDaily,

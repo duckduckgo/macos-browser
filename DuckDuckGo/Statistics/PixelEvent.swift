@@ -173,6 +173,15 @@ extension Pixel {
         case networkProtectionRemoteMessageOpened(messageID: String)
 
         // Sync
+        case syncSignupDirect
+        case syncSignupConnect
+        case syncLogin
+        case syncDaily
+        case syncDuckAddressOverride
+        case syncSuccessRateDaily
+        case syncBookmarksLocalTimestampResolutionTriggered
+        case syncCredentialsLocalTimestampResolutionTriggered
+        case syncSettingsLocalTimestampResolutionTriggered
         case syncBookmarksCountLimitExceededDaily
         case syncCredentialsCountLimitExceededDaily
         case syncBookmarksRequestSizeLimitExceededDaily
@@ -497,6 +506,24 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_opened_\(messageID)"
 
             // Sync
+        case .syncSignupDirect:
+            return "m.mac.sync_signup_direct"
+        case .syncSignupConnect:
+            return "m.mac.sync_signup_connect"
+        case .syncLogin:
+            return "m.mac.sync_login"
+        case .syncDaily:
+            return "m.mac.sync_daily"
+        case .syncDuckAddressOverride:
+            return "m.mac.sync_duck_address_override"
+        case .syncSuccessRateDaily:
+            return "m.mac.sync_success_rate_daily"
+        case .syncBookmarksLocalTimestampResolutionTriggered:
+            return "m.mac.sync_bookmarks_local_timestamp_resolution_triggered"
+        case .syncCredentialsLocalTimestampResolutionTriggered:
+            return "m.mac.sync_credentials_local_timestamp_resolution_triggered"
+        case .syncSettingsLocalTimestampResolutionTriggered:
+            return "m.mac.sync_settings_local_timestamp_resolution_triggered"
         case .syncBookmarksCountLimitExceededDaily: return "m.mac.sync_bookmarks_count_limit_exceeded_daily"
         case .syncCredentialsCountLimitExceededDaily: return "m.mac.sync_credentials_count_limit_exceeded_daily"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m.mac.sync_bookmarks_request_size_limit_exceeded_daily"
