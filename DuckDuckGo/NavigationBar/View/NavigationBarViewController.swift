@@ -111,6 +111,12 @@ final class NavigationBarViewController: NSViewController {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 #endif
 
+    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore()) -> NavigationBarViewController {
+        NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation)
+        }!
+    }
+
     required init?(coder: NSCoder) {
         fatalError("NavigationBarViewController: Bad initializer")
     }

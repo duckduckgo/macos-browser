@@ -79,9 +79,9 @@ extension NSViewController {
         }
     }
 
-    func addAndLayoutChild(_ vc: NSViewController) {
+    func addAndLayoutChild(_ vc: NSViewController, into view: NSView? = nil) {
         self.addChild(vc)
-        view.addAndLayout(vc.view)
+        (view ?? self.view).addAndLayout(vc.view)
     }
 
     func removeCompletely() {

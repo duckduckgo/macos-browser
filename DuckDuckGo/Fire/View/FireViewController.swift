@@ -43,13 +43,17 @@ final class FireViewController: NSViewController {
     private var fireAnimationView: AnimationView?
     private var fireAnimationViewLoadingTask: Task<(), Never>?
 
+    static func create(tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) -> FireViewController {
+        NSStoryboard(name: "Fire", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, fireViewModel: fireViewModel)
+        }!
+    }
+
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          fireViewModel: FireViewModel? = nil) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, fireViewModel: FireViewModel? = nil) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
 

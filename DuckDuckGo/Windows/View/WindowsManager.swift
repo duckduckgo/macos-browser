@@ -159,23 +159,7 @@ final class WindowsManager {
                                      contentSize: NSSize? = nil,
                                      popUp: Bool = false,
                                      burnerMode: BurnerMode) -> MainWindowController {
-        let mainViewController: MainViewController
-        do {
-            mainViewController = try NSException.catch {
-                NSStoryboard(name: "Main", bundle: .main)
-                    .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        let model = tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode)
-                        assert(model.burnerMode == burnerMode)
-                        return MainViewController(coder: coder, tabCollectionViewModel: model)
-                    }
-            }
-        } catch {
-#if DEBUG
-            fatalError("WindowsManager.makeNewWindow: \(error)")
-#else
-            fatalError("WindowsManager.makeNewWindow: the App Bundle seems to be removed")
-#endif
-        }
+        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode))
 
         var contentSize = contentSize ?? NSSize(width: 1024, height: 790)
         contentSize.width = min(NSScreen.main?.frame.size.width ?? 1024, max(contentSize.width, 300))

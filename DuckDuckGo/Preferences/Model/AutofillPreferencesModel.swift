@@ -121,7 +121,7 @@ final class AutofillPreferencesModel: ObservableObject {
     @MainActor
     func showAutofillPopover(_ selectedCategory: SecureVaultSorting.Category = .allItems) {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
         navigationViewController.showPasswordManagerPopover(selectedCategory: selectedCategory)
     }
 

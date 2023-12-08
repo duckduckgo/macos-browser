@@ -43,6 +43,10 @@ final class FindInPageViewController: NSViewController {
 
     private var modelCancellables = Set<AnyCancellable>()
 
+    static func create() -> FindInPageViewController {
+        (NSStoryboard(name: "FindInPage", bundle: nil).instantiateInitialController() as? FindInPageViewController)!
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         focusRingView.strokedBackgroundColor = NSColor.findInPageFocusedBackgroundColor

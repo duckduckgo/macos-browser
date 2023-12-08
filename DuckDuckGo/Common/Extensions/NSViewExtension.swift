@@ -47,11 +47,17 @@ extension NSView {
         layer?.cornerRadius = radius
     }
 
-    func addAndLayout(_ subView: NSView) {
-        subView.frame = bounds
-        subView.autoresizingMask = [.height, .width]
-        subView.translatesAutoresizingMaskIntoConstraints = true
-        addSubview(subView)
+    func addAndLayout(_ subview: NSView) {
+        subview.translatesAutoresizingMaskIntoConstraints = false
+        subview.frame = bounds
+        addSubview(subview)
+
+        NSLayoutConstraint.activate([
+            subview.topAnchor.constraint(equalTo: topAnchor),
+            subview.leadingAnchor.constraint(equalTo: leadingAnchor),
+            subview.trailingAnchor.constraint(equalTo: trailingAnchor),
+            subview.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
    }
 
     func wrappedInContainer(padding: CGFloat = 0) -> NSView {
@@ -70,6 +76,11 @@ extension NSView {
         self.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding.bottom).isActive = true
 
         return containerView
+    }
+
+    func hidden() -> Self {
+        self.isHidden = true
+        return self
     }
 
     func makeMeFirstResponder() {

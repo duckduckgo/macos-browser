@@ -56,6 +56,12 @@ final class BrowserTabViewController: NSViewController {
 
     private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
+    static func create(tabCollectionViewModel: TabCollectionViewModel) -> BrowserTabViewController {
+        NSStoryboard(name: "BrowserTab", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        }!
+    }
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }

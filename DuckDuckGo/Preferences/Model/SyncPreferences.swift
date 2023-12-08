@@ -193,7 +193,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @MainActor
     func manageLogins() {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
         navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
     }
 

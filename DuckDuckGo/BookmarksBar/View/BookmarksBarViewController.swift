@@ -41,6 +41,12 @@ final class BookmarksBarViewController: NSViewController {
     @UserDefaultsWrapper(key: .bookmarksBarPromptShown, defaultValue: false)
     var bookmarksBarPromptShown: Bool
 
+    static func create(tabCollectionViewModel: TabCollectionViewModel) -> BookmarksBarViewController {
+        NSStoryboard(name: "BookmarksBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        }!
+    }
+
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
@@ -49,7 +55,7 @@ final class BookmarksBarViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("TabBarViewController: Bad initializer")
+        fatalError("BookmarksBarViewController: Bad initializer")
     }
 
     // MARK: - View Lifecycle
