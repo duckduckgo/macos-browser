@@ -129,12 +129,23 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 
-        await AccountManager().exchangeAndStoreTokens(with: subscriptionValues.token)
+        let authToken = subscriptionValues.token
+        let accountManager = AccountManager()
+        if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
+           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
+            accountManager.storeAuthToken(token: authToken)
+            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
+        }
+
         return nil
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        await AccountManager().refreshAccountData()
+        let accountManager = AccountManager()
+        if let accessToken = accountManager.accessToken,
+           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
+            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
+        }
 
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
@@ -282,11 +293,16 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
                             switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
                             case .success(let subscription):
-                                if !subscription.isActive {
+                                break
+                            case .failure(let error):
+                                switch error {
+                                case .missingAccountOrTransactions:
+                                    self.showSubscriptionNotFoundAlert()
+                                case .subscriptionExpired:
                                     self.showSubscriptionInactiveAlert()
+                                default:
+                                    self.showSomethingWentWrongAlert()
                                 }
-                            case .failure:
-                                self.showSubscriptionNotFoundAlert()
                             }
 
                             message.webView?.reload()

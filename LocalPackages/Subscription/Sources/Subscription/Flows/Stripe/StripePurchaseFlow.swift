@@ -76,7 +76,12 @@ public final class StripePurchaseFlow {
 
         if let authToken = accountManager.authToken {
             print("Exchanging token")
-            await accountManager.exchangeAndStoreTokens(with: authToken)
+
+            if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
+               case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
+                accountManager.storeAuthToken(token: authToken)
+                accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
+            }
         }
 
         if #available(macOS 12.0, *) {

@@ -109,17 +109,16 @@ extension Preferences {
                         guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
                         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                        case .success(let subscription):
-                            if !subscription.isActive {
-                                AccountManager().signOut()
-                                self.showSubscriptionInactiveAlert()
-                            }
+                        case .success:
+                            break
                         case .failure(let error):
                             switch error {
                             case .missingAccountOrTransactions:
                                 self.showSubscriptionNotFoundAlert()
+                            case .subscriptionExpired:
+                                self.showSubscriptionInactiveAlert()
                             default:
-                                break
+                                self.showSomethingWentWrongAlert()
                             }
                         }
                     }
@@ -134,6 +133,14 @@ extension Preferences {
             return SubscriptionUI.PreferencesSubscriptionView(model: model)
         }
 
+        @MainActor
+        private func showSomethingWentWrongAlert() {
+            guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+
+            let alert = NSAlert.somethingWentWrongAlert()
+            alert.beginSheetModal(for: window)
+        }
+        
         @MainActor
         private func showSubscriptionNotFoundAlert() {
             guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }

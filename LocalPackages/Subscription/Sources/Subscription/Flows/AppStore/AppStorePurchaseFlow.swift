@@ -55,21 +55,28 @@ public final class AppStorePurchaseFlow {
     }
 
     public static func purchaseSubscription(with subscriptionIdentifier: String, emailAccessToken: String?) async -> Result<Void, AppStorePurchaseFlow.Error> {
+        let accountManager = AccountManager()
         let externalID: String
 
         // Check for past transactions most recent
         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
         case .success(let subscription):
-            guard !subscription.isActive else { return .failure(.activeSubscriptionAlreadyPresent)}
-            externalID = subscription.externalID
+            return .failure(.activeSubscriptionAlreadyPresent)
         case .failure(let error):
             switch error {
+            case .subscriptionExpired(let expiredExternalID):
+                externalID = expiredExternalID
             case .missingAccountOrTransactions:
                 // No history, create new account
                 switch await AuthService.createAccount(emailAccessToken: emailAccessToken) {
                 case .success(let response):
                     externalID = response.externalID
-                    await AccountManager().exchangeAndStoreTokens(with: response.authToken)
+
+                    if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(response.authToken),
+                       case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
+                        accountManager.storeAuthToken(token: response.authToken)
+                        accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
+                    }
                 case .failure:
                     return .failure(.accountCreationFailed)
                 }

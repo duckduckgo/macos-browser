@@ -103,7 +103,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             guard let token = accountManager.accessToken else { return }
 
-            if case .success(let response) = await SubscriptionService.getSubscriptionInfo(token: token) {
+            if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
                 if response.expiresOrRenewsAt < Date() {
                     AccountManager().signOut()
                     return

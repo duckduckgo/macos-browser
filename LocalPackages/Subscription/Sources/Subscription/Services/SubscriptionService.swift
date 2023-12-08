@@ -30,11 +30,11 @@ public struct SubscriptionService: APIService {
 
     // MARK: -
 
-    public static func getSubscriptionInfo(token: String) async -> Result<GetSubscriptionInfoResponse, APIServiceError> {
+    public static func getSubscriptionDetails(token: String) async -> Result<GetSubscriptionDetailsResponse, APIServiceError> {
         await executeAPICall(method: "GET", endpoint: "subscription", headers: makeAuthorizationHeader(for: token))
     }
 
-    public struct GetSubscriptionInfoResponse: Decodable {
+    public struct GetSubscriptionDetailsResponse: Decodable {
         public let productId: String
         public let startedAt: Date
         public let expiresOrRenewsAt: Date
