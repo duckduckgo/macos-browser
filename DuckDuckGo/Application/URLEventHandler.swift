@@ -123,6 +123,8 @@ final class URLEventHandler {
             }
         case AppLaunchCommand.showSettings.launchURL:
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
+        case AppLaunchCommand.shareFeedback.launchURL:
+            WindowControllersManager.shared.showShareFeedbackModal()
         default:
             return
         }
