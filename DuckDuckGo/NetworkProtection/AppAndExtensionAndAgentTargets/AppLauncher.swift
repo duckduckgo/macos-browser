@@ -83,7 +83,7 @@ extension AppLaunchCommand {
         case .justOpen:
             return "networkprotection://just-open"
         case .shareFeedback:
-            return "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945"
+            return "networkprotection://share-feedback"
         case .showStatus:
             return "networkprotection://show-status"
         case .showSettings:

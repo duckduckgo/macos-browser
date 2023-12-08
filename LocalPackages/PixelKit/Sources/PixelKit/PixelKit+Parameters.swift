@@ -57,6 +57,11 @@ public extension PixelKit {
 
         // Dashboard
         public static let dashboardTriggerOrigin = "trigger_origin"
+
+        // VPN
+        public static let vpnBreakageCategory = "breakageCategory"
+        public static let vpnBreakageDescription = "breakageDescription"
+        public static let vpnBreakageMetadata = "breakageMetadata"
     }
 
     enum Values {

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1701156568791,
+    "version": 1701727717991,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1037,6 +1037,27 @@
             "state": "enabled",
             "hash": "d757f6509e9a9a20140c755ed0f21ea2"
         },
+        "dbp": {
+            "state": "disabled",
+            "features": {
+                "waitlistBetaActive": {
+                    "state": "disabled"
+                },
+                "waitlist": {
+                    "state": "disabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 1
+                            }
+                        ]
+                    }
+                }
+            },
+            "exceptions": [],
+            "minSupportedVersion": "1.66.0",
+            "hash": "325d5463fd2f2b6c8b9ad9288ae6ceed"
+        },
         "duckPlayer": {
             "exceptions": [],
             "settings": {
@@ -1413,10 +1434,6 @@
                     },
                     {
                         "selector": "[class*='container--ads']",
-                        "type": "hide-empty"
-                    },
-                    {
-                        "selector": "[class*='l-ad']",
                         "type": "hide-empty"
                     },
                     {
@@ -2283,6 +2300,23 @@
                             {
                                 "selector": "#leaderboard",
                                 "type": "override"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "healthline.com",
+                        "rules": [
+                            {
+                                "selector": "[data-testid='header-leaderboard']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-testid='sticky-inline-ad']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-ad='true']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -3493,7 +3527,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "d1e47557ed5b3533b4de1c700f7ff009"
+            "hash": "4bdb15fda526543efaeb12a14a3fdf09"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4976,6 +5010,16 @@
                             }
                         ]
                     },
+                    "datadoghq-browser-agent.com": {
+                        "rules": [
+                            {
+                                "rule": "www.datadoghq-browser-agent.com/datadog-logs-v4.js",
+                                "domains": [
+                                    "shapermint.com"
+                                ]
+                            }
+                        ]
+                    },
                     "datadome.co": {
                         "rules": [
                             {
@@ -5233,6 +5277,12 @@
                     },
                     "facebook.net": {
                         "rules": [
+                            {
+                                "rule": "connect.facebook.net/en_UK/sdk.js",
+                                "domains": [
+                                    "globalcyclingnetwork.com"
+                                ]
+                            },
                             {
                                 "rule": "connect.facebook.net/en_US/sdk.js",
                                 "domains": [
@@ -5582,7 +5632,8 @@
                             {
                                 "rule": "googletagmanager.com/gtag/js",
                                 "domains": [
-                                    "abril.com.br"
+                                    "abril.com.br",
+                                    "cosmicbook.news"
                                 ]
                             }
                         ]
@@ -6125,6 +6176,16 @@
                             }
                         ]
                     },
+                    "mediavine.com": {
+                        "rules": [
+                            {
+                                "rule": "scripts.mediavine.com/tags/cosmic-book-news.js",
+                                "domains": [
+                                    "cosmicbook.news"
+                                ]
+                            }
+                        ]
+                    },
                     "medicare.gov": {
                         "rules": [
                             {
@@ -6263,6 +6324,16 @@
                                 "rule": "omtrdc.net",
                                 "domains": [
                                     "pizzahut.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "onesignal.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.onesignal.com/sdks/OneSignalSDK.js",
+                                "domains": [
+                                    "cosmicbook.news"
                                 ]
                             }
                         ]
@@ -6527,6 +6598,7 @@
                             {
                                 "rule": "protection-widget.route.com/protect.core.js",
                                 "domains": [
+                                    "clionadhcosmetics.com",
                                     "littleunicorn.com",
                                     "olfactif.com"
                                 ]
@@ -6905,7 +6977,14 @@
                                 "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js",
                                 "domains": [
                                     "azurestandard.com",
-                                    "domesticandgeneral.com"
+                                    "domesticandgeneral.com",
+                                    "www.hotpoint.co.uk"
+                                ]
+                            },
+                            {
+                                "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js",
+                                "domains": [
+                                    "www.hotpoint.co.uk"
                                 ]
                             }
                         ]
@@ -7020,6 +7099,16 @@
                                 "rule": "voxmedia.com/sso/unison_request",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "wovn.io": {
+                        "rules": [
+                            {
+                                "rule": "j.wovn.io/1",
+                                "domains": [
+                                    "tamashiiweb.com"
                                 ]
                             }
                         ]
@@ -7222,7 +7311,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "eac75f23372b47b682e0c2028080397b"
+            "hash": "eecc760d0412d7108963574d456d6fde"
         },
         "trackingCookies1p": {
             "settings": {
