@@ -388,8 +388,8 @@ platform :mac do
   # Checks current build number and increments it by 1.
   #
   desc 'Increment build number'
-  private_lane :increment_current_build_number do
-    macos_current_build_number = [fetch_testflight_build_number, fetch_appcast_build_number].max
+  private_lane :increment_current_build_number do |options|
+    macos_current_build_number = [fetch_testflight_build_number(options), fetch_appcast_build_number].max
     macos_current_build_number + 1
   end
 
