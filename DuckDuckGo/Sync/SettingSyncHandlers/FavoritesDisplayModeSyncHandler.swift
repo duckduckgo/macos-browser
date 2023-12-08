@@ -27,7 +27,7 @@ final class FavoritesDisplayModeSyncHandler: FavoritesDisplayModeSyncHandlerBase
         preferences.favoritesDisplayMode.description
     }
 
-    override func setValue(_ value: String?) throws {
+    override func setValue(_ value: String?, shouldDetectOverride: Bool) throws {
         if let value, let displayMode = FavoritesDisplayMode(value) {
             DispatchQueue.main.async {
                 self.preferences.favoritesDisplayMode = displayMode

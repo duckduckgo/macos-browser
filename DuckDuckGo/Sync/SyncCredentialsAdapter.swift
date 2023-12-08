@@ -58,7 +58,11 @@ final class SyncCredentialsAdapter {
         }
     }
 
-    func setUpProviderIfNeeded(secureVaultFactory: AutofillVaultFactory, metadataStore: SyncMetadataStore) {
+    func setUpProviderIfNeeded(
+        secureVaultFactory: AutofillVaultFactory,
+        metadataStore: SyncMetadataStore,
+        metricsEventsHandler: EventMapping<MetricsEvent>? = nil
+    ) {
         guard provider == nil else {
             return
         }
@@ -68,6 +72,7 @@ final class SyncCredentialsAdapter {
                 secureVaultFactory: secureVaultFactory,
                 secureVaultErrorReporter: SecureVaultErrorReporter.shared,
                 metadataStore: metadataStore,
+                metricsEvents: metricsEventsHandler,
                 syncDidUpdateData: { [weak self] in
                     self?.syncDidCompleteSubject.send()
                     self?.isSyncCredentialsPaused = false

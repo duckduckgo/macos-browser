@@ -944,6 +944,9 @@
 		37197EAC294244D600394917 /* FutureExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBE6293C98C500C3C99E /* FutureExtension.swift */; };
 		371C0A2927E33EDC0070591F /* FeedbackPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */; };
 		371D00E129D8509400EC8598 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 371D00E029D8509400EC8598 /* OpenSSL */; };
+		372A0FEC2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */; };
+		372A0FED2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */; };
+		372A0FEE2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */; };
 		372BC2A12A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
 		372BC2A22A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */; };
 		3739326529AE4B39009346AE /* DDGSync in Frameworks */ = {isa = PBXBuildFile; productRef = 3739326429AE4B39009346AE /* DDGSync */; };
@@ -3194,6 +3197,7 @@
 		3714B1E628EDB7FA0056C57A /* DuckPlayerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerPreferencesTests.swift; sourceTree = "<group>"; };
 		3714B1E828EDBAAB0056C57A /* DuckPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerTests.swift; sourceTree = "<group>"; };
 		371C0A2827E33EDC0070591F /* FeedbackPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackPresenter.swift; sourceTree = "<group>"; };
+		372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetricsEventsHandler.swift; sourceTree = "<group>"; };
 		372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCredentialsAdapter.swift; sourceTree = "<group>"; };
 		373A1AA7283ED1B900586521 /* BookmarkHTMLReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHTMLReader.swift; sourceTree = "<group>"; };
 		373A1AA9283ED86C00586521 /* BookmarksHTMLReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLReaderTests.swift; sourceTree = "<group>"; };
@@ -4718,6 +4722,7 @@
 				372BC2A02A4AFA47001D8FD5 /* SyncCredentialsAdapter.swift */,
 				37CBCA992A8966E60050218F /* SyncSettingsAdapter.swift */,
 				37FD78102A29EBD100B36DB1 /* SyncErrorHandler.swift */,
+				372A0FEB2B2379310033BF7F /* SyncMetricsEventsHandler.swift */,
 				37CEFCA82A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift */,
 				37A6A8F02AFCC988008580A3 /* FaviconsFetcherOnboarding.swift */,
 				37A6A8F52AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift */,
@@ -9760,6 +9765,7 @@
 				3706FCA2293F65D500E42796 /* ChromiumKeychainPrompt.swift in Sources */,
 				3707C71E294B5D2900682A9F /* URLRequestExtension.swift in Sources */,
 				3706FCA3293F65D500E42796 /* WKProcessPool+GeolocationProvider.swift in Sources */,
+				372A0FED2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */,
 				3706FCA4293F65D500E42796 /* RecentlyClosedMenu.swift in Sources */,
 				4B9DB02D2A983B24000927DB /* WaitlistKeychainStorage.swift in Sources */,
 				EECE10E629DD77E60044D027 /* FeatureFlag.swift in Sources */,
@@ -10786,6 +10792,7 @@
 				4B957B892AC7AE700062CA31 /* ToggleableScrollView.swift in Sources */,
 				4B957B8A2AC7AE700062CA31 /* TabCleanupPreparer.swift in Sources */,
 				4B957B8B2AC7AE700062CA31 /* NetworkProtectionOptionKeyExtension.swift in Sources */,
+				372A0FEE2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */,
 				316850702AF3AD1D009A2828 /* WaitlistViewControllerPresenter.swift in Sources */,
 				1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */,
 				4B957B8C2AC7AE700062CA31 /* UserScripts.swift in Sources */,
@@ -11151,6 +11158,7 @@
 				B693954C26F04BEB0015B914 /* FocusRingView.swift in Sources */,
 				4BE41A5E28446EAD00760399 /* BookmarksBarViewModel.swift in Sources */,
 				4B1E6EF127AB5E5D00F51793 /* NSPopUpButtonView.swift in Sources */,
+				372A0FEC2B2379310033BF7F /* SyncMetricsEventsHandler.swift in Sources */,
 				85774B032A71CDD000DE0561 /* BlockMenuItem.swift in Sources */,
 				4B9292DB2667125D00AD2C21 /* ContextualMenu.swift in Sources */,
 				AA68C3D32490ED62001B8783 /* NavigationBarViewController.swift in Sources */,
@@ -12751,8 +12759,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 92.0.4;
+				branch = "dominik/sync-pixels";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

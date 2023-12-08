@@ -38,7 +38,11 @@ final class SyncSettingsAdapter {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
     }
 
-    func setUpProviderIfNeeded(metadataDatabase: CoreDataDatabase, metadataStore: SyncMetadataStore) {
+    func setUpProviderIfNeeded(
+        metadataDatabase: CoreDataDatabase,
+        metadataStore: SyncMetadataStore,
+        metricsEventsHandler: EventMapping<MetricsEvent>? = nil
+    ) {
         guard provider == nil else {
             return
         }
@@ -48,6 +52,7 @@ final class SyncSettingsAdapter {
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
             settingsHandlers: [FavoritesDisplayModeSyncHandler(), EmailProtectionSyncHandler(emailManager: emailManager)],
+            metricsEvents: metricsEventsHandler,
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }

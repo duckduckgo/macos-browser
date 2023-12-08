@@ -36,9 +36,21 @@ final class SyncDataProviders: DataProvidersSource {
             return []
         }
 
-        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
-        credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
-        settingsAdapter.setUpProviderIfNeeded(metadataDatabase: syncMetadataDatabase.db, metadataStore: syncMetadata)
+        bookmarksAdapter.setUpProviderIfNeeded(
+            database: bookmarksDatabase,
+            metadataStore: syncMetadata,
+            metricsEventsHandler: metricsEventsHandler
+        )
+        credentialsAdapter.setUpProviderIfNeeded(
+            secureVaultFactory: secureVaultFactory,
+            metadataStore: syncMetadata,
+            metricsEventsHandler: metricsEventsHandler
+        )
+        settingsAdapter.setUpProviderIfNeeded(
+            metadataDatabase: syncMetadataDatabase.db,
+            metadataStore: syncMetadata,
+            metricsEventsHandler: metricsEventsHandler
+        )
 
         let providers: [Any] = [
             bookmarksAdapter.provider as Any,
@@ -108,6 +120,7 @@ final class SyncDataProviders: DataProvidersSource {
     private var isSyncMetadaDatabaseLoaded: Bool = false
     private var syncMetadata: SyncMetadataStore?
     private var syncAuthStateDidChangeCancellable: AnyCancellable?
+    private let metricsEventsHandler = SyncMetricsEventsHandler()
 
     private let syncMetadataDatabase: SyncMetadataDatabase = SyncMetadataDatabase()
     private let bookmarksDatabase: CoreDataDatabase
