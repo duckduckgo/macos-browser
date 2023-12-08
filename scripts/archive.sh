@@ -132,18 +132,20 @@ set_up_environment() {
 	team_id=$(security find-certificate -c "Developer ID Application: Duck" | grep "alis" | awk 'NF { print $NF }' | tr -d \(\)\")
 	export_options_plist="${cwd}/assets/ExportOptions.plist"
 
+	source "${cwd}/helpers/version.sh"
 	if [[ -n "${override_version}" ]]; then
 		app_version="${override_version}"
 	else
-		source "${cwd}/helpers/version.sh"
 		app_version=$(get_app_version "${scheme}")
 	fi
+	build_number=$(get_build_number "${scheme}")
+	version_identifier="${app_version}.${build_number}"
 
 	app_path="${workdir}/${app_name}.app"
 	dsym_path="${archive}/dSYMs"
 
-	output_app_zip_path="${workdir}/DuckDuckGo-${app_version}.zip"
-	output_dsym_zip_path="${workdir}/DuckDuckGo-${app_version}-dSYM.zip"
+	output_app_zip_path="${workdir}/DuckDuckGo-${version_identifier}.zip"
+	output_dsym_zip_path="${workdir}/DuckDuckGo-${version_identifier}-dSYM.zip"
 }
 
 get_developer_credentials() {
@@ -232,7 +234,7 @@ archive_and_export() {
 	local log_formatter
 	setup_log_formatter
 
-	echo "Building and archiving the app (version ${app_version}) ..."
+	echo "Building and archiving the app version ${app_version} (${build_number}) ..."
 
 	local derived_data="${workdir}/DerivedData"
 	rm -rf "${derived_data}"
@@ -242,8 +244,8 @@ archive_and_export() {
 		-configuration "${configuration}" \
 		-archivePath "${archive}" \
 		-derivedDataPath "${derived_data}" \
-		CURRENT_PROJECT_VERSION="${app_version}" \
 		MARKETING_VERSION="${app_version}" \
+		CURRENT_PROJECT_VERSION="${build_number}" \
 		RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo \
 		2>&1 \
 		| ${log_formatter}
@@ -300,7 +302,7 @@ create_dmg() {
 
 	local dmg_dir="${workdir}/dmg"
 	local dmg_background="${cwd}/assets/dmg-background.png"
-	dmg_output_path="${workdir}/duckduckgo-${app_version}.dmg"
+	dmg_output_path="${workdir}/duckduckgo-${version_identifier}.dmg"
 
 	rm -rf "${dmg_dir}" "${dmg_output_path}"
 	mkdir -p "${dmg_dir}"
@@ -316,7 +318,7 @@ create_dmg() {
 
 export_app_version_to_environment() {
 	if [[ -n "${GITHUB_ENV}" ]]; then
-		echo "app-version=${app_version}" >> "${GITHUB_ENV}"
+		echo "app-version=${version_identifier}" >> "${GITHUB_ENV}"
 		echo "app-name=${app_name}" >> "${GITHUB_ENV}"
 	fi
 }
