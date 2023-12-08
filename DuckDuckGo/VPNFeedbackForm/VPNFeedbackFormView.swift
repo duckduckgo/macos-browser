@@ -188,11 +188,11 @@ private struct VPNFeedbackFormButtons: View {
     var body: some View {
         HStack {
             if viewModel.viewState == .feedbackSent {
-                button(text: "Done", action: .cancel)
+                button(text: UserText.vpnFeedbackFormButtonDone, action: .cancel)
                     .keyboardShortcut(.defaultAction)
             } else {
-                button(text: "Cancel", action: .cancel)
-                button(text: viewModel.viewState == .feedbackSending ? "Submitting..." : "Submit", action: .submit)
+                button(text: UserText.vpnFeedbackFormButtonCancel, action: .cancel)
+                button(text: viewModel.viewState == .feedbackSending ? UserText.vpnFeedbackFormButtonSubmitting : UserText.vpnFeedbackFormButtonSubmit, action: .submit)
                     .keyboardShortcut(.defaultAction)
                     .disabled(!viewModel.submitButtonEnabled)
             }
