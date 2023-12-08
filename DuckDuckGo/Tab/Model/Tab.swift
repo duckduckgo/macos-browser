@@ -41,6 +41,7 @@ protocol NewWindowPolicyDecisionMaker {
 
 // swiftlint:disable:next type_body_length
 @dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
+
     enum TabContent: Equatable {
         case homePage
         case url(URL, credential: URLCredential? = nil, userEntered: String? = nil)
@@ -462,7 +463,6 @@ protocol NewWindowPolicyDecisionMaker {
             userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
         }
-
         if !onDeinit {
             // Tab should be deallocated shortly after burning
             self.assertObjectDeallocated(after: 4.0)
