@@ -32,6 +32,7 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
+
 }
 
 protocol NewWindowPolicyDecisionMaker {
@@ -40,7 +41,6 @@ protocol NewWindowPolicyDecisionMaker {
 
 // swiftlint:disable:next type_body_length
 @dynamicMemberLookup final class Tab: NSObject, Identifiable, ObservableObject {
-
     enum TabContent: Equatable {
         case homePage
         case url(URL, credential: URLCredential? = nil, userEntered: String? = nil)
