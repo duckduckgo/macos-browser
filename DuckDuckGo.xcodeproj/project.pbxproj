@@ -3214,7 +3214,7 @@
 		3767190128E724B2003A2A15 /* DuckPlayerURLExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckPlayerURLExtension.swift; sourceTree = "<group>"; };
 		376C4DB828A1A48A00CC0F5B /* FirePopoverViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopoverViewModelTests.swift; sourceTree = "<group>"; };
 		376CC8B4296EB630006B63A7 /* AppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStore.xcconfig; sourceTree = "<group>"; };
-		376CC8B5296EBA8F006B63A7 /* AppStoreBuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppStoreBuildNumber.xcconfig; sourceTree = "<group>"; };
+		376CC8B5296EBA8F006B63A7 /* BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildNumber.xcconfig; sourceTree = "<group>"; };
 		37717E66296B5A20002FAEDF /* Global.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Global.xcconfig; sourceTree = "<group>"; };
 		3775912C29AAC72700E26367 /* SyncPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPreferences.swift; sourceTree = "<group>"; };
 		3775913529AB9A1C00E26367 /* SyncManagementDialogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManagementDialogViewController.swift; sourceTree = "<group>"; };
@@ -4757,8 +4757,8 @@
 				37717E66296B5A20002FAEDF /* Global.xcconfig */,
 				378B5888295CF2A4002C0CC0 /* Common.xcconfig */,
 				378B5887295CF2A4002C0CC0 /* Version.xcconfig */,
+				376CC8B5296EBA8F006B63A7 /* BuildNumber.xcconfig */,
 				376CC8B4296EB630006B63A7 /* AppStore.xcconfig */,
-				376CC8B5296EBA8F006B63A7 /* AppStoreBuildNumber.xcconfig */,
 				7B5291892A169BC90022E406 /* DeveloperID.xcconfig */,
 				378C76D8296842FD0092E949 /* App */,
 				4B4D604E2A0B293C00BCD287 /* Extensions */,
@@ -12752,7 +12752,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 92.0.3;
+				version = 92.0.4;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
