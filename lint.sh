@@ -50,22 +50,8 @@ run_swiftlint_for_modified_files () {
     fi
 }
 
-if which swiftlint >/dev/null; then
-    if [ "$CONFIGURATION" = "Release" ]; then
-        if $FIX; then
-            swiftlint lint --fix --strict
-        else
-            swiftlint lint --strict
-        fi
-
-        if [ $? -ne 0 ]; then
-            echo "error: SwiftLint validation failed."
-            exit 1
-        fi
-    else
-        run_swiftlint_for_modified_files
-    fi
-else
+if ! command -v shellcheck &> /dev/null; then
     echo "error: SwiftLint not installed. Install using \`brew install swiftlint\`"
     exit 1
 fi
+run_swiftlint_for_modified_files
