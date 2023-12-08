@@ -33,6 +33,15 @@ final class VPNFeedbackFormViewModel: ObservableObject {
         case feedbackSending
         case feedbackSendingFailed
         case feedbackSent
+
+        var canSubmit: Bool {
+            switch self {
+            case .feedbackPending: return true
+            case .feedbackSending: return false
+            case .feedbackSendingFailed: return true
+            case .feedbackSent: return false
+            }
+        }
     }
 
     enum ViewAction {
@@ -88,7 +97,7 @@ final class VPNFeedbackFormViewModel: ObservableObject {
     }
 
     private func updateSubmitButtonStatus() {
-        self.submitButtonEnabled = (viewState == .feedbackPending || viewState == .feedbackSendingFailed) && !feedbackFormText.isEmpty
+        self.submitButtonEnabled = viewState.canSubmit && !feedbackFormText.isEmpty
     }
 
 }
