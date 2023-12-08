@@ -63,7 +63,7 @@ final class PrivacyPreferencesModel: ObservableObject {
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
-        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
+        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled
     }
 
     private let privacySecurityPreferences: PrivacySecurityPreferences

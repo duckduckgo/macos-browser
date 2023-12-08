@@ -16,12 +16,16 @@
 //  limitations under the License.
 //
 
+import Foundation
+
 final class AutoconsentManagement {
     static let shared = AutoconsentManagement()
+
     var sitesNotifiedCache = Set<String>()
-    var promptLastShown: Date?
+
     func clearCache() {
         dispatchPrecondition(condition: .onQueue(.main))
         sitesNotifiedCache.removeAll()
     }
+
 }

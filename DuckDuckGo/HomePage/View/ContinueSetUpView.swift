@@ -273,3 +273,7 @@ extension HomePage.Views {
         }
     }
 }
+
+#Preview {
+    HomePage.Views.ContinueSetUpView()
+}

@@ -76,11 +76,7 @@ extension HomePage.Models {
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
         private let privacyPreferences: PrivacySecurityPreferences
-        private let cookieConsentPopoverManager: CookieConsentPopoverManager
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
-        private var cookiePopUpVisible = false
-
-        weak var delegate: ContinueSetUpVewModelDelegate?
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
         var shouldShowAllFeatures: Bool {
@@ -100,9 +96,6 @@ extension HomePage.Models {
 
         @UserDefaultsWrapper(key: .homePageShowEmailProtection, defaultValue: true)
         private var shouldShowEmailProtectionSetting: Bool
-
-        @UserDefaultsWrapper(key: .homePageShowCookie, defaultValue: true)
-        private var shouldShowCookieSetting: Bool
 
         @UserDefaultsWrapper(key: .homePageShowSurveyDay0, defaultValue: true)
         private var shouldShowSurveyDay0: Bool
@@ -151,7 +144,6 @@ extension HomePage.Models {
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-             cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
              appGroupUserDefaults: UserDefaults,
@@ -161,7 +153,6 @@ extension HomePage.Models {
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
             self.privacyPreferences = privacyPreferences
-            self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
             self.appGroupUserDefaults = appGroupUserDefaults
@@ -176,7 +167,6 @@ extension HomePage.Models {
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
-             cookieConsentPopoverManager: CookieConsentPopoverManager = CookieConsentPopoverManager(),
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
@@ -184,7 +174,6 @@ extension HomePage.Models {
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
             self.privacyPreferences = privacyPreferences
-            self.cookieConsentPopoverManager = cookieConsentPopoverManager
             self.duckPlayerPreferences = duckPlayerPreferences
             self.privacyConfigurationManager = privacyConfigurationManager
             refreshFeaturesMatrix()
@@ -212,18 +201,6 @@ extension HomePage.Models {
             case .emailProtection:
                 let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true)
                 tabCollectionViewModel.append(tab: tab)
-            case .cookiePopUp:
-                if !cookiePopUpVisible {
-                    delegate?.showCookieConsentPopUp(manager: cookieConsentPopoverManager, completion: { [weak self] result in
-                        guard let self = self else {
-                            return
-                        }
-                        self.privacyPreferences.autoconsentEnabled = result
-                        self.refreshFeaturesMatrix()
-                        self.cookiePopUpVisible = false
-                    })
-                    cookiePopUpVisible = true
-                }
             case .surveyDay0:
                 visitSurvey(day: .day0)
             case .surveyDay7:
@@ -252,8 +229,6 @@ extension HomePage.Models {
                 shouldShowDuckPlayerSetting = false
             case .emailProtection:
                 shouldShowEmailProtectionSetting = false
-            case .cookiePopUp:
-                shouldShowCookieSetting = false
             case .surveyDay0:
                 shouldShowSurveyDay0 = false
             case .surveyDay7:
@@ -318,10 +293,6 @@ extension HomePage.Models {
                     if shouldEmailProtectionCardBeVisible {
                         features.append(feature)
                     }
-                case .cookiePopUp:
-                    if shouldCookieCardBeVisible {
-                        features.append(feature)
-                    }
                 case .surveyDay0:
                     if shouldSurveyDay0BeVisible {
                         features.append(feature)
@@ -368,9 +339,8 @@ extension HomePage.Models {
         }
 
         var firstRunFeatures: [FeatureType] {
-            var features: [FeatureType] = FeatureType.allCases.filter { $0 != .duckplayer && $0 != .cookiePopUp }
+            var features = FeatureType.allCases.filter { $0 != .duckplayer }
             features.insert(.duckplayer, at: 0)
-            features.insert(.cookiePopUp, at: 1)
             return features
         }
 
@@ -413,12 +383,6 @@ extension HomePage.Models {
             !PixelExperiment.isNoCardsExperimentOn &&
             shouldShowEmailProtectionSetting &&
             !emailManager.isSignedIn
-        }
-
-        private var shouldCookieCardBeVisible: Bool {
-            !PixelExperiment.isNoCardsExperimentOn &&
-            shouldShowCookieSetting &&
-            privacyPreferences.autoconsentEnabled != true
         }
 
         private var shouldSurveyDay0BeVisible: Bool {
@@ -503,11 +467,10 @@ extension HomePage.Models {
         // We ignore the `networkProtectionRemoteMessage` case here to avoid it getting accidentally included - it has special handling and will get
         // included elsewhere.
         static var allCases: [HomePage.Models.FeatureType] {
-            [.duckplayer, .cookiePopUp, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay7]
+            [.duckplayer, .emailProtection, .defaultBrowser, .importBookmarksAndPasswords, .surveyDay0, .surveyDay7]
         }
 
         case duckplayer
-        case cookiePopUp
         case emailProtection
         case defaultBrowser
         case importBookmarksAndPasswords
@@ -527,8 +490,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerCardTitle
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionCardTitle
-            case .cookiePopUp:
-                return UserText.newTabSetUpCookieManagerCardTitle
             case .surveyDay0:
                 return UserText.newTabSetUpSurveyDay0CardTitle
             case .surveyDay7:
@@ -552,8 +513,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerSummary
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionSummary
-            case .cookiePopUp:
-                return UserText.newTabSetUpCookieManagerSummary
             case .surveyDay0:
                 return UserText.newTabSetUpSurveyDay0Summary
             case .surveyDay7:
@@ -577,8 +536,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpDuckPlayerAction
             case .emailProtection:
                 return UserText.newTabSetUpEmailProtectionAction
-            case .cookiePopUp:
-                return UserText.newTabSetUpCookieManagerAction
             case .surveyDay0:
                 return UserText.newTabSetUpSurveyDay0Action
             case .surveyDay7:
@@ -604,8 +561,6 @@ extension HomePage.Models {
                 return NSImage(named: "Clean-Tube-128")!.resized(to: iconSize)!
             case .emailProtection:
                 return NSImage(named: "inbox-128")!.resized(to: iconSize)!
-            case .cookiePopUp:
-                return NSImage(named: "Cookie-Popups-128")!.resized(to: iconSize)!
             case .surveyDay0:
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .surveyDay7:
@@ -629,16 +584,5 @@ extension HomePage.Models {
         static func height(for rowCount: Int) -> CGFloat {
             (itemHeight + verticalSpacing) * CGFloat(rowCount) - verticalSpacing
         }
-    }
-}
-
-// MARK: ContinueSetUpVewModelDelegate
-protocol ContinueSetUpVewModelDelegate: AnyObject {
-    func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?)
-}
-
-extension HomePageViewController: ContinueSetUpVewModelDelegate {
-    func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?) {
-        manager.show(on: self.view, animated: true, type: .setUp, result: completion)
     }
 }

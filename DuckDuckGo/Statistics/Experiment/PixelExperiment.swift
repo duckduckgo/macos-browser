@@ -91,10 +91,6 @@ extension PixelExperiment {
         logic.fireWatchInDuckPlayerPixel()
     }
 
-    static func fireCookieManagementEnabledPixel() {
-        logic.fireCookieManagementEnabledPixel()
-    }
-
     static func fireEmailProtectionEnabledPixel() {
         logic.fireEmailProtectionEnabledPixel()
     }
@@ -199,14 +195,6 @@ final internal class PixelExperimentLogic {
             Pixel.fire(.watchInDuckPlayerInitial(cohort: cohort.rawValue), limitTo: .initial)
         } else {
             Pixel.fire(.watchInDuckPlayerInitial(), limitTo: .initial)
-        }
-    }
-
-    func fireCookieManagementEnabledPixel() {
-        if allocatedCohort != nil, let cohort {
-            Pixel.fire(.cookieManagementEnabledInitial(cohort: cohort.rawValue), limitTo: .initial)
-        } else {
-            Pixel.fire(.cookieManagementEnabledInitial(), limitTo: .initial)
         }
     }
 

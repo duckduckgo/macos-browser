@@ -167,3 +167,10 @@ extension FindInPageViewController: NSTextFieldDelegate {
     }
 
 }
+
+@available(macOS 14.0, *)
+#Preview {
+
+    FindInPageViewController()
+
+}

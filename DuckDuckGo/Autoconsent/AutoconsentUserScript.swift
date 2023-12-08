@@ -24,7 +24,6 @@ import PrivacyDashboard
 
 protocol AutoconsentUserScriptDelegate: AnyObject {
     func autoconsentUserScript(consentStatus: CookieConsentInfo)
-    func autoconsentUserScriptPromptUserForConsent(_ result: @escaping (Bool) -> Void)
 }
 
 protocol UserScriptWithAutoconsent: UserScript {
@@ -32,17 +31,18 @@ protocol UserScriptWithAutoconsent: UserScript {
 }
 
 final class AutoconsentUserScript: NSObject, WKScriptMessageHandlerWithReply, UserScriptWithAutoconsent {
+
+    static let newSitePopupHiddenNotification = Notification.Name("newSitePopupHidden")
+
     var injectionTime: WKUserScriptInjectionTime { .atDocumentStart }
     var forMainFrameOnly: Bool { false }
-    weak var selfTestWebView: WKWebView?
-    weak var selfTestFrameInfo: WKFrameInfo?
-    var topUrl: URL?
-    let preferences = PrivacySecurityPreferences.shared
-    let management = AutoconsentManagement.shared
 
-    enum Constants {
-        static let newSitePopupHidden = Notification.Name("newSitePopupHidden")
-    }
+    private weak var selfTestWebView: WKWebView?
+    private weak var selfTestFrameInfo: WKFrameInfo?
+
+    private var topUrl: URL?
+    private let preferences = PrivacySecurityPreferences.shared
+    private let management = AutoconsentManagement.shared
 
     public var messageNames: [String] { MessageName.allCases.map(\.rawValue) }
     let source: String
@@ -170,7 +170,8 @@ extension AutoconsentUserScript {
         case MessageName.eval:
             handleEval(message: message, replyHandler: replyHandler)
         case MessageName.popupFound:
-            handlePopupFound(message: message, replyHandler: replyHandler)
+            os_log("Autoconsent popup found", log: .autoconsent)
+            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
         case MessageName.optOutResult:
             handleOptOutResult(message: message, replyHandler: replyHandler)
         case MessageName.optInResult:
@@ -239,11 +240,9 @@ extension AutoconsentUserScript {
             "rules": nil, // rules are bundled with the content script atm
             "config": [
                 "enabled": true,
-                // if it's the first time, disable autoAction
                 "autoAction": preferences.autoconsentEnabled == true ? "optOut" : nil,
                 "disabledCmps": disabledCMPs,
-                // the very first time (autoconsentEnabled = nil), make sure the popup is visible
-                "enablePrehide": preferences.autoconsentEnabled ?? false,
+                "enablePrehide": true,
                 "enableCosmeticRules": true,
                 "detectRetries": 20,
                 "isMainWorld": false
@@ -282,30 +281,6 @@ extension AutoconsentUserScript {
                         ],
                         nil
                     )
-                }
-            })
-        } else {
-            replyHandler(nil, "missing frame target")
-        }
-    }
-
-    @MainActor
-    func handlePopupFound(message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-        guard preferences.autoconsentEnabled == nil else {
-            // if feature is already enabled, opt-out will happen automatically
-            replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
-            return
-        }
-
-        os_log("Prompting user about autoconsent", log: .autoconsent, type: .debug)
-
-        // if it's the first time, prompt the user and trigger opt-out
-        if let window = message.webView?.window {
-            ensurePrompt(window: window, callback: { shouldProceed in
-                if shouldProceed {
-                    Task {
-                        replyHandler([ "type": "optOut" ], nil)
-                    }
                 }
             })
         } else {
@@ -355,7 +330,7 @@ extension AutoconsentUserScript {
             management.sitesNotifiedCache.insert(host)
             // post popover notification on main thread
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: Constants.newSitePopupHidden, object: self, userInfo: [
+                NotificationCenter.default.post(name: Self.newSitePopupHiddenNotification, object: self, userInfo: [
                     "topUrl": self.topUrl ?? url,
                     "isCosmetic": messageData.isCosmetic
                 ])
@@ -399,20 +374,4 @@ extension AutoconsentUserScript {
         replyHandler([ "type": "ok" ], nil) // this is just to prevent a Promise rejection
     }
 
-    @MainActor
-    func ensurePrompt(window: NSWindow, callback: @escaping (Bool) -> Void) {
-        let now = Date.init()
-        guard management.promptLastShown == nil || now > management.promptLastShown!.addingTimeInterval(30) else {
-            // user said "not now" recently, don't bother asking
-            os_log("Have a recent user response, canceling prompt", log: .autoconsent, type: .debug)
-            callback(preferences.autoconsentEnabled ?? false) // if two prompts were scheduled from the same tab, result could be true
-            return
-        }
-
-        management.promptLastShown = now
-        self.delegate?.autoconsentUserScriptPromptUserForConsent { result in
-            self.preferences.autoconsentEnabled = result
-            callback(result)
-        }
-    }
 }

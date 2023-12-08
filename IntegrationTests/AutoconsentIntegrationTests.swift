@@ -80,36 +80,6 @@ class AutoconsentIntegrationTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenAutoconsentDisabled_promptIsDisplayed() async throws {
-        // reset the feature setting
-        PrivacySecurityPreferences.shared.autoconsentEnabled = nil
-        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/")!
-
-        let tab = self.tabViewModel.tab
-
-        _=await tab.setUrl(url, userEntered: nil)?.result
-
-        // expect cookieConsent request to be published
-        let cookieConsentPromptRequestPromise = tab.cookieConsentPromptRequestPublisher
-            .compactMap { $0 != nil ? true : nil }
-            .timeout(5)
-            .first()
-            .promise()
-
-        let cookieConsentPromptRequestPublished = try await cookieConsentPromptRequestPromise.value
-        XCTAssertTrue(cookieConsentPromptRequestPublished)
-        XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-
-        // expect cookieConsent popover to be hidden when opening a new tab
-        mainViewController.browserTabViewController.openNewTab(with: .none)
-        XCTAssertFalse(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-
-        // switch back: popover should be reopen
-        mainViewController.tabCollectionViewModel.select(at: .unpinned(0))
-        XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-    }
-
-    @MainActor
     func testCosmeticRule_whenFakeCookieBannerIsDisplayed_bannerIsHidden() async throws {
         // enable the feature
         PrivacySecurityPreferences.shared.autoconsentEnabled = true

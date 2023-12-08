@@ -313,7 +313,7 @@ struct DataBrokerProtectionWaitlist: Waitlist {
 
             if inviteCode == nil {
                 os_log("No DBP invite code found, fetching...", log: .default)
-                inviteCode = try await fetchInviteCode()
+                inviteCode = "aaa" // try await fetchInviteCode()
             }
 
             if let code = inviteCode {

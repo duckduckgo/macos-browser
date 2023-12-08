@@ -24,23 +24,11 @@ import Foundation
 import Navigation
 import PrivacyDashboard
 
-typealias CookieConsentPromptRequest = UserDialogRequest<Void, Bool>
-
 final class PrivacyDashboardTabExtension {
 
     private let contentBlocking: any ContentBlockingProtocol
 
     @Published private(set) var privacyInfo: PrivacyInfo?
-    @Published private(set) var cookieConsentPromptRequest: CookieConsentPromptRequest? {
-        didSet {
-            guard let request = cookieConsentPromptRequest else { return }
-            request.addCompletionHandler { [weak self, weak request] _ in
-                if let self, let request, self.cookieConsentPromptRequest === request {
-                    self.cookieConsentPromptRequest = nil
-                }
-            }
-        }
-    }
 
     private var previousPrivacyInfosByURL: [String: PrivacyInfo] = [:]
 
@@ -165,18 +153,11 @@ extension PrivacyDashboardTabExtension: AutoconsentUserScriptDelegate {
         self.privacyInfo?.cookieConsentManaged = consentStatus
     }
 
-    func autoconsentUserScriptPromptUserForConsent(_ callback: @escaping (Bool) -> Void) {
-        cookieConsentPromptRequest = .init { result in
-            callback((try? result.get()) ?? false)
-        }
-    }
-
 }
 
 protocol PrivacyDashboardProtocol: AnyObject, NavigationResponder {
     var privacyInfo: PrivacyInfo? { get }
     var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> { get }
-    var cookieConsentPromptRequestPublisher: AnyPublisher<CookieConsentPromptRequest?, Never> { get }
 
     func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?)
 }
@@ -186,10 +167,6 @@ extension PrivacyDashboardTabExtension: PrivacyDashboardProtocol, TabExtension {
 
     var privacyInfoPublisher: AnyPublisher<PrivacyDashboard.PrivacyInfo?, Never> {
         self.$privacyInfo.eraseToAnyPublisher()
-    }
-
-    var cookieConsentPromptRequestPublisher: AnyPublisher<CookieConsentPromptRequest?, Never> {
-        self.$cookieConsentPromptRequest.eraseToAnyPublisher()
     }
 
 }
@@ -202,10 +179,6 @@ extension Tab {
 
     var privacyInfoPublisher: AnyPublisher<PrivacyInfo?, Never> {
         self.privacyDashboard?.privacyInfoPublisher ?? Just(nil).eraseToAnyPublisher()
-    }
-
-    var cookieConsentPromptRequestPublisher: AnyPublisher<CookieConsentPromptRequest?, Never> {
-        self.privacyDashboard?.cookieConsentPromptRequestPublisher ?? Just(nil).eraseToAnyPublisher()
     }
 
     func setMainFrameConnectionUpgradedTo(_ upgradedUrl: URL?) {

@@ -170,7 +170,6 @@ final class HomePageViewController: NSViewController {
         )
 #endif
 
-        vm.delegate = self
         return vm
     }
 
