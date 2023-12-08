@@ -57,8 +57,7 @@ extension ExternalAppSchemeHandler: NavigationResponder {
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let externalUrl = navigationAction.url
         // only proceed with non-external-scheme navigations
-        guard externalUrl.isExternalSchemeLink,
-              let scheme = externalUrl.scheme else {
+        guard externalUrl.isExternalSchemeLink, let scheme = externalUrl.scheme else {
             // is it the first navigation?
             if navigationAction.isForMainFrame, navigationAction.fromHistoryItemIdentity != nil {
                 // don‘t close tab when opening an app for non-initial navigations
