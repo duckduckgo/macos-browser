@@ -1,5 +1,5 @@
 //
-//  PurchaseInProgressViewController.swift
+//  ProgressViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,26 +19,26 @@
 import AppKit
 import SwiftUI
 
-public final class PurchaseInProgressViewController: NSViewController {
+public final class ProgressViewController: NSViewController {
 
-    private var purchaseInProgressView: PurchaseInProgressView?
-    private var viewModel: PurchaseInProgressViewModel
+    private var progressView: ProgressView?
+    private var viewModel: ProgressViewModel
 
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     public init(title: String) {
-        self.viewModel = PurchaseInProgressViewModel(title: title)
+        self.viewModel = ProgressViewModel(title: title)
         super.init(nibName: nil, bundle: nil)
     }
 
     public override func loadView() {
 
-        let purchaseInProgressView = PurchaseInProgressView(viewModel: viewModel)
-        let hostingView = NSHostingView(rootView: purchaseInProgressView)
+        let progressView = ProgressView(viewModel: viewModel)
+        let hostingView = NSHostingView(rootView: progressView)
 
-        self.purchaseInProgressView = purchaseInProgressView
+        self.progressView = progressView
 
         view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 160))
         hostingView.frame = view.bounds
@@ -53,7 +53,7 @@ public final class PurchaseInProgressViewController: NSViewController {
     }
 }
 
-final class PurchaseInProgressViewModel: ObservableObject {
+final class ProgressViewModel: ObservableObject {
     @Published var title: String
 
     init(title: String) {
@@ -61,9 +61,9 @@ final class PurchaseInProgressViewModel: ObservableObject {
     }
 }
 
-struct PurchaseInProgressView: View {
+struct ProgressView: View {
 
-    @ObservedObject var viewModel: PurchaseInProgressViewModel
+    @ObservedObject var viewModel: ProgressViewModel
 
     public var body: some View {
         VStack {

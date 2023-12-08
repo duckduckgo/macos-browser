@@ -90,6 +90,19 @@ extension Preferences {
         }
 
 #if SUBSCRIPTION
+
+        @MainActor
+        private func showProgress(with title: String) -> ProgressViewController {
+            let progressVC = ProgressViewController(title: title)
+            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(progressVC)
+            return progressVC
+        }
+
+        @MainActor
+        private func hideProgress(_ progressVC: ProgressViewController) {
+            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(progressVC)
+        }
+
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)
@@ -106,6 +119,10 @@ extension Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
+                        let progressViewController = self.showProgress(with: "Restoring subscription...")
+
+                        defer { self.hideProgress(progressViewController) }
+
                         guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
                         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {

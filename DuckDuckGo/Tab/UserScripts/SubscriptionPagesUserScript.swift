@@ -256,27 +256,27 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         return nil
     }
 
-    private weak var purchaseInProgressViewController: PurchaseInProgressViewController?
+    private weak var progressViewController: ProgressViewController?
 
     @MainActor
     private func showProgress(with title: String) {
-        guard purchaseInProgressViewController == nil else { return }
-        let progressVC = PurchaseInProgressViewController(title: title)
+        guard progressViewController == nil else { return }
+        let progressVC = ProgressViewController(title: title)
         WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(progressVC)
-        purchaseInProgressViewController = progressVC
+        progressViewController = progressVC
     }
 
     @MainActor
     private func updateProgressTitle(_ title: String) {
-        guard let purchaseInProgressViewController else { return }
-        purchaseInProgressViewController.updateTitleText(title)
+        guard let progressViewController else { return }
+        progressViewController.updateTitleText(title)
     }
 
     @MainActor
     private func hideProgress() {
-        guard let purchaseInProgressViewController else { return }
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(purchaseInProgressViewController)
-        self.purchaseInProgressViewController = nil
+        guard let progressViewController else { return }
+        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(progressViewController)
+        self.progressViewController = nil
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -289,11 +289,14 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 restorePurchases: {
                     if #available(macOS 12.0, *) {
                         Task {
+                            defer { self.hideProgress() }
+                            self.showProgress(with: "Restoring subscription...")
+
                             guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
                             switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
                             case .success(let subscription):
-                                break
+                                message.webView?.reload()
                             case .failure(let error):
                                 switch error {
                                 case .missingAccountOrTransactions:
@@ -304,8 +307,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                                     self.showSomethingWentWrongAlert()
                                 }
                             }
-
-                            message.webView?.reload()
                         }
                     }
                 },
