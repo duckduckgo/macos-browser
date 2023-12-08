@@ -106,13 +106,18 @@ extension Preferences {
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)
-            }, manageSubscriptionInAppStore: {
+            }, changePlanOrBilling: {
                 switch SubscriptionPurchaseEnvironment.current {
                 case .appStore:
                     NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
                 case .stripe:
-                    // fetch the management url and open in new tab
-                    break
+                    Task {
+                        guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
+                              case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                        guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
+
+                        WindowControllersManager.shared.show(url: customerPortalURL, newTab: true)
+                    }
                 }
             }, openVPN: {
                 print("openVPN")

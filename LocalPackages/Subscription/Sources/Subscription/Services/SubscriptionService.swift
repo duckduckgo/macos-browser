@@ -58,4 +58,16 @@ public struct SubscriptionService: APIService {
         public let currency: String
     }
 
+    // MARK: -
+
+    public static func getCustomerPortalURL(accessToken: String, externalID: String) async -> Result<GetCustomerPortalURLResponse, APIServiceError> {
+        var headers = makeAuthorizationHeader(for: accessToken)
+        headers["externalAccountId"] = externalID
+        return await executeAPICall(method: "GET", endpoint: "checkout/portal", headers: headers)
+    }
+
+    public struct GetCustomerPortalURLResponse: Decodable {
+        public let customerPortalUrl: String
+    }
+
 }

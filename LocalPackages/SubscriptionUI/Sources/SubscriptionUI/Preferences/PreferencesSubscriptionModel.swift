@@ -67,7 +67,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func changePlanOrBillingAction() {
-        actionHandler.manageSubscriptionInAppStore()
+        actionHandler.changePlanOrBilling()
     }
 
     @MainActor
@@ -123,14 +123,14 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
 public final class PreferencesSubscriptionActionHandlers {
     var openURL: (URL) -> Void
-    var manageSubscriptionInAppStore: () -> Void
+    var changePlanOrBilling: () -> Void
     var openVPN: () -> Void
     var openPersonalInformationRemoval: () -> Void
     var openIdentityTheftRestoration: () -> Void
 
-    public init(openURL: @escaping (URL) -> Void, manageSubscriptionInAppStore: @escaping () -> Void, openVPN: @escaping () -> Void, openPersonalInformationRemoval: @escaping () -> Void, openIdentityTheftRestoration: @escaping () -> Void) {
+    public init(openURL: @escaping (URL) -> Void, changePlanOrBilling: @escaping () -> Void, openVPN: @escaping () -> Void, openPersonalInformationRemoval: @escaping () -> Void, openIdentityTheftRestoration: @escaping () -> Void) {
         self.openURL = openURL
-        self.manageSubscriptionInAppStore = manageSubscriptionInAppStore
+        self.changePlanOrBilling = changePlanOrBilling
         self.openVPN = openVPN
         self.openPersonalInformationRemoval = openPersonalInformationRemoval
         self.openIdentityTheftRestoration = openIdentityTheftRestoration
