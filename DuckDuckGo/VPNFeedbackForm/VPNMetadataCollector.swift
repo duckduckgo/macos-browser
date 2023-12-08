@@ -46,7 +46,18 @@ struct VPNMetadata: Encodable {
     struct VPNState: Encodable {
         let onboardingState: String
         let connectionState: String
-        let serverLocation: String
+        let connectedServer: String
+    }
+
+    struct VPNSettingsState: Encodable {
+        let connectOnLoginEnabled: Bool
+        let includeAllNetworksEnabled: Bool
+        let enforceRoutesEnabled: Bool
+        let excludeLocalNetworksEnabled: Bool
+        let notifyStatusChangesEnabled: Bool
+        let showInMenuBarEnabled: Bool
+        let selectedServer: String
+        let selectedEnvironment: String
     }
 
     struct LoginItemState: Encodable {
@@ -61,6 +72,7 @@ struct VPNMetadata: Encodable {
     let deviceInfo: DeviceInfo
     let networkInfo: NetworkInfo
     let vpnState: VPNState
+    let vpnSettingsState: VPNSettingsState
     let loginItemState: LoginItemState
 
     func toPrettyPrintedJSON() -> String? {
@@ -120,6 +132,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let deviceInfoMetadata = collectDeviceInfoMetadata()
         let networkInfoMetadata = await collectNetworkInformation()
         let vpnState = await collectVPNState()
+        let vpnSettingsState = collectVPNSettingsState()
         let loginItemState = collectLoginItemState()
 
         return VPNMetadata(
@@ -127,6 +140,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             deviceInfo: deviceInfoMetadata,
             networkInfo: networkInfoMetadata,
             vpnState: vpnState,
+            vpnSettingsState: vpnSettingsState,
             loginItemState: loginItemState
         )
     }
@@ -199,8 +213,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         }
 
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
-        let serverLocation = statusReporter.serverInfoObserver.recentValue.serverLocation ?? "No Location"
-        return .init(onboardingState: onboardingState, connectionState: connectionState, serverLocation: serverLocation)
+        let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation ?? "none"
+        return .init(onboardingState: onboardingState, connectionState: connectionState, connectedServer: connectedServer)
     }
 
     func collectLoginItemState() -> VPNMetadata.LoginItemState {
@@ -212,6 +226,21 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 #else
         return .init(vpnMenuState: vpnMenuState)
 #endif
+    }
+
+    func collectVPNSettingsState() -> VPNMetadata.VPNSettingsState {
+        let settings = VPNSettings(defaults: .netP)
+
+        return .init(
+            connectOnLoginEnabled: settings.connectOnLogin,
+            includeAllNetworksEnabled: settings.includeAllNetworks,
+            enforceRoutesEnabled: settings.enforceRoutes,
+            excludeLocalNetworksEnabled: settings.excludeLocalNetworks,
+            notifyStatusChangesEnabled: settings.notifyStatusChanges,
+            showInMenuBarEnabled: settings.showInMenuBar,
+            selectedServer: settings.selectedServer.stringValue ?? "automatic",
+            selectedEnvironment: settings.selectedEnvironment.rawValue
+        )
     }
 
 }
