@@ -202,7 +202,9 @@ private struct VPNFeedbackFormButtons: View {
     @ViewBuilder
     func button(text: String, action: VPNFeedbackFormViewModel.ViewAction) -> some View {
         Button(action: {
-            viewModel.process(action: action)
+            Task {
+                await viewModel.process(action: action)
+            }
         }, label: {
             Text(text)
                 .frame(maxWidth: .infinity)

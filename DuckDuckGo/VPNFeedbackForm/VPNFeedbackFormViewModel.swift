@@ -77,21 +77,20 @@ final class VPNFeedbackFormViewModel: ObservableObject {
         self.feedbackSender = feedbackSender
     }
 
-    func process(action: ViewAction) {
+    @MainActor
+    func process(action: ViewAction) async {
         switch action {
         case .cancel:
             delegate?.vpnFeedbackViewModelDismissedView(self)
         case .submit:
             self.viewState = .feedbackSending
 
-            Task { @MainActor in
-                do {
-                    let metadata = await self.metadataCollector.collectMetadata()
-                    try await self.feedbackSender.send(metadata: metadata, category: selectedFeedbackCategory, userText: feedbackFormText)
-                    self.viewState = .feedbackSent
-                } catch {
-                    self.viewState = .feedbackSendingFailed
-                }
+            do {
+                let metadata = await self.metadataCollector.collectMetadata()
+                try await self.feedbackSender.send(metadata: metadata, category: selectedFeedbackCategory, userText: feedbackFormText)
+                self.viewState = .feedbackSent
+            } catch {
+                self.viewState = .feedbackSendingFailed
             }
         }
     }

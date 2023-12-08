@@ -23,19 +23,33 @@ import XCTest
 
 final class VPNFeedbackFormViewModelTests: XCTestCase {
 
-    func testWhenCancelActionIsReceived_ThenViewModelSendsCancelActionToDelegate() throws {
+    func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
         let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
-        viewModel.delegate = delegate
 
-        XCTAssertFalse(delegate.receivedDismissedViewCallback)
-        viewModel.process(action: .cancel)
-        XCTAssertTrue(delegate.receivedDismissedViewCallback)
+        XCTAssertEqual(viewModel.viewState, .feedbackPending)
+        XCTAssertEqual(viewModel.selectedFeedbackCategory, .landingPage)
     }
 
-    func testWhenCancelActionIsReceived_ThenViewModelSendsCancelActionToDelegate() throws {
+    func testWhenSendingFeedback_ThenFeedbackIsSent() async throws {
+        let collector = MockVPNMetadataCollector()
+        let sender = MockVPNFeedbackSender()
+        let delegate = MockVPNFeedbackFormViewModelDelegate()
+        let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
+        let text = "Some feedback report text"
+        viewModel.selectedFeedbackCategory = .unableToInstall
+        viewModel.feedbackFormText = text
+
+        XCTAssertFalse(sender.sentMetadata)
+        await viewModel.process(action: .submit)
+        XCTAssertTrue(sender.sentMetadata)
+        XCTAssertEqual(sender.receivedData!.1, .unableToInstall)
+        XCTAssertEqual(sender.receivedData!.2, text)
+    }
+
+    func testWhenCancelActionIsReceived_ThenViewModelSendsCancelActionToDelegate() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
@@ -43,7 +57,7 @@ final class VPNFeedbackFormViewModelTests: XCTestCase {
         viewModel.delegate = delegate
 
         XCTAssertFalse(delegate.receivedDismissedViewCallback)
-        viewModel.process(action: .cancel)
+        await viewModel.process(action: .cancel)
         XCTAssertTrue(delegate.receivedDismissedViewCallback)
     }
 
@@ -103,8 +117,11 @@ private class MockVPNFeedbackSender: VPNFeedbackSender {
     var throwErrorWhenSending: Bool = false
     var sentMetadata: Bool = false
 
+    var receivedData: (VPNMetadata, VPNFeedbackCategory, String)?
+
     func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws {
         self.sentMetadata = true
+        self.receivedData = (metadata, category, userText)
     }
 
 }
