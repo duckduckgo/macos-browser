@@ -69,7 +69,8 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         }
 
         // don‘t close tab for user-entered URLs
-        if navigationAction.isForMainFrame, navigationAction.isUserEnteredUrl {
+        if let mainFrameNavigationAction = navigationAction.mainFrameNavigation?.navigationAction,
+           (mainFrameNavigationAction.redirectHistory?.first ?? mainFrameNavigationAction).isUserEnteredUrl == true {
             shouldCloseTabOnExternalAppOpen = false
         }
         // only close tab when "Always Open" is on (so the callback would be called synchronously)
@@ -80,8 +81,10 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         }
 
         // prevent opening twice for session restoration/tab reopening requests
-        guard navigationAction.request.cachePolicy != .returnCacheDataElseLoad,
-              navigationAction.mainFrameNavigation?.navigationAction.request.cachePolicy != .returnCacheDataElseLoad else {
+        guard ![.returnCacheDataElseLoad, .returnCacheDataDontLoad]
+            .contains((navigationAction.mainFrameNavigation?.navigationAction.redirectHistory?.first
+                       ?? navigationAction.mainFrameNavigation?.navigationAction
+                       ?? navigationAction).request.cachePolicy) else {
             return .cancel
         }
 
