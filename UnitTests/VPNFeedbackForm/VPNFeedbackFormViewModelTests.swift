@@ -33,7 +33,7 @@ final class VPNFeedbackFormViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedFeedbackCategory, .landingPage)
     }
 
-    func testWhenSendingFeedback_ThenFeedbackIsSent() async throws {
+    func testWhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
         let delegate = MockVPNFeedbackFormViewModelDelegate()
@@ -47,6 +47,22 @@ final class VPNFeedbackFormViewModelTests: XCTestCase {
         XCTAssertTrue(sender.sentMetadata)
         XCTAssertEqual(sender.receivedData!.1, .unableToInstall)
         XCTAssertEqual(sender.receivedData!.2, text)
+    }
+
+    func testWhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
+        let collector = MockVPNMetadataCollector()
+        let sender = MockVPNFeedbackSender()
+        let delegate = MockVPNFeedbackFormViewModelDelegate()
+        let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
+        let text = "Some feedback report text"
+        viewModel.selectedFeedbackCategory = .unableToInstall
+        viewModel.feedbackFormText = text
+        sender.throwErrorWhenSending = true
+
+        XCTAssertFalse(sender.sentMetadata)
+        await viewModel.process(action: .submit)
+        XCTAssertFalse(sender.sentMetadata)
+        XCTAssertEqual(viewModel.viewState, .feedbackSendingFailed)
     }
 
     func testWhenCancelActionIsReceived_ThenViewModelSendsCancelActionToDelegate() async throws {
@@ -119,7 +135,15 @@ private class MockVPNFeedbackSender: VPNFeedbackSender {
 
     var receivedData: (VPNMetadata, VPNFeedbackCategory, String)?
 
+    enum SomeError: Error {
+        case error
+    }
+
     func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws {
+        if throwErrorWhenSending {
+            throw SomeError.error
+        }
+
         self.sentMetadata = true
         self.receivedData = (metadata, category, userText)
     }
