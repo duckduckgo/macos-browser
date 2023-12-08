@@ -166,6 +166,9 @@ extension UserText {
     static let vpnFeedbackFormCategoryFeatureRequest = NSLocalizedString("vpn.feedback-form.category.feature-request", value: "VPN feature request", comment: "Title for the 'VPN feature request' category of the VPN feedback form")
     static let vpnFeedbackFormCategoryOther = NSLocalizedString("vpn.feedback-form.category.other", value: "Other VPN feedback", comment: "Title for the 'other VPN feedback' category of the VPN feedback form")
 
+    static let vpnFeedbackFormSendingConfirmationTitle = NSLocalizedString("vpn.feedback-form.sending-confirmation.title", value: "Thank you!", comment: "Title for the feedback sent view title of the VPN feedback form")
+    static let vpnFeedbackFormSendingConfirmationDescription = NSLocalizedString("vpn.feedback-form.sending-confirmation.description", value: "Your feedback will help us improve the\nDuckDuckGo VPN.", comment: "Title for the feedback sent view description of the VPN feedback form")
+
     static let vpnFeedbackFormButtonDone = NSLocalizedString("vpn.feedback-form.button.done", value: "Done", comment: "Title for the Done button of the VPN feedback form")
     static let vpnFeedbackFormButtonCancel = NSLocalizedString("vpn.feedback-form.button.cancel", value: "Cancel", comment: "Title for the Cancel button of the VPN feedback form")
     static let vpnFeedbackFormButtonSubmit = NSLocalizedString("vpn.feedback-form.button.submit", value: "Submit", comment: "Title for the Submit button of the VPN feedback form")

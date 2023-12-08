@@ -167,11 +167,11 @@ private struct VPNFeedbackFormSentView: View {
             Image("VPNFeedbackSent")
                 .padding(.top, 20)
 
-            Text("Thank you!")
+            Text(UserText.vpnFeedbackFormSendingConfirmationTitle)
                 .font(.system(size: 18, weight: .medium))
                 .padding(.top, 30)
 
-            Text("Your feedback will help us improve the\nDuckDuckGo VPN.")
+            Text(UserText.vpnFeedbackFormSendingConfirmationDescription)
                 .multilineTextAlignment(.center)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
