@@ -448,6 +448,7 @@ final class BrowserTabViewController: NSViewController {
         bookmarksViewController?.removeCompletely()
 #if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
+        dataBrokerProtectionHomeViewController = nil
 #endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
