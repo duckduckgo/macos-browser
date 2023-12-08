@@ -43,6 +43,7 @@ struct DataBrokerProtectionWaitlistFeatureSetupHandler: WaitlistFeatureSetupHand
     func confirmFeature() {
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
         NotificationCenter.default.post(name: .dataBrokerProtectionUserPressedOnGetStartedOnWaitlist, object: nil)
+        UserDefaults().setValue(false, forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
     }
 }
 

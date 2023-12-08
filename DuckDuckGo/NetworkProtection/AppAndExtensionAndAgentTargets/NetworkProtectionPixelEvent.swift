@@ -25,6 +25,7 @@ import NetworkProtection
 enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     case networkProtectionActiveUser
+    case networkProtectionNewUser
 
     case networkProtectionTunnelConfigurationNoServerRegistrationInfo
     case networkProtectionTunnelConfigurationCouldNotSelectClosestServer
@@ -74,6 +75,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
         case .networkProtectionActiveUser:
             return "m_mac_netp_daily_active"
+
+        case .networkProtectionNewUser:
+            return "m_mac_netp_daily_active_u"
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo:
             return "m_mac_netp_tunnel_config_error_no_server_registration_info"
@@ -254,7 +258,8 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionWireguardErrorInvalidState,
              .networkProtectionWireguardErrorFailedDNSResolution,
              .networkProtectionSystemExtensionUnknownActivationResult,
-             .networkProtectionActiveUser:
+             .networkProtectionActiveUser,
+             .networkProtectionNewUser:
 
             return nil
         }

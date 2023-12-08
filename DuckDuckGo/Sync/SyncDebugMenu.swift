@@ -30,6 +30,8 @@ final class SyncDebugMenu: NSMenu {
         buildItems {
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
+            NSMenuItem(title: "Reset Favicons Fetcher Onboarding Dialog", action: #selector(resetFaviconsFetcherOnboardingDialog))
+                .targetting(self)
         }
     }
 
@@ -74,5 +76,9 @@ final class SyncDebugMenu: NSMenu {
         syncService.updateServerEnvironment(environment)
         UserDefaults.standard.set(environment.description, forKey: UserDefaultsWrapper<String>.Key.syncEnvironment.rawValue)
 #endif
+    }
+
+    @objc func resetFaviconsFetcherOnboardingDialog(_ sender: NSMenuItem) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<String>.Key.syncDidPresentFaviconsFetcherOnboarding.rawValue)
     }
 }

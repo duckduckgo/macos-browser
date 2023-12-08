@@ -22,6 +22,7 @@ import DataBrokerProtection
 import Foundation
 import AppKit
 import Common
+import LoginItems
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
@@ -34,6 +35,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     private var databaseBrowserWindowController: NSWindowController?
 
+    // swiftlint:disable:next function_body_length
     init() {
         super.init(title: "Personal Information Removal")
 
@@ -62,11 +64,52 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 waitlistInviteCodeItem
                 waitlistTermsAndConditionsAcceptedItem
             }
-            NSMenuItem(title: "Debug") {
-                NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+
+            NSMenuItem(title: "Background Agent") {
+                NSMenuItem(title: "Enable", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentEnable))
                     .targetting(self)
 
+                NSMenuItem(title: "Disable", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentDisable))
+                    .targetting(self)
+
+                NSMenuItem(title: "Restart", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentRestart))
+                    .targetting(self)
             }
+
+            NSMenuItem(title: "Operations") {
+                NSMenuItem(title: "Hidden WebView") {
+                    menuItem(withTitle: "Run queued operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             representedObject: false)
+
+                    menuItem(withTitle: "Run scan operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runScanOperations(_:)),
+                             representedObject: false)
+
+                    menuItem(withTitle: "Run opt-out operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runOptoutOperations(_:)),
+                             representedObject: false)
+                }
+
+                NSMenuItem(title: "Visible WebView") {
+                    menuItem(withTitle: "Run queued operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             representedObject: true)
+
+                    menuItem(withTitle: "Run scan operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runScanOperations(_:)),
+                             representedObject: true)
+
+                    menuItem(withTitle: "Run opt-out operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runOptoutOperations(_:)),
+                             representedObject: true)
+                }
+            }
+
+            NSMenuItem.separator()
+
+            NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+                .targetting(self)
         }
     }
 
@@ -80,7 +123,65 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         updateWaitlistItems()
     }
 
+    func menuItem(withTitle title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
+        let menuItem = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        menuItem.target = self
+        menuItem.representedObject = representedObject
+        return menuItem
+    }
+
     // MARK: - Menu functions
+
+    @objc private func runQueuedOperations(_ sender: NSMenuItem) {
+        os_log("Running queued operations...", log: .dataBrokerProtection)
+        let showWebView = sender.representedObject as? Bool ?? false
+
+        DataBrokerProtectionManager.shared.scheduler.runQueuedOperations(showWebView: showWebView) { error in
+            if let error = error {
+                os_log("Queued operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Queued operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func runScanOperations(_ sender: NSMenuItem) {
+        os_log("Running scan operations...", log: .dataBrokerProtection)
+        let showWebView = sender.representedObject as? Bool ?? false
+
+        DataBrokerProtectionManager.shared.scheduler.scanAllBrokers(showWebView: showWebView) { error in
+            if let error = error {
+                os_log("Scan operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Scan operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func runOptoutOperations(_ sender: NSMenuItem) {
+        os_log("Running Optout operations...", log: .dataBrokerProtection)
+        let showWebView = sender.representedObject as? Bool ?? false
+
+        DataBrokerProtectionManager.shared.scheduler.optOutAllBrokers(showWebView: showWebView) { error in
+            if let error = error {
+                os_log("Optout operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Optout operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func backgroundAgentRestart() {
+        LoginItemsManager().restartLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+    }
+
+    @objc private func backgroundAgentDisable() {
+        LoginItemsManager().disableLoginItems([LoginItem.dbpBackgroundAgent])
+    }
+
+    @objc private func backgroundAgentEnable() {
+        LoginItemsManager().enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+    }
 
     @objc private func showDatabaseBrowser() {
         let viewController = DataBrokerDatabaseBrowserViewController()
@@ -100,6 +201,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     @objc private func resetWaitlistState() {
         DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         KeychainAuthenticationData().reset()
+
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.dataBrokerProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
         os_log("DBP waitlist state cleaned", log: .dataBrokerProtection)

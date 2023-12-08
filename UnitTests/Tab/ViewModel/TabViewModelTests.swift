@@ -74,7 +74,7 @@ final class TabViewModelTests: XCTestCase {
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
         tabViewModel.simulateLoadingCompletion()
-        
+
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
             XCTAssertEqual(tabViewModel.passiveAddressBarString, urlString)
@@ -90,13 +90,40 @@ final class TabViewModelTests: XCTestCase {
         let addressBarStringExpectation = expectation(description: "Address bar string")
 
         tabViewModel.simulateLoadingCompletion()
-        
+
         tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
             XCTAssertEqual(tabViewModel.addressBarString, urlString)
             XCTAssertEqual(tabViewModel.passiveAddressBarString, "data:")
             addressBarStringExpectation.fulfill()
         } .store(in: &cancellables)
         waitForExpectations(timeout: 1, handler: nil)
+    }
+
+    func testWhenURLIsBlobURLWithBasicAuthThenAddressBarStripsBasicAuth() {
+        let urlStrings = ["blob:https://spoofed.domain.com%20%20%20%20%20%20%20%20%20@attacker.com",
+                          "blob:ftp://another.spoofed.domain.com%20%20%20%20%20%20%20%20%20@attacker.com",
+                          "blob:http://yetanother.spoofed.domain.com%20%20%20%20%20%20%20%20%20@attacker.com"]
+        let expectedStarts = ["blob:https://", "blob:ftp://", "blob:http://"]
+        let expectedNotContains = ["spoofed.domain.com", "another.spoofed.domain.com", "yetanother.spoofed.domain.com"]
+        let uuidPattern = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        let uuidRegex = try! NSRegularExpression(pattern: uuidPattern, options: [])
+
+        for i in 0..<urlStrings.count {
+            let tabViewModel = TabViewModel.forTabWithURL(.makeURL(from: urlStrings[i])!)
+            let addressBarStringExpectation = expectation(description: "Address bar string")
+            tabViewModel.simulateLoadingCompletion()
+
+            tabViewModel.$addressBarString.debounce(for: 0.1, scheduler: RunLoop.main).sink { _ in
+                XCTAssertTrue(tabViewModel.addressBarString.starts(with: expectedStarts[i]))
+                XCTAssertTrue(tabViewModel.addressBarString.contains("attacker.com"))
+                XCTAssertFalse(tabViewModel.addressBarString.contains(expectedNotContains[i]))
+                let range = NSRange(location: 0, length: tabViewModel.addressBarString.utf16.count)
+                let match = uuidRegex.firstMatch(in: tabViewModel.addressBarString, options: [], range: range)
+                XCTAssertNotNil(match, "URL does not end with a GUID")
+                addressBarStringExpectation.fulfill()
+            } .store(in: &cancellables)
+            waitForExpectations(timeout: 1, handler: nil)
+        }
     }
 
     // MARK: - Title
@@ -203,7 +230,7 @@ extension TabViewModel {
         let tab = Tab(content: .url(url))
         return TabViewModel(tab: tab)
     }
-    
+
     func simulateLoadingCompletion() {
         self.updateAddressBarStrings()
     }

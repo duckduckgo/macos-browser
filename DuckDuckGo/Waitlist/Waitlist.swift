@@ -171,6 +171,9 @@ struct NetworkProtectionWaitlist: Waitlist {
     let waitlistRequest: WaitlistRequest
     private let networkProtectionCodeRedemption: NetworkProtectionCodeRedeeming
 
+    @UserDefaultsWrapper(key: .networkProtectionWaitlistSignUpPromptDismissed, defaultValue: false)
+    var waitlistSignUpPromptDismissed: Bool
+
     var shouldShowWaitlistViewController: Bool {
         return isOnWaitlist || readyToAcceptTermsAndConditions
     }
@@ -351,8 +354,12 @@ struct DataBrokerProtectionWaitlist: Waitlist {
         NotificationCenter.default.post(name: .dataBrokerProtectionWaitlistAccessChanged, object: nil)
 
         os_log("DBP invite code redeemed", log: .dataBrokerProtection)
+        UserDefaults().setValue(true, forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
+
         sendInviteCodeAvailableNotification {
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown,
+                            frequency: .dailyAndCount,
+                            includeAppVersionParameter: true)
         }
     }
 }

@@ -28,6 +28,7 @@ final class SyncDataProviders: DataProvidersSource {
     public let credentialsAdapter: SyncCredentialsAdapter
     public let settingsAdapter: SyncSettingsAdapter
 
+    @MainActor
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
         guard let syncMetadata else {
