@@ -359,6 +359,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             if isRecovery {
                 self.showDevicesSynced()
             } else {
+                Pixel.fire(.syncLogin)
                 self.presentDialog(for: .saveRecoveryCode(self.recoveryCode ?? ""))
             }
             self.stopPollingForRecoveryKey()
@@ -376,6 +377,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let device = deviceInfo()
                 presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                Pixel.fire(.syncSignupDirect)
                 presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
@@ -439,6 +441,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                         .prefix(1)
                         .sink { [weak self] _ in
                             guard let self else { return }
+                            Pixel.fire(.syncSignupConnect)
                             self.presentDialog(for: .saveRecoveryCode(recoveryCode))
                         }.store(in: &cancellables)
 
