@@ -112,7 +112,7 @@ private extension Tab.TabContent {
             guard let videoID = videoID else { return nil }
             self = .url(.duckPlayer(videoID, timestamp: timestamp))
         case .dataBrokerProtection:
-            self = .dataBrokerProtection
+            self = .dataBrokerProtection(DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared))
         }
     }
 

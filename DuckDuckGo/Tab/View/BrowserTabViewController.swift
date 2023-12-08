@@ -442,13 +442,14 @@ final class BrowserTabViewController: NSViewController {
     }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
+#if DBP
+        dataBrokerProtectionHomeViewController?.removeCompletely()
+#endif
         self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
         preferencesViewController?.removeCompletely()
         bookmarksViewController?.removeCompletely()
-#if DBP
-        dataBrokerProtectionHomeViewController?.removeCompletely()
-#endif
+
         if includingWebView {
             self.removeWebViewFromHierarchy()
         }
@@ -503,11 +504,11 @@ final class BrowserTabViewController: NSViewController {
             view.addAndLayout(homePageView)
 
 #if DBP
-        case .dataBrokerProtection:
+        case .dataBrokerProtection(let viewController):
             removeAllTabContent()
-            let dataBrokerProtectionViewController = dataBrokerProtectionHomeViewControllerCreatingIfNeeded()
+            dataBrokerProtectionHomeViewController = viewController
             self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-            addAndLayoutChild(dataBrokerProtectionViewController)
+            addAndLayoutChild(viewController)
 #endif
         default:
             removeAllTabContent()
@@ -531,14 +532,8 @@ final class BrowserTabViewController: NSViewController {
 #if DBP
     // MARK: - DataBrokerProtection
 
-    var dataBrokerProtectionHomeViewController: DBPHomeViewController?
-    private func dataBrokerProtectionHomeViewControllerCreatingIfNeeded() -> DBPHomeViewController {
-        return dataBrokerProtectionHomeViewController ?? {
-            let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared)
-            self.dataBrokerProtectionHomeViewController = dataBrokerProtectionHomeViewController
-            return dataBrokerProtectionHomeViewController
-        }()
-    }
+    weak var dataBrokerProtectionHomeViewController: DBPHomeViewController?
+
 #endif
 
     // MARK: - Preferences
@@ -680,12 +675,6 @@ extension BrowserTabViewController: TabDelegate {
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
         case .tab(selected: let selected, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
-        }
-    }
-
-    func tabWillClose(_ tab: Tab) {
-        if tab.content == .dataBrokerProtection {
-            dataBrokerProtectionHomeViewController = nil
         }
     }
 

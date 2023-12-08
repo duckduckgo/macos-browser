@@ -32,8 +32,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
-    func tabWillClose(_ tab: Tab)
-
 }
 
 protocol NewWindowPolicyDecisionMaker {
@@ -50,7 +48,7 @@ protocol NewWindowPolicyDecisionMaker {
         case bookmarks
         case onboarding
         case none
-        case dataBrokerProtection
+        case dataBrokerProtection(DBPHomeViewController)
 
         static func contentFromURL(_ url: URL?, userEntered: String? = nil) -> TabContent {
             if url == .homePage {
@@ -464,7 +462,6 @@ protocol NewWindowPolicyDecisionMaker {
             userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
         }
-        delegate?.tabWillClose(self)
 
         if !onDeinit {
             // Tab should be deallocated shortly after burning

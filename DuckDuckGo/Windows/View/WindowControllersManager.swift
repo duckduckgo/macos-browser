@@ -110,7 +110,9 @@ extension WindowControllersManager {
 
 #if DBP
     func showDataBrokerProtectionTab() {
-        showTab(with: .dataBrokerProtection)
+        let dataBrokerProtectionHomeViewController = DBPHomeViewController(dataBrokerProtectionManager: DataBrokerProtectionManager.shared)
+
+        showTab(with: .dataBrokerProtection(dataBrokerProtectionHomeViewController))
     }
 #endif
 
