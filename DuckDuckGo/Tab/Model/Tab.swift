@@ -32,8 +32,6 @@ protocol TabDelegate: ContentOverlayUserScriptDelegate {
 
     func tabPageDOMLoaded(_ tab: Tab)
     func closeTab(_ tab: Tab)
-    func tabWillClose(_ tab: Tab)
-
 }
 
 protocol NewWindowPolicyDecisionMaker {
@@ -464,7 +462,6 @@ protocol NewWindowPolicyDecisionMaker {
             userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
         }
-        delegate?.tabWillClose(self)
 
         if !onDeinit {
             // Tab should be deallocated shortly after burning

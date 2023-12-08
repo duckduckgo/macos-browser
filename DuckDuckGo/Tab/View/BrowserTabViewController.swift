@@ -223,11 +223,25 @@ final class BrowserTabViewController: NSViewController {
         tabCollectionViewModel.tabCollection.$tabs
             .sink(receiveValue: setDelegate())
             .store(in: &cancellables)
+
+        tabCollectionViewModel.tabCollection.$tabs
+            .sink(receiveValue: removeDataBrokerViewIfNecessary())
+            .store(in: &cancellables)
     }
 
     private func subscribeToPinnedTabs() {
         pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
             .sink(receiveValue: setDelegate())
+    }
+
+    private func removeDataBrokerViewIfNecessary() -> ([Tab]) -> Void {
+        { [weak self] (tabs: [Tab]) in
+            guard let self else { return }
+            if !tabs.isEmpty && !tabs.contains(where: { $0.content == .dataBrokerProtection }) {
+                dataBrokerProtectionHomeViewController?.removeCompletely()
+                dataBrokerProtectionHomeViewController = nil
+            }
+        }
     }
 
     private func setDelegate() -> ([Tab]) -> Void {
@@ -680,12 +694,6 @@ extension BrowserTabViewController: TabDelegate {
             WindowsManager.openNewWindow(with: childTab, showWindow: active)
         case .tab(selected: let selected, _):
             self.tabCollectionViewModel.insert(childTab, after: parentTab, selected: selected)
-        }
-    }
-
-    func tabWillClose(_ tab: Tab) {
-        if tab.content == .dataBrokerProtection {
-            dataBrokerProtectionHomeViewController = nil
         }
     }
 
