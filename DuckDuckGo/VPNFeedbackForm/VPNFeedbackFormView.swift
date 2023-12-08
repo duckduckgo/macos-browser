@@ -101,27 +101,27 @@ private struct VPNFeedbackFormIssueDescriptionForm: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Please describe what's happening, what you expected to happen, and the steps that led to the issue:")
+            Text(UserText.vpnFeedbackFormText1)
                 .multilineTextAlignment(.leading)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
 
             textEditor()
 
-            Text("In addition to the details entered into this form, your app issue report will contain:")
+            Text(UserText.vpnFeedbackFormText2)
                 .multilineTextAlignment(.leading)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.secondary)
 
             VStack(alignment: .leading) {
-                Text("• Whether specific DuckDuckGo features are enabled")
+                Text(UserText.vpnFeedbackFormText3)
                     .foregroundColor(.secondary)
-                Text("• Aggregate DuckDuckGo app diagnostics")
+                Text(UserText.vpnFeedbackFormText4)
                     .foregroundColor(.secondary)
             }
 
-            Text("By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features.")
+            Text(UserText.vpnFeedbackFormText5)
                 .multilineTextAlignment(.leading)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
