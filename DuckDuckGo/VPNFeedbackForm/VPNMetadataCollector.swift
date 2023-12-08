@@ -22,6 +22,7 @@ import Foundation
 import Common
 import LoginItems
 import NetworkProtection
+import NetworkExtension
 import NetworkProtectionIPC
 import NetworkProtectionUI
 
@@ -46,7 +47,9 @@ struct VPNMetadata: Encodable {
     struct VPNState: Encodable {
         let onboardingState: String
         let connectionState: String
+        let lastErrorMessage: String
         let connectedServer: String
+        let connectedServerIP: String
     }
 
     struct VPNSettingsState: Encodable {
@@ -178,7 +181,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "VPNMetadataCollector.NWPathMonitor.paths"))
 
-        var path: NWPath?
+        var path: Network.NWPath?
         let startTime = CFAbsoluteTimeGetCurrent()
 
         while true {
@@ -213,8 +216,14 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         }
 
         let connectionState = String(describing: statusReporter.statusObserver.recentValue)
+        let lastErrorMessage = statusReporter.connectionErrorObserver.recentValue ?? "none"
         let connectedServer = statusReporter.serverInfoObserver.recentValue.serverLocation ?? "none"
-        return .init(onboardingState: onboardingState, connectionState: connectionState, connectedServer: connectedServer)
+        let connectedServerIP = statusReporter.serverInfoObserver.recentValue.serverAddress ?? "none"
+        return .init(onboardingState: onboardingState,
+                     connectionState: connectionState,
+                     lastErrorMessage: lastErrorMessage,
+                     connectedServer: connectedServer,
+                     connectedServerIP: connectedServerIP)
     }
 
     func collectLoginItemState() -> VPNMetadata.LoginItemState {
