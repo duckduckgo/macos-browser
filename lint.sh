@@ -6,8 +6,8 @@ if [[ "$1" == "--fix" ]]; then
     FIX=true
 fi
 
-if [[ -z "$DEBUG" ]]; then
-    echo "Skipping SwiftLint run in CI"
+if [[ "$CONFIGURATION" != "Debug" ]]; then
+    echo "Skipping SwiftLint run in non-debug build"
     exit 0
 fi
 
