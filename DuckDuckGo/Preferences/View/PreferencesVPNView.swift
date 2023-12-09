@@ -25,6 +25,7 @@ extension Preferences {
 
     struct VPNView: View {
         @ObservedObject var model: VPNPreferencesModel
+        @State var isShowingLocationSheet: Bool = false
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
@@ -32,6 +33,33 @@ extension Preferences {
                 // TITLE
 
                 TextMenuTitle(text: UserText.vpn)
+
+                PreferencePaneSection {
+                    TextMenuItemHeader(text: UserText.vpnLocationTitle)
+
+                    VStack(alignment: .leading) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "location.fill")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                            VStack(alignment: .leading) {
+                                Text(UserText.vpnLocationNearestAvailable)
+                                    .font(.system(size: 13))
+                                    .foregroundColor(Color.black.opacity(0.84))
+                            }
+                            Spacer()
+                            Button("Change...") {
+                                isShowingLocationSheet = true
+                            }.sheet(isPresented: $isShowingLocationSheet, content: {
+                                Text("Hi, I'm a sheet")
+                            })
+                        }
+                    }.frame(alignment: .topLeading)
+                        .frame(idealWidth: .infinity, maxWidth: .infinity)
+                        .padding(10)
+                        .background(Color("BlackWhite1"))
+                        .roundedBorder()
+                }
 
                 // SECTION: Manage VPN
 

@@ -302,9 +302,17 @@ struct UserText {
 
     // VPN Setting Titles
 
+    static let vpnLocationTitle = NSLocalizedString("vpn.location.title", value: "Location", comment: "Location section title in VPN settings")
     static let vpnGeneralTitle = NSLocalizedString("vpn.general.title", value: "General", comment: "General section title in VPN settings")
     static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "Notifications", comment: "Notifications section title in VPN settings")
     static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced", comment: "VPN Advanced section title in VPN settings")
+
+    // VPN Location
+
+    static let vpnLocationNearestAvailable = NSLocalizedString(
+        "vpn.location.description.nearest.available",
+        value: "Nearest Available",
+        comment: "Nearest available location setting description")
 
     // VPN Settings
 
