@@ -11,7 +11,7 @@
         {
           "actionType": "navigate",
           "id": "e1adef78-997c-42f5-8c33-501566fc705b",
-          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&fage=${ageRange}&state=${state}&city=${city}",
+          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&fage=${age|ageRange}&state=${state}&city=${city}",
           "ageRange": [
             "18-30",
             "31-40",
@@ -40,7 +40,7 @@
               "afterText": ", "
             },
             "addressCityStateList": {
-              "selector": ".//span[@itemprop='address']",
+              "selector": ".//div[contains(@class, 'search-item')]//dt[text() = 'Has lived in']/following-sibling::dd/ul/li",
               "findElements": true
             },
             "relativesList": {

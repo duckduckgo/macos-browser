@@ -299,10 +299,10 @@ struct DataBrokerProtectionWaitlist: Waitlist {
         }
 
         do {
-            guard waitlistStorage.getWaitlistToken() != nil else {
-                os_log("User not in DBP waitlist, returning...", log: .default)
-                return
-            }
+//            guard waitlistStorage.getWaitlistToken() != nil else {
+//                os_log("User not in DBP waitlist, returning...", log: .default)
+//                return
+//            }
 
             guard redeemAuthenticationRepository.getAccessToken() == nil else {
                 os_log("Invite code already redeemed, returning...", log: .default)
