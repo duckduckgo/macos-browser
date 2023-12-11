@@ -134,11 +134,11 @@ extension Preferences {
                         case .failure(let error):
                             switch error {
                             case .missingAccountOrTransactions:
-                                self.showSubscriptionNotFoundAlert()
+                                WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
                             case .subscriptionExpired:
-                                self.showSubscriptionInactiveAlert()
+                                WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
                             default:
-                                self.showSomethingWentWrongAlert()
+                                WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
                             }
                         }
                     }
@@ -151,38 +151,6 @@ extension Preferences {
 
             let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
             return SubscriptionUI.PreferencesSubscriptionView(model: model)
-        }
-
-        @MainActor
-        private func showSomethingWentWrongAlert() {
-            guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
-
-            let alert = NSAlert.somethingWentWrongAlert()
-            alert.beginSheetModal(for: window)
-        }
-
-        @MainActor
-        private func showSubscriptionNotFoundAlert() {
-            guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
-
-            let alert = NSAlert.subscriptionNotFoundAlert()
-            alert.beginSheetModal(for: window, completionHandler: { response in
-                if case .alertFirstButtonReturn = response {
-                    WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
-                }
-            })
-        }
-
-        @MainActor
-        private func showSubscriptionInactiveAlert() {
-            guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
-
-            let alert = NSAlert.subscriptionInactiveAlert()
-            alert.beginSheetModal(for: window, completionHandler: { response in
-                if case .alertFirstButtonReturn = response {
-                    WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
-                }
-            })
         }
 #endif
     }

@@ -60,7 +60,7 @@ public final class AppStorePurchaseFlow {
 
         // Check for past transactions most recent
         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-        case .success(let subscription):
+        case .success:
             return .failure(.activeSubscriptionAlreadyPresent)
         case .failure(let error):
             switch error {
@@ -101,7 +101,7 @@ public final class AppStorePurchaseFlow {
     @discardableResult
     public static func completeSubscriptionPurchase() async -> Result<PurchaseUpdate, AppStorePurchaseFlow.Error> {
 
-        let result = await checkForEntitlements(wait: 2.0, retry: 5)
+        let result = await checkForEntitlements(wait: 2.0, retry: 10)
 
         return result ? .success(PurchaseUpdate(type: "completed")) : .failure(.missingEntitlements)
     }

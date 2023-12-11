@@ -57,3 +57,14 @@ public extension NSAlert {
         return alert
     }
 }
+
+public extension NSWindow {
+
+    func show(_ alert: NSAlert, firstButtonAction: (() -> Void)? = nil) {
+        alert.beginSheetModal(for: self, completionHandler: { response in
+            if case .alertFirstButtonReturn = response {
+                firstButtonAction?()
+            }
+        })
+    }
+}

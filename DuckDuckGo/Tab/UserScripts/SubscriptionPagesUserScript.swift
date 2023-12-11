@@ -225,7 +225,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
                 print("hasActiveSubscription: TRUE")
-                await showSubscriptionFoundAlert(originalMessage: message)
+                await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
                 return nil
             }
 
@@ -278,11 +278,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                             case .failure(let error):
                                 switch error {
                                 case .missingAccountOrTransactions:
-                                    self.showSubscriptionNotFoundAlert()
+                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
                                 case .subscriptionExpired:
-                                    self.showSubscriptionInactiveAlert()
+                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
                                 default:
-                                    self.showSomethingWentWrongAlert()
+                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
                                 }
                             }
                         }
@@ -345,55 +345,46 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         print(">>> Pushing into WebView:", method.rawValue, String(describing: params))
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
+}
 
-    // MARK: Alerts
+extension MainWindowController {
 
     @MainActor
-    private func showSomethingWentWrongAlert() {
-        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+    func showSomethingWentWrongAlert() {
+        guard let window else { return }
 
-        let alert = NSAlert.somethingWentWrongAlert()
-        alert.beginSheetModal(for: window)
+        window.show(.somethingWentWrongAlert())
     }
 
     @MainActor
-    private func showSubscriptionNotFoundAlert() {
-        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+    func showSubscriptionNotFoundAlert() {
+        guard let window else { return }
 
-        let alert = NSAlert.subscriptionNotFoundAlert()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            if case .alertFirstButtonReturn = response {
-                WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
-            }
+        window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
+            WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
         })
     }
 
     @MainActor
-    private func showSubscriptionInactiveAlert() {
-        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+    func showSubscriptionInactiveAlert() {
+        guard let window else { return }
 
-        let alert = NSAlert.subscriptionInactiveAlert()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            if case .alertFirstButtonReturn = response {
-                WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
-                AccountManager().signOut()
-                // TODO: Check if it is required
-            }
+        window.show(.subscriptionInactiveAlert(), firstButtonAction: {
+            WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
+//            AccountManager().signOut()
+            // TODO: Check if it is required
         })
     }
 
     @MainActor
-    private func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
-        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+    func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
+        guard let window else { return }
 
-        let alert = NSAlert.subscriptionFoundAlert()
-        alert.beginSheetModal(for: window, completionHandler: { response in
-            if case .alertFirstButtonReturn = response {
-                if #available(macOS 12.0, *) {
-                    Task {
-                        _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
-                        originalMessage.webView?.reload()
-                    }
+        window.show(.subscriptionFoundAlert(), firstButtonAction: {
+            if #available(macOS 12.0, *) {
+                Task {
+                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                    originalMessage.webView?.reload()
                 }
             }
         })
