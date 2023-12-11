@@ -431,6 +431,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        Pixel.fire(.syncSignupConnect)
                         presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 
@@ -441,7 +442,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                         .prefix(1)
                         .sink { [weak self] _ in
                             guard let self else { return }
-                            Pixel.fire(.syncSignupConnect)
                             self.presentDialog(for: .saveRecoveryCode(recoveryCode))
                         }.store(in: &cancellables)
 
