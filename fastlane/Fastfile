@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+fastlane_require 'httparty'
+fastlane_require 'rexml/document'
+
 UI.abort_with_message!('Please run fastlane via `bundle exec`') unless FastlaneCore::Helper.bundler?
 
 ########################################################################
@@ -7,9 +10,11 @@ UI.abort_with_message!('Please run fastlane via `bundle exec`') unless FastlaneC
 ########################################################################
 DEFAULT_BRANCH = 'main'
 RELEASE_BRANCH = 'release'
+HOTFIX_BRANCH = 'hotfix'
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
+INFO_PLIST = File.join(PROJECT_ROOT_FOLDER, 'DuckDuckGo/Info.plist')
 VERSION_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/Version.xcconfig')
-APP_STORE_BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/AppStoreBuildNumber.xcconfig')
+BUILD_NUMBER_CONFIG_PATH = File.join(PROJECT_ROOT_FOLDER, 'Configuration/BuildNumber.xcconfig')
 VERSION_CONFIG_DEFINITION = 'MARKETING_VERSION'
 BUILD_NUMBER_CONFIG_DEFINITION = 'CURRENT_PROJECT_VERSION'
 UPGRADABLE_EMBEDDED_FILES = [
@@ -99,23 +104,27 @@ platform :mac do
   #
   # - Cuts a new release branch
   # - Updates submodules and embedded files
+  # - Pushes changes to remote
   #
   # @option [String] version (default: nil) Marketing version string
-  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
   # @option [Boolean] resume (default: false) If true, the lane can run from a release/ branch and will run dedicated prechecks.
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
   #
   desc 'Executes the release preparation work in the repository'
   lane :code_freeze do |options|
     begin
       options[:resume]? macos_codefreeze_resume_prechecks : macos_codefreeze_prechecks
       new_version = validate_new_version(options)
-      app_store_build_number = increment_app_store_build_number(options)
+      build_number = increment_current_build_number(options)
       macos_create_release_branch(version: new_version) unless options[:resume]
       macos_update_embedded_files
       macos_update_version_and_build_number_config(
         version: new_version,
-        build_number: app_store_build_number
+        build_number: build_number,
+        force: options[:force]
       )
+      sh('git', 'push')
+
     rescue => exception
       if exception.message == "Tests have failed"
         UI.user_error! %{Tests have failed.
@@ -129,6 +138,101 @@ platform :mac do
         raise exception
       end
     end
+  end
+
+  # Bumps build number for the current version and updates embedded files.
+  # Pushes changes to remote.
+  #
+  # - Should be called on an existing internal release branch.
+  # - Also runs unit tests after updating embedded files.
+  #
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
+  #
+  desc 'Prepares new internal release on top of an existing one'
+  lane :bump_internal_release do |options|
+    begin
+      unless git_branch.start_with?(RELEASE_BRANCH)
+        UI.abort_with_message!("Incorrect branch. Branch name must start with '#{RELEASE_BRANCH}/'.")
+      end
+
+      force = options[:force].nil? ? false : options[:force]
+      current_version = macos_current_version
+      current_build_number = macos_current_build_number
+      build_number = increment_current_build_number(options)
+
+      UI.important("Current version is #{current_version} (#{current_build_number}).")
+      UI.important("Will update to #{current_version} (#{build_number}).")
+
+      unless force
+        unless UI.confirm("Do you want to continue?")
+          UI.abort_with_message!('Aborted by user.')
+        end
+      end
+
+      macos_update_embedded_files
+      macos_update_version_and_build_number_config(
+        version: current_version,
+        build_number: build_number,
+        force: true
+      )
+      sh('git', 'push')
+
+    rescue => exception
+      if exception.message == "Tests have failed"
+        UI.user_error! %{Tests have failed.
+* If you believe the failing test is flaky, please retry the same fastlane command.
+* If the failure looks legitimate, try to fix it, commit the fix (be sure to only
+  include the files you've changed while making a fix and leave other changed files
+  unmodified), and run the command again appending `resume:true`.
+        }
+      else
+        raise exception
+      end
+    end
+  end
+
+  # Executes the hotfix release preparation work in the repository
+  #
+  # - Creates a new hotfix release branch
+  # - Updates version and build number
+  # - Pushes changes to remote
+  #
+  # @option [String] version Marketing version string to be hotfixed (must be equal to an existing tag)
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
+  #
+  desc 'Executes the hotfix release preparation work in the repository'
+  lane :prepare_hotfix do |options|
+    UI.user_error! 'You must provide a version you want to hotfix.' unless options[:version]
+
+    source_version = validate_version_exists(options)
+    new_version = validate_hotfix_version(source_version: source_version)
+
+    build_number = increment_current_build_number(options)
+    macos_create_hotfix_branch(source_version: source_version, new_version: new_version)
+    macos_update_version_and_build_number_config(
+      version: new_version,
+      build_number: build_number,
+      force: options[:force]
+    )
+    sh('git', 'push')
+  end
+
+  # Updates marketing version to the specified one and increments build number by 1.
+  #
+  # @option [String] version Marketing version string.
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
+  #
+  desc 'Executes the release preparation work in the repository'
+  lane :set_version do |options|
+    unless options[:version]
+      UI.user_error! 'You must provide a version.'
+    end
+    new_version = validate_new_version(options)
+    build_number = increment_current_build_number(options)
+    macos_update_version_and_build_number_config(
+      version: new_version,
+      build_number: build_number
+    )
   end
 
   #################################################
@@ -222,35 +326,88 @@ platform :mac do
       git_changes = git_status.split("\n").select { |line| line.include?('modified:')}.join("\n")
       message = "Current branch contains these changes:\n #{git_changes}."
     end
-    unless UI.confirm(
-      "#{message}\nDo you want to continue?"
-    )
-      UI.abort_with_message!('Aborted by user.')
-    end
+
+    UI.important(message)
+    UI.abort_with_message!('Aborted by user.') unless UI.confirm("Do you want to continue?")
   end
 
-  # Calculates the new version or validate the provided one, if it exists
+  # Calculates the new version or validates the provided one, if it exists
   # and prompts the user to confirm
   #
   # @option [String] version (default: nil) Marketing version string
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
   #
   private_lane :validate_new_version do |options|
     current_version = macos_current_version
     user_version = format_user_version(options[:version])
     new_version = user_version.nil? ? macos_bump_minor_version(current_version) : user_version
-    unless UI.confirm(
-      "Current version is #{current_version}.\nNew version is #{new_version}.\nDo you want to continue?"
-    )
-    UI.abort_with_message!('Aborted by user.')
+
+    UI.important("Current version is #{current_version}.")
+    UI.important("New version is #{new_version}.")
+
+    force = options[:force].nil? ? false : options[:force]
+    unless force
+      UI.abort_with_message!('Aborted by user.') unless UI.confirm("Do you want to continue?")
     end
+    new_version
+  end
+
+  private_lane :validate_version_exists do |options|
+    user_version = format_user_version(options[:version])
+    UI.user_error! "Incorrect version provided: #{options[:version]}. Expected x.y.z format." unless user_version
+
+    Action.sh('git', 'fetch', '--tags')
+    existing_tag = sh('git', 'tag', '--list', user_version).chomp
+    existing_tag = existing_tag.empty? ? nil : existing_tag
+
+    UI.user_error! "Release #{user_version} not found. Make sure you've passed the version you want to make hotfix for, not the upcoming hotfix version." unless existing_tag
+    existing_tag
+  end
+
+  # Bumps provided version for hotfixing and presents to the user for confirmation.
+  #
+  # @option [String] source_version Marketing version string of the release that needs to be hotfixed.
+  # @option [Boolean] force (default: false) Don't ask for confirmation.
+  #
+  private_lane :validate_hotfix_version do |options|
+    source_version = options[:source_version]
+    new_version = macos_bump_patch_version(source_version)
+
+    UI.important("Release #{source_version} will be hotfixed as #{new_version}.")
+
+    force = options[:force].nil? ? false : options[:force]
+    unless force
+      unless UI.confirm("Do you want to continue?")
+        UI.abort_with_message!('Aborted by user.')
+      end
+    end
+
     new_version
   end
 
   # Checks current build number and increments it by 1.
   #
-  desc 'Increment App Store build number'
-  private_lane :increment_app_store_build_number do
+  desc 'Increment build number'
+  private_lane :increment_current_build_number do |options|
+    macos_current_build_number = [fetch_testflight_build_number(options), fetch_appcast_build_number].max
     macos_current_build_number + 1
+  end
+
+  private_lane :fetch_testflight_build_number do |options|
+    build_number = latest_testflight_build_number(
+      api_key: get_api_key,
+      username: get_username(options),
+      platform: 'osx'
+    )
+    build_number
+  end
+
+  private_lane :fetch_appcast_build_number do |options|
+    url = sh("plutil -extract SUFeedURL raw #{INFO_PLIST}").chomp
+    xml = HTTParty.get(url).body
+    xml_data = REXML::Document.new(xml)
+    versions = xml_data.get_elements('//rss/channel/item/sparkle:version').map { |e| e.text.split('.')[0].to_i }
+    versions.max
   end
 
   # Checks out a new branch from the current commit and pushes it
@@ -272,6 +429,27 @@ platform :mac do
     Action.sh('git', 'push', '-u', 'origin', release_branch)
   end
 
+  # Checks out a new branch from the current commit and pushes it
+  #
+  # @option [String] version (default: nil) Marketing version string
+  #
+  private_lane :macos_create_hotfix_branch do |options|
+    source_version = options[:source_version]
+    version = options[:new_version]
+    UI.message("Creating new hotfix release branch for #{version}")
+    release_branch = "#{HOTFIX_BRANCH}/#{version}"
+
+    # Abort if the branch already exists
+    UI.abort_with_message!("Branch #{release_branch} already exists in this repository. Aborting.") unless Action.sh(
+      'git', 'branch', '--list', release_branch
+    ).empty?
+
+    # Create the branch and push
+    Action.sh('git', 'fetch', '--tags')
+    Action.sh('git', 'checkout', '-b', release_branch, source_version)
+    Action.sh('git', 'push', '-u', 'origin', release_branch)
+  end
+
   # Updates embedded files:
   #
   # - Calls update_embedded.sh shell script
@@ -279,7 +457,7 @@ platform :mac do
   # - Runs automated tests
   # - Commits and pushes
   #
-  private_lane :macos_update_embedded_files do
+  private_lane :macos_update_embedded_files do |options|
     sh("cd #{PROJECT_ROOT_FOLDER} && ./scripts/update_embedded.sh")
 
     # Verify no unexpected files were modified
@@ -300,36 +478,35 @@ platform :mac do
     modified_files.each { |modified_file| sh('git', 'add', modified_file.to_s) }
     sh('git', 'commit', '-m', 'Update embedded files')
     ensure_git_status_clean
-    sh('git', 'push')
   end
 
   # Updates version in the config file
   #
-  # @option [String] version (default: nil) Marketing version string
+  # @option [String] version Marketing version string
+  # @option [String] build_number Build number
   #
   private_lane :macos_update_version_and_build_number_config do |options|
     version = options[:version]
     build_number = options[:build_number]
     File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
-    File.write(APP_STORE_BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
+    File.write(BUILD_NUMBER_CONFIG_PATH, "#{BUILD_NUMBER_CONFIG_DEFINITION} = #{build_number}\n")
     git_commit(
       path: [
         VERSION_CONFIG_PATH,
-        APP_STORE_BUILD_NUMBER_CONFIG_PATH
+        BUILD_NUMBER_CONFIG_PATH
       ],
       message: "Bump version to #{version} (#{build_number})"
     )
-    sh('git', 'push')
   end
 
-  # Reads App Store build number from the config file
+  # Reads build number from the config file
   #
   # @return [String] build number read from the file, or nil in case of failure
   #
   def macos_current_build_number
     current_build_number = 0
 
-    file_data = File.read(APP_STORE_BUILD_NUMBER_CONFIG_PATH).split("\n")
+    file_data = File.read(BUILD_NUMBER_CONFIG_PATH).split("\n")
     file_data.each do |line|
       current_build_number = line.split('=')[1].strip.to_i if line.start_with?(BUILD_NUMBER_CONFIG_DEFINITION)
     end
@@ -361,6 +538,17 @@ platform :mac do
     current_version_array = current_version.split('.')
     new_minor_number = current_version_array[1].to_i + 1
     "#{current_version_array[0]}.#{new_minor_number}.0"
+  end
+
+  # Updates version in the config file by bumping the patch (third) number
+  #
+  # @param [String] current version
+  # @return [String] updated version
+  #
+  def macos_bump_patch_version(current_version)
+    current_version_array = current_version.split('.')
+    new_patch_number = current_version_array[2].to_i + 1
+    "#{current_version_array[0]}.#{current_version_array[1]}.#{new_patch_number}"
   end
 
   # Formats the version provided by the user to be Major.Minor.Patch
