@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Bookmarks
 import Configuration
+import DDGSync
 import PixelKit
 
 extension Pixel {
@@ -179,9 +180,7 @@ extension Pixel {
         case syncDaily
         case syncDuckAddressOverride
         case syncSuccessRateDaily
-        case syncBookmarksLocalTimestampResolutionTriggered
-        case syncCredentialsLocalTimestampResolutionTriggered
-        case syncSettingsLocalTimestampResolutionTriggered
+        case syncLocalTimestampResolutionTriggered(Feature)
         case syncBookmarksCountLimitExceededDaily
         case syncCredentialsCountLimitExceededDaily
         case syncBookmarksRequestSizeLimitExceededDaily
@@ -518,12 +517,8 @@ extension Pixel.Event {
             return "m.mac.sync_duck_address_override"
         case .syncSuccessRateDaily:
             return "m.mac.sync_success_rate_daily"
-        case .syncBookmarksLocalTimestampResolutionTriggered:
-            return "m.mac.sync_bookmarks_local_timestamp_resolution_triggered"
-        case .syncCredentialsLocalTimestampResolutionTriggered:
-            return "m.mac.sync_credentials_local_timestamp_resolution_triggered"
-        case .syncSettingsLocalTimestampResolutionTriggered:
-            return "m.mac.sync_settings_local_timestamp_resolution_triggered"
+        case .syncLocalTimestampResolutionTriggered(let feature):
+            return "m.mac.sync_\(feature.name)_local_timestamp_resolution_triggered"
         case .syncBookmarksCountLimitExceededDaily: return "m.mac.sync_bookmarks_count_limit_exceeded_daily"
         case .syncCredentialsCountLimitExceededDaily: return "m.mac.sync_credentials_count_limit_exceeded_daily"
         case .syncBookmarksRequestSizeLimitExceededDaily: return "m.mac.sync_bookmarks_request_size_limit_exceeded_daily"
