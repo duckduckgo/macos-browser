@@ -13,7 +13,7 @@ fi
 
 # Add brew into PATH
 if [[ -f /opt/homebrew/bin/brew ]]; then
-    eval $(/opt/homebrew/bin/brew shellenv)
+    eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 run_swiftlint_for_modified_files () {
@@ -50,7 +50,7 @@ run_swiftlint_for_modified_files () {
     fi
 }
 
-if ! command -v shellcheck &> /dev/null; then
+if ! command -v swiftlint &> /dev/null; then
     echo "error: SwiftLint not installed. Install using \`brew install swiftlint\`"
     exit 1
 fi
