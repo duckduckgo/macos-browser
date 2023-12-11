@@ -1,8 +1,8 @@
 {
   "name": "veripages.com",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "parent": "verecor.com",
-  "addedDatetime": 1691985600000,
+  "addedDatetime": 1691982000000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,8 +10,8 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "e1adef78-997c-42f5-8c33-501566fc705b",
-          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&fage=${ageRange}&state=${state}&city=${city}",
+          "id": "5bf98772-1804-4939-a06b-dbf9cd31f198",
+          "url": "https://veripages.com/inner/profile/search?fname=${firstName}&lname=${lastName}&fage=${age|ageRange}&state=${state}&city=${city}",
           "ageRange": [
             "18-30",
             "31-40",
@@ -24,7 +24,7 @@
         },
         {
           "actionType": "extract",
-          "id": "1a06491a-e2b6-4d04-9ac2-d14b0776415a",
+          "id": "f3d53642-9a58-4275-b97f-5547e3ef8e55",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -40,7 +40,7 @@
               "afterText": ", "
             },
             "addressCityStateList": {
-              "selector": ".//span[@itemprop='address']",
+              "selector": ".//div[contains(@class, 'search-item')]//dt[text() = 'Has lived in']/following-sibling::dd/ul/li",
               "findElements": true
             },
             "relativesList": {

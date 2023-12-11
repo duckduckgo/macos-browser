@@ -145,11 +145,51 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 frequency: .dailyOnly,
                 withAdditionalParameters: ["cohort": PixelKit.dateString(for: settings.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
-        case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionLatency(ms: ms, server: server, networkType: networkType),
-                frequency: .standard,
-                includeAppVersionParameter: true)
+        case .reportConnectionAttempt(attempt: let attempt):
+            switch attempt {
+            case .connecting:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionEnableAttemptConnecting,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionEnableAttemptSuccess,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionEnableAttemptFailure,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .reportTunnelFailure(result: let result):
+            switch result {
+            case .failureDetected:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelFailureDetected,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failureRecovered:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelFailureRecovered,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .reportLatency(let result):
+            switch result {
+            case .error:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionLatencyError,
+                    frequency: .dailyOnly,
+                    includeAppVersionParameter: true)
+            case .quality(let quality):
+                guard quality != .unknown else { return }
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionLatency(quality: quality),
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
         case .rekeyCompleted:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
@@ -273,6 +313,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     enum ConfigurationError: Error {
         case missingProviderConfiguration
         case missingPixelHeaders
+    }
+
+    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
+        super.prepareToConnect(using: provider)
+
+        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
+        try? loadDefaultPixelHeaders(from: options)
     }
 
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {

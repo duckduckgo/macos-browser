@@ -82,6 +82,13 @@ extension Pixel.Event {
         case .syncSuccessRateDaily:
             return nil
 
+        case .vpnBreakageReport(let category, let description, let metadata):
+            return [
+                PixelKit.Parameters.vpnBreakageCategory: category,
+                PixelKit.Parameters.vpnBreakageDescription: description,
+                PixelKit.Parameters.vpnBreakageMetadata: metadata
+            ]
+
         // Don't use default to force new items to be thought about
         case .crash,
              .brokenSiteReport,

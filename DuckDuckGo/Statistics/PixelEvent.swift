@@ -160,6 +160,9 @@ extension Pixel {
         case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
         case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
 
+        // VPN
+        case vpnBreakageReport(category: String, description: String, metadata: String)
+
         // Network Protection Waitlist
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
@@ -480,6 +483,9 @@ extension Pixel.Event {
             return "m.mac.navigation.first-search"
         case .serpDay21to27:
             return "m.mac.search-day-21-27.initial"
+
+        case .vpnBreakageReport:
+            return "m_mac_vpn_breakage_report"
 
         case .networkProtectionWaitlistUserActive:
             return "m_mac_netp_waitlist_user_active"

@@ -63,6 +63,14 @@ Executes the release preparation work in the repository
 
 Prepares new internal release on top of an existing one
 
+### mac prepare_hotfix
+
+```sh
+[bundle exec] fastlane mac prepare_hotfix
+```
+
+Executes the hotfix release preparation work in the repository
+
 ### mac set_version
 
 ```sh
