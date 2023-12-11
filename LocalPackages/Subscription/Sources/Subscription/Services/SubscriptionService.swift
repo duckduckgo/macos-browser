@@ -31,7 +31,16 @@ public struct SubscriptionService: APIService {
     // MARK: -
 
     public static func getSubscriptionDetails(token: String) async -> Result<GetSubscriptionDetailsResponse, APIServiceError> {
-        await executeAPICall(method: "GET", endpoint: "subscription", headers: makeAuthorizationHeader(for: token))
+        let result: Result<GetSubscriptionDetailsResponse, APIServiceError> = await executeAPICall(method: "GET", endpoint: "subscription", headers: makeAuthorizationHeader(for: token))
+
+        switch result {
+        case .success(let response):
+            cachedSubscriptionDetailsResponse = response
+        case .failure:
+            cachedSubscriptionDetailsResponse = nil
+        }
+
+        return result
     }
 
     public struct GetSubscriptionDetailsResponse: Decodable {
@@ -41,6 +50,8 @@ public struct SubscriptionService: APIService {
         public let platform: String
         public let status: String
     }
+
+    public static var cachedSubscriptionDetailsResponse: GetSubscriptionDetailsResponse?
 
     // MARK: -
 

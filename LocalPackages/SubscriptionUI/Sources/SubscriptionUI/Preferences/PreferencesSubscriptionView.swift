@@ -70,8 +70,7 @@ public struct PreferencesSubscriptionView: View {
                             .padding(4)
                     } content: {
                         TextMenuItemHeader(text: UserText.preferencesSubscriptionActiveHeader)
-                        TextMenuItemCaption(text: model.subscriptionDetails ?? UserText.preferencesSubscriptionActiveCaption)
-//                        TextMenuItemCaption(text: UserText.preferencesSubscriptionActiveCaption)
+                        TextMenuItemCaption(text: model.subscriptionDetails ?? "")
                     } buttons: {
                         Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
 
@@ -86,7 +85,7 @@ public struct PreferencesSubscriptionView: View {
                         .fixedSize()
                     }
                     .onAppear {
-                        model.fetchEntitlements()
+                        model.fetchAndUpdateSubscriptionDetails()
                     }
 
                 } else {
@@ -113,8 +112,7 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.vpnServiceTitle,
                             description: UserText.vpnServiceDescription,
                             buttonName: model.isUserAuthenticated ? "Manage" : nil,
-                            buttonAction: { model.openVPN() },
-                            enabled: model.hasEntitlements)
+                            buttonAction: { model.openVPN() })
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -123,8 +121,7 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.personalInformationRemovalServiceTitle,
                             description: UserText.personalInformationRemovalServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
-                            buttonAction: { model.openPersonalInformationRemoval() },
-                            enabled: model.hasEntitlements)
+                            buttonAction: { model.openPersonalInformationRemoval() })
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -133,8 +130,7 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.identityTheftRestorationServiceTitle,
                             description: UserText.identityTheftRestorationServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
-                            buttonAction: { model.openIdentityTheftRestoration() },
-                            enabled: model.hasEntitlements)
+                            buttonAction: { model.openIdentityTheftRestoration() })
             }
             .padding(10)
             .roundedBorder()

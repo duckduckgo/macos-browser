@@ -22,7 +22,6 @@ import Subscription
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
-    @Published var hasEntitlements: Bool = false
     @Published var subscriptionDetails: String?
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -35,8 +34,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.actionHandler = actionHandler
         self.sheetActionHandler = sheetActionHandler
 
-        let isUserAuthenticated = accountManager.isUserAuthenticated
-        self.isUserAuthenticated = isUserAuthenticated
+        self.isUserAuthenticated = accountManager.isUserAuthenticated
+
+        if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+            print(" -- got cached \(cachedDate)")
+
+            updateDescription(for: cachedDate)
+        }
 
         NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
             self.updateUserAuthenticatedState(true)
@@ -96,12 +100,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func fetchEntitlements() {
-        print("Entitlements!")
+    func fetchAndUpdateSubscriptionDetails() {
         Task {
-            self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
-
             guard let token = accountManager.accessToken else { return }
+
+            if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
+                updateDescription(for: cachedDate)
+            }
 
             if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
                 if response.expiresOrRenewsAt < Date() {
@@ -109,16 +114,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                     return
                 }
 
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateStyle = .medium
-                dateFormatter.timeStyle = .short
-
-                let stringDate = dateFormatter.string(from: response.expiresOrRenewsAt)
-
-                self.subscriptionDetails = "Your monthly Privacy Pro subscription renews on \(stringDate)."
+                updateDescription(for: response.expiresOrRenewsAt)
             }
         }
     }
+
+    private func updateDescription(for date: Date) {
+        self.subscriptionDetails = UserText.preferencesSubscriptionActiveCaption(formattedDate: dateFormatter.string(from: date))
+    }
+
+    private var dateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        dateFormatter.timeStyle = .short
+
+        return dateFormatter
+    }()
 }
 
 public final class PreferencesSubscriptionActionHandlers {

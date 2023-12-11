@@ -39,7 +39,10 @@ enum UserText {
 
     // MARK: Preferences when subscription is active
     static let preferencesSubscriptionActiveHeader = NSLocalizedString("subscription.preferences.subscription.active.header", value: "Privacy Pro is active on this device", comment: "Header for the subscription preferences pane when the subscription is active")
-    static let preferencesSubscriptionActiveCaption = NSLocalizedString("subscription.preferences.subscription.active.caption", value: "Your monthly Privacy Pro subscription renews on April 20, 2027.", comment: "Caption for the subscription preferences pane when the subscription is active")
+    static func preferencesSubscriptionActiveCaption(formattedDate: String) -> String {
+        let localized = NSLocalizedString("subscription.preferences.subscription.active.caption", value: "Your monthly Privacy Pro subscription renews on %@", comment: "Caption for the subscription preferences pane when the subscription is active")
+        return String(format: localized, formattedDate)
+    }
 
     static let addToAnotherDeviceButton = NSLocalizedString("subscription.preferences.add.to.another.device.button", value: "Add to Another Device…", comment: "Button to add subscription to another device")
     static let manageSubscriptionButton = NSLocalizedString("subscription.preferences.manage.subscription.button", value: "Manage Subscription", comment: "Button to manage subscription")
