@@ -506,23 +506,23 @@ extension Pixel.Event {
 
             // Sync
         case .syncSignupDirect:
-            return "m.mac.sync_signup_direct"
+            return "m_mac_sync_signup_direct"
         case .syncSignupConnect:
-            return "m.mac.sync_signup_connect"
+            return "m_mac_sync_signup_connect"
         case .syncLogin:
-            return "m.mac.sync_login"
+            return "m_mac_sync_login"
         case .syncDaily:
-            return "m.mac.sync_daily"
+            return "m_mac_sync_daily"
         case .syncDuckAddressOverride:
-            return "m.mac.sync_duck_address_override"
+            return "m_mac_sync_duck_address_override"
         case .syncSuccessRateDaily:
-            return "m.mac.sync_success_rate_daily"
+            return "m_mac_sync_success_rate_daily"
         case .syncLocalTimestampResolutionTriggered(let feature):
-            return "m.mac.sync_\(feature.name)_local_timestamp_resolution_triggered"
-        case .syncBookmarksCountLimitExceededDaily: return "m.mac.sync_bookmarks_count_limit_exceeded_daily"
-        case .syncCredentialsCountLimitExceededDaily: return "m.mac.sync_credentials_count_limit_exceeded_daily"
-        case .syncBookmarksRequestSizeLimitExceededDaily: return "m.mac.sync_bookmarks_request_size_limit_exceeded_daily"
-        case .syncCredentialsRequestSizeLimitExceededDaily: return "m.mac.sync_credentials_request_size_limit_exceeded_daily"
+            return "m_mac_sync_\(feature.name)_local_timestamp_resolution_triggered"
+        case .syncBookmarksCountLimitExceededDaily: return "m_mac_sync_bookmarks_count_limit_exceeded_daily"
+        case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_count_limit_exceeded_daily"
+        case .syncBookmarksRequestSizeLimitExceededDaily: return "m_mac_sync_bookmarks_request_size_limit_exceeded_daily"
+        case .syncCredentialsRequestSizeLimitExceededDaily: return "m_mac_sync_credentials_request_size_limit_exceeded_daily"
 
         case .dataBrokerProtectionWaitlistUserActive:
             return "m_mac_dbp_waitlist_user_active"
