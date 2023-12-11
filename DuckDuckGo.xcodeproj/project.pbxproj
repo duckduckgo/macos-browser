@@ -9022,7 +9022,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n#./lint.sh\n";
+			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n./lint.sh\n";
 		};
 		B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;

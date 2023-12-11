@@ -556,8 +556,7 @@ final class FeedbackSubMenu: NSMenu {
         removeAllItems()
 
         let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite, action: #selector(AppDelegate.openReportBrokenSite(_:)), keyEquivalent: "")
-            .withImage(NSImage(named: "Feedback"))
-//            .targetting(target)
+            .withImage(NSImage(named: "Exclamation"))
         addItem(reportBrokenSiteItem)
 
         let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback, action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
