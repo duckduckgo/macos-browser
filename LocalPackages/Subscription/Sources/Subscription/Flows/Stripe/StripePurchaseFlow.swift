@@ -58,17 +58,17 @@ public final class StripePurchaseFlow {
 
     public static func prepareSubscriptionPurchase(emailAccessToken: String?) async -> Result<PurchaseUpdate, StripePurchaseFlow.Error> {
 
-        var token: String = ""
+        var authToken: String = ""
 
-        switch await AuthService.createAccount(emailAccessToken: nil) {
+        switch await AuthService.createAccount(emailAccessToken: emailAccessToken) {
         case .success(let response):
-            token = response.authToken
-            AccountManager().storeAuthToken(token: response.authToken)
+            authToken = response.authToken
+            AccountManager().storeAuthToken(token: authToken)
         case .failure:
             return .failure(.accountCreationFailed)
         }
 
-        return .success(PurchaseUpdate(type: "redirect", token: token))
+        return .success(PurchaseUpdate(type: "redirect", token: authToken))
     }
 
     public static func completeSubscriptionPurchase() async {
