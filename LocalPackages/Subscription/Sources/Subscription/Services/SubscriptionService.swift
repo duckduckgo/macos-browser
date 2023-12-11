@@ -49,6 +49,10 @@ public struct SubscriptionService: APIService {
         public let expiresOrRenewsAt: Date
         public let platform: String
         public let status: String
+
+        public var isSubscriptionActive: Bool {
+            status.lowercased() != "expired" && status.lowercased() != "inactive"
+        }
     }
 
     public static var cachedSubscriptionDetailsResponse: GetSubscriptionDetailsResponse?
@@ -58,7 +62,7 @@ public struct SubscriptionService: APIService {
     public static func getProducts() async -> Result<GetProductsResponse, APIServiceError> {
         await executeAPICall(method: "GET", endpoint: "products")
     }
-    
+
     public typealias GetProductsResponse = [GetProductsItem]
 
     public struct GetProductsItem: Decodable {

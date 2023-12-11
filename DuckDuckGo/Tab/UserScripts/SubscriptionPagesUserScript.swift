@@ -377,6 +377,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             if case .alertFirstButtonReturn = response {
                 WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
                 AccountManager().signOut()
+                // TODO: Check if it is required
             }
         })
     }

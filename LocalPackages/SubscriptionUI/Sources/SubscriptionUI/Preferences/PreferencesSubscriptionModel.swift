@@ -37,8 +37,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.isUserAuthenticated = accountManager.isUserAuthenticated
 
         if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
-            print(" -- got cached \(cachedDate)")
-
             updateDescription(for: cachedDate)
         }
 
@@ -109,7 +107,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
 
             if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
-                if response.expiresOrRenewsAt < Date() {
+                if !response.isSubscriptionActive {
                     AccountManager().signOut()
                     return
                 }

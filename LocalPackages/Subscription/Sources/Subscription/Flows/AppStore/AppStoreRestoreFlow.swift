@@ -68,12 +68,11 @@ public final class AppStoreRestoreFlow {
             return .failure(.failedToFetchAccountDetails)
         }
 
-        //
         var isSubscriptionActive = false
 
         switch await SubscriptionService.getSubscriptionDetails(token: accessToken) {
         case .success(let response):
-            isSubscriptionActive = response.status != "Expired" && response.status != "Inactive"
+            isSubscriptionActive = response.isSubscriptionActive
         case .failure:
             return .failure(.somethingWentWrong)
         }
