@@ -585,6 +585,8 @@ import Subscription
 
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
+            NSMenuItem(title: "Internal User state", action: #selector(MainViewController.internalUserState))
+
 #if SUBSCRIPTION
             SubscriptionDebugMenu(currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
