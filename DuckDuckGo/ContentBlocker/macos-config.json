@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1701727717991,
+    "version": 1702319693796,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1956,6 +1956,15 @@
                         ]
                     },
                     {
+                        "domain": "dpreview.com",
+                        "rules": [
+                            {
+                                "selector": ".ad-wrapper",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "ebay.com",
                         "rules": [
                             {
@@ -3527,7 +3536,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "4bdb15fda526543efaeb12a14a3fdf09"
+            "hash": "b82b3912ad9e3fea5b8754fdec02bc86"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4589,6 +4598,7 @@
                             {
                                 "rule": "analytics.analytics-egain.com/onetag/",
                                 "domains": [
+                                    "landsend.com",
                                     "support.norton.com"
                                 ]
                             }
@@ -5104,6 +5114,7 @@
                                     "ah.nl",
                                     "nytimes.com",
                                     "rocketnews24.com",
+                                    "uwbadgers.com",
                                     "wunderground.com",
                                     "youmath.it"
                                 ]
@@ -5278,12 +5289,6 @@
                     "facebook.net": {
                         "rules": [
                             {
-                                "rule": "connect.facebook.net/en_UK/sdk.js",
-                                "domains": [
-                                    "globalcyclingnetwork.com"
-                                ]
-                            },
-                            {
                                 "rule": "connect.facebook.net/en_US/sdk.js",
                                 "domains": [
                                     "bandsintown.com",
@@ -5296,6 +5301,12 @@
                                 "rule": "connect.facebook.net/en_US/all.js",
                                 "domains": [
                                     "nordicwellness.se"
+                                ]
+                            },
+                            {
+                                "rule": "connect.facebook.net/en_UK/sdk.js",
+                                "domains": [
+                                    "globalcyclingnetwork.com"
                                 ]
                             },
                             {
@@ -5566,6 +5577,7 @@
                             {
                                 "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
                                 "domains": [
+                                    "arkadium.com",
                                     "bloomberg.com",
                                     "gamak.tv",
                                     "games.washingtonpost.com",
@@ -5593,6 +5605,7 @@
                             {
                                 "rule": "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
                                 "domains": [
+                                    "daotranslate.com",
                                     "drakescans.com",
                                     "duden.de",
                                     "magicgameworld.com",
@@ -5921,6 +5934,16 @@
                             }
                         ]
                     },
+                    "inmobi.com": {
+                        "rules": [
+                            {
+                                "rule": "cmp.inmobi.com",
+                                "domains": [
+                                    "express.co.uk"
+                                ]
+                            }
+                        ]
+                    },
                     "inq.com": {
                         "rules": [
                             {
@@ -6046,7 +6069,9 @@
                                 "rule": "www.klaviyo.com/media/js/public/klaviyo_subscribe.js",
                                 "domains": [
                                     "fearofgod.com",
-                                    "shopyalehome.com"
+                                    "restrap.com",
+                                    "shopyalehome.com",
+                                    "silhouetteu.com"
                                 ]
                             },
                             {
@@ -6593,18 +6618,6 @@
                             }
                         ]
                     },
-                    "protection-widget.route.com": {
-                        "rules": [
-                            {
-                                "rule": "protection-widget.route.com/protect.core.js",
-                                "domains": [
-                                    "clionadhcosmetics.com",
-                                    "littleunicorn.com",
-                                    "olfactif.com"
-                                ]
-                            }
-                        ]
-                    },
                     "pubmatic.com": {
                         "rules": [
                             {
@@ -6702,7 +6715,7 @@
                             {
                                 "rule": "protection-widget.route.com/protect.core.js",
                                 "domains": [
-                                    "littleunicorn.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6909,6 +6922,16 @@
                             }
                         ]
                     },
+                    "tfaforms.net": {
+                        "rules": [
+                            {
+                                "rule": "tfaforms.net",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
                     "theplatform.com": {
                         "rules": [
                             {
@@ -7089,6 +7112,16 @@
                                 "rule": "cdn.viglink.com/api/vglnk.js",
                                 "domains": [
                                     "9to5mac.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "visualwebsiteoptimizer.com": {
+                        "rules": [
+                            {
+                                "rule": "dev.visualwebsiteoptimizer.com/j.php",
+                                "domains": [
+                                    "searchhudforeclosures.com"
                                 ]
                             }
                         ]
@@ -7311,7 +7344,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "eecc760d0412d7108963574d456d6fde"
+            "hash": "d21f391b3028d4b3831e8992c9dc7040"
         },
         "trackingCookies1p": {
             "settings": {
@@ -7695,20 +7728,10 @@
                                 "value": "enabled"
                             }
                         ]
-                    },
-                    {
-                        "domain": "kia.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/safariObject",
-                                "value": "disabled"
-                            }
-                        ]
                     }
                 ]
             },
-            "hash": "4e09593afeef6d21db6dbfef6e6a5ca7"
+            "hash": "1a7df2f0fbf4e5838e7c4b21627d2086"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
