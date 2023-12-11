@@ -22,7 +22,7 @@ import Combine
 import BrowserServicesKit
 import PrivacyDashboard
 
-protocol PrivacyDashboardViewControllerSizeDelegate {
+protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
 
     func privacyDashboardViewControllerDidChange(size: NSSize)
 }
@@ -60,8 +60,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
 
-    required init?(coder: NSCoder,
-          initMode: Mode) {
+    required init?(coder: NSCoder, initMode: Mode) {
         self.initMode = initMode
         super.init(coder: coder)
     }
