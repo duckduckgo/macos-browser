@@ -194,9 +194,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 #else
         if #available(macOS 12.0, *) {
+            let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            let progressViewController = await ProgressViewController(title: "Purchase in progress...")
+
             defer {
                 Task {
-                    await hideProgress()
+                    await mainViewController?.dismiss(progressViewController)
                 }
             }
 
@@ -207,7 +210,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             print("Selected: \(subscriptionSelection.id)")
 
-            await showProgress(with: "Purchase in progress...")
+            await mainViewController?.presentAsSheet(progressViewController)
 
             // Trigger sign in pop-up
             switch await PurchaseManager.shared.syncAppleIDAccount() {
@@ -224,14 +227,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 return nil
             }
 
-            // Hide it after some time in case nothing happens
-            /*
-            DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
-                print("hiding it since nothing happened!")
-                self.hideProgress()
-            }
-             */
-
             let emailAccessToken = try? EmailManager().getToken()
 
             switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
@@ -241,42 +236,19 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 return nil
             }
 
-            await updateProgressTitle("Completing purchase...")
+            await progressViewController.updateTitleText("Completing purchase...")
 
             switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
             case .failure:
                 // TODO: handle errors - missing entitlements on post purchase check
-                return nil
+                await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "completed"))
             }
         }
 #endif
 
         return nil
-    }
-
-    private weak var progressViewController: ProgressViewController?
-
-    @MainActor
-    private func showProgress(with title: String) {
-        guard progressViewController == nil else { return }
-        let progressVC = ProgressViewController(title: title)
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(progressVC)
-        progressViewController = progressVC
-    }
-
-    @MainActor
-    private func updateProgressTitle(_ title: String) {
-        guard let progressViewController else { return }
-        progressViewController.updateTitleText(title)
-    }
-
-    @MainActor
-    private func hideProgress() {
-        guard let progressViewController else { return }
-        WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(progressViewController)
-        self.progressViewController = nil
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -289,13 +261,17 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 restorePurchases: {
                     if #available(macOS 12.0, *) {
                         Task {
-                            defer { self.hideProgress() }
-                            self.showProgress(with: "Restoring subscription...")
+                            let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+                            let progressViewController = ProgressViewController(title: "Restoring subscription...")
+
+                            defer { mainViewController?.dismiss(progressViewController) }
+
+                            mainViewController?.presentAsSheet(progressViewController)
 
                             guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
                             switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                            case .success(let subscription):
+                            case .success:
                                 message.webView?.reload()
                             case .failure(let error):
                                 switch error {
@@ -340,9 +316,12 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         print(">>> completeStripePayment")
 
-        await showProgress(with: "Completing purchase...")
+        let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+        let progressViewController = await ProgressViewController(title: "Completing purchase...")
+
+        await mainViewController?.presentAsSheet(progressViewController)
         await StripePurchaseFlow.completeSubscriptionPurchase()
-        await hideProgress()
+        await mainViewController?.dismiss(progressViewController)
 
         return [String: String]() // cannot be nil
     }

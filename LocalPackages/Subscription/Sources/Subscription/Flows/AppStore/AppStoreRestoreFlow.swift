@@ -22,13 +22,15 @@ import StoreKit
 @available(macOS 12.0, *)
 public final class AppStoreRestoreFlow {
 
+    public typealias RestoredAccountDetails = (authToken: String, accessToken: String, externalID: String, email: String?)
+
     public enum Error: Swift.Error {
         case missingAccountOrTransactions
         case pastTransactionAuthenticationError
         case failedToObtainAccessToken
         case failedToFetchAccountDetails
         case failedToFetchSubscriptionDetails
-        case subscriptionExpired(externalID: String)
+        case subscriptionExpired(accountDetails: RestoredAccountDetails)
         case somethingWentWrong
     }
 
@@ -81,7 +83,8 @@ public final class AppStoreRestoreFlow {
             accountManager.storeAccount(token: accessToken, email: email, externalID: externalID)
             return .success(())
         } else {
-            return .failure(.subscriptionExpired(externalID: externalID))
+            let details = RestoredAccountDetails(authToken: authToken, accessToken: accessToken, externalID: externalID, email: email)
+            return .failure(.subscriptionExpired(accountDetails: details))
         }
     }
 }

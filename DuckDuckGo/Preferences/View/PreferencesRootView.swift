@@ -90,19 +90,8 @@ extension Preferences {
         }
 
 #if SUBSCRIPTION
-
-        @MainActor
-        private func showProgress(with title: String) -> ProgressViewController {
-            let progressVC = ProgressViewController(title: title)
-            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(progressVC)
-            return progressVC
-        }
-
-        @MainActor
-        private func hideProgress(_ progressVC: ProgressViewController) {
-            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.dismiss(progressVC)
-        }
-
+        // swiftlint:disable:next cyclomatic_complexity
+        // swiftlint:disable:next function_body_length
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, newTab: true)
@@ -130,9 +119,12 @@ extension Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 if #available(macOS 12.0, *) {
                     Task {
-                        let progressViewController = self.showProgress(with: "Restoring subscription...")
+                        let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+                        let progressViewController = ProgressViewController(title: "Restoring subscription...")
 
-                        defer { self.hideProgress(progressViewController) }
+                        defer { mainViewController?.dismiss(progressViewController) }
+
+                        mainViewController?.presentAsSheet(progressViewController)
 
                         guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
 
@@ -168,7 +160,7 @@ extension Preferences {
             let alert = NSAlert.somethingWentWrongAlert()
             alert.beginSheetModal(for: window)
         }
-        
+
         @MainActor
         private func showSubscriptionNotFoundAlert() {
             guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
