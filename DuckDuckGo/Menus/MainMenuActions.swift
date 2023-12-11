@@ -21,7 +21,7 @@ import Cocoa
 import Common
 import WebKit
 import Configuration
-// swiftlint:disable:trailing_whitespace
+
 // Actions are sent to objects of responder chain
 
 // MARK: - Main Menu Actions
