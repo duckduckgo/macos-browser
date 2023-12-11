@@ -180,6 +180,17 @@
                ReferencedContainer = "container:LocalPackages/PixelKit">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "565E46DC2B2725DC0013AC2A"
+               BuildableName = "DuckDuckGoSyncUITests.xctest"
+               BlueprintName = "DuckDuckGoSyncUITests"
+               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
