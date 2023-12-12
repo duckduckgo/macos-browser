@@ -72,6 +72,7 @@ struct DataImportViewModel {
         var isFileImport: Bool {
             if case .fileImport = self { true } else { false }
         }
+
         var fileImportDataType: DataType? {
             switch self {
             case .fileImport(dataType: let dataType, summary: _):
@@ -230,34 +231,39 @@ struct DataImportViewModel {
         if handleErrors(summary.compactMapValues { $0.error }) { return }
 
         var nextScreen: Screen?
-        // merge new import results into the model import summary
+        // merge new import results into the model import summary keeping the original DataType sorting order
         for (dataType, result) in DataType.allCases.compactMap({ dataType in summary[dataType].map { (dataType, $0) } }) {
             self.summary.append( .init(dataType, result) )
 
             switch result {
-            case .success(let summary):
-                if summary.isEmpty, nextScreen == nil {
-                    nextScreen = .fileImport(dataType: dataType)
+            case .success(let dataTypeSummary):
+                // if a data type can‘t be imported (Yandex/Passwords) - switch to its file import displaying successful import results
+                if dataTypeSummary.isEmpty, nextScreen == nil {
+                    nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
             case .failure(let error):
                 // show "no data to import" screen when no bookmarks|passwords found
-                if case .noData = error.errorType, nextScreen == nil, screen != .fileImport(dataType: dataType) {
+                if case .noData = error.errorType, screen != .fileImport(dataType: dataType), nextScreen == nil {
                     nextScreen = .fileImport(dataType: dataType)
-                } else if nextScreen == nil, screen != .fileImport(dataType: dataType, summary: Set(DataType.dataTypes(before: dataType, inclusive: false))) {
-                    nextScreen = .fileImport(dataType: dataType, summary: Set(DataType.dataTypes(before: dataType, inclusive: false)))
+                } else if !(screen.isFileImport && screen.fileImportDataType == dataType), nextScreen == nil {
+                    // switch to file import of the failed data type displaying successful import results
+                    nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
                 Pixel.fire(.dataImportFailed(source: importSource, error: error))
             }
         }
 
         if let nextScreen {
+            log("mergeImportSummary: next screen: \(nextScreen)")
             self.screen = nextScreen
         } else if screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: summary.keys.contains)) == nil, // no next data type manual import screen
            // and there should be failed data types (and non-recovered)
            selectedDataTypes.contains(where: { dataType in self.summary.last(where: { $0.dataType == dataType })?.result.error != nil }) {
+            log("mergeImportSummary: feedback")
             // after last failed datatype show feedback
             self.screen = .feedback
         } else {
+            log("mergeImportSummary: summary(\(Set(summary.keys)))")
             self.screen = .summary(Set(summary.keys))
         }
 
@@ -265,8 +271,6 @@ struct DataImportViewModel {
             successfulImportHappened = true
             NotificationCenter.default.post(name: .dataImportComplete, object: nil)
         }
-
-        log("next screen: \(screen)")
     }
 
     /// handle recoverable errors (request primary password or file permission)
