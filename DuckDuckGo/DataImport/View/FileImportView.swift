@@ -221,6 +221,7 @@ struct FileImportView: View {
                     %8$@ - “Select Passwords CSV File” button
                     **bold text**; _italic text_
                     """)
+                    source.importSourceName
                     NSImage.menuHamburger16
                     NSImage.menuVertical16
                     button("Select Passwords CSV File…")
@@ -806,7 +807,7 @@ struct CircleNumberView: View {
 
 #Preview {
     HStack {
-        FileImportView(source: .onePassword7, dataType: .passwords, isButtonDisabled: false)
+        FileImportView(source: .yandex, dataType: .passwords, isButtonDisabled: false)
             .padding()
             .frame(width: 512 - 20)
     }
