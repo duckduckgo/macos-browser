@@ -73,7 +73,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged)
@@ -100,7 +100,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         do {
             let cookieConsentManaged = try await cookieConsentManagedPromise.value
@@ -152,7 +152,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .promise()
 
         os_log("starting navigation to http://privacy-test-pages.site/features/autoconsent/banner.html")
-        let navigation = tab.setUrl(url, userEntered: nil)
+        let navigation = tab.setUrl(url, source: .link)
 
         navigation?.appendResponder(navigationResponse: { response in
             os_log("navigationResponse: %s", "\(String(describing: response))")

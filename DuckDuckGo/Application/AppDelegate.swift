@@ -68,8 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
-    private var syncStateCancellable: AnyCancellable?
-    private var bookmarksSyncErrorCancellable: AnyCancellable?
+    private var isSyncInProgressCancellable: AnyCancellable?
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
@@ -353,6 +352,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
+
+        isSyncInProgressCancellable = syncService.isSyncInProgressPublisher
+            .filter { $0 }
+            .asVoid()
+            .prefix(1)
+            .sink {
+                Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+            }
 
         subscribeSyncQueueToScreenLockedNotifications()
     }

@@ -56,7 +56,7 @@ final class PrivacyPreferencesModel: ObservableObject {
 
     @MainActor
     func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
     }
 
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {

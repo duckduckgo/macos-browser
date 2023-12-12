@@ -30,7 +30,7 @@ import NetworkProtectionUI
 final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
-    private var status: NetworkProtection.ConnectionStatus = .disconnected
+    private var status: NetworkProtection.ConnectionStatus = .default
     private let popoverManager: NetworkProtectionNavBarPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
 

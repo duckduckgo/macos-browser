@@ -90,6 +90,9 @@ final class GeolocationService: NSObject, GeolocationServiceProtocol {
             assert(geolocationSubscriptionCounter >= 0)
             switch (oldValue, geolocationSubscriptionCounter) {
             case (0, 1):
+                if case .notDetermined = authorizationStatus {
+                    locationManager.requestWhenInUseAuthorization()
+                }
                 locationManager.startUpdatingLocation()
             case (1, 0):
                 locationManager.stopUpdatingLocation()
