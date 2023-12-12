@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1702319693796,
+    "version": 1702336323870,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -5605,6 +5605,7 @@
                             {
                                 "rule": "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
                                 "domains": [
+                                    "arcadepunks.com",
                                     "daotranslate.com",
                                     "drakescans.com",
                                     "duden.de",
@@ -7344,7 +7345,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "d21f391b3028d4b3831e8992c9dc7040"
+            "hash": "f98388b316b40c7edc4e620ef88ed494"
         },
         "trackingCookies1p": {
             "settings": {

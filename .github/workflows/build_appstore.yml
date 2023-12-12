@@ -100,9 +100,10 @@ jobs:
         bundle exec fastlane release_${{ env.destination }}
         dsyms_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
         mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsyms_path}"
-        app_version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
         echo "dsyms_path=${dsyms_path}" >> $GITHUB_ENV
-        echo "app_version=${app_version}" >> $GITHUB_ENV
+        echo "app_version=${version}.${build_number}" >> $GITHUB_ENV
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v3
