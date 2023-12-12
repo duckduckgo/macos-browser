@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import Foundation
 
 import XCTest
@@ -108,4 +109,6 @@ final class BookmarkStoreMock: BookmarkStore {
         updateFavoriteIndexCalled = true
     }
 
+    func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode) {}
+    func handleFavoritesAfterDisablingSync() {}
 }

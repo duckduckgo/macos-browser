@@ -20,16 +20,10 @@ import Foundation
 
 struct BookmarksBarMenuFactory {
 
-    static func replace(_ menuItem: NSMenuItem?, _ prefs: AppearancePreferences = .shared) -> NSMenuItem? {
-        assert(menuItem != nil)
-        guard let menuItem, let menu = menuItem.menu else {
-            return nil
-        }
-
+    static func replace(_ menuItem: NSMenuItem, _ prefs: AppearancePreferences = .shared) -> NSMenuItem? {
+        guard let menu = menuItem.menu else { return nil }
         let index = menu.index(of: menuItem)
-        guard index >= 0 else {
-            return nil
-        }
+        guard index >= 0 else { return nil }
 
         let item = makeMenuItem(prefs)
         menu.replaceItem(at: index, with: item)

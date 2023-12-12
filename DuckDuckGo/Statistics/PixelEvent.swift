@@ -20,10 +20,17 @@ import Foundation
 import BrowserServicesKit
 import Bookmarks
 import Configuration
+import DDGSync
+import PixelKit
 
 extension Pixel {
 
     indirect enum Event {
+        /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
+        /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
+        /// nothing breaks in the migration towards `PixelKit`.
+        case pixelKitEvent(_ event: PixelKitEvent)
+
         case crash
 
         case brokenSiteReport
@@ -92,6 +99,8 @@ extension Pixel {
         case serpInitial(cohort: String)
         case serpDay21to27(cohort: String)
 
+        case dailyOsVersionCounter
+
         case dataImportFailed(any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
@@ -99,9 +108,6 @@ extension Pixel {
 
         case bitwardenPasswordAutofilled
         case bitwardenPasswordSaved
-
-        case autoconsentOptOutFailed
-        case autoconsentSelfTestFailed
 
         case ampBlockingRulesCompilationFailed
 
@@ -117,17 +123,15 @@ extension Pixel {
 
         case jsPixel(_ pixel: AutofillUserScript.JSPixel)
 
-        case networkProtectionSystemExtensionUnknownActivationResult
-
         case debug(event: Debug, error: Error? = nil)
 
         // Activation Points
-        case newTabInitial
-        case emailEnabledInitial
-        case cookieManagementEnabledInitial
-        case watchInDuckPlayerInitial
-        case setAsDefaultInitial(cohort: String)
-        case importDataInitial
+        case newTabInitial(cohort: String? = nil)
+        case emailEnabledInitial(cohort: String? = nil)
+
+        case watchInDuckPlayerInitial(cohort: String? = nil)
+        case setAsDefaultInitial(cohort: String? = nil)
+        case importDataInitial(cohort: String? = nil)
 
         // New Tab section removed
         case favoriteSectionHidden
@@ -149,6 +153,13 @@ extension Pixel {
         case duckPlayerSettingNever
         case duckPlayerSettingBackToDefault
 
+        // Dashboard
+        case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
+        case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
+
+        // VPN
+        case vpnBreakageReport(category: String, description: String, metadata: String)
+
         // Network Protection Waitlist
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
@@ -162,35 +173,41 @@ extension Pixel {
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
 
+        // Sync
+        case syncSignupDirect
+        case syncSignupConnect
+        case syncLogin
+        case syncDaily
+        case syncDuckAddressOverride
+        case syncSuccessRateDaily
+        case syncLocalTimestampResolutionTriggered(Feature)
+        case syncBookmarksCountLimitExceededDaily
+        case syncCredentialsCountLimitExceededDaily
+        case syncBookmarksRequestSizeLimitExceededDaily
+        case syncCredentialsRequestSizeLimitExceededDaily
+
+        // DataBroker Protection Waitlist
+        case dataBrokerProtectionWaitlistUserActive
+        case dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed
+        case dataBrokerProtectionWaitlistIntroDisplayed
+        case dataBrokerProtectionWaitlistNotificationShown
+        case dataBrokerProtectionWaitlistNotificationTapped
+        case dataBrokerProtectionWaitlistCardUITapped
+        case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
+        case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
+
         // 28-day Home Button
-        case enableHomeButton
-        case disableHomeButton
-        case setnewHomePage
+        case homeButtonHidden
+        case homeButtonLeft
+        case homeButtonRight
 
         case dailyPixel(Event, isFirst: Bool)
-#if DBP
-        case parentChildMatches
-        // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
-
-        // Stage Pixels
-        case optOutStart
-        case optOutEmailGenerate
-        case optOutCaptchaParse
-        case optOutCaptchaSend
-        case optOutCaptchaSolve
-        case optOutSubmit
-        case optOutEmailReceive
-        case optOutEmailConfirm
-        case optOutValidate
-        case optOutFinish
-
-        // Process Pixels
-        case optOutSubmitSuccess
-        case optOutSuccess
-        case optOutFailure
-#endif
 
         enum Debug {
+            /// This is a convenience pixel that allows us to fire `PixelKitEvents` using our
+            /// regular `Pixel.fire()` calls.  This is a convenience intermediate step to help ensure
+            /// nothing breaks in the migration towards `PixelKit`.
+            case pixelKitEvent(_ event: PixelKitEvent)
 
             case assertionFailure(message: String, file: StaticString, line: UInt)
 
@@ -283,18 +300,6 @@ extension Pixel {
             case userSelectedToInstallUpdate
             case userSelectedToDismissUpdate
 
-            case networkProtectionClientFailedToEncodeRedeemRequest
-            case networkProtectionClientInvalidInviteCode
-            case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
-            case networkProtectionClientFailedToParseRedeemResponse(error: Error)
-            case networkProtectionClientInvalidAuthToken
-            case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
-            case networkProtectionKeychainReadError(field: String, status: Int32)
-            case networkProtectionKeychainWriteError(field: String, status: Int32)
-            case networkProtectionKeychainDeleteError(status: Int32)
-            case networkProtectionNoAuthTokenFoundError
-            case networkProtectionUnhandledError(function: String, line: Int, error: Error)
-
             case faviconDecryptionFailedUnique
             case downloadListItemDecryptionFailedUnique
             case historyEntryDecryptionFailedUnique
@@ -313,6 +318,7 @@ extension Pixel {
             case bookmarksMigrationCouldNotPrepareDatabase
             case bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration
             case bookmarksMigrationCouldNotRemoveOldStore
+            case bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders
 
             case syncSentUnauthenticatedRequest
             case syncMetadataCouldNotLoadDatabase
@@ -325,6 +331,9 @@ extension Pixel {
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
+            case favoritesCleanupFailed
+            case bookmarksFaviconsFetcherStateStoreInitializationFailed
+            case bookmarksFaviconsFetcherFailed
 
             case credentialsDatabaseCleanupFailed
             case credentialsCleanupAttemptedWhileSyncWasEnabled
@@ -336,9 +345,7 @@ extension Pixel {
             case networkProtectionRemoteMessageFetchingFailed
             case networkProtectionRemoteMessageStorageFailed
 
-#if DBP
-            case dataBrokerProtectionError
-#endif
+            case loginItemUpdateError
         }
 
     }
@@ -348,6 +355,9 @@ extension Pixel.Event {
 
     var name: String {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.name
+
         case .crash:
             return "m_mac_crash"
 
@@ -359,6 +369,9 @@ extension Pixel.Event {
 
         case .serp:
             return "m_mac_navigation_search"
+
+        case .dailyOsVersionCounter:
+            return "m_mac_daily-os-version-counter"
 
         case .dataImportFailed(let error) where error.action == .favicons:
             return "m_mac_favicon-import-failed_\(error.source)"
@@ -380,12 +393,6 @@ extension Pixel.Event {
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"
 
-        case .autoconsentOptOutFailed:
-            return "m_mac_autoconsent_optout_failed"
-
-        case .autoconsentSelfTestFailed:
-            return "m_mac_autoconsent_selftest_failed"
-
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
 
@@ -398,7 +405,7 @@ extension Pixel.Event {
         case .adClickAttributionPageLoads:
             return "m_mac_ad_click_page_loads"
 
-        // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
+            // Deliberately omit the `m_mac_` prefix in order to format these pixels the same way as other platforms
         case .emailEnabled: return "email_enabled_macos_desktop"
         case .emailDisabled: return "email_disabled_macos_desktop"
         case .emailUserPressedUseAddress: return "email_filled_main_macos_desktop"
@@ -414,8 +421,7 @@ extension Pixel.Event {
             }
         case .emailEnabledInitial:
             return "m_mac.enable-email-protection.initial"
-        case .cookieManagementEnabledInitial:
-            return "m_mac.cookie-management-enabled.initial"
+
         case .watchInDuckPlayerInitial:
             return "m_mac.watch-in-duckplayer.initial"
         case .setAsDefaultInitial:
@@ -424,8 +430,6 @@ extension Pixel.Event {
             return "m_mac.import-data.initial"
         case .newTabInitial:
             return "m_mac.new-tab-opened.initial"
-        case .networkProtectionSystemExtensionUnknownActivationResult:
-            return "m_mac_netp_system_extension_unknown_activation_result"
         case .favoriteSectionHidden:
             return "m_mac.favorite-section-hidden"
         case .recentActivitySectionHidden:
@@ -433,7 +437,7 @@ extension Pixel.Event {
         case .continueSetUpSectionHidden:
             return "m_mac.continue-setup-section-hidden"
 
-        // Fire Button
+            // Fire Button
         case .fireButtonFirstBurn:
             return "m_mac_fire_button_first_burn"
         case .fireButton(option: let option):
@@ -458,12 +462,20 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
+        case .dashboardProtectionAllowlistAdd:
+            return "m_mac_mp_wla"
+        case .dashboardProtectionAllowlistRemove:
+            return "m_mac_mp_wlr"
+
         case .launchInitial:
             return "m.mac.first-launch"
         case .serpInitial:
             return "m.mac.navigation.first-search"
         case .serpDay21to27:
             return "m.mac.search-day-21-27.initial"
+
+        case .vpnBreakageReport:
+            return "m_mac_vpn_breakage_report"
 
         case .networkProtectionWaitlistUserActive:
             return "m_mac_netp_waitlist_user_active"
@@ -488,35 +500,53 @@ extension Pixel.Event {
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
 
-        // 28-day Home Button
-        case .enableHomeButton:
-            return "m_mac_enable_home_button"
-        case .disableHomeButton:
-            return "m_mac_disable_home_button"
-        case .setnewHomePage:
-            return "m_mac_set_new_homepage"
+            // Sync
+        case .syncSignupDirect:
+            return "m_mac_sync_signup_direct"
+        case .syncSignupConnect:
+            return "m_mac_sync_signup_connect"
+        case .syncLogin:
+            return "m_mac_sync_login"
+        case .syncDaily:
+            return "m_mac_sync_daily"
+        case .syncDuckAddressOverride:
+            return "m_mac_sync_duck_address_override"
+        case .syncSuccessRateDaily:
+            return "m_mac_sync_success_rate_daily"
+        case .syncLocalTimestampResolutionTriggered(let feature):
+            return "m_mac_sync_\(feature.name)_local_timestamp_resolution_triggered"
+        case .syncBookmarksCountLimitExceededDaily: return "m_mac_sync_bookmarks_count_limit_exceeded_daily"
+        case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_count_limit_exceeded_daily"
+        case .syncBookmarksRequestSizeLimitExceededDaily: return "m_mac_sync_bookmarks_request_size_limit_exceeded_daily"
+        case .syncCredentialsRequestSizeLimitExceededDaily: return "m_mac_sync_credentials_request_size_limit_exceeded_daily"
+
+        case .dataBrokerProtectionWaitlistUserActive:
+            return "m_mac_dbp_waitlist_user_active"
+        case .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed:
+            return "m_mac_dbp_imp_settings_entry_menu_item"
+        case .dataBrokerProtectionWaitlistIntroDisplayed:
+            return "m_mac_dbp_imp_intro_screen"
+        case .dataBrokerProtectionWaitlistNotificationShown:
+            return "m_mac_dbp_ev_waitlist_notification_shown"
+        case .dataBrokerProtectionWaitlistNotificationTapped:
+            return "m_mac_dbp_ev_waitlist_notification_launched"
+        case .dataBrokerProtectionWaitlistCardUITapped:
+            return "m_mac_dbp_ev_waitlist_card_ui_launched"
+        case .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed:
+            return "m_mac_dbp_imp_terms"
+        case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
+            return "m_mac_dbp_ev_terms_accepted"
+
+            // 28-day Home Button
+        case .homeButtonHidden:
+            return "m_mac_home_button_hidden"
+        case .homeButtonLeft:
+            return "m_mac_home_button_left"
+        case .homeButtonRight:
+            return "m_mac_home_button_right"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
-#if DBP
-        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
-            // Stage Pixels
-        case .optOutStart: return "dbp_macos_optout_stage_start"
-        case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"
-        case .optOutCaptchaParse: return "dbp_macos_optout_stage_captcha-parse"
-        case .optOutCaptchaSend: return "dbp_macos_optout_stage_captcha-send"
-        case .optOutCaptchaSolve: return "dbp_macos_optout_stage_captcha-solve"
-        case .optOutSubmit: return "dbp_macos_optout_stage_submit"
-        case .optOutEmailReceive: return "dbp_macos_optout_stage_email-receive"
-        case .optOutEmailConfirm: return "dbp_macos_optout_stage_email-confirm"
-        case .optOutValidate: return "dbp_macos_optout_stage_validate"
-        case .optOutFinish: return "dbp_macos_optout_stage_finish"
-
-            // Process Pixels
-        case .optOutSubmitSuccess: return "dbp_macos_optout_process_submit-success"
-        case .optOutSuccess: return "dbp_macos_optout_process_success"
-        case .optOutFailure: return "dbp_macos_optout_process_failure"
-#endif
         }
     }
 }
@@ -533,6 +563,8 @@ extension Pixel.Event.Debug {
 
     var name: String {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.name
 
         case .assertionFailure:
             return "assertion_failure"
@@ -706,29 +738,6 @@ extension Pixel.Event.Debug {
         case .userSelectedToDismissUpdate:
             return "user_selected_to_dismiss_update"
 
-        case .networkProtectionClientFailedToEncodeRedeemRequest:
-            return "netp_backend_api_error_encoding_redeem_request_body_failed"
-        case .networkProtectionClientInvalidInviteCode:
-            return "netp_backend_api_error_invalid_invite_code"
-        case .networkProtectionClientFailedToRedeemInviteCode:
-            return "netp_backend_api_error_failed_to_redeem_invite_code"
-        case .networkProtectionClientFailedToParseRedeemResponse:
-            return "netp_backend_api_error_parsing_redeem_response_failed"
-        case .networkProtectionClientInvalidAuthToken:
-            return "netp_backend_api_error_invalid_auth_token"
-        case .networkProtectionKeychainErrorFailedToCastKeychainValueToData:
-            return "netp_keychain_error_failed_to_cast_keychain_value_to_data"
-        case .networkProtectionKeychainReadError:
-            return "netp_keychain_error_read_failed"
-        case .networkProtectionKeychainWriteError:
-            return "netp_keychain_error_write_failed"
-        case .networkProtectionKeychainDeleteError:
-            return "netp_keychain_error_delete_failed"
-        case .networkProtectionNoAuthTokenFoundError:
-            return "netp_no_auth_token_found_error"
-        case .networkProtectionUnhandledError:
-            return "netp_unhandled_error"
-
         case .faviconDecryptionFailedUnique:
             return "favicon_decryption_failed_unique"
         case .downloadListItemDecryptionFailedUnique:
@@ -751,6 +760,8 @@ extension Pixel.Event.Debug {
         case .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration:
             return "bookmarks_migration_could_not_prepare_database_on_failed_migration"
         case .bookmarksMigrationCouldNotRemoveOldStore: return "bookmarks_migration_could_not_remove_old_store"
+        case .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders:
+            return "bookmarks_migration_could_not_prepare_multiple_favorite_folders"
 
         case .syncSentUnauthenticatedRequest: return "sync_sent_unauthenticated_request"
         case .syncMetadataCouldNotLoadDatabase: return "sync_metadata_could_not_load_database"
@@ -763,6 +774,9 @@ extension Pixel.Event.Debug {
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
+        case .favoritesCleanupFailed: return "favorites_cleanup_failed"
+        case .bookmarksFaviconsFetcherStateStoreInitializationFailed: return "bookmarks_favicons_fetcher_state_store_initialization_failed"
+        case .bookmarksFaviconsFetcherFailed: return "bookmarks_favicons_fetcher_failed"
 
         case .credentialsDatabaseCleanupFailed: return "credentials_database_cleanup_failed"
         case .credentialsCleanupAttemptedWhileSyncWasEnabled: return "credentials_cleanup_attempted_while_sync_was_enabled"
@@ -774,9 +788,7 @@ extension Pixel.Event.Debug {
         case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
         case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
 
-#if DBP
-        case .dataBrokerProtectionError: return "data_broker_error"
-#endif
+        case .loginItemUpdateError: return "login-item_update-error"
         }
     }
 }

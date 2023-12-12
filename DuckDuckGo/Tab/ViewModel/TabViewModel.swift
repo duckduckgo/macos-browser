@@ -27,9 +27,7 @@ final class TabViewModel {
         static let burnerHome = NSImage(named: "BurnerTabFavicon")!
         static let preferences = NSImage(named: "Preferences")!
         static let bookmarks = NSImage(named: "Bookmarks")!
-#if DBP
         static let dataBrokerProtection = NSImage(named: "BurnerWindowIcon2")! // PLACEHOLDER: Change it once we have the final icon
-#endif
     }
 
     private(set) var tab: Tab
@@ -56,7 +54,6 @@ final class TabViewModel {
     }
     @Published var errorViewState = ErrorViewState() {
         didSet {
-            updateAddressBarStrings()
             updateTitle()
             updateFavicon()
         }
@@ -69,6 +66,7 @@ final class TabViewModel {
     @Published private(set) var addressBarString: String = ""
     @Published private(set) var passiveAddressBarString: String = ""
     var lastAddressBarTextFieldValue: AddressBarTextField.Value?
+    private(set) var addressBarHasUpdated: Bool = false
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
@@ -106,11 +104,29 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
-        tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateAddressBarStrings()
-            self?.updateCanBeBookmarked()
-            self?.updateFavicon()
-        } .store(in: &cancellables)
+        tab.$content
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] content in
+                self?.waitToUpdateAddressBar(content)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func waitToUpdateAddressBar(_ content: Published<Tab.TabContent>.Publisher.Output) {
+        self.addressBarHasUpdated = false
+        tab.$loadingProgress
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] progress in
+                // Update the address bar only after the tab has reached 10% loading
+                // to prevent Address Bar Spoofing
+                if progress > 0.1 && !(self?.addressBarHasUpdated ?? true) {
+                    self?.updateAddressBarStrings()
+                    self?.updateCanBeBookmarked()
+                    self?.updateFavicon()
+                    self?.addressBarHasUpdated = true
+                }
+            }
+            .store(in: &cancellables)
     }
 
     private func subscribeToCanGoBackForwardAndReload() {
@@ -231,6 +247,13 @@ final class TabViewModel {
             return
         }
 
+        if url.isBlobURL {
+            let strippedUrl = url.stripUnsupportedCredentials()
+            addressBarString = strippedUrl
+            passiveAddressBarString = strippedUrl
+            return
+        }
+
         guard let hostURL = tabHostURL else {
             // also lands here for about:blank and about:home
             addressBarString = ""
@@ -239,7 +262,6 @@ final class TabViewModel {
         }
 
         addressBarString = url.absoluteString
-
         updatePassiveAddressBarString(showURL: appearancePreferences.showFullURL, url: url, hostURL: hostURL)
     }
 
@@ -258,10 +280,8 @@ final class TabViewModel {
         }
 
         switch tab.content {
-#if DBP
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
-#endif
         case .preferences:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
@@ -293,11 +313,9 @@ final class TabViewModel {
         }
 
         switch tab.content {
-#if DBP
         case .dataBrokerProtection:
             favicon = Favicon.dataBrokerProtection
             return
-#endif
         case .homePage:
             if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome

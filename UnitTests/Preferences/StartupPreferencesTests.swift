@@ -20,14 +20,16 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct StartupPreferencesPersistorMock: StartupPreferencesPersistor {
+    var appearancePrefs: AppearancePreferences
     var launchToCustomHomePage: Bool
     var customHomePageURL: String
     var restorePreviousSession: Bool
 
-    init(launchToCustomHomePage: Bool, customHomePageURL: String, restorePreviousSession: Bool = false) {
+    init(launchToCustomHomePage: Bool, customHomePageURL: String, restorePreviousSession: Bool = false, appearancePrefs: AppearancePreferences = AppearancePreferences(persistor: AppearancePreferencesPersistorMock())) {
         self.customHomePageURL = customHomePageURL
         self.launchToCustomHomePage = launchToCustomHomePage
         self.restorePreviousSession = restorePreviousSession
+        self.appearancePrefs = appearancePrefs
     }
 }
 
@@ -48,16 +50,16 @@ class StartupPreferencesTests: XCTestCase {
         XCTAssertEqual(model.customHomePageURL, "https://duckduckgo.com")
 
         model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://mail.google.com/mail/u/1/#spam/FMfcgzGtxKRZFPXfxKMWSKVgwJlswxnH", restorePreviousSession: true))
-        XCTAssertEqual(model.friendlyURL, "mail.google.com/mail/u/1/#s...")
+        XCTAssertEqual(model.friendlyURL, "https://mail.google.com/mai...")
 
         model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://www.rnids.rs/национални-домени/регистрација-националних-домена", restorePreviousSession: true))
-        XCTAssertEqual(model.friendlyURL, "www.rnids.rs/национални-дом...")
+        XCTAssertEqual(model.friendlyURL, "https://www.rnids.rs/национ...")
 
         model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "www.rnids.rs/национални-домени/регистрација-националних-домена", restorePreviousSession: true))
         XCTAssertEqual(model.friendlyURL, "www.rnids.rs/национални-дом...")
 
         model = StartupPreferences(persistor: StartupPreferencesPersistorMock(launchToCustomHomePage: true, customHomePageURL: "https://💩.la", restorePreviousSession: true))
-        XCTAssertEqual(model.friendlyURL, "💩.la")
+        XCTAssertEqual(model.friendlyURL, "https://💩.la")
 
     }
 

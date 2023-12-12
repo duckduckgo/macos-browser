@@ -64,7 +64,7 @@ final class DataBrokerProtectionInviteCodeViewModel: InviteCodeViewModel {
     @Published var showProgressView = false
 
     init(delegate: DataBrokerProtectionInviteCodeViewModelDelegate,
-         authenticationRepository: AuthenticationRepository = UserDefaultsAuthenticationData(),
+         authenticationRepository: AuthenticationRepository = KeychainAuthenticationData(),
          authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()) {
         self.delegate = delegate
         self.redeemUseCase = RedeemUseCase(authenticationService: authenticationService, authenticationRepository: authenticationRepository)

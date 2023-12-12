@@ -285,7 +285,7 @@ private extension ContextMenuManager {
         let identifier = item.identifier.flatMap(WKMenuItemIdentifier.init)
         assert(identifier != nil && validIdentifiers.contains(identifier!))
 
-        return NSMenuItem(title: title, action: action, target: self, keyEquivalent: keyEquivalent ?? item.keyEquivalent, representedObject: item)
+        return NSMenuItem(title: title, action: action, target: self, keyEquivalent: [.charCode(keyEquivalent ?? item.keyEquivalent)], representedObject: item)
     }
 
 }

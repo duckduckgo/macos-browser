@@ -27,6 +27,15 @@ final class HomePageViewController: NSViewController {
     private var bookmarkManager: BookmarkManager
     private let historyCoordinating: HistoryCoordinating
     private let fireViewModel: FireViewModel
+    private let onboardingViewModel: OnboardingViewModel
+
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 
     private weak var host: NSView?
 
@@ -48,12 +57,14 @@ final class HomePageViewController: NSViewController {
           tabCollectionViewModel: TabCollectionViewModel,
           bookmarkManager: BookmarkManager,
           historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireViewModel: FireViewModel? = nil) {
+          fireViewModel: FireViewModel? = nil,
+          onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
         self.historyCoordinating = historyCoordinating
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
+        self.onboardingViewModel = onboardingViewModel
 
         super.init(coder: coder)
     }
@@ -93,14 +104,11 @@ final class HomePageViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        // Temporary pixel for first time user sees the new tab
-        if Pixel.isNewUser && OnboardingViewModel().onboardingFinished {
-            let repetition = Pixel.Event.Repetition(key: Pixel.Event.newTabInitial.name)
-            if repetition == .initial {
-                Pixel.fire(.newTabInitial)
+        if !PixelExperiment.isExperimentInstalled {
+            if onboardingViewModel.onboardingFinished && Pixel.isNewUser {
+                Pixel.fire(.newTabInitial(), limitTo: .initial)
             }
         }
-
         subscribeToHistory()
     }
 
@@ -129,7 +137,7 @@ final class HomePageViewController: NSViewController {
     }
 
     func refreshModels() {
-        guard !NSApp.isRunningUnitTests else { return }
+        guard NSApp.runType.requiresEnvironment else { return }
 
         refreshFavoritesModel()
         refreshRecentlyVisitedModel()
@@ -144,8 +152,24 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-        let vm = HomePage.Models.ContinueSetUpModel(defaultBrowserProvider: SystemDefaultBrowserProvider(), dataImportProvider: BookmarksAndPasswordsImportStatusProvider(), tabCollectionViewModel: tabCollectionViewModel, duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(), networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging())
-        vm.delegate = self
+#if NETWORK_PROTECTION
+        let vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: tabCollectionViewModel,
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
+            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
+            appGroupUserDefaults: .netP
+        )
+#else
+        let vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: SystemDefaultBrowserProvider(),
+            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
+            tabCollectionViewModel: tabCollectionViewModel,
+            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
+        )
+#endif
+
         return vm
     }
 
@@ -177,6 +201,8 @@ final class HomePageViewController: NSViewController {
             self?.showAddEditController(for: bookmark)
         }, moveFavorite: { [weak self] (bookmark, index) in
             self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
+        }, onFaviconMissing: { [weak self] in
+            self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
     }
 
@@ -212,21 +238,21 @@ final class HomePageViewController: NSViewController {
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
-            WindowsManager.openNewWindow(with: url, isBurner: tabCollectionViewModel.isBurner)
+            WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: tabCollectionViewModel.isBurner)
             return
         }
 
         if target == .newTab || NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: true)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: true)
             return
         }
 
         if NSApplication.shared.isCommandPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: false)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: false)
             return
         }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url))
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url, source: .bookmark))
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {

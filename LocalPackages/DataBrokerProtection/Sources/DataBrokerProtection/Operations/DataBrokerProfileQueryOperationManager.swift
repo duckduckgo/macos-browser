@@ -110,14 +110,17 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishScan, object: brokerProfileQueryData.dataBroker.name)
         }
 
+        let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+
         do {
             let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .scanStarted)
             database.add(event)
-            let stageCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
+
             let extractedProfiles = try await runner.scan(brokerProfileQueryData, stageCalculator: stageCalculator, showWebView: showWebView, shouldRunNextStep: shouldRunNextStep)
             os_log("Extracted profiles: %@", log: .dataBrokerProtection, extractedProfiles)
 
             if !extractedProfiles.isEmpty {
+                stageCalculator.fireScanSuccess(matchesFound: extractedProfiles.count)
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .matchesFound(count: extractedProfiles.count))
                 database.add(event)
 
@@ -158,6 +161,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                     }
                 }
             } else {
+                stageCalculator.fireScanFailed()
                 let event = HistoryEvent(brokerId: brokerId, profileQueryId: profileQueryId, type: .noMatchFound)
                 database.add(event)
             }
@@ -177,6 +181,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         database.updateRemovedDate(Date(), on: extractedProfileId)
 
                         try updateOperationDataDates(
+                            origin: .scan,
                             brokerId: brokerId,
                             profileQueryId: profileQueryId,
                             extractedProfileId: extractedProfileId,
@@ -198,6 +203,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 }
             } else {
                 try updateOperationDataDates(
+                    origin: .scan,
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: nil,
@@ -207,11 +213,14 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             }
 
         } catch {
-            handleOperationError(brokerId: brokerId,
+            stageCalculator.fireScanError(error: error)
+            handleOperationError(origin: .scan,
+                                 brokerId: brokerId,
                                  profileQueryId: profileQueryId,
                                  extractedProfileId: nil,
                                  error: error,
-                                 database: database)
+                                 database: database,
+                                 schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig)
             throw error
         }
     }
@@ -234,6 +243,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             return
         }
 
+        guard let optOutStep = brokerProfileQueryData.dataBroker.optOutStep(), optOutStep.optOutType != .parentSiteOptOut else {
+            os_log("Broker opts out in parent, skipping...", log: .dataBrokerProtection)
+            return
+        }
+
         let stageDurationCalculator = DataBrokerProtectionStageDurationCalculator(dataBroker: brokerProfileQueryData.dataBroker.name, handler: pixelHandler)
         stageDurationCalculator.fireOptOutStart()
         os_log("Running opt-out operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
@@ -244,6 +258,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             database.updateLastRunDate(Date(), brokerId: brokerId, profileQueryId: profileQueryId, extractedProfileId: extractedProfileId)
             do {
                 try updateOperationDataDates(
+                    origin: .optOut,
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: extractedProfileId,
@@ -252,11 +267,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                 )
             } catch {
                 handleOperationError(
+                    origin: .optOut,
                     brokerId: brokerId,
                     profileQueryId: profileQueryId,
                     extractedProfileId: extractedProfileId,
                     error: error,
-                    database: database
+                    database: database,
+                    schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig
                 )
             }
             notificationCenter.post(name: DataBrokerProtectionNotifications.didFinishOptOut, object: brokerProfileQueryData.dataBroker.name)
@@ -284,17 +301,20 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         } catch {
             stageDurationCalculator.fireOptOutFailure()
             handleOperationError(
+                origin: .optOut,
                 brokerId: brokerId,
                 profileQueryId: profileQueryId,
                 extractedProfileId: extractedProfileId,
                 error: error,
-                database: database
+                database: database,
+                schedulingConfig: brokerProfileQueryData.dataBroker.schedulingConfig
             )
             throw error
         }
     }
 
     internal func updateOperationDataDates(
+        origin: OperationPreferredDateUpdaterOrigin,
         brokerId: Int64,
         profileQueryId: Int64,
         extractedProfileId: Int64?,
@@ -302,13 +322,20 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         database: DataBrokerProtectionRepository) throws {
 
             let dateUpdater = OperationPreferredDateUpdaterUseCase(database: database)
-            try dateUpdater.updateOperationDataDates(brokerId: brokerId,
+            try dateUpdater.updateOperationDataDates(origin: origin,
+                                                     brokerId: brokerId,
                                                      profileQueryId: profileQueryId,
                                                      extractedProfileId: extractedProfileId,
                                                      schedulingConfig: schedulingConfig)
         }
 
-    private func handleOperationError(brokerId: Int64, profileQueryId: Int64, extractedProfileId: Int64?, error: Error, database: DataBrokerProtectionRepository) {
+    private func handleOperationError(origin: OperationPreferredDateUpdaterOrigin,
+                                      brokerId: Int64,
+                                      profileQueryId: Int64,
+                                      extractedProfileId: Int64?,
+                                      error: Error,
+                                      database: DataBrokerProtectionRepository,
+                                      schedulingConfig: DataBrokerScheduleConfig) {
         let event: HistoryEvent
 
         if let extractedProfileId = extractedProfileId {
@@ -326,6 +353,19 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         }
 
         database.add(event)
+
+        do {
+            try updateOperationDataDates(
+                origin: origin,
+                brokerId: brokerId,
+                profileQueryId: profileQueryId,
+                extractedProfileId: extractedProfileId,
+                schedulingConfig: schedulingConfig,
+                database: database
+            )
+        } catch {
+            os_log("Can't update operation date after error")
+        }
 
         os_log("Error on operation : %{public}@", log: .dataBrokerProtection, error.localizedDescription)
     }

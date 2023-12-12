@@ -28,8 +28,6 @@ final class TestRunHelper: NSObject {
         super.init()
         XCTestObservationCenter.shared.addTestObserver(self)
 
-        // set NSApp.runType to appropriate test run type
-        _=NSApplication.swizzleRunTypeOnce
         // allow mocking NSApp.currentEvent
         _=NSApplication.swizzleCurrentEventOnce
 
@@ -86,19 +84,6 @@ extension TestRunHelper: XCTestObservation {
 
 extension NSApplication {
 
-    // NSApp.runType - returns .unitTests or .integrationTests when running tests
-
-    static var swizzleRunTypeOnce: Void = {
-        let runTypeMethod = class_getClassMethod(NSApplication.self, #selector(getter: NSApplication.runType))!
-        let swizzledRunTypeMethod = class_getClassMethod(NSApplication.self, #selector(NSApplication.swizzled_runType))!
-
-        method_exchangeImplementations(runTypeMethod, swizzledRunTypeMethod)
-    }()
-
-    @objc dynamic class func swizzled_runType() -> NSApplication.RunType {
-        RunType(bundle: Bundle(for: TestRunHelper.self))
-    }
-
     // allow mocking NSApp.currentEvent
 
     static var swizzleCurrentEventOnce: Void = {
@@ -116,20 +101,6 @@ extension NSApplication {
         }
         set {
             objc_setAssociatedObject(self, Self.currentEventKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-
-}
-
-extension NSApplication.RunType {
-
-    init(bundle: Bundle) {
-        if bundle.displayName!.hasPrefix("Unit") {
-            self = .unitTests
-        } else if bundle.displayName!.hasPrefix("Integration") {
-            self = .integrationTests
-        } else {
-            self = .uiTests
         }
     }
 

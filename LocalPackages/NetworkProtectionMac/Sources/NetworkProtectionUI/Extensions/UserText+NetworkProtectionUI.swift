@@ -30,7 +30,7 @@ final class UserText {
 
     // MARK: - Onboarding
 
-    static let networkProtectionOnboardingAllowExtensionTitle = NSLocalizedString("network.protection.onboarding.allow.extension.title", value: "Allow System Extension", comment: "Title for the onboarding allow-extension step")
+    static let networkProtectionOnboardingInstallExtensionTitle = NSLocalizedString("network.protection.onboarding.install.extension.title", value: "Install VPN System Extension", comment: "Title for the onboarding install-vpn-extension step")
     static let networkProtectionOnboardingAllowExtensionDescPrefix = NSLocalizedString("network.protection.onboarding.allow.extension.desc.prefix", value: "Open System Settings to Privacy & Security. Scroll and select ", comment: "Non-bold prefix for the onboarding allow-extension description")
     static let networkProtectionOnboardingAllowExtensionDescAllow = NSLocalizedString("network.protection.onboarding.allow.extension.desc.allow", value: "Allow", comment: "'Allow' word between the prefix and suffix for the onboarding allow-extension description")
     static let networkProtectionOnboardingAllowExtensionDescSuffix = NSLocalizedString("network.protection.onboarding.allow.extension.desc.suffix", value: " for DuckDuckGo software.", comment: "Non-bold suffix for the onboarding allow-extension description")

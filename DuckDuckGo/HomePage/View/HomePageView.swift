@@ -38,7 +38,7 @@ extension HomePage.Views {
             if isBurner {
                 BurnerHomePageView()
             } else {
-                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable)
+                regularHomePageView(includingContinueSetUpCards: model.isContinueSetUpAvailable, isNoCardExperimentOn: PixelExperiment.isNoCardsExperimentOn)
                     .contextMenu(ContextMenu(menuItems: {
                         if model.isContinueSetUpAvailable {
                             Toggle(UserText.newTabMenuItemShowContinuteSetUp, isOn: $model.isContinueSetUpVisible)
@@ -53,18 +53,20 @@ extension HomePage.Views {
             }
         }
 
-        func regularHomePageView(includingContinueSetUpCards: Bool) -> some View {
+        func regularHomePageView(includingContinueSetUpCards: Bool, isNoCardExperimentOn: Bool) -> some View {
             ZStack(alignment: .top) {
 
                 ScrollView {
                     VStack(spacing: 0) {
                         Group {
+                            if isNoCardExperimentOn {
+                                DefaultBrowserPrompt()
+                            }
                             if includingContinueSetUpCards {
                                 ContinueSetUpView()
                                     .padding(.top, 64)
                                     .visibility(model.isContinueSetUpVisible ? .visible : .gone)
                             }
-
                             Favorites()
                                 .padding(.top, 24)
                                 .visibility(model.isFavoriteVisible ? .visible : .gone)

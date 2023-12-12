@@ -31,7 +31,7 @@ protocol EnableWaitlistFeatureViewData {
 
 struct EnableWaitlistFeatureView: View {
     var viewData: EnableWaitlistFeatureViewData
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
         WaitlistDialogView {
@@ -53,7 +53,7 @@ struct EnableWaitlistFeatureView: View {
         } buttons: {
             Button(viewData.buttonConfirmLabel) {
                 Task {
-                    await model.perform(action: .closeAndPinNetworkProtection)
+                    await model.perform(action: .closeAndConfirmFeature)
                 }
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
@@ -72,18 +72,6 @@ struct EnableNetworkProtectionViewData: EnableWaitlistFeatureViewData {
     var subtitle: String = UserText.networkProtectionWaitlistEnableSubtitle
     var availabilityDisclaimer: String = UserText.networkProtectionWaitlistAvailabilityDisclaimer
     var buttonConfirmLabel: String = UserText.networkProtectionWaitlistButtonGotIt
-}
-
-#endif
-
-#if DBP
-
-struct EnableDataBrokerProtectionViewData: EnableWaitlistFeatureViewData {
-    var headerImageName: String = "DBP-JoinWaitlistHeader"
-    var title: String = UserText.dataBrokerProtectionWaitlistEnableTitle
-    var subtitle: String = UserText.dataBrokerProtectionWaitlistEnableSubtitle
-    var availabilityDisclaimer: String = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
-    var buttonConfirmLabel: String = UserText.dataBrokerProtectionWaitlistButtonGotIt
 }
 
 #endif

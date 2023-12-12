@@ -56,6 +56,7 @@ final class HistoryStore: HistoryStoring {
                 let identifiers = entries.map { $0.identifier }
                 switch self.remove(identifiers, context: self.context) {
                 case .failure(let error):
+                    self.context.reset()
                     promise(.failure(error))
                 case .success:
                     promise(.success(()))
@@ -74,6 +75,7 @@ final class HistoryStore: HistoryStoring {
 
                 switch self.clean(self.context, until: date) {
                 case .failure(let error):
+                    self.context.reset()
                     promise(.failure(error))
                 case .success:
                     let reloadResult = self.reload(self.context)
@@ -100,6 +102,7 @@ final class HistoryStore: HistoryStoring {
                 os_log("%d items cleaned from history", log: .history, entriesToDelete.count)
             } catch {
                 Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
+                self.context.reset()
                 return .failure(error)
             }
         }
@@ -108,6 +111,7 @@ final class HistoryStore: HistoryStoring {
             try context.save()
         } catch {
             Pixel.fire(.debug(event: .historyRemoveFailed, error: error))
+            context.reset()
             return .failure(error)
         }
 
@@ -140,6 +144,7 @@ final class HistoryStore: HistoryStoring {
             try context.save()
         } catch {
             Pixel.fire(.debug(event: .historyCleanEntriesFailed, error: error))
+            context.reset()
             return .failure(error)
         }
 
@@ -155,6 +160,7 @@ final class HistoryStore: HistoryStoring {
             return .success(())
         } catch {
             Pixel.fire(.debug(event: .historyCleanVisitsFailed, error: error))
+            context.reset()
             return .failure(error)
         }
     }
@@ -206,12 +212,14 @@ final class HistoryStore: HistoryStoring {
                 switch insertionResult {
                 case .failure(let error):
                     Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                    context.reset()
                     promise(.failure(error))
                 case .success(let visitMOs):
                     do {
                         try self.context.save()
                     } catch {
                         Pixel.fire(.debug(event: .historySaveFailed, error: error))
+                        context.reset()
                         promise(.failure(HistoryStoreError.savingFailed))
                         return
                     }
@@ -250,6 +258,7 @@ final class HistoryStore: HistoryStoring {
         if let result {
             return .success(result)
         } else {
+            context.reset()
             return .failure(HistoryStoreError.savingFailed)
         }
     }
@@ -260,6 +269,7 @@ final class HistoryStore: HistoryStoring {
         let insertedObject = NSEntityDescription.insertNewObject(forEntityName: VisitManagedObject.className(), into: context)
         guard let visitMO = insertedObject as? VisitManagedObject else {
             Pixel.fire(.debug(event: .historyInsertVisitFailed))
+            context.reset()
             return .failure(HistoryStoreError.savingFailed)
         }
         visitMO.update(with: visit, historyEntryManagedObject: historyEntryManagedObject)
@@ -276,6 +286,7 @@ final class HistoryStore: HistoryStoring {
 
                 switch self.remove(visits, context: self.context) {
                 case .failure(let error):
+                    self.context.reset()
                     promise(.failure(error))
                 case .success:
                     promise(.success(()))
@@ -314,6 +325,7 @@ final class HistoryStore: HistoryStoring {
             try context.save()
         } catch {
             Pixel.fire(.debug(event: .historyRemoveVisitsFailed, error: error))
+            context.reset()
             return .failure(error)
         }
 

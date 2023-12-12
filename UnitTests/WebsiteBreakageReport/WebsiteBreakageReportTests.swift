@@ -39,7 +39,8 @@ class WebsiteBreakageReportTests: XCTestCase {
             ],
             isGPCEnabled: true,
             ampURL: "https://example.test",
-            urlParametersRemoved: false
+            urlParametersRemoved: false,
+            protectionsState: true
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -57,6 +58,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
+        XCTAssertEqual(queryItems[valueFor: "protectionsState"], "true")
     }
 
     func testThatNativeAppSpecificFieldsAreReported() throws {
@@ -77,6 +79,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             isGPCEnabled: true,
             ampURL: "https://example.test",
             urlParametersRemoved: false,
+            protectionsState: true,
             manufacturer: "IBM"
         )
 
@@ -95,6 +98,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
+        XCTAssertEqual(queryItems[valueFor: "protectionsState"], "true")
         XCTAssertEqual(queryItems[valueFor: "manufacturer"], "IBM")
         XCTAssertEqual(queryItems[valueFor: "os"], "12")
         XCTAssertEqual(queryItems[valueFor: "gpc"], "true")
@@ -102,8 +106,10 @@ class WebsiteBreakageReportTests: XCTestCase {
 
     func makeURLRequest(with parameters: [String: String]) -> URLRequest {
         APIRequest.Headers.setUserAgent("")
+        var params = parameters
+        params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
-                                                     queryParameters: parameters,
+                                                     queryParameters: params,
                                                      allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters)
         return configuration.request
     }

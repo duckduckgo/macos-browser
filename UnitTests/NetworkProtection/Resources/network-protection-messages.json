@@ -3,21 +3,35 @@
         "id": "123",
         "cardTitle": "Title 1",
         "cardDescription": "Description 1",
-        "cardAction": "Action 1"
+        "requiresNetworkProtectionAccess": true,
+        "requiresNetworkProtectionUsage": true,
+        "action": {
+            "actionTitle": "Action 1"
+        }
     },
     {
         "id": "456",
         "daysSinceNetworkProtectionEnabled": 1,
         "cardTitle": "Title 2",
         "cardDescription": "Description 2",
-        "cardAction": "Action 2"
+        "requiresNetworkProtectionAccess": true,
+        "requiresNetworkProtectionUsage": true,
+        "action": {
+            "actionTitle": "Action 2"
+        }
     },
     {
         "id": "789",
         "daysSinceNetworkProtectionEnabled": 5,
         "cardTitle": "Title 3",
         "cardDescription": "Description 3",
-        "cardAction": "Action 3",
-        "surveyURL": "https://duckduckgo.com/"
+        "requiresNetworkProtectionAccess": true,
+        "requiresNetworkProtectionUsage": true,
+        "action": {
+            "actionTitle": "Action 3",
+            "actionType": "openSurveyURL",
+            "actionURL": "https://duckduckgo.com/"
+        }
+
     }
 ]

@@ -51,9 +51,12 @@ final class AutofillTabExtension: TabExtension {
             autofillScript?.currentOverlayTab = self.delegate
         }
     }
+    private lazy var cachedRuntimeConfigurationForDomain: [String: String?] = [:]
+
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
     private var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+    private let privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
     private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
@@ -177,6 +180,27 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
         // no-op
+    }
+
+    func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        if let runtimeConfigurationForDomain = cachedRuntimeConfigurationForDomain[domain] as? String {
+            completionHandler(runtimeConfigurationForDomain)
+            return
+        }
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: buildContentScopePropertiesForDomain(domain))
+            .build()
+            .buildRuntimeConfigResponse()
+
+        cachedRuntimeConfigurationForDomain = [domain: runtimeConfiguration]
+        completionHandler(runtimeConfiguration)
+    }
+
+    private func buildContentScopePropertiesForDomain(_ domain: String) -> ContentScopeProperties {
+        return ContentScopeProperties(gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                      sessionKey: autofillScript?.sessionKey ?? "",
+                                      featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig)
+        )
     }
 }
 

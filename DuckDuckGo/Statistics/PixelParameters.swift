@@ -22,6 +22,9 @@ extension Pixel.Event {
 
     var parameters: [String: String]? {
         switch self {
+        case .pixelKitEvent(let event):
+            return event.parameters
+
         case .debug(event: let debugEvent, error: let error):
 
             var params = error?.pixelParameters ?? [:]
@@ -42,12 +45,46 @@ extension Pixel.Event {
         case .serpInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
         case .serpDay21to27(let cohort):
-            return [PixelKit.Parameters.experimentCohort: cohort, "isDefault": DefaultBrowserPreferences().isDefault.description]
+            return [PixelKit.Parameters.experimentCohort: cohort]
         case .setAsDefaultInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case .newTabInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case  .emailEnabledInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case  .watchInDuckPlayerInitial(let cohort):
+            guard let cohort else { return nil }
+            return [PixelKit.Parameters.experimentCohort: cohort]
+        case  .importDataInitial(let cohort):
+            guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .dailyPixel(let pixel, isFirst: _):
             return pixel.parameters
+
+        case .dailyOsVersionCounter:
+            return [PixelKit.Parameters.osMajorVersion: "\(ProcessInfo.processInfo.operatingSystemVersion.majorVersion)"]
+
+        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+            guard let trigger = triggerOrigin else { return nil }
+            return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
+
+        case .syncSuccessRateDaily:
+            return nil
+
+        case .vpnBreakageReport(let category, let description, let metadata):
+            return [
+                PixelKit.Parameters.vpnBreakageCategory: category,
+                PixelKit.Parameters.vpnBreakageDescription: description,
+                PixelKit.Parameters.vpnBreakageMetadata: metadata
+            ]
 
         // Don't use default to force new items to be thought about
         case .crash,
@@ -58,8 +95,6 @@ extension Pixel.Event {
              .autofillItemSaved,
              .bitwardenPasswordAutofilled,
              .bitwardenPasswordSaved,
-             .autoconsentOptOutFailed,
-             .autoconsentSelfTestFailed,
              .ampBlockingRulesCompilationFailed,
              .adClickAttributionDetected,
              .adClickAttributionActive,
@@ -70,12 +105,6 @@ extension Pixel.Event {
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
              .jsPixel,
-             .emailEnabledInitial,
-             .cookieManagementEnabledInitial,
-             .watchInDuckPlayerInitial,
-             .importDataInitial,
-             .newTabInitial,
-             .networkProtectionSystemExtensionUnknownActivationResult,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
@@ -101,27 +130,28 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
-             .enableHomeButton,
-             .disableHomeButton,
-             .setnewHomePage:
+             .syncSignupDirect,
+             .syncSignupConnect,
+             .syncLogin,
+             .syncDaily,
+             .syncDuckAddressOverride,
+             .syncLocalTimestampResolutionTriggered,
+             .syncBookmarksCountLimitExceededDaily,
+             .syncCredentialsCountLimitExceededDaily,
+             .syncBookmarksRequestSizeLimitExceededDaily,
+             .syncCredentialsRequestSizeLimitExceededDaily,
+             .dataBrokerProtectionWaitlistUserActive,
+             .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed,
+             .dataBrokerProtectionWaitlistIntroDisplayed,
+             .dataBrokerProtectionWaitlistNotificationShown,
+             .dataBrokerProtectionWaitlistNotificationTapped,
+             .dataBrokerProtectionWaitlistCardUITapped,
+             .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
+             .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
+             .homeButtonLeft,
+             .homeButtonRight,
+             .homeButtonHidden:
             return nil
-#if DBP
-        case .optOutStart,
-            .optOutEmailGenerate,
-            .optOutCaptchaParse,
-            .optOutCaptchaSend,
-            .optOutCaptchaSolve,
-            .optOutSubmit,
-            .optOutEmailReceive,
-            .optOutEmailConfirm,
-            .optOutValidate,
-            .optOutFinish,
-            .optOutSubmitSuccess,
-            .optOutSuccess,
-            .optOutFailure,
-            .parentChildMatches:
-          return nil
-#endif
         }
     }
 

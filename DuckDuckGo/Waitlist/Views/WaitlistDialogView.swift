@@ -24,7 +24,7 @@ struct WaitlistDialogView<Content, Buttons>: View where Content: View, Buttons: 
 
     let innerPadding: CGFloat
 
-    @EnvironmentObject var model: NetworkProtectionWaitlistViewModel
+    @EnvironmentObject var model: WaitlistViewModel
     @ViewBuilder let content: () -> Content
     @ViewBuilder let buttons: () -> Buttons
 

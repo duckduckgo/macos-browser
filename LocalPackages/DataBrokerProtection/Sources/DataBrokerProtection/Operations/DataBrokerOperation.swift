@@ -76,7 +76,7 @@ extension DataBrokerOperation {
                 try await runEmailConfirmationAction(action: emailConfirmationAction)
                 await executeNextStep()
             } catch {
-                await onError(error: .emailError(error as? EmailError))
+                await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
             }
 
             return
@@ -84,12 +84,13 @@ extension DataBrokerOperation {
 
         if action as? SolveCaptchaAction != nil, let captchaTransactionId = actionsHandler?.captchaTransactionId {
             actionsHandler?.captchaTransactionId = nil
+            stageCalculator?.setStage(.captchaSolve)
             if let captchaData = try? await captchaService.submitCaptchaToBeResolved(for: captchaTransactionId,
                                                                                      shouldRunNextStep: shouldRunNextStep) {
                 stageCalculator?.fireOptOutCaptchaSolve()
                 await webViewHandler?.execute(action: action, data: .solveCaptcha(CaptchaToken(token: captchaData)))
             } else {
-                await onError(error: .captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
+                await onError(error: DataBrokerProtectionError.captchaServiceError(CaptchaServiceError.nilDataWhenFetchingCaptchaResult))
             }
 
             return
@@ -97,21 +98,17 @@ extension DataBrokerOperation {
 
         if action.needsEmail {
             do {
+                stageCalculator?.setStage(.emailGenerate)
                 extractedProfile?.email = try await emailService.getEmail()
                 stageCalculator?.fireOptOutEmailGenerate()
             } catch {
-                await onError(error: .emailError(error as? EmailError))
+                await onError(error: DataBrokerProtectionError.emailError(error as? EmailError))
                 return
             }
         }
 
         if action as? GetCaptchaInfoAction != nil {
-            // Captcha is a third-party resource that sometimes takes more time to load
-            // if we are not able to get the captcha information. We will try to run the action again
-            // instead of failing the whole thing.
-            //
-            // https://app.asana.com/0/1203581873609357/1205476538384291/f
-            retriesCountOnError = 3
+            stageCalculator?.setStage(.captchaParse)
         }
 
         if let extractedProfile = self.extractedProfile {
@@ -123,6 +120,7 @@ extension DataBrokerOperation {
 
     private func runEmailConfirmationAction(action: EmailConfirmationAction) async throws {
         if let email = extractedProfile?.email {
+            stageCalculator?.setStage(.emailReceive)
             let url =  try await emailService.getConfirmationLink(
                 from: email,
                 numberOfRetries: 100, // Move to constant
@@ -130,7 +128,14 @@ extension DataBrokerOperation {
                 shouldRunNextStep: shouldRunNextStep
             )
             stageCalculator?.fireOptOutEmailReceive()
-            try? await webViewHandler?.load(url: url)
+            stageCalculator?.setStage(.emailReceive)
+            do {
+                try await webViewHandler?.load(url: url)
+            } catch {
+                await onError(error: error)
+                return
+            }
+
             stageCalculator?.fireOptOutEmailConfirm()
         } else {
             throw EmailError.cantFindEmail
@@ -142,7 +147,7 @@ extension DataBrokerOperation {
         self.continuation = nil
     }
 
-    func failed(with error: DataBrokerProtectionError) {
+    func failed(with error: Error) {
         self.continuation?.resume(throwing: error)
         self.continuation = nil
     }
@@ -162,8 +167,12 @@ extension DataBrokerOperation {
     // MARK: - CSSCommunicationDelegate
 
     func loadURL(url: URL) async {
-        try? await webViewHandler?.load(url: url)
-        await executeNextStep()
+        do {
+            try await webViewHandler?.load(url: url)
+            await executeNextStep()
+        } catch {
+           await onError(error: error)
+        }
     }
 
     func success(actionId: String, actionType: ActionType) async {
@@ -178,6 +187,7 @@ extension DataBrokerOperation {
     func captchaInformation(captchaInfo: GetCaptchaInfoResponse) async {
         do {
             stageCalculator?.fireOptOutCaptchaParse()
+            stageCalculator?.setStage(.captchaSend)
             actionsHandler?.captchaTransactionId = try await captchaService.submitCaptchaInformation(captchaInfo,
                                                                                                      shouldRunNextStep: shouldRunNextStep)
             stageCalculator?.fireOptOutCaptchaSend()
@@ -197,11 +207,11 @@ extension DataBrokerOperation {
 
             await executeNextStep()
         } catch {
-            await onError(error: .solvingCaptchaWithCallbackError)
+            await onError(error: DataBrokerProtectionError.solvingCaptchaWithCallbackError)
         }
     }
 
-    func onError(error: DataBrokerProtectionError) async {
+    func onError(error: Error) async {
         if retriesCountOnError > 0 {
             await executeCurrentAction()
         } else {
@@ -218,7 +228,8 @@ extension DataBrokerOperation {
             retriesCountOnError -= 1
             await runNextAction(currentAction)
         } else {
-            await onError(error: .unknown("No current action to execute"))
+            retriesCountOnError = 0
+            await onError(error: DataBrokerProtectionError.unknown("No current action to execute"))
         }
     }
 }

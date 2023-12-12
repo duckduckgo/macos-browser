@@ -16,6 +16,12 @@ inputs:
   RELEASE_PROVISION_PROFILE_BASE64:
     required: true
     type: string
+  DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
+  DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64:
+    required: true
+    type: string
   NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64:
     required: true
     type: string
@@ -32,15 +38,6 @@ inputs:
     required: true
     type: string
   NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_START_VPN_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_STOP_VPN_PROVISION_PROFILE_BASE64:
-    required: true
-    type: string
-  NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64:
     required: true
     type: string
   access-token:
@@ -64,29 +61,27 @@ runs:
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
         REVIEW_PP_PATH=$RUNNER_TEMP/review_pp.provisionprofile
         RELEASE_PP_PATH=$RUNNER_TEMP/release_pp.provisionprofile
+        DBP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/dbp_agent_release_pp.provisionprofile
+        DBP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/dbp_agent_review_pp.provisionprofile
         NETP_SYSEX_RELEASE_PP_PATH=$RUNNER_TEMP/netp_sysex_release_pp.provisionprofile
         NETP_SYSEX_REVIEW_PP_PATH=$RUNNER_TEMP/netp_sysex_review_pp.provisionprofile
         NETP_AGENT_RELEASE_PP_PATH=$RUNNER_TEMP/netp_agent_release_pp.provisionprofile
         NETP_AGENT_REVIEW_PP_PATH=$RUNNER_TEMP/netp_agent_review_pp.provisionprofile
         NETP_NOTIFICATIONS_RELEASE_PP_PATH=$RUNNER_TEMP/netp_notifications_release_pp.provisionprofile
         NETP_NOTIFICATIONS_REVIEW_PP_PATH=$RUNNER_TEMP/netp_notifications_review_pp.provisionprofile
-        NETP_START_VPN_PP_PATH=$RUNNER_TEMP/netp_start_vpn_pp.provisionprofile
-        NETP_STOP_VPN_PP_PATH=$RUNNER_TEMP/netp_stop_vpn_pp.provisionprofile
-        NETP_ENABLE_ON_DEMAND_PP_PATH=$RUNNER_TEMP/netp_enable_on_demand_pp.provisionprofile
 
         # import certificate from secrets
         echo -n "${{ inputs.BUILD_CERTIFICATE_BASE64 }}" | base64 --decode -o $CERTIFICATE_PATH
         echo -n "${{ inputs.REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $REVIEW_PP_PATH
         echo -n "${{ inputs.RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $RELEASE_PP_PATH
+        echo -n "${{ inputs.DBP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_RELEASE_PP_PATH
+        echo -n "${{ inputs.DBP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $DBP_AGENT_REVIEW_PP_PATH
         echo -n "${{ inputs.NETP_SYSEX_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_RELEASE_PP_PATH
         echo -n "${{ inputs.NETP_SYSEX_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_SYSEX_REVIEW_PP_PATH
         echo -n "${{ inputs.NETP_AGENT_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_RELEASE_PP_PATH
         echo -n "${{ inputs.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_AGENT_REVIEW_PP_PATH
         echo -n "${{ inputs.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_RELEASE_PP_PATH
         echo -n "${{ inputs.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_NOTIFICATIONS_REVIEW_PP_PATH
-        echo -n "${{ inputs.NETP_START_VPN_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_START_VPN_PP_PATH
-        echo -n "${{ inputs.NETP_STOP_VPN_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_STOP_VPN_PP_PATH
-        echo -n "${{ inputs.NETP_ENABLE_ON_DEMAND_PROVISION_PROFILE_BASE64 }}" | base64 --decode -o $NETP_ENABLE_ON_DEMAND_PP_PATH
 
         # create temporary keychain
         security create-keychain -p "${{ inputs.KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
@@ -101,14 +96,13 @@ runs:
         mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
         cp $REVIEW_PP_PATH \
             $RELEASE_PP_PATH \
+            $DBP_AGENT_RELEASE_PP_PATH \
+            $DBP_AGENT_REVIEW_PP_PATH \
             $NETP_SYSEX_RELEASE_PP_PATH \
             $NETP_SYSEX_REVIEW_PP_PATH \
             $NETP_AGENT_RELEASE_PP_PATH \
             $NETP_AGENT_REVIEW_PP_PATH \
             $NETP_NOTIFICATIONS_RELEASE_PP_PATH \
             $NETP_NOTIFICATIONS_REVIEW_PP_PATH \
-            $NETP_START_VPN_PP_PATH \
-            $NETP_STOP_VPN_PP_PATH \
-            $NETP_ENABLE_ON_DEMAND_PP_PATH \
             ~/Library/MobileDevice/Provisioning\ Profiles
       shell: bash

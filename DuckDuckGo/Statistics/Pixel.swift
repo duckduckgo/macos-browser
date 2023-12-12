@@ -30,7 +30,7 @@ final class Pixel {
         if dryRun {
             shared = Pixel(store: LocalPixelDataStore.shared) { event, params, _, _, onComplete in
                 let params = params.filter { key, _ in !["appVersion", "test"].contains(key) }
-                os_log(.debug, log: .pixel, "%@ %@", event.name.replacingOccurrences(of: "_", with: "."), params)
+                os_log(.debug, log: .pixel, "%{public}@ %{public}@", event.name.replacingOccurrences(of: "_", with: "."), params)
                 // simulate server response time for Dry Run mode
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     onComplete(nil)
@@ -80,7 +80,13 @@ final class Pixel {
         }
     }
 
-    init(store: @escaping @autoclosure () -> PixelDataStore, requestSender: @escaping RequestSender) {
+    private let appVersion: String
+
+    init(appVersion: String = AppVersion.shared.versionNumber,
+         store: @escaping @autoclosure () -> PixelDataStore,
+         requestSender: @escaping RequestSender) {
+
+        self.appVersion = appVersion
         self.store = store
         self.sendRequest = requestSender
     }
@@ -124,7 +130,7 @@ final class Pixel {
         }
 
         if includeAppVersionParameter {
-            newParams[PixelKit.Parameters.appVersion] = AppVersion.shared.versionNumber
+            newParams[PixelKit.Parameters.appVersion] = appVersion
         }
 #if DEBUG
         newParams[PixelKit.Parameters.test] = PixelKit.Values.test

@@ -24,18 +24,27 @@ public protocol ManagementViewModel: ObservableObject {
     var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
     var errorMessage: String? { get }
+    var isSyncBookmarksPaused: Bool { get }
+    var isSyncCredentialsPaused: Bool { get }
 
     var recoveryCode: String? { get }
+    var codeToDisplay: String? { get }
     var devices: [SyncDevice] { get }
+    var isFaviconsFetchingEnabled: Bool { get set }
+    var isUnifiedFavoritesEnabled: Bool { get set }
 
-    func presentEnableSyncDialog()
-    func presentRecoverSyncAccountDialog()
-    func presentTurnOffSyncConfirmDialog()
     func presentDeleteAccount()
-    func presentShowOrEnterCodeDialog()
     func presentDeviceDetails(_ device: SyncDevice)
     func presentRemoveDevice(_ device: SyncDevice)
 
     func saveRecoveryPDF()
     func refreshDevices()
+
+    func manageBookmarks()
+    func manageLogins()
+
+    func syncWithAnotherDevicePressed()
+    func syncWithServerPressed()
+    func recoverDataPressed()
+    func turnOffSyncPressed()
 }

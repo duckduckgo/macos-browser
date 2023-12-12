@@ -20,29 +20,58 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct SaveRecoveryPDFView: View {
-    @EnvironmentObject var model: ManagementDialogModel
+    @EnvironmentObject var viewModel: ManagementDialogModel
+    let code: String
 
     var body: some View {
         SyncDialog {
             VStack(spacing: 20.0) {
                 Image("SyncRecoveryPDF")
-                Text(UserText.saveRecoveryPDF)
-                    .font(.system(size: 17, weight: .bold))
-                Text(UserText.recoveryPDFExplanation1)
-                    .multilineTextAlignment(.center)
-                Text(UserText.recoveryPDFExplanation2)
-                    .multilineTextAlignment(.center)
+                SyncUIViews.TextHeader(text: UserText.saveRecoveryPDF)
+                SyncUIViews.TextDetailMultiline(text: UserText.recoveryPDFExplanation)
             }
+            VStack(alignment: .leading, spacing: 20) {
+                HStack {
+                    QRCode(string: code, size: CGSize(width: 56, height: 56))
+                    Text(code)
+                        .kerning(2)
+                        .multilineTextAlignment(.leading)
+                        .lineSpacing(5)
+                        .lineLimit(3)
+                        .font(Font.custom("SF Mono", size: 12))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(width: 340)
+                HStack {
+                    Button {
+                        viewModel.delegate?.copyCode()
+                    } label: {
+                        Text(UserText.recoveryPDFCopyCodeButton)
+                            .frame(width: 155, height: 28)
+                    }
+                    Button {
+                        viewModel.delegate?.saveRecoveryPDF()
+                    } label: {
+                        Text(UserText.recoveryPDFSavePDFButton)
+                            .frame(width: 155, height: 28)
+                    }
+                }
+                .frame(width: 340)
+            }
+            .padding(20)
+            .roundedBorder()
+            .padding(20)
+
+            Text(UserText.recoveryPDFWarning)
+                .foregroundColor(Color("BlackWhite60"))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         } buttons: {
-            Button(UserText.notNow) {
-                model.endFlow()
-            }
-            Button(UserText.saveRecoveryPDF) {
-                model.delegate?.saveRecoveryPDF()
-                model.endFlow()
+            Button(UserText.next) {
+                viewModel.delegate?.recoveryCodeNextPressed()
             }
             .buttonStyle(DefaultActionButtonStyle(enabled: true))
         }
-        .frame(height: 314)
+        .frame(width: 420)
     }
 }

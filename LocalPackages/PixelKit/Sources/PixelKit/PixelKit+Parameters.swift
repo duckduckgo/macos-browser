@@ -24,6 +24,7 @@ public extension PixelKit {
         public static let duration = "duration"
         public static let test = "test"
         public static let appVersion = "appVersion"
+        public static let osMajorVersion = "osMajorVersion"
 
         public static let errorCode = "e"
         public static let errorDesc = "d"
@@ -53,6 +54,14 @@ public extension PixelKit {
 
         // Pixel experiments
         public static let experimentCohort = "cohort"
+
+        // Dashboard
+        public static let dashboardTriggerOrigin = "trigger_origin"
+
+        // VPN
+        public static let vpnBreakageCategory = "breakageCategory"
+        public static let vpnBreakageDescription = "breakageDescription"
+        public static let vpnBreakageMetadata = "breakageMetadata"
     }
 
     enum Values {

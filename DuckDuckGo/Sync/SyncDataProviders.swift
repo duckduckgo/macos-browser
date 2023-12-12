@@ -28,6 +28,7 @@ final class SyncDataProviders: DataProvidersSource {
     public let credentialsAdapter: SyncCredentialsAdapter
     public let settingsAdapter: SyncSettingsAdapter
 
+    @MainActor
     func makeDataProviders() -> [DataProviding] {
         initializeMetadataDatabaseIfNeeded()
         guard let syncMetadata else {
@@ -35,9 +36,21 @@ final class SyncDataProviders: DataProvidersSource {
             return []
         }
 
-        bookmarksAdapter.setUpProviderIfNeeded(database: bookmarksDatabase, metadataStore: syncMetadata)
-        credentialsAdapter.setUpProviderIfNeeded(secureVaultFactory: secureVaultFactory, metadataStore: syncMetadata)
-        settingsAdapter.setUpProviderIfNeeded(metadataDatabase: syncMetadataDatabase.db, metadataStore: syncMetadata)
+        bookmarksAdapter.setUpProviderIfNeeded(
+            database: bookmarksDatabase,
+            metadataStore: syncMetadata,
+            metricsEventsHandler: metricsEventsHandler
+        )
+        credentialsAdapter.setUpProviderIfNeeded(
+            secureVaultFactory: secureVaultFactory,
+            metadataStore: syncMetadata,
+            metricsEventsHandler: metricsEventsHandler
+        )
+        settingsAdapter.setUpProviderIfNeeded(
+            metadataDatabase: syncMetadataDatabase.db,
+            metadataStore: syncMetadata,
+            metricsEventsHandler: metricsEventsHandler
+        )
 
         let providers: [Any] = [
             bookmarksAdapter.provider as Any,
@@ -63,6 +76,7 @@ final class SyncDataProviders: DataProvidersSource {
             .removeDuplicates()
 
         syncAuthStateDidChangeCancellable = syncAuthStateDidChangePublisher
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] isSyncDisabled in
                 self?.bookmarksAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
                 self?.credentialsAdapter.cleanUpDatabaseAndUpdateSchedule(shouldEnable: isSyncDisabled)
@@ -106,6 +120,7 @@ final class SyncDataProviders: DataProvidersSource {
     private var isSyncMetadaDatabaseLoaded: Bool = false
     private var syncMetadata: SyncMetadataStore?
     private var syncAuthStateDidChangeCancellable: AnyCancellable?
+    private let metricsEventsHandler = SyncMetricsEventsHandler()
 
     private let syncMetadataDatabase: SyncMetadataDatabase = SyncMetadataDatabase()
     private let bookmarksDatabase: CoreDataDatabase

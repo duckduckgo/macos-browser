@@ -32,7 +32,7 @@ protocol WaitlistBetaOverriding {
 }
 
 final class DefaultWaitlistBetaOverrides: WaitlistBetaOverriding {
-    private let userDefaults: UserDefaults = .shared
+    private let userDefaults: UserDefaults = .netP
 
     var waitlistActive: WaitlistOverride {
         .init(rawValue: userDefaults.networkProtectionWaitlistBetaActiveOverrideRawValue) ?? .default

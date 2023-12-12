@@ -69,7 +69,7 @@ final class DataBrokerProtectionProcessor {
         runOperations(operationType: .optOut,
                       priorityDate: nil,
                       showWebView: showWebView) {
-            os_log("Scans done", log: .dataBrokerProtection)
+            os_log("Optouts done", log: .dataBrokerProtection)
             completion?()
         }
     }
@@ -153,5 +153,9 @@ final class DataBrokerProtectionProcessor {
         }
 
         return collections
+    }
+
+    deinit {
+        os_log("Deinit DataBrokerProtectionProcessor", log: .dataBrokerProtection)
     }
 }

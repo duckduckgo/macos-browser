@@ -19,13 +19,24 @@
 import Foundation
 import DDGSync
 
-@objc @MainActor
+@MainActor
 final class SyncDebugMenu: NSMenu {
 
-    @IBOutlet private weak var environmentMenu: NSMenu! {
-        didSet {
-            populateEnvironmentMenu()
+    private let environmentMenu = NSMenu()
+
+    init() {
+        super.init(title: "")
+
+        buildItems {
+            NSMenuItem(title: "Environment")
+                .submenu(environmentMenu)
+            NSMenuItem(title: "Reset Favicons Fetcher Onboarding Dialog", action: #selector(resetFaviconsFetcherOnboardingDialog))
+                .targetting(self)
         }
+    }
+
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func update() {
@@ -35,7 +46,7 @@ final class SyncDebugMenu: NSMenu {
     private func populateEnvironmentMenu() {
         environmentMenu.removeAllItems()
 
-        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+        guard let syncService = NSApp.delegateTyped.syncService else {
             return
         }
 
@@ -56,7 +67,7 @@ final class SyncDebugMenu: NSMenu {
 
     @objc func switchSyncEnvironment(_ sender: NSMenuItem) {
 #if DEBUG || REVIEW
-        guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService,
+        guard let syncService = NSApp.delegateTyped.syncService,
               let environment = sender.representedObject as? ServerEnvironment
         else {
             return
@@ -65,5 +76,9 @@ final class SyncDebugMenu: NSMenu {
         syncService.updateServerEnvironment(environment)
         UserDefaults.standard.set(environment.description, forKey: UserDefaultsWrapper<String>.Key.syncEnvironment.rawValue)
 #endif
+    }
+
+    @objc func resetFaviconsFetcherOnboardingDialog(_ sender: NSMenuItem) {
+        UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<String>.Key.syncDidPresentFaviconsFetcherOnboarding.rawValue)
     }
 }

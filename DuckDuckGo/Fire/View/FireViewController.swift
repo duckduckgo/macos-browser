@@ -63,21 +63,16 @@ final class FireViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-#if DEBUG
-        let isRunningTests = NSApp.isRunningUnitTests
-#else
-        let isRunningTests = false
-#endif
-
-        fireAnimationViewLoadingTask = isRunningTests ? nil : Task.detached(priority: .userInitiated) {
-            await self.setupFireAnimationView()
+        if case .normal = NSApp.runType {
+            fireAnimationViewLoadingTask = Task.detached(priority: .userInitiated) {
+                await self.setupFireAnimationView()
+            }
         }
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
-//        self.view.superview?.isHidden = true
         subscribeToFireAnimationEvents()
         progressIndicator.startAnimation(self)
     }

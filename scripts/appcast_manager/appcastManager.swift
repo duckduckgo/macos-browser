@@ -72,7 +72,7 @@ NAME
 
 SYNOPSIS
     appcastManager --release-to-internal-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes>
-    appcastManager --release-to-public-channel --version <version_number> [--release-notes <path_to_release_notes>]
+    appcastManager --release-to-public-channel --version <version_identifier> [--release-notes <path_to_release_notes>]
     appcastManager --release-hotfix-to-public-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes>
     appcastManager --help
 
@@ -85,9 +85,10 @@ DESCRIPTION
         appcastManager --release-to-internal-channel --dmg /path/to/app.dmg --release-notes /path/to/notes.txt
 
     --release-to-public-channel
-        Releases an app update to the public channel. Requires the version number to be released. Optionally, a path to the release notes can be provided.
+        Releases an app update to the public channel. Requires the identifier of the version to be released
+        (marketing version + build number, dot-separated). Optionally, a path to the release notes can be provided.
         Example:
-        appcastManager --release-to-public-channel --version 1.2.3 --release-notes /path/to/notes.txt
+        appcastManager --release-to-public-channel --version 1.2.3.45 --release-notes /path/to/notes.txt
 
     --release-hotfix-to-public-channel
         Releases a hotfix app update to the public channel. Requires a path to the DMG file and a path to the release notes.
@@ -111,8 +112,7 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     print("DMG Path: \(dmgPath)")
     print("Release Notes Path: \(releaseNotesPath)")
 
-    // Download appcast and update files
-    AppcastDownloader().download()
+    performCommonChecksAndOperations()
 
     // Handle dmg file
     guard let dmgURL = handleDMGFile(dmgPath: dmgPath, updatesDirectoryURL: specificDir) else {
@@ -123,51 +123,138 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
     handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURL)
 
     // Extract version number from DMG file name
-    let versions = getVersionFromDMGFileName(dmgURL: dmgURL)
+    let versionNumber = getVersionNumberFromDMGFileName(dmgURL: dmgURL)
 
     // Differentiate between the two actions
     if arguments.action == .releaseToInternalChannel {
-        runGenerateAppcast(withVersions: versions, channel: "internal-channel")
+        runGenerateAppcast(with: versionNumber, channel: "internal-channel")
     } else {
-        runGenerateAppcast(withVersions: versions)
+        runGenerateAppcast(with: versionNumber)
     }
 
 case .releaseToPublicChannel:
-    guard let version = arguments.parameters["--version"] else {
+    guard let versionIdentifier = arguments.parameters["--version"] else {
         print("Missing required version parameter for action '--release-to-public-channel'")
         exit(1)
     }
 
+    let versionNumber = extractVersionNumber(from: versionIdentifier)
+
     print("Action: Release to public channel")
-    print("Version: \(version)")
+    print("Version: \(versionIdentifier)")
 
-    // Download appcast and update files
-    AppcastDownloader().download()
+    performCommonChecksAndOperations()
 
-    // Verify version
-    if !verifyVersion(version: version, atDirectory: specificDir) {
+    guard let dmgFileName = findDMG(for: versionIdentifier, in: specificDir) else {
+        print("Version \(versionIdentifier) does not exist in the downloaded appcast items.")
         exit(1)
     }
+    print("Verified: Version \(versionIdentifier) exists in the downloaded appcast items: \(dmgFileName)")
 
     // Handle release notes if provided
     if let releaseNotesPath = arguments.parameters["--release-notes"] {
         print("Release Notes Path: \(releaseNotesPath)")
-        let dmgURLForPublic = specificDir.appendingPathComponent(getDmgFilename(for: version))
+        let dmgURLForPublic = specificDir.appendingPathComponent(dmgFileName)
         handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURLForPublic)
     } else {
         print("No new release notes provided. Keeping existing release notes.")
     }
 
     // Process appcast content
-    if !processAppcastRemovingVersion(version: version, appcastFilePath: appcastFilePath) {
+    guard processAppcast(removing: versionNumber, appcastFilePath: appcastFilePath) else {
+        exit(1)
+    }
+    print("Version \(versionIdentifier) removed from the appcast.")
+
+    runGenerateAppcast(with: versionNumber, rolloutInterval: "43200")
+}
+
+// MARK: - Common
+
+func extractVersionNumber(from versionIdentifier: String) -> String {
+    let components = versionIdentifier.components(separatedBy: ".")
+    guard components.count == 4 else {
+        print("Invalid version identifier format. Expected 'X.Y.Z.B'")
+        exit(1)
+    }
+    let versionNumber = components[3]
+    return versionNumber
+}
+
+func performCommonChecksAndOperations() {
+    // Check if generate_appcast is recent
+    guard checkSparkleToolRecency(toolName: "generate_appcast"),
+          checkSparkleToolRecency(toolName: "generate_keys"),
+          checkSparkleToolRecency(toolName: "sign_update"),
+          checkSparkleToolRecency(toolName: "BinaryDelta") else {
         exit(1)
     }
 
-    runGenerateAppcast(withVersions: version, rolloutInterval: "43200")
+    // Verify signing keys
+    guard verifySigningKeys() else {
+        exit(1)
+    }
+
+    // Download appcast and update files
+    AppcastDownloader().download()
 }
 
-func getDmgFilename(for version: String) -> String {
-    return "duckduckgo-\(version).dmg"
+// MARK: - Checking the recency of Sparkle tools
+
+func checkSparkleToolRecency(toolName: String) -> Bool {
+    let binaryPath = shell("which", toolName).trimmingCharacters(in: .whitespacesAndNewlines)
+
+    if binaryPath.isEmpty {
+        print("Failed to find the path for \(toolName).")
+        return false
+    }
+
+    guard let binaryAttributes = try? FileManager.default.attributesOfItem(atPath: binaryPath),
+          let modificationDate = binaryAttributes[.modificationDate] as? Date else {
+        print("Failed to get the modification date for \(toolName).")
+        return false
+    }
+
+    // Get the current script's path and navigate to the root folder to get the release date file
+    let currentScriptPath = URL(fileURLWithPath: #file)
+    let rootDirectory = currentScriptPath.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    let releaseDateFilePath = rootDirectory.appendingPathComponent(".sparkle_tools_release_date")
+
+    guard let releaseDateString = try? String(contentsOf: releaseDateFilePath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
+          let releaseDate = DateFormatter.yyyyMMddUTC.date(from: releaseDateString) else {
+        print("Failed to get the release date from .sparkle_tools_release_date.")
+        return false
+    }
+
+    if modificationDate < releaseDate {
+        print("\(toolName) from Sparkle binary utilities is outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
+        return false
+    }
+
+    return true
+}
+
+extension DateFormatter {
+    static let yyyyMMddUTC: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter
+    }()
+}
+
+// MARK: - Verification of the signing keys
+
+func verifySigningKeys() -> Bool {
+    let publicKeyOutput = shell("generate_keys", "-p").trimmingCharacters(in: .whitespacesAndNewlines)
+    let desiredPublicKey = "ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo="
+
+    if publicKeyOutput == desiredPublicKey {
+        return true
+    } else {
+        print("Incorrect or missing public signing key. Please ensure you have the correct keys installed.")
+        return false
+    }
 }
 
 // MARK: - Downloading of Appcast and Files
@@ -353,18 +440,21 @@ func handleReleaseNotesFile(path: String, updatesDirectoryURL: URL, dmgURL: URL)
     }
 }
 
-func getVersionFromDMGFileName(dmgURL: URL) -> String {
+func getVersionNumberFromDMGFileName(dmgURL: URL) -> String {
     // Extract version number from DMG file name
     let filename = dmgURL.lastPathComponent
     let components = filename.components(separatedBy: "-")
     guard components.count >= 2 else {
-        print("Invalid DMG file name format. Expected 'duckduckgo-X.Y.Z.dmg'")
+        print("Invalid DMG file name format. Expected 'duckduckgo-X.Y.Z.B.dmg'")
         exit(1)
     }
     let versionWithExtension = components[1]
     let versionComponents = versionWithExtension.components(separatedBy: ".dmg")
-    let versions = versionComponents[0]
-    return versions
+    let versionSubcomponents = versionComponents[0].split(separator: ".").map(String.init)
+    if versionSubcomponents.count > 3 {
+        return String(versionSubcomponents[3])
+    }
+    return String(versionComponents[0])
 }
 
 // MARK: - Handling of DMG Files
@@ -386,31 +476,27 @@ func handleDMGFile(dmgPath: String, updatesDirectoryURL: URL) -> URL? {
     }
 }
 
-func verifyVersion(version: String, atDirectory dir: URL) -> Bool {
-    let expectedDMGFileName = getDmgFilename(for: version)
-    let expectedDMGFilePath = dir.appendingPathComponent(expectedDMGFileName).path
-    if FileManager.default.fileExists(atPath: expectedDMGFilePath) {
-        print("Verified: Version \(version) exists in the downloaded appcast items.")
-        return true
-    } else {
-        print("Version \(version) does not exist in the downloaded appcast items.")
-        return false
+func findDMG(for versionIdentifier: String, in dir: URL) -> String? {
+    let fileURL = dir.appending(component: "duckduckgo-\(versionIdentifier).dmg")
+    var isDirectory: ObjCBool = false
+    guard FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDirectory), isDirectory.boolValue == false else {
+        return nil
     }
+    return fileURL.lastPathComponent
 }
 
 // MARK: - Processing of Appcast
 
-func processAppcastRemovingVersion(version: String, appcastFilePath: URL) -> Bool {
+func processAppcast(removing versionNumber: String, appcastFilePath: URL) -> Bool {
     guard let appcastContent = readAppcastContent(from: appcastFilePath) else {
         print("Failed to read the appcast file.")
         return false
     }
-    guard let modifiedAppcastContent = removeVersionFromAppcast(version, appcastContent: appcastContent) else {
-        print("Failed to remove version \(version) from the appcast.")
+    guard let modifiedAppcastContent = removeVersionFromAppcast(versionNumber, appcastContent: appcastContent) else {
+        print("Failed to remove version #\(versionNumber) from the appcast.")
         return false
     }
     writeAppcastContent(modifiedAppcastContent, to: appcastFilePath)
-    print("Version \(version) removed from the appcast.")
     return true
 }
 
@@ -419,7 +505,7 @@ func readAppcastContent(from filePath: URL) -> String? {
 }
 
 func removeVersionFromAppcast(_ version: String, appcastContent: String) -> String? {
-    let pattern = "(<item>\\s*<title>\\s*\(version)\\s*</title>.*?</item>)"
+    let pattern = "(<item>.*?<sparkle:version>\(version)</sparkle:version>.*?</item>)"
 
     guard let regex = try? NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators),
           let startMatch = regex.firstMatch(in: appcastContent, range: NSRange(appcastContent.startIndex..., in: appcastContent)),
@@ -445,7 +531,7 @@ func writeAppcastContent(_ content: String, to filePath: URL) {
 
 // MARK: - Generating of New Appcast
 
-func runGenerateAppcast(withVersions versions: String, channel: String? = nil, rolloutInterval: String? = nil) {
+func runGenerateAppcast(with versionNumber: String, channel: String? = nil, rolloutInterval: String? = nil) {
     // Check if backup file already exists and remove it
     if FileManager.default.fileExists(atPath: backupFileURL.path) {
         do {
@@ -469,7 +555,7 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
 
     var commandComponents: [String] = []
     commandComponents.append("generate_appcast")
-    commandComponents.append("--versions \(versions)")
+    commandComponents.append("--versions \(versionNumber)")
     commandComponents.append("--maximum-versions \(maximumVersions)")
     commandComponents.append("--maximum-deltas \(maximumDeltas)")
 
@@ -508,7 +594,7 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
     }
 
     // Get and save the diff
-    let diffResult = shell("diff", backupAppcastFilePath, appcastFilePath.path)
+    let diffResult = shell("diff", "-u", backupAppcastFilePath, appcastFilePath.path)
     let diffFilePath = specificDir.appendingPathComponent("appcast_diff.txt").path
     do {
         try diffResult.write(toFile: diffFilePath, atomically: true, encoding: .utf8)
@@ -517,8 +603,29 @@ func runGenerateAppcast(withVersions versions: String, channel: String? = nil, r
         print("Error writing diff to file: \(error)")
     }
 
+    // Move files back to the original location
+    moveFiles(from: specificDir.appendingPathComponent("old_updates"), to: specificDir)
+    print("Old update files moved back to \(specificDir.path)")
+
     // Open specific directory in Finder
     shell("open", specificDir.path)
+}
+
+func moveFiles(from sourceDir: URL, to destinationDir: URL) {
+    let fileManager = FileManager.default
+    do {
+        let fileURLs = try fileManager.contentsOfDirectory(at: sourceDir, includingPropertiesForKeys: nil)
+        for fileURL in fileURLs {
+            let destinationURL = destinationDir.appendingPathComponent(fileURL.lastPathComponent)
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                try fileManager.removeItem(at: destinationURL)
+            }
+            try fileManager.moveItem(at: fileURL, to: destinationURL)
+        }
+    } catch {
+        print("Failed to move files from \(sourceDir.path) to \(destinationDir.path): \(error).")
+        exit(1)
+    }
 }
 
 @discardableResult func shell(_ command: String, _ arguments: String...) -> String {

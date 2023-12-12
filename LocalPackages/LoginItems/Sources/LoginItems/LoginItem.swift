@@ -26,7 +26,8 @@ import ServiceManagement
 public struct LoginItem: Equatable, Hashable {
 
     let agentBundleID: String
-    let url: URL
+    private let launchInformation: LoginItemLaunchInformation
+    private let defaults: UserDefaults
     private let log: OSLog
 
     public var isRunning: Bool {
@@ -71,9 +72,10 @@ public struct LoginItem: Equatable, Hashable {
         return Status(SMAppService.loginItem(identifier: agentBundleID).status)
     }
 
-    public init(bundleId: String, url: URL, log: OSLog) {
+    public init(bundleId: String, defaults: UserDefaults, log: OSLog = .disabled) {
         self.agentBundleID = bundleId
-        self.url = url
+        self.defaults = defaults
+        self.launchInformation = LoginItemLaunchInformation(agentBundleID: bundleId, defaults: defaults)
         self.log = log
     }
 
@@ -85,6 +87,8 @@ public struct LoginItem: Equatable, Hashable {
         } else {
             SMLoginItemSetEnabled(agentBundleID as CFString, true)
         }
+
+        launchInformation.updateLastEnabledTimestamp()
     }
 
     public func disable() throws {
@@ -95,7 +99,6 @@ public struct LoginItem: Equatable, Hashable {
         } else {
             SMLoginItemSetEnabled(agentBundleID as CFString, false)
         }
-        stop()
     }
 
     /// Restarts a login item.
@@ -111,17 +114,11 @@ public struct LoginItem: Equatable, Hashable {
         try enable()
     }
 
-    public func launch() async throws {
-        os_log("🟢 launching login item %{public}@", log: log, self.debugDescription)
-        _ = try await NSWorkspace.shared.openApplication(at: url, configuration: .init())
-    }
-
-    private func stop() {
+    public func forceStop() {
         let runningApplications = runningApplications
         os_log("🟢 stopping %{public}@", log: log, runningApplications.map { $0.processIdentifier }.description)
         runningApplications.forEach { $0.terminate() }
     }
-
 }
 
 extension LoginItem: CustomDebugStringConvertible {

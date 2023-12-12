@@ -64,8 +64,6 @@ extension Preferences {
                         model.openURL(.aboutDuckDuckGo)
                     }
 
-                    Text("Build variant: \(variant)")
-
                     TextButton(UserText.privacyPolicy) {
                         model.openURL(.privacyPolicy)
                     }

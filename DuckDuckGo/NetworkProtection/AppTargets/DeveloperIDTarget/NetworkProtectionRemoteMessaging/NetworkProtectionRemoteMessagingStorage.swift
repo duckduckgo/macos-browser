@@ -61,7 +61,7 @@ final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRem
 
             return messages
         } catch {
-            // Errors can occur if the file doesn't exist, or it got stored in a bad state, in which case the app will fetch the file again later and
+            // Errors can occur if the file doesn't exist or the schema changed, in which case the app will fetch the file again later and
             // overwrite it.
             return []
         }

@@ -28,12 +28,9 @@ struct CallToAction: View {
 
     let onNext: () -> Void
 
-    @EnvironmentObject var model: OnboardingViewModel
-
     @State var typingFinished = false
 
     var body: some View {
-        let shouldNotDelayButton = model.state == .startBrowsing  && model.isNewOnboarding
         VStack(spacing: 15) {
             DaxSpeech(text: text) {
                 withAnimation {
@@ -48,9 +45,9 @@ struct CallToAction: View {
             } label: {
                 Text(cta)
             }
-            .frame(width: speechWidth, height: buttonHeight)
+            .frame(width: speechWidth)
             .buttonStyle(ActionButtonStyle())
-            .visibility(typingFinished || shouldNotDelayButton ? .visible : .gone)
+            .visibility(typingFinished  ? .visible : .gone)
         }
     }
 

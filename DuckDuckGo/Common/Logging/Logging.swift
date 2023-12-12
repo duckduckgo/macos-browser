@@ -42,6 +42,7 @@ extension OSLog {
         case duckPlayer = "Duck Player"
         case sync = "Sync"
         case networkProtection = "Network Protection"
+        case dbp = "dbp"
     }
 
     enum AllCategories {
@@ -69,6 +70,7 @@ extension OSLog {
     @OSLogWrapper(.duckPlayer) static var duckPlayer
     @OSLogWrapper(.sync) static var sync
     @OSLogWrapper(.networkProtection) static var networkProtection
+    @OSLogWrapper(.dbp) static var dbp
 
     // Debug->Logging categories will only be enabled for one day
     @UserDefaultsWrapper(key: .loggingEnabledDate, defaultValue: .distantPast)

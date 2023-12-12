@@ -18,7 +18,7 @@
 
 import Foundation
 import NetworkProtection
-import XPC
+import XPCHelper
 
 /// This protocol describes the client-side IPC interface for controlling the tunnel
 ///
@@ -69,15 +69,52 @@ public final class TunnelControllerIPCClient {
 
 extension TunnelControllerIPCClient: IPCServerInterface {
     public func register() {
-        try? xpc.server().register()
+        xpc.execute(call: { server in
+            server.register()
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func start() {
-        try? xpc.server().start()
+        xpc.execute(call: { server in
+            server.start()
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
     }
 
     public func stop() {
-        try? xpc.server().stop()
+        xpc.execute(call: { server in
+            server.stop()
+        }, xpcReplyErrorHandler: { _ in
+            // Intentional no-op as there's no completion block
+            // If you add a completion block, please remember to call it here too!
+        })
+    }
+
+    public func debugCommand(_ command: DebugCommand) async throws {
+        guard let payload = try? JSONEncoder().encode(command) else {
+            return
+        }
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            xpc.execute(call: { server in
+                server.debugCommand(payload) { error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
+                }
+            }, xpcReplyErrorHandler: { error in
+                // Intentional no-op as there's no completion block
+                // If you add a completion block, please remember to call it here too!
+                continuation.resume(throwing: error)
+            })
+        }
     }
 }
 

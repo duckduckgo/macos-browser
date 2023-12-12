@@ -21,7 +21,8 @@ import Foundation
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
-    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)!
+    static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
+    static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
 }
 
 @propertyWrapper
@@ -82,6 +83,8 @@ public struct UserDefaultsWrapper<T> {
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"
 
+        case homeButtonPosition = "preferences.appeareance.home-button-position"
+
         // ATB
         case installDate = "statistics.installdate.key"
         case atb = "statistics.atb.key"
@@ -103,7 +106,6 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageShowCookie = "home.page.show.cookie"
         case homePageShowSurveyDay0 = "home.page.show.survey.0"
         case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
         case homePageShowSurveyDay7 = "home.page.show.survey.7"
@@ -133,23 +135,19 @@ public struct UserDefaultsWrapper<T> {
         case loggingCategories = "logging.categories"
 
         case firstLaunchDate = "first.app.launch.date"
+        case customConfigurationUrl = "custom.configuration.url"
+
+        // Data Broker Protection
+
+        case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
         // Network Protection
 
-        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
-        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
-
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-        case networkProtectionShouldExcludeLocalRoutes = "netp.exclude-local-routes"
-        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
-
-        case networkProtectionConnectOnLogIn = "netp.connect-on-login"
-
-        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
-
-        case netpMenuAgentLaunchTime = "netp.agent.launch-time"
-
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
+        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // Network Protection: Shared Defaults
         // ---
@@ -170,12 +168,28 @@ public struct UserDefaultsWrapper<T> {
         // Sync
 
         case syncEnvironment = "sync.environment"
+        case favoritesDisplayMode = "sync.favorites-display-mode"
+        case syncBookmarksPaused = "sync.bookmarks-paused"
+        case syncCredentialsPaused = "sync.credentials-paused"
+        case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
+        case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
+        case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
+        case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
+        case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
     }
 
     enum RemovedKeys: String, CaseIterable {
         case passwordManagerDoNotPromptDomains = "com.duckduckgo.passwordmanager.do-not-prompt-domains"
         case incrementalFeatureFlagTestHasSentPixel = "network-protection.incremental-feature-flag-test.has-sent-pixel"
         case homePageShowNetworkProtectionBetaEndedNotice = "home.page.network-protection.show-beta-ended-notice"
+
+        // NetP removed keys
+        case networkProtectionShouldEnforceRoutes = "netp.enforce-routes"
+        case networkProtectionShouldIncludeAllNetworks = "netp.include-all-networks"
+        case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
+        case networkProtectionShouldExcludeLocalNetworks = "netp.exclude-local-routes"
+        case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
     }
 
     private let key: Key
@@ -193,7 +207,7 @@ public struct UserDefaultsWrapper<T> {
         if case .normal = NSApplication.runType {
             return .standard
         } else {
-            return UserDefaults(suiteName: Bundle.main.bundleIdentifier! + "." + NSApplication.runType.description)!
+            return UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
         }
 #else
         return .standard

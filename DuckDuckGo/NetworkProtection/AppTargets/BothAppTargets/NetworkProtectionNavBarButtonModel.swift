@@ -22,6 +22,7 @@ import AppKit
 import Combine
 import Foundation
 import NetworkProtection
+import NetworkProtectionIPC
 import NetworkProtectionUI
 
 /// Model for managing the NetP button in the Nav Bar.
@@ -29,14 +30,19 @@ import NetworkProtectionUI
 final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
-    private var status: NetworkProtection.ConnectionStatus = .disconnected
-    private let popovers: NavigationBarPopovers
+    private var status: NetworkProtection.ConnectionStatus = .default
+    private let popoverManager: NetworkProtectionNavBarPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
+
+    // MARK: - IPC
+
+    public var ipcClient: TunnelControllerIPCClient {
+        popoverManager.ipcClient
+    }
 
     // MARK: - Subscriptions
 
-    private var statusChangeCancellable: AnyCancellable?
-    private var interruptionCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - NetP Icon publisher
 
@@ -67,26 +73,24 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    init(popovers: NavigationBarPopovers,
+    init(popoverManager: NetworkProtectionNavBarPopoverManager,
          pinningManager: PinningManager = LocalPinningManager.shared,
          statusReporter: NetworkProtectionStatusReporter? = nil,
          iconProvider: IconProvider = NavigationBarIconProvider()) {
 
-        let statusObserver = ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                    platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let statusInfoObserver = ConnectionServerInfoObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        let connectionErrorObserver = ConnectionErrorObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-                                                                            platformDidWakeNotification: NSWorkspace.didWakeNotification)
-        self.networkProtectionStatusReporter = statusReporter ?? DefaultNetworkProtectionStatusReporter(
-            statusObserver: statusObserver,
-            serverInfoObserver: statusInfoObserver,
-            connectionErrorObserver: connectionErrorObserver,
-            connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-            controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+        self.popoverManager = popoverManager
+
+        let ipcClient = popoverManager.ipcClient
+
+        self.networkProtectionStatusReporter = statusReporter
+            ?? DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.connectionStatusObserver,
+                serverInfoObserver: ipcClient.serverInfoObserver,
+                connectionErrorObserver: ipcClient.connectionErrorObserver,
+                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
-        self.popovers = popovers
         self.pinningManager = pinningManager
         isPinned = pinningManager.isPinned(.networkProtection)
 
@@ -119,6 +123,13 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private func buttonImageFromWaitlistState(icon: NetworkProtectionAsset?) -> NSImage {
         let icon = icon ?? iconPublisher.icon
 
+        let isWaitlistUser = NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+        let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+
+        if !isWaitlistUser && !hasAuthToken {
+            return NSImage(named: "NetworkProtectionAvailableButton")!
+        }
+
         if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
             return NSImage(named: "NetworkProtectionAvailableButton")!
         }
@@ -131,7 +142,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     private func setupStatusSubscription() {
-        statusChangeCancellable = networkProtectionStatusReporter.statusObserver.publisher.sink { [weak self] status in
+        networkProtectionStatusReporter.statusObserver.publisher.sink { [weak self] status in
             guard let self = self else {
                 return
             }
@@ -147,11 +158,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 self.status = status
                 self.updateVisibility()
             }
-        }
+        }.store(in: &cancellables)
     }
 
     private func setupInterruptionSubscription() {
-        interruptionCancellable = networkProtectionStatusReporter.connectivityIssuesObserver.publisher.sink { [weak self] isHavingConnectivityIssues in
+        networkProtectionStatusReporter.connectivityIssuesObserver.publisher.sink { [weak self] isHavingConnectivityIssues in
             guard let self = self else {
                 return
             }
@@ -160,32 +171,52 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 self.isHavingConnectivityIssues = isHavingConnectivityIssues
                 self.updateVisibility()
             }
-        }
+        }.store(in: &cancellables)
     }
 
     private func setupWaitlistAvailabilitySubscription() {
-        NotificationCenter.default.addObserver(forName: .networkProtectionWaitlistAccessChanged, object: nil, queue: .main) { _ in
-            Task { @MainActor in
+        NotificationCenter.default.publisher(for: .networkProtectionWaitlistAccessChanged)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+
                 self.buttonImage = self.buttonImageFromWaitlistState(icon: nil)
-                self.updateVisibility()
+
+                Task { @MainActor in
+                    self.updateVisibility()
+                }
             }
-        }
+            .store(in: &cancellables)
     }
 
     @MainActor
     private func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
         let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
-        if networkProtectionVisibility.isNetworkProtectionVisible(), NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-            DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
-                            frequency: .dailyOnly,
-                            includeAppVersionParameter: true)
-            showButton = true
-            return
+        if networkProtectionVisibility.isNetworkProtectionVisible() {
+            if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
+                DailyPixel.fire(pixel: .networkProtectionWaitlistEntryPointToolbarButtonDisplayed,
+                                frequency: .dailyOnly,
+                                includeAppVersionParameter: true)
+                showButton = true
+                return
+            }
+
+            let waitlist = NetworkProtectionWaitlist()
+            let isWaitlistUser = waitlist.waitlistStorage.isWaitlistUser
+            let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
+
+            // If the user hasn't signed up to the waitlist or doesn't have an auth token through some other method, then show them the badged icon
+            // to get their attention and encourage them to sign up. Also avoid showing the button is the user has opened the waitlist UI but
+            // dismissed it.
+            if !isWaitlistUser && !hasAuthToken && !waitlist.waitlistSignUpPromptDismissed {
+                showButton = true
+                return
+            }
         }
 
         guard !isPinned,
-              !popovers.isNetworkProtectionPopoverShown else {
+              !popoverManager.isShown else {
             showButton = true
             return
         }

@@ -289,9 +289,9 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     }
                 },
                 openURLHandler: { url in
-                    WindowControllersManager.shared.show(url: url, newTab: true)
+                    WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
                 }, goToSyncPreferences: {
-                    WindowControllersManager.shared.show(url: URL(string: "about:preferences/sync")!, newTab: true)
+                    WindowControllersManager.shared.show(url: URL(string: "about:preferences/sync")!, source: .ui, newTab: true)
                 })
 
             let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
@@ -361,7 +361,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
+            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
         })
     }
 
@@ -370,7 +370,7 @@ extension MainWindowController {
         guard let window else { return }
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
-            WindowControllersManager.shared.show(url: .purchaseSubscription, newTab: true)
+            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
 //            AccountManager().signOut()
             // TODO: Check if it is required
         })

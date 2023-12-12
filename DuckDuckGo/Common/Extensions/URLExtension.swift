@@ -75,7 +75,16 @@ extension URL {
             return nil
         }
 
-        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+
+        // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
+        // https://app.asana.com/0/1199230911884351/1205979030848528/f
+        if case .normal = NSApp.runType,
+           NSApp.delegateTyped.featureFlagger.isFeatureOn(.appendAtbToSerpQueries),
+           let atbWithVariant = LocalStatisticsStore().atbWithVariant {
+            url = url.appendingParameter(name: URL.DuckDuckGoParameters.ATB.atb, value: atbWithVariant + "-wb")
+        }
+        return url
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
@@ -121,11 +130,9 @@ extension URL {
         return URL(string: "about:preferences")!
     }
 
-#if DBP
     static var dataBrokerProtection: URL {
         return URL(string: "about:dbp")!
     }
-#endif
 
     static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
         return Self.preferences.appendingPathComponent(pane.rawValue)
@@ -134,18 +141,6 @@ extension URL {
     var isHypertextURL: Bool {
         guard let scheme = self.scheme.map(NavigationalScheme.init(rawValue:)) else { return false }
         return NavigationalScheme.validSchemes.contains(scheme)
-    }
-
-    // MARK: Pixel
-
-    static let pixelBase = ProcessInfo.processInfo.environment["PIXEL_BASE_URL", default: "https://improving.duckduckgo.com"]
-
-    static func pixelUrl(forPixelNamed pixelName: String) -> URL {
-        let urlString = "\(Self.pixelBase)/t/\(pixelName)"
-        let url = URL(string: urlString)!
-        // url = url.addParameter(name: \"atb\", value: statisticsStore.atbWithVariant ?? \"\")")
-        // https://app.asana.com/0/1177771139624306/1199951074455863/f
-        return url
     }
 
     // MARK: ATB
@@ -434,4 +429,26 @@ extension URL {
     // MARK: - System Settings
 
     static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+
+    // MARK: - Blob URLs
+
+    var isBlobURL: Bool {
+        guard let scheme = self.scheme?.lowercased() else { return false }
+
+        if scheme == "blob" || scheme.hasPrefix("blob:") {
+            return true
+        }
+
+        return false
+    }
+
+    func stripUnsupportedCredentials() -> String {
+        if self.absoluteString.firstIndex(of: "@") != nil {
+            let authPattern = "([^:]+):\\/\\/[^\\/]*@"
+            let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
+            let uuid = UUID().uuidString.lowercased()
+            return "\(strippedURL)\(uuid)"
+        }
+        return self.absoluteString
+    }
 }

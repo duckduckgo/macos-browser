@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
@@ -57,6 +58,12 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+
+#if NETWORK_PROTECTION
+                            case .vpn:
+                                VPNView(model: VPNPreferencesModel())
+#endif
+
 #if SUBSCRIPTION
                             case .subscription:
                                 makeSubscriptionView()
@@ -94,7 +101,7 @@ extension Preferences {
         // swiftlint:disable:next function_body_length
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }, changePlanOrBilling: {
                 switch SubscriptionPurchaseEnvironment.current {
                 case .appStore:
@@ -105,7 +112,7 @@ extension Preferences {
                               case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                         guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
-                        WindowControllersManager.shared.show(url: customerPortalURL, newTab: true)
+                        WindowControllersManager.shared.show(url: customerPortalURL, source: .ui, newTab: true)
                     }
                 }
             }, openVPN: {
@@ -144,7 +151,7 @@ extension Preferences {
                     }
                 }
             }, openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }, goToSyncPreferences: {
                 self.model.selectPane(.sync)
             })
@@ -159,11 +166,23 @@ extension Preferences {
 struct SyncView: View {
 
     var body: some View {
-        if let syncService = (NSApp.delegate as? AppDelegate)?.syncService {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        if let syncService = NSApp.delegateTyped.syncService, let syncDataProviders = NSApp.delegateTyped.syncDataProviders {
+            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService, syncBookmarksAdapter: syncDataProviders.bookmarksAdapter))
+                .onAppear {
+                    requestSync()
+                }
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")
         }
     }
 
+    private func requestSync() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            syncService.scheduler.notifyDataChanged()
+        }
+    }
 }

@@ -84,8 +84,6 @@
 	<string>Allows you to share your geolocation</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allows you to share your location</string>
-	<key>NSMainStoryboardFile</key>
-	<string>MainMenu</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allows you to share recordings</string>
 	<key>NSAppDataUsageDescription</key>
@@ -118,7 +116,13 @@
 	<string>$(AGENT_PRODUCT_NAME)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
+	<key>DBP_APP_GROUP</key>
+	<string>$(DBP_APP_GROUP)</string>
 	<key>DISTRIBUTED_NOTIFICATIONS_PREFIX</key>
 	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
+	<key>DBP_BACKGROUND_AGENT_BUNDLE_ID</key>
+	<string>$(DBP_BACKGROUND_AGENT_BUNDLE_ID)</string>
+	<key>DBP_BACKGROUND_AGENT_PRODUCT_NAME</key>
+	<string>$(DBP_BACKGROUND_AGENT_PRODUCT_NAME)</string>
 </dict>
 </plist>

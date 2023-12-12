@@ -27,12 +27,13 @@ internal class BaseBookmarkEntity {
         return request
     }
 
-    static func favorite(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
+    static func favorite(with uuid: String, favoritesFolder: BookmarkEntity) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()
-        request.predicate = NSPredicate(format: "%K == %@ AND %K != nil AND %K == NO AND %K == NO",
+        request.predicate = NSPredicate(format: "%K == %@ AND %K CONTAINS %@ AND %K == NO AND %K == NO",
                                         #keyPath(BookmarkEntity.uuid),
                                         uuid as CVarArg,
-                                        #keyPath(BookmarkEntity.favoriteFolder),
+                                        #keyPath(BookmarkEntity.favoriteFolders),
+                                        favoritesFolder,
                                         #keyPath(BookmarkEntity.isFolder),
                                         #keyPath(BookmarkEntity.isPendingDeletion))
         return request
@@ -57,7 +58,12 @@ internal class BaseBookmarkEntity {
         self.isFolder = isFolder
     }
 
-    static func from(managedObject: BookmarkEntity, parentFolderUUID: String? = nil) -> BaseBookmarkEntity? {
+    static func from(
+        managedObject: BookmarkEntity,
+        parentFolderUUID: String? = nil,
+        favoritesDisplayMode: FavoritesDisplayMode
+    ) -> BaseBookmarkEntity? {
+
         guard let id = managedObject.uuid,
               let title = managedObject.title else {
             assertionFailure("\(#file): Failed to create BaseBookmarkEntity from BookmarkManagedObject")
@@ -66,7 +72,7 @@ internal class BaseBookmarkEntity {
 
         if managedObject.isFolder {
             let children: [BaseBookmarkEntity] = managedObject.childrenArray.compactMap {
-                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id)
+                return BaseBookmarkEntity.from(managedObject: $0, parentFolderUUID: id, favoritesDisplayMode: favoritesDisplayMode)
             }
 
             let folder = BookmarkFolder(id: id, title: title, parentFolderUUID: parentFolderUUID, children: children)
@@ -81,7 +87,7 @@ internal class BaseBookmarkEntity {
             return Bookmark(id: id,
                             url: url,
                             title: title,
-                            isFavorite: managedObject.isFavorite,
+                            isFavorite: managedObject.isFavorite(on: favoritesDisplayMode.displayedFolder),
                             parentFolderUUID: parentFolderUUID)
         }
     }

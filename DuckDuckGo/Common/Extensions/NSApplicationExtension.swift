@@ -25,37 +25,51 @@ extension NSApplication {
         ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil
     }
 
-    @objc enum RunType: Int, CustomStringConvertible {
+    enum RunType {
         case normal
         case unitTests
         case integrationTests
         case uiTests
+        case xcPreviews
 
-        var description: String {
+        /// Defines if app run type requires loading full environment, i.e. databases, saved state, keychain etc.
+        var requiresEnvironment: Bool {
             switch self {
-            case .normal: return "normal"
-            case .unitTests: return "unitTests"
-            case .integrationTests: return "integrationTests"
-            case .uiTests: return "uiTests"
+            case .normal, .integrationTests, .uiTests:
+                return true
+            case .unitTests, .xcPreviews:
+                return false
             }
         }
     }
-    @objc dynamic class var runType: RunType { .normal }
+    static let runType: RunType = {
+#if DEBUG
+        if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
+            if testBundlePath.contains("Unit") {
+                return .unitTests
+            } else if testBundlePath.contains("Integration") {
+                return .integrationTests
+            } else {
+                return .uiTests
+            }
+        } else if ProcessInfo().environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
+            return .xcPreviews
+        } else {
+            return .normal
+        }
+#else
+        return .normal
+#endif
+    }()
     var runType: RunType { Self.runType }
-
-    var isRunningUnitTests: Bool {
-        if case .unitTests = Self.runType { return true }
-        return false
-    }
-
-    var isRunningIntegrationTests: Bool {
-        if case .integrationTests = Self.runType { return true }
-        return false
-    }
 
 #if !NETWORK_EXTENSION
     var mainMenuTyped: MainMenu {
         return mainMenu as! MainMenu // swiftlint:disable:this force_cast
+    }
+
+    var delegateTyped: AppDelegate {
+        return delegate as! AppDelegate // swiftlint:disable:this force_cast
     }
 #endif
 

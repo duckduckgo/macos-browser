@@ -153,6 +153,16 @@
                ReferencedContainer = "container:LocalPackages/SyncUI">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PixelKitTests"
+               BuildableName = "PixelKitTests"
+               BlueprintName = "PixelKitTests"
+               ReferencedContainer = "container:LocalPackages/PixelKit">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

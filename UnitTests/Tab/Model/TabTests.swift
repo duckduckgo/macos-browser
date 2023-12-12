@@ -75,7 +75,7 @@ final class TabTests: XCTestCase {
         XCTAssertEqual(tab.content, .preferences(pane: .autofill))
 
         tab.url = URL.duckDuckGo
-        XCTAssertEqual(tab.content, .url(.duckDuckGo))
+        XCTAssertEqual(tab.content, .url(.duckDuckGo, source: .link))
     }
 
     // MARK: - Equality
@@ -159,13 +159,13 @@ final class TabTests: XCTestCase {
 
         // after first navigation: false
         eDidFinishLoading = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.url))
+        tab.setContent(.url(urls.url, source: .link))
         waitForExpectations(timeout: 5)
 
         // after second navigation: true
         eCanGoBack = expectation(description: "canGoBack: true")
         eDidFinishLoading = expectation(description: "gb_didFinish 2")
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
 
         // after go back: false
@@ -222,7 +222,7 @@ final class TabTests: XCTestCase {
 
         // initial page
         didFinishExpectations[urls.url.absoluteString] = expectation(description: "didFinish \(urls.url.absoluteString)")
-        tab.setContent(.url(urls.url))
+        tab.setContent(.url(urls.url, source: .link))
         waitForExpectations(timeout: 5)
 
         // load urls.url1 which will be js-redirected to urls.url2
@@ -248,7 +248,7 @@ final class TabTests: XCTestCase {
 
         eDidRedirect = expectation(description: "did redirect")
 
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
         // "didFinish \(urls.url3.absoluteString)" expectation is set in redirect handler above
         waitForExpectations(timeout: 5)
@@ -298,12 +298,12 @@ final class TabTests: XCTestCase {
 
         // initial page
         eDidFinish = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.url))
+        tab.setContent(.url(urls.url, source: .link))
         waitForExpectations(timeout: 5)
 
         // page 2 to make canGoBack == true
         eDidFinish = expectation(description: "didFinish 1")
-        tab.setContent(.url(urls.url3))
+        tab.setContent(.url(urls.url3, source: .link))
         waitForExpectations(timeout: 5)
 
         // load urls.url1 which will be js-redirected to urls.url2
@@ -324,7 +324,7 @@ final class TabTests: XCTestCase {
 
         eDidRedirect = expectation(description: "did redirect")
 
-        tab.setContent(.url(urls.url1))
+        tab.setContent(.url(urls.url1, source: .link))
         waitForExpectations(timeout: 5)
         eDidFinish = nil
 
@@ -354,7 +354,7 @@ extension Tab {
             content.url
         }
         set {
-            setContent(newValue.map { TabContent.url($0) } ?? .homePage)
+            setContent(newValue.map { TabContent.url($0, source: .link) } ?? .homePage)
         }
     }
 }

@@ -16,16 +16,13 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
 
 extension NSMenu {
 
-    convenience init(items: [NSMenuItem]) {
-        self.init()
-
-        items.forEach { item in
-            addItem(item)
-        }
+    convenience init(title: String = "", items: [NSMenuItem]) {
+        self.init(title: title)
+        self.items = items
     }
 
     func indexOfItem(withIdentifier id: String) -> Int? {

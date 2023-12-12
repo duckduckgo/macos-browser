@@ -26,9 +26,9 @@ public struct NativeCheckboxToggle: NSViewRepresentable {
     var label: String
 
     public init(isOn: Binding<Bool>, label: String) {
-           self._isOn = isOn
-           self.label = label
-       }
+       self._isOn = isOn
+       self.label = label
+   }
 
     public func makeNSView(context: Context) -> NSButton {
         let button = NSButton(checkboxWithTitle: label, target: context.coordinator, action: #selector(context.coordinator.toggleChecked))
