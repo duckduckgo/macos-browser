@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1702336323870,
+    "version": 1702415315898,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -4352,6 +4352,16 @@
                             }
                         ]
                     },
+                    "a2z.com": {
+                        "rules": [
+                            {
+                                "rule": "assets.brightspot.abebooks.a2z.com/",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
                     "acsbapp.com": {
                         "rules": [
                             {
@@ -7345,7 +7355,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "f98388b316b40c7edc4e620ef88ed494"
+            "hash": "6d895ce49e17ece65475082c7e376325"
         },
         "trackingCookies1p": {
             "settings": {
