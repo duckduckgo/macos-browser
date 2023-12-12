@@ -171,6 +171,8 @@ final class WaitlistViewModel: ObservableObject {
 
     @MainActor
     private func requestNotificationPermission() {
+        self.viewState = .joinedWaitlist(.notificationAllowed)
+
         Task {
             do {
                 let currentStatus = await notificationService.authorizationStatus()
