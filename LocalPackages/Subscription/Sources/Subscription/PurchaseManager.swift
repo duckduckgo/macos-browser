@@ -116,21 +116,6 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    func fetchAvailableProducts() async -> [Product] {
-        print(" -- [PurchaseManager] fetchAvailableProducts()")
-
-        do {
-            let availableProducts = try await Product.products(for: Self.productIdentifiers)
-            print(" -- [PurchaseManager] fetchAvailableProducts(): fetched \(availableProducts.count) products")
-
-            return availableProducts
-        } catch {
-            print("Error fetching available products: \(error)")
-            return []
-        }
-    }
-
-    @MainActor
     public func updatePurchasedProducts() async {
         print(" -- [PurchaseManager] updatePurchasedProducts()")
 

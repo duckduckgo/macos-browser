@@ -197,4 +197,14 @@ public class AccountManager {
             return .failure(error)
         }
     }
+
+    public func checkSubscriptionState() async {
+        guard let token = accessToken else { return }
+
+        if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
+            if response.isSubscriptionActive {
+                signOut()
+            }
+        }
+    }
 }

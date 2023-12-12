@@ -24,5 +24,35 @@ public final class SubscriptionPurchaseEnvironment {
         case appStore, stripe
     }
 
-    public static var current: Environment = .appStore
+    public static var current: Environment = .appStore {
+        didSet {
+            canPurchase = false
+
+            switch current {
+            case .appStore:
+                setupForAppStore()
+            case .stripe:
+                setupForStripe()
+            }
+        }
+    }
+
+    public static var canPurchase: Bool = false
+
+    private static func setupForAppStore() {
+        if #available(macOS 12.0, *) {
+            Task {
+                await PurchaseManager.shared.updateAvailableProducts()
+                canPurchase = !PurchaseManager.shared.availableProducts.isEmpty
+            }
+        }
+    }
+
+    private static func setupForStripe() {
+        Task {
+            if case let .success(products) = await SubscriptionService.getProducts() {
+                canPurchase = !products.isEmpty
+            }
+        }
+    }
 }
