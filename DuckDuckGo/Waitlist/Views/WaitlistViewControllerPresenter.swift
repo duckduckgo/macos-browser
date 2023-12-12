@@ -54,6 +54,7 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
             DispatchQueue.main.async {
                 let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
                                                   notificationPermissionState: state,
+                                                  showNotificationSuccessState: true,
                                                   termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
                                                   featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
 
@@ -103,6 +104,7 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
             DispatchQueue.main.async {
                 let viewModel = WaitlistViewModel(waitlist: DataBrokerProtectionWaitlist(),
                                                   notificationPermissionState: state,
+                                                  showNotificationSuccessState: false,
                                                   termsAndConditionActionHandler: DataBrokerProtectionWaitlistTermsAndConditionsActionHandler(),
                                                   featureSetupHandler: DataBrokerProtectionWaitlistFeatureSetupHandler())
 

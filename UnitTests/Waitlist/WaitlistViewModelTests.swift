@@ -32,6 +32,7 @@ final class WaitlistViewModelTests: XCTestCase {
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: MockNotificationService(),
+                                                           showNotificationSuccessState: true,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
                                                            featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
@@ -50,6 +51,7 @@ final class WaitlistViewModelTests: XCTestCase {
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
                                                            featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
@@ -70,6 +72,7 @@ final class WaitlistViewModelTests: XCTestCase {
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
                                                            featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
@@ -89,6 +92,7 @@ final class WaitlistViewModelTests: XCTestCase {
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
                                                            featureSetupHandler: MockWaitlistFeatureSetupHandler())
 
@@ -113,6 +117,7 @@ final class WaitlistViewModelTests: XCTestCase {
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: notificationService,
+                                                           showNotificationSuccessState: true,
                                                            termsAndConditionActionHandler: MockWaitlistTermsAndConditionsActionHandler(),
                                                            featureSetupHandler: MockWaitlistFeatureSetupHandler())
 

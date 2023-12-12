@@ -70,16 +70,19 @@ final class WaitlistViewModel: ObservableObject {
     private let notificationService: NotificationService
     private var termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler
     private let featureSetupHandler: WaitlistFeatureSetupHandler
+    private let showNotificationSuccessState: Bool
 
     init(waitlistRequest: WaitlistRequest,
          waitlistStorage: WaitlistStorage,
          notificationService: NotificationService,
          notificationPermissionState: NotificationPermissionState = .notDetermined,
+         showNotificationSuccessState: Bool,
          termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler,
          featureSetupHandler: WaitlistFeatureSetupHandler) {
         self.waitlistRequest = waitlistRequest
         self.waitlistStorage = waitlistStorage
         self.notificationService = notificationService
+        self.showNotificationSuccessState = showNotificationSuccessState
         self.termsAndConditionActionHandler = termsAndConditionActionHandler
         self.featureSetupHandler = featureSetupHandler
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
@@ -97,6 +100,7 @@ final class WaitlistViewModel: ObservableObject {
 
     convenience init(waitlist: Waitlist,
                      notificationPermissionState: NotificationPermissionState = .notDetermined,
+                     showNotificationSuccessState: Bool,
                      termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler,
                      featureSetupHandler: WaitlistFeatureSetupHandler) {
         let waitlistType = type(of: waitlist)
@@ -105,6 +109,7 @@ final class WaitlistViewModel: ObservableObject {
             waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier, keychainAppGroup: waitlistType.keychainAppGroup),
             notificationService: UNUserNotificationCenter.current(),
             notificationPermissionState: notificationPermissionState,
+            showNotificationSuccessState: showNotificationSuccessState,
             termsAndConditionActionHandler: termsAndConditionActionHandler,
             featureSetupHandler: featureSetupHandler
         )
@@ -171,8 +176,6 @@ final class WaitlistViewModel: ObservableObject {
 
     @MainActor
     private func requestNotificationPermission() {
-        self.viewState = .joinedWaitlist(.notificationAllowed)
-
         Task {
             do {
                 let currentStatus = await notificationService.authorizationStatus()
@@ -196,6 +199,14 @@ final class WaitlistViewModel: ObservableObject {
                  }
             } catch {
                 await checkNotificationPermissions()
+            }
+        }
+
+        if showNotificationSuccessState {
+            self.viewState = .joinedWaitlist(.notificationAllowed)
+        } else {
+            Task {
+                await perform(action: .close)
             }
         }
     }
