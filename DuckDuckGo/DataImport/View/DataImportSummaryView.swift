@@ -47,28 +47,34 @@ struct DataImportSummaryView: View {
                 case .fileImportComplete(.passwords):
                     Text("Password import complete. You can now delete the saved passwords file.", comment: "message about Passwords Data Import completion")
                 }
-            }().padding(.bottom, 16)
+            }().padding(.bottom, 4)
 
             ForEach(model.results, id: \.dataType) { item in
                 switch (item.dataType, item.result) {
                 case (.bookmarks, .success(let summary)):
                     HStack {
                         successImage()
-                        Text("Bookmarks: \(summary.successful)",
+                        Text("Bookmarks:",
                              comment: "Data import summary format of how many bookmarks (%lld) were successfully imported.")
+                        + Text(" " as String)
+                        + Text(String(summary.successful)).bold()
                     }
                     if summary.duplicate > 0 {
                         HStack {
                             failureImage()
-                            Text("Duplicate Bookmarks Skipped: \(summary.duplicate)",
+                            Text("Duplicate Bookmarks Skipped:",
                                  comment: "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import.")
+                            + Text(" " as String)
+                            + Text(String(summary.duplicate)).bold()
                         }
                     }
                     if summary.failed > 0 {
                         HStack {
                             failureImage()
-                            Text("Bookmark import failed: \(summary.failed)",
+                            Text("Bookmark import failed:",
                                  comment: "Data import summary format of how many bookmarks (%lld) failed to import.")
+                            + Text(" " as String)
+                            + Text(String(summary.failed)).bold()
                         }
                     }
 
@@ -89,14 +95,18 @@ struct DataImportSummaryView: View {
                 case (.passwords, .success(let summary)):
                     HStack {
                         successImage()
-                        Text("Passwords: \(summary.successful)",
+                        Text("Passwords:",
                              comment: "Data import summary format of how many passwords (%lld) were successfully imported.")
+                        + Text(" " as String)
+                        + Text(String(summary.successful)).bold()
                     }
                     if summary.failed > 0 {
                         HStack {
                             failureImage()
-                            Text("Passwords import failed: \(summary.failed)",
+                            Text("Passwords import failed: ",
                                  comment: "Data import summary format of how many passwords (%lld) failed to import.")
+                            + Text(" " as String)
+                            + Text(String(summary.failed)).bold()
                         }
                     }
                 }
@@ -118,11 +128,14 @@ private func failureImage() -> some View {
 
 #Preview {
     VStack {
-        DataImportSummaryView(model: .init(source: .chrome, summary: [
-            .bookmarks: .success(.init(successful: 123, duplicate: 456, failed: 7890)),
-            .passwords: .success(.init(successful: 123, duplicate: 456, failed: 7890))
-        ]))
-        .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+        HStack {
+            DataImportSummaryView(model: .init(source: .chrome, summary: [
+                .bookmarks: .success(.init(successful: 123, duplicate: 456, failed: 7890)),
+                .passwords: .success(.init(successful: 123, duplicate: 456, failed: 7890))
+            ]))
+            .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+            Spacer()
+        }
     }
     .frame(width: 512)
 }

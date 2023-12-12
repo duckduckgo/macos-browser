@@ -28,7 +28,7 @@ struct DataImportErrorView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("We were unable to import \(dataType.displayName) directly from \(source.importSourceName).",
                  comment: "Message when data import fails from a browser. %1$@ - Bookmarks or Passwords; %2$@ - a browser name")
-            .font(.headline)
+            .bold()
 
             Text("Let’s try doing it manually. It won’t take long.",
                  comment: "Suggestion to switch to a Manual File Data Import when data import fails.")

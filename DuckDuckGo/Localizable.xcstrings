@@ -1148,7 +1148,7 @@
         }
       }
     },
-    "Bookmark import failed: %lld" : {
+    "Bookmark import failed:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) failed to import."
     },
     "Bookmark import failed." : {
@@ -1205,7 +1205,7 @@
     "Bookmarks Import Complete:" : {
       "comment" : "Bookmarks Data Import result summary headline"
     },
-    "Bookmarks: %lld" : {
+    "Bookmarks:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) were successfully imported."
     },
     "Bookmarks…" : {
@@ -2440,7 +2440,7 @@
         }
       }
     },
-    "Duplicate Bookmarks Skipped: %lld" : {
+    "Duplicate Bookmarks Skipped:" : {
       "comment" : "Data import summary format of how many duplicate bookmarks (%lld) were skipped during import."
     },
     "duplicate.tab" : {
@@ -3429,7 +3429,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "HTML Bookmarks File"
+            "value" : "HTML Bookmarks File (for other browsers)"
           }
         }
       }
@@ -3507,7 +3507,7 @@
       }
     },
     "import.csv.instructions.bitwarden" : {
-      "comment" : "Instructions to import Passwords as CSV from Bitwarden.\n%d is a step number; %s is Bitwarden app name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Bitwarden.\n%2$s - app name (Bitwarden)\n%7$@ - hamburger menu icon\n%9$@ - “Select Bitwarden CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3518,8 +3518,20 @@
         }
       }
     },
+    "import.csv.instructions.brave" : {
+      "comment" : "Instructions to import Passwords as CSV from Brave browser.\n%N$d - step number\n%2$s - browser name (Brave)\n%4$@, %6$@ - hamburger menu icon\n%10$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Password Manager**\n%5$d Click %6$@ **at the top left** of the Password Manager and select **Settings**\n%7$d Find “Export Passwords” and click **Download File**\n%8$d Save the passwords file someplace you can find it (e.g. Desktop)\n%9$d %10$@"
+          }
+        }
+      }
+    },
     "import.csv.instructions.chrome" : {
-      "comment" : "Instructions to import Passwords as CSV from Google Chrome browser.\n%d is a step number; %s is a Browser name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Google Chrome browser.\n%N$d - step number\n%2$s - browser name (Chrome)\n%4$@ - hamburger menu icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3531,7 +3543,7 @@
       }
     },
     "import.csv.instructions.chromium" : {
-      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%d is a step number; %s is a Browser name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name\n%4$@ - hamburger menu icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3542,8 +3554,20 @@
         }
       }
     },
+    "import.csv.instructions.coccoc" : {
+      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name (Cốc Cốc)\n%5$@ - hamburger menu icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Type “_coccoc://settings/passwords_” into the Address field\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+          }
+        }
+      }
+    },
     "import.csv.instructions.firefox" : {
-      "comment" : "Instructions to import Passwords as CSV from Firefox.\n%d is a step number; %s is a Browser name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Firefox.\n%N$d - step number\n%2$s - browser name (Firefox)\n%4$@, %6$@ - hamburger menu icon\n%9$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3555,7 +3579,7 @@
       }
     },
     "import.csv.instructions.generic" : {
-      "comment" : "Instructions to import a generic CSV passwords file.\n%d is a step number; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import a generic CSV passwords file.\n%N$d - step number\n%3$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3567,7 +3591,7 @@
       }
     },
     "import.csv.instructions.lastpass" : {
-      "comment" : "Instructions to import Passwords as CSV from LastPass.\n%d is a step number; %s is LastPass app name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from LastPass.\n%2$s - app name (LastPass)\n%8$@ - “Select LastPass CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3579,7 +3603,7 @@
       }
     },
     "import.csv.instructions.onePassword7" : {
-      "comment" : "Instructions to import Passwords as CSV from 1Password 7.\n%d is a step number; %s is 1Password app name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from 1Password 7.\n%2$s - app name (1Password)\n%9$@ - “Select 1Password CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3591,7 +3615,7 @@
       }
     },
     "import.csv.instructions.onePassword8" : {
-      "comment" : "Instructions to import Passwords as CSV from 1Password 8.\n%d is a step number; %s is 1Password app name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from 1Password 8.\n%2$s - app name (1Password)\n%8$@ - “Select 1Password CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3602,8 +3626,32 @@
         }
       }
     },
+    "import.csv.instructions.opera" : {
+      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name (Opera)\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **View → Show Password Manager**\n%4$d Select **Settings**\n%5$d Find “Export Passwords” and click **Download File**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+          }
+        }
+      }
+    },
+    "import.csv.instructions.operagx" : {
+      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name (Opera GX)\n%5$@ - menu button icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **View → Show Password Manager**\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+          }
+        }
+      }
+    },
     "import.csv.instructions.safari" : {
-      "comment" : "Instructions to import Passwords as CSV from Safari.\n%d is a step number; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Safari.\n%N$d - step number\n%5$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3614,14 +3662,26 @@
         }
       }
     },
-    "import.csv.instructions.yandex" : {
-      "comment" : "Instructions to import Passwords as CSV from Yandex Browser.\n%d is a step number; %@ is for a button image to click\n**bold text**; _italic text_",
+    "import.csv.instructions.vivaldi" : {
+      "comment" : "Instructions to import Passwords exported as CSV from Vivaldi browser.\n%N$d - step number\n%2$s - browser name (Vivaldi)\n%5$@ - menu button icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **Yandex**\n%2$d Click %3$@ to open the application menu then click **Passwords and cards**\n%4$d Click %5$@ then **Export passwords**\n%6$d Choose **To a text file (not secure)** and click **Export**\n%7$d Save the passwords file someplace you can find it (e.g. Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Type “_chrome://settings/passwords_” into the Address field\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
+          }
+        }
+      }
+    },
+    "import.csv.instructions.yandex" : {
+      "comment" : "Instructions to import Passwords as CSV from Yandex Browser.\n%N$d - step number\n%2$s - browser name (Yandex)\n%4$@ - hamburger menu icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Passwords and cards**\n%5$d Click %6$@ then **Export passwords**\n%7$d Choose **To a text file (not secure)** and click **Export**\n%8$d Save the passwords file someplace you can find it (e.g. Desktop)\n%9$d %10$@"
           }
         }
       }
@@ -3723,7 +3783,7 @@
       }
     },
     "import.html.instructions.chromium" : {
-      "comment" : "Instructions to import Bookmarks exported as HTML from Chromium-based browsers.\n%d is a step number; %s is a Browser name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Bookmarks exported as HTML from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name\n%5$@ - hamburger menu icon\n%8$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3735,7 +3795,7 @@
       }
     },
     "import.html.instructions.firefox" : {
-      "comment" : "Instructions to import Bookmarks exported as HTML from Firefox based browsers.\n%d is a step number; %s is a Browser name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Bookmarks exported as HTML from Firefox based browsers.\n%N$d - step number\n%2$s - browser name (Firefox)\n%5$@ - hamburger menu icon\n%8$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3747,19 +3807,43 @@
       }
     },
     "import.html.instructions.generic" : {
-      "comment" : "Instructions to import a generic HTML Bookmarks file.\n%d is a step number; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import a generic HTML Bookmarks file.\n%N$d - step number\n%6$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open your old browser\n%2$d Click %3$@ then select **Bookmarks → Bookmark Manager**\n%4$d Click %5$@ then **Export bookmarks to HTML…**\n%6$d Save the file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open your old browser\n%2$d Open **Bookmark Manager**\n%3$d Export bookmarks to HTML…\n%4$d Save the file someplace you can find it (e.g., Desktop)\n%5$d %6$@"
+          }
+        }
+      }
+    },
+    "import.html.instructions.opera" : {
+      "comment" : "Instructions to import Bookmarks exported as HTML from Opera browser.\n%N$d - step number\n%2$s - browser name (Opera)\n%8$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **Bookmarks → Bookmarks**\n%4$d Click **Open full Bookmarks view…** in the bottom left\n%5$d Click **Import/Export…** in the bottom left and select **Export Bookmarks**\n%6$d Save the file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
+          }
+        }
+      }
+    },
+    "import.html.instructions.operagx" : {
+      "comment" : "Instructions to import Bookmarks exported as HTML from Opera GX browser.\n%N$d - step number\n%2$s - browser name (Opera GX)\n%7$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **Bookmarks → Bookmarks**\n%4$d Click **Import/Export…** in the bottom left and select **Export Bookmarks**\n%5$d Save the file someplace you can find it (e.g., Desktop)\n%6$d %7$@"
           }
         }
       }
     },
     "import.html.instructions.safari" : {
-      "comment" : "Instructions to import Bookmarks exported as HTML from Safari.\n%d is a step number; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Bookmarks exported as HTML from Safari.\n%N$d - step number\n%5$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3770,8 +3854,20 @@
         }
       }
     },
+    "import.html.instructions.vivaldi" : {
+      "comment" : "Instructions to import Bookmarks exported as HTML from Vivaldi browser.\n%N$d - step number\n%2$s - browser name (Vivaldi)\n%6$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **File → Export Bookmarks…**\n%4$d Save the file someplace you can find it (e.g., Desktop)\n%5$d %6$@"
+          }
+        }
+      }
+    },
     "import.html.instructions.yandex" : {
-      "comment" : "Instructions to import Bookmarks exported as HTML from Yandex Browser.\n%d is a step number; %s is a Browser name; %@ is for a button image to click\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Bookmarks exported as HTML from Yandex Browser.\n%N$d - step number\n%2$s - browser name (Yandex)\n%5$@ - hamburger menu icon\n%8$@ - “Select Bookmarks HTML File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3789,7 +3885,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "CSV Passwords File"
+            "value" : "CSV Passwords File (for other browsers)"
           }
         }
       }
@@ -5806,13 +5902,13 @@
         }
       }
     },
-    "Passwords import failed: %lld" : {
+    "Passwords import failed: " : {
       "comment" : "Data import summary format of how many passwords (%lld) failed to import."
     },
     "Passwords import failed." : {
       "comment" : "Data import summary message of failed passwords import."
     },
-    "Passwords: %lld" : {
+    "Passwords:" : {
       "comment" : "Data import summary format of how many passwords (%lld) were successfully imported."
     },
     "Passwords…" : {
@@ -8662,6 +8758,9 @@
     },
     "Window" : {
       "comment" : "Main Menu "
+    },
+    "You can find your version by selecting **%@ → About 1Password** from the Menu Bar" : {
+
     },
     "You could try importing %@ manually." : {
       "comment" : "Data import error subtitle: suggestion to import Bookmarks or Passwords (%@) manually by selecting a CSV or HTML file."

@@ -27,7 +27,7 @@ struct DataImportNoDataView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("We couldn‘t find any \(dataType.displayName)…", comment: "Data import error message: Bookmarks or Passwords (%@) weren‘t found.")
-                .font(.headline)
+                .bold()
 
             Text("You could try importing \(dataType.displayName) manually.",
                  comment: "Data import error subtitle: suggestion to import Bookmarks or Passwords (%@) manually by selecting a CSV or HTML file.")

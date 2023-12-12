@@ -38,7 +38,7 @@ struct FileImportView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 16) {
             {
                 switch dataType {
                 case .bookmarks:
@@ -46,10 +46,29 @@ struct FileImportView: View {
                 case .passwords:
                     Text("Import Passwords")
                 }
-            }().font(.headline)
+            }().bold()
 
-            InstructionsView(fontName: "SF Pro Text", fontSize: 13) {
+            if [.onePassword7, .onePassword8].contains(source) {
+                HStack {
+                    Image(.info)
+                    Text("""
+                    You can find your version by selecting **\(source.importSourceName) → About 1Password** from the Menu Bar
+                    """)
+                    Spacer()
+                }
+                .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+                .background(Color("BlackWhite5"))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color("SeparatorColor"),
+                                style: StrokeStyle(lineWidth: 1))
+                )
+                .padding(.top, 8)
+                .padding(.bottom, 8)
+            }
 
+            InstructionsView {
                 switch (source, dataType) {
                 case (.chrome, .passwords):
                     NSLocalizedString("import.csv.instructions.chrome", value: """
@@ -60,21 +79,39 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from Google Chrome browser.
-                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    %N$d - step number
+                    %2$s - browser name (Chrome)
+                    %4$@ - hamburger menu icon
+                    %8$@ - “Select Passwords CSV File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
                     NSImage.menuVertical16
                     button("Select Passwords CSV File…")
 
-                case (.brave, .passwords),
-                    (.chromium, .passwords),
-                    (.coccoc, .passwords),
-                    (.edge, .passwords),
-                    (.vivaldi, .passwords),
-                    (.opera, .passwords),
-                    (.operaGX, .passwords):
+                case (.brave, .passwords):
+                    NSLocalizedString("import.csv.instructions.brave", value: """
+                    %d Open **%s**
+                    %d Click %@ to open the application menu then click **Password Manager**
+                    %d Click %@ **at the top left** of the Password Manager and select **Settings**
+                    %d Find “Export Passwords” and click **Download File**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Brave browser.
+                    %N$d - step number
+                    %2$s - browser name (Brave)
+                    %4$@, %6$@ - hamburger menu icon
+                    %10$@ - “Select Passwords CSV File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuHamburger16
+                    NSImage.menuHamburger16
+                    button("Select Passwords CSV File…")
 
+                case (.chromium, .passwords),
+                     (.edge, .passwords):
                     NSLocalizedString("import.csv.instructions.chromium", value: """
                     %d Open **%s**
                     %d In a fresh tab, click %@ then **Password Manager → Settings**
@@ -83,7 +120,85 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from Chromium-based browsers.
-                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    %N$d - step number
+                    %2$s - browser name
+                    %4$@ - hamburger menu icon
+                    %8$@ - “Select Passwords CSV File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuVertical16
+                    button("Select Passwords CSV File…")
+
+                case (.coccoc, .passwords):
+                    NSLocalizedString("import.csv.instructions.coccoc", value: """
+                    %d Open **%s**
+                    %d Type “_coccoc://settings/passwords_” into the Address field
+                    %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Chromium-based browsers.
+                    %N$d - step number
+                    %2$s - browser name (Cốc Cốc)
+                    %5$@ - hamburger menu icon
+                    %8$@ - “Select Passwords CSV File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuVertical16
+                    button("Select Passwords CSV File…")
+
+                case (.opera, .passwords):
+                    NSLocalizedString("import.csv.instructions.opera", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **View → Show Password Manager**
+                    %d Select **Settings**
+                    %d Find “Export Passwords” and click **Download File**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Chromium-based browsers.
+                    %N$d - step number
+                    %2$s - browser name (Opera)
+                    %8$@ - “Select Passwords CSV File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    button("Select Passwords CSV File…")
+
+                case (.vivaldi, .passwords):
+                    NSLocalizedString("import.csv.instructions.vivaldi", value: """
+                    %d Open **%s**
+                    %d Type “_chrome://settings/passwords_” into the Address field
+                    %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords exported as CSV from Vivaldi browser.
+                    %N$d - step number
+                    %2$s - browser name (Vivaldi)
+                    %5$@ - menu button icon
+                    %8$@ - “Select Passwords CSV File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    NSImage.menuVertical16
+                    button("Select Passwords CSV File…")
+
+                case (.operaGX, .passwords):
+                    NSLocalizedString("import.csv.instructions.operagx", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **View → Show Password Manager**
+                    %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
+                    %d Save the passwords file someplace you can find it (e.g. Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Passwords as CSV from Chromium-based browsers.
+                    %N$d - step number
+                    %2$s - browser name (Opera GX)
+                    %5$@ - menu button icon
+                    %8$@ - “Select Passwords CSV File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
@@ -92,7 +207,7 @@ struct FileImportView: View {
 
                 case (.yandex, .passwords):
                     NSLocalizedString("import.csv.instructions.yandex", value: """
-                    %d Open **Yandex**
+                    %d Open **%s**
                     %d Click %@ to open the application menu then click **Passwords and cards**
                     %d Click %@ then **Export passwords**
                     %d Choose **To a text file (not secure)** and click **Export**
@@ -100,7 +215,10 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from Yandex Browser.
-                    %d is a step number; %@ is for a button image to click
+                    %N$d - step number
+                    %2$s - browser name (Yandex)
+                    %4$@ - hamburger menu icon
+                    %8$@ - “Select Passwords CSV File” button
                     **bold text**; _italic text_
                     """)
                     NSImage.menuHamburger16
@@ -108,13 +226,10 @@ struct FileImportView: View {
                     button("Select Passwords CSV File…")
 
                 case (.brave, .bookmarks),
-                    (.chrome, .bookmarks),
-                    (.chromium, .bookmarks),
-                    (.coccoc, .bookmarks),
-                    (.edge, .bookmarks),
-                    (.vivaldi, .bookmarks),
-                    (.opera, .bookmarks),
-                    (.operaGX, .bookmarks):
+                     (.chrome, .bookmarks),
+                     (.chromium, .bookmarks),
+                     (.coccoc, .bookmarks),
+                     (.edge, .bookmarks):
                     NSLocalizedString("import.html.instructions.chromium", value: """
                     %d Open **%s**
                     %d Use the Menu Bar to select **Bookmarks → Bookmark Manager**
@@ -123,11 +238,65 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Bookmarks exported as HTML from Chromium-based browsers.
-                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    %N$d - step number
+                    %2$s - browser name
+                    %5$@ - hamburger menu icon
+                    %8$@ - “Select Bookmarks HTML File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
                     NSImage.menuVertical16
+                    button("Select Bookmarks HTML File…")
+
+                case (.vivaldi, .bookmarks):
+                    NSLocalizedString("import.html.instructions.vivaldi", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **File → Export Bookmarks…**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Bookmarks exported as HTML from Vivaldi browser.
+                    %N$d - step number
+                    %2$s - browser name (Vivaldi)
+                    %6$@ - “Select Bookmarks HTML File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    button("Select Bookmarks HTML File…")
+
+                case (.opera, .bookmarks):
+                    NSLocalizedString("import.html.instructions.opera", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **Bookmarks → Bookmarks**
+                    %d Click **Open full Bookmarks view…** in the bottom left
+                    %d Click **Import/Export…** in the bottom left and select **Export Bookmarks**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Bookmarks exported as HTML from Opera browser.
+                    %N$d - step number
+                    %2$s - browser name (Opera)
+                    %8$@ - “Select Bookmarks HTML File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
+                    button("Select Bookmarks HTML File…")
+
+                case (.operaGX, .bookmarks):
+                    NSLocalizedString("import.html.instructions.operagx", value: """
+                    %d Open **%s**
+                    %d Use the Menu Bar to select **Bookmarks → Bookmarks**
+                    %d Click **Import/Export…** in the bottom left and select **Export Bookmarks**
+                    %d Save the file someplace you can find it (e.g., Desktop)
+                    %d %@
+                    """, comment: """
+                    Instructions to import Bookmarks exported as HTML from Opera GX browser.
+                    %N$d - step number
+                    %2$s - browser name (Opera GX)
+                    %7$@ - “Select Bookmarks HTML File” button
+                    **bold text**; _italic text_
+                    """)
+                    source.importSourceName
                     button("Select Bookmarks HTML File…")
 
                 case (.yandex, .bookmarks):
@@ -139,7 +308,10 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Bookmarks exported as HTML from Yandex Browser.
-                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    %N$d - step number
+                    %2$s - browser name (Yandex)
+                    %5$@ - hamburger menu icon
+                    %8$@ - “Select Bookmarks HTML File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
@@ -154,7 +326,8 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from Safari.
-                    %d is a step number; %@ is for a button image to click
+                    %N$d - step number
+                    %5$@ - “Select Passwords CSV File” button
                     **bold text**; _italic text_
                     """)
 
@@ -168,7 +341,8 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Bookmarks exported as HTML from Safari.
-                    %d is a step number; %@ is for a button image to click
+                    %N$d - step number
+                    %5$@ - “Select Bookmarks HTML File” button
                     **bold text**; _italic text_
                     """)
                     button("Select Bookmarks HTML File…")
@@ -182,12 +356,15 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from Firefox.
-                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    %N$d - step number
+                    %2$s - browser name (Firefox)
+                    %4$@, %6$@ - hamburger menu icon
+                    %9$@ - “Select Passwords CSV File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
                     NSImage.menuHamburger16
-                    NSImage.menuVertical16
+                    NSImage.menuHorizontal16
                     button("Select Passwords CSV File…")
 
                 case (.firefox, .bookmarks), (.tor, .bookmarks):
@@ -199,7 +376,10 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Bookmarks exported as HTML from Firefox based browsers.
-                    %d is a step number; %s is a Browser name; %@ is for a button image to click
+                    %N$d - step number
+                    %2$s - browser name (Firefox)
+                    %5$@ - hamburger menu icon
+                    %8$@ - “Select Bookmarks HTML File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
@@ -216,7 +396,8 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from 1Password 8.
-                    %d is a step number; %s is 1Password app name; %@ is for a button image to click
+                    %2$s - app name (1Password)
+                    %8$@ - “Select 1Password CSV File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
@@ -233,7 +414,8 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from 1Password 7.
-                    %d is a step number; %s is 1Password app name; %@ is for a button image to click
+                    %2$s - app name (1Password)
+                    %9$@ - “Select 1Password CSV File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
@@ -249,7 +431,9 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from Bitwarden.
-                    %d is a step number; %s is Bitwarden app name; %@ is for a button image to click
+                    %2$s - app name (Bitwarden)
+                    %7$@ - hamburger menu icon
+                    %9$@ - “Select Bitwarden CSV File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
@@ -266,7 +450,8 @@ struct FileImportView: View {
                     %d %@
                     """, comment: """
                     Instructions to import Passwords as CSV from LastPass.
-                    %d is a step number; %s is LastPass app name; %@ is for a button image to click
+                    %2$s - app name (LastPass)
+                    %8$@ - “Select LastPass CSV File” button
                     **bold text**; _italic text_
                     """)
                     source.importSourceName
@@ -281,7 +466,8 @@ struct FileImportView: View {
                     %@
                     """, comment: """
                     Instructions to import a generic CSV passwords file.
-                    %d is a step number; %@ is for a button image to click
+                    %N$d - step number
+                    %3$@ - “Select Passwords CSV File” button
                     **bold text**; _italic text_
                     """)
 
@@ -290,17 +476,16 @@ struct FileImportView: View {
                 case (.bookmarksHTML, .bookmarks):
                     NSLocalizedString("import.html.instructions.generic", value: """
                     %d Open your old browser
-                    %d Click %@ then select **Bookmarks → Bookmark Manager**
-                    %d Click %@ then **Export bookmarks to HTML…**
+                    %d Open **Bookmark Manager**
+                    %d Export bookmarks to HTML…
                     %d Save the file someplace you can find it (e.g., Desktop)
                     %d %@
                     """, comment: """
                     Instructions to import a generic HTML Bookmarks file.
-                    %d is a step number; %@ is for a button image to click
+                    %N$d - step number
+                    %6$@ - “Select Bookmarks HTML File” button
                     **bold text**; _italic text_
                     """)
-                    NSImage.menuHamburger16
-                    NSImage.menuVertical16
                     button("Select Bookmarks HTML File…")
 
                 case (.bookmarksHTML, .passwords),
@@ -386,18 +571,11 @@ struct InstructionsView: View {
         case view(AnyView)
     }
 
-    // Text font - used to calculate inline image baseline offset and set Text/Font modifier
-    let fontName: String
-    let fontSize: CGFloat
-
     // View Model
     private let instructions: [[InstructionsViewItem]]
 
     // swiftlint:disable:next function_body_length cyclomatic_complexity
-    init(fontName: String, fontSize: CGFloat, @InstructionsBuilder builder: () -> [InstructionsItem]) {
-        self.fontName = fontName
-        self.fontSize = fontSize
-
+    init(@InstructionsBuilder builder: () -> [InstructionsItem]) {
         var args = builder()
 
         guard case .string(let format) = args.first else {
@@ -548,16 +726,19 @@ struct InstructionsView: View {
     }
 
     var body: some View {
-        ForEach(instructions.indices, id: \.self) { i in
-            HStack(spacing: 4) {
-                ForEach(instructions[i].indices, id: \.self) { j in
-                    switch instructions[i][j] {
-                    case .lineNumber(let number):
-                        CircleNumberView(number: number)
-                    case .textItems(let textParts):
-                        Text(textParts, fontName: fontName, fontSize: fontSize)
-                    case .view(let view):
-                        view
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(instructions.indices, id: \.self) { i in
+                HStack(spacing: 8) {
+                    ForEach(instructions[i].indices, id: \.self) { j in
+                        switch instructions[i][j] {
+                        case .lineNumber(let number):
+                            CircleNumberView(number: number)
+                        case .textItems(let textParts):
+                            Text(textParts)
+                                .makeSelectable()
+                        case .view(let view):
+                            view
+                        }
                     }
                 }
             }
@@ -568,15 +749,15 @@ struct InstructionsView: View {
 
 private extension Text {
 
-    init(_ textPart: InstructionsView.TextItem, fontName: String, fontSize: CGFloat) {
+    init(_ textPart: InstructionsView.TextItem) {
         switch textPart {
         case .image(let image):
             self.init(Image(nsImage: image))
-            self = self.baselineOffset(fontSize - image.size.height)
+            self = self
+                .baselineOffset(-3)
 
         case .text(let text, let isBold, let isItalic):
             self.init(text)
-            self = self.font(.custom(fontName, size: fontSize))
             if isBold {
                 self = self.bold()
             }
@@ -586,18 +767,18 @@ private extension Text {
         }
     }
 
-    init(_ textParts: [InstructionsView.TextItem], fontName: String, fontSize: CGFloat) {
+    init(_ textParts: [InstructionsView.TextItem]) {
         guard !textParts.isEmpty else {
             assertionFailure("Empty TextParts")
             self.init("")
             return
         }
-        self.init(textParts[0], fontName: fontName, fontSize: fontSize)
+        self.init(textParts[0])
 
         guard textParts.count > 1 else { return }
         for textPart in textParts[1...] {
             // swiftlint:disable:next shorthand_operator
-            self = self + Text(textPart, fontName: fontName, fontSize: fontSize)
+            self = self + Text(textPart)
         }
     }
 
@@ -614,7 +795,7 @@ struct CircleNumberView: View {
             .overlay(
                 Text("\(number)")
                     .foregroundColor(.onboardingActionButton)
-                    .font(.headline)
+                    .bold()
 
             )
     }
@@ -624,7 +805,11 @@ struct CircleNumberView: View {
 // MARK: - Preview
 
 #Preview {
-    FileImportView(source: .chrome, dataType: .passwords, isButtonDisabled: false)
-        .frame(width: 512 - 20)
-
+    HStack {
+        FileImportView(source: .onePassword7, dataType: .passwords, isButtonDisabled: false)
+            .padding()
+            .frame(width: 512 - 20)
+    }
+    .font(.custom("SF Pro Text", size: 13))
+    .background(Color.white)
 }

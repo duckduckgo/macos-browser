@@ -30,22 +30,20 @@ struct DataImportProfilePicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if profiles.count > 1 {
-                Text("Select Profile:", comment: "Browser Profile picker title for Data Import")
-                    .font(.headline)
+            Text("Select Profile:", comment: "Browser Profile picker title for Data Import")
+                .bold()
 
-                Picker(selection: Binding {
-                    selectedProfile.flatMap(profiles.firstIndex(of:)) ?? 0
-                } set: {
-                    selectedProfile = profiles[safe: $0]
-                }) {
-                    ForEach(profiles.indices, id: \.self) { idx in
-                        Text(profiles[idx].profileName)
-                    }
-                } label: {}
-                    .pickerStyle(.menu)
-                    .controlSize(.large)
-            }
+            Picker(selection: Binding {
+                selectedProfile.flatMap(profiles.firstIndex(of:)) ?? 0
+            } set: {
+                selectedProfile = profiles[safe: $0]
+            }) {
+                ForEach(profiles.indices, id: \.self) { idx in
+                    Text(profiles[idx].profileName)
+                }
+            } label: {}
+                .pickerStyle(.menu)
+                .controlSize(.large)
         }
     }
 
@@ -67,4 +65,5 @@ struct DataImportProfilePicker: View {
     })
     .padding()
     .frame(width: 512)
+    .font(.custom("SF Pro Text", size: 13))
 }

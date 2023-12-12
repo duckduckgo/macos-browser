@@ -34,7 +34,7 @@ struct ReportFeedbackView: View {
                          comment: "Data import failure Report dialog title containing a message that not only automatic data import has failed failed but manual browser data import didn‘t work either.")
                 }
             }()
-                .font(.headline)
+                .bold()
                 .padding(.bottom, 8)
 
             VStack(alignment: .leading, spacing: 12) {
@@ -69,7 +69,6 @@ struct ReportFeedbackView: View {
                     HStack {
                         Text("Add any details that you think may help us fix the problem",
                              comment: "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem.")
-                            .font(.custom("SF Pro Text", size: 13))
                             .foregroundColor(Color(.placeholderTextColor))
                         Spacer()
                     }.padding(EdgeInsets(top: 11, leading: 11, bottom: 0, trailing: 11))

@@ -65,6 +65,11 @@ struct DataImportView: View {
                 .padding(.trailing, 20)
                 .padding(.bottom, 32)
 
+            // if import in progress…
+            if let importProgress = model.importProgress {
+                progressView(importProgress)
+            }
+
             Divider()
 
             viewFooter()
@@ -78,6 +83,7 @@ struct DataImportView: View {
             }
 #endif
         }
+        .font(.custom("SF Pro Text", size: 13))
         .frame(width: 512)
         .fixedSize()
     }
@@ -85,7 +91,7 @@ struct DataImportView: View {
     private func viewHeader() -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(UserText.importDataTitle)
-                .font(.headline)
+                .bold()
                 .padding(.bottom, 16)
 
             // browser to import data from picker popup
@@ -105,10 +111,12 @@ struct DataImportView: View {
             switch model.screen {
             case .profileAndDataTypesPicker:
                 // Browser Profile picker
-                DataImportProfilePicker(profileList: model.browserProfiles,
-                                        selectedProfile: $model.selectedProfile)
-                .disabled(model.isImportSourcePickerDisabled)
-                .padding(.bottom, 24)
+                if model.browserProfiles?.validImportableProfiles.count ?? 0 > 1 {
+                    DataImportProfilePicker(profileList: model.browserProfiles,
+                                            selectedProfile: $model.selectedProfile)
+                    .disabled(model.isImportSourcePickerDisabled)
+                    .padding(.bottom, 24)
+                }
 
                 // Bookmarks/Passwords checkboxes
                 DataImportTypePicker(viewModel: $model)
@@ -129,9 +137,10 @@ struct DataImportView: View {
                 if !summaryTypes.isEmpty {
                     DataImportSummaryView(model, dataTypes: summaryTypes)
                         .padding(.bottom, 24)
+                }
 
                 // if no data to import
-                } else if model.summary(for: dataType)?.isEmpty == true
+                if model.summary(for: dataType)?.isEmpty == true
                             || model.error(for: dataType)?.errorType == .noData {
 
                     DataImportNoDataView(source: model.importSource, dataType: dataType)
@@ -158,11 +167,6 @@ struct DataImportView: View {
                 .padding(.bottom, 20)
 
                 ReportFeedbackView(model: $model.reportModel)
-            }
-
-            // Import in progress…
-            if let importProgress = model.importProgress {
-                progressView(importProgress)
             }
         }
     }
@@ -459,7 +463,7 @@ extension DataImportViewModel.ButtonType {
         }
     }
 
-    let viewModel = DataImportViewModel(importSource: .chrome) { browser in
+    let viewModel = DataImportViewModel(importSource: .bookmarksHTML) { browser in
         guard case .chrome = browser else {
             print("empty profiles")
             return .init(browser: browser, profiles: [])
@@ -514,6 +518,7 @@ extension DataImportViewModel.ButtonType {
             })
 
         PreviewPreferencesView()
+        Spacer()
     }
     .frame(minHeight: 666)
 
