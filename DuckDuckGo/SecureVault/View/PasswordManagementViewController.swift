@@ -45,6 +45,7 @@ final class PasswordManagementViewController: NSViewController {
 
     weak var delegate: PasswordManagementDelegate?
 
+    @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
@@ -171,6 +172,8 @@ final class PasswordManagementViewController: NSViewController {
         moreButton.sendAction(on: .leftMouseDown)
 
         exportLoginItem.title = UserText.exportLogins
+        unlockYourAutofillInfo.setAccessibilityIdentifier("Unlock Autofill")
+        addVaultItemButton.setAccessibilityIdentifier("add item")
 
         NotificationCenter.default.publisher(for: .deviceBecameLocked)
             .receive(on: DispatchQueue.main)
@@ -249,14 +252,16 @@ final class PasswordManagementViewController: NSViewController {
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
 #if DEBUG
-        if NSApp.runType != .uiTests {
-            toggleLockScreen(hidden: !authenticator.requiresAuthentication)
-
-            authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
-                self.toggleLockScreen(hidden: authenticationResult.authenticated)
-            }
+        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            toggleLockScreen(hidden: true)
+            return
         }
 #endif
+        toggleLockScreen(hidden: !authenticator.requiresAuthentication)
+
+        authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
+            self.toggleLockScreen(hidden: authenticationResult.authenticated)
+        }
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {
@@ -1000,6 +1005,7 @@ extension PasswordManagementViewController: NSMenuDelegate {
             } else {
                 lockItem.isHidden = true
             }
+
         }
     }
 

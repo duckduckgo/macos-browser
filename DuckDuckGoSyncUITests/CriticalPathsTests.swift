@@ -112,12 +112,10 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     func testCanLoginToExistingSyncAccount() {
-        //        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
-        //            XCTFail("CODE not set")
-        //            return
-        //        }
-
-        let code = "eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiZGM2ZTMxZTctOTM3Mi00MjcwLTliOGMtNTlkYzczM2JhZmJhIiwicHJpbWFyeV9rZXkiOiJnR1FEaGU2UThnS00zTTVCZ0VOVHNwZTFYSWJGRVhqMSsxR2hNNDBmVGNJPSJ9fQ=="
+        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
+            XCTFail("CODE not set")
+            return
+        }
 
         // Launch App
         let app = XCUIApplication()
@@ -163,15 +161,14 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     func testCanSyncData() {
-        //        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
-        //            XCTFail("CODE not set")
-        //            return
-        //        }
-
-        let code = "eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiYWY1YTZiMTEtNTYxZS00YTJiLWI1YzItYWQ0MTljMzIyMzJmIiwicHJpbWFyeV9rZXkiOiJlSkRIU3FwQ2Nxd2tyaFZudHZVWVlJdlIrTTYxRXQrbEJKcjFueUhucHNvPSJ9fQ=="
-
+        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
+            XCTFail("CODE not set")
+            return
+        }
+        
         // Launch App
         let app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
 
         // Set Internal User
@@ -206,10 +203,18 @@ final class CriticalPathsTests: XCTestCase {
         bookmarksWindow/*@START_MENU_TOKEN@*/.menuItems["toggleBookmarkAsFavorite:"]/*[[".splitGroups",".menus",".menuItems[\"Add to Favorites\"]",".menuItems[\"toggleBookmarkAsFavorite:\"]"],[[[-1,3],[-1,2],[-1,1,2],[-1,0,1]],[[-1,3],[-1,2],[-1,1,2]],[[-1,3],[-1,2]]],[0]]@END_MENU_TOKEN@*/.click()
 
         // Add Login
-//        bookmarksWindow.buttons["Options Button"].click()
-//        bookmarksWindow/*@START_MENU_TOKEN@*/.menuItems["Autofill"]/*[[".buttons[\"Options Button\"]",".menus.menuItems[\"Autofill\"]",".menuItems[\"Autofill\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
-//        bookmarksWindow/*@START_MENU_TOKEN@*/.popovers/*[[".buttons.popovers",".popovers"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.children(matching: .button).element(boundBy: 1).click()
-//        bookmarksWindow/*@START_MENU_TOKEN@*/.popovers.menuItems["createNewLogin"]/*[[".buttons.popovers",".menus",".menuItems[\"Login\"]",".menuItems[\"createNewLogin\"]",".popovers"],[[[-1,4,1],[-1,0,1]],[[-1,3],[-1,2],[-1,1,2]],[[-1,3],[-1,2]]],[0,0]]@END_MENU_TOKEN@*/.click()
+        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow/*@START_MENU_TOKEN@*/.menuItems["Autofill"]/*[[".buttons[\"Options Button\"]",".menus.menuItems[\"Autofill\"]",".menuItems[\"Autofill\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
+        bookmarksWindow/*@START_MENU_TOKEN@*/.popovers.buttons["Unlock Autofill"]/*[[".buttons.popovers",".groups",".buttons[\"Unlock your Autofill info\"]",".buttons[\"Unlock Autofill\"]",".popovers"],[[[-1,4,1],[-1,0,1]],[[-1,3],[-1,2],[-1,1,2]],[[-1,3],[-1,2]]],[0,0]]@END_MENU_TOKEN@*/.click()
+        bookmarksWindow/*@START_MENU_TOKEN@*/.popovers/*[[".buttons.popovers",".popovers"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.buttons["add item"].click()
+        bookmarksWindow/*@START_MENU_TOKEN@*/.popovers.menuItems["createNewLogin"]/*[[".buttons.popovers",".menus",".menuItems[\"Login\"]",".menuItems[\"createNewLogin\"]",".popovers"],[[[-1,4,1],[-1,0,1]],[[-1,3],[-1,2],[-1,1,2]],[[-1,3],[-1,2]]],[0,0]]@END_MENU_TOKEN@*/.click()
+        let usernameTextfieldTextField = bookmarksWindow/*@START_MENU_TOKEN@*/.popovers.textFields["Username TextField"]/*[[".buttons.popovers",".groups",".scrollViews[\"Login item View\"].textFields[\"Username TextField\"]",".textFields[\"Username TextField\"]",".popovers"],[[[-1,4,1],[-1,0,1]],[[-1,3],[-1,2],[-1,1,2]],[[-1,3],[-1,2]]],[0,0]]@END_MENU_TOKEN@*/
+        usernameTextfieldTextField.click()
+        usernameTextfieldTextField.typeText("mywebsite")
+        let websiteTextfieldTextField = bookmarksWindow/*@START_MENU_TOKEN@*/.popovers.textFields["Website TextField"]/*[[".buttons.popovers",".groups",".scrollViews[\"Login item View\"].textFields[\"Website TextField\"]",".textFields[\"Website TextField\"]",".popovers"],[[[-1,4,1],[-1,0,1]],[[-1,3],[-1,2],[-1,1,2]],[[-1,3],[-1,2]]],[0,0]]@END_MENU_TOKEN@*/
+        websiteTextfieldTextField.click()
+        websiteTextfieldTextField.typeText("mywebsite.com")
+        bookmarksWindow.popovers.buttons["Save"].click()
 
         // Copy code to clipboard
         let pasteboard = NSPasteboard.general
@@ -262,8 +267,7 @@ final class CriticalPathsTests: XCTestCase {
         settingsSheetsQuery/*@START_MENU_TOKEN@*/.buttons["Next"]/*[[".groups.buttons[\"Next\"]",".buttons[\"Next\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.click()
         settingsSheetsQuery.buttons["Done"].click()
         XCTAssertTrue(secondDevice.exists, "Original Device not visible")
-        let syncBackupScrollViewsQuery = settingsWindow/*@START_MENU_TOKEN@*/.scrollViews.containing(.staticText, identifier:"Sync & Backup")/*[[".groups",".scrollViews.containing(.button, identifier:\"Turn Off and Delete Server Data\")",".scrollViews.containing(.button, identifier:\"Save Your Recovery Code\")",".scrollViews.containing(.staticText, identifier:\"If you lose your device, you will need this recovery code to restore your synced data.\")",".scrollViews.containing(.staticText, identifier:\"Recovery\")",".scrollViews.containing(.staticText, identifier:\"Use the same favorite bookmarks on the new tab. Leave off to keep mobile and desktop favorites separate.\")",".scrollViews.containing(.staticText, identifier:\"Unify Favorites Across Devices\")",".scrollViews.containing(.staticText, identifier:\"Automatically download icons for synced bookmarks.\")",".scrollViews.containing(.staticText, identifier:\"Fetch Bookmark Icons\")",".scrollViews.containing(.staticText, identifier:\"Options\")",".scrollViews.containing(.button, identifier:\"Sync with Another Device\")",".scrollViews.containing(.image, identifier:\"SyncedDeviceMobile\")",".scrollViews.containing(.other, identifier:\"list of devices\")",".scrollViews.containing(.button, identifier:\"Details...\")",".scrollViews.containing(.button, identifier:\"list of devices\")",".scrollViews.containing(.staticText, identifier:\"list of devices\")",".scrollViews.containing(.image, identifier:\"SyncedDeviceDesktop\")",".scrollViews.containing(.image, identifier:\"list of devices\")",".scrollViews.containing(.staticText, identifier:\"Synced Devices\")",".scrollViews.containing(.staticText, identifier:\"Bookmarks and Saved Logins are currently in sync across your devices.\")",".scrollViews.containing(.button, identifier:\"Turn off Sync...\")",".scrollViews.containing(.staticText, identifier:\"Sync Enabled\")",".scrollViews.containing(.image, identifier:\"SolidCheckmark\")",".scrollViews.containing(.staticText, identifier:\"Sync & Backup\")"],[[[-1,23],[-1,22],[-1,21],[-1,20],[-1,19],[-1,18],[-1,17],[-1,16],[-1,15],[-1,14],[-1,13],[-1,12],[-1,11],[-1,10],[-1,9],[-1,8],[-1,7],[-1,6],[-1,5],[-1,4],[-1,3],[-1,2],[-1,1],[-1,0,1]],[[-1,23],[-1,22],[-1,21],[-1,20],[-1,19],[-1,18],[-1,17],[-1,16],[-1,15],[-1,14],[-1,13],[-1,12],[-1,11],[-1,10],[-1,9],[-1,8],[-1,7],[-1,6],[-1,5],[-1,4],[-1,3],[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/
-        syncBackupScrollViewsQuery.children(matching: .switch).element(boundBy: 1).click()
+        settingsWindow/*@START_MENU_TOKEN@*/.scrollViews.containing(.staticText, identifier:"Sync & Backup")/*[[".groups",".scrollViews.containing(.button, identifier:\"Turn Off and Delete Server Data\")",".scrollViews.containing(.button, identifier:\"Save Your Recovery Code\")",".scrollViews.containing(.staticText, identifier:\"If you lose your device, you will need this recovery code to restore your synced data.\")",".scrollViews.containing(.staticText, identifier:\"Recovery\")",".scrollViews.containing(.staticText, identifier:\"Use the same favorite bookmarks on the new tab. Leave off to keep mobile and desktop favorites separate.\")",".scrollViews.containing(.staticText, identifier:\"Unify Favorites Across Devices\")",".scrollViews.containing(.staticText, identifier:\"Automatically download icons for synced bookmarks.\")",".scrollViews.containing(.staticText, identifier:\"Fetch Bookmark Icons\")",".scrollViews.containing(.staticText, identifier:\"Options\")",".scrollViews.containing(.button, identifier:\"Sync with Another Device\")",".scrollViews.containing(.image, identifier:\"SyncedDeviceMobile\")",".scrollViews.containing(.other, identifier:\"list of devices\")",".scrollViews.containing(.button, identifier:\"Details...\")",".scrollViews.containing(.button, identifier:\"list of devices\")",".scrollViews.containing(.staticText, identifier:\"list of devices\")",".scrollViews.containing(.image, identifier:\"SyncedDeviceDesktop\")",".scrollViews.containing(.image, identifier:\"list of devices\")",".scrollViews.containing(.staticText, identifier:\"Synced Devices\")",".scrollViews.containing(.staticText, identifier:\"Bookmarks and Saved Logins are currently in sync across your devices.\")",".scrollViews.containing(.button, identifier:\"Turn off Sync...\")",".scrollViews.containing(.staticText, identifier:\"Sync Enabled\")",".scrollViews.containing(.image, identifier:\"SolidCheckmark\")",".scrollViews.containing(.staticText, identifier:\"Sync & Backup\")"],[[[-1,23],[-1,22],[-1,21],[-1,20],[-1,19],[-1,18],[-1,17],[-1,16],[-1,15],[-1,14],[-1,13],[-1,12],[-1,11],[-1,10],[-1,9],[-1,8],[-1,7],[-1,6],[-1,5],[-1,4],[-1,3],[-1,2],[-1,1],[-1,0,1]],[[-1,23],[-1,22],[-1,21],[-1,20],[-1,19],[-1,18],[-1,17],[-1,16],[-1,15],[-1,14],[-1,13],[-1,12],[-1,11],[-1,10],[-1,9],[-1,8],[-1,7],[-1,6],[-1,5],[-1,4],[-1,3],[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.children(matching: .switch).element(boundBy: 1).click()
 
         // Check Bookmarks
         settingsWindow/*@START_MENU_TOKEN@*/.popUpButtons["Settings"]/*[[".groups.popUpButtons[\"Settings\"]",".popUpButtons[\"Settings\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.click()
@@ -291,6 +295,13 @@ final class CriticalPathsTests: XCTestCase {
         XCTAssertTrue(gitHub.exists)
         XCTAssertTrue(spreadPrivacy.exists)
 
+        // Check Logins
+        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow/*@START_MENU_TOKEN@*/.menuItems["Autofill"]/*[[".buttons[\"Options Button\"]",".menus.menuItems[\"Autofill\"]",".menuItems[\"Autofill\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
+        let elementsQuery = bookmarksWindow/*@START_MENU_TOKEN@*/.popovers.scrollViews/*[[".buttons.popovers",".groups.scrollViews",".scrollViews",".popovers"],[[[-1,3,1],[-1,0,1]],[[-1,2],[-1,1]]],[0,0]]@END_MENU_TOKEN@*/.otherElements
+        elementsQuery.buttons["Da, Dax Login, daxthetest"].click()
+        elementsQuery.buttons["Gi, Github, githubusername"].click()
+        elementsQuery.buttons["My, mywebsite.com, mywebsite"].click()
+        elementsQuery.buttons["St, StackOverflow, stacker"].click()
     }
-
 }
