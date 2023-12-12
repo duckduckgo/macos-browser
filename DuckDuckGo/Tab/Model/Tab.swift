@@ -25,6 +25,13 @@ import Navigation
 import UserScript
 import WebKit
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+import NetworkProtectionIPC
+#endif
+
+// swiftlint:disable file_length
+
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
@@ -193,8 +200,15 @@ protocol NewWindowPolicyDecisionMaker {
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
     private let statisticsLoader: StatisticsLoader?
+    private let netPStatusReporter: NetworkProtectionStatusReporter?
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
+
+#if NETWORK_PROTECTION
+    @MainActor
+    @Published
+    private var netPConnectionStatus: NetworkProtection.ConnectionStatus = .default
+#endif
 
     private let webViewConfiguration: WKWebViewConfiguration
 
@@ -225,6 +239,7 @@ protocol NewWindowPolicyDecisionMaker {
                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
+                     netPStatusReporter: NetworkProtectionStatusReporter? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      title: String? = nil,
                      favicon: NSImage? = nil,
@@ -265,6 +280,7 @@ protocol NewWindowPolicyDecisionMaker {
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
+                  netPStatusReporter: netPStatusReporter,
                   internalUserDecider: internalUserDecider,
                   title: title,
                   favicon: favicon,
@@ -296,6 +312,7 @@ protocol NewWindowPolicyDecisionMaker {
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
+         netPStatusReporter: NetworkProtectionStatusReporter?,
          internalUserDecider: InternalUserDecider?,
          title: String?,
          favicon: NSImage?,
@@ -365,6 +382,24 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager))
 
+#if NETWORK_PROTECTION
+        if let netPStatusReporter {
+            self.netPStatusReporter = netPStatusReporter
+        } else {
+            let machServiceName = Bundle.main.vpnMenuAgentBundleId
+            let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+            ipcClient.register()
+
+            self.netPStatusReporter = DefaultNetworkProtectionStatusReporter(
+                statusObserver: ipcClient.connectionStatusObserver,
+                serverInfoObserver: ipcClient.serverInfoObserver,
+                connectionErrorObserver: ipcClient.connectionErrorObserver,
+                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
+            )
+        }
+#endif
+
         super.init()
         tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
@@ -386,6 +421,13 @@ protocol NewWindowPolicyDecisionMaker {
 
         addDeallocationChecks(for: webView)
 
+#if NETWORK_PROTECTION
+        netPStatusReporterCancellable = netPStatusReporter?.statusObserver.publisher
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.netPConnectionStatus, onWeaklyHeld: self)
+
+        self.netPStatusReporter?.forceRefresh()
+#endif
     }
 
 #if DEBUG
@@ -869,6 +911,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
+    private var netPStatusReporterCancellable: AnyCancellable?
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
@@ -1104,6 +1147,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+
+#if NETWORK_PROTECTION
+        if navigation.url.isDuckDuckGoSearch, case .connected = netPConnectionStatus {
+            DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        }
+#endif
     }
 
     @MainActor
@@ -1169,3 +1218,5 @@ extension Tab {
     }
 
 }
+
+// swiftlint:enable file_length

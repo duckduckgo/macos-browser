@@ -163,7 +163,7 @@ extension Pixel {
         // VPN
         case vpnBreakageReport(category: String, description: String, metadata: String)
 
-        // Network Protection Waitlist
+        // Network Protection
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
         case networkProtectionWaitlistEntryPointToolbarButtonDisplayed
@@ -175,6 +175,7 @@ extension Pixel {
         case networkProtectionRemoteMessageDisplayed(messageID: String)
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
+        case networkProtectionEnabledOnSearch
 
         // Sync
         case syncSignupDirect
@@ -509,6 +510,8 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_dismissed_\(messageID)"
         case .networkProtectionRemoteMessageOpened(let messageID):
             return "m_mac_netp_remote_message_opened_\(messageID)"
+        case .networkProtectionEnabledOnSearch:
+            return "m_mac_netp_ev_enabled_on_search"
 
             // Sync
         case .syncSignupDirect:
