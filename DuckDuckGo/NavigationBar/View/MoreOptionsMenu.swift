@@ -294,7 +294,11 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        items.append(contentsOf: AccountManager().isUserAuthenticated ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+        if AccountManager().isUserAuthenticated {
+            items.append(contentsOf: makeActiveSubscriptionItems())
+        } else if SubscriptionPurchaseEnvironment.canPurchase {
+            items.append(contentsOf: makeInactiveSubscriptionItems())
+        }
 #else
         items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
 #endif
