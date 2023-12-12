@@ -248,12 +248,15 @@ final class PasswordManagementViewController: NSViewController {
 
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
+#if DEBUG
+        if NSApp.runType != .uiTests {
+            toggleLockScreen(hidden: !authenticator.requiresAuthentication)
 
-        toggleLockScreen(hidden: !authenticator.requiresAuthentication)
-
-        authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
-            self.toggleLockScreen(hidden: authenticationResult.authenticated)
+            authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
+                self.toggleLockScreen(hidden: authenticationResult.authenticated)
+            }
         }
+#endif
     }
 
     @IBAction func onNewClicked(_ sender: NSButton) {

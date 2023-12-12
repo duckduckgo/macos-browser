@@ -44,6 +44,10 @@ extension NSApplication {
     }
     static let runType: RunType = {
 #if DEBUG
+        print(ProcessInfo().environment)
+        if let isUITest = ProcessInfo().environment["UITEST"], isUITest == "1" {
+            return .uiTests
+        }
         if let testBundlePath = ProcessInfo().environment["XCTestBundlePath"] {
             if testBundlePath.contains("Unit") {
                 return .unitTests
