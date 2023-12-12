@@ -142,7 +142,9 @@ platform :mac do
   # Pushes changes to remote.
   #
   # - Should be called on an existing internal release branch.
-  # - Also runs unit tests after updating embedded files.
+  # - When not in CI, it updates embedded files and runs unit tests.
+  #
+  # @option [Boolean] update_embedded_files (default: true) Set to false to skip updating embedded files (used by CI).
   #
   desc 'Prepares new internal release on top of an existing one'
   lane :bump_internal_release do |options|
@@ -151,6 +153,7 @@ platform :mac do
         UI.abort_with_message!("Incorrect branch. Branch name must start with '#{RELEASE_BRANCH}/'.")
       end
 
+      update_embedded_files = options[:update_embedded_files].nil? ? true : options[:update_embedded_files]
       current_version = macos_current_version
       current_build_number = macos_current_build_number
       build_number = increment_current_build_number(options)
@@ -164,7 +167,7 @@ platform :mac do
         end
       end
 
-      macos_update_embedded_files
+      macos_update_embedded_files if update_embedded_files
       macos_update_version_and_build_number_config(
         version: current_version,
         build_number: build_number
@@ -209,6 +212,16 @@ platform :mac do
     sh('git', 'push')
   end
 
+  # Updates embedded files and pushes to remote.
+  # Only for CI use, where unit tests are run as a separate job.
+  #
+  desc 'Updates embedded files and pushes to remote.'
+  lane :update_embedded_files do |options|
+    UI.user_error! 'This lane should only be used in CI.' unless is_ci
+    macos_update_embedded_files
+    sh('git', 'push')
+  end
+
   # Updates marketing version to the specified one and increments build number by 1.
   #
   # @option [String] version Marketing version string.
@@ -249,10 +262,10 @@ platform :mac do
   end
 
   private_lane :get_username do |options|
-    if options[:username]
+    if is_ci
+      nil # not supported in CI
+    elsif options[:username]
       options[:username]
-    elsif is_ci
-      nil # don't make assumptions in CI
     else
       git_user_email = Action.sh("git", "config", "user.email").chomp
       if git_user_email.end_with? "@duckduckgo.com"
