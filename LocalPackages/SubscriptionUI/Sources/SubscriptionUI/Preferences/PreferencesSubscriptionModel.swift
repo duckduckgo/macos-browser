@@ -110,11 +110,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
 
             if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
-                // TODO: Disabling auto-sign out on expired subscription
-//                if !response.isSubscriptionActive {
-//                    AccountManager().signOut()
-//                    return
-//                }
+                if !response.isSubscriptionActive {
+                    AccountManager().signOut()
+                    return
+                }
 
                 updateDescription(for: response.expiresOrRenewsAt)
             }
