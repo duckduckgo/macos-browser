@@ -509,7 +509,7 @@ enum DataImportResult<T>: CustomStringConvertible {
         case .success(let value):
             ".success(\(value))"
         case .failure(let error):
-            ".success(\(error))"
+            ".failure(\(error))"
         }
     }
 
