@@ -22,6 +22,7 @@ import Subscription
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
+    @Published var hasEntitlements: Bool = false
     @Published var subscriptionDetails: String?
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -35,6 +36,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         self.sheetActionHandler = sheetActionHandler
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
+        self.hasEntitlements = self.isUserAuthenticated
 
         if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
             updateDescription(for: cachedDate)
@@ -104,16 +106,20 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
             if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
                 updateDescription(for: cachedDate)
+                self.hasEntitlements = cachedDate.timeIntervalSinceNow > 0
             }
 
             if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
-                if !response.isSubscriptionActive {
-                    AccountManager().signOut()
-                    return
-                }
+                // TODO: Disabling auto-sign out on expired subscription
+//                if !response.isSubscriptionActive {
+//                    AccountManager().signOut()
+//                    return
+//                }
 
                 updateDescription(for: response.expiresOrRenewsAt)
             }
+
+            self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
         }
     }
 

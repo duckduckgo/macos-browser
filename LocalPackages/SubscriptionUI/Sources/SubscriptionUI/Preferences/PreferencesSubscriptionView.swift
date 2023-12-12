@@ -112,7 +112,8 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.vpnServiceTitle,
                             description: UserText.vpnServiceDescription,
                             buttonName: model.isUserAuthenticated ? "Manage" : nil,
-                            buttonAction: { model.openVPN() })
+                            buttonAction: { model.openVPN() },
+                            enabled: model.hasEntitlements)
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -121,7 +122,8 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.personalInformationRemovalServiceTitle,
                             description: UserText.personalInformationRemovalServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
-                            buttonAction: { model.openPersonalInformationRemoval() })
+                            buttonAction: { model.openPersonalInformationRemoval() },
+                            enabled: model.hasEntitlements)
 
                 Divider()
                     .foregroundColor(Color.secondary)
@@ -130,7 +132,8 @@ public struct PreferencesSubscriptionView: View {
                             title: UserText.identityTheftRestorationServiceTitle,
                             description: UserText.identityTheftRestorationServiceDescription,
                             buttonName: model.isUserAuthenticated ? "View" : nil,
-                            buttonAction: { model.openIdentityTheftRestoration() })
+                            buttonAction: { model.openIdentityTheftRestoration() },
+                            enabled: model.hasEntitlements)
             }
             .padding(10)
             .roundedBorder()
