@@ -24,7 +24,7 @@ class WebsiteBreakageReportTests: XCTestCase {
 
     func testCommonSetOfFields() throws {
         let breakage = WebsiteBreakage(
-            category: .contentIsMissing,
+            category: "contentIsMissing",
             description: nil,
             siteUrlString: "https://example.test/",
             osVersion: "12.3.0",
@@ -40,7 +40,8 @@ class WebsiteBreakageReportTests: XCTestCase {
             isGPCEnabled: true,
             ampURL: "https://example.test",
             urlParametersRemoved: false,
-            protectionsState: true
+            protectionsState: true,
+            reportFlow: .appMenu
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -52,7 +53,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
         XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
-        XCTAssertEqual(queryItems[valueFor: "category"], "content")
+        XCTAssertEqual(queryItems[valueFor: "category"], "contentIsMissing")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "https%3A%2F%2Fexample.test%2F")
         XCTAssertEqual(queryItems[valueFor: "upgradedHttps"], "true")
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")
@@ -63,7 +64,7 @@ class WebsiteBreakageReportTests: XCTestCase {
 
     func testThatNativeAppSpecificFieldsAreReported() throws {
         let breakage = WebsiteBreakage(
-            category: .videoOrImagesDidntLoad,
+            category: "videoOrImagesDidntLoad",
             description: nil,
             siteUrlString: "http://unsafe.example.test/path/to/thing.html",
             osVersion: "12",
@@ -80,7 +81,8 @@ class WebsiteBreakageReportTests: XCTestCase {
             ampURL: "https://example.test",
             urlParametersRemoved: false,
             protectionsState: true,
-            manufacturer: "IBM"
+            manufacturer: "IBM",
+            reportFlow: .appMenu
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -92,7 +94,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(url.host, "improving.duckduckgo.com")
         XCTAssertEqual(url.path, "/t/epbf_macos_desktop")
 
-        XCTAssertEqual(queryItems[valueFor: "category"], "images")
+        XCTAssertEqual(queryItems[valueFor: "category"], "videoOrImagesDidntLoad")
         XCTAssertEqual(queryItems[valueFor: "siteUrl"], "http%3A%2F%2Funsafe.example.test%2Fpath%2Fto%2Fthing.html")
         XCTAssertEqual(queryItems[valueFor: "upgradedHttps"], "false")
         XCTAssertEqual(queryItems[valueFor: "tds"], "abc123")

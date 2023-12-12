@@ -52,9 +52,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
             os_log("Testing [%s]", type: .info, test.name)
 
-            let category = WebsiteBreakage.Category(rawValue: test.category)
-
-            let breakage = WebsiteBreakage(category: category,
+            let breakage = WebsiteBreakage(category: "test",
                                            description: nil,
                                            siteUrlString: test.siteURL,
                                            osVersion: test.os ?? "",
@@ -66,7 +64,8 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            ampURL: "",
                                            urlParametersRemoved: false,
                                            protectionsState: test.protectionsEnabled,
-                                           manufacturer: test.manufacturer ?? "")
+                                           manufacturer: test.manufacturer ?? "",
+                                           reportFlow: .appMenu)
 
             let request = makeURLRequest(with: breakage.requestParameters)
 

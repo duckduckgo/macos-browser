@@ -107,7 +107,9 @@ final class MoreOptionsMenu: NSMenu {
         setupMenuItems()
     }
 #endif
-
+    
+    let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
+    
     private func setupMenuItems() {
 
 #if FEEDBACK
@@ -124,7 +126,6 @@ final class MoreOptionsMenu: NSMenu {
 
         addWindowItems()
 
-        let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
         zoomMenuItem.submenu = ZoomSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(zoomMenuItem)
 
