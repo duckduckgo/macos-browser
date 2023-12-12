@@ -487,8 +487,10 @@ release in progress and you're making a follow-up internal release that includes
       end
     end
 
-    # Run tests
-    run_tests(scheme: 'DuckDuckGo Privacy Browser')
+    unless is_ci
+      # Run tests (CI will run them separately)
+      run_tests(scheme: 'DuckDuckGo Privacy Browser')
+    end
 
     # Every thing looks good: commit and push
     unless modified_files.empty?
