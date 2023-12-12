@@ -39,7 +39,6 @@ final class BrowserTabViewController: NSViewController {
 
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
-    private var cookieConsentCancellable: AnyCancellable?
     private var activeUserDialogCancellable: Cancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
@@ -53,8 +52,6 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private var transientTabContentViewController: NSViewController?
-
-    private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -214,7 +211,6 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
-                self.subscribeToCookieConsentPrompt(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
     }
@@ -355,19 +351,6 @@ final class BrowserTabViewController: NSViewController {
         .map { $1 ?? $0 }
         .sink { [weak self] dialog in
             self?.show(dialog)
-        }
-    }
-
-    private func subscribeToCookieConsentPrompt(of tabViewModel: TabViewModel?) {
-        cookieConsentCancellable = tabViewModel?.tab.cookieConsentPromptRequestPublisher.sink { [weak self, weak tab=tabViewModel?.tab] request in
-            guard let self, let tab, let request else {
-                self?.cookieConsentPopoverManager.close(animated: false)
-                return
-            }
-            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { [weak request] result in
-                request?.submit(result)
-            }
-            self.cookieConsentPopoverManager.currentTab = tab
         }
     }
 

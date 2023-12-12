@@ -416,7 +416,7 @@ final class NavigationBarViewController: NSViewController {
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showAutoconsentFeedback(_:)),
-                                               name: AutoconsentUserScript.Constants.newSitePopupHidden,
+                                               name: AutoconsentUserScript.newSitePopupHiddenNotification,
                                                object: nil)
 
 #if NETWORK_PROTECTION
