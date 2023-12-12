@@ -491,9 +491,11 @@ release in progress and you're making a follow-up internal release that includes
     run_tests(scheme: 'DuckDuckGo Privacy Browser')
 
     # Every thing looks good: commit and push
-    modified_files.each { |modified_file| sh('git', 'add', modified_file.to_s) }
-    sh('git', 'commit', '-m', 'Update embedded files')
-    ensure_git_status_clean
+    unless modified_files.empty?
+      modified_files.each { |modified_file| sh('git', 'add', modified_file.to_s) }
+      sh('git', 'commit', '-m', 'Update embedded files')
+      ensure_git_status_clean
+    end
   end
 
   # Updates version in the config file
