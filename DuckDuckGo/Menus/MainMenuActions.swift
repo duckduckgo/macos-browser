@@ -81,7 +81,7 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url, source: .historyEntry), shouldLoadInBackground: true))
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
@@ -132,7 +132,7 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url, source: .bookmark), shouldLoadInBackground: true)
         WindowsManager.openNewWindow(with: tab)
     }
 
@@ -232,7 +232,7 @@ extension AppDelegate {
             assertionFailure("No reference to main window controller")
             return
         }
-        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin, source: .ui))
     }
 
 }
@@ -414,7 +414,7 @@ extension MainViewController {
         }
 
         makeKeyIfNeeded()
-        getActiveTabAndIndex()?.tab.setContent(.contentFromURL(url))
+        getActiveTabAndIndex()?.tab.setContent(.contentFromURL(url, source: .historyEntry))
         adjustFirstResponder()
     }
 
@@ -501,7 +501,7 @@ extension MainViewController {
         }
 
         let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
-            Tab(content: .url($0),
+            Tab(content: .url($0, source: .bookmark),
                 shouldLoadInBackground: true,
                 burnerMode: tabCollectionViewModel.burnerMode)
         }
@@ -710,9 +710,9 @@ extension MainViewController {
         #endif
     }
 
+    /// debug menu popup window test
     @objc func showPopUpWindow(_ sender: Any?) {
-        let tabURL = Tab.TabContent.url(URL(string: "https://duckduckgo.com")!)
-        let tab = Tab(content: tabURL,
+        let tab = Tab(content: .url(.duckDuckGo, source: .ui),
                       webViewConfiguration: WKWebViewConfiguration(),
                       parentTab: nil,
                       canBeClosedWithBack: false,
