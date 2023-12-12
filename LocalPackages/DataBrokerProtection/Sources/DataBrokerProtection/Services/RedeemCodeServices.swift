@@ -69,7 +69,7 @@ public final class RedeemUseCase: DataBrokerProtectionRedeemUseCase {
     }
 
     public func shouldAskForInviteCode() -> Bool {
-        false // authenticationRepository.getAccessToken() == nil
+        authenticationRepository.getAccessToken() == nil
     }
 
     public func redeem(inviteCode: String) async throws {
