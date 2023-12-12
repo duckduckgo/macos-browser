@@ -124,7 +124,7 @@ internal class FirefoxDataImporter: DataImporter {
     func validateAccess(for selectedDataTypes: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]? {
         guard selectedDataTypes.contains(.passwords) else { return nil }
 
-        let loginReader = FirefoxLoginReader(firefoxProfileURL: profile.profileURL, primaryPassword: nil)
+        let loginReader = FirefoxLoginReader(firefoxProfileURL: profile.profileURL, primaryPassword: primaryPassword)
         do {
             _=try loginReader.getEncryptionKey()
             return nil
