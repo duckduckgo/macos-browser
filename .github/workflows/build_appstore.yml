@@ -27,6 +27,8 @@ on:
         required: true
         type: string
     secrets:
+      SSH_PRIVATE_KEY_FASTLANE_MATCH:
+        required: true
       APPLE_API_KEY_BASE64:
         required: true
       APPLE_API_KEY_ID:
@@ -63,6 +65,12 @@ jobs:
           refs/heads/hotfix/*) ;;
           *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
         esac
+
+    - name: Register SSH keys for submodules access
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
     - name: Check out the code
       uses: actions/checkout@v3

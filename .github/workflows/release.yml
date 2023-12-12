@@ -58,6 +58,8 @@ on:
         required: true
       MATCH_PASSWORD:
         required: true
+      SSH_PRIVATE_KEY_FASTLANE_MATCH:
+        required: true
 
 jobs:
 
@@ -98,6 +100,7 @@ jobs:
       destination: appstore
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
     secrets:
+      SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
       APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
       APPLE_API_KEY_ISSUER: ${{ secrets.APPLE_API_KEY_ISSUER }}
