@@ -87,7 +87,7 @@ jobs:
 
     name: Export Notarized App
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
 
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
