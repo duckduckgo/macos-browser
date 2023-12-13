@@ -157,15 +157,7 @@ final class CriticalPathsTests: XCTestCase {
         logOut()
 
         // Check Favorites not unified
-        let settingsWindow = app.windows["Settings"]
-        settingsWindow.popUpButtons["Settings"].click()
-        settingsWindow.menuItems["Bookmarks"].click()
-        bookmarksWindow.outlines.staticTexts["Favorites"].click()
-        let gitHub = bookmarksWindow.staticTexts["DuckDuckGo · GitHub"]
-        let spreadPrivacy = bookmarksWindow.staticTexts["www.spreadprivacy.com"]
-        XCTAssertFalse(gitHub.exists)
-        XCTAssertTrue(spreadPrivacy.exists)
-        bookmarksWindow.outlines.staticTexts["Bookmarks"].click()
+        checkFavoriteNonUnified()
 
         // Remove Bookmarks
         bookmarksWindow.staticTexts["www.spreadprivacy.com"].rightClick()
@@ -177,42 +169,19 @@ final class CriticalPathsTests: XCTestCase {
         bookmarksWindow.splitGroups.children(matching: .popUpButton).element.click()
         bookmarksWindow.menuItems["Settings"].click()
         logIn()
+
+        // Toggle Unified Favorite
+        let settingsWindow = app.windows["Settings"]
         settingsWindow.scrollViews.containing(.staticText, identifier: "Sync & Backup").children(matching: .switch).element(boundBy: 1).click()
 
         // Check Bookmarks
-        settingsWindow.popUpButtons["Settings"].click()
-        settingsWindow.menuItems["Bookmarks"].click()
-        bookmarksWindow.sheets.buttons["Not Now"].click()
-        let duckduckgoBookmark =  bookmarksWindow.staticTexts["www.duckduckgo.com"]
-        let stackOverflow =  bookmarksWindow.staticTexts["Stack Overflow - Where Developers Learn, Share, & Build Careers"]
-        let privacySimplified = bookmarksWindow.staticTexts["DuckDuckGo — Privacy, simplified."]
-        let wolfram = bookmarksWindow.staticTexts["Wolfram|Alpha: Computational Intelligence"]
-        let news = bookmarksWindow.staticTexts["news"]
-        let codes = bookmarksWindow.staticTexts["code"]
-        let sports = bookmarksWindow.staticTexts["sports"]
-        XCTAssertTrue(duckduckgoBookmark.exists)
-        XCTAssertTrue(spreadPrivacy.exists)
-        XCTAssertTrue(stackOverflow.exists)
-        XCTAssertTrue(privacySimplified.exists)
-        XCTAssertTrue(gitHub.exists)
-        XCTAssertTrue(wolfram.exists)
-        XCTAssertTrue(news.exists)
-        XCTAssertTrue(codes.exists)
-        XCTAssertTrue(sports.exists)
+        chekBookmarks()
 
         // Check Unified favorites
-        bookmarksWindow.outlines.staticTexts["Favorites"].click()
-        XCTAssertTrue(gitHub.exists)
-        XCTAssertTrue(spreadPrivacy.exists)
+        checkUnifiedFavorites()
 
         // Check Logins
-        bookmarksWindow.buttons["Options Button"].click()
-        bookmarksWindow.menuItems["Autofill"].click()
-        let elementsQuery = bookmarksWindow.popovers.scrollViews.otherElements
-        elementsQuery.buttons["Da, Dax Login, daxthetest"].click()
-        elementsQuery.buttons["Gi, Github, githubusername"].click()
-        elementsQuery.buttons["My, mywebsite.com, mywebsite"].click()
-        elementsQuery.buttons["St, StackOverflow, stacker"].click()
+        checkLogins()
 
         // Clean Up
         debugMenuBarItem.click()
@@ -287,5 +256,64 @@ final class CriticalPathsTests: XCTestCase {
         websiteTextfieldTextField.click()
         websiteTextfieldTextField.typeText("mywebsite.com")
         bookmarksWindow.popovers.buttons["Save"].click()
+    }
+
+    private func checkFavoriteNonUnified() {
+        let bookmarksWindow = app.windows["Bookmarks"]
+        let settingsWindow = app.windows["Settings"]
+        settingsWindow.popUpButtons["Settings"].click()
+        settingsWindow.menuItems["Bookmarks"].click()
+        bookmarksWindow.outlines.staticTexts["Favorites"].click()
+        let gitHub = bookmarksWindow.staticTexts["DuckDuckGo · GitHub"]
+        let spreadPrivacy = bookmarksWindow.staticTexts["www.spreadprivacy.com"]
+        XCTAssertFalse(gitHub.exists)
+        XCTAssertTrue(spreadPrivacy.exists)
+        bookmarksWindow.outlines.staticTexts["Bookmarks"].click()
+    }
+
+    private func chekBookmarks() {
+        let settingsWindow = app.windows["Settings"]
+        let bookmarksWindow = app.windows["Bookmarks"]
+        settingsWindow.popUpButtons["Settings"].click()
+        settingsWindow.menuItems["Bookmarks"].click()
+        bookmarksWindow.sheets.buttons["Not Now"].click()
+        let duckduckgoBookmark =  bookmarksWindow.staticTexts["www.duckduckgo.com"]
+        let stackOverflow =  bookmarksWindow.staticTexts["Stack Overflow - Where Developers Learn, Share, & Build Careers"]
+        let privacySimplified = bookmarksWindow.staticTexts["DuckDuckGo — Privacy, simplified."]
+        let wolfram = bookmarksWindow.staticTexts["Wolfram|Alpha: Computational Intelligence"]
+        let news = bookmarksWindow.staticTexts["news"]
+        let codes = bookmarksWindow.staticTexts["code"]
+        let sports = bookmarksWindow.staticTexts["sports"]
+        let gitHub = bookmarksWindow.staticTexts["DuckDuckGo · GitHub"]
+        let spreadPrivacy = bookmarksWindow.staticTexts["www.spreadprivacy.com"]
+        XCTAssertTrue(duckduckgoBookmark.exists)
+        XCTAssertTrue(spreadPrivacy.exists)
+        XCTAssertTrue(stackOverflow.exists)
+        XCTAssertTrue(privacySimplified.exists)
+        XCTAssertTrue(gitHub.exists)
+        XCTAssertTrue(wolfram.exists)
+        XCTAssertTrue(news.exists)
+        XCTAssertTrue(codes.exists)
+        XCTAssertTrue(sports.exists)
+    }
+
+    private func checkUnifiedFavorites() {
+        let bookmarksWindow = app.windows["Bookmarks"]
+        let gitHub = bookmarksWindow.staticTexts["DuckDuckGo · GitHub"]
+        let spreadPrivacy = bookmarksWindow.staticTexts["www.spreadprivacy.com"]
+        bookmarksWindow.outlines.staticTexts["Favorites"].click()
+        XCTAssertTrue(gitHub.exists)
+        XCTAssertTrue(spreadPrivacy.exists)
+    }
+
+    private func checkLogins() {
+        let bookmarksWindow = app.windows["Bookmarks"]
+        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow.menuItems["Autofill"].click()
+        let elementsQuery = bookmarksWindow.popovers.scrollViews.otherElements
+        elementsQuery.buttons["Da, Dax Login, daxthetest"].click()
+        elementsQuery.buttons["Gi, Github, githubusername"].click()
+        elementsQuery.buttons["My, mywebsite.com, mywebsite"].click()
+        elementsQuery.buttons["St, StackOverflow, stacker"].click()
     }
 }
