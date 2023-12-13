@@ -84,7 +84,7 @@ public final class StripePurchaseFlow {
             }
         }
 
-        if #available(macOS 12.0, *) {
+        if #available(macOS 12.0, iOS 15.0, *) {
             await AppStorePurchaseFlow.checkForEntitlements(wait: 2.0, retry: 5)
         }
     }

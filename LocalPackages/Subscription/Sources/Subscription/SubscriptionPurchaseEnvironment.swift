@@ -23,7 +23,7 @@ public final class SubscriptionPurchaseEnvironment {
     public enum Environment {
         case appStore, stripe
     }
-
+    
     public static var current: Environment = .appStore {
         didSet {
             canPurchase = false
@@ -38,9 +38,9 @@ public final class SubscriptionPurchaseEnvironment {
     }
 
     public static var canPurchase: Bool = false
-
+    
     private static func setupForAppStore() {
-        if #available(macOS 12.0, *) {
+        if #available(macOS 12.0, iOS 15.0, *) {
             Task {
                 await PurchaseManager.shared.updateAvailableProducts()
                 canPurchase = !PurchaseManager.shared.availableProducts.isEmpty

@@ -19,7 +19,7 @@
 import Foundation
 import StoreKit
 
-@available(macOS 12.0, *)
+@available(macOS 12.0, iOS 15.0, *)
 public final class AppStorePurchaseFlow {
 
     public enum Error: Swift.Error {
