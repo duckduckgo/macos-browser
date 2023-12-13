@@ -20,9 +20,9 @@ import Foundation
 import StoreKit
 import Common
 
-@available(macOS 12.0, *) typealias Transaction = StoreKit.Transaction
-@available(macOS 12.0, *) typealias RenewalInfo = StoreKit.Product.SubscriptionInfo.RenewalInfo
-@available(macOS 12.0, *) typealias RenewalState = StoreKit.Product.SubscriptionInfo.RenewalState
+@available(macOS 12.0, iOS 15.0, *) typealias Transaction = StoreKit.Transaction
+@available(macOS 12.0, iOS 15.0, *) typealias RenewalInfo = StoreKit.Product.SubscriptionInfo.RenewalInfo
+@available(macOS 12.0, iOS 15.0, *) typealias RenewalState = StoreKit.Product.SubscriptionInfo.RenewalState
 
 public enum StoreError: Error {
     case failedVerification
@@ -38,10 +38,11 @@ enum PurchaseManagerError: Error {
     case unknownError
 }
 
-@available(macOS 12.0, *)
+@available(macOS 12.0, iOS 15.0, *)
 public final class PurchaseManager: ObservableObject {
 
-    static let productIdentifiers = ["subscription.1week", "subscription.1month", "subscription.1year",
+    static let productIdentifiers = ["ios.subscription.1month", "ios.subscription.1year",
+                                     "subscription.1week", "subscription.1month", "subscription.1year",
                                      "review.subscription.1week", "review.subscription.1month", "review.subscription.1year"]
 
     public static let shared = PurchaseManager()

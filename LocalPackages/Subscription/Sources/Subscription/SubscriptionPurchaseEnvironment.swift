@@ -24,7 +24,7 @@ public final class SubscriptionPurchaseEnvironment {
     public enum Environment: String {
         case appStore, stripe
     }
-
+    
     public static var current: Environment = .appStore {
         didSet {
             os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] Setting to %@", current.rawValue)
@@ -47,7 +47,7 @@ public final class SubscriptionPurchaseEnvironment {
     }
 
     private static func setupForAppStore() {
-        if #available(macOS 12.0, *) {
+        if #available(macOS 12.0, iOS 15.0, *) {
             Task {
                 await PurchaseManager.shared.updateAvailableProducts()
                 canPurchase = !PurchaseManager.shared.availableProducts.isEmpty
