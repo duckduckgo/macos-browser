@@ -149,20 +149,33 @@ public final class PixelKit {
             if !pixelHasBeenFiredEver(pixelName) {
                 fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName, parameters: newParams, skipped: true)
             }
         case .dailyOnly:
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName + "_d", parameters: newParams, skipped: true)
             }
         case .dailyAndContinuous:
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName + "_d", parameters: newParams, skipped: true)
             }
 
             fireRequestWrapper(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
         }
+    }
+
+    private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) {
+#if DEBUG
+        let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
+        os_log(.debug, log: log, "👾 [%{public}@] %{public}@ %{public}@", skipped ? "SKIPPED" : "FIRED", pixelName.replacingOccurrences(of: "_", with: "."), params)
+#endif
     }
 
     private func fireRequestWrapper(
@@ -173,8 +186,7 @@ public final class PixelKit {
         _ callBackOnMainThread: Bool,
         _ onComplete: @escaping CompletionBlock) {
         guard !dryRun else {
-            let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
-            os_log(.debug, log: log, "👾 %{public}@ %{public}@", pixelName.replacingOccurrences(of: "_", with: "."), params)
+            printDebugInfo(pixelName: pixelName, parameters: parameters)
 
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
