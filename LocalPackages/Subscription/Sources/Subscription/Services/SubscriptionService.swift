@@ -21,7 +21,7 @@ import Common
 
 public struct SubscriptionService: APIService {
 
-    public static let logger: OSLog = .subscriptionService
+    public static let logger: OSLog = .subscription
     public static let session = {
         let configuration = URLSessionConfiguration.ephemeral
         return URLSession(configuration: configuration)

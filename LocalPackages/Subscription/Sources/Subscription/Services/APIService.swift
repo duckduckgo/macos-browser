@@ -63,7 +63,7 @@ public extension APIService {
                 }
             }
         } catch {
-            os_log("Service error: %{public}@", log: .error, error.localizedDescription)
+            os_log(.error, log: .subscription, "Service error: %{public}@", error.localizedDescription)
             return .failure(.connectionError)
         }
     }
