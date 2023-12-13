@@ -18,6 +18,7 @@
 
 import Foundation
 import StoreKit
+import Common
 
 @available(macOS 12.0, iOS 15.0, *) typealias Transaction = StoreKit.Transaction
 @available(macOS 12.0, iOS 15.0, *) typealias RenewalInfo = StoreKit.Product.SubscriptionInfo.RenewalInfo
@@ -66,59 +67,46 @@ public final class PurchaseManager: ObservableObject {
     }
 
     @MainActor
-    public func hasProductsAvailable() async -> Bool {
-        do {
-            let availableProducts = try await Product.products(for: Self.productIdentifiers)
-            print(" -- [PurchaseManager] updateAvailableProducts(): fetched \(availableProducts.count)")
-            return !availableProducts.isEmpty
-        } catch {
-            print("Error fetching available products: \(error)")
-            return false
-        }
-    }
-
-    @MainActor
     @discardableResult
     public func syncAppleIDAccount() async -> Result<Void, Error> {
         do {
             purchaseQueue.removeAll()
 
-            print("Before AppStore.sync()")
+            os_log(.info, log: .subscription, "[PurchaseManager] Before AppStore.sync()")
 
             try await AppStore.sync()
 
-            print("After AppStore.sync()")
+            os_log(.info, log: .subscription, "[PurchaseManager] After AppStore.sync()")
 
             await updatePurchasedProducts()
             await updateAvailableProducts()
 
             return .success(())
         } catch {
-            print("AppStore.sync error: \(error)")
+            os_log(.error, log: .subscription, "[PurchaseManager] Error: %{public}s", String(reflecting: error))
             return .failure(error)
         }
     }
 
     @MainActor
     public func updateAvailableProducts() async {
-        print(" -- [PurchaseManager] updateAvailableProducts()")
+        os_log(.info, log: .subscription, "[PurchaseManager] updateAvailableProducts")
 
         do {
             let availableProducts = try await Product.products(for: Self.productIdentifiers)
-            print(" -- [PurchaseManager] updateAvailableProducts(): fetched \(availableProducts.count) products")
+            os_log(.info, log: .subscription, "[PurchaseManager] updateAvailableProducts fetched %d products", availableProducts.count)
 
             if self.availableProducts != availableProducts {
-                print("availableProducts changed!")
                 self.availableProducts = availableProducts
             }
         } catch {
-            print("Error updating available products: \(error)")
+            os_log(.error, log: .subscription, "[PurchaseManager] Error: %{public}s", String(reflecting: error))
         }
     }
 
     @MainActor
     public func updatePurchasedProducts() async {
-        print(" -- [PurchaseManager] updatePurchasedProducts()")
+        os_log(.info, log: .subscription, "[PurchaseManager] updatePurchasedProducts")
 
         var purchasedSubscriptions: [String] = []
 
@@ -131,20 +119,15 @@ public final class PurchaseManager: ObservableObject {
 
                 if let expirationDate = transaction.expirationDate, expirationDate > .now {
                     purchasedSubscriptions.append(transaction.productID)
-
-                    if let token = transaction.appAccountToken {
-                        print(" -- [PurchaseManager] updatePurchasedProducts(): \(transaction.productID) -- custom UUID: \(token)" )
-                    }
                 }
             }
         } catch {
-            print("Error updating purchased products: \(error)")
+            os_log(.error, log: .subscription, "[PurchaseManager] Error: %{public}s", String(reflecting: error))
         }
 
-        print(" -- [PurchaseManager] updatePurchasedProducts(): have \(purchasedSubscriptions.count) active subscriptions")
+        os_log(.info, log: .subscription, "[PurchaseManager] updatePurchasedProducts fetched %d active subscriptions", purchasedSubscriptions.count)
 
         if self.purchasedProductIDs != purchasedSubscriptions {
-            print("purchasedSubscriptions changed!")
             self.purchasedProductIDs = purchasedSubscriptions
         }
 
@@ -153,22 +136,22 @@ public final class PurchaseManager: ObservableObject {
 
     @MainActor
     public static func mostRecentTransaction() async -> String? {
-        print(" -- [PurchaseManager] mostRecentTransaction()")
+        os_log(.info, log: .subscription, "[PurchaseManager] mostRecentTransaction")
 
         var transactions: [VerificationResult<Transaction>] = []
 
         for await result in Transaction.all {
             transactions.append(result)
         }
-
-        print(" -- [PurchaseManager] mostRecentTransaction(): fetched \(transactions.count) transactions")
+        
+        os_log(.info, log: .subscription, "[PurchaseManager] mostRecentTransaction fetched %d transactions", transactions.count)
 
         return transactions.first?.jwsRepresentation
     }
 
     @MainActor
     public static func hasActiveSubscription() async -> Bool {
-        print(" -- [PurchaseManager] hasActiveSubscription()")
+        os_log(.info, log: .subscription, "[PurchaseManager] hasActiveSubscription")
 
         var transactions: [VerificationResult<Transaction>] = []
 
@@ -176,29 +159,26 @@ public final class PurchaseManager: ObservableObject {
             transactions.append(result)
         }
 
-        print(" -- [PurchaseManager] hasActiveSubscription(): fetched \(transactions.count) transactions")
+        os_log(.info, log: .subscription, "[PurchaseManager] hasActiveSubscription fetched %d transactions", transactions.count)
 
         return !transactions.isEmpty
     }
 
     @MainActor
     public func purchaseSubscription(with identifier: String, externalID: String) async -> Result<Void, Error> {
-        
+
         guard let product = availableProducts.first(where: { $0.id == identifier }) else { return .failure(PurchaseManagerError.productNotFound) }
 
-        print(" -- [PurchaseManager] buy: \(product.displayName) (customUUID: \(externalID))")
+        os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription %s (customUUID: %s)", product.displayName, externalID)
 
-        print("purchaseQueue append!")
         purchaseQueue.append(product.id)
-
-        print(" -- [PurchaseManager] starting purchase")
 
         var options: Set<Product.PurchaseOption> = Set()
 
         if let token = UUID(uuidString: externalID) {
             options.insert(.appAccountToken(token))
         } else {
-            print("Wrong UUID")
+            os_log(.error, log: .subscription, "[PurchaseManager] Error: Failed to create UUID")
             return .failure(PurchaseManagerError.externalIDisNotAValidUUID)
         }
 
@@ -206,14 +186,13 @@ public final class PurchaseManager: ObservableObject {
         do {
             result = try await product.purchase(options: options)
         } catch {
-            print("error \(error)")
+            os_log(.error, log: .subscription, "[PurchaseManager] Error: %{public}s", String(reflecting: error))
             return .failure(PurchaseManagerError.purchaseFailed)
         }
 
-        print(" -- [PurchaseManager] purchase complete")
+        os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription complete")
 
         purchaseQueue.removeAll()
-        print("purchaseQueue removeAll!")
 
         switch result {
         case let .success(.verified(transaction)):
@@ -253,7 +232,7 @@ public final class PurchaseManager: ObservableObject {
 
         Task.detached { [unowned self] in
             for await result in Transaction.updates {
-                print(" -- [PurchaseManager] observeTransactionUpdates()")
+                os_log(.info, log: .subscription, "[PurchaseManager] observeTransactionUpdates")
 
                 if case .verified(let transaction) = result {
                     await transaction.finish()
@@ -268,7 +247,7 @@ public final class PurchaseManager: ObservableObject {
 
         Task.detached { [unowned self] in
             for await result in Storefront.updates {
-                print(" -- [PurchaseManager] observeStorefrontChanges(): \(result.countryCode)")
+                os_log(.info, log: .subscription, "[PurchaseManager] observeStorefrontChanges: %s", result.countryCode)
                 await updatePurchasedProducts()
                 await updateAvailableProducts()
             }

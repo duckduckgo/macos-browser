@@ -171,7 +171,7 @@ public class AccountManager {
             return entitlements.map { $0.name }
 
         case .failure(let error):
-            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+            os_log(.error, log: .subscription, "AccountManager error: %{public}@", error.localizedDescription)
             return []
         }
     }
@@ -181,7 +181,7 @@ public class AccountManager {
         case .success(let response):
             return .success(response.accessToken)
         case .failure(let error):
-            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+            os_log(.error, log: .subscription, "AccountManager error: %{public}@", error.localizedDescription)
             return .failure(error)
         }
     }
@@ -193,7 +193,7 @@ public class AccountManager {
         case .success(let response):
             return .success(AccountDetails(email: response.account.email, externalID: response.account.externalID))
         case .failure(let error):
-            os_log("AccountManager error: %{public}@", log: .error, error.localizedDescription)
+            os_log(.error, log: .subscription, "AccountManager error: %{public}@", error.localizedDescription)
             return .failure(error)
         }
     }
