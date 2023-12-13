@@ -1215,6 +1215,10 @@
 		4B78A86B26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */; };
 		4B7A57CF279A4EF300B1C70E /* ChromePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */; };
 		4B7A60A1273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */; };
+		4B81AD322B29507300706C96 /* DataBrokerProtectionPixelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B81AD312B29507300706C96 /* DataBrokerProtectionPixelTests.swift */; };
+		4B81AD332B29507300706C96 /* DataBrokerProtectionPixelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B81AD312B29507300706C96 /* DataBrokerProtectionPixelTests.swift */; };
+		4B81AD352B29512B00706C96 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */; };
+		4B81AD372B29513100706C96 /* PixelKitTestingUtilities in Frameworks */ = {isa = PBXBuildFile; productRef = 4B81AD362B29513100706C96 /* PixelKitTestingUtilities */; };
 		4B85A48028821CC500FC4C39 /* NSPasteboardItemExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B85A47F28821CC500FC4C39 /* NSPasteboardItemExtension.swift */; };
 		4B8A4DFF27C83B29005F40E8 /* SaveIdentityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */; };
 		4B8A4E0127C8447E005F40E8 /* SaveIdentityPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */; };
@@ -2189,7 +2193,6 @@
 		7B5F9A752AE2BE4E002AEBC0 /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B5F9A742AE2BE4E002AEBC0 /* PixelKit */; };
 		7B8C083C2AE1268E00F4C67F /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B8C083B2AE1268E00F4C67F /* PixelKit */; };
 		7B934C412A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */; };
-		7B96D0DC2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B96D0DB2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift */; };
 		7BA4727D26F01BC400EAA165 /* CoreDataTestUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C42667104B00AD2C21 /* CoreDataTestUtilities.swift */; };
 		7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */ = {isa = PBXBuildFile; productRef = 7BA59C9A2AE18B49009A97B1 /* SystemExtensionManager */; };
 		7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */; };
@@ -3411,6 +3414,7 @@
 		4B78A86A26BB3ADD0071BB16 /* BrowserImportSummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserImportSummaryViewController.swift; sourceTree = "<group>"; };
 		4B7A57CE279A4EF300B1C70E /* ChromePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromePreferences.swift; sourceTree = "<group>"; };
 		4B7A60A0273E0BE400BBDFEB /* WKWebsiteDataStoreExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WKWebsiteDataStoreExtension.swift; sourceTree = "<group>"; };
+		4B81AD312B29507300706C96 /* DataBrokerProtectionPixelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataBrokerProtectionPixelTests.swift; path = LocalPackages/DataBrokerProtection/Tests/DataBrokerProtectionTests/DataBrokerProtectionPixelTests.swift; sourceTree = SOURCE_ROOT; };
 		4B85A47F28821CC500FC4C39 /* NSPasteboardItemExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSPasteboardItemExtension.swift; sourceTree = "<group>"; };
 		4B8A4DFE27C83B29005F40E8 /* SaveIdentityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityViewController.swift; sourceTree = "<group>"; };
 		4B8A4E0027C8447E005F40E8 /* SaveIdentityPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveIdentityPopover.swift; sourceTree = "<group>"; };
@@ -3604,7 +3608,6 @@
 		7B934C3D2A866CFF00FC8F9C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+NetworkProtectionShared.swift"; sourceTree = "<group>"; };
 		7B96D0CF2ADFDA7E007E02C8 /* DuckDuckGoDBPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuckDuckGoDBPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7B96D0DB2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionPixelTests.swift; sourceTree = "<group>"; };
 		7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoVPNAppStore.xcconfig; sourceTree = "<group>"; };
 		7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoVPN.xcconfig; sourceTree = "<group>"; };
 		7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckDuckGoVPNAppDelegate.swift; sourceTree = "<group>"; };
@@ -4243,6 +4246,7 @@
 			files = (
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
+				4B81AD372B29513100706C96 /* PixelKitTestingUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4428,6 +4432,7 @@
 			files = (
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
+				4B81AD352B29512B00706C96 /* PixelKitTestingUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5390,6 +5395,14 @@
 			path = DataExport;
 			sourceTree = "<group>";
 		};
+		4B81AD302B29506300706C96 /* DataBrokerProtection */ = {
+			isa = PBXGroup;
+			children = (
+				4B81AD312B29507300706C96 /* DataBrokerProtectionPixelTests.swift */,
+			);
+			path = DataBrokerProtection;
+			sourceTree = "<group>";
+		};
 		4B82E9B725B6A04B00656FE7 /* ContentBlocker */ = {
 			isa = PBXGroup;
 			children = (
@@ -5809,7 +5822,6 @@
 			isa = PBXGroup;
 			children = (
 				7BF1A9D72AE054D300FCA683 /* Info.plist */,
-				7B96D0DB2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift */,
 			);
 			path = DuckDuckGoDBPTests;
 			sourceTree = "<group>";
@@ -6439,6 +6451,7 @@
 		AA585D93248FD31400E9A3E2 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				4B81AD302B29506300706C96 /* DataBrokerProtection */,
 				5629846D2AC460DF00AC20EB /* Sync */,
 				B6A5A28C25B962CB00AA7ADA /* App */,
 				85F1B0C725EF9747004792B6 /* AppDelegate */,
@@ -7930,6 +7943,7 @@
 			packageProductDependencies = (
 				3706FDD6293F661700E42796 /* OHHTTPStubs */,
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
+				4B81AD362B29513100706C96 /* PixelKitTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -8302,6 +8316,7 @@
 			packageProductDependencies = (
 				B6DA44162616C13800DD1EC2 /* OHHTTPStubs */,
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
+				4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -9815,6 +9830,7 @@
 				3706FE00293F661700E42796 /* FaviconStoringMock.swift in Sources */,
 				3706FE01293F661700E42796 /* PixelStoreMock.swift in Sources */,
 				3706FE02293F661700E42796 /* BookmarksBarViewModelTests.swift in Sources */,
+				4B81AD332B29507300706C96 /* DataBrokerProtectionPixelTests.swift in Sources */,
 				3706FE03293F661700E42796 /* CoreDataStoreTests.swift in Sources */,
 				3706FE04293F661700E42796 /* TreeControllerTests.swift in Sources */,
 				3706FE05293F661700E42796 /* DownloadsWebViewMock.m in Sources */,
@@ -10883,7 +10899,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B96D0DC2ADFDB8E007E02C8 /* DataBrokerProtectionPixelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11674,6 +11689,7 @@
 				4B723E0926B0003E00E14D75 /* CSVLoginExporterTests.swift in Sources */,
 				B6DA06E12913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */,
 				56D145E829E6BB6300E3488A /* CapturingDataImportProvider.swift in Sources */,
+				4B81AD322B29507300706C96 /* DataBrokerProtectionPixelTests.swift in Sources */,
 				B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */,
 				B603974E29C1F93600902A34 /* TabPermissionsTests.swift in Sources */,
 				85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */,
@@ -12971,6 +12987,14 @@
 		4B5F14FD2A1529230060320F /* InputFilesChecker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:InputFilesChecker";
+		};
+		4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
+		};
+		4B81AD362B29513100706C96 /* PixelKitTestingUtilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PixelKitTestingUtilities;
 		};
 		4B8F52342A169D2D00BE7131 /* Common */ = {
 			isa = XCSwiftPackageProductDependency;
