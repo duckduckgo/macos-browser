@@ -9,7 +9,7 @@ on:
 jobs:
   sync-end-to-end-tests:
     name: Sync End to end Tests
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
 
     steps:
     - name: Check out the code
