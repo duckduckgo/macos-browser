@@ -586,6 +586,7 @@ extension MainViewController {
 
 }
 
+#if DEBUG
 @available(macOS 14.0, *)
 #Preview(traits: .fixedLayout(width: 700, height: 660)) {
 
@@ -607,3 +608,4 @@ extension MainViewController {
 
     return vc
 }
+#endif
