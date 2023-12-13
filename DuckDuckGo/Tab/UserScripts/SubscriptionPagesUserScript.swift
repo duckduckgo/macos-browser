@@ -210,7 +210,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 return nil
             }
 
-            print("Selected: \(subscriptionSelection.id)")
+            os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %s", subscriptionSelection.id)
 
             await mainViewController?.presentAsSheet(progressViewController)
 
@@ -224,29 +224,35 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
-                print("hasActiveSubscription: TRUE")
+                os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
                 await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
                 return nil
             }
 
             let emailAccessToken = try? EmailManager().getToken()
 
+            os_log(.info, log: .subscription, "[Purchase] Purchasing")
             switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
             case .success:
                 break
-            case .failure:
+            case .failure(let error):
+                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
                 return nil
             }
 
             await progressViewController.updateTitleText("Completing purchase...")
 
+            os_log(.info, log: .subscription, "[Purchase] Completing purchase")
+
             switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
             case .success(let purchaseUpdate):
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
-            case .failure:
-                // TODO: handle errors - missing entitlements on post purchase check
+            case .failure(let error):
+                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
                 await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "completed"))
             }
+
+            os_log(.info, log: .subscription, "[Purchase] Purchase complete")
         }
 #endif
 
