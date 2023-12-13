@@ -20,6 +20,7 @@ import Foundation
 import BrowserServicesKit
 import Bookmarks
 import Configuration
+import DDGSync
 import PixelKit
 
 extension Pixel {
@@ -108,9 +109,6 @@ extension Pixel {
         case bitwardenPasswordAutofilled
         case bitwardenPasswordSaved
 
-        case autoconsentOptOutFailed
-        case autoconsentSelfTestFailed
-
         case ampBlockingRulesCompilationFailed
 
         case adClickAttributionDetected
@@ -130,7 +128,7 @@ extension Pixel {
         // Activation Points
         case newTabInitial(cohort: String? = nil)
         case emailEnabledInitial(cohort: String? = nil)
-        case cookieManagementEnabledInitial(cohort: String? = nil)
+
         case watchInDuckPlayerInitial(cohort: String? = nil)
         case setAsDefaultInitial(cohort: String? = nil)
         case importDataInitial(cohort: String? = nil)
@@ -159,6 +157,9 @@ extension Pixel {
         case dashboardProtectionAllowlistAdd(triggerOrigin: String?)
         case dashboardProtectionAllowlistRemove(triggerOrigin: String?)
 
+        // VPN
+        case vpnBreakageReport(category: String, description: String, metadata: String)
+
         // Network Protection Waitlist
         case networkProtectionWaitlistUserActive
         case networkProtectionWaitlistEntryPointMenuItemDisplayed
@@ -173,6 +174,13 @@ extension Pixel {
         case networkProtectionRemoteMessageOpened(messageID: String)
 
         // Sync
+        case syncSignupDirect
+        case syncSignupConnect
+        case syncLogin
+        case syncDaily
+        case syncDuckAddressOverride
+        case syncSuccessRateDaily
+        case syncLocalTimestampResolutionTriggered(Feature)
         case syncBookmarksCountLimitExceededDaily
         case syncCredentialsCountLimitExceededDaily
         case syncBookmarksRequestSizeLimitExceededDaily
@@ -385,12 +393,6 @@ extension Pixel.Event {
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"
 
-        case .autoconsentOptOutFailed:
-            return "m_mac_autoconsent_optout_failed"
-
-        case .autoconsentSelfTestFailed:
-            return "m_mac_autoconsent_selftest_failed"
-
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
 
@@ -419,8 +421,7 @@ extension Pixel.Event {
             }
         case .emailEnabledInitial:
             return "m_mac.enable-email-protection.initial"
-        case .cookieManagementEnabledInitial:
-            return "m_mac.cookie-management-enabled.initial"
+
         case .watchInDuckPlayerInitial:
             return "m_mac.watch-in-duckplayer.initial"
         case .setAsDefaultInitial:
@@ -461,9 +462,9 @@ extension Pixel.Event {
         case .duckPlayerSettingBackToDefault:
             return "m_mac_duck-player_setting_back-to-default"
 
-        case .dashboardProtectionAllowlistAdd(let triggerOrigin):
+        case .dashboardProtectionAllowlistAdd:
             return "m_mac_mp_wla"
-        case .dashboardProtectionAllowlistRemove(let triggerOrigin):
+        case .dashboardProtectionAllowlistRemove:
             return "m_mac_mp_wlr"
 
         case .launchInitial:
@@ -472,6 +473,9 @@ extension Pixel.Event {
             return "m.mac.navigation.first-search"
         case .serpDay21to27:
             return "m.mac.search-day-21-27.initial"
+
+        case .vpnBreakageReport:
+            return "m_mac_vpn_breakage_report"
 
         case .networkProtectionWaitlistUserActive:
             return "m_mac_netp_waitlist_user_active"
@@ -497,10 +501,24 @@ extension Pixel.Event {
             return "m_mac_netp_remote_message_opened_\(messageID)"
 
             // Sync
-        case .syncBookmarksCountLimitExceededDaily: return "m.mac.sync_bookmarks_count_limit_exceeded_daily"
-        case .syncCredentialsCountLimitExceededDaily: return "m.mac.sync_credentials_count_limit_exceeded_daily"
-        case .syncBookmarksRequestSizeLimitExceededDaily: return "m.mac.sync_bookmarks_request_size_limit_exceeded_daily"
-        case .syncCredentialsRequestSizeLimitExceededDaily: return "m.mac.sync_credentials_request_size_limit_exceeded_daily"
+        case .syncSignupDirect:
+            return "m_mac_sync_signup_direct"
+        case .syncSignupConnect:
+            return "m_mac_sync_signup_connect"
+        case .syncLogin:
+            return "m_mac_sync_login"
+        case .syncDaily:
+            return "m_mac_sync_daily"
+        case .syncDuckAddressOverride:
+            return "m_mac_sync_duck_address_override"
+        case .syncSuccessRateDaily:
+            return "m_mac_sync_success_rate_daily"
+        case .syncLocalTimestampResolutionTriggered(let feature):
+            return "m_mac_sync_\(feature.name)_local_timestamp_resolution_triggered"
+        case .syncBookmarksCountLimitExceededDaily: return "m_mac_sync_bookmarks_count_limit_exceeded_daily"
+        case .syncCredentialsCountLimitExceededDaily: return "m_mac_sync_credentials_count_limit_exceeded_daily"
+        case .syncBookmarksRequestSizeLimitExceededDaily: return "m_mac_sync_bookmarks_request_size_limit_exceeded_daily"
+        case .syncCredentialsRequestSizeLimitExceededDaily: return "m_mac_sync_credentials_request_size_limit_exceeded_daily"
 
         case .dataBrokerProtectionWaitlistUserActive:
             return "m_mac_dbp_waitlist_user_active"

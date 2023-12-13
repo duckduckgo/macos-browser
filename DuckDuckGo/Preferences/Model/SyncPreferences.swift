@@ -355,6 +355,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let device = deviceInfo()
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
+        Pixel.fire(.syncLogin)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if isRecovery {
                 self.showDevicesSynced()
@@ -376,6 +377,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let device = deviceInfo()
                 presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                Pixel.fire(.syncSignupDirect)
                 presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
@@ -429,6 +431,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        Pixel.fire(.syncSignupConnect)
                         presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 

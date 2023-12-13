@@ -1,5 +1,5 @@
 //
-//  CapturingSetUpVewModelDelegate.swift
+//  SyncMetricsEventsHandler.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,14 +16,24 @@
 //  limitations under the License.
 //
 
+import Common
+import SyncDataProviders
 import Foundation
-@testable import DuckDuckGo_Privacy_Browser
 
-class CapturingSetUpVewModelDelegate: ContinueSetUpVewModelDelegate {
-    var showCookieConsentPopUpCalled = false
+public class SyncMetricsEventsHandler: EventMapping<MetricsEvent> {
 
-    func showCookieConsentPopUp(manager: CookieConsentPopoverManager, completion: ((Bool) -> Void)?) {
-        showCookieConsentPopUpCalled = true
-        completion?(true)
+    public init() {
+        super.init { event, _, _, _ in
+            switch event {
+            case .overrideEmailProtectionSettings:
+                Pixel.fire(.syncDuckAddressOverride)
+            case .localTimestampResolutionTriggered(let feature):
+                Pixel.fire(.syncLocalTimestampResolutionTriggered(feature))
+            }
+        }
+    }
+
+    override init(mapping: @escaping EventMapping<MetricsEvent>.Mapping) {
+        fatalError("Use init()")
     }
 }

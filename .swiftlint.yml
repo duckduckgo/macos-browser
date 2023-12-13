@@ -76,3 +76,4 @@ excluded:
   - UITests
   - vendor
   - DerivedData
+  - .ruby-lsp
