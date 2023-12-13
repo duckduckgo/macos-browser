@@ -200,14 +200,11 @@ protocol NewWindowPolicyDecisionMaker {
     private var onNewWindow: ((WKNavigationAction?) -> NavigationDecision)?
 
     private let statisticsLoader: StatisticsLoader?
-    private let netPStatusReporter: NetworkProtectionStatusReporter?
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
 #if NETWORK_PROTECTION
-    @MainActor
-    @Published
-    private var netPConnectionStatus: NetworkProtection.ConnectionStatus = .default
+    private let tunnelController: NetworkProtectionIPCTunnelController
 #endif
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -239,7 +236,7 @@ protocol NewWindowPolicyDecisionMaker {
                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
-                     netPStatusReporter: NetworkProtectionStatusReporter? = nil,
+                     tunnelController: NetworkProtectionIPCTunnelController? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      title: String? = nil,
                      favicon: NSImage? = nil,
@@ -280,7 +277,7 @@ protocol NewWindowPolicyDecisionMaker {
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
-                  netPStatusReporter: netPStatusReporter,
+                  tunnelController: tunnelController,
                   internalUserDecider: internalUserDecider,
                   title: title,
                   favicon: favicon,
@@ -312,7 +309,7 @@ protocol NewWindowPolicyDecisionMaker {
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
-         netPStatusReporter: NetworkProtectionStatusReporter?,
+         tunnelController: NetworkProtectionIPCTunnelController?,
          internalUserDecider: InternalUserDecider?,
          title: String?,
          favicon: NSImage?,
@@ -383,20 +380,14 @@ protocol NewWindowPolicyDecisionMaker {
                                                        downloadManager: downloadManager))
 
 #if NETWORK_PROTECTION
-        if let netPStatusReporter {
-            self.netPStatusReporter = netPStatusReporter
+        if let tunnelController {
+            self.tunnelController = tunnelController
         } else {
             let machServiceName = Bundle.main.vpnMenuAgentBundleId
             let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
             ipcClient.register()
 
-            self.netPStatusReporter = DefaultNetworkProtectionStatusReporter(
-                statusObserver: ipcClient.connectionStatusObserver,
-                serverInfoObserver: ipcClient.serverInfoObserver,
-                connectionErrorObserver: ipcClient.connectionErrorObserver,
-                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
-                controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
-            )
+            self.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
         }
 #endif
 
@@ -420,14 +411,6 @@ protocol NewWindowPolicyDecisionMaker {
             }
 
         addDeallocationChecks(for: webView)
-
-#if NETWORK_PROTECTION
-        netPStatusReporterCancellable = netPStatusReporter?.statusObserver.publisher
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.netPConnectionStatus, onWeaklyHeld: self)
-
-        self.netPStatusReporter?.forceRefresh()
-#endif
     }
 
 #if DEBUG
@@ -911,7 +894,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
-    private var netPStatusReporterCancellable: AnyCancellable?
 
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
@@ -1149,7 +1131,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
 
 #if NETWORK_PROTECTION
-        if navigation.url.isDuckDuckGoSearch, case .connected = netPConnectionStatus {
+        if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected {
             DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }
 #endif
