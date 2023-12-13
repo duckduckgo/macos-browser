@@ -2,9 +2,12 @@ name: PR Checks
 
 on: 
   push:
-    branches: [ develop, "release/**" ]
+    branches: [ main, "release/**" ]
   pull_request:
-
+  workflow_call:
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
 
 jobs:
   swiftlint:
@@ -29,6 +32,8 @@ jobs:
     steps:
     - name: Check out the code
       uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
 
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
@@ -71,7 +76,7 @@ jobs:
           - cache-key: dbp-
             flavor: DBP
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
     timeout-minutes: 30
 
     outputs:
@@ -79,17 +84,11 @@ jobs:
       commit_author: ${{ steps.fetch_commit_author.outputs.commit_author }}
 
     steps:
-    - name: Register SSH keys for submodules access
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
-          ${{ secrets.SSH_PRIVATE_KEY_PRIVACY_DASHBOARD }}
-
     - name: Check out the code
       uses: actions/checkout@v3
       with:
         submodules: recursive
+        ref: ${{ github.ref_name }}
 
     - name: Set cache key hash
       run: |
@@ -226,7 +225,7 @@ jobs:
         retention-days: 7
 
     - name: Fetch latest commit author
-      if: always() && github.ref_name == 'develop'
+      if: always() && github.ref_name == 'main'
       id: fetch_commit_author
       env:
         GH_TOKEN: ${{ github.token }}
@@ -248,27 +247,22 @@ jobs:
     name: Make Release Build
 
     # Dependabot doesn't have access to all secrets, so we skip this job
-    if: github.actor != 'dependabot[bot]'
+    # workflow_call is used by bump_internal_release and is followed by a proper release job
+    if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
     strategy:
       matrix:
         scheme: [ "DuckDuckGo Privacy Browser", "DuckDuckGo Privacy Pro" ]
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
     timeout-minutes: 30
 
     steps:
-    - name: Register SSH keys for submodules access
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
-          ${{ secrets.SSH_PRIVATE_KEY_PRIVACY_DASHBOARD }}
-
     - name: Check out the code
       uses: actions/checkout@v3
       with:
         submodules: recursive
+        ref: ${{ github.ref_name }}
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles
@@ -353,7 +347,7 @@ jobs:
     name: Create Asana Task
     needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
 
-    if: failure() && github.ref_name == 'develop' && github.run_attempt == 1
+    if: failure() && github.ref_name == 'main' && github.run_attempt == 1
 
     runs-on: ubuntu-latest
 
@@ -370,7 +364,7 @@ jobs:
     name: Close Asana Task
     needs: [swiftlint, tests, release-build, verify-autoconsent-bundle, private-api]
 
-    if: success() && github.ref_name == 'develop' && github.run_attempt > 1
+    if: success() && github.ref_name == 'main' && github.run_attempt > 1
 
     runs-on: ubuntu-latest
 

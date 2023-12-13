@@ -22,6 +22,7 @@ import DataBrokerProtection
 import Foundation
 import AppKit
 import Common
+import LoginItems
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
@@ -32,8 +33,16 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let waitlistTermsAndConditionsAcceptedItem = NSMenuItem(title: "T&C Accepted:")
     private let waitlistBypassItem = NSMenuItem(title: "Bypass Waitlist", action: #selector(DataBrokerProtectionDebugMenu.toggleBypassWaitlist))
 
-    private var databaseBrowserWindowController: NSWindowController?
+    private let productionURLMenuItem = NSMenuItem(title: "Use Production URL", action: #selector(DataBrokerProtectionDebugMenu.useWebUIProductionURL))
 
+    private let customURLMenuItem = NSMenuItem(title: "Use Custom URL", action: #selector(DataBrokerProtectionDebugMenu.useWebUICustomURL))
+
+    private var databaseBrowserWindowController: NSWindowController?
+    private let customURLLabelMenuItem = NSMenuItem(title: "")
+
+    private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
+
+    // swiftlint:disable:next function_body_length
     init() {
         super.init(title: "Personal Information Removal")
 
@@ -62,11 +71,66 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 waitlistInviteCodeItem
                 waitlistTermsAndConditionsAcceptedItem
             }
-            NSMenuItem(title: "Debug") {
-                NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+
+            NSMenuItem(title: "Background Agent") {
+                NSMenuItem(title: "Enable", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentEnable))
                     .targetting(self)
 
+                NSMenuItem(title: "Disable", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentDisable))
+                    .targetting(self)
+
+                NSMenuItem(title: "Restart", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentRestart))
+                    .targetting(self)
             }
+
+            NSMenuItem(title: "Operations") {
+                NSMenuItem(title: "Hidden WebView") {
+                    menuItem(withTitle: "Run queued operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             representedObject: false)
+
+                    menuItem(withTitle: "Run scan operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runScanOperations(_:)),
+                             representedObject: false)
+
+                    menuItem(withTitle: "Run opt-out operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runOptoutOperations(_:)),
+                             representedObject: false)
+                }
+
+                NSMenuItem(title: "Visible WebView") {
+                    menuItem(withTitle: "Run queued operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runQueuedOperations(_:)),
+                             representedObject: true)
+
+                    menuItem(withTitle: "Run scan operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runScanOperations(_:)),
+                             representedObject: true)
+
+                    menuItem(withTitle: "Run opt-out operations",
+                             action: #selector(DataBrokerProtectionDebugMenu.runOptoutOperations(_:)),
+                             representedObject: true)
+                }
+            }
+
+            NSMenuItem(title: "Web UI") {
+                productionURLMenuItem.targetting(self)
+                customURLMenuItem.targetting(self)
+
+                NSMenuItem.separator()
+
+                NSMenuItem(title: "Set Custom URL", action: #selector(DataBrokerProtectionDebugMenu.setWebUICustomURL))
+                    .targetting(self)
+                NSMenuItem(title: "Reset Custom URL", action: #selector(DataBrokerProtectionDebugMenu.resetCustomURL))
+                    .targetting(self)
+
+                customURLLabelMenuItem
+            }
+
+            NSMenuItem.separator()
+
+            NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+                .targetting(self)
         }
     }
 
@@ -78,9 +142,83 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     override func update() {
         updateWaitlistItems()
+        updateWebUIMenuItemsState()
     }
 
     // MARK: - Menu functions
+
+    @objc private func useWebUIProductionURL() {
+        webUISettings.setURLType(.production)
+    }
+
+    @objc private func useWebUICustomURL() {
+        webUISettings.setURLType(.custom)
+    }
+
+    @objc private func resetCustomURL() {
+        webUISettings.setURLType(.production)
+        webUISettings.setCustomURL("")
+    }
+
+    @objc private func setWebUICustomURL() {
+        showCustomURLAlert { [weak self] value in
+            if let url = value {
+                let modifiedURL = url.hasPrefix("https://") ? url : "https://\(url)"
+                self?.webUISettings.setCustomURL(modifiedURL)
+            }
+        }
+    }
+
+    @objc private func runQueuedOperations(_ sender: NSMenuItem) {
+        os_log("Running queued operations...", log: .dataBrokerProtection)
+        let showWebView = sender.representedObject as? Bool ?? false
+
+        DataBrokerProtectionManager.shared.scheduler.runQueuedOperations(showWebView: showWebView) { error in
+            if let error = error {
+                os_log("Queued operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Queued operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func runScanOperations(_ sender: NSMenuItem) {
+        os_log("Running scan operations...", log: .dataBrokerProtection)
+        let showWebView = sender.representedObject as? Bool ?? false
+
+        DataBrokerProtectionManager.shared.scheduler.scanAllBrokers(showWebView: showWebView) { error in
+            if let error = error {
+                os_log("Scan operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Scan operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func runOptoutOperations(_ sender: NSMenuItem) {
+        os_log("Running Optout operations...", log: .dataBrokerProtection)
+        let showWebView = sender.representedObject as? Bool ?? false
+
+        DataBrokerProtectionManager.shared.scheduler.optOutAllBrokers(showWebView: showWebView) { error in
+            if let error = error {
+                os_log("Optout operations finished,  error: %{public}@", log: .dataBrokerProtection, error.localizedDescription)
+            } else {
+                os_log("Optout operations finished", log: .dataBrokerProtection)
+            }
+        }
+    }
+
+    @objc private func backgroundAgentRestart() {
+        LoginItemsManager().restartLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+    }
+
+    @objc private func backgroundAgentDisable() {
+        LoginItemsManager().disableLoginItems([LoginItem.dbpBackgroundAgent])
+    }
+
+    @objc private func backgroundAgentEnable() {
+        LoginItemsManager().enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+    }
 
     @objc private func showDatabaseBrowser() {
         let viewController = DataBrokerDatabaseBrowserViewController()
@@ -132,6 +270,37 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     // MARK: - Utility Functions
+
+    func showCustomURLAlert(callback: @escaping (String?) -> Void) {
+        let alert = NSAlert()
+        alert.messageText = "Enter URL"
+        alert.addButton(withTitle: "Accept")
+        alert.addButton(withTitle: "Cancel")
+
+        let inputTextField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        alert.accessoryView = inputTextField
+
+        let response = alert.runModal()
+        if response == .alertFirstButtonReturn {
+            callback(inputTextField.stringValue)
+        } else {
+            callback(nil)
+        }
+    }
+
+    private func updateWebUIMenuItemsState() {
+        productionURLMenuItem.state = webUISettings.selectedURLType == .custom ? .off : .on
+        customURLMenuItem.state = webUISettings.selectedURLType == .custom ? .on : .off
+
+        customURLLabelMenuItem.title = "Custom URL: [\(webUISettings.customURL ?? "")]"
+    }
+
+    func menuItem(withTitle title: String, action: Selector, representedObject: Any?) -> NSMenuItem {
+        let menuItem = NSMenuItem(title: title, action: action, keyEquivalent: "")
+        menuItem.target = self
+        menuItem.representedObject = representedObject
+        return menuItem
+    }
 
     private func updateWaitlistItems() {
         let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: DataBrokerProtectionWaitlist.identifier, keychainAppGroup: Bundle.main.appGroup(bundle: .dbp))

@@ -55,8 +55,9 @@ final class DBPHomeViewController: NSViewController {
             dataManager: dataBrokerProtectionManager.dataManager,
             privacyConfig: privacyConfigurationManager,
             prefs: prefs,
+            webUISettings: DataBrokerProtectionWebUIURLSettings(.dbp),
             openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .link, newTab: true)
             })
     }()
 
@@ -171,7 +172,10 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .enableLoginItem,
                     .restartLoginItem,
                     .disableLoginItem,
-                    .resetLoginItem:
+                    .resetLoginItem,
+                    .scanSuccess,
+                    .scanFailed,
+                    .scanError:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

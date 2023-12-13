@@ -186,7 +186,7 @@ final class DownloadsViewController: NSViewController {
         else { return }
 
         self.dismiss()
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        WindowControllersManager.shared.show(url: url, source: .historyEntry, newTab: true)
     }
 
     @IBAction func doubleClickAction(_ sender: Any) {

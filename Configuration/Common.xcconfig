@@ -14,6 +14,7 @@
 //
 
 #include "Version.xcconfig"
+#include "BuildNumber.xcconfig"
 
 COMBINE_HIDPI_IMAGES = YES
 

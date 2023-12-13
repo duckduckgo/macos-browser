@@ -29,8 +29,6 @@ on:
     secrets:
       SSH_PRIVATE_KEY_FASTLANE_MATCH:
         required: true
-      SSH_PRIVATE_KEY_FIND_IN_PAGE:
-        required: true
       APPLE_API_KEY_BASE64:
         required: true
       APPLE_API_KEY_ID:
@@ -51,7 +49,7 @@ jobs:
 
     name: Make App Store Connect Release
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
 
     env:
       destination: ${{ github.event.inputs.destination || inputs.destination }}
@@ -73,12 +71,12 @@ jobs:
       with:
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
-          ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
 
     - name: Check out the code
       uses: actions/checkout@v3
       with:
         submodules: recursive
+        ref: ${{ github.ref_name }}
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
@@ -100,9 +98,10 @@ jobs:
         bundle exec fastlane release_${{ env.destination }}
         dsyms_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
         mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsyms_path}"
-        app_version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
         echo "dsyms_path=${dsyms_path}" >> $GITHUB_ENV
-        echo "app_version=${app_version}" >> $GITHUB_ENV
+        echo "app_version=${version}.${build_number}" >> $GITHUB_ENV
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v3

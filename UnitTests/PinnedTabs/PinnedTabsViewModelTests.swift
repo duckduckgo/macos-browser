@@ -35,11 +35,11 @@ class PinnedTabsViewModelTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         collection = TabCollection(tabs: [
-            Tab(content: .url("http://a.com".url!)),
-            Tab(content: .url("http://b.com".url!)),
-            Tab(content: .url("http://c.com".url!)),
-            Tab(content: .url("http://d.com".url!)),
-            Tab(content: .url("http://e.com".url!))
+            Tab(content: .url("http://a.com".url!, source: .link)),
+            Tab(content: .url("http://b.com".url!, source: .link)),
+            Tab(content: .url("http://c.com".url!, source: .link)),
+            Tab(content: .url("http://d.com".url!, source: .link)),
+            Tab(content: .url("http://e.com".url!, source: .link))
         ])
         model = PinnedTabsViewModel(collection: collection)
     }
@@ -90,8 +90,8 @@ class PinnedTabsViewModelTests: XCTestCase {
     }
 
     func testWhenThereIsOnlyOneItemThenDraggingMovesWindow() throws {
-        let tabA = Tab(content: .url("http://a.com".url!))
-        let tabB = Tab(content: .url("http://b.com".url!))
+        let tabA = Tab(content: .url("http://a.com".url!, source: .link))
+        let tabB = Tab(content: .url("http://b.com".url!, source: .link))
 
         model.items = [tabA, tabB]
         XCTAssertFalse(model.dragMovesWindow)
@@ -104,9 +104,9 @@ class PinnedTabsViewModelTests: XCTestCase {
         var events: [[Tab]] = []
         let cancellable = model.tabsDidReorderPublisher.sink(receiveValue: { events.append($0) })
 
-        let tabA = Tab(content: .url("http://a.com".url!))
-        let tabB = Tab(content: .url("http://b.com".url!))
-        let tabC = Tab(content: .url("http://c.com".url!))
+        let tabA = Tab(content: .url("http://a.com".url!, source: .link))
+        let tabB = Tab(content: .url("http://b.com".url!, source: .link))
+        let tabC = Tab(content: .url("http://c.com".url!, source: .link))
 
         model.items = []
         XCTAssertTrue(events.isEmpty)
@@ -134,8 +134,8 @@ class PinnedTabsViewModelTests: XCTestCase {
     }
 
     func testThatContextMenuActionsArePublished() {
-        let tabA = Tab(content: .url("http://a.com".url!))
-        let tabB = Tab(content: .url("http://b.com".url!))
+        let tabA = Tab(content: .url("http://a.com".url!, source: .link))
+        let tabB = Tab(content: .url("http://b.com".url!, source: .link))
 
         var events: [PinnedTabsViewModel.ContextMenuAction] = []
 
@@ -171,6 +171,6 @@ class PinnedTabsViewModelTests: XCTestCase {
 private extension Array where Element == Tab {
     @MainActor
     static func urls(_ urlStrings: String ...) -> [Tab] {
-        self.init(urlStrings.map({ Tab(content: .url($0.url!)) }))
+        self.init(urlStrings.map({ Tab(content: .url($0.url!, source: .link)) }))
     }
 }

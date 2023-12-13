@@ -34,6 +34,7 @@ jobs:
     needs: set-up-variants
 
     strategy:
+      fail-fast: false
       matrix: ${{ fromJSON(needs.set-up-variants.outputs.atb-variants) }}
 
     runs-on: macos-12

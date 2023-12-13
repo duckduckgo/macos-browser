@@ -19,6 +19,7 @@
 import Foundation
 import DDGSync
 import Combine
+import Common
 import SystemConfiguration
 import SyncUI
 import SwiftUI
@@ -85,7 +86,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isSyncCredentialsPaused: Bool
 
     private var shouldRequestSyncOnFavoritesOptionChange: Bool = true
-
+    private var isScreenLocked: Bool = false
     private var recoveryKey: SyncCode.RecoveryKey?
 
     var recoveryCode: String? {
@@ -140,6 +141,18 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 self?.isSyncBookmarksPaused = UserDefaultsWrapper(key: .syncBookmarksPaused, defaultValue: false).wrappedValue
                 self?.isSyncCredentialsPaused = UserDefaultsWrapper(key: .syncCredentialsPaused, defaultValue: false).wrappedValue
             }
+            .store(in: &cancellables)
+
+        let screenIsLockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
+            .map { _ in true }
+        let screenIsUnlockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
+            .map { _ in false }
+
+        Publishers.Merge(screenIsLockedPublisher, screenIsUnlockedPublisher)
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.isScreenLocked, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
@@ -241,6 +254,10 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     func refreshDevices() {
+        guard !isScreenLocked else {
+            os_log(.debug, log: .sync, "Screen is locked, skipping devices refresh")
+            return
+        }
         guard syncService.account != nil else {
             devices = []
             return
@@ -250,7 +267,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 let registeredDevices = try await syncService.fetchDevices()
                 mapDevices(registeredDevices)
             } catch {
-                print("error", error.localizedDescription)
+                os_log(.error, log: .sync, "Failed to refresh devices: \(error)")
             }
         }
     }
@@ -338,6 +355,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let device = deviceInfo()
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
+        Pixel.fire(.syncLogin)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if isRecovery {
                 self.showDevicesSynced()
@@ -359,6 +377,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let device = deviceInfo()
                 presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                Pixel.fire(.syncSignupDirect)
                 presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
                 managementDialogModel.errorMessage = String(describing: error)
@@ -412,6 +431,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        Pixel.fire(.syncSignupConnect)
                         presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 
