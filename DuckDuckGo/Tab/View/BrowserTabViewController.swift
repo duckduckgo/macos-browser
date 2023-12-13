@@ -237,10 +237,13 @@ final class BrowserTabViewController: NSViewController {
     private func removeDataBrokerViewIfNecessary() -> ([Tab]) -> Void {
         { [weak self] (tabs: [Tab]) in
             guard let self else { return }
-            if !tabs.isEmpty && !tabs.contains(where: { $0.content == .dataBrokerProtection }) {
-                dataBrokerProtectionHomeViewController?.removeCompletely()
-                dataBrokerProtectionHomeViewController = nil
+#if DBP
+            if let dataBrokerProtectionHomeViewController,
+               !tabs.contains(where: { $0.content == .dataBrokerProtection }) {
+                dataBrokerProtectionHomeViewController.removeCompletely()
+                self.dataBrokerProtectionHomeViewController = nil
             }
+#endif
         }
     }
 
