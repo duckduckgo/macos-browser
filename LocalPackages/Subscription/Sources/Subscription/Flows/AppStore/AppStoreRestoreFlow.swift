@@ -75,7 +75,7 @@ public final class AppStoreRestoreFlow {
         case .success(let response):
             isSubscriptionActive = response.isSubscriptionActive
         case .failure:
-            return .failure(.somethingWentWrong)
+            return .failure(.failedToFetchSubscriptionDetails)
         }
 
         if isSubscriptionActive {

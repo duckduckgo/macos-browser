@@ -27,7 +27,7 @@ public final class SubscriptionPurchaseEnvironment {
     
     public static var current: Environment = .appStore {
         didSet {
-            os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] Setting to %{public}%@", current.rawValue)
+            os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] Setting to %{public}s", current.rawValue)
 
             canPurchase = false
 
@@ -42,7 +42,7 @@ public final class SubscriptionPurchaseEnvironment {
 
     public static var canPurchase: Bool = false {
         didSet {
-            os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] canPurchase %{public}%@", (canPurchase ? "true" : "false"))
+            os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] canPurchase %{public}s", (canPurchase ? "true" : "false"))
         }
     }
 

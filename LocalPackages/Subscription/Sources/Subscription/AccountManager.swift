@@ -96,8 +96,10 @@ public class AccountManager {
             return nil
         }
     }
-    
+
     public func storeAuthToken(token: String) {
+        os_log(.info, log: .subscription, "[AccountManager] storeAuthToken")
+
         do {
             try storage.store(authToken: token)
         } catch {
@@ -110,6 +112,8 @@ public class AccountManager {
     }
 
     public func storeAccount(token: String, email: String?, externalID: String?) {
+        os_log(.info, log: .subscription, "[AccountManager] storeAccount")
+
         do {
             try storage.store(accessToken: token)
         } catch {
@@ -143,6 +147,8 @@ public class AccountManager {
     }
 
     public func signOut() {
+        os_log(.info, log: .subscription, "[AccountManager] signOut")
+
         do {
             try storage.clearAuthenticationState()
         } catch {
@@ -199,6 +205,8 @@ public class AccountManager {
     }
 
     public func checkSubscriptionState() async {
+        os_log(.info, log: .subscription, "[AccountManager] checkSubscriptionState")
+
         guard let token = accessToken else { return }
 
         if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {

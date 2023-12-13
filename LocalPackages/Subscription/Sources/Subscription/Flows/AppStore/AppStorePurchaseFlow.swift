@@ -18,6 +18,7 @@
 
 import Foundation
 import StoreKit
+import Common
 
 @available(macOS 12.0, iOS 15.0, *)
 public final class AppStorePurchaseFlow {
@@ -55,20 +56,24 @@ public final class AppStorePurchaseFlow {
     }
 
     public static func purchaseSubscription(with subscriptionIdentifier: String, emailAccessToken: String?) async -> Result<Void, AppStorePurchaseFlow.Error> {
+        os_log(.info, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription")
+
         let accountManager = AccountManager()
         let externalID: String
 
         // Check for past transactions most recent
         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
         case .success:
+            os_log(.info, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription -> AppStoreRestoreFlow.restoreAccountFromPastPurchase: activeSubscriptionAlreadyPresent")
             return .failure(.activeSubscriptionAlreadyPresent)
         case .failure(let error):
+            os_log(.info, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription -> AppStoreRestoreFlow.restoreAccountFromPastPurchase: %{public}s", String(reflecting: error))
             switch error {
             case .subscriptionExpired(let expiredAccountDetails):
                 externalID = expiredAccountDetails.externalID
                 accountManager.storeAuthToken(token: expiredAccountDetails.authToken)
                 accountManager.storeAccount(token: expiredAccountDetails.accessToken, email: expiredAccountDetails.email, externalID: expiredAccountDetails.externalID)
-            case .missingAccountOrTransactions, .pastTransactionAuthenticationError:
+            default:
                 // No history, create new account
                 switch await AuthService.createAccount(emailAccessToken: emailAccessToken) {
                 case .success(let response):
@@ -82,8 +87,6 @@ public final class AppStorePurchaseFlow {
                 case .failure:
                     return .failure(.accountCreationFailed)
                 }
-            default:
-                return .failure(.authenticatingWithTransactionFailed)
             }
         }
 
@@ -92,7 +95,7 @@ public final class AppStorePurchaseFlow {
         case .success:
             return .success(())
         case .failure(let error):
-            print("Something went wrong, reason: \(error)")
+            os_log(.error, log: .subscription, "[AppStorePurchaseFlow] Error: %{public}s", String(reflecting: error))
             AccountManager().signOut()
             return .failure(.purchaseFailed)
         }
