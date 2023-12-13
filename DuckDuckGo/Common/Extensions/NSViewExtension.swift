@@ -50,14 +50,10 @@ extension NSView {
     func addAndLayout(_ subview: NSView) {
         subview.translatesAutoresizingMaskIntoConstraints = false
         subview.frame = bounds
-        addSubview(subview)
+        subview.autoresizingMask = [.height, .width]
+        subview.translatesAutoresizingMaskIntoConstraints = true
 
-        NSLayoutConstraint.activate([
-            subview.topAnchor.constraint(equalTo: topAnchor),
-            subview.leadingAnchor.constraint(equalTo: leadingAnchor),
-            subview.trailingAnchor.constraint(equalTo: trailingAnchor),
-            subview.bottomAnchor.constraint(equalTo: bottomAnchor),
-        ])
+        addSubview(subview)
    }
 
     func wrappedInContainer(padding: CGFloat = 0) -> NSView {

@@ -24,11 +24,11 @@ import SwiftUI
 import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
-    @IBOutlet weak var errorView: NSView!
-    @IBOutlet weak var homePageView: NSView!
-    @IBOutlet weak var errorMessageLabel: NSTextField!
-    @IBOutlet weak var hoverLabel: NSTextField!
-    @IBOutlet weak var hoverLabelContainer: NSView!
+    @IBOutlet var errorView: NSView!
+    @IBOutlet var homePageView: NSView!
+    @IBOutlet var errorMessageLabel: NSTextField!
+    @IBOutlet var hoverLabel: NSTextField!
+    @IBOutlet var hoverLabelContainer: NSView!
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -72,17 +72,11 @@ final class BrowserTabViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
-        guard let controller = HomePageViewController(coder: coder,
-                                                      tabCollectionViewModel: tabCollectionViewModel,
-                                                      bookmarkManager: LocalBookmarkManager.shared) else {
-            fatalError("BrowserTabViewController: Failed to init HomePageViewController")
-        }
-        return controller
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: LocalBookmarkManager.shared)
+        self.addAndLayoutChild(homePageViewController, into: homePageView)
 
         hoverLabelContainer.alphaValue = 0
         subscribeToTabs()

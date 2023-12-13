@@ -31,6 +31,16 @@ final class AddEditFavoriteViewController: NSViewController {
 
     private var cancellables = Set<AnyCancellable>()
 
+    static func create(bookmark: Bookmark? = nil) -> AddEditFavoriteViewController {
+        NSStoryboard(name: "AddEditFavoriteViewController", bundle: .main).instantiateInitialController {
+            let addEditFavoriteViewController = AddEditFavoriteViewController.init(coder: $0)
+            if let bookmark {
+                addEditFavoriteViewController?.edit(bookmark: bookmark)
+            }
+            return addEditFavoriteViewController
+        }!
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

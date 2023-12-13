@@ -60,10 +60,11 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("BookmarksBarViewController: Bad initializer")
+        fatalError("MainViewController: Bad initializer")
     }
 
-    init(tabCollectionViewModel: TabCollectionViewModel? = nil) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
@@ -73,7 +74,7 @@ final class MainViewController: NSViewController {
         browserTabViewController = BrowserTabViewController.create(tabCollectionViewModel: tabCollectionViewModel)
         findInPageViewController = FindInPageViewController.create()
         fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
-        bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
 
         super.init(nibName: nil, bundle: nil)
 
@@ -81,8 +82,7 @@ final class MainViewController: NSViewController {
     }
 
     override func loadView() {
-        view = MainView()
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
 
         for subview in [
             tabBarContainerView,
@@ -584,4 +584,26 @@ extension MainViewController {
 
     }
 
+}
+
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: 700, height: 660)) {
+
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
+        BookmarkFolder(id: "1", title: "Folder", children: [
+            Bookmark(id: "2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
+        ]),
+        Bookmark(id: "3", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
+    ]))
+    bkman.loadBookmarks()
+
+    let vc = MainViewController(bookmarkManager: bkman)
+    var c: AnyCancellable!
+    c = vc.publisher(for: \.view.window).sink { window in
+        window?.titlebarAppearsTransparent = true
+        window?.titleVisibility = .hidden
+        withExtendedLifetime(c) {}
+    }
+
+    return vc
 }
