@@ -1005,7 +1005,6 @@ extension PasswordManagementViewController: NSMenuDelegate {
             } else {
                 lockItem.isHidden = true
             }
-
         }
     }
 

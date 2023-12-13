@@ -68,7 +68,7 @@ final class AddBookmarkModalViewController: NSViewController {
     @IBOutlet var bookmarkTitleTextField: NSTextField!
     @IBOutlet var urlTextField: NSTextField!
     @IBOutlet var addButton: NSButton!
-    
+
     private var hasValidInput: Bool {
         guard let url = urlTextField.stringValue.url else { return false }
 

@@ -145,7 +145,6 @@ struct SyncedDevicesList: View {
                     }
                 }
             }
-            .accessibility(identifier: "list of devices")
             Rectangle()
                 .fill(Color("BlackWhite10"))
                 .frame(height: 1)
