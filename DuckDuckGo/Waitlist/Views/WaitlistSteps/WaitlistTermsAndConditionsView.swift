@@ -186,7 +186,7 @@ struct DataBrokerProtectionTermsAndConditionsContentView: View {
                         .underline(color: .blue)
                         .onTapGesture {
                             if let url = URL(string: "https://duckduckgo.com/privacy") {
-                                WindowsManager.openNewWindow(with: url, isBurner: false)
+                                WindowsManager.openNewWindow(with: url, source: .ui, isBurner: false)
                             }
                         }
                     Text("also applies here.")
