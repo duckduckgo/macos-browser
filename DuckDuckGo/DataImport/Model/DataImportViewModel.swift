@@ -711,3 +711,42 @@ extension DataImportViewModel {
     }
 
 }
+
+extension DataImportViewModel: CustomStringConvertible {
+
+    var description: String {
+        "DataImportViewModel(importSource: .\(importSource.rawValue), screen: \(screen)\(!summary.isEmpty ? ", summary: \(summary)" : ""))"
+    }
+
+}
+
+extension DataImportViewModel.Screen: CustomStringConvertible {
+
+    var description: String {
+        switch self {
+        case .profileAndDataTypesPicker: ".profileAndDataTypesPicker"
+        case .moreInfo: ".moreInfo"
+        case .getReadPermission(let url): ".getReadPermission(\(fatalError()))" // TODO: getReadPermission
+        case .fileImport(dataType: let dataType, summary: let summaryDataTypes): ".fileImport(dataType: .\(dataType)\(!summaryDataTypes.isEmpty ? ", summary: [\(summaryDataTypes.map { "." + $0.rawValue }.joined(separator: ", "))]" : ""))"
+        case .summary(let dataTypes): ".summary([\(dataTypes.map { "." + $0.rawValue }.joined(separator: ", "))])"
+        case .feedback: ".feedback"
+        }
+    }
+
+}
+
+extension DataImportViewModel.DataTypeImportResult: CustomStringConvertible {
+
+    var description: String {
+        ".init(.\(dataType), \(result))"
+    }
+
+}
+
+extension DataImport.DataTypeSummary: CustomStringConvertible {
+
+    var description: String {
+        ".init(successful: \(successful), duplicate: \(duplicate), failed: \(failed))"
+    }
+
+}

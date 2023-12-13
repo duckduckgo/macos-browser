@@ -20,7 +20,7 @@ import AppKit
 import Foundation
 import SwiftUI
 
-final class SheetHostingWindow<Content: View>: NSWindow {
+internal class SheetHostingWindow<Content: View>: NSWindow {
 
     init(rootView: Content) {
         super.init(contentRect: .zero, styleMask: [.titled, .closable, .docModalWindow], backing: .buffered, defer: false)

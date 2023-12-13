@@ -3429,7 +3429,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "HTML Bookmarks File (for other browsers)"
+            "value" : "HTML Bookmarks File"
           }
         }
       }
@@ -3466,6 +3466,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Select Safari Folder…"
+          }
+        }
+      }
+    },
+    "import.bookmarks.select-html-file" : {
+      "comment" : "Button text for selecting HTML Bookmarks file",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select Bookmarks HTML File…"
           }
         }
       }
@@ -3885,7 +3897,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "CSV Passwords File (for other browsers)"
+            "value" : "CSV Passwords File"
           }
         }
       }
@@ -3898,6 +3910,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Passwords"
+          }
+        }
+      }
+    },
+    "import.logins.select-csv-file" : {
+      "comment" : "Button text for selecting a CSV file",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select Passwords CSV File…"
+          }
+        }
+      }
+    },
+    "import.logins.select-csv-file.source" : {
+      "comment" : "Button text for selecting a CSV file exported from (LastPass or Bitwarden or 1Password - %@)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select %@ CSV File…"
           }
         }
       }
@@ -7909,23 +7945,14 @@
     "Select %@ Folder…" : {
 
     },
-    "Select 1Password CSV File…" : {
-
-    },
     "Select All" : {
       "comment" : "Main Menu Edit item"
-    },
-    "Select Bitwarden CSV File…" : {
-
     },
     "Select Bookmarks HTML File…" : {
 
     },
     "Select data to import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks."
-    },
-    "Select LastPass CSV File…" : {
-
     },
     "Select Passwords CSV File…" : {
 

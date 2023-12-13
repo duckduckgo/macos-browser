@@ -22,7 +22,7 @@ import PixelKit
 
 enum DataImport {
 
-    enum Source: CaseIterable, Equatable {
+    enum Source: String, RawRepresentable, CaseIterable, Equatable {
         case brave
         case chrome
         case chromium
@@ -347,7 +347,7 @@ enum DataImport {
 
 }
 
-enum DataImportAction {
+enum DataImportAction: String, RawRepresentable {
     case bookmarks
     case passwords
     case favicons

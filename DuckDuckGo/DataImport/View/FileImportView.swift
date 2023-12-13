@@ -20,6 +20,440 @@ import Common
 import SwiftUI
 import UniformTypeIdentifiers
 
+// swiftlint:disable function_body_length cyclomatic_complexity
+@InstructionsView.InstructionsBuilder
+func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImport.DataType, button: @escaping (String) -> AnyView) -> [InstructionsView.InstructionsItem] {
+
+    switch (source, dataType) {
+    case (.chrome, .passwords):
+        NSLocalizedString("import.csv.instructions.chrome", value: """
+        %d Open **%s**
+        %d In a fresh tab, click %@ then **Google Password Manager → Settings**
+        %d Find “Export Passwords” and click **Download File**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Google Chrome browser.
+        %N$d - step number
+        %2$s - browser name (Chrome)
+        %4$@ - hamburger menu icon
+        %8$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuVertical16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.brave, .passwords):
+        NSLocalizedString("import.csv.instructions.brave", value: """
+        %d Open **%s**
+        %d Click %@ to open the application menu then click **Password Manager**
+        %d Click %@ **at the top left** of the Password Manager and select **Settings**
+        %d Find “Export Passwords” and click **Download File**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Brave browser.
+        %N$d - step number
+        %2$s - browser name (Brave)
+        %4$@, %6$@ - hamburger menu icon
+        %10$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuHamburger16
+        NSImage.menuHamburger16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.chromium, .passwords),
+        (.edge, .passwords):
+        NSLocalizedString("import.csv.instructions.chromium", value: """
+        %d Open **%s**
+        %d In a fresh tab, click %@ then **Password Manager → Settings**
+        %d Find “Export Passwords” and click **Download File**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Chromium-based browsers.
+        %N$d - step number
+        %2$s - browser name
+        %4$@ - hamburger menu icon
+        %8$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuVertical16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.coccoc, .passwords):
+        NSLocalizedString("import.csv.instructions.coccoc", value: """
+        %d Open **%s**
+        %d Type “_coccoc://settings/passwords_” into the Address field
+        %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Chromium-based browsers.
+        %N$d - step number
+        %2$s - browser name (Cốc Cốc)
+        %5$@ - hamburger menu icon
+        %8$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuVertical16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.opera, .passwords):
+        NSLocalizedString("import.csv.instructions.opera", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **View → Show Password Manager**
+        %d Select **Settings**
+        %d Find “Export Passwords” and click **Download File**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Chromium-based browsers.
+        %N$d - step number
+        %2$s - browser name (Opera)
+        %8$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.vivaldi, .passwords):
+        NSLocalizedString("import.csv.instructions.vivaldi", value: """
+        %d Open **%s**
+        %d Type “_chrome://settings/passwords_” into the Address field
+        %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords exported as CSV from Vivaldi browser.
+        %N$d - step number
+        %2$s - browser name (Vivaldi)
+        %5$@ - menu button icon
+        %8$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuVertical16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.operaGX, .passwords):
+        NSLocalizedString("import.csv.instructions.operagx", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **View → Show Password Manager**
+        %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Chromium-based browsers.
+        %N$d - step number
+        %2$s - browser name (Opera GX)
+        %5$@ - menu button icon
+        %8$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuVertical16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.yandex, .passwords):
+        NSLocalizedString("import.csv.instructions.yandex", value: """
+        %d Open **%s**
+        %d Click %@ to open the application menu then click **Passwords and cards**
+        %d Click %@ then **Export passwords**
+        %d Choose **To a text file (not secure)** and click **Export**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Yandex Browser.
+        %N$d - step number
+        %2$s - browser name (Yandex)
+        %4$@ - hamburger menu icon
+        %8$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuHamburger16
+        NSImage.menuVertical16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.brave, .bookmarks),
+        (.chrome, .bookmarks),
+        (.chromium, .bookmarks),
+        (.coccoc, .bookmarks),
+        (.edge, .bookmarks):
+        NSLocalizedString("import.html.instructions.chromium", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **Bookmarks → Bookmark Manager**
+        %d Click %@ then **Export Bookmarks**
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Bookmarks exported as HTML from Chromium-based browsers.
+        %N$d - step number
+        %2$s - browser name
+        %5$@ - hamburger menu icon
+        %8$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuVertical16
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.vivaldi, .bookmarks):
+        NSLocalizedString("import.html.instructions.vivaldi", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **File → Export Bookmarks…**
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Bookmarks exported as HTML from Vivaldi browser.
+        %N$d - step number
+        %2$s - browser name (Vivaldi)
+        %6$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.opera, .bookmarks):
+        NSLocalizedString("import.html.instructions.opera", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **Bookmarks → Bookmarks**
+        %d Click **Open full Bookmarks view…** in the bottom left
+        %d Click **Import/Export…** in the bottom left and select **Export Bookmarks**
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Bookmarks exported as HTML from Opera browser.
+        %N$d - step number
+        %2$s - browser name (Opera)
+        %8$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.operaGX, .bookmarks):
+        NSLocalizedString("import.html.instructions.operagx", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **Bookmarks → Bookmarks**
+        %d Click **Import/Export…** in the bottom left and select **Export Bookmarks**
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Bookmarks exported as HTML from Opera GX browser.
+        %N$d - step number
+        %2$s - browser name (Opera GX)
+        %7$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.yandex, .bookmarks):
+        NSLocalizedString("import.html.instructions.yandex", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **Favorites → Bookmark Manager**
+        %d Click %@ then **Export bookmarks to HTML file**
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Bookmarks exported as HTML from Yandex Browser.
+        %N$d - step number
+        %2$s - browser name (Yandex)
+        %5$@ - hamburger menu icon
+        %8$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuVertical16
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.safari, .passwords), (.safariTechnologyPreview, .passwords):
+        NSLocalizedString("import.csv.instructions.safari", value: """
+        %d Open **Safari**
+        %d Select **File → Export → Passwords**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Safari.
+        %N$d - step number
+        %5$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.safari, .bookmarks), (.safariTechnologyPreview, .bookmarks):
+        NSLocalizedString("import.html.instructions.safari", value: """
+        %d Open **Safari**
+        %d Select **File → Export → Bookmarks**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Bookmarks exported as HTML from Safari.
+        %N$d - step number
+        %5$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.firefox, .passwords):
+        NSLocalizedString("import.csv.instructions.firefox", value: """
+        %d Open **%s**
+        %d Click %@ to open the application menu then click **Passwords**
+        %d Click %@ then **Export Logins…**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Firefox.
+        %N$d - step number
+        %2$s - browser name (Firefox)
+        %4$@, %6$@ - hamburger menu icon
+        %9$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.menuHamburger16
+        NSImage.menuHorizontal16
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.firefox, .bookmarks), (.tor, .bookmarks):
+        NSLocalizedString("import.html.instructions.firefox", value: """
+        %d Open **%s**
+        %d Use the Menu Bar to select **Bookmarks → Manage Bookmarks**
+        %d Click %@ then **Export bookmarks to HTML…**
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Bookmarks exported as HTML from Firefox based browsers.
+        %N$d - step number
+        %2$s - browser name (Firefox)
+        %5$@ - hamburger menu icon
+        %8$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage.importExport16
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.onePassword8, .passwords):
+        NSLocalizedString("import.csv.instructions.onePassword8", value: """
+        %d Open and unlock **%s**
+        %d Select **File → Export** from the Menu Bar and choose the account you want to export
+        %d Enter your 1Password account password
+        %d Select the File Format: **CSV (Logins and Passwords only)**
+        %d Click Export Data and save the file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from 1Password 8.
+        %2$s - app name (1Password)
+        %8$@ - “Select 1Password CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        button(UserText.importLoginsSelectCSVFile(from: source))
+
+    case (.onePassword7, .passwords):
+        NSLocalizedString("import.csv.instructions.onePassword7", value: """
+        %d Open and unlock **%s**
+        %d Select the vault you want to Export (You cannot export from “All Vaults.”)
+        %d Select **File → Export → All Items** from the Menu Bar
+        %d Enter your 1Password master or account password
+        %d Select the File Format: **iCloud Keychain (.csv)**
+        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from 1Password 7.
+        %2$s - app name (1Password)
+        %9$@ - “Select 1Password CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        button(UserText.importLoginsSelectCSVFile(from: source))
+
+    case (.bitwarden, .passwords):
+        NSLocalizedString("import.csv.instructions.bitwarden", value: """
+        %d Open and unlock **%s**
+        %d Select **File → Export vault** from the Menu Bar
+        %d Select the File Format: **.csv**
+        %d Enter your Bitwarden Master password
+        %d Click %@ and save the file someplace you can find it (e.g. Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from Bitwarden.
+        %2$s - app name (Bitwarden)
+        %7$@ - hamburger menu icon
+        %9$@ - “Select Bitwarden CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: nil) ?? .downloads
+        button(UserText.importLoginsSelectCSVFile(from: source))
+
+    case (.lastPass, .passwords):
+        NSLocalizedString("import.csv.instructions.lastpass", value: """
+        %d Click on the **%s** icon in your browser and enter your master password
+        %d Select **Open My Vault**
+        %d From the sidebar select **Advanced Options → Export**
+        %d Enter your LastPass master password
+        %d Select the File Format: **Comma Delimited Text (.csv)**
+        %d %@
+        """, comment: """
+        Instructions to import Passwords as CSV from LastPass.
+        %2$s - app name (LastPass)
+        %8$@ - “Select LastPass CSV File” button
+        **bold text**; _italic text_
+        """)
+        source.importSourceName
+        button(UserText.importLoginsSelectCSVFile(from: source))
+
+    case (.csv, .passwords):
+        NSLocalizedString("import.csv.instructions.generic", value: """
+        The CSV importer will try to match column headers to their position.
+        If there is no header, it supports two formats:
+        %d URL, Username, Password
+        %d Title, URL, Username, Password
+        %@
+        """, comment: """
+        Instructions to import a generic CSV passwords file.
+        %N$d - step number
+        %3$@ - “Select Passwords CSV File” button
+        **bold text**; _italic text_
+        """)
+        button(UserText.importLoginsSelectCSVFile)
+
+    case (.bookmarksHTML, .bookmarks):
+        NSLocalizedString("import.html.instructions.generic", value: """
+        %d Open your old browser
+        %d Open **Bookmark Manager**
+        %d Export bookmarks to HTML…
+        %d Save the file someplace you can find it (e.g., Desktop)
+        %d %@
+        """, comment: """
+        Instructions to import a generic HTML Bookmarks file.
+        %N$d - step number
+        %6$@ - “Select Bookmarks HTML File” button
+        **bold text**; _italic text_
+        """)
+        button(UserText.importBookmarksSelectHTMLFile)
+
+    case (.bookmarksHTML, .passwords),
+        (.tor, .passwords),
+        (.onePassword7, .bookmarks),
+        (.onePassword8, .bookmarks),
+        (.bitwarden, .bookmarks),
+        (.lastPass, .bookmarks),
+        (.csv, .bookmarks):
+        assertionFailure("Invalid source/dataType")
+    }
+}
+// swiftlint:enable function_body_length cyclomatic_complexity
+
 struct FileImportView: View {
 
     let source: DataImport.Source
@@ -69,443 +503,17 @@ struct FileImportView: View {
             }
 
             InstructionsView {
-                switch (source, dataType) {
-                case (.chrome, .passwords):
-                    NSLocalizedString("import.csv.instructions.chrome", value: """
-                    %d Open **%s**
-                    %d In a fresh tab, click %@ then **Google Password Manager → Settings**
-                    %d Find “Export Passwords” and click **Download File**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Google Chrome browser.
-                    %N$d - step number
-                    %2$s - browser name (Chrome)
-                    %4$@ - hamburger menu icon
-                    %8$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuVertical16
-                    button("Select Passwords CSV File…")
-
-                case (.brave, .passwords):
-                    NSLocalizedString("import.csv.instructions.brave", value: """
-                    %d Open **%s**
-                    %d Click %@ to open the application menu then click **Password Manager**
-                    %d Click %@ **at the top left** of the Password Manager and select **Settings**
-                    %d Find “Export Passwords” and click **Download File**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Brave browser.
-                    %N$d - step number
-                    %2$s - browser name (Brave)
-                    %4$@, %6$@ - hamburger menu icon
-                    %10$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuHamburger16
-                    NSImage.menuHamburger16
-                    button("Select Passwords CSV File…")
-
-                case (.chromium, .passwords),
-                     (.edge, .passwords):
-                    NSLocalizedString("import.csv.instructions.chromium", value: """
-                    %d Open **%s**
-                    %d In a fresh tab, click %@ then **Password Manager → Settings**
-                    %d Find “Export Passwords” and click **Download File**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Chromium-based browsers.
-                    %N$d - step number
-                    %2$s - browser name
-                    %4$@ - hamburger menu icon
-                    %8$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuVertical16
-                    button("Select Passwords CSV File…")
-
-                case (.coccoc, .passwords):
-                    NSLocalizedString("import.csv.instructions.coccoc", value: """
-                    %d Open **%s**
-                    %d Type “_coccoc://settings/passwords_” into the Address field
-                    %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Chromium-based browsers.
-                    %N$d - step number
-                    %2$s - browser name (Cốc Cốc)
-                    %5$@ - hamburger menu icon
-                    %8$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuVertical16
-                    button("Select Passwords CSV File…")
-
-                case (.opera, .passwords):
-                    NSLocalizedString("import.csv.instructions.opera", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **View → Show Password Manager**
-                    %d Select **Settings**
-                    %d Find “Export Passwords” and click **Download File**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Chromium-based browsers.
-                    %N$d - step number
-                    %2$s - browser name (Opera)
-                    %8$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    button("Select Passwords CSV File…")
-
-                case (.vivaldi, .passwords):
-                    NSLocalizedString("import.csv.instructions.vivaldi", value: """
-                    %d Open **%s**
-                    %d Type “_chrome://settings/passwords_” into the Address field
-                    %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords exported as CSV from Vivaldi browser.
-                    %N$d - step number
-                    %2$s - browser name (Vivaldi)
-                    %5$@ - menu button icon
-                    %8$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuVertical16
-                    button("Select Passwords CSV File…")
-
-                case (.operaGX, .passwords):
-                    NSLocalizedString("import.csv.instructions.operagx", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **View → Show Password Manager**
-                    %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Chromium-based browsers.
-                    %N$d - step number
-                    %2$s - browser name (Opera GX)
-                    %5$@ - menu button icon
-                    %8$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuVertical16
-                    button("Select Passwords CSV File…")
-
-                case (.yandex, .passwords):
-                    NSLocalizedString("import.csv.instructions.yandex", value: """
-                    %d Open **%s**
-                    %d Click %@ to open the application menu then click **Passwords and cards**
-                    %d Click %@ then **Export passwords**
-                    %d Choose **To a text file (not secure)** and click **Export**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Yandex Browser.
-                    %N$d - step number
-                    %2$s - browser name (Yandex)
-                    %4$@ - hamburger menu icon
-                    %8$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuHamburger16
-                    NSImage.menuVertical16
-                    button("Select Passwords CSV File…")
-
-                case (.brave, .bookmarks),
-                     (.chrome, .bookmarks),
-                     (.chromium, .bookmarks),
-                     (.coccoc, .bookmarks),
-                     (.edge, .bookmarks):
-                    NSLocalizedString("import.html.instructions.chromium", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **Bookmarks → Bookmark Manager**
-                    %d Click %@ then **Export Bookmarks**
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Bookmarks exported as HTML from Chromium-based browsers.
-                    %N$d - step number
-                    %2$s - browser name
-                    %5$@ - hamburger menu icon
-                    %8$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuVertical16
-                    button("Select Bookmarks HTML File…")
-
-                case (.vivaldi, .bookmarks):
-                    NSLocalizedString("import.html.instructions.vivaldi", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **File → Export Bookmarks…**
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Bookmarks exported as HTML from Vivaldi browser.
-                    %N$d - step number
-                    %2$s - browser name (Vivaldi)
-                    %6$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    button("Select Bookmarks HTML File…")
-
-                case (.opera, .bookmarks):
-                    NSLocalizedString("import.html.instructions.opera", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **Bookmarks → Bookmarks**
-                    %d Click **Open full Bookmarks view…** in the bottom left
-                    %d Click **Import/Export…** in the bottom left and select **Export Bookmarks**
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Bookmarks exported as HTML from Opera browser.
-                    %N$d - step number
-                    %2$s - browser name (Opera)
-                    %8$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    button("Select Bookmarks HTML File…")
-
-                case (.operaGX, .bookmarks):
-                    NSLocalizedString("import.html.instructions.operagx", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **Bookmarks → Bookmarks**
-                    %d Click **Import/Export…** in the bottom left and select **Export Bookmarks**
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Bookmarks exported as HTML from Opera GX browser.
-                    %N$d - step number
-                    %2$s - browser name (Opera GX)
-                    %7$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    button("Select Bookmarks HTML File…")
-
-                case (.yandex, .bookmarks):
-                    NSLocalizedString("import.html.instructions.yandex", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **Favorites → Bookmark Manager**
-                    %d Click %@ then **Export bookmarks to HTML file**
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Bookmarks exported as HTML from Yandex Browser.
-                    %N$d - step number
-                    %2$s - browser name (Yandex)
-                    %5$@ - hamburger menu icon
-                    %8$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuVertical16
-                    button("Select Bookmarks HTML File…")
-
-                case (.safari, .passwords), (.safariTechnologyPreview, .passwords):
-                    NSLocalizedString("import.csv.instructions.safari", value: """
-                    %d Open **Safari**
-                    %d Select **File → Export → Passwords**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Safari.
-                    %N$d - step number
-                    %5$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-
-                    button("Select Passwords CSV File…")
-
-                case (.safari, .bookmarks), (.safariTechnologyPreview, .bookmarks):
-                    NSLocalizedString("import.html.instructions.safari", value: """
-                    %d Open **Safari**
-                    %d Select **File → Export → Bookmarks**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Bookmarks exported as HTML from Safari.
-                    %N$d - step number
-                    %5$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    button("Select Bookmarks HTML File…")
-
-                case (.firefox, .passwords):
-                    NSLocalizedString("import.csv.instructions.firefox", value: """
-                    %d Open **%s**
-                    %d Click %@ to open the application menu then click **Passwords**
-                    %d Click %@ then **Export Logins…**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Firefox.
-                    %N$d - step number
-                    %2$s - browser name (Firefox)
-                    %4$@, %6$@ - hamburger menu icon
-                    %9$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.menuHamburger16
-                    NSImage.menuHorizontal16
-                    button("Select Passwords CSV File…")
-
-                case (.firefox, .bookmarks), (.tor, .bookmarks):
-                    NSLocalizedString("import.html.instructions.firefox", value: """
-                    %d Open **%s**
-                    %d Use the Menu Bar to select **Bookmarks → Manage Bookmarks**
-                    %d Click %@ then **Export bookmarks to HTML…**
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Bookmarks exported as HTML from Firefox based browsers.
-                    %N$d - step number
-                    %2$s - browser name (Firefox)
-                    %5$@ - hamburger menu icon
-                    %8$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage.importExport16
-                    button("Select Bookmarks HTML File…")
-
-                case (.onePassword8, .passwords):
-                    NSLocalizedString("import.csv.instructions.onePassword8", value: """
-                    %d Open and unlock **%s**
-                    %d Select **File → Export** from the Menu Bar and choose the account you want to export
-                    %d Enter your 1Password account password
-                    %d Select the File Format: **CSV (Logins and Passwords only)**
-                    %d Click Export Data and save the file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from 1Password 8.
-                    %2$s - app name (1Password)
-                    %8$@ - “Select 1Password CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    button("Select 1Password CSV File…")
-
-                case (.onePassword7, .passwords):
-                    NSLocalizedString("import.csv.instructions.onePassword7", value: """
-                    %d Open and unlock **%s**
-                    %d Select the vault you want to Export (You cannot export from “All Vaults.”)
-                    %d Select **File → Export → All Items** from the Menu Bar
-                    %d Enter your 1Password master or account password
-                    %d Select the File Format: **iCloud Keychain (.csv)**
-                    %d Save the passwords file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from 1Password 7.
-                    %2$s - app name (1Password)
-                    %9$@ - “Select 1Password CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    button("Select 1Password CSV File…")
-
-                case (.bitwarden, .passwords):
-                    NSLocalizedString("import.csv.instructions.bitwarden", value: """
-                    %d Open and unlock **%s**
-                    %d Select **File → Export vault** from the Menu Bar
-                    %d Select the File Format: **.csv**
-                    %d Enter your Bitwarden Master password
-                    %d Click %@ and save the file someplace you can find it (e.g. Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from Bitwarden.
-                    %2$s - app name (Bitwarden)
-                    %7$@ - hamburger menu icon
-                    %9$@ - “Select Bitwarden CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: nil) ?? .downloads
-                    button("Select Bitwarden CSV File…")
-
-                case (.lastPass, .passwords):
-                    NSLocalizedString("import.csv.instructions.lastpass", value: """
-                    %d Click on the **%s** icon in your browser and enter your master password
-                    %d Select **Open My Vault**
-                    %d From the sidebar select **Advanced Options → Export**
-                    %d Enter your LastPass master password
-                    %d Select the File Format: **Comma Delimited Text (.csv)**
-                    %d %@
-                    """, comment: """
-                    Instructions to import Passwords as CSV from LastPass.
-                    %2$s - app name (LastPass)
-                    %8$@ - “Select LastPass CSV File” button
-                    **bold text**; _italic text_
-                    """)
-                    source.importSourceName
-                    button("Select LastPass CSV File…")
-
-                case (.csv, .passwords):
-                    NSLocalizedString("import.csv.instructions.generic", value: """
-                    The CSV importer will try to match column headers to their position.
-                    If there is no header, it supports two formats:
-                    %d URL, Username, Password
-                    %d Title, URL, Username, Password
-                    %@
-                    """, comment: """
-                    Instructions to import a generic CSV passwords file.
-                    %N$d - step number
-                    %3$@ - “Select Passwords CSV File” button
-                    **bold text**; _italic text_
-                    """)
-
-                    button("Select Passwords CSV File…")
-
-                case (.bookmarksHTML, .bookmarks):
-                    NSLocalizedString("import.html.instructions.generic", value: """
-                    %d Open your old browser
-                    %d Open **Bookmark Manager**
-                    %d Export bookmarks to HTML…
-                    %d Save the file someplace you can find it (e.g., Desktop)
-                    %d %@
-                    """, comment: """
-                    Instructions to import a generic HTML Bookmarks file.
-                    %N$d - step number
-                    %6$@ - “Select Bookmarks HTML File” button
-                    **bold text**; _italic text_
-                    """)
-                    button("Select Bookmarks HTML File…")
-
-                case (.bookmarksHTML, .passwords),
-                    (.tor, .passwords),
-                    (.onePassword7, .bookmarks),
-                    (.onePassword8, .bookmarks),
-                    (.bitwarden, .bookmarks),
-                    (.lastPass, .bookmarks),
-                    (.csv, .bookmarks):
-                    assertionFailure("Invalid source/dataType")
-                }
+                fileImportInstructionsBuilder(source: source, dataType: dataType, button: self.button)
             }
         }
     }
 
-    private func button(_ localizedTitleKey: LocalizedStringKey) -> some View {
-        Button(localizedTitleKey, action: action)
-            .onDrop(of: dataType.allowedFileTypes, isTargeted: nil, perform: onDrop)
-            .disabled(isButtonDisabled)
+    private func button(_ title: String) -> AnyView {
+        AnyView(
+            Button(title, action: action)
+                .onDrop(of: dataType.allowedFileTypes, isTargeted: nil, perform: onDrop)
+                .disabled(isButtonDisabled)
+        )
     }
 
     private func onDrop(_ providers: [NSItemProvider], _ location: CGPoint) -> Bool {
@@ -670,7 +678,7 @@ struct InstructionsView: View {
             }
             assert(usedArgs.subtracting(IndexSet(args.indices)).isEmpty,
                    "Unused arguments at indices \(usedArgs.subtracting(IndexSet(args.indices)))")
-
+// TODO: add tests for each localization and import source combination
             self.instructions = result
 
         } catch {

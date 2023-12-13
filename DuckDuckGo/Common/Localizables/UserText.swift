@@ -555,6 +555,11 @@ struct UserText {
 
     static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Passwords File", comment: "Title text for the CSV importer")
     static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File", comment: "Title text for the HTML Bookmarks importer")
+    static let importBookmarksSelectHTMLFile = NSLocalizedString("import.bookmarks.select-html-file", value: "Select Bookmarks HTML File…", comment: "Button text for selecting HTML Bookmarks file")
+    static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a CSV file")
+    static func importLoginsSelectCSVFile(from source: DataImport.Source) -> String {
+        String(format: NSLocalizedString("import.logins.select-csv-file.source", value: "Select %@ CSV File…", comment: "Button text for selecting a CSV file exported from (LastPass or Bitwarden or 1Password - %@)"), source.importSourceName)
+    }
 
     static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")
 
