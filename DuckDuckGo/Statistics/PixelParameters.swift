@@ -55,9 +55,6 @@ extension Pixel.Event {
         case  .emailEnabledInitial(let cohort):
             guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
-        case  .cookieManagementEnabledInitial(let cohort):
-            guard let cohort else { return nil }
-            return [PixelKit.Parameters.experimentCohort: cohort]
         case  .watchInDuckPlayerInitial(let cohort):
             guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
@@ -98,8 +95,6 @@ extension Pixel.Event {
              .autofillItemSaved,
              .bitwardenPasswordAutofilled,
              .bitwardenPasswordSaved,
-             .autoconsentOptOutFailed,
-             .autoconsentSelfTestFailed,
              .ampBlockingRulesCompilationFailed,
              .adClickAttributionDetected,
              .adClickAttributionActive,

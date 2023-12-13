@@ -97,8 +97,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         case .general:
             return UserText.general
         case .sync:
-            var isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-            var isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            let isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+            let isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             if isSyncBookmarksPaused || isSyncCredentialsPaused {
                 return UserText.sync + " ⚠️"
             }

@@ -227,7 +227,7 @@ extension TabViewModel {
 
     @MainActor
     static func forTabWithURL(_ url: URL) -> TabViewModel {
-        let tab = Tab(content: .url(url))
+        let tab = Tab(content: .url(url, source: .link))
         return TabViewModel(tab: tab)
     }
 
