@@ -20,34 +20,6 @@
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B1AD89C25FC27E200261379"
-               BuildableName = "Integration Tests.xctest"
-               BlueprintName = "Integration Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
-               BuildableName = "Unit Tests.xctest"
-               BlueprintName = "Unit Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -84,102 +56,6 @@
          </ExecutionAction>
       </PostActions>
       <Testables>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AA585D8F248FD31400E9A3E2"
-               BuildableName = "Unit Tests.xctest"
-               BlueprintName = "Unit Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "BrokenSiteReportingReferenceTests/testBrokenSiteReporting()">
-               </Test>
-               <Test
-                  Identifier = "CBRCompileTimeReporterTests">
-               </Test>
-               <Test
-                  Identifier = "PixelStoreTests/testWhenValuesAreAddedThenCallbacksAreCalled()">
-               </Test>
-               <Test
-                  Identifier = "PixelStoreTests/testWhenValuesAreRemovedThenTheyAreNotInCache()">
-               </Test>
-               <Test
-                  Identifier = "StatisticsLoaderTests/testWhenRefreshRetentionAtbIsPerformedForNavigationThenAppRetentionAtbRequested()">
-               </Test>
-               <Test
-                  Identifier = "WindowManagerStateRestorationTests/testWindowManagerStateRestoration()">
-               </Test>
-            </SkippedTests>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B1AD89C25FC27E200261379"
-               BuildableName = "Integration Tests.xctest"
-               BlueprintName = "Integration Tests"
-               ReferencedContainer = "container:DuckDuckGo.xcodeproj">
-            </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "AutoconsentIntegrationTests/testWhenAutoconsentDisabled_promptIsDisplayed()">
-               </Test>
-               <Test
-                  Identifier = "CoreDataEncryptionTests/testSavingIncorrectValueTypes()">
-               </Test>
-               <Test
-                  Identifier = "DownloadsIntegrationTests/testWhenNavigationActionIsData_downloadStarts()">
-               </Test>
-               <Test
-                  Identifier = "EncryptionKeyStoreTests">
-               </Test>
-               <Test
-                  Identifier = "HTTPSUpgradeIntegrationTests">
-               </Test>
-               <Test
-                  Identifier = "NavigationProtectionIntegrationTests/testAMPLinks()">
-               </Test>
-               <Test
-                  Identifier = "NavigationProtectionIntegrationTests/testReferrerTrimming()">
-               </Test>
-               <Test
-                  Identifier = "SearchNonexistentDomainTests/testWhenNonexistentDomainSuggestionChosen_redirectedToSERP()">
-               </Test>
-            </SkippedTests>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SyncUITests"
-               BuildableName = "SyncUITests"
-               BlueprintName = "SyncUITests"
-               ReferencedContainer = "container:LocalPackages/SyncUI">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "NetworkProtectionUITests"
-               BuildableName = "NetworkProtectionUITests"
-               BlueprintName = "NetworkProtectionUITests"
-               ReferencedContainer = "container:LocalPackages/NetworkProtectionMac">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PixelKitTests"
-               BuildableName = "PixelKitTests"
-               BlueprintName = "PixelKitTests"
-               ReferencedContainer = "container:LocalPackages/PixelKit">
-            </BuildableReference>
-         </TestableReference>
          <TestableReference
             skipped = "NO">
             <BuildableReference
