@@ -204,7 +204,7 @@ protocol NewWindowPolicyDecisionMaker {
     let pinnedTabsManager: PinnedTabsManager
 
 #if NETWORK_PROTECTION
-    private let tunnelController: NetworkProtectionIPCTunnelController
+    private var tunnelController: NetworkProtectionIPCTunnelController?
 #endif
 
     private let webViewConfiguration: WKWebViewConfiguration
@@ -236,7 +236,6 @@ protocol NewWindowPolicyDecisionMaker {
                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
                      statisticsLoader: StatisticsLoader? = nil,
-                     tunnelController: NetworkProtectionIPCTunnelController? = nil,
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      title: String? = nil,
                      favicon: NSImage? = nil,
@@ -277,7 +276,6 @@ protocol NewWindowPolicyDecisionMaker {
                   extensionsBuilder: extensionsBuilder,
                   cbaTimeReporter: cbaTimeReporter,
                   statisticsLoader: statisticsLoader,
-                  tunnelController: tunnelController,
                   internalUserDecider: internalUserDecider,
                   title: title,
                   favicon: favicon,
@@ -309,7 +307,6 @@ protocol NewWindowPolicyDecisionMaker {
          extensionsBuilder: TabExtensionsBuilderProtocol,
          cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter?,
          statisticsLoader: StatisticsLoader?,
-         tunnelController: NetworkProtectionIPCTunnelController?,
          internalUserDecider: InternalUserDecider?,
          title: String?,
          favicon: NSImage?,
@@ -379,18 +376,6 @@ protocol NewWindowPolicyDecisionMaker {
                                                        duckPlayer: duckPlayer,
                                                        downloadManager: downloadManager))
 
-#if NETWORK_PROTECTION
-        if let tunnelController {
-            self.tunnelController = tunnelController
-        } else {
-            let machServiceName = Bundle.main.vpnMenuAgentBundleId
-            let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
-            ipcClient.register()
-
-            self.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-        }
-#endif
-
         super.init()
         tabGetter = { [weak self] in self }
         userContentController.map(userContentControllerPromise.fulfill)
@@ -409,6 +394,20 @@ protocol NewWindowPolicyDecisionMaker {
             .sink { [weak self] notification in
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
+
+#if NETWORK_PROTECTION
+        netPOnboardStatusCancellabel = DefaultNetworkProtectionVisibility().onboardStatusPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] onboardingStatus in
+                guard onboardingStatus == .completed else { return }
+
+                let machServiceName = Bundle.main.vpnMenuAgentBundleId
+                let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+                ipcClient.register()
+
+                self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+            }
+#endif
 
         addDeallocationChecks(for: webView)
     }
@@ -895,6 +894,10 @@ protocol NewWindowPolicyDecisionMaker {
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
 
+#if NETWORK_PROTECTION
+    private var netPOnboardStatusCancellabel: AnyCancellable?
+#endif
+
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = self
@@ -1131,7 +1134,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
 
 #if NETWORK_PROTECTION
-        if navigation.url.isDuckDuckGoSearch, tunnelController.isConnected {
+        if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
             DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount, includeAppVersionParameter: true)
         }
 #endif
