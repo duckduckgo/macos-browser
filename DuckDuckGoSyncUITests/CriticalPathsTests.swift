@@ -21,18 +21,25 @@ import JavaScriptCore
 
 final class CriticalPathsTests: XCTestCase {
 
-    func testCanCreateSyncAccount() throws {
+    var app: XCUIApplication!
+    var debugMenuBarItem: XCUIElement!
+    var internaluserstateMenuItem: XCUIElement!
+
+    override func setUp() async throws {
         // Launch App
-        let app = XCUIApplication()
+        app = XCUIApplication()
+        app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
 
         // Set Internal User
         let menuBarsQuery = app.menuBars
-        let debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
+        debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
         debugMenuBarItem.click()
-        let internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
+        internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
         internaluserstateMenuItem.click()
+    }
 
+    func testCanCreateSyncAccount() throws {
         // Go to Sync Set up
         let newTabWindow = app.windows["New Tab"]
         newTabWindow.children(matching: .button).element(boundBy: 4).click()
@@ -61,17 +68,6 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     func testCanRecoverSyncAccount() throws {
-        // Launch App
-        let app = XCUIApplication()
-        app.launch()
-
-        // Set Internal User
-        let menuBarsQuery = app.menuBars
-        let debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
-        debugMenuBarItem.click()
-        let internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
-        internaluserstateMenuItem.click()
-
         // Go to Sync Set up
         let newTabWindow = app.windows["New Tab"]
         newTabWindow.children(matching: .button).element(boundBy: 4).click()
@@ -117,17 +113,6 @@ final class CriticalPathsTests: XCTestCase {
             return
         }
 
-        // Launch App
-        let app = XCUIApplication()
-        app.launch()
-
-        // Set Internal User
-        let menuBarsQuery = app.menuBars
-        let debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
-        debugMenuBarItem.click()
-        let internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
-        internaluserstateMenuItem.click()
-
         // Go to Sync Set up
         let newTabWindow = app.windows["New Tab"]
         newTabWindow.children(matching: .button).element(boundBy: 4).click()
@@ -165,18 +150,6 @@ final class CriticalPathsTests: XCTestCase {
             XCTFail("CODE not set")
             return
         }
-        
-        // Launch App
-        let app = XCUIApplication()
-        app.launchEnvironment["UITEST_MODE"] = "1"
-        app.launch()
-
-        // Set Internal User
-        let menuBarsQuery = app.menuBars
-        let debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
-        debugMenuBarItem.click()
-        let internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
-        internaluserstateMenuItem.click()
 
         // Add Bookmarks and Favorite
         let newTabWindow = app.windows["New Tab"]
@@ -267,7 +240,7 @@ final class CriticalPathsTests: XCTestCase {
         settingsSheetsQuery.buttons["Next"].click()
         settingsSheetsQuery.buttons["Done"].click()
         XCTAssertTrue(secondDevice.exists, "Original Device not visible")
-        settingsWindow.scrollViews.containing(.staticText, identifier:"Sync & Backup").children(matching: .switch).element(boundBy: 1).click()
+        settingsWindow.scrollViews.containing(.staticText, identifier: "Sync & Backup").children(matching: .switch).element(boundBy: 1).click()
 
         // Check Bookmarks
         settingsWindow.popUpButtons["Settings"].click()
