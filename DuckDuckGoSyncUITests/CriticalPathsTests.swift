@@ -25,7 +25,7 @@ final class CriticalPathsTests: XCTestCase {
     var debugMenuBarItem: XCUIElement!
     var internaluserstateMenuItem: XCUIElement!
 
-    override func setUp() async throws {
+    override func setUp() {
         // Launch App
         app = XCUIApplication()
         app.launchEnvironment["UITEST_MODE"] = "1"
@@ -121,9 +121,7 @@ final class CriticalPathsTests: XCTestCase {
         settingsWindow.buttons["Sync & Backup"].click()
 
         // Copy code to clipboard
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.setString(code, forType: .string)
+        copyToClipboard(code: code)
 
         // Log In
         logIn()
@@ -131,12 +129,7 @@ final class CriticalPathsTests: XCTestCase {
         // Clean Up
         debugMenuBarItem.click()
         internaluserstateMenuItem.click()
-        settingsWindow.buttons["Turn off Sync..."].click()
-        let sheetsQuery = settingsWindow.sheets
-        sheetsQuery.buttons["Turn Off"].click()
-        let beginSync = settingsWindow.staticTexts["Begin Syncing"]
-        beginSync.click()
-        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
+        logOut()
     }
 
     func testCanSyncData() {
@@ -146,62 +139,25 @@ final class CriticalPathsTests: XCTestCase {
         }
 
         // Add Bookmarks and Favorite
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.buttons["Options Button"].click()
-        newTabWindow.menuItems["openPreferences:"].click()
-        let settingsWindow = app.windows["Settings"]
-        settingsWindow.popUpButtons["Settings"].click()
-        settingsWindow.menuItems["Bookmarks"].click()
-        let bookmarksWindow = app.windows["Bookmarks"]
-        bookmarksWindow.buttons["  New Bookmark"].click()
-        let sheetsQuery = XCUIApplication().windows["Bookmarks"].sheets
-        sheetsQuery.textFields["Title Text Field"].click()
-        sheetsQuery.textFields["Title Text Field"].typeText("www.duckduckgo.com")
-        sheetsQuery.textFields["URL Text Field"].click()
-        sheetsQuery.textFields["URL Text Field"].typeText("www.duckduckgo.com")
-        sheetsQuery.buttons["Add"].click()
-        bookmarksWindow.buttons["  New Bookmark"].click()
-        sheetsQuery.textFields["Title Text Field"].click()
-        sheetsQuery.textFields["Title Text Field"].typeText("www.spreadprivacy.com")
-        sheetsQuery.textFields["URL Text Field"].click()
-        sheetsQuery.textFields["URL Text Field"].typeText("www.spreadprivacy.com")
-        sheetsQuery.buttons["Add"].click()
-        bookmarksWindow.staticTexts["www.spreadprivacy.com"].rightClick()
-        bookmarksWindow.menuItems["toggleBookmarkAsFavorite:"].click()
+        addBookmarksAndFavorites()
 
         // Add Login
-        bookmarksWindow.buttons["Options Button"].click()
-        bookmarksWindow.menuItems["Autofill"].click()
-        bookmarksWindow.popovers.buttons["Unlock Autofill"].click()
-        bookmarksWindow.popovers.buttons["add item"].click()
-        bookmarksWindow.popovers.menuItems["createNewLogin"].click()
-        let usernameTextfieldTextField = bookmarksWindow.popovers.textFields["Username TextField"]
-        usernameTextfieldTextField.click()
-        usernameTextfieldTextField.typeText("mywebsite")
-        let websiteTextfieldTextField = bookmarksWindow.popovers.textFields["Website TextField"]
-        websiteTextfieldTextField.click()
-        websiteTextfieldTextField.typeText("mywebsite.com")
-        bookmarksWindow.popovers.buttons["Save"].click()
+        addLogin()
 
         // Copy code to clipboard
-        let pasteboard = NSPasteboard.general
-        pasteboard.declareTypes([.string], owner: nil)
-        pasteboard.setString(code, forType: .string)
+        copyToClipboard(code: code)
 
         // Log In
+        let bookmarksWindow = app.windows["Bookmarks"]
         bookmarksWindow.splitGroups.children(matching: .popUpButton).element.click()
         bookmarksWindow.menuItems["Settings"].click()
         logIn()
 
         // Log Out
-        let settingsSheetsQuery = settingsWindow.sheets
-        settingsWindow.buttons["Turn off Sync..."].click()
-        settingsSheetsQuery.buttons["Turn Off"].click()
-        let beginSync = settingsWindow.staticTexts["Begin Syncing"]
-        beginSync.click()
-        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
+        logOut()
 
         // Check Favorites not unified
+        let settingsWindow = app.windows["Settings"]
         settingsWindow.popUpButtons["Settings"].click()
         settingsWindow.menuItems["Bookmarks"].click()
         bookmarksWindow.outlines.staticTexts["Favorites"].click()
@@ -274,5 +230,62 @@ final class CriticalPathsTests: XCTestCase {
         settingsSheetsQuery.buttons["Done"].click()
         let secondDevice = settingsWindow.images["SyncedDeviceMobile"]
         XCTAssertTrue(secondDevice.exists, "Original Device not visible")
+    }
+
+    private func logOut() {
+        let settingsWindow = app.windows["Settings"]
+        let settingsSheetsQuery = settingsWindow.sheets
+        settingsWindow.buttons["Turn off Sync..."].click()
+        settingsSheetsQuery.buttons["Turn Off"].click()
+        let beginSync = settingsWindow.staticTexts["Begin Syncing"]
+        beginSync.click()
+        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
+    }
+
+    private func copyToClipboard(code: String) {
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.setString(code, forType: .string)
+    }
+
+    private func addBookmarksAndFavorites() {
+        let newTabWindow = app.windows["New Tab"]
+        newTabWindow.buttons["Options Button"].click()
+        newTabWindow.menuItems["openPreferences:"].click()
+        let settingsWindow = app.windows["Settings"]
+        settingsWindow.popUpButtons["Settings"].click()
+        settingsWindow.menuItems["Bookmarks"].click()
+        let bookmarksWindow = app.windows["Bookmarks"]
+        bookmarksWindow.buttons["  New Bookmark"].click()
+        let sheetsQuery = XCUIApplication().windows["Bookmarks"].sheets
+        sheetsQuery.textFields["Title Text Field"].click()
+        sheetsQuery.textFields["Title Text Field"].typeText("www.duckduckgo.com")
+        sheetsQuery.textFields["URL Text Field"].click()
+        sheetsQuery.textFields["URL Text Field"].typeText("www.duckduckgo.com")
+        sheetsQuery.buttons["Add"].click()
+        bookmarksWindow.buttons["  New Bookmark"].click()
+        sheetsQuery.textFields["Title Text Field"].click()
+        sheetsQuery.textFields["Title Text Field"].typeText("www.spreadprivacy.com")
+        sheetsQuery.textFields["URL Text Field"].click()
+        sheetsQuery.textFields["URL Text Field"].typeText("www.spreadprivacy.com")
+        sheetsQuery.buttons["Add"].click()
+        bookmarksWindow.staticTexts["www.spreadprivacy.com"].rightClick()
+        bookmarksWindow.menuItems["toggleBookmarkAsFavorite:"].click()
+    }
+
+    private func addLogin() {
+        let bookmarksWindow = app.windows["Bookmarks"]
+        bookmarksWindow.buttons["Options Button"].click()
+        bookmarksWindow.menuItems["Autofill"].click()
+        bookmarksWindow.popovers.buttons["Unlock Autofill"].click()
+        bookmarksWindow.popovers.buttons["add item"].click()
+        bookmarksWindow.popovers.menuItems["createNewLogin"].click()
+        let usernameTextfieldTextField = bookmarksWindow.popovers.textFields["Username TextField"]
+        usernameTextfieldTextField.click()
+        usernameTextfieldTextField.typeText("mywebsite")
+        let websiteTextfieldTextField = bookmarksWindow.popovers.textFields["Website TextField"]
+        websiteTextfieldTextField.click()
+        websiteTextfieldTextField.typeText("mywebsite.com")
+        bookmarksWindow.popovers.buttons["Save"].click()
     }
 }
