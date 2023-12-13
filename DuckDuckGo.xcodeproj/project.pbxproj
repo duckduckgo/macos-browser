@@ -8133,7 +8133,6 @@
 				4B95793F2AC7AE700062CA31 /* LoginItems */,
 				7B31FD8F2AD1257B0086AA24 /* NetworkProtectionIPC */,
 				3143C8782B0D1F3D00382627 /* DataBrokerProtection */,
-				7BF770642AD6CA14001C9182 /* PixelKit */,
 				1E0068AC2B1673BB00BBF43B /* SubscriptionUI */,
 				1E934E2A2B167CA80084722B /* Subscription */,
 			);
@@ -12742,8 +12741,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 94.0.0;
+				branch = michal/logging;
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
