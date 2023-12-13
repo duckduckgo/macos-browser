@@ -678,7 +678,6 @@ struct InstructionsView: View {
             }
             assert(usedArgs.subtracting(IndexSet(args.indices)).isEmpty,
                    "Unused arguments at indices \(usedArgs.subtracting(IndexSet(args.indices)))")
-// TODO: add tests for each localization and import source combination
             self.instructions = result
 
         } catch {
