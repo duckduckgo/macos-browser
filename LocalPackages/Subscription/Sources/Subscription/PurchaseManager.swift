@@ -169,7 +169,7 @@ public final class PurchaseManager: ObservableObject {
 
         guard let product = availableProducts.first(where: { $0.id == identifier }) else { return .failure(PurchaseManagerError.productNotFound) }
 
-        os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription %s (customUUID: %s)", product.displayName, externalID)
+        os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription %{public}s (%{public}s)", product.displayName, externalID)
 
         purchaseQueue.append(product.id)
 

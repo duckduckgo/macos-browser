@@ -210,7 +210,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 return nil
             }
 
-            os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %s", subscriptionSelection.id)
+            os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}%s", subscriptionSelection.id)
 
             await mainViewController?.presentAsSheet(progressViewController)
 

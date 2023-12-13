@@ -93,7 +93,7 @@ public extension APIService {
         let statusCode = (response as? HTTPURLResponse)!.statusCode
         let stringData = String(data: data, encoding: .utf8) ?? ""
 
-        os_log(.info, log: .subscription, "[API] %d %{public}s /%{public}s :: %{private}s", statusCode, method, endpoint, stringData)
+        os_log(.info, log: .subscription, "[API] %d %{public}s /%{public}s :: %{public}s", statusCode, method, endpoint, stringData)
     }
 
     static func makeAuthorizationHeader(for token: String) -> [String: String] {
