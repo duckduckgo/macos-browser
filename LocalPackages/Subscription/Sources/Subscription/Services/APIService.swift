@@ -32,7 +32,6 @@ struct ErrorResponse: Decodable {
 }
 
 public protocol APIService {
-    static var logger: OSLog { get }
     static var baseURL: URL { get }
     static var session: URLSession { get }
     static func executeAPICall<T>(method: String, endpoint: String, headers: [String: String]?, body: Data?) async -> Result<T, APIServiceError> where T: Decodable
@@ -93,7 +92,8 @@ public extension APIService {
     private static func printDebugInfo(method: String, endpoint: String, data: Data, response: URLResponse) {
         let statusCode = (response as? HTTPURLResponse)!.statusCode
         let stringData = String(data: data, encoding: .utf8) ?? ""
-        os_log("[%d] %{public}@ /%{public}@ :: %{public}@", log: logger, statusCode, method, endpoint, stringData)
+
+        os_log(.info, log: .subscription, "[API] %d %{public}s /%{public}s :: %{private}s", statusCode, method, endpoint, stringData)
     }
 
     static func makeAuthorizationHeader(for token: String) -> [String: String] {

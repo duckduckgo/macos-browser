@@ -54,9 +54,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         menu.addItem(NSMenuItem(title: "Validate Token", action: #selector(validateToken), target: self))
         menu.addItem(NSMenuItem(title: "Check Entitlements", action: #selector(checkEntitlements), target: self))
         menu.addItem(NSMenuItem(title: "Get Subscription Info", action: #selector(getSubscriptionDetails), target: self))
-        if #available(macOS 12.0, *) {
-            menu.addItem(NSMenuItem(title: "Check Purchase Products Availability", action: #selector(checkProductsAvailability), target: self))
-        }
         menu.addItem(NSMenuItem(title: "Restore Subscription from App Store transaction", action: #selector(restorePurchases), target: self))
         menu.addItem(.separator())
         if #available(macOS 12.0, *) {
@@ -135,17 +132,6 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     func syncAppleIDAccount() {
         Task {
             await purchaseManager.syncAppleIDAccount()
-        }
-    }
-
-    @available(macOS 12.0, *)
-    @objc
-    func checkProductsAvailability() {
-        Task {
-
-            let result = await purchaseManager.hasProductsAvailable()
-            showAlert(title: "Check App Store Product Availability",
-                      message: "Can purchase: \(result ? "YES" : "NO")")
         }
     }
 

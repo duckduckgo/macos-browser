@@ -17,15 +17,18 @@
 //
 
 import Foundation
+import Common
 
 public final class SubscriptionPurchaseEnvironment {
 
-    public enum Environment {
+    public enum Environment: String {
         case appStore, stripe
     }
 
     public static var current: Environment = .appStore {
         didSet {
+            os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] Setting to %@", current.rawValue)
+
             canPurchase = false
 
             switch current {
@@ -37,7 +40,11 @@ public final class SubscriptionPurchaseEnvironment {
         }
     }
 
-    public static var canPurchase: Bool = false
+    public static var canPurchase: Bool = false {
+        didSet {
+            os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] canPurchase %@", (canPurchase ? "true" : "false"))
+        }
+    }
 
     private static func setupForAppStore() {
         if #available(macOS 12.0, *) {
