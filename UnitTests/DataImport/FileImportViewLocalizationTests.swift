@@ -22,7 +22,7 @@ import SwiftUI
 @testable import DuckDuckGo_Privacy_Browser
 
 @available(macOS 13.0, *)
-class YourLocalizationTests: XCTestCase {
+class FileImportViewLocalizationTests: XCTestCase {
 
     override func tearDown() {
         Bundle.resetSwizzling()
