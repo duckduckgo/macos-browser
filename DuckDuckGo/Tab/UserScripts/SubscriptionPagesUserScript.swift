@@ -237,6 +237,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 break
             case .failure(let error):
                 os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
                 return nil
             }
 
