@@ -2728,6 +2728,7 @@
 		B662D3D92755D7AD0035D4D6 /* PixelStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3D82755D7AD0035D4D6 /* PixelStoreTests.swift */; };
 		B662D3DE275613BB0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */; };
 		B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */; };
+		B6656E122B29E3BE008798A1 /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
 		B6676BE12AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6676BE22AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B687B7CB2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift */; };
@@ -2785,7 +2786,6 @@
 		B693955726F04BEC0015B914 /* MouseOverButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693954926F04BEB0015B914 /* MouseOverButton.swift */; };
 		B693955D26F19CD70015B914 /* DownloadListStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693955C26F19CD70015B914 /* DownloadListStoreTests.swift */; };
 		B693955F26F1C17F0015B914 /* DownloadListCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693955E26F1C17F0015B914 /* DownloadListCoordinatorTests.swift */; };
-		B693956126F1C1BC0015B914 /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
 		B693956326F1C2A40015B914 /* FileDownloadManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956226F1C2A40015B914 /* FileDownloadManagerMock.swift */; };
 		B693956926F352DB0015B914 /* DownloadsWebViewMock.m in Sources */ = {isa = PBXBuildFile; fileRef = B693956826F352DB0015B914 /* DownloadsWebViewMock.m */; };
 		B696AFFB2AC5924800C93203 /* FileLineError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B696AFFA2AC5924800C93203 /* FileLineError.swift */; };
@@ -2874,9 +2874,6 @@
 		B6C416A7294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */; };
 		B6CA4824298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
 		B6CA4825298CE4B70067ECCE /* AdClickAttributionTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CA4823298CDC2E0067ECCE /* AdClickAttributionTabExtensionTests.swift */; };
-		B6CE476B2B28461F001BCC0D /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
-		B6CE476C2B284678001BCC0D /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
-		B6CE476D2B28467C001BCC0D /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
 		B6D574B429472253008ED1B6 /* FBProtectionTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D574B329472253008ED1B6 /* FBProtectionTabExtension.swift */; };
 		B6D6A5DD2982A4CE001F5F11 /* Tab+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E2CD4294346C000773D8A /* Tab+Navigation.swift */; };
 		B6DA06E12913AEDC00225DE2 /* TestNavigationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6DA06E02913AEDB00225DE2 /* TestNavigationDelegate.swift */; };
@@ -9332,7 +9329,6 @@
 				3706FB4B293F65D500E42796 /* CookieNotificationAnimationModel.swift in Sources */,
 				3706FB4C293F65D500E42796 /* SharingMenu.swift in Sources */,
 				3706FB4D293F65D500E42796 /* GrammarFeaturesManager.swift in Sources */,
-				B6CE476B2B28461F001BCC0D /* DownloadListStoreMock.swift in Sources */,
 				3706FB50293F65D500E42796 /* SafariFaviconsReader.swift in Sources */,
 				3706FB51293F65D500E42796 /* NSScreenExtension.swift in Sources */,
 				3706FB52293F65D500E42796 /* NSBezierPathExtension.swift in Sources */,
@@ -10715,7 +10711,6 @@
 				4B957B482AC7AE700062CA31 /* MouseOverButton.swift in Sources */,
 				4B957B492AC7AE700062CA31 /* FireInfoViewController.swift in Sources */,
 				4B957B4A2AC7AE700062CA31 /* LoginItem+NetworkProtection.swift in Sources */,
-				B6CE476D2B28467C001BCC0D /* DownloadListStoreMock.swift in Sources */,
 				4B957B4B2AC7AE700062CA31 /* PermissionButton.swift in Sources */,
 				4B957B4C2AC7AE700062CA31 /* MoreOptionsMenu.swift in Sources */,
 				4B957B4D2AC7AE700062CA31 /* PermissionAuthorizationViewController.swift in Sources */,
@@ -11389,7 +11384,6 @@
 				B6A9E45326142B070067D1B9 /* Pixel.swift in Sources */,
 				B6A9E47726146A570067D1B9 /* PixelEvent.swift in Sources */,
 				AA2CB1352587C29500AA6FBE /* TabBarFooter.swift in Sources */,
-				B6CE476C2B284678001BCC0D /* DownloadListStoreMock.swift in Sources */,
 				EEC111E6294D06290086524F /* JSAlertViewModel.swift in Sources */,
 				4BE5336C286912D40019DBFD /* BookmarksBarCollectionViewItem.swift in Sources */,
 				B6C0B23926E742610031CB7F /* FileDownloadError.swift in Sources */,
@@ -11634,6 +11628,7 @@
 				B662D3DE275613BB0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */,
 				1D3B1ABF29369FC8006F4388 /* BWEncryptionTests.swift in Sources */,
 				B6F56567299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
+				B6656E122B29E3BE008798A1 /* DownloadListStoreMock.swift in Sources */,
 				37D23780287EFEE200BCE03B /* PinnedTabsManagerTests.swift in Sources */,
 				AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */,
 				B69B50462726C5C200758A2B /* AtbAndVariantCleanupTests.swift in Sources */,
@@ -11678,7 +11673,6 @@
 				B630793526731BC400DCEE41 /* URLSuggestedFilenameTests.swift in Sources */,
 				B603974E29C1F93600902A34 /* TabPermissionsTests.swift in Sources */,
 				85AC3B4925DAC9BD00C7D2AA /* ConfigurationStorageTests.swift in Sources */,
-				B693956126F1C1BC0015B914 /* DownloadListStoreMock.swift in Sources */,
 				AA91F83927076F1900771A0D /* PrivacyIconViewModelTests.swift in Sources */,
 				4B723E0726B0003E00E14D75 /* CSVImporterTests.swift in Sources */,
 				4BCF15EC2ABB9AF80083F6DF /* NetworkProtectionRemoteMessageTests.swift in Sources */,
