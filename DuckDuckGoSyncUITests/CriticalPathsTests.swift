@@ -126,19 +126,13 @@ final class CriticalPathsTests: XCTestCase {
         pasteboard.setString(code, forType: .string)
 
         // Log In
-        settingsWindow.staticTexts["Sync with Another Device"].click()
-        let sheetsQuery = settingsWindow.sheets
-        sheetsQuery.staticTexts["Enter Code"].click()
-        sheetsQuery.buttons["Paste"].click()
-        sheetsQuery.buttons["Next"].click()
-        sheetsQuery.buttons["Done"].click()
-        let secondDevice = settingsWindow.images["SyncedDeviceMobile"]
-        XCTAssertTrue(secondDevice.exists, "Original Device not visible")
+        logIn()
 
         // Clean Up
         debugMenuBarItem.click()
         internaluserstateMenuItem.click()
         settingsWindow.buttons["Turn off Sync..."].click()
+        let sheetsQuery = settingsWindow.sheets
         sheetsQuery.buttons["Turn Off"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
@@ -197,17 +191,10 @@ final class CriticalPathsTests: XCTestCase {
         // Log In
         bookmarksWindow.splitGroups.children(matching: .popUpButton).element.click()
         bookmarksWindow.menuItems["Settings"].click()
-        settingsWindow.buttons["Sync & Backup"].click()
-        settingsWindow.staticTexts["Sync with Another Device"].click()
-        let settingsSheetsQuery = settingsWindow.sheets
-        settingsSheetsQuery.staticTexts["Enter Code"].click()
-        settingsSheetsQuery.buttons["Paste"].click()
-        settingsSheetsQuery.buttons["Next"].click()
-        settingsSheetsQuery.buttons["Done"].click()
-        let secondDevice = settingsWindow.images["SyncedDeviceMobile"]
-        XCTAssertTrue(secondDevice.exists, "Original Device not visible")
+        logIn()
 
         // Log Out
+        let settingsSheetsQuery = settingsWindow.sheets
         settingsWindow.buttons["Turn off Sync..."].click()
         settingsSheetsQuery.buttons["Turn Off"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
@@ -233,13 +220,7 @@ final class CriticalPathsTests: XCTestCase {
         // Log In
         bookmarksWindow.splitGroups.children(matching: .popUpButton).element.click()
         bookmarksWindow.menuItems["Settings"].click()
-        settingsWindow.buttons["Sync & Backup"].click()
-        settingsWindow.staticTexts["Sync with Another Device"].click()
-        settingsSheetsQuery.staticTexts["Enter Code"].click()
-        settingsSheetsQuery.buttons["Paste"].click()
-        settingsSheetsQuery.buttons["Next"].click()
-        settingsSheetsQuery.buttons["Done"].click()
-        XCTAssertTrue(secondDevice.exists, "Original Device not visible")
+        logIn()
         settingsWindow.scrollViews.containing(.staticText, identifier: "Sync & Backup").children(matching: .switch).element(boundBy: 1).click()
 
         // Check Bookmarks
@@ -280,5 +261,18 @@ final class CriticalPathsTests: XCTestCase {
         // Clean Up
         debugMenuBarItem.click()
         internaluserstateMenuItem.click()
+    }
+
+    private func logIn() {
+        let settingsWindow = app.windows["Settings"]
+        settingsWindow.buttons["Sync & Backup"].click()
+        settingsWindow.staticTexts["Sync with Another Device"].click()
+        let settingsSheetsQuery = settingsWindow.sheets
+        settingsSheetsQuery.staticTexts["Enter Code"].click()
+        settingsSheetsQuery.buttons["Paste"].click()
+        settingsSheetsQuery.buttons["Next"].click()
+        settingsSheetsQuery.buttons["Done"].click()
+        let secondDevice = settingsWindow.images["SyncedDeviceMobile"]
+        XCTAssertTrue(secondDevice.exists, "Original Device not visible")
     }
 }
