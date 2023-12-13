@@ -439,6 +439,6 @@ fileprivate extension TabCollectionViewModel {
 extension Tab {
     @MainActor
     convenience init(parentTab: Tab) {
-        self.init(content: .url(.blankPage), parentTab: parentTab)
+        self.init(content: .url(.blankPage, source: .link), parentTab: parentTab)
     }
 }

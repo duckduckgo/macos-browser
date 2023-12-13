@@ -37,7 +37,7 @@ extension UserText {
 
     // MARK: - Navigation Bar Status View
 
-    static let networkProtectionNavBarStatusViewShareFeedback = NSLocalizedString("network.protection.navbar.status.view.share.feedback", value: "Share Feedback…", comment: "Menu item for 'Share Feedback' in the Network Protection status view that's shown in the navigation bar")
+    static let networkProtectionNavBarStatusViewShareFeedback = NSLocalizedString("network.protection.navbar.status.view.share.feedback", value: "Send Feedback…", comment: "Menu item for 'Send Feedback' in the Network Protection status view that's shown in the navigation bar")
     static let networkProtectionNavBarStatusMenuVPNSettings = NSLocalizedString("network.protection.status.menu.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
 
     // MARK: - System Extension Installation Messages
@@ -153,6 +153,34 @@ extension UserText {
     static let networkProtectionTermsOfServiceSection8Title = NSLocalizedString("network-protection.terms-of-service.section.8.title", value: "We need your feedback.", comment: "Terms of Service title for Network Protection")
     static let networkProtectionTermsOfServiceSection8List = NSLocalizedString("network-protection.terms-of-service.section.8.list", value: "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.", comment: "Terms of Service list for Network Protection")
 
+    // MARK: - Feedback Form
+
+    static let vpnFeedbackFormTitle = NSLocalizedString("vpn.feedback-form.title", value: "Help Improve the DuckDuckGo VPN", comment: "Title for each screen of the VPN feedback form")
+    static let vpnFeedbackFormCategorySelect = NSLocalizedString("vpn.feedback-form.category.select-category", value: "Select a category", comment: "Title for the category selection state of the VPN feedback form")
+    static let vpnFeedbackFormCategoryUnableToInstall = NSLocalizedString("vpn.feedback-form.category.unable-to-install", value: "Unable to install VPN", comment: "Title for the 'unable to install' category of the VPN feedback form")
+    static let vpnFeedbackFormCategoryFailsToConnect = NSLocalizedString("vpn.feedback-form.category.fails-to-connect", value: "VPN fails to connect", comment: "Title for the 'VPN fails to connect' category of the VPN feedback form")
+    static let vpnFeedbackFormCategoryTooSlow = NSLocalizedString("vpn.feedback-form.category.too-slow", value: "VPN connection is too slow", comment: "Title for the 'VPN is too slow' category of the VPN feedback form")
+    static let vpnFeedbackFormCategoryIssuesWithApps = NSLocalizedString("vpn.feedback-form.category.issues-with-apps", value: "VPN causes issues with other apps or websites", comment: "Title for the category 'VPN causes issues with other apps or websites' category of the VPN feedback form")
+    static let vpnFeedbackFormCategoryLocalDeviceConnectivity = NSLocalizedString("vpn.feedback-form.category.local-device-connectivity", value: "VPN won't let me connect to local device", comment: "Title for the local device connectivity category of the VPN feedback form")
+    static let vpnFeedbackFormCategoryBrowserCrashOrFreeze = NSLocalizedString("vpn.feedback-form.category.browser-crash-or-freeze", value: "VPN causes browser to crash or freeze", comment: "Title for the browser crash/freeze category of the VPN feedback form")
+    static let vpnFeedbackFormCategoryFeatureRequest = NSLocalizedString("vpn.feedback-form.category.feature-request", value: "VPN feature request", comment: "Title for the 'VPN feature request' category of the VPN feedback form")
+    static let vpnFeedbackFormCategoryOther = NSLocalizedString("vpn.feedback-form.category.other", value: "Other VPN feedback", comment: "Title for the 'other VPN feedback' category of the VPN feedback form")
+
+    static let vpnFeedbackFormText1 = NSLocalizedString("vpn.feedback-form.text-1", value: "Please describe what's happening, what you expected to happen, and the steps that led to the issue:", comment: "Text for the body of the VPN feedback form")
+    static let vpnFeedbackFormText2 = NSLocalizedString("vpn.feedback-form.text-2", value: "In addition to the details entered into this form, your app issue report will contain:", comment: "Text for the body of the VPN feedback form")
+    static let vpnFeedbackFormText3 = NSLocalizedString("vpn.feedback-form.text-3", value: "• Whether specific DuckDuckGo features are enabled", comment: "Bullet text for the body of the VPN feedback form")
+    static let vpnFeedbackFormText4 = NSLocalizedString("vpn.feedback-form.text-4", value: "• Aggregate DuckDuckGo app diagnostics", comment: "Bullet text for the body of the VPN feedback form")
+    static let vpnFeedbackFormText5 = NSLocalizedString("vpn.feedback-form.text-5", value: "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features.", comment: "Text for the body of the VPN feedback form")
+
+    static let vpnFeedbackFormSendingConfirmationTitle = NSLocalizedString("vpn.feedback-form.sending-confirmation.title", value: "Thank you!", comment: "Title for the feedback sent view title of the VPN feedback form")
+    static let vpnFeedbackFormSendingConfirmationDescription = NSLocalizedString("vpn.feedback-form.sending-confirmation.description", value: "Your feedback will help us improve the\nDuckDuckGo VPN.", comment: "Title for the feedback sent view description of the VPN feedback form")
+    static let vpnFeedbackFormSendingConfirmationError = NSLocalizedString("vpn.feedback-form.sending-confirmation.error", value: "We couldn't send your feedback right now, please try again.", comment: "Title for the feedback sending error text of the VPN feedback form")
+
+    static let vpnFeedbackFormButtonDone = NSLocalizedString("vpn.feedback-form.button.done", value: "Done", comment: "Title for the Done button of the VPN feedback form")
+    static let vpnFeedbackFormButtonCancel = NSLocalizedString("vpn.feedback-form.button.cancel", value: "Cancel", comment: "Title for the Cancel button of the VPN feedback form")
+    static let vpnFeedbackFormButtonSubmit = NSLocalizedString("vpn.feedback-form.button.submit", value: "Submit", comment: "Title for the Submit button of the VPN feedback form")
+    static let vpnFeedbackFormButtonSubmitting = NSLocalizedString("vpn.feedback-form.button.submitting", value: "Submitting…", comment: "Title for the Submitting state of the VPN feedback form")
+
 }
 
 #if DBP
@@ -190,6 +218,7 @@ extension UserText {
     static let dataBrokerProtectionWaitlistButtonEnableNotifications = NSLocalizedString("data-broker-protection.waitlist.button.enable-notifications", value: "Enable Notifications", comment: "Enable Notifications button for Personal Information Removal joined waitlist screen")
     static let dataBrokerProtectionWaitlistButtonJoinWaitlist = NSLocalizedString("data-broker-protection.waitlist.button.join-waitlist", value: "Join the Waitlist", comment: "Join Waitlist button for Personal Information Removal join waitlist screen")
     static let dataBrokerProtectionWaitlistButtonAgreeAndContinue = NSLocalizedString("data-broker-protection.waitlist.button.agree-and-continue", value: "Agree and Continue", comment: "Agree and Continue button for Personal Information Removal join waitlist screen")
+
 }
 
 #endif

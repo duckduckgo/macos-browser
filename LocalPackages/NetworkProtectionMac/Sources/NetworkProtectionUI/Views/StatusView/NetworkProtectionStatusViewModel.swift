@@ -47,7 +47,7 @@ extension NetworkProtectionStatusView {
 
         @MainActor
         @Published
-        private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected
+        private var connectionStatus: NetworkProtection.ConnectionStatus = .default
 
         /// The type of extension that's being used for NetP
         ///
