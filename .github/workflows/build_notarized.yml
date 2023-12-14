@@ -38,6 +38,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
     secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
@@ -103,7 +107,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         submodules: recursive
-        ref: ${{ github.ref_name }}
+        ref: ${{ inputs.branch || github.ref_name }}
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles

@@ -100,6 +100,41 @@ platform :mac do
     }))
   end
 
+  # Creates a new release branch and updates embedded files.
+  #
+  # - Cuts a new release branch
+  # - Updates submodules and embedded files
+  # - Pushes changes to remote
+  #
+  # @option [String] version (default: nil) Marketing version string
+  #
+  desc 'Executes the release preparation work in the repository'
+  lane :make_release_branch do |options|
+    begin
+      macos_codefreeze_prechecks
+      new_version = validate_new_version(options)
+      macos_create_release_branch(version: new_version)
+      macos_update_embedded_files
+      macos_update_version_config(version: new_version)
+      sh('git', 'push')
+
+      sh("echo \"release_branch_name=#{RELEASE_BRANCH}/#{new_version}\" >> $GITHUB_OUTPUT") if is_ci
+
+    rescue => exception
+      if exception.message == "Tests have failed"
+        UI.user_error! %{Tests have failed.
+* If you believe the failing test is flaky, please retry the same fastlane command,
+  appending `resume:true`.
+* If the failure looks legitimate, try to fix it, commit the fix (be sure to only
+  include the files you've changed while making a fix and leave other changed files
+  unmodified), and run the command again appending `resume:true`.
+        }
+      else
+        raise exception
+      end
+    end
+  end
+
   # Executes the release preparation work in the repository
   #
   # - Cuts a new release branch
@@ -307,7 +342,7 @@ platform :mac do
   private_lane :macos_codefreeze_prechecks do
     ensure_git_status_clean 
 
-    ensure_git_branch(branch: DEFAULT_BRANCH)
+    # ensure_git_branch(branch: DEFAULT_BRANCH)
     git_pull
 
     git_submodule_update(recursive: true, init: true)
@@ -500,10 +535,8 @@ release in progress and you're making a follow-up internal release that includes
       end
     end
 
-    unless is_ci
-      # Run tests (CI will run them separately)
-      run_tests(scheme: 'DuckDuckGo Privacy Browser')
-    end
+    # Run tests (CI will run them separately)
+    run_tests(scheme: 'DuckDuckGo Privacy Browser') unless is_ci
 
     # Every thing looks good: commit and push
     unless modified_files.empty?
@@ -513,7 +546,7 @@ release in progress and you're making a follow-up internal release that includes
     end
   end
 
-  # Updates version in the config file
+  # Updates version and build number in respective config files
   #
   # @option [String] version Marketing version string
   # @option [String] build_number Build number
@@ -529,6 +562,19 @@ release in progress and you're making a follow-up internal release that includes
         BUILD_NUMBER_CONFIG_PATH
       ],
       message: "Bump version to #{version} (#{build_number})"
+    )
+  end
+
+  # Updates version in the config file
+  #
+  # @option [String] version Marketing version string
+  #
+  private_lane :macos_update_version_config do |options|
+    version = options[:version]
+    File.write(VERSION_CONFIG_PATH, "#{VERSION_CONFIG_DEFINITION} = #{version}\n")
+    git_commit(
+      path: VERSION_CONFIG_PATH,
+      message: "Set marketing version to #{version}"
     )
   end
 
