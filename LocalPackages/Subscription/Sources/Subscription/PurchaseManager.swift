@@ -196,22 +196,26 @@ public final class PurchaseManager: ObservableObject {
 
         switch result {
         case let .success(.verified(transaction)):
+            os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription result: success")
             // Successful purchase
             await transaction.finish()
             await self.updatePurchasedProducts()
             return .success(())
         case let .success(.unverified(_, error)):
+            os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription result: success /unverified/ - %{public}s", String(reflecting: error))
             // Successful purchase but transaction/receipt can't be verified
             // Could be a jailbroken phone
-            print("Error: \(error.localizedDescription)")
             return .failure(PurchaseManagerError.transactionCannotBeVerified)
         case .pending:
+            os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription result: pending")
             // Transaction waiting on SCA (Strong Customer Authentication) or
             // approval from Ask to Buy
             return .failure(PurchaseManagerError.transactionPendingAuthentication)
         case .userCancelled:
+            os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription result: user cancelled")
             return .failure(PurchaseManagerError.purchaseCancelledByUser)
         @unknown default:
+            os_log(.info, log: .subscription, "[PurchaseManager] purchaseSubscription result: unknown")
             return .failure(PurchaseManagerError.unknownError)
         }
     }
