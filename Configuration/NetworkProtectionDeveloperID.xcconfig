@@ -45,6 +45,16 @@ NETP_APP_GROUP[config=Review][sdk=*] = $(NETP_BASE_APP_GROUP).review
 NETP_APP_GROUP[config=Debug][sdk=*] = $(NETP_BASE_APP_GROUP).debug
 NETP_APP_GROUP[config=Release][sdk=*] = $(NETP_BASE_APP_GROUP)
 
+// It's important to try and keep this app group short since some IPC
+// mechanisms require really short paths. For instance Unix Domain Sockets
+// support paths of up to 108 bytes in length
+// (di = developer ID)
+BASE_IPC_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.di.ipc
+IPC_APP_GROUP[config=CI][sdk=macos*] = $(BASE_IPC_APP_GROUP).debug
+IPC_APP_GROUP[config=Review][sdk=macos*] = $(BASE_IPC_APP_GROUP).review
+IPC_APP_GROUP[config=Debug][sdk=macos*] = $(BASE_IPC_APP_GROUP).debug
+IPC_APP_GROUP[config=Release][sdk=macos*] = $(BASE_IPC_APP_GROUP)
+
 SYSEX_MACH_SERVICE_NAME[sdk=*] = $(NETP_APP_GROUP).ipc
 SYSEX_MACH_SERVICE_NAME[config=CI][sdk=*] = $(NETP_APP_GROUP).ipc
 SYSEX_MACH_SERVICE_NAME[config=Review][sdk=*] = $(NETP_APP_GROUP).ipc

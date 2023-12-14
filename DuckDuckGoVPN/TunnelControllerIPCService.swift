@@ -20,6 +20,12 @@ import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
+import UDSHelper
+
+enum IPCRequest: Codable {
+    case start
+    case stop
+}
 
 /// Takes care of handling incoming IPC requests from clients that need to be relayed to the tunnel, and handling state
 /// changes that need to be relayed back to IPC clients.
@@ -34,14 +40,21 @@ final class TunnelControllerIPCService {
     private let statusReporter: NetworkProtectionStatusReporter
     private var cancellables = Set<AnyCancellable>()
 
+    private let udsServer: UDSServer<IPCRequest>
+
     init(tunnelController: TunnelController,
          networkExtensionController: NetworkExtensionController,
-         statusReporter: NetworkProtectionStatusReporter) {
+         statusReporter: NetworkProtectionStatusReporter,
+         fileManager: FileManager = .default) {
 
         self.tunnelController = tunnelController
         self.networkExtensionController = networkExtensionController
         server = .init(machServiceName: Bundle.main.bundleIdentifier!)
         self.statusReporter = statusReporter
+
+        let socketFileURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Bundle.main.appGroupName)!.appendingPathComponent("vpn.sock")
+
+        udsServer = UDSServer<IPCRequest>(socketFileURL: socketFileURL, log: .networkProtectionIPCLog)
 
         subscribeToErrorChanges()
         subscribeToStatusUpdates()
@@ -52,6 +65,14 @@ final class TunnelControllerIPCService {
 
     public func activate() {
         server.activate()
+
+        do {
+            try udsServer.start { request in
+                // no-op
+            }
+        } catch {
+            fatalError()
+        }
     }
 
     private func subscribeToErrorChanges() {

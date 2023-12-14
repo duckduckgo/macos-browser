@@ -34,6 +34,7 @@ extension Bundle {
         static let notificationsAgentProductName = "NOTIFICATIONS_AGENT_PRODUCT_NAME"
 #endif
         static let appGroup = "NETP_APP_GROUP"
+        static let ipcAppGroup = "IPC_APP_GROUP"
 
 #if DBP
         static let dbpBackgroundAgentBundleId = "DBP_BACKGROUND_AGENT_BUNDLE_ID"
@@ -98,6 +99,14 @@ extension Bundle {
     var appGroupName: String {
         guard let appGroup = object(forInfoDictionaryKey: Keys.appGroup) as? String else {
             fatalError("Info.plist is missing \(Keys.appGroup)")
+        }
+        return appGroup
+    }
+
+
+    var ipcAppGroupName: String {
+        guard let appGroup = object(forInfoDictionaryKey: Keys.ipcAppGroup) as? String else {
+            fatalError("Info.plist is missing \(Keys.ipcAppGroup)")
         }
         return appGroup
     }
