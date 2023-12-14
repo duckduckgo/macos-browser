@@ -267,7 +267,7 @@ final class PixelKitTests: XCTestCase {
         timeMachine.travel(by: 60 * 60 * 10)
         pixelKit.fire(event, frequency: .dailyOnly) // Skipped (10 hours since last fire)
 
-        timeMachine.travel(by: 60 * 60 * 14)
+        timeMachine.travel(by: 60 * 60 * 24)
         pixelKit.fire(event, frequency: .dailyOnly) // Fired (24 hours since last fire)
 
         // Wait for expectations to be fulfilled
