@@ -31,17 +31,14 @@ struct SaveRecoveryPDFView: View {
                 SyncUIViews.TextDetailMultiline(text: UserText.recoveryPDFExplanation)
             }
             VStack(alignment: .leading, spacing: 20) {
-                HStack {
-                    QRCode(string: code, size: CGSize(width: 56, height: 56))
-                    Text(code)
-                        .kerning(2)
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(5)
-                        .lineLimit(3)
-                        .font(Font.custom("SF Mono", size: 12))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(width: 340)
+                Text(code)
+                    .kerning(2)
+                    .multilineTextAlignment(.leading)
+                    .lineSpacing(5)
+                    .lineLimit(3)
+                    .font(Font.custom("SF Mono", size: 12))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(width: 340)
                 HStack {
                     Button {
                         viewModel.delegate?.copyCode()
