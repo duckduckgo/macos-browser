@@ -54,32 +54,24 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [ "Sandbox", "Non-Sandbox", "DBP" ]
+        flavor: [ "Sandbox", "Non-Sandbox" ]
         include:
           - scheme: DuckDuckGo Privacy Browser
             flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
-          - scheme: DataBrokerProtectionTests
-            flavor: DBP
           - active-arch: YES
             flavor: Non-Sandbox
           - active-arch: NO
             flavor: Sandbox
-          - active-arch: YES
-            flavor: DBP
           - integration-tests-target: Integration Tests
             flavor: Non-Sandbox
           - integration-tests-target: Integration Tests App Store
             flavor: Sandbox
-          - integration-tests-target: Integration Tests
-            flavor: DBP
           - cache-key:
             flavor: Non-Sandbox
           - cache-key: sandbox-
             flavor: Sandbox
-          - cache-key: dbp-
-            flavor: DBP
 
     runs-on: macos-13-xlarge
     timeout-minutes: 30
@@ -144,7 +136,6 @@ jobs:
           || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-unittests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-unittests.xcresult && exit 1; }
 
     - name: Run integration tests
-      if: matrix.flavor != 'DBP'
       run: |
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
@@ -222,7 +213,7 @@ jobs:
 
     - name: Upload failed integration tests log
       uses: actions/upload-artifact@v3
-      if: failure() && matrix.flavor != 'DBP'
+      if: failure()
       with:
         name: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
         path: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
@@ -230,7 +221,7 @@ jobs:
 
     - name: Upload failed integration tests xcresult
       uses: actions/upload-artifact@v3
-      if: failure() && matrix.flavor != 'DBP'
+      if: failure()
       with:
         name: ${{ matrix.flavor }}-integrationtests.xcresult
         path: ${{ matrix.flavor }}-integrationtests.xcresult
