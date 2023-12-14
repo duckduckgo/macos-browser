@@ -63,13 +63,9 @@ struct DataBrokerProtectionAppEvents {
         if DataBrokerProtectionWaitlist().readyToAcceptTermsAndConditions {
             switch source {
             case .cardUI:
-                DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistCardUITapped,
-                                frequency: .dailyAndCount,
-                                includeAppVersionParameter: true)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistCardUITapped, frequency: .dailyAndCount)
             case .localPush:
-                DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped,
-                                frequency: .dailyAndCount,
-                                includeAppVersionParameter: true)
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationTapped, frequency: .dailyAndCount)
             }
 
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
@@ -82,9 +78,7 @@ struct DataBrokerProtectionAppEvents {
 
     private func sendActiveDataBrokerProtectionWaitlistUserPixel() {
         if DefaultDataBrokerProtectionFeatureVisibility().waitlistIsOngoing {
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistUserActive,
-                            frequency: .dailyOnly,
-                            includeAppVersionParameter: true)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistUserActive, frequency: .dailyOnly)
         }
     }
 
