@@ -40,7 +40,7 @@ struct DeviceDetailsView: View {
 
     var body: some View {
         if isLoading {
-            ProgressView("Loading...")
+            ProgressView()
                 .padding()
         } else {
             SyncDialog {
