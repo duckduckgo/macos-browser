@@ -108,7 +108,7 @@ jobs:
         echo "app_version=${version}.${build_number}" >> $GITHUB_ENV
 
     - name: Upload dSYMs artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.destination }}-dSYM-${{ env.app_version }}
         path: ${{ env.dsyms_path }}
