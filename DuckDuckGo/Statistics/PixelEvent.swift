@@ -109,9 +109,6 @@ extension Pixel {
         case bitwardenPasswordAutofilled
         case bitwardenPasswordSaved
 
-        case autoconsentOptOutFailed
-        case autoconsentSelfTestFailed
-
         case ampBlockingRulesCompilationFailed
 
         case adClickAttributionDetected
@@ -131,7 +128,7 @@ extension Pixel {
         // Activation Points
         case newTabInitial(cohort: String? = nil)
         case emailEnabledInitial(cohort: String? = nil)
-        case cookieManagementEnabledInitial(cohort: String? = nil)
+
         case watchInDuckPlayerInitial(cohort: String? = nil)
         case setAsDefaultInitial(cohort: String? = nil)
         case importDataInitial(cohort: String? = nil)
@@ -396,12 +393,6 @@ extension Pixel.Event {
         case .debug(event: let event, error: _):
             return "m_mac_debug_\(event.name)"
 
-        case .autoconsentOptOutFailed:
-            return "m_mac_autoconsent_optout_failed"
-
-        case .autoconsentSelfTestFailed:
-            return "m_mac_autoconsent_selftest_failed"
-
         case .ampBlockingRulesCompilationFailed:
             return "m_mac_amp_rules_compilation_failed"
 
@@ -430,8 +421,7 @@ extension Pixel.Event {
             }
         case .emailEnabledInitial:
             return "m_mac.enable-email-protection.initial"
-        case .cookieManagementEnabledInitial:
-            return "m_mac.cookie-management-enabled.initial"
+
         case .watchInDuckPlayerInitial:
             return "m_mac.watch-in-duckplayer.initial"
         case .setAsDefaultInitial:
