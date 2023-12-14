@@ -61,14 +61,14 @@ jobs:
 
     steps:
 
-    # - name: Assert release branch
-    #   if: env.destination == 'appstore'
-    #   run: |
-    #     case "${{ github.ref }}" in
-    #       refs/heads/release/*) ;;
-    #       refs/heads/hotfix/*) ;;
-    #       *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
-    #     esac
+    - name: Assert release branch
+      if: env.destination == 'appstore'
+      run: |
+        case "${{ inputs.branch || github.ref_name }}" in
+          release/*) ;;
+          hotfix/*) ;;
+          *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
+        esac
 
     - name: Register SSH keys for submodules access
       uses: webfactory/ssh-agent@v0.7.0

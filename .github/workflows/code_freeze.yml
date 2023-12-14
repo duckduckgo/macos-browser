@@ -2,11 +2,6 @@ name: Code Freeze
 
 on:
   workflow_dispatch:
-    inputs:
-      asana-task-url:
-        description: "Asana release task URL"
-        required: true
-        type: string
 
 jobs:
 
@@ -19,6 +14,7 @@ jobs:
 
     outputs:
       release_branch_name: ${{ steps.make_release_branch.outputs.release_branch_name }}
+      asana_task_url: ${{ steps.create_release_task.outputs.asana_task_url }}
 
     steps:
 
@@ -34,9 +30,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
-
       - name: Prepare fastlane
         run: bundle install
 
@@ -50,6 +43,29 @@ jobs:
           git config --global user.name "Dax the Duck"
           git config --global user.email "dax@duckduckgo.com"
           bundle exec fastlane make_release_branch
+
+      - name: Create release task
+        id: create_release_task
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          version="$(echo ${{ steps.make_release_branch.outputs.release_branch_name }} | cut -d '/' -f 2)"
+          task_name="macOS App Release $version"
+          asana_task_id="$(curl -fLSs -X POST "https://app.asana.com/api/1.0/task_templates/${{ vars.MACOS_RELEASE_TASK_TEMPLATE_ID }}/instantiateTask" \
+            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{ \"data\": { \"name\": \"$task_name\" }}" \
+            | jq -r .data.new_task.gid)"
+          echo "asana_task_url=https://app.asana.com/0/0/${asana_task_id}/f" >> $GITHUB_OUTPUT
+
+          assignee_id="$(curl -fLSs https://raw.githubusercontent.com/duckduckgo/BrowserServicesKit/main/.github/actions/asana-failed-pr-checks/user_ids.json \
+            | jq -r .${{ github.actor }})"
+
+          curl -fLSs -X PUT "https://app.asana.com/api/1.0/tasks/${asana_task_id}" \
+            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --output /dev/null \
+            -d "{ \"data\": { \"assignee\": \"$assignee_id\" }}"
 
   run_tests:
 
@@ -78,9 +94,6 @@ jobs:
           submodules: recursive
           ref: ${{ needs.create_release_branch.outputs.release_branch_name }}
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
-
       - name: Prepare fastlane
         run: bundle install
 
@@ -99,7 +112,7 @@ jobs:
     needs: [ create_release_branch, increment_build_number ]
     uses: ./.github/workflows/release.yml
     with:
-      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      asana-task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
       branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
