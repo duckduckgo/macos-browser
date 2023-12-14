@@ -340,6 +340,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 self.devices = []
                 let devices = try await syncService.updateDeviceName(name)
+                managementDialogModel.endFlow()
                 mapDevices(devices)
             } catch {
                 managementDialogModel.syncErrorMessage
