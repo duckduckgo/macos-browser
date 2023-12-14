@@ -205,6 +205,10 @@ extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didSetHeight height: Int) {
         sizeDelegate?.privacyDashboardViewControllerDidChange(size: NSSize(width: width, height: CGFloat(height)))
     }
+
+    func privacyDashboardControllerDidTapClose(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController) {
+        dismiss()
+    }
 }
 
 // MARK: - PrivacyDashboardReportBrokenSiteDelegate

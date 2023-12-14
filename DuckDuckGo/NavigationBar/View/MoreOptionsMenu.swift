@@ -107,9 +107,9 @@ final class MoreOptionsMenu: NSMenu {
         setupMenuItems()
     }
 #endif
-    
+
     let zoomMenuItem = NSMenuItem(title: UserText.zoom, action: nil, keyEquivalent: "")
-    
+
     private func setupMenuItems() {
 
 #if FEEDBACK

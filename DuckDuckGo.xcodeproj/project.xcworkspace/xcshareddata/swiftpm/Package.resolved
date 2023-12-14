@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "e4f4ae624174c1398d345cfc387db38f8f69986d",
-        "version" : "94.0.0"
+        "branch" : "fcappelli/breakage_improvement_mac",
+        "revision" : "ebd0e6bc34816e838da07a36f89ce1720a118fd4"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "38336a574e13090764ba09a6b877d15ee514e371",
-        "version" : "3.1.1"
+        "branch" : "12-14-feat_macos_allow_direct_navigation_to_breakage_form",
+        "revision" : "97f6acbf9318045fbfb9b0ff098e307450d7457b"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "trackerradarkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
+      "location" : "https://github.com/duckduckgo/TrackerRadarKit",
       "state" : {
         "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
         "version" : "1.2.2"
