@@ -249,6 +249,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
             // kill switch
             protocolConfiguration.enforceRoutes = settings.enforceRoutes
+
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 
@@ -283,7 +284,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
-    // MARK: - Ensure things are working
+    // MARK: - Activate System Extension
 
 #if NETP_SYSTEM_EXTENSION
     /// Ensures that the system extension is activated if necessary.
@@ -311,7 +312,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
 
-            return
+            // Re-throw the error so that the caller knows something failed:
+            throw error
         }
 
         self.controllerErrorStore.lastErrorMessage = nil
