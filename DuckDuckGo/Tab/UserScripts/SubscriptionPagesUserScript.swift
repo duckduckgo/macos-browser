@@ -216,12 +216,15 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             await mainViewController?.presentAsSheet(progressViewController)
 
             // Trigger sign in pop-up
+
+            /* TODO: Disabling for now
             switch await PurchaseManager.shared.syncAppleIDAccount() {
             case .success:
                 break
             case .failure:
                 return nil
             }
+             */
 
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
