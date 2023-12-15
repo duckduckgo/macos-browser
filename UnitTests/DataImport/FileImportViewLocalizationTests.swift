@@ -30,7 +30,7 @@ class FileImportViewLocalizationTests: XCTestCase {
         customAssertionFailure = nil
     }
 
-    func testLocalizedStringForEnglish() throws {
+    func testFileImportLocalizedStrings() throws {
         // collect reference "Base" localization escaped format arguments
         var referenceValues = [DataImport.Source: [DataImport.DataType: [String]]]()
         for locale in [.base] + Bundle.main.availableLocalizations().filter({ $0 != .base }) {
@@ -43,7 +43,7 @@ class FileImportViewLocalizationTests: XCTestCase {
                     // build instructions
                     let items = fileImportInstructionsBuilder(source: source, dataType: dataType) { title in
                         // button title should not be empty
-                        XCTAssertFalse(title.isEmpty)
+                        XCTAssertFalse(title.isEmpty, "\(locale).\(source.rawValue).\(dataType.rawValue).title")
                         // button should be present in items
                         e.fulfill()
                         return AnyView(EmptyView())
@@ -89,11 +89,11 @@ class FileImportViewLocalizationTests: XCTestCase {
                                    "\(locale).\(source.rawValue).\(dataType.rawValue).strings")
 
 #if CI
-                    customAssert = { _, _, _, _ in
-                        XCTFail("\(locale).\(source.rawValue).\(dataType.rawValue).InstructionsView.assert")
+                    customAssert = { condition, message, file, line in
+                        XCTAssert(condition(), "\(locale).\(source.rawValue).\(dataType.rawValue).InstructionsView.assert: " + message(), file: file, line: line)
                     }
-                    customAssertionFailure = { _, _, _ in
-                        XCTFail("\(locale).\(source.rawValue).\(dataType.rawValue).InstructionsView.assertionFailure")
+                    customAssertionFailure = { message, file, line in
+                        XCTFail("\(locale).\(source.rawValue).\(dataType.rawValue).InstructionsView.assertionFailure: " + message(), file: file, line: line)
                     }
 #endif
                     _=InstructionsView {
