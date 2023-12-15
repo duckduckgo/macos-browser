@@ -736,7 +736,7 @@ struct InstructionsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             ForEach(instructions.indices, id: \.self) { i in
-                HStack(spacing: 8) {
+                HStack(alignment: .top, spacing: 8) {
                     ForEach(instructions[i].indices, id: \.self) { j in
                         switch instructions[i][j] {
                         case .lineNumber(let number):
@@ -744,6 +744,7 @@ struct InstructionsView: View {
                         case .textItems(let textParts):
                             Text(textParts)
                                 .makeSelectable()
+                                .frame(minHeight: CircleNumberView.Constants.diameter)
                         case .view(let view):
                             view
                         }
@@ -794,12 +795,16 @@ private extension Text {
 
 struct CircleNumberView: View {
 
+    enum Constants {
+        static let diameter: CGFloat = 20
+    }
+
     let number: Int
 
     var body: some View {
         Circle()
             .fill(.globalBackground)
-            .frame(width: 20, height: 20)
+            .frame(width: Constants.diameter, height: Constants.diameter)
             .overlay(
                 Text("\(number)")
                     .foregroundColor(.onboardingActionButton)
