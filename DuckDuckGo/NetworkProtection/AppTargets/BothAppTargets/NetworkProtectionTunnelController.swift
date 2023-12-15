@@ -81,7 +81,13 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Connection Status
 
-    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
+    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(
+        statusObserver: ConnectionStatusObserverThroughSession(
+            platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+            platformDidWakeNotification: NSWorkspace.didWakeNotification
+        ),
+        transitionTimeout: .seconds(10)
+    )
 
     // MARK: - Tunnel Manager
 
