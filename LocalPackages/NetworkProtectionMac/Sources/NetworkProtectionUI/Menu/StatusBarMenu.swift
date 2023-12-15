@@ -117,10 +117,10 @@ public final class StatusBarMenu: NSObject {
         let menu = NSMenu()
         menu.delegate = self
         menu.items = model.contextMenuItems
-        
+
         menu.popUp(positioning: nil,
-                            at: NSPoint(x: 0, y: statusItem.statusBar!.thickness),
-                            in: statusItem.button)
+                   at: .zero,
+                   in: statusItem.button)
     }
 
     // MARK: - Showing & Hiding the menu
