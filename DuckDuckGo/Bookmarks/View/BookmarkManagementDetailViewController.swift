@@ -145,11 +145,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
         if let url = (entity as? Bookmark)?.urlObject {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-                WindowsManager.openNewWindow(with: url, isBurner: false)
+                WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
             } else if NSApplication.shared.isCommandPressed {
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
             } else {
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
             }
         } else if let folder = entity as? BookmarkFolder {
             resetSelections()
@@ -495,7 +495,7 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
 
         let tabs = bookmarks.compactMap { $0.urlObject }.map {
-            Tab(content: .url($0),
+            Tab(content: .url($0, source: .bookmark),
                 shouldLoadInBackground: true,
                 burnerMode: tabCollection.burnerMode)
         }
@@ -647,7 +647,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -657,7 +657,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: url, isBurner: false)
+        WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {

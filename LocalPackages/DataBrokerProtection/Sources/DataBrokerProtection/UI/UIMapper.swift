@@ -249,9 +249,9 @@ fileprivate extension Array where Element == BrokerProfileQueryData {
         guard let broker = self.first?.dataBroker else { return 0 }
 
         let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
-        let areAllQueriesNotStartedScanning = allSatisfy { $0.scanOperationData.lastRunDate == nil }
+        let didAllQueriesFinished = allSatisfy { $0.scanOperationData.lastRunDate != nil }
 
-        if areAllQueriesDeprecated || areAllQueriesNotStartedScanning {
+        if areAllQueriesDeprecated || !didAllQueriesFinished {
             return 0
         } else {
             return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
