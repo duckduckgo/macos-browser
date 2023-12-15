@@ -38,6 +38,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
     secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
@@ -103,7 +107,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         submodules: recursive
-        ref: ${{ github.ref_name }}
+        ref: ${{ inputs.branch || github.ref_name }}
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles
@@ -155,13 +159,13 @@ jobs:
         echo "app-name=${{ env.app-name }}" >> $GITHUB_OUTPUT
 
     - name: Upload app artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
         path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}.zip
 
     - name: Upload dSYMs artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
         path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
@@ -205,7 +209,7 @@ jobs:
     steps:
 
     - name: Fetch app bundle
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
         path: ${{ github.workspace }}/dmg
@@ -234,7 +238,7 @@ jobs:
             "dmg"
 
     - name: Upload DMG artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
         path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg

@@ -20,6 +20,8 @@ import AppKit
 
 extension NSScreen {
 
+    static let fallbackHeadlessScreenFrame = NSRect(x: 0, y: 100, width: 1280, height: 900)
+
     static var dockScreen: NSScreen? {
         screens.min(by: { ($0.frame.height - $0.visibleFrame.height) > ($1.frame.height - $1.visibleFrame.height) })
     }
