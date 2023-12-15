@@ -486,8 +486,8 @@ struct FileImportView: View {
                 HStack {
                     Image(.info)
                     Text("""
-                    You can find your version by selecting **\(source.importSourceName) → About 1Password** from the Menu Bar
-                    """)
+                    You can find your version by selecting **\(source.importSourceName) → About \(source.importSourceName)** from the Menu Bar
+                    """, comment: "Instructions how to find an installed 1Password password manager app version. %1$@, %2$@ - app name (1Password)")
                     Spacer()
                 }
                 .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
