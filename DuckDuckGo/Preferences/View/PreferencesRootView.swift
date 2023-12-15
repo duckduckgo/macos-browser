@@ -100,7 +100,7 @@ extension Preferences {
 #if SUBSCRIPTION
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }, manageSubscriptionInAppStore: {
                 NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
             }, openVPN: {
@@ -114,7 +114,7 @@ extension Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 AccountManager().signInByRestoringPastPurchases()
             }, openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }, goToSyncPreferences: {
                 self.model.selectPane(.sync)
             })

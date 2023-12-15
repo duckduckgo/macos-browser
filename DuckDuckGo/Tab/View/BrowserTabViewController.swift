@@ -24,11 +24,11 @@ import SwiftUI
 import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
-    @IBOutlet weak var errorView: NSView!
-    @IBOutlet weak var homePageView: NSView!
-    @IBOutlet weak var errorMessageLabel: NSTextField!
-    @IBOutlet weak var hoverLabel: NSTextField!
-    @IBOutlet weak var hoverLabelContainer: NSView!
+    @IBOutlet var errorView: NSView!
+    @IBOutlet var homePageView: NSView!
+    @IBOutlet var errorMessageLabel: NSTextField!
+    @IBOutlet var hoverLabel: NSTextField!
+    @IBOutlet var hoverLabelContainer: NSView!
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -39,7 +39,6 @@ final class BrowserTabViewController: NSViewController {
 
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
-    private var cookieConsentCancellable: AnyCancellable?
     private var activeUserDialogCancellable: Cancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
@@ -54,7 +53,11 @@ final class BrowserTabViewController: NSViewController {
 
     private var transientTabContentViewController: NSViewController?
 
-    private var cookieConsentPopoverManager = CookieConsentPopoverManager()
+    static func create(tabCollectionViewModel: TabCollectionViewModel) -> BrowserTabViewController {
+        NSStoryboard(name: "BrowserTab", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        }!
+    }
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -66,17 +69,11 @@ final class BrowserTabViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
-        guard let controller = HomePageViewController(coder: coder,
-                                                      tabCollectionViewModel: tabCollectionViewModel,
-                                                      bookmarkManager: LocalBookmarkManager.shared) else {
-            fatalError("BrowserTabViewController: Failed to init HomePageViewController")
-        }
-        return controller
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: LocalBookmarkManager.shared)
+        self.addAndLayoutChild(homePageViewController, into: homePageView)
 
         hoverLabelContainer.alphaValue = 0
         subscribeToTabs()
@@ -146,7 +143,7 @@ final class BrowserTabViewController: NSViewController {
         guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
 
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -214,7 +211,6 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
-                self.subscribeToCookieConsentPrompt(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
     }
@@ -355,19 +351,6 @@ final class BrowserTabViewController: NSViewController {
         .map { $1 ?? $0 }
         .sink { [weak self] dialog in
             self?.show(dialog)
-        }
-    }
-
-    private func subscribeToCookieConsentPrompt(of tabViewModel: TabViewModel?) {
-        cookieConsentCancellable = tabViewModel?.tab.cookieConsentPromptRequestPublisher.sink { [weak self, weak tab=tabViewModel?.tab] request in
-            guard let self, let tab, let request else {
-                self?.cookieConsentPopoverManager.close(animated: false)
-                return
-            }
-            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { [weak request] result in
-                request?.submit(result)
-            }
-            self.cookieConsentPopoverManager.currentTab = tab
         }
     }
 
@@ -615,11 +598,11 @@ extension BrowserTabViewController: NSDraggingDestination {
               let selectedTab = tabCollectionViewModel.selectedTab,
               !selectedTab.isPinned else {
 
-            self.openNewTab(with: .url(url))
+            self.openNewTab(with: .url(url, source: .appOpenUrl))
             return true
         }
 
-        selectedTab.setContent(.url(url))
+        selectedTab.setContent(.url(url, source: .appOpenUrl))
         return true
     }
 

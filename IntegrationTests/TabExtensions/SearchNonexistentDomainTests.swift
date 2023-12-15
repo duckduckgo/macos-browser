@@ -185,7 +185,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
 
         let url = urls.invalidTLD
 
-        tab.setUrl(url, userEntered: nil)
+        tab.setUrl(url, source: .link)
 
         let error = try await eNavigationFailed.value
         XCTAssertEqual(error.errorCode, NSURLErrorCannotFindHost)

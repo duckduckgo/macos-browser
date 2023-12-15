@@ -16,13 +16,15 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import DataBrokerProtection
 import Networking
 import Foundation
 import PixelKit
 import PixelKitTestingUtilities
 import XCTest
-@testable import DuckDuckGo_DBP
+@testable import DuckDuckGo_Privacy_Browser
 
 /// Tests to ensure that DBP pixels sent from the main app work well
 ///
@@ -143,3 +145,5 @@ final class DataBrokerProtectionPixelTests: XCTestCase {
         }
     }
 }
+
+#endif

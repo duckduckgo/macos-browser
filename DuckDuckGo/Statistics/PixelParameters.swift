@@ -55,9 +55,6 @@ extension Pixel.Event {
         case  .emailEnabledInitial(let cohort):
             guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
-        case  .cookieManagementEnabledInitial(let cohort):
-            guard let cohort else { return nil }
-            return [PixelKit.Parameters.experimentCohort: cohort]
         case  .watchInDuckPlayerInitial(let cohort):
             guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
@@ -79,6 +76,9 @@ extension Pixel.Event {
             guard let trigger = triggerOrigin else { return nil }
             return [PixelKit.Parameters.dashboardTriggerOrigin: trigger]
 
+        case .syncSuccessRateDaily:
+            return nil
+
         case .vpnBreakageReport(let category, let description, let metadata):
             return [
                 PixelKit.Parameters.vpnBreakageCategory: category,
@@ -95,8 +95,6 @@ extension Pixel.Event {
              .autofillItemSaved,
              .bitwardenPasswordAutofilled,
              .bitwardenPasswordSaved,
-             .autoconsentOptOutFailed,
-             .autoconsentSelfTestFailed,
              .ampBlockingRulesCompilationFailed,
              .adClickAttributionDetected,
              .adClickAttributionActive,
@@ -132,6 +130,12 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
+             .syncSignupDirect,
+             .syncSignupConnect,
+             .syncLogin,
+             .syncDaily,
+             .syncDuckAddressOverride,
+             .syncLocalTimestampResolutionTriggered,
              .syncBookmarksCountLimitExceededDaily,
              .syncCredentialsCountLimitExceededDaily,
              .syncBookmarksRequestSizeLimitExceededDaily,

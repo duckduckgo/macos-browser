@@ -87,7 +87,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 statusObserver: ipcClient.connectionStatusObserver,
                 serverInfoObserver: ipcClient.serverInfoObserver,
                 connectionErrorObserver: ipcClient.connectionErrorObserver,
-                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)

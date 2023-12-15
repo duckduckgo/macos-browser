@@ -57,7 +57,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     }
 
     @Published var shouldShowErrorMessage: Bool = false
-    @Published private(set) var errorMessage: String?
+    @Published private(set) var syncErrorMessage: SyncErrorMessage?
 
     @Published var isCreatingAccount: Bool = false
 
@@ -120,7 +120,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
             }
             .store(in: &cancellables)
 
-        $errorMessage
+        $syncErrorMessage
             .map { $0 != nil }
             .receive(on: DispatchQueue.main)
             .assign(to: \.shouldShowErrorMessage, onWeaklyHeld: self)
@@ -179,7 +179,8 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
-                errorMessage = String(describing: error)
+                managementDialogModel.syncErrorMessage
+                = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
             }
         }
     }
@@ -193,7 +194,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @MainActor
     func manageLogins() {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
         navigationViewController.showPasswordManagerPopover(selectedCategory: .allItems)
     }
 
@@ -328,7 +329,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
-                managementDialogModel.errorMessage = String(describing: error)
+                managementDialogModel.syncErrorMessage
+                = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
             }
         }
     }
@@ -338,9 +340,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 self.devices = []
                 let devices = try await syncService.updateDeviceName(name)
+                managementDialogModel.endFlow()
                 mapDevices(devices)
             } catch {
-                managementDialogModel.errorMessage = String(describing: error)
+                managementDialogModel.syncErrorMessage
+                = SyncErrorMessage(type: .unableToUpdateDeviceName, description: error.localizedDescription)
             }
         }
     }
@@ -355,6 +359,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         let device = deviceInfo()
         let devices = try await syncService.login(recoveryKey, deviceName: device.name, deviceType: device.type)
         mapDevices(devices)
+        Pixel.fire(.syncLogin)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if isRecovery {
                 self.showDevicesSynced()
@@ -376,9 +381,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 let device = deviceInfo()
                 presentDialog(for: .prepareToSync)
                 try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                Pixel.fire(.syncSignupDirect)
                 presentDialog(for: .saveRecoveryCode(recoveryCode ?? ""))
             } catch {
-                managementDialogModel.errorMessage = String(describing: error)
+                managementDialogModel.syncErrorMessage
+                = SyncErrorMessage(type: .unableToSync, description: error.localizedDescription)
             }
         }
     }
@@ -403,7 +410,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 }
             } catch {
                 if syncService.account == nil {
-                    managementDialogModel.errorMessage = String(describing: error)
+                    managementDialogModel.syncErrorMessage
+                    = SyncErrorMessage(type: .unableToSync, description: error.localizedDescription)
                 }
             }
         }
@@ -418,7 +426,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         Task { @MainActor in
             do {
                 guard let syncCode = try? SyncCode.decodeBase64String(recoveryCode) else {
-                    managementDialogModel.errorMessage = "Invalid code"
+                    managementDialogModel.syncErrorMessage
+                    = SyncErrorMessage(type: .invalidCode, description: "")
                     return
                 }
                 presentDialog(for: .prepareToSync)
@@ -429,6 +438,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                     if syncService.account == nil {
                         let device = deviceInfo()
                         try await syncService.createAccount(deviceName: device.name, deviceType: device.type)
+                        Pixel.fire(.syncSignupConnect)
                         presentDialog(for: .saveRecoveryCode(recoveryCode))
                     }
 
@@ -444,11 +454,13 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
                     // The UI will update when the devices list changes.
                 } else {
-                    managementDialogModel.errorMessage = "Invalid code"
+                    managementDialogModel.syncErrorMessage
+                    = SyncErrorMessage(type: .invalidCode, description: "")
                     return
                 }
             } catch {
-                managementDialogModel.errorMessage = String(describing: error)
+                managementDialogModel.syncErrorMessage
+                = SyncErrorMessage(type: .unableToSync, description: error.localizedDescription)
             }
         }
     }
@@ -478,7 +490,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             do {
                 try data.writeFileWithProgress(to: location)
             } catch {
-                managementDialogModel.errorMessage = String(describing: error)
+                managementDialogModel.syncErrorMessage
+                = SyncErrorMessage(type: .unableCreateRecoveryPDF, description: error.localizedDescription)
             }
         }
 
@@ -492,8 +505,8 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 refreshDevices()
                 managementDialogModel.endFlow()
             } catch {
-                managementDialogModel.errorMessage = String(describing: error)
-            }
+                managementDialogModel.syncErrorMessage
+                = SyncErrorMessage(type: .unableToRemoveDevice, description: error.localizedDescription)            }
         }
     }
 

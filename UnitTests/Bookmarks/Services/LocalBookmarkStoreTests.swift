@@ -770,7 +770,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(with: .displayNative(.mobile), in: context)
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = true
             bookmarkStore.update(bookmark: bookmark)
@@ -792,7 +792,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(folders: [nonNativeFolder])
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = true
             bookmarkStore.update(bookmark: bookmark)
@@ -813,7 +813,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(with: bookmarkStore.favoritesDisplayMode, in: context)
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = false
             bookmarkStore.update(bookmark: bookmark)
@@ -894,7 +894,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(folders: [nonNativeFolder])
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = true
             bookmarkStore.update(bookmark: bookmark)
@@ -917,7 +917,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(folders: [nonNativeFolder])
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = false
             bookmarkStore.update(bookmark: bookmark)
