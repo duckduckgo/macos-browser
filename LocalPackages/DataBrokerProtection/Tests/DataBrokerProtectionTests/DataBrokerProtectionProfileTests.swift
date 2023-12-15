@@ -259,13 +259,12 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
             birthYear: 1980
         )
 
-        await database.save(newProfile)
+        _ = await database.save(newProfile)
 
         XCTAssertTrue(vault.wasSaveProfileQueryCalled)
         XCTAssertFalse(vault.wasUpdateProfileQueryCalled)
         XCTAssertTrue(vault.wasDeleteProfileQueryCalled)
     }
-
 }
 
 extension ProfileQuery: Comparable {
