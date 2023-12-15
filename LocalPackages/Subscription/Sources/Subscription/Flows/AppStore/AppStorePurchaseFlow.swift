@@ -110,7 +110,7 @@ public final class AppStorePurchaseFlow {
     public static func completeSubscriptionPurchase() async -> Result<PurchaseUpdate, AppStorePurchaseFlow.Error> {
         os_log(.info, log: .subscription, "[AppStorePurchaseFlow] completeSubscriptionPurchase")
 
-        let result = await checkForEntitlements(wait: 2.0, retry: 10)
+        let result = await checkForEntitlements(wait: 2.0, retry: 20)
 
         return result ? .success(PurchaseUpdate(type: "completed")) : .failure(.missingEntitlements)
     }
