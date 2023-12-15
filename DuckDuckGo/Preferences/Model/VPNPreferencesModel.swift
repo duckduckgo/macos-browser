@@ -26,6 +26,8 @@ import NetworkProtectionUI
 
 final class VPNPreferencesModel: ObservableObject {
 
+    @Published var locationItem: VPNLocationPreferenceItemModel
+
     @Published var alwaysON = true
 
     @Published var connectOnLogin: Bool {
@@ -75,13 +77,22 @@ final class VPNPreferencesModel: ObservableObject {
         showInMenuBar = settings.showInMenuBar
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
+        locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
+        subscribeToLocationSettingChanges()
     }
 
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
         defaults.networkProtectionOnboardingStatusPublisher
             .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToLocationSettingChanges() {
+        settings.selectedLocationPublisher
+            .map(VPNLocationPreferenceItemModel.init(selectedLocation:))
+            .assign(to: \.locationItem, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
