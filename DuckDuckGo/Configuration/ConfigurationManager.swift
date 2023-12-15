@@ -97,9 +97,9 @@ final class ConfigurationManager {
         os_log("last refresh check %{public}s", log: .config, type: .default, String(describing: lastRefreshCheckTime))
     }
 
-    private func refreshNow() async {
+    private func refreshNow(isDebug: Bool = false) async {
         let updateTrackerBlockingDependenciesTask = Task {
-            let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies()
+            let didFetchAnyTrackerBlockingDependencies = await fetchTrackerBlockingDependencies(isDebug: isDebug)
             if didFetchAnyTrackerBlockingDependencies {
                 updateTrackerBlockingDependencies()
                 tryAgainLater()
@@ -134,13 +134,13 @@ final class ConfigurationManager {
         log()
     }
 
-    private func fetchTrackerBlockingDependencies() async -> Bool {
+    private func fetchTrackerBlockingDependencies(isDebug: Bool) async -> Bool {
         var didFetchAnyTrackerBlockingDependencies = false
 
         var tasks = [Configuration: Task<(), Swift.Error>]()
         tasks[.trackerDataSet] = Task { try await fetcher.fetch(.trackerDataSet) }
         tasks[.surrogates] = Task { try await fetcher.fetch(.surrogates) }
-        tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration) }
+        tasks[.privacyConfiguration] = Task { try await fetcher.fetch(.privacyConfiguration, isDebug: isDebug) }
 
         for (configuration, task) in tasks {
             do {
@@ -184,9 +184,9 @@ final class ConfigurationManager {
 
     private var isReadyToRefresh: Bool { Date().timeIntervalSince(lastUpdateTime) > Constants.refreshPeriodSeconds }
 
-    public func forceRefresh() {
+    public func forceRefresh(isDebug: Bool = false) {
         Task {
-            await refreshNow()
+            await refreshNow(isDebug: isDebug)
         }
     }
 

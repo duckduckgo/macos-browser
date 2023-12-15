@@ -744,7 +744,7 @@ extension MainViewController {
             configurationProvider.resetToDefaultConfigurationUrl()
         }
         Configuration.setURLProvider(configurationProvider)
-        ConfigurationManager.shared.forceRefresh()
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
         if let configurationUrl {
             os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
         } else {
