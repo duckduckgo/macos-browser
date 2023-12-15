@@ -53,7 +53,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private let logger: NetworkProtectionLogger
 
-    /// Stores the last controller error for the purpose of updating the UI as needed..
+    /// Stores the last controller error for the purpose of updating the UI as needed.
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
