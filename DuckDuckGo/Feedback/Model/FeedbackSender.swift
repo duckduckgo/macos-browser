@@ -58,8 +58,8 @@ final class FeedbackSender {
                               Import source: \(report.importSourceDescription)
                               Error: \(report.error.localizedDescription)
                               """,
-                              appVersion: "\(AppVersion.shared.versionNumber)",
-                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)"))
+                              appVersion: report.appVersion,
+                              osVersion: report.osVersion))
     }
 
 }

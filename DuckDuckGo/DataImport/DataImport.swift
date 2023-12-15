@@ -145,6 +145,13 @@ enum DataImport {
 
         var description: String { rawValue }
 
+        var importAction: DataImportAction {
+            switch self {
+            case .bookmarks: .bookmarks
+            case .passwords: .passwords
+            }
+        }
+
     }
 
     struct DataTypeSummary: Equatable {
@@ -153,7 +160,11 @@ enum DataImport {
         let failed: Int
 
         var isEmpty: Bool {
-            successful == 0 && duplicate == 0 && failed == 0
+            self == .empty
+        }
+
+        static var empty: Self {
+            DataTypeSummary(successful: 0, duplicate: 0, failed: 0)
         }
 
         init(successful: Int, duplicate: Int, failed: Int) {
