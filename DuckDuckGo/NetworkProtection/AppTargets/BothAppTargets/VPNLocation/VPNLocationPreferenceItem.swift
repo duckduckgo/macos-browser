@@ -32,7 +32,7 @@ struct VPNLocationPreferenceItem: View {
                 case .defaultIcon:
                     Image(systemName: "location.fill")
                         .resizable()
-                        .frame(width: 20, height: 20)
+                        .frame(width: 18, height: 18)
                 case .emoji(let string):
                     Text(string).font(.system(size: 20))
                 }
@@ -42,17 +42,17 @@ struct VPNLocationPreferenceItem: View {
                         .font(.system(size: 13))
                         .foregroundColor(.primary)
                     if let subtitle = model.subtitle {
-                        Text(model.title)
+                        Text(subtitle)
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
                 }
                 Spacer()
-                Button("Change...") {
+                Button(UserText.vpnLocationChangeButtonTitle) {
                     isShowingLocationSheet = true
                 }
                 .sheet(isPresented: $isShowingLocationSheet) {
-                    Text("Hi, I'm a sheet")
+                    VPNLocationView(isPresented: $isShowingLocationSheet)
                 }
             }
         }

@@ -35,7 +35,7 @@ struct VPNLocationPreferenceItemModel {
         switch selectedLocation {
         case .nearest:
             title = UserText.vpnLocationNearestAvailable
-            subtitle = nil
+            subtitle = UserText.vpnLocationNearestAvailableSubtitle
             icon = .defaultIcon
         case .location(let location):
             let countryLabelsModel = NetworkProtectionVPNCountryLabelsModel(country: location.country)
