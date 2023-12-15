@@ -169,7 +169,10 @@ struct DataImportViewModel {
 
         // are we handling file import or browser selected data types import?
         let dataType: DataType? = self.screen.fileImportDataType
-        let dataTypes = dataType.map { [$0] } ?? selectedDataTypes
+        // either import only data type for file import
+        let dataTypes = dataType.map { [$0] }
+            // or all the selected data types subtracting the ones that are already imported
+            ?? selectedDataTypes.subtracting(self.summary.filter { $0.result.isSuccess }.map(\.dataType))
         let importer = dataImporterFactory(importSource, dataType, url, primaryPassword)
 
         log("import \(dataTypes) at \"\(url.path)\" using \(type(of: importer))")
