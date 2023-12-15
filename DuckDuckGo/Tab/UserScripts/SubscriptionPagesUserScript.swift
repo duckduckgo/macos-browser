@@ -119,8 +119,11 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let authToken = AccountManager().authToken ?? ""
-        return Subscription(token: authToken)
+        if let authToken = AccountManager().authToken, let accessToken = AccountManager().accessToken {
+            return Subscription(token: authToken)
+        } else {
+            return Subscription(token: "")
+        }
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
