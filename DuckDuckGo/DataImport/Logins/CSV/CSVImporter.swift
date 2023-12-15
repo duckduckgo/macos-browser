@@ -203,13 +203,22 @@ final class CSVImporter: DataImporter {
     }
 
     func importData(types: Set<DataImport.DataType>) -> DataImportTask {
-        .detachedWithProgress { _ in
-            let result = self.importLoginsSync()
-            return [.passwords: result]
+        .detachedWithProgress { updateProgress in
+            do {
+                let result = try await self.importLoginsSync(updateProgress: updateProgress)
+                return [.passwords: result]
+            } catch is CancellationError {
+            } catch {
+                assertionFailure("Only CancellationError should be thrown here")
+            }
+            return [:]
         }
     }
 
-    func importLoginsSync() -> DataImportResult<DataImport.DataTypeSummary> {
+    private func importLoginsSync(updateProgress: @escaping DataImportProgressCallback) async throws -> DataImportResult<DataImport.DataTypeSummary> {
+
+        try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
+
         let fileContents: String
         do {
             fileContents = try String(contentsOf: fileURL, encoding: .utf8)
@@ -218,13 +227,24 @@ final class CSVImporter: DataImporter {
         }
 
         do {
+            try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.2))
+
             let loginCredentials = try Self.extractLogins(from: fileContents, defaultColumnPositions: defaultColumnPositions) ?? {
+                try Task.checkCancellation()
                 throw LoginImporterError(error: nil, type: .malformedCSV)
             }()
-            let summary = try loginImporter.importLogins(loginCredentials)
+
+            try updateProgress(.importingPasswords(numberOfPasswords: loginCredentials.count, fraction: 0.5))
+
+            let summary = try loginImporter.importLogins(loginCredentials) { count in
+                try updateProgress(.importingPasswords(numberOfPasswords: count, fraction: 0.5 + 0.5 * (Double(count) / Double(loginCredentials.count))))
+            }
+
+            try updateProgress(.importingPasswords(numberOfPasswords: loginCredentials.count, fraction: 1.0))
 
             return .success(summary)
-
+        } catch is CancellationError {
+            throw CancellationError()
         } catch let error as DataImportError {
             return .failure(error)
         } catch {

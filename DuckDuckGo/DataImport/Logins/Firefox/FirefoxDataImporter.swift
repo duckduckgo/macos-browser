@@ -45,23 +45,38 @@ internal class FirefoxDataImporter: DataImporter {
 
     func importData(types: Set<DataImport.DataType>) -> DataImportTask {
         .detachedWithProgress { updateProgress in
-            let result = await self.importDataSync(types: types, updateProgress: updateProgress)
-            return result
+            do {
+                let result = try await self.importDataSync(types: types, updateProgress: updateProgress)
+                return result
+            } catch is CancellationError {
+            } catch {
+                assertionFailure("Only CancellationError should be thrown here")
+            }
+            return [:]
         }
     }
 
-    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: DataImportProgressCallback) async -> DataImportSummary {
+    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: @escaping DataImportProgressCallback) async throws -> DataImportSummary {
         var summary = DataImportSummary()
 
+        let dataTypeFraction = 1.0 / Double(types.count)
+
         if types.contains(.passwords) {
-            try? updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
+            try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
 
             let loginReader = FirefoxLoginReader(firefoxProfileURL: profile.profileURL, primaryPassword: self.primaryPassword)
             let loginResult = loginReader.readLogins(dataFormat: nil)
 
-            let loginsSummary = loginResult.flatMap { logins in
+            try updateProgress(.importingPasswords(numberOfPasswords: try? loginResult.get().count, fraction: dataTypeFraction * 0.5))
+
+            let loginsSummary = try loginResult.flatMap { logins in
                 do {
-                    return try .success(loginImporter.importLogins(logins))
+                    return try .success(loginImporter.importLogins(logins) { count in
+                        try updateProgress(.importingPasswords(numberOfPasswords: count, 
+                                                               fraction: dataTypeFraction * (0.5 + 0.5 * Double(count) / Double(logins.count))))
+                    })
+                } catch is CancellationError {
+                    throw CancellationError()
                 } catch {
                     return .failure(LoginImporterError(error: error))
                 }
@@ -69,14 +84,21 @@ internal class FirefoxDataImporter: DataImporter {
 
             summary[.passwords] = loginsSummary
 
-            try? updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 1.0))
+            try updateProgress(.importingPasswords(numberOfPasswords: try? loginResult.get().count, fraction: dataTypeFraction * 1.0))
         }
 
-        if types.contains(.bookmarks) {
-            try? updateProgress(.importingBookmarks(numberOfBookmarks: nil, fraction: 0.0))
+        let passwordsFraction: Double = types.contains(.passwords) ? 0.5 : 0.0
+        if types.contains(.bookmarks)
+            // don‘t proceed with bookmarks import on invalid Primary Password
+            && (summary[.passwords]?.error as? FirefoxLoginReader.ImportError)?.type != .requiresPrimaryPassword {
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: nil, fraction: passwordsFraction + 0.0))
 
             let bookmarkReader = FirefoxBookmarksReader(firefoxDataDirectoryURL: profile.profileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 0.5))
 
             let bookmarksSummary = bookmarkResult.map { bookmarks in
                 bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
@@ -88,9 +110,10 @@ internal class FirefoxDataImporter: DataImporter {
 
             summary[.bookmarks] = bookmarksSummary.map { .init($0) }
 
-            try? updateProgress(.importingBookmarks(numberOfBookmarks: nil, fraction: 1.0))
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 1.0))
         }
-        try? updateProgress(.done)
+        try updateProgress(.done)
 
         return summary
     }

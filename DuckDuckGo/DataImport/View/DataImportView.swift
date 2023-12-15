@@ -46,8 +46,12 @@ struct DataImportView: View {
 
     @State var model = DataImportViewModel()
 
-    @State private var progressText: String?
-    @State private var progressFraction: Double?
+    struct ProgressState {
+        let text: String?
+        let fraction: Double?
+        let updated: CFTimeInterval
+    }
+    @State private var progress: ProgressState?
 
 #if DEBUG || REVIEW
     @State private var debugViewDisabled: Bool = false
@@ -68,6 +72,9 @@ struct DataImportView: View {
             // if import in progress…
             if let importProgress = model.importProgress {
                 progressView(importProgress)
+                    .padding(.leading, 20)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 8)
             }
 
             Divider()
@@ -173,10 +180,9 @@ struct DataImportView: View {
 
     private func progressView(_ progress: TaskProgress<DataImportViewModel, Never, DataImportProgressEvent>) -> some View {
         // Progress bar with label: Importing [bookmarks|passwords]…
-        ProgressView(value: progressFraction) {
-            Text(progressText ?? "")
+        ProgressView(value: self.progress?.fraction) {
+            Text(self.progress?.text ?? "")
         }
-        .padding(.top, 24)
         .task {
             // when model.importProgress async sequence not nil
             // receive progress updates events and update model on completion
@@ -209,8 +215,13 @@ struct DataImportView: View {
         for await event in progress {
             switch event {
             case .progress(let progress):
-                progressText = progress.description
-                progressFraction = progress.fraction
+                let currentTime = CACurrentMediaTime()
+                // throttle progress updates
+                if (self.progress?.updated ?? 0) < currentTime - 0.2 {
+                    self.progress = .init(text: progress.description,
+                                          fraction: progress.fraction,
+                                          updated: currentTime)
+                }
 
                 // update view model on completion
             case .completed(.success(let newModel)):

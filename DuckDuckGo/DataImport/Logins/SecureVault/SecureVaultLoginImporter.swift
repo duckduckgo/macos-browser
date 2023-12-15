@@ -22,7 +22,7 @@ import SecureStorage
 
 final class SecureVaultLoginImporter: LoginImporter {
 
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.DataTypeSummary {
+    func importLogins(_ logins: [ImportedLoginCredential], progressCallback: @escaping (Int) throws -> Void) throws -> DataImport.DataTypeSummary {
         let vault = try AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared)
 
         var successful: [String] = []
@@ -33,7 +33,7 @@ final class SecureVaultLoginImporter: LoginImporter {
         let hashingSalt = try vault.getHashingSalt()
 
         try vault.inDatabaseTransaction { database in
-            for login in logins {
+            for (idx, login) in logins.enumerated() {
                 let title = login.title
                 let account = SecureVaultModels.WebsiteAccount(title: title, username: login.username, domain: login.url, notes: login.notes)
                 let credentials = SecureVaultModels.WebsiteCredentials(account: account, password: login.password.data(using: .utf8)!)
@@ -55,6 +55,8 @@ final class SecureVaultLoginImporter: LoginImporter {
                         failed.append(importSummaryValue)
                     }
                 }
+
+                try progressCallback(idx + 1)
             }
         }
 

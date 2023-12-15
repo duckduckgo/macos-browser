@@ -640,7 +640,7 @@ struct UserText {
 
     static func importingBookmarks(_ numberOfBookmarks: Int?) -> String {
         if let numberOfBookmarks, numberOfBookmarks > 0 {
-            let localized = NSLocalizedString("import.bookmarks.number.progress.text", value: "Importing %d bookmarks", comment: "Operation progress info message about %d number of bookmarks being imported")
+            let localized = NSLocalizedString("import.bookmarks.number.progress.text", value: "Importing %d bookmarks…", comment: "Operation progress info message about %d number of bookmarks being imported")
             return String(format: localized, numberOfBookmarks)
         } else {
             return NSLocalizedString("import.bookmarks.indefinite.progress.text", value: "Importing bookmarks…", comment: "Operation progress info message about indefinite number of bookmarks being imported")
@@ -649,7 +649,7 @@ struct UserText {
 
     static func importingPasswords(_ numberOfPasswords: Int?) -> String {
         if let numberOfPasswords, numberOfPasswords > 0 {
-            let localized = NSLocalizedString("import.passwords.number.progress.text", value: "Importing %d passwords", comment: "Operation progress info message about %d number of passwords being imported")
+            let localized = NSLocalizedString("import.passwords.number.progress.text", value: "Importing %d passwords…", comment: "Operation progress info message about %d number of passwords being imported")
             return String(format: localized, numberOfPasswords)
         } else {
             return NSLocalizedString("import.passwords.indefinite.progress.text", value: "Importing passwords…", comment: "Operation progress info message about indefinite number of passwords being imported")

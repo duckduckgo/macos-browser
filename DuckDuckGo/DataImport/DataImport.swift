@@ -490,10 +490,10 @@ enum DataImportResult<T>: CustomStringConvertible {
     /// - Parameter transform: A closure that takes the success value of the instance.
     /// - Returns: A `Result` instance, either from the closure or the previous
     ///   `.failure`.
-    @inlinable public func flatMap<NewT>(_ transform: (T) -> DataImportResult<NewT>) -> DataImportResult<NewT> {
+    @inlinable public func flatMap<NewT>(_ transform: (T) throws -> DataImportResult<NewT>) rethrows -> DataImportResult<NewT> {
         switch self {
         case .success(let value):
-            switch transform(value) {
+            switch try transform(value) {
             case .success(let transformedValue):
                 return .success(transformedValue)
             case .failure(let error):

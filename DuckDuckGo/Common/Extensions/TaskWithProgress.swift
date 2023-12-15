@@ -111,7 +111,7 @@ extension TaskWithProgress: AnyTask {}
 
 extension AnyTask where Failure == Error {
 
-    static func detachedWithProgress<ProgressUpdate>(_ progress: ProgressUpdate? = nil, priority: TaskPriority? = nil, do operation: @escaping @Sendable (TaskProgressUpdateCallback<Success, Failure, ProgressUpdate>) async throws -> Success) -> TaskWithProgress<Success, Failure, ProgressUpdate> {
+    static func detachedWithProgress<ProgressUpdate>(_ progress: ProgressUpdate? = nil, priority: TaskPriority? = nil, do operation: @escaping @Sendable (@escaping TaskProgressUpdateCallback<Success, Failure, ProgressUpdate>) async throws -> Success) -> TaskWithProgress<Success, Failure, ProgressUpdate> {
         let (progressStream, progressContinuation) = TaskProgress<Success, Failure, ProgressUpdate>.makeStream()
         if let progress {
             progressContinuation.yield(.progress(progress))
@@ -144,7 +144,7 @@ extension AnyTask where Failure == Error {
 
 extension AnyTask where Failure == Never {
 
-    static func detachedWithProgress<ProgressUpdate>(_ progress: ProgressUpdate? = nil, completed: UInt? = nil, priority: TaskPriority? = nil, do operation: @escaping @Sendable (TaskProgressUpdateCallback<Success, Failure, ProgressUpdate>) async -> Success) -> TaskWithProgress<Success, Failure, ProgressUpdate> {
+    static func detachedWithProgress<ProgressUpdate>(_ progress: ProgressUpdate? = nil, completed: UInt? = nil, priority: TaskPriority? = nil, do operation: @escaping @Sendable (@escaping TaskProgressUpdateCallback<Success, Failure, ProgressUpdate>) async -> Success) -> TaskWithProgress<Success, Failure, ProgressUpdate> {
         let (progressStream, progressContinuation) = TaskProgress<Success, Failure, ProgressUpdate>.makeStream()
         if let progress {
             progressContinuation.yield(.progress(progress))
