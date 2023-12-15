@@ -248,15 +248,28 @@ struct DataImportView: View {
     }
 
     private var noFailure: String { "No failure" }
+    private var zeroSuccess: String { "Success (0 imported)" }
     private var allFailureReasons: [String?] {
-        [noFailure, nil] + DataImport.ErrorType.allCases.map { $0.rawValue }
+        [noFailure, zeroSuccess, nil] + DataImport.ErrorType.allCases.map { $0.rawValue }
     }
 
     private func failureReasonPicker(for dataType: DataImport.DataType) -> some View {
         Picker(selection: Binding {
-            allFailureReasons.firstIndex(of: model.testImportFailureReasons[dataType]?.rawValue ?? noFailure)!
+            allFailureReasons.firstIndex(where: { failureReason in
+                model.testImportResults[dataType]?.error?.errorType.rawValue == failureReason
+                || (failureReason == zeroSuccess && model.testImportResults[dataType] == .success(.empty))
+                || (failureReason == noFailure && model.testImportResults[dataType] == nil)
+            })!
         } set: { newValue in
-            model.testImportFailureReasons[dataType] = DataImport.ErrorType(rawValue: allFailureReasons[newValue]!)
+            let reason = allFailureReasons[newValue]!
+            switch reason {
+            case noFailure: model.testImportResults[dataType] = nil
+            case zeroSuccess: model.testImportResults[dataType] = .success(.empty)
+            default:
+                let errorType = DataImport.ErrorType(rawValue: reason)!
+                let error = DataImportViewModel.TestImportError(action: dataType.importAction, errorType: errorType)
+                model.testImportResults[dataType] = .failure(error)
+            }
         }) {
             ForEach(allFailureReasons.indices, id: \.self) { idx in
                 if let failureReason = allFailureReasons[idx] {

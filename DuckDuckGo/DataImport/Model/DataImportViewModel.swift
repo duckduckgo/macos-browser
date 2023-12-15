@@ -54,7 +54,8 @@ struct DataImportViewModel {
     private let reportSenderFactory: ReportSenderFactory
 
     private func log(_ message: @autoclosure () -> String) {
-        if OSLog.dataImportExport != .disabled {
+        if NSApp.runType == .unitTests {
+        } else if OSLog.dataImportExport != .disabled {
             os_log(log: .dataImportExport, message())
         } else if NSApp.runType == .xcPreviews {
             print(message())
@@ -110,25 +111,18 @@ struct DataImportViewModel {
 
 #if DEBUG || REVIEW
 
-    enum ImportError: DataImportError {
+    // simulated test import failure
+    struct TestImportError: DataImportError {
         enum OperationType: Int {
             case imp
         }
-
         var type: OperationType { .imp }
-        var action: DataImportAction { .generic }
-        var underlyingError: Error? {
-            if case .err(let err) = self {
-                return err
-            }
-            return nil
-        }
-        var errorType: DataImport.ErrorType { .noData }
-
-        case err(Error)
+        var action: DataImportAction
+        var underlyingError: Error? { CocoaError(.fileReadUnknown) }
+        var errorType: DataImport.ErrorType
     }
 
-    var testImportFailureReasons = [DataType: DataImport.ErrorType]()
+    var testImportResults = [DataType: DataImportResult<DataTypeSummary>]()
 
 #endif
 
@@ -186,29 +180,19 @@ struct DataImportViewModel {
             return
         }
 
-        // simulated test import failures
 #if DEBUG || REVIEW
-        struct TestImportError: DataImportError {
-            enum OperationType: Int {
-                case imp
-            }
-            var type: OperationType { .imp }
-            var action: DataImportAction
-            var underlyingError: Error? { CocoaError(.fileReadUnknown) }
-            var errorType: DataImport.ErrorType
-        }
-
-        guard dataTypes.compactMap({ testImportFailureReasons[$0] }).isEmpty else {
-            importTask = .detachedWithProgress { [testImportFailureReasons] _ in
+        // simulated test import failures
+        guard dataTypes.compactMap({ testImportResults[$0] }).isEmpty else {
+            importTask = .detachedWithProgress { [testImportResults] _ in
                 var result = DataImportSummary()
-                let selectedDataTypesWithoutFailureReasons = dataTypes.intersection(importer.importableTypes).subtracting(testImportFailureReasons.keys)
+                let selectedDataTypesWithoutFailureReasons = dataTypes.intersection(importer.importableTypes).subtracting(testImportResults.keys)
                 var realSummary = DataImportSummary()
                 if !selectedDataTypesWithoutFailureReasons.isEmpty {
                     realSummary = await importer.importData(types: selectedDataTypesWithoutFailureReasons).task.value
                 }
                 for dataType in dataTypes {
-                    if let failureReason = testImportFailureReasons[dataType] {
-                        result[dataType] = .failure(TestImportError(action: .init(dataType), errorType: failureReason))
+                    if let importResult = testImportResults[dataType] {
+                        result[dataType] = importResult
                     } else {
                         result[dataType] = realSummary[dataType]
                     }
@@ -228,24 +212,31 @@ struct DataImportViewModel {
 
         log("merging summary \(summary)")
 
+        // append successful import results first keeping the original DataType sorting order
+        self.summary.append(contentsOf: DataType.allCases.compactMap { dataType in
+            (try? summary[dataType]?.get()).map {
+                .init(dataType, .success($0))
+            }
+        })
+
+        // if there‘s read permission/primary password requested - request it and reinitiate import
         if handleErrors(summary.compactMapValues { $0.error }) { return }
 
         var nextScreen: Screen?
         // merge new import results into the model import summary keeping the original DataType sorting order
         for (dataType, result) in DataType.allCases.compactMap({ dataType in summary[dataType].map { (dataType, $0) } }) {
-            self.summary.append( .init(dataType, result) )
-
             switch result {
             case .success(let dataTypeSummary):
                 // if a data type can‘t be imported (Yandex/Passwords) - switch to its file import displaying successful import results
-                if dataTypeSummary.isEmpty, nextScreen == nil {
+                if dataTypeSummary.isEmpty, !(screen.isFileImport && screen.fileImportDataType == dataType), nextScreen == nil {
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
             case .failure(let error):
-                // show "no data to import" screen when no bookmarks|passwords found
-                if case .noData = error.errorType, screen != .fileImport(dataType: dataType), nextScreen == nil {
-                    nextScreen = .fileImport(dataType: dataType)
-                } else if !(screen.isFileImport && screen.fileImportDataType == dataType), nextScreen == nil {
+                // successful imports are appended above
+                self.summary.append( .init(dataType, result) )
+
+                // show file import screen when import fails or no bookmarks|passwords found
+                if !(screen.isFileImport && screen.fileImportDataType == dataType), nextScreen == nil {
                     // switch to file import of the failed data type displaying successful import results
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
@@ -262,8 +253,12 @@ struct DataImportViewModel {
             log("mergeImportSummary: feedback")
             // after last failed datatype show feedback
             self.screen = .feedback
+        } else if screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: summary.keys.contains)) == nil { // no next data type manual import screen
+            let allKeys = self.summary.reduce(into: Set()) { $0.insert($1.dataType) }
+            log("mergeImportSummary: final summary(\(Set(allKeys)))")
+            self.screen = .summary(allKeys)
         } else {
-            log("mergeImportSummary: summary(\(Set(summary.keys)))")
+            log("mergeImportSummary: final summary(\(Set(summary.keys)))")
             self.screen = .summary(Set(summary.keys))
         }
 
@@ -708,45 +703,6 @@ extension DataImportViewModel {
         } set {
             userReportText = newValue.text
         }
-    }
-
-}
-
-extension DataImportViewModel: CustomStringConvertible {
-
-    var description: String {
-        "DataImportViewModel(importSource: .\(importSource.rawValue), screen: \(screen)\(!summary.isEmpty ? ", summary: \(summary)" : ""))"
-    }
-
-}
-
-extension DataImportViewModel.Screen: CustomStringConvertible {
-
-    var description: String {
-        switch self {
-        case .profileAndDataTypesPicker: ".profileAndDataTypesPicker"
-        case .moreInfo: ".moreInfo"
-        case .getReadPermission(let url): ".getReadPermission(\(fatalError()))" // TODO: getReadPermission
-        case .fileImport(dataType: let dataType, summary: let summaryDataTypes): ".fileImport(dataType: .\(dataType)\(!summaryDataTypes.isEmpty ? ", summary: [\(summaryDataTypes.map { "." + $0.rawValue }.joined(separator: ", "))]" : ""))"
-        case .summary(let dataTypes): ".summary([\(dataTypes.map { "." + $0.rawValue }.joined(separator: ", "))])"
-        case .feedback: ".feedback"
-        }
-    }
-
-}
-
-extension DataImportViewModel.DataTypeImportResult: CustomStringConvertible {
-
-    var description: String {
-        ".init(.\(dataType), \(result))"
-    }
-
-}
-
-extension DataImport.DataTypeSummary: CustomStringConvertible {
-
-    var description: String {
-        ".init(successful: \(successful), duplicate: \(duplicate), failed: \(failed))"
     }
 
 }
