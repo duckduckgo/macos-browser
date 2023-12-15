@@ -39,7 +39,10 @@ struct DataImportSummaryViewModel {
         let dataTypes = dataTypes ?? Set(results.map(\.dataType))
         assert(!dataTypes.isEmpty)
 
-        if dataTypes.count > 1 {
+        if dataTypes.count > 1 || dataTypes.contains(where: { dataType in
+            // always “results” if there‘s a failure
+            results.last(where: { $0.dataType == dataType })?.result.isSuccess == false
+        }) {
             self.summaryKind = .results
 
         } else {
@@ -52,10 +55,6 @@ struct DataImportSummaryViewModel {
         self.results = DataType.allCases.compactMap { dataType in
             dataTypes.contains(dataType) ? results.last(where: { $0.dataType == dataType }) : nil
         }
-    }
-
-    init(source: Source, summary: [DataType: DataImportResult<DataTypeSummary>]) {
-        self.init(source: source, results: summary.reduce(into: [], { $0.append(.init($1.key, $1.value)) }), dataTypes: Set(summary.keys))
     }
 
 }

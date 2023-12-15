@@ -126,12 +126,17 @@ private func failureImage() -> some View {
         .frame(width: 16, height: 16)
 }
 
+#if DEBUG
 #Preview {
     VStack {
         HStack {
-            DataImportSummaryView(model: .init(source: .chrome, summary: [
-                .bookmarks: .success(.init(successful: 123, duplicate: 456, failed: 7890)),
-                .passwords: .success(.init(successful: 123, duplicate: 456, failed: 7890))
+            DataImportSummaryView(model: .init(source: .chrome, results: [
+//                .init(.bookmarks, .success(.init(successful: 123, duplicate: 456, failed: 7890))),
+//                .init(.passwords, .success(.init(successful: 123, duplicate: 456, failed: 7890))),
+//                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .bookmarks, errorType: .dataCorrupted))),
+//                .init(.bookmarks, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
+                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
+                .init(.passwords, .failure(DataImportViewModel.TestImportError(action: .passwords, errorType: .keychainError))),
             ]))
             .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
             Spacer()
@@ -139,3 +144,4 @@ private func failureImage() -> some View {
     }
     .frame(width: 512)
 }
+#endif
