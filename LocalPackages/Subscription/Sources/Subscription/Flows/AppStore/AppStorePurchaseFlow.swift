@@ -37,13 +37,17 @@ public final class AppStorePurchaseFlow {
     }
 
     public static func subscriptionOptions() async -> Result<SubscriptionOptions, AppStorePurchaseFlow.Error> {
+        os_log(.info, log: .subscription, "[AppStorePurchaseFlow] subscriptionOptions")
 
         let products = PurchaseManager.shared.availableProducts
 
         let monthly = products.first(where: { $0.id.contains("1month") })
         let yearly = products.first(where: { $0.id.contains("1year") })
 
-        guard let monthly, let yearly else { return .failure(.noProductsFound) }
+        guard let monthly, let yearly else {
+            os_log(.error, log: .subscription, "[AppStorePurchaseFlow] Error: noProductsFound")
+            return .failure(.noProductsFound)
+        }
 
         let options = [SubscriptionOption(id: monthly.id, cost: .init(displayPrice: monthly.displayPrice, recurrence: "monthly")),
                        SubscriptionOption(id: yearly.id, cost: .init(displayPrice: yearly.displayPrice, recurrence: "yearly"))]
@@ -64,10 +68,10 @@ public final class AppStorePurchaseFlow {
         // Check for past transactions most recent
         switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
         case .success:
-            os_log(.info, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription -> AppStoreRestoreFlow.restoreAccountFromPastPurchase: activeSubscriptionAlreadyPresent")
+            os_log(.info, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription -> restoreAccountFromPastPurchase: activeSubscriptionAlreadyPresent")
             return .failure(.activeSubscriptionAlreadyPresent)
         case .failure(let error):
-            os_log(.info, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription -> AppStoreRestoreFlow.restoreAccountFromPastPurchase: %{public}s", String(reflecting: error))
+            os_log(.info, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription -> restoreAccountFromPastPurchase: %{public}s", String(reflecting: error))
             switch error {
             case .subscriptionExpired(let expiredAccountDetails):
                 externalID = expiredAccountDetails.externalID
@@ -84,7 +88,8 @@ public final class AppStorePurchaseFlow {
                         accountManager.storeAuthToken(token: response.authToken)
                         accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
                     }
-                case .failure:
+                case .failure(let error):
+                    os_log(.error, log: .subscription, "[AppStorePurchaseFlow] createAccount error: %{public}s", String(reflecting: error))
                     return .failure(.accountCreationFailed)
                 }
             }
@@ -95,7 +100,7 @@ public final class AppStorePurchaseFlow {
         case .success:
             return .success(())
         case .failure(let error):
-            os_log(.error, log: .subscription, "[AppStorePurchaseFlow] Error: %{public}s", String(reflecting: error))
+            os_log(.error, log: .subscription, "[AppStorePurchaseFlow] purchaseSubscription error: %{public}s", String(reflecting: error))
             AccountManager().signOut()
             return .failure(.purchaseFailed)
         }
@@ -103,6 +108,7 @@ public final class AppStorePurchaseFlow {
 
     @discardableResult
     public static func completeSubscriptionPurchase() async -> Result<PurchaseUpdate, AppStorePurchaseFlow.Error> {
+        os_log(.info, log: .subscription, "[AppStorePurchaseFlow] completeSubscriptionPurchase")
 
         let result = await checkForEntitlements(wait: 2.0, retry: 10)
 

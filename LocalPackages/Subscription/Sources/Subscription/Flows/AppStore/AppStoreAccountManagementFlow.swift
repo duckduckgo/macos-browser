@@ -18,6 +18,7 @@
 
 import Foundation
 import StoreKit
+import Common
 
 public final class AppStoreAccountManagementFlow {
 
@@ -28,11 +29,13 @@ public final class AppStoreAccountManagementFlow {
 
     @discardableResult
     public static func refreshAuthTokenIfNeeded() async -> Result<String, AppStoreAccountManagementFlow.Error> {
+        os_log(.info, log: .subscription, "[AppStoreAccountManagementFlow] refreshAuthTokenIfNeeded")
+
         var authToken = AccountManager().authToken ?? ""
 
         // Check if auth token if still valid
-        if case let .failure(error) = await AuthService.validateToken(accessToken: authToken) {
-            print(error)
+        if case let .failure(validateTokenError) = await AuthService.validateToken(accessToken: authToken) {
+            os_log(.error, log: .subscription, "[AppStoreAccountManagementFlow] validateToken error: %{public}s", String(reflecting: validateTokenError))
 
             if #available(macOS 12.0, iOS 15.0, *) {
                 // In case of invalid token attempt store based authentication to obtain a new one
@@ -44,7 +47,8 @@ public final class AppStoreAccountManagementFlow {
                         authToken = response.authToken
                         AccountManager().storeAuthToken(token: authToken)
                     }
-                case .failure:
+                case .failure(let storeLoginError):
+                    os_log(.error, log: .subscription, "[AppStoreAccountManagementFlow] storeLogin error: %{public}s", String(reflecting: storeLoginError))
                     return .failure(.authenticatingWithTransactionFailed)
                 }
             }

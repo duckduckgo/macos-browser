@@ -262,8 +262,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 
     func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        print(">>> Selected to activate a subscription -- show the activation settings screen")
-
         let message = original
 
         Task { @MainActor in
@@ -320,12 +318,13 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         }
 
         print(">>> Selected a feature -- show the corresponding UI", featureSelection)
+
+        // TODO: implement selection
+
         return nil
     }
 
     func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        print(">>> completeStripePayment")
-
         let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
         let progressViewController = await ProgressViewController(title: "Completing purchase...")
 
@@ -349,8 +348,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
         let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
-
-        print(">>> Pushing into WebView:", method.rawValue, String(describing: params))
         broker.push(method: method.rawValue, params: params, for: self, into: webView)
     }
 }

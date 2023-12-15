@@ -18,6 +18,7 @@
 
 import Foundation
 import StoreKit
+import Common
 
 @available(macOS 12.0, iOS 15.0, *)
 public final class AppStoreRestoreFlow {
@@ -35,7 +36,12 @@ public final class AppStoreRestoreFlow {
     }
 
     public static func restoreAccountFromPastPurchase() async -> Result<Void, AppStoreRestoreFlow.Error> {
-        guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return .failure(.missingAccountOrTransactions) }
+        os_log(.info, log: .subscription, "[AppStoreRestoreFlow] restoreAccountFromPastPurchase")
+
+        guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else {
+            os_log(.error, log: .subscription, "[AppStoreRestoreFlow] Error: missingAccountOrTransactions")
+            return .failure(.missingAccountOrTransactions)
+        }
 
         let accountManager = AccountManager()
 
@@ -46,6 +52,7 @@ public final class AppStoreRestoreFlow {
         case .success(let response):
             authToken = response.authToken
         case .failure:
+            os_log(.error, log: .subscription, "[AppStoreRestoreFlow] Error: pastTransactionAuthenticationError")
             return .failure(.pastTransactionAuthenticationError)
         }
 
@@ -57,6 +64,7 @@ public final class AppStoreRestoreFlow {
         case .success(let exchangedAccessToken):
             accessToken = exchangedAccessToken
         case .failure:
+            os_log(.error, log: .subscription, "[AppStoreRestoreFlow] Error: failedToObtainAccessToken")
             return .failure(.failedToObtainAccessToken)
         }
 
@@ -65,6 +73,7 @@ public final class AppStoreRestoreFlow {
             email = accountDetails.email
             externalID = accountDetails.externalID
         case .failure:
+            os_log(.error, log: .subscription, "[AppStoreRestoreFlow] Error: failedToFetchAccountDetails")
             return .failure(.failedToFetchAccountDetails)
         }
 
@@ -74,6 +83,7 @@ public final class AppStoreRestoreFlow {
         case .success(let response):
             isSubscriptionActive = response.isSubscriptionActive
         case .failure:
+            os_log(.error, log: .subscription, "[AppStoreRestoreFlow] Error: failedToFetchSubscriptionDetails")
             return .failure(.failedToFetchSubscriptionDetails)
         }
 
@@ -83,6 +93,7 @@ public final class AppStoreRestoreFlow {
             return .success(())
         } else {
             let details = RestoredAccountDetails(authToken: authToken, accessToken: accessToken, externalID: externalID, email: email)
+            os_log(.error, log: .subscription, "[AppStoreRestoreFlow] Error: subscriptionExpired")
             return .failure(.subscriptionExpired(accountDetails: details))
         }
     }

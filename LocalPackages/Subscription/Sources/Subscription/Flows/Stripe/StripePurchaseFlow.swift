@@ -18,6 +18,7 @@
 
 import Foundation
 import StoreKit
+import Common
 
 public final class StripePurchaseFlow {
 
@@ -27,8 +28,12 @@ public final class StripePurchaseFlow {
     }
 
     public static func subscriptionOptions() async -> Result<SubscriptionOptions, StripePurchaseFlow.Error> {
+        os_log(.info, log: .subscription, "[StripePurchaseFlow] subscriptionOptions")
 
-        guard case let .success(products) = await SubscriptionService.getProducts(), !products.isEmpty else { return .failure(.noProductsFound) }
+        guard case let .success(products) = await SubscriptionService.getProducts(), !products.isEmpty else { 
+            os_log(.error, log: .subscription, "[StripePurchaseFlow] Error: noProductsFound")
+            return .failure(.noProductsFound)
+        }
 
         let currency = products.first?.currency ?? "USD"
 
@@ -57,6 +62,7 @@ public final class StripePurchaseFlow {
     }
 
     public static func prepareSubscriptionPurchase(emailAccessToken: String?) async -> Result<PurchaseUpdate, StripePurchaseFlow.Error> {
+        os_log(.info, log: .subscription, "[StripePurchaseFlow] prepareSubscriptionPurchase")
 
         var authToken: String = ""
 
@@ -65,6 +71,7 @@ public final class StripePurchaseFlow {
             authToken = response.authToken
             AccountManager().storeAuthToken(token: authToken)
         case .failure:
+            os_log(.error, log: .subscription, "[StripePurchaseFlow] Error: accountCreationFailed")
             return .failure(.accountCreationFailed)
         }
 
@@ -72,11 +79,11 @@ public final class StripePurchaseFlow {
     }
 
     public static func completeSubscriptionPurchase() async {
+        os_log(.info, log: .subscription, "[StripePurchaseFlow] completeSubscriptionPurchase")
+
         let accountManager = AccountManager()
 
         if let authToken = accountManager.authToken {
-            print("Exchanging token")
-
             if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
                case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
                 accountManager.storeAuthToken(token: authToken)

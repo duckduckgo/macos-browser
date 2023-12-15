@@ -18,10 +18,6 @@
 
 import Foundation
 
-protocol PurchaseFlow {
-
-}
-
 public struct SubscriptionOptions: Encodable {
     let platform: String
     let options: [SubscriptionOption]
