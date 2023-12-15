@@ -313,7 +313,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 includeAppVersionParameter: true
             )
 
-            // Re-throw the error so that the caller knows something failed:
             throw error
         }
 
