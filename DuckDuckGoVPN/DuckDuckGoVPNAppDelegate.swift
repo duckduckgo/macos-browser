@@ -133,7 +133,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             OnboardingStatus(rawValue: rawValue) ?? .default
         }.eraseToAnyPublisher()
 
+        let model = StatusBarMenuModel(vpnSettings: .init(defaults: .netP))
+
         return StatusBarMenu(
+            model: model,
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
             controller: tunnelController,
