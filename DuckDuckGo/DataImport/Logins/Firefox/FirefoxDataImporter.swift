@@ -72,7 +72,7 @@ internal class FirefoxDataImporter: DataImporter {
             let loginsSummary = try loginResult.flatMap { logins in
                 do {
                     return try .success(loginImporter.importLogins(logins) { count in
-                        try updateProgress(.importingPasswords(numberOfPasswords: count, 
+                        try updateProgress(.importingPasswords(numberOfPasswords: count,
                                                                fraction: dataTypeFraction * (0.5 + 0.5 * Double(count) / Double(logins.count))))
                     })
                 } catch is CancellationError {

@@ -74,7 +74,7 @@ internal class ChromiumDataImporter: DataImporter {
             let loginsSummary = try loginResult.flatMap { logins in
                 do {
                     return try .success(loginImporter.importLogins(logins) { count in
-                        try updateProgress(.importingPasswords(numberOfPasswords: count, 
+                        try updateProgress(.importingPasswords(numberOfPasswords: count,
                                                                fraction: dataTypeFraction * (0.5 + Double(count) / Double(logins.count))))
                     })
                 } catch is CancellationError {
@@ -112,7 +112,7 @@ internal class ChromiumDataImporter: DataImporter {
 
             summary[.bookmarks] = bookmarksSummary.map { .init($0) }
 
-            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks, 
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
                                                    fraction: passwordsFraction + dataTypeFraction * 1.0))
         }
 
