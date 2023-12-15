@@ -278,7 +278,9 @@ import XCTest
     }
 
     func testWhenImportSourceChanges_selectedDataTypesAreReset() {
-        model = DataImportViewModel(importSource: .safari)
+        setupModel(with: .safari, profiles: [BrowserProfile.test]) { _, _, _, _ in
+            ImporterMock(importableTypes: [.passwords, .bookmarks], keychainPasswordRequiredFor: [.passwords])
+        }
 
         model.setDataType(.bookmarks, selected: false)
         model.setDataType(.passwords, selected: false)
