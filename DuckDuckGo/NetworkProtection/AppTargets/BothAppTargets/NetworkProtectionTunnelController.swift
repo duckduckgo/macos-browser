@@ -291,8 +291,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
         do {
-            try await networkExtensionController.activateSystemExtension(
-                waitingForUserApproval: waitingForUserApproval)
+            try await networkExtensionController.activateSystemExtension(waitingForUserApproval: waitingForUserApproval)
         } catch {
             switch error {
             case OSSystemExtensionError.requestSuperseded:
@@ -301,16 +300,18 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case SystemExtensionRequestError.unknownRequestResult:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
-
-                PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionSystemExtensionUnknownActivationResult,
-                    frequency: .standard,
-                    includeAppVersionParameter: true)
             case SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
             default:
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
+
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
+                frequency: .standard,
+                withError: error,
+                includeAppVersionParameter: true
+            )
 
             // Re-throw the error so that the caller knows something failed:
             throw error
@@ -395,6 +396,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 try await start(tunnelManager)
             }
         } catch {
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionStartFailed, frequency: .standard, withError: error, includeAppVersionParameter: true
+            )
+
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
         }
