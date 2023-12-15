@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "sam/update-connection-waiter",
-        "revision" : "4d6229613cd8c0fa1f2ba219b4a63133f58e5d11"
+        "revision" : "e4f4ae624174c1398d345cfc387db38f8f69986d",
+        "version" : "94.0.0"
       }
     },
     {
