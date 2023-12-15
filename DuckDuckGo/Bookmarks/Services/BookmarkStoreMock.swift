@@ -16,13 +16,35 @@
 //  limitations under the License.
 //
 
+#if DEBUG
+
 import Bookmarks
 import Foundation
 
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
+public final class BookmarkStoreMock: BookmarkStore {
 
-final class BookmarkStoreMock: BookmarkStore {
+    init(loadAllCalled: Bool = false, bookmarks: [BaseBookmarkEntity]? = nil, loadError: Error? = nil, saveBookmarkCalled: Bool = false, saveBookmarkSuccess: Bool = true, saveBookmarkError: Error? = nil, saveFolderCalled: Bool = false, saveFolderSuccess: Bool = true, saveFolderError: Error? = nil, removeCalled: Bool = false, removeSuccess: Bool = true, removeError: Error? = nil, updateBookmarkCalled: Bool = false, updateFolderCalled: Bool = false, addChildCalled: Bool = false, updateObjectsCalled: Bool = false, importBookmarksCalled: Bool = false, canMoveObjectWithUUIDCalled: Bool = false, moveObjectUUIDCalled: Bool = false, updateFavoriteIndexCalled: Bool = false) {
+        self.loadAllCalled = loadAllCalled
+        self.bookmarks = bookmarks
+        self.loadError = loadError
+        self.saveBookmarkCalled = saveBookmarkCalled
+        self.saveBookmarkSuccess = saveBookmarkSuccess
+        self.saveBookmarkError = saveBookmarkError
+        self.saveFolderCalled = saveFolderCalled
+        self.saveFolderSuccess = saveFolderSuccess
+        self.saveFolderError = saveFolderError
+        self.removeCalled = removeCalled
+        self.removeSuccess = removeSuccess
+        self.removeError = removeError
+        self.updateBookmarkCalled = updateBookmarkCalled
+        self.updateFolderCalled = updateFolderCalled
+        self.addChildCalled = addChildCalled
+        self.updateObjectsCalled = updateObjectsCalled
+        self.importBookmarksCalled = importBookmarksCalled
+        self.canMoveObjectWithUUIDCalled = canMoveObjectWithUUIDCalled
+        self.moveObjectUUIDCalled = moveObjectUUIDCalled
+        self.updateFavoriteIndexCalled = updateFavoriteIndexCalled
+    }
 
     var loadAllCalled = false
     var bookmarks: [BaseBookmarkEntity]?
@@ -112,3 +134,5 @@ final class BookmarkStoreMock: BookmarkStore {
     func applyFavoritesDisplayMode(_ configuration: FavoritesDisplayMode) {}
     func handleFavoritesAfterDisablingSync() {}
 }
+
+#endif
