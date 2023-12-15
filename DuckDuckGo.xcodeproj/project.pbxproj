@@ -2714,6 +2714,7 @@
 		B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */; };
 		B6656E0D2B29C733008798A1 /* FileImportViewLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6656E0C2B29C733008798A1 /* FileImportViewLocalizationTests.swift */; };
 		B6656E0E2B29C733008798A1 /* FileImportViewLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6656E0C2B29C733008798A1 /* FileImportViewLocalizationTests.swift */; };
+		B6656E5B2B2ADB1C008798A1 /* RequestFilePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */; };
 		B6676BE12AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6676BE22AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B687B7CB2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift */; };
@@ -2850,7 +2851,6 @@
 		B6B5F5822B024105008DB58A /* DataImportSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F57E2B024105008DB58A /* DataImportSummaryView.swift */; };
 		B6B5F5842B03580A008DB58A /* RequestFilePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */; };
 		B6B5F5852B03580A008DB58A /* RequestFilePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */; };
-		B6B5F5872B03580A008DB58A /* RequestFilePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */; };
 		B6B5F5892B03673B008DB58A /* BrowserImportMoreInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5882B03673B008DB58A /* BrowserImportMoreInfoView.swift */; };
 		B6B5F58A2B03673B008DB58A /* BrowserImportMoreInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5882B03673B008DB58A /* BrowserImportMoreInfoView.swift */; };
 		B6B5F58C2B03673B008DB58A /* BrowserImportMoreInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5882B03673B008DB58A /* BrowserImportMoreInfoView.swift */; };
@@ -10541,6 +10541,7 @@
 				4B957A5A2AC7AE700062CA31 /* CSVParser.swift in Sources */,
 				4B957A5B2AC7AE700062CA31 /* PixelDataModel.xcdatamodeld in Sources */,
 				4B957A5C2AC7AE700062CA31 /* PrivacyDashboardWebView.swift in Sources */,
+				B6656E5B2B2ADB1C008798A1 /* RequestFilePermissionView.swift in Sources */,
 				4B957A5D2AC7AE700062CA31 /* AppearancePreferences.swift in Sources */,
 				4B957A5E2AC7AE700062CA31 /* DownloadListCoordinator.swift in Sources */,
 				4B957A5F2AC7AE700062CA31 /* AdClickAttributionTabExtension.swift in Sources */,
