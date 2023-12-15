@@ -120,14 +120,12 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace] isGranted in
             if isGranted {
                 workspace.open(externalUrl)
-
                 // if "Always allow" is set and this is the only navigation in the tab: close the tab
-                if self?.shouldCloseTabOnExternalAppOpen == true, let webView = navigationAction.targetFrame?.webView {
+                if self.shouldCloseTabOnExternalAppOpen == true, let webView = navigationAction.targetFrame?.webView {
                     webView.close()
                 }
             }
         }
-
         return .cancel
     }
 
