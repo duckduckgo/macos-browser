@@ -19,6 +19,8 @@
 import Combine
 import Foundation
 import DataBrokerProtection
+import PixelKit
+import Common
 
 /// Manages the IPC service for the Agent app
 ///
@@ -28,13 +30,16 @@ import DataBrokerProtection
 final class IPCServiceManager {
     private let ipcServer: DataBrokerProtectionIPCServer
     private let scheduler: DataBrokerProtectionScheduler
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private var cancellables = Set<AnyCancellable>()
 
     init(ipcServer: DataBrokerProtectionIPCServer = .init(machServiceName: Bundle.main.bundleIdentifier!),
-         scheduler: DataBrokerProtectionScheduler) {
+         scheduler: DataBrokerProtectionScheduler,
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
 
         self.ipcServer = ipcServer
         self.scheduler = scheduler
+        self.pixelHandler = pixelHandler
 
         ipcServer.serverDelegate = self
         ipcServer.activate()
@@ -53,31 +58,48 @@ final class IPCServiceManager {
 extension IPCServiceManager: IPCServerInterface {
 
     func register() {
+        pixelHandler.fire(.ipcServerRegister)
+
         // When a new client registers, send the last known status
         ipcServer.schedulerStatusChanges(scheduler.status)
     }
 
     func startScheduler(showWebView: Bool) {
+        pixelHandler.fire(.ipcServerStartScheduler)
         scheduler.startScheduler(showWebView: showWebView)
     }
 
     func stopScheduler() {
+        pixelHandler.fire(.ipcServerStopScheduler)
         scheduler.stopScheduler()
     }
 
     func optOutAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
-        scheduler.optOutAllBrokers(showWebView: showWebView, completion: completion)
+        pixelHandler.fire(.ipcServerOptOutAllBrokers)
+        scheduler.optOutAllBrokers(showWebView: showWebView) { error in
+            self.pixelHandler.fire(.ipcServerOptOutAllBrokersCompletion(error: error))
+            completion(error)
+        }
     }
 
     func scanAllBrokers(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
-        scheduler.scanAllBrokers(showWebView: showWebView, completion: completion)
+        pixelHandler.fire(.ipcServerScanAllBrokers)
+        scheduler.scanAllBrokers(showWebView: showWebView) { error in
+            self.pixelHandler.fire(.ipcServerScanAllBrokersCompletion(error: error))
+            completion(error)
+        }
     }
 
     func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void)) {
-        scheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
+        pixelHandler.fire(.ipcServerRunQueuedOperations)
+        scheduler.runQueuedOperations(showWebView: showWebView) { error in
+            self.pixelHandler.fire(.ipcServerRunQueuedOperationsCompletion(error: error))
+            completion(error)
+        }
     }
 
     func runAllOperations(showWebView: Bool) {
+        pixelHandler.fire(.ipcServerRunAllOperations)
         scheduler.runAllOperations(showWebView: showWebView)
     }
 }

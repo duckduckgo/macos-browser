@@ -30,7 +30,7 @@ import NetworkProtectionUI
 final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
     private let networkProtectionStatusReporter: NetworkProtectionStatusReporter
-    private var status: NetworkProtection.ConnectionStatus = .disconnected
+    private var status: NetworkProtection.ConnectionStatus = .default
     private let popoverManager: NetworkProtectionNavBarPopoverManager
     private let waitlistActivationDateStore: DefaultWaitlistActivationDateStore
 
@@ -87,7 +87,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 statusObserver: ipcClient.connectionStatusObserver,
                 serverInfoObserver: ipcClient.serverInfoObserver,
                 connectionErrorObserver: ipcClient.connectionErrorObserver,
-                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)

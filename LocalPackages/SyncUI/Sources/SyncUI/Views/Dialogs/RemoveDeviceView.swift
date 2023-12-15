@@ -33,11 +33,8 @@ struct RemoveDeviceView: View {
         SyncDialog(spacing: 20.0) {
 
             Image(removeImageName)
-            Text(UserText.removeDeviceConfirmTitle)
-                .font(.system(size: 17, weight: .bold))
-            Text(UserText.removeDeviceConfirmMessage(device.name))
-                .multilineTextAlignment(.center)
-                .font(.system(size: 13))
+            SyncUIViews.TextHeader(text: UserText.removeDeviceConfirmTitle)
+            SyncUIViews.TextDetailMultiline(text: UserText.removeDeviceConfirmMessage(device.name))
 
         } buttons: {
 

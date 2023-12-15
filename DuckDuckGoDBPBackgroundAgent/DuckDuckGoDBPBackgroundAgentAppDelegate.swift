@@ -22,6 +22,8 @@ import Common
 import ServiceManagement
 import DataBrokerProtection
 import BrowserServicesKit
+import PixelKit
+import Networking
 
 @objc(Application)
 final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
@@ -30,9 +32,36 @@ final class DuckDuckGoDBPBackgroundAgentApplication: NSApplication {
     override init() {
         os_log(.error, log: .dbpBackgroundAgent, "🟢 DBP background Agent starting: %{public}d", NSRunningApplication.current.processIdentifier)
 
+        let dryRun: Bool
+#if DEBUG
+        dryRun = true
+#else
+        dryRun = false
+#endif
+
+        PixelKit.setUp(dryRun: dryRun,
+                       appVersion: AppVersion.shared.versionNumber,
+                       defaultHeaders: [:],
+                       log: .dbpBackgroundAgentPixel,
+                       defaults: .standard) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Bool, Error?) -> Void) in
+
+            let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers) // workaround - Pixel class should really handle APIRequest.Headers by itself
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+            let request = APIRequest(configuration: configuration)
+
+            request.fetch { _, error in
+                onComplete(true, error)
+            }
+        }
+
+        let pixelHandler = DataBrokerProtectionPixelsHandler()
+        pixelHandler.fire(.backgroundAgentStarted)
+
         // prevent agent from running twice
         if let anotherInstance = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier!).first(where: { $0 != .current }) {
             os_log(.error, log: .dbpBackgroundAgent, "🔴 Stopping: another instance is running: %{public}d.", anotherInstance.processIdentifier)
+            pixelHandler.fire(.backgroundAgentStartedStoppingDueToAnotherInstanceRunning)
             exit(0)
         }
 

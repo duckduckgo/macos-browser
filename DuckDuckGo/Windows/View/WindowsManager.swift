@@ -106,8 +106,8 @@ final class WindowsManager {
                              popUp: popUp)
     }
 
-    class func openNewWindow(with initialUrl: URL, isBurner: Bool, parentTab: Tab? = nil) {
-        openNewWindow(with: Tab(content: .contentFromURL(initialUrl), parentTab: parentTab, shouldLoadInBackground: true, burnerMode: BurnerMode(isBurner: isBurner)))
+    class func openNewWindow(with initialUrl: URL, source: Tab.TabContent.URLSource, isBurner: Bool, parentTab: Tab? = nil) {
+        openNewWindow(with: Tab(content: .contentFromURL(initialUrl, source: source), parentTab: parentTab, shouldLoadInBackground: true, burnerMode: BurnerMode(isBurner: isBurner)))
     }
 
     class func openNewWindow(with tabCollection: TabCollection, isBurner: Bool, droppingPoint: NSPoint? = nil, contentSize: NSSize? = nil, popUp: Bool = false) {
@@ -123,7 +123,6 @@ final class WindowsManager {
 
     private static let defaultPopUpWidth: CGFloat = 1024
     private static let defaultPopUpHeight: CGFloat = 752
-    private static let fallbackHeadlessScreenFrame = NSRect(x: 0, y: 100, width: 1280, height: 900)
 
     class func openPopUpWindow(with tab: Tab, origin: NSPoint?, contentSize: NSSize?) {
         if let mainWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
@@ -133,7 +132,7 @@ final class WindowsManager {
             mainWindowController.mainViewController.tabCollectionViewModel.insert(tab, selected: true)
 
         } else {
-            let screenFrame = (self.findPositioningSourceWindow(for: tab)?.screen ?? .main)?.visibleFrame ?? Self.fallbackHeadlessScreenFrame
+            let screenFrame = (self.findPositioningSourceWindow(for: tab)?.screen ?? .main)?.visibleFrame ?? NSScreen.fallbackHeadlessScreenFrame
 
             // limit popUp content size to screen visible frame
             // fallback to default if nil or zero
@@ -159,23 +158,7 @@ final class WindowsManager {
                                      contentSize: NSSize? = nil,
                                      popUp: Bool = false,
                                      burnerMode: BurnerMode) -> MainWindowController {
-        let mainViewController: MainViewController
-        do {
-            mainViewController = try NSException.catch {
-                NSStoryboard(name: "Main", bundle: .main)
-                    .instantiateController(identifier: .mainViewController) { coder -> MainViewController? in
-                        let model = tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode)
-                        assert(model.burnerMode == burnerMode)
-                        return MainViewController(coder: coder, tabCollectionViewModel: model)
-                    }
-            }
-        } catch {
-#if DEBUG
-            fatalError("WindowsManager.makeNewWindow: \(error)")
-#else
-            fatalError("WindowsManager.makeNewWindow: the App Bundle seems to be removed")
-#endif
-        }
+        let mainViewController = MainViewController(tabCollectionViewModel: tabCollectionViewModel ?? TabCollectionViewModel(burnerMode: burnerMode))
 
         var contentSize = contentSize ?? NSSize(width: 1024, height: 790)
         contentSize.width = min(NSScreen.main?.frame.size.width ?? 1024, max(contentSize.width, 300))

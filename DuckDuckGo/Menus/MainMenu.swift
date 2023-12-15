@@ -570,7 +570,7 @@ import Subscription
             NSMenuItem(title: "User Scripts") {
                 NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
             }
-            NSMenuItem(title: "Sync")
+            NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
 
 #if DBP

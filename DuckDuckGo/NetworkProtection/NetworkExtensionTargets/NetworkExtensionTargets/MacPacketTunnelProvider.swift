@@ -132,17 +132,64 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private static var packetTunnelProviderEvents: EventMapping<PacketTunnelProvider.Event> = .init { event, _, _, _ in
 
+#if NETP_SYSTEM_EXTENSION
+        let settings = VPNSettings(defaults: .standard)
+#else
+        let settings = VPNSettings(defaults: .netP)
+#endif
+
         switch event {
         case .userBecameActive:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionActiveUser,
                 frequency: .dailyOnly,
+                withAdditionalParameters: ["cohort": PixelKit.dateString(for: settings.vpnFirstEnabled)],
                 includeAppVersionParameter: true)
-        case .reportLatency(ms: let ms, server: let server, networkType: let networkType):
-            PixelKit.fire(
-                NetworkProtectionPixelEvent.networkProtectionLatency(ms: ms, server: server, networkType: networkType),
-                frequency: .standard,
-                includeAppVersionParameter: true)
+        case .reportConnectionAttempt(attempt: let attempt):
+            switch attempt {
+            case .connecting:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionEnableAttemptConnecting,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .success:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionEnableAttemptSuccess,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failure:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionEnableAttemptFailure,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .reportTunnelFailure(result: let result):
+            switch result {
+            case .failureDetected:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelFailureDetected,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            case .failureRecovered:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionTunnelFailureRecovered,
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
+        case .reportLatency(let result):
+            switch result {
+            case .error:
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionLatencyError,
+                    frequency: .dailyOnly,
+                    includeAppVersionParameter: true)
+            case .quality(let quality):
+                guard quality != .unknown else { return }
+                PixelKit.fire(
+                    NetworkProtectionPixelEvent.networkProtectionLatency(quality: quality),
+                    frequency: .dailyAndContinuous,
+                    includeAppVersionParameter: true)
+            }
         case .rekeyCompleted:
             PixelKit.fire(
                 NetworkProtectionPixelEvent.networkProtectionRekeyCompleted,
@@ -167,7 +214,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 #if NETP_SYSTEM_EXTENSION
         let settings = VPNSettings(defaults: .standard)
 #else
-        let settings = VPNSettings(defaults: .shared)
+        let settings = VPNSettings(defaults: .netP)
 #endif
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
@@ -255,7 +302,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             return
         }
 
-        let serverStatusInfo = NetworkProtectionStatusServerInfo(serverLocation: serverInfo.serverLocation, serverAddress: serverInfo.endpoint?.description)
+        let serverStatusInfo = NetworkProtectionStatusServerInfo(
+            serverLocation: serverInfo.serverLocation,
+            serverAddress: serverInfo.endpoint?.host.hostWithoutPort
+        )
         let payload = ServerSelectedNotificationObjectEncoder().encode(serverStatusInfo)
 
         notificationCenter.post(.serverSelected, object: payload)
@@ -266,6 +316,13 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     enum ConfigurationError: Error {
         case missingProviderConfiguration
         case missingPixelHeaders
+    }
+
+    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
+        super.prepareToConnect(using: provider)
+
+        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
+        try? loadDefaultPixelHeaders(from: options)
     }
 
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
@@ -325,7 +382,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
                        defaultHeaders: defaultHeaders,
-                       log: .networkProtectionPixel) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping (Error?) -> Void) in
+                       log: .networkProtectionPixel,
+                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
 
             let url = URL.pixelUrl(forPixelNamed: pixelName)
             let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
@@ -333,7 +391,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
             let request = APIRequest(configuration: configuration)
 
             request.fetch { _, error in
-                onComplete(error)
+                onComplete(error == nil, error)
             }
         }
     }

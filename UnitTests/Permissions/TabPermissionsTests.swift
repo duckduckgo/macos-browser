@@ -77,7 +77,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -105,7 +105,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried = try await authQueryPromise.value
         let resultUrl = try await workspaceOpenCalledPromise.value
@@ -137,7 +137,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried2 = try await authQueryPromise2.value
         let resultUrl2 = try await workspaceOpenCalledPromise2.value
@@ -158,7 +158,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -186,7 +186,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried = try await authQueryPromise.value
         let resultUrl = try await workspaceOpenCalledPromise.value
@@ -212,7 +212,7 @@ final class TabPermissionsTests: XCTestCase {
         }
 
         let externalUrl2 = URL(string: "testextapp://openapp2?arg=2")!
-        tab.setUrl(externalUrl2, userEntered: nil)
+        tab.setUrl(externalUrl2, source: .link)
 
         let resultUrl2 = try await workspaceOpenCalledPromise2.value
         XCTAssertEqual(resultUrl2, externalUrl2)
@@ -256,7 +256,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: externalUrl.absoluteString)
+        tab.setUrl(externalUrl, source: .userEntered(externalUrl.absoluteString))
 
         let queried = try await authQueryPromise.value
         let resultUrl = try await workspaceOpenCalledPromise.value
@@ -277,7 +277,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = Bundle.main.bundleURL
 
@@ -301,7 +301,7 @@ final class TabPermissionsTests: XCTestCase {
             }
         }.timeout(1).first().promise()
 
-        tab.setUrl(externalUrl, userEntered: nil)
+        tab.setUrl(externalUrl, source: .link)
 
         let queried = try await authQueryPromise.value
 
@@ -321,7 +321,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = nil
 
@@ -337,7 +337,7 @@ final class TabPermissionsTests: XCTestCase {
             XCTFail("Unexpected permissions query \(query)")
         }
 
-        let result = await tab.setUrl(externalUrl, userEntered: nil)?.result
+        let result = await tab.setUrl(externalUrl, source: .link)?.result
 
         guard case .failure(let error) = result else {
             XCTFail("unexpected result \(String(describing: result))")
@@ -359,7 +359,7 @@ final class TabPermissionsTests: XCTestCase {
             return .ok(.html(""))
         }]
 
-        _=await tab.setUrl(urls.url, userEntered: nil)?.result
+        _=await tab.setUrl(urls.url, source: .link)?.result
 
         workspace.appUrl = nil
 
@@ -375,7 +375,7 @@ final class TabPermissionsTests: XCTestCase {
             XCTFail("Unexpected permissions query \(query)")
         }
 
-        let result = await tab.setUrl(externalUrl, userEntered: externalUrl.absoluteString)?.result
+        let result = await tab.setUrl(externalUrl, source: .userEntered(externalUrl.absoluteString))?.result
 
         guard case .failure(let error) = result,
               let error = error as? DidCancelError,
@@ -385,7 +385,7 @@ final class TabPermissionsTests: XCTestCase {
         }
 
         _=await navigation.result
-        XCTAssertEqual(tab.content, .contentFromURL(URL.makeSearchUrl(from: externalUrl.absoluteString), userEntered: nil))
+        XCTAssertEqual(tab.content, .contentFromURL(URL.makeSearchUrl(from: externalUrl.absoluteString), source: .webViewUpdated))
 
         withExtendedLifetime(c) {}
     }
@@ -414,7 +414,7 @@ final class TabPermissionsTests: XCTestCase {
         eDidCancel = expectation(description: "didCancel external app should be called")
 
         // shouldn‘t open external app when restoring session from interaction state
-        let tab = Tab(content: .url(externalUrl), webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true, shouldLoadFromCache: true)
+        let tab = Tab(content: .url(externalUrl, source: .stateRestoration), webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         var c = tab.permissions.$authorizationQuery.sink { query in
             guard let query else { return }

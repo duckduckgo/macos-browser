@@ -22,6 +22,7 @@ import AppKit
 import Common
 import SwiftUI
 import BrowserServicesKit
+import PixelKit
 
 public extension Notification.Name {
     static let dbpDidClose = Notification.Name("com.duckduckgo.DBP.DBPDidClose")
@@ -54,8 +55,9 @@ final class DBPHomeViewController: NSViewController {
             dataManager: dataBrokerProtectionManager.dataManager,
             privacyConfig: privacyConfigurationManager,
             prefs: prefs,
+            webUISettings: DataBrokerProtectionWebUIURLSettings(.dbp),
             openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .link, newTab: true)
             })
     }()
 
@@ -136,6 +138,11 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
             switch event {
             case .error(let error, _):
                 Pixel.fire(.debug(event: .pixelKitEvent(event), error: error))
+            case .ipcServerOptOutAllBrokersCompletion(error: let error),
+                    .ipcServerScanAllBrokersCompletion(error: let error),
+                    .ipcServerRunQueuedOperationsCompletion(error: let error):
+                // We can't use .debug directly because it modifies the pixel name and clobbers the params
+                Pixel.fire(.pixelKitEvent(DebugEvent(event, error: error)))
             case .parentChildMatches,
                     .optOutStart,
                     .optOutEmailGenerate,
@@ -149,7 +156,26 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .optOutFinish,
                     .optOutSubmitSuccess,
                     .optOutSuccess,
-                    .optOutFailure:
+                    .optOutFailure,
+                    .backgroundAgentStarted,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossible,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile,
+                    .backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler,
+                    .backgroundAgentStartedStoppingDueToAnotherInstanceRunning,
+                    .ipcServerRegister,
+                    .ipcServerStartScheduler,
+                    .ipcServerStopScheduler,
+                    .ipcServerOptOutAllBrokers,
+                    .ipcServerScanAllBrokers,
+                    .ipcServerRunQueuedOperations,
+                    .ipcServerRunAllOperations,
+                    .enableLoginItem,
+                    .restartLoginItem,
+                    .disableLoginItem,
+                    .resetLoginItem,
+                    .scanSuccess,
+                    .scanFailed,
+                    .scanError:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

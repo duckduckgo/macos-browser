@@ -23,6 +23,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
+        // Errors
         VStack(alignment: .leading, spacing: 16) {
             if model.isSyncBookmarksPaused {
                 syncPaused(for: .bookmarks)
@@ -31,14 +32,15 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 syncPaused(for: .credentials)
             }
         }
-        .padding(.top, 20)
 
+        // Sync Enabled
         PreferencePaneSection(vericalPadding: 12) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
                 .frame(width: 513, alignment: .topLeading)
         }
 
+        // Synced Devices
         PreferencePaneSection(vericalPadding: 12) {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
@@ -48,27 +50,38 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
-            Text(UserText.syncNewDevice)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
-            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.recoveryCode ?? "")
-                .environmentObject(model)
-        }
-
+        // Options
         PreferencePaneSection(vericalPadding: 12) {
             Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
+            Toggle(isOn: $model.isFaviconsFetchingEnabled) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(UserText.fetchFaviconsOptionTitle)
+                        Text(UserText.fetchFaviconsOptionCaption)
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("BlackWhite60"))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.leading)
+                    }
+                    Spacer(minLength: 30)
+                }
+            }
+            .padding(.horizontal, 16)
+            .toggleStyle(.switch)
+            .padding(.vertical, 12)
+            .roundedBorder()
+            .frame(width: 513, alignment: .topLeading)
             Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                 HStack {
-                    IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
                     VStack(alignment: .leading, spacing: 8) {
                         Text(UserText.shareFavoritesOptionTitle)
-                            .font(Const.Fonts.preferencePaneOptionTitle)
                         Text(UserText.shareFavoritesOptionCaption)
                             .font(Const.Fonts.preferencePaneCaption)
                             .foregroundColor(Color("BlackWhite60"))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.leading)
                     }
                     Spacer(minLength: 30)
                 }
@@ -80,6 +93,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             .frame(width: 513, alignment: .topLeading)
         }
 
+        // Recovery
         PreferencePaneSection(vericalPadding: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(UserText.recovery)
@@ -97,6 +111,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             .frame(width: 513, alignment: .topLeading)
         }
 
+        // Turn Off and Delate Data
         PreferencePaneSection(vericalPadding: 12) {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()

@@ -68,8 +68,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
-    private var syncStateCancellable: AnyCancellable?
-    private var bookmarksSyncErrorCancellable: AnyCancellable?
+    private var isSyncInProgressCancellable: AnyCancellable?
+    private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
@@ -339,9 +339,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let environment = defaultEnvironment
 #endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        if bookmarksManager.didMigrateToFormFactorSpecificFavorites {
-            syncDataProviders.bookmarksAdapter.shouldResetBookmarksSyncTimestamp = true
-        }
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
         syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
@@ -355,6 +352,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
+
+        isSyncInProgressCancellable = syncService.isSyncInProgressPublisher
+            .filter { $0 }
+            .asVoid()
+            .prefix(1)
+            .sink {
+                Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+            }
+
+        subscribeSyncQueueToScreenLockedNotifications()
+    }
+
+    private func subscribeSyncQueueToScreenLockedNotifications() {
+        let screenIsLockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
+            .map { _ in true }
+        let screenIsUnlockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
+            .map { _ in false }
+
+        screenLockedCancellable = Publishers.Merge(screenIsLockedPublisher, screenIsUnlockedPublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLocked in
+                guard let syncService = self?.syncService, syncService.authState != .inactive else {
+                    return
+                }
+                if isLocked {
+                    os_log(.debug, log: .sync, "Screen is locked")
+                    syncService.scheduler.cancelSyncAndSuspendSyncQueue()
+                } else {
+                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    syncService.scheduler.resumeSyncQueue()
+                }
+            }
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {
@@ -429,7 +460,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DataBrokerProtectionAppEvents().handleNotification()
+                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
             }
 #endif
         }

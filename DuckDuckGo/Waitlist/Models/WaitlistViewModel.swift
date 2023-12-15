@@ -70,16 +70,19 @@ final class WaitlistViewModel: ObservableObject {
     private let notificationService: NotificationService
     private var termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler
     private let featureSetupHandler: WaitlistFeatureSetupHandler
+    private let showNotificationSuccessState: Bool
 
     init(waitlistRequest: WaitlistRequest,
          waitlistStorage: WaitlistStorage,
          notificationService: NotificationService,
          notificationPermissionState: NotificationPermissionState = .notDetermined,
+         showNotificationSuccessState: Bool,
          termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler,
          featureSetupHandler: WaitlistFeatureSetupHandler) {
         self.waitlistRequest = waitlistRequest
         self.waitlistStorage = waitlistStorage
         self.notificationService = notificationService
+        self.showNotificationSuccessState = showNotificationSuccessState
         self.termsAndConditionActionHandler = termsAndConditionActionHandler
         self.featureSetupHandler = featureSetupHandler
         if waitlistStorage.getWaitlistTimestamp() != nil, waitlistStorage.getWaitlistInviteCode() == nil {
@@ -97,6 +100,7 @@ final class WaitlistViewModel: ObservableObject {
 
     convenience init(waitlist: Waitlist,
                      notificationPermissionState: NotificationPermissionState = .notDetermined,
+                     showNotificationSuccessState: Bool,
                      termsAndConditionActionHandler: WaitlistTermsAndConditionsActionHandler,
                      featureSetupHandler: WaitlistFeatureSetupHandler) {
         let waitlistType = type(of: waitlist)
@@ -105,6 +109,7 @@ final class WaitlistViewModel: ObservableObject {
             waitlistStorage: WaitlistKeychainStore(waitlistIdentifier: waitlistType.identifier, keychainAppGroup: waitlistType.keychainAppGroup),
             notificationService: UNUserNotificationCenter.current(),
             notificationPermissionState: notificationPermissionState,
+            showNotificationSuccessState: showNotificationSuccessState,
             termsAndConditionActionHandler: termsAndConditionActionHandler,
             featureSetupHandler: featureSetupHandler
         )
@@ -173,14 +178,48 @@ final class WaitlistViewModel: ObservableObject {
     private func requestNotificationPermission() {
         Task {
             do {
-                let permissionGranted = try await notificationService.requestAuthorization(options: [.alert])
-                self.viewState = .joinedWaitlist(permissionGranted ? .notificationAllowed : .notificationsDisabled)
+                let currentStatus = await notificationService.authorizationStatus()
+                let permissionGranted: Bool
+
+                switch currentStatus {
+                case .notDetermined:
+                    permissionGranted = try await notificationService.requestAuthorization(options: [.alert])
+                case .authorized, .provisional:
+                    permissionGranted = true
+                case .denied:
+                    openAppNotificationSettings()
+                    permissionGranted = false
+                @unknown default:
+                    permissionGranted = false
+                }
+                if permissionGranted {
+                     self.viewState = .joinedWaitlist(.notificationAllowed)
+                 } else {
+                     await perform(action: .close)
+                 }
             } catch {
                 await checkNotificationPermissions()
             }
         }
 
-        self.viewState = .joinedWaitlist(.notificationAllowed)
+        if showNotificationSuccessState {
+            self.viewState = .joinedWaitlist(.notificationAllowed)
+        } else {
+            Task {
+                await perform(action: .close)
+            }
+        }
+    }
+
+    private func openAppNotificationSettings() {
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.duckduckgo"
+        let settingsPath = "x-apple.systempreferences:com.apple.preference.notifications"
+        let urlComponents = NSURLComponents(string: settingsPath)
+        urlComponents?.queryItems = [URLQueryItem(name: "id", value: bundleID)]
+
+        if let appSettings = urlComponents?.url {
+            NSWorkspace.shared.open(appSettings)
+        }
     }
 
     private func showTermsAndConditions() {

@@ -62,7 +62,7 @@ enum UserText {
     // MARK: - Services for accessing the subscription
     static let appleID = NSLocalizedString("subscription.access.channel.appleid.name", value: "Apple ID", comment: "Service name displayed when accessing subscription using AppleID account")
     static let email = NSLocalizedString("subscription.access.channel.email.name", value: "Email", comment: "Service name displayed when accessing subscription using email address")
-    static let sync = NSLocalizedString("subscription.access.channel.sync.name", value: "Sync", comment: "Service name displayed when accessing sync feature")
+    static let sync = NSLocalizedString("subscription.access.channel.sync.name", value: "Sync & Backup", comment: "Service name displayed when accessing sync feature")
 
     // MARK: - Activate subscription modal
     static let activateModalTitle = NSLocalizedString("subscription.activate.modal.title", value: "Activate your subscription on this device", comment: "Activate subscription modal view title")
