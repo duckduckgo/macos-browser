@@ -2950,11 +2950,26 @@
 		EE7295EB2A545BFC008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295EA2A545BFC008C0991 /* NetworkProtection */; };
 		EE7295ED2A545C0A008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295EC2A545C0A008C0991 /* NetworkProtection */; };
 		EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */ = {isa = PBXBuildFile; productRef = EE7295EE2A545C12008C0991 /* NetworkProtection */; };
+		EEA3EEB12B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */; };
+		EEA3EEB32B24EC0600E8333A /* VPNLocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */; };
 		EEAD7A7A2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEAD7A7B2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEAD7A7C2A1D3E20002A24E7 /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEC111E4294D06020086524F /* JSAlert.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEC111E3294D06020086524F /* JSAlert.storyboard */; };
 		EEC111E6294D06290086524F /* JSAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC111E5294D06290086524F /* JSAlertViewModel.swift */; };
+		EEC4A65E2B277E8D00F7C0AA /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */; };
+		EEC4A65F2B277EE100F7C0AA /* VPNLocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */; };
+		EEC4A6602B277F0D00F7C0AA /* VPNLocationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */; };
+		EEC4A6612B277F1100F7C0AA /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */; };
+		EEC4A6692B2C87D300F7C0AA /* VPNLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A6682B2C87D300F7C0AA /* VPNLocationView.swift */; };
+		EEC4A66A2B2C87D300F7C0AA /* VPNLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A6682B2C87D300F7C0AA /* VPNLocationView.swift */; };
+		EEC4A66B2B2C87D300F7C0AA /* VPNLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A6682B2C87D300F7C0AA /* VPNLocationView.swift */; };
+		EEC4A66D2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A66C2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift */; };
+		EEC4A66E2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A66C2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift */; };
+		EEC4A66F2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A66C2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift */; };
+		EEC4A6712B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */; };
+		EEC4A6722B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */; };
+		EEC4A6732B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */; };
 		EEC589D92A4F1CE300BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEC589DA2A4F1CE400BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
 		EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */; };
@@ -4197,9 +4212,14 @@
 		EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadModel.swift; sourceTree = "<group>"; };
 		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
 		EE339227291BDEFD009F62C1 /* JSAlertController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSAlertController.swift; sourceTree = "<group>"; };
+		EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionVPNCountryLabelsModel.swift; sourceTree = "<group>"; };
+		EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VPNLocationViewModel.swift; sourceTree = "<group>"; };
 		EEAD7A6E2A1D3E1F002A24E7 /* AppLauncher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppLauncher.swift; sourceTree = "<group>"; };
 		EEC111E3294D06020086524F /* JSAlert.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = JSAlert.storyboard; sourceTree = "<group>"; };
 		EEC111E5294D06290086524F /* JSAlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModel.swift; sourceTree = "<group>"; };
+		EEC4A6682B2C87D300F7C0AA /* VPNLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationView.swift; sourceTree = "<group>"; };
+		EEC4A66C2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationPreferenceItemModel.swift; sourceTree = "<group>"; };
+		EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationPreferenceItem.swift; sourceTree = "<group>"; };
 		EECE10E429DD77E60044D027 /* FeatureFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureFlag.swift; sourceTree = "<group>"; };
 		EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPacketTunnelProvider.swift; sourceTree = "<group>"; };
 		EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSAlertViewModelTests.swift; sourceTree = "<group>"; };
@@ -5107,6 +5127,7 @@
 		4B4D60632A0B29FA00BCD287 /* BothAppTargets */ = {
 			isa = PBXGroup;
 			children = (
+				EEA3EEAF2B24EB5100E8333A /* VPNLocation */,
 				9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */,
 				7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */,
 				7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */,
@@ -7839,6 +7860,18 @@
 			path = fonts;
 			sourceTree = "<group>";
 		};
+		EEA3EEAF2B24EB5100E8333A /* VPNLocation */ = {
+			isa = PBXGroup;
+			children = (
+				EEA3EEB22B24EC0600E8333A /* VPNLocationViewModel.swift */,
+				EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */,
+				EEC4A6682B2C87D300F7C0AA /* VPNLocationView.swift */,
+				EEC4A66C2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift */,
+				EEC4A6702B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift */,
+			);
+			path = VPNLocation;
+			sourceTree = "<group>";
+		};
 		EEAEA3F4294D05CF00D04DF3 /* JSAlert */ = {
 			isa = PBXGroup;
 			children = (
@@ -9067,6 +9100,7 @@
 				3706FA7F293F65D500E42796 /* TabIndex.swift in Sources */,
 				3706FA80293F65D500E42796 /* TabLazyLoaderDataSource.swift in Sources */,
 				3706FA81293F65D500E42796 /* LoginImport.swift in Sources */,
+				EEC4A66E2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */,
 				3706FA83293F65D500E42796 /* LazyLoadable.swift in Sources */,
 				3706FA84293F65D500E42796 /* ClickToLoadModel.swift in Sources */,
 				3706FA85293F65D500E42796 /* KeyedCodingExtension.swift in Sources */,
@@ -9165,6 +9199,7 @@
 				3706FADC293F65D500E42796 /* FirefoxLoginReader.swift in Sources */,
 				3706FADD293F65D500E42796 /* AtbParser.swift in Sources */,
 				3706FADE293F65D500E42796 /* PreferencesDuckPlayerView.swift in Sources */,
+				EEC4A65E2B277E8D00F7C0AA /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
 				B66260E729ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift in Sources */,
 				3706FADF293F65D500E42796 /* AddFolderModalViewController.swift in Sources */,
 				3706FAE0293F65D500E42796 /* BookmarkSidebarTreeController.swift in Sources */,
@@ -9302,6 +9337,7 @@
 				3706FB4D293F65D500E42796 /* GrammarFeaturesManager.swift in Sources */,
 				3706FB50293F65D500E42796 /* SafariFaviconsReader.swift in Sources */,
 				3706FB51293F65D500E42796 /* NSScreenExtension.swift in Sources */,
+				EEC4A66A2B2C87D300F7C0AA /* VPNLocationView.swift in Sources */,
 				3706FB52293F65D500E42796 /* NSBezierPathExtension.swift in Sources */,
 				3706FB53293F65D500E42796 /* WebsiteDataStore.swift in Sources */,
 				3706FB54293F65D500E42796 /* PermissionContextMenu.swift in Sources */,
@@ -9391,6 +9427,7 @@
 				4B4032852AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
 				3706FB93293F65D500E42796 /* PasteboardFolder.swift in Sources */,
 				3706FB94293F65D500E42796 /* CookieManagedNotificationView.swift in Sources */,
+				EEC4A65F2B277EE100F7C0AA /* VPNLocationViewModel.swift in Sources */,
 				370A34B22AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,
 				4B4D60BE2A0C848A00BCD287 /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				3706FB95293F65D500E42796 /* PermissionType.swift in Sources */,
@@ -9492,6 +9529,7 @@
 				37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */,
 				56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
 				3706FBDF293F65D500E42796 /* String+Punycode.swift in Sources */,
+				EEC4A6722B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */,
 				3706FBE0293F65D500E42796 /* NSException+Catch.m in Sources */,
 				3706FBE1293F65D500E42796 /* AppStateRestorationManager.swift in Sources */,
 				3706FBE2293F65D500E42796 /* ClickToLoadUserScript.swift in Sources */,
@@ -10331,6 +10369,7 @@
 				B68D21D22ACBCA01002DA3C2 /* ContentBlockerRulesManagerMock.swift in Sources */,
 				4B9579F62AC7AE700062CA31 /* ChromiumFaviconsReader.swift in Sources */,
 				4B9579F72AC7AE700062CA31 /* SuggestionTableRowView.swift in Sources */,
+				EEC4A6732B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */,
 				4B9579F82AC7AE700062CA31 /* DownloadsPreferences.swift in Sources */,
 				4B9579F92AC7AE700062CA31 /* PasswordManagementItemList.swift in Sources */,
 				4B9579FA2AC7AE700062CA31 /* Bookmark.swift in Sources */,
@@ -10492,6 +10531,7 @@
 				4B957A8B2AC7AE700062CA31 /* PasswordManagementListSection.swift in Sources */,
 				4B957A8C2AC7AE700062CA31 /* FaviconReferenceCache.swift in Sources */,
 				4B957A8D2AC7AE700062CA31 /* BookmarkTreeController.swift in Sources */,
+				EEC4A6602B277F0D00F7C0AA /* VPNLocationViewModel.swift in Sources */,
 				4B957A8E2AC7AE700062CA31 /* FirefoxEncryptionKeyReader.swift in Sources */,
 				4B957A8F2AC7AE700062CA31 /* EventMapping+NetworkProtectionError.swift in Sources */,
 				4B957A902AC7AE700062CA31 /* BookmarkManagementSplitViewController.swift in Sources */,
@@ -10628,6 +10668,7 @@
 				4B957B112AC7AE700062CA31 /* DateExtension.swift in Sources */,
 				4B957B122AC7AE700062CA31 /* History.xcdatamodeld in Sources */,
 				4B957B132AC7AE700062CA31 /* PermissionStore.swift in Sources */,
+				EEC4A6612B277F1100F7C0AA /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
 				4B957B142AC7AE700062CA31 /* PrivacyIconViewModel.swift in Sources */,
 				4B957B152AC7AE700062CA31 /* ChromiumBookmarksReader.swift in Sources */,
 				4B957B162AC7AE700062CA31 /* Downloads.xcdatamodeld in Sources */,
@@ -10667,6 +10708,7 @@
 				4B957B382AC7AE700062CA31 /* ProgressView.swift in Sources */,
 				7BEC20472B0F505F00243D3E /* BookmarkAddFolderPopoverViewController.swift in Sources */,
 				4B957B392AC7AE700062CA31 /* StatisticsStore.swift in Sources */,
+				EEC4A66B2B2C87D300F7C0AA /* VPNLocationView.swift in Sources */,
 				4B957B3A2AC7AE700062CA31 /* BWInstallationService.swift in Sources */,
 				4B957B3B2AC7AE700062CA31 /* BookmarksBarPromptPopover.swift in Sources */,
 				4B957B3C2AC7AE700062CA31 /* NetworkProtectionInvitePresenter.swift in Sources */,
@@ -10692,6 +10734,7 @@
 				4B957B502AC7AE700062CA31 /* CoreDataStore.swift in Sources */,
 				4B957B512AC7AE700062CA31 /* BundleExtension.swift in Sources */,
 				4B957B522AC7AE700062CA31 /* NSOpenPanelExtensions.swift in Sources */,
+				EEC4A66F2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */,
 				4B957B532AC7AE700062CA31 /* FirePopover.swift in Sources */,
 				4B957B542AC7AE700062CA31 /* HistoryCoordinator.swift in Sources */,
 				4B957B552AC7AE700062CA31 /* NetworkProtectionOnboardingMenu.swift in Sources */,
@@ -10892,6 +10935,7 @@
 				85799C1825DEBB3F0007EC87 /* Logging.swift in Sources */,
 				AAC30A2E268F1EE300D2D9CD /* CrashReportPromptPresenter.swift in Sources */,
 				1D2DC00629016798008083A1 /* BWCredential.swift in Sources */,
+				EEA3EEB12B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
 				37AFCE8727DA334800471A10 /* PreferencesRootView.swift in Sources */,
 				B684590825C9027900DC17B6 /* AppStateChangedPublisher.swift in Sources */,
 				4B92928F26670D1700AD2C21 /* BookmarkTableCellView.swift in Sources */,
@@ -10993,6 +11037,7 @@
 				37F19A6528E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift in Sources */,
 				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
+				EEC4A6712B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */,
 				85589E8727BBB8F20038AD11 /* HomePageFavoritesModel.swift in Sources */,
 				4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */,
 				B602E7CF2A93A5FF00F12201 /* WKBackForwardListExtension.swift in Sources */,
@@ -11087,6 +11132,7 @@
 				4BBC16A027C4859400E00A38 /* DeviceAuthenticationService.swift in Sources */,
 				CB24F70C29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift in Sources */,
 				37CBCA9A2A8966E60050218F /* SyncSettingsAdapter.swift in Sources */,
+				EEC4A66D2B2C894F00F7C0AA /* VPNLocationPreferenceItemModel.swift in Sources */,
 				3776582F27F82E62009A6B35 /* AutofillPreferences.swift in Sources */,
 				AAD8078727B3F45600CF7703 /* WebsiteBreakage.swift in Sources */,
 				7BEC20422B0F505F00243D3E /* BookmarkAddPopoverViewController.swift in Sources */,
@@ -11223,6 +11269,7 @@
 				B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */,
 				4B92929C26670D2A00AD2C21 /* PasteboardFolder.swift in Sources */,
 				3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */,
+				EEA3EEB32B24EC0600E8333A /* VPNLocationViewModel.swift in Sources */,
 				B6106BAB26A7BF1D0013B453 /* PermissionType.swift in Sources */,
 				AAC6881B28626C1900D54247 /* RecentlyClosedWindow.swift in Sources */,
 				85707F2A276A35FE00DC0649 /* ActionSpeech.swift in Sources */,
@@ -11436,6 +11483,7 @@
 				4BA1A69B258B076900F6F690 /* FileStore.swift in Sources */,
 				B6A9E47F26146A800067D1B9 /* PixelArguments.swift in Sources */,
 				37BF3F21286F0A7A00BD9014 /* PinnedTabsViewModel.swift in Sources */,
+				EEC4A6692B2C87D300F7C0AA /* VPNLocationView.swift in Sources */,
 				AAC5E4D225D6A709007F5990 /* BookmarkList.swift in Sources */,
 				B602E81D2A1E25B1006D261F /* NEOnDemandRuleExtension.swift in Sources */,
 				4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */,

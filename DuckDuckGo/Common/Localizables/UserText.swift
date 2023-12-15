@@ -302,9 +302,33 @@ struct UserText {
 
     // VPN Setting Titles
 
+    static let vpnLocationTitle = NSLocalizedString("vpn.location.title", value: "Location", comment: "Location section title in VPN settings")
     static let vpnGeneralTitle = NSLocalizedString("vpn.general.title", value: "General", comment: "General section title in VPN settings")
     static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "Notifications", comment: "Notifications section title in VPN settings")
     static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced", comment: "VPN Advanced section title in VPN settings")
+
+    // VPN Location
+
+    static let vpnLocationChangeButtonTitle = NSLocalizedString("vpn.location.change.button.title", value: "Change...", comment: "Title of the VPN location preference change button")
+    static let vpnLocationListTitle = NSLocalizedString("vpn.location.list.title", value: "VPN Location", comment: "Title of the VPN location list screen")
+    static let vpnLocationRecommendedSectionTitle = NSLocalizedString("vpn.location.recommended.section.title", value: "Recommended", comment: "Title of the VPN location list recommended section")
+    static let vpnLocationCustomSectionTitle = NSLocalizedString("vpn.location.custom.section.title", value: "Custom", comment: "Title of the VPN location list custom section")
+    static let vpnLocationSubmitButtonTitle = NSLocalizedString("vpn.location.submit.button.title", value: "Submit", comment: "Title of the VPN location list submit button")
+    static let vpnLocationCancelButtonTitle = NSLocalizedString("vpn.location.custom.section.title", value: "Cancel", comment: "Title of the VPN location list cancel button")
+    static let vpnLocationNearest = NSLocalizedString(
+        "vpn.location.description.nearest",
+        value: "Nearest",
+        comment: "Nearest city setting description")
+    static let vpnLocationNearestAvailable = NSLocalizedString(
+        "vpn.location.description.nearest.available",
+        value: "Nearest Available",
+        comment: "Nearest available location setting description")
+    static let vpnLocationNearestAvailableSubtitle = NSLocalizedString("vpn.location.nearest.available.title", value: "Automatically connect to the nearest server we can find.", comment: "Subtitle underneath the nearest available vpn location preference text.")
+
+    static func vpnLocationCountryItemFormattedCitiesCount(_ count: Int) -> String {
+        let message = NSLocalizedString("network.protection.vpn.location.country.item.formatted.cities.count", value: "%d cities", comment: "Subtitle of countries item when there are multiple cities, example : ")
+        return String(format: message, count)
+    }
 
     // VPN Settings
 

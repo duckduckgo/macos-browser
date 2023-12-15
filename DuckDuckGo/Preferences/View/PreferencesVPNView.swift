@@ -33,6 +33,13 @@ extension Preferences {
 
                 TextMenuTitle(text: UserText.vpn)
 
+                if model.shouldShowLocationItem {
+                    PreferencePaneSection {
+                        TextMenuItemHeader(text: UserText.vpnLocationTitle)
+                        VPNLocationPreferenceItem(model: model.locationItem)
+                    }
+                }
+
                 // SECTION: Manage VPN
 
                 PreferencePaneSection {
