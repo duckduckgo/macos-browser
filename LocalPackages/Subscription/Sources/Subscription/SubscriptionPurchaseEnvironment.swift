@@ -24,7 +24,7 @@ public final class SubscriptionPurchaseEnvironment {
     public enum Environment: String {
         case appStore, stripe
     }
-    
+
     public static var current: Environment = .appStore {
         didSet {
             os_log(.info, log: .subscription, "[SubscriptionPurchaseEnvironment] Setting to %{public}s", current.rawValue)

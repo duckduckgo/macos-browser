@@ -47,7 +47,6 @@ public extension NSAlert {
         return alert
     }
 
-
     static func subscriptionFoundAlert() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Subscription Found"

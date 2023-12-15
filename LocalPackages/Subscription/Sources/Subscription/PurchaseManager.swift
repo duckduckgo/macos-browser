@@ -143,7 +143,7 @@ public final class PurchaseManager: ObservableObject {
         for await result in Transaction.all {
             transactions.append(result)
         }
-        
+
         os_log(.info, log: .subscription, "[PurchaseManager] mostRecentTransaction fetched %d transactions", transactions.count)
 
         return transactions.first?.jwsRepresentation

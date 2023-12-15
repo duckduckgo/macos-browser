@@ -92,7 +92,7 @@ public class AccountManager {
             } else {
                 assertionFailure("Expected AccountKeychainAccessError")
             }
-            
+
             return nil
         }
     }

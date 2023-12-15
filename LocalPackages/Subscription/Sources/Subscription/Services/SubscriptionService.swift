@@ -20,7 +20,7 @@ import Foundation
 import Common
 
 public struct SubscriptionService: APIService {
-    
+
     public static let session = {
         let configuration = URLSessionConfiguration.ephemeral
         return URLSession(configuration: configuration)
