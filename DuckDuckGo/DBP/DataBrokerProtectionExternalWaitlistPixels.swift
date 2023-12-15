@@ -20,14 +20,31 @@ import Foundation
 
 struct DataBrokerProtectionExternalWaitlistPixels {
 
+    static var isUserLocaleAllowed: Bool {
+        var regionCode: String?
+        if #available(macOS 13, *) {
+            regionCode = Locale.current.region?.identifier
+        } else {
+            regionCode = Locale.current.regionCode
+        }
+
+#if DEBUG // Always assume US for debug builds
+        regionCode = "US"
+#endif
+
+        return (regionCode ?? "US") == "US"
+    }
+
     static func fire(pixel: Pixel.Event, frequency: DailyPixel.PixelFrequency) {
-        let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
-        DailyPixel.fire(pixel: pixel,
-                        frequency: frequency,
-                        includeAppVersionParameter: true,
-                        withAdditionalParameters: [
-                            "isInternalUser": isInternalUser.description
-                        ]
-        )
+        if Self.isUserLocaleAllowed {
+            let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
+            DailyPixel.fire(pixel: pixel,
+                            frequency: frequency,
+                            includeAppVersionParameter: true,
+                            withAdditionalParameters: [
+                                "isInternalUser": isInternalUser.description
+                            ]
+            )
+        }
     }
 }

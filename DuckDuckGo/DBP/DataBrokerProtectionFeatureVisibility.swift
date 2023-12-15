@@ -43,7 +43,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         isWaitlistEnabled && isWaitlistBetaActive
     }
 
-    private var isUserLocaleAllowed: Bool {
+    var isUserLocaleAllowed: Bool {
         var regionCode: String?
         if #available(macOS 13, *) {
             regionCode = Locale.current.region?.identifier
