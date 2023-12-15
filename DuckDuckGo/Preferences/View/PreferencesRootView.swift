@@ -97,8 +97,7 @@ extension Preferences {
         }
 
 #if SUBSCRIPTION
-        // swiftlint:disable:next cyclomatic_complexity
-        // swiftlint:disable:next function_body_length
+        // swiftlint:disable:next cyclomatic_complexity function_body_length
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)

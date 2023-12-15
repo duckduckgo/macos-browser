@@ -22,7 +22,6 @@ import StoreKit
 @available(macOS 12.0, iOS 15.0, *)
 public final class AppStoreRestoreFlow {
 
-    // swiftlint:disable:next large_tuple
     public typealias RestoredAccountDetails = (authToken: String, accessToken: String, externalID: String, email: String?)
 
     public enum Error: Swift.Error {

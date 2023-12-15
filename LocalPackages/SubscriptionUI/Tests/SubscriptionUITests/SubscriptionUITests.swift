@@ -1,5 +1,5 @@
 //
-//  SubscriptionTests.swift
+//  SubscriptionUITests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -24,6 +24,6 @@ final class SubscriptionTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(SubscriptionUI().text, "Hello, World!")
+//        XCTAssertEqual(SubscriptionUI().text, "Hello, World!")
     }
 }

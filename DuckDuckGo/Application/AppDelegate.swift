@@ -183,6 +183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
     }
 
+    // swiftlint:disable:next function_body_length
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {

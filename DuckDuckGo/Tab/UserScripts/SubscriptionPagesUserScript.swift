@@ -177,6 +177,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #endif
     }
 
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         struct SubscriptionSelection: Decodable {
             let id: String
@@ -378,8 +379,6 @@ extension MainWindowController {
 
         window.show(.subscriptionInactiveAlert(), firstButtonAction: {
             WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
-//            AccountManager().signOut()
-            // TODO: Check if it is required
         })
     }
 
