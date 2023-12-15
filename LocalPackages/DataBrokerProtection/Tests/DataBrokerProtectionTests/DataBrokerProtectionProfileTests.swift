@@ -266,10 +266,6 @@ final class DataBrokerProtectionProfileTests: XCTestCase {
         XCTAssertTrue(vault.wasDeleteProfileQueryCalled)
     }
 
-    func testDeliberatelyBrokenTestLol() {
-        XCTFail("Testing GitHub")
-    }
-
 }
 
 extension ProfileQuery: Comparable {
