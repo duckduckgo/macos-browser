@@ -32,6 +32,7 @@ struct DataImportViewModel {
     @UserDefaultsWrapper(key: .homePageContinueSetUpImport, defaultValue: nil)
     var successfulImportHappened: Bool?
 
+    let availableImportSources: [DataImport.Source]
     /// Browser to import data from
     let importSource: Source
     /// BrowserProfileList loader (factory method) - used
@@ -128,7 +129,7 @@ struct DataImportViewModel {
 
     init(importSource: Source? = nil,
          screen: Screen? = nil,
-         availableImportSources: @autoclosure () -> Set<Source> = Set(ThirdPartyBrowser.installedBrowsers.map(\.importSource)),
+         availableImportSources: [DataImport.Source] = ThirdPartyBrowser.installedBrowsers.map(\.importSource),
          preferredImportSources: [Source] = [.chrome, .firefox, .safari],
          summary: [DataTypeImportResult] = [],
          loadProfiles: @escaping (ThirdPartyBrowser) -> BrowserProfileList = { $0.browserProfiles() },
@@ -137,7 +138,7 @@ struct DataImportViewModel {
          openPanelCallback: @escaping @MainActor (DataType) -> URL? = Self.openPanelCallback,
          reportSenderFactory: @escaping ReportSenderFactory = { FeedbackSender().sendDataImportReport }) {
 
-        lazy var availableImportSources = availableImportSources()
+        self.availableImportSources = availableImportSources
         let importSource = importSource ?? preferredImportSources.first(where: { availableImportSources.contains($0) }) ?? .csv
 
         self.importSource = importSource
@@ -459,7 +460,7 @@ extension DataImportViewModel {
         for dataType in (currentDataType.map { DataType.dataTypes(after: $0) } ?? DataType.allCases[0...]) where selectedDataTypes.contains(dataType) {
             // if some of selected data types failed to import or not imported yet
             switch summary.last(where: { $0.dataType == dataType })?.result {
-            case .success(let summary) where summary.successful == 0 && summary.duplicate == 0 && summary.failed == 0:
+            case .success(let summary) where summary.isEmpty:
                 return .fileImport(dataType: dataType)
             case .failure(let error) where error.errorType == .noData:
                 return .fileImport(dataType: dataType)
@@ -680,6 +681,7 @@ extension DataImportViewModel {
             }
         }
 
+        log("dismiss")
         dismiss()
         if case .xcPreviews = NSApp.runType {
             self.update(with: importSource) // reset

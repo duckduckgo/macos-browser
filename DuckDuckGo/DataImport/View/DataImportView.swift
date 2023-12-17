@@ -197,15 +197,16 @@ struct DataImportView: View {
         HStack(spacing: 8) {
             Spacer()
 
-            ForEach(model.buttons, id: \.self) { button in
+            ForEach(model.buttons.indices, id: \.self) { idx in
                 Button {
-                    model.performAction(for: button, dismiss: dismiss.callAsFunction)
+                    model.performAction(for: model.buttons[idx],
+                                        dismiss: dismiss.callAsFunction)
                 } label: {
-                    Text(button.title(dataType: model.screen.fileImportDataType))
+                    Text(model.buttons[idx].title(dataType: model.screen.fileImportDataType))
                         .frame(minWidth: 80 - 16 - 1)
                 }
-                .keyboardShortcut(button.shortcut)
-                .disabled(button.isDisabled)
+                .keyboardShortcut(model.buttons[idx].shortcut)
+                .disabled(model.buttons[idx].isDisabled)
             }
         }
     }
@@ -500,7 +501,7 @@ extension DataImportViewModel.ButtonType {
         }
     }
 
-    let viewModel = DataImportViewModel(importSource: .bookmarksHTML) { browser in
+    let viewModel = DataImportViewModel(importSource: .bookmarksHTML, availableImportSources: DataImport.Source.allCases) { browser in
         guard case .chrome = browser else {
             print("empty profiles")
             return .init(browser: browser, profiles: [])

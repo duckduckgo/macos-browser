@@ -29,9 +29,10 @@ struct DataImportSourcePicker: View {
         viewModel.importSources
     }
 
-    init(selectedSource: DataImport.Source,
+    init(importSources: [DataImport.Source],
+         selectedSource: DataImport.Source,
          onSelectedSourceChanged: @escaping (DataImport.Source) -> Void) {
-        self.viewModel = DataImportSourceViewModel(selectedSource: selectedSource)
+        self.viewModel = DataImportSourceViewModel(importSources: importSources, selectedSource: selectedSource)
         self.onSelectedSourceChanged = onSelectedSourceChanged
     }
 
@@ -61,7 +62,7 @@ struct DataImportSourcePicker: View {
 }
 
 #Preview {
-    DataImportSourcePicker(selectedSource: .csv) {
+    DataImportSourcePicker(importSources: DataImport.Source.allCases, selectedSource: .csv) {
         print("selection:", $0)
     }
     .padding()
