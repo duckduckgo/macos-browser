@@ -48,9 +48,10 @@ struct DataImportTypePicker: View {
                     .disabled(!viewModel.importSource.supportedDataTypes.contains(dataType))
 
                     // subtitle
-                    if !viewModel.importSource.supportedDataTypes.contains(dataType) {
-                        Text("\(viewModel.importSource.importSourceName) does not support storing \(dataType.displayName)",
-                             comment: "Data Import disabled checkbox message about a browser (%1$@) not supporting storing a data type (%2$@ - Bookmarks or Passwords)")
+                    if case .passwords = dataType,
+                       !viewModel.importSource.supportedDataTypes.contains(.passwords) {
+                        Text("\(viewModel.importSource.importSourceName) does not support storing passwords",
+                             comment: "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords")
                             .foregroundColor(Color(.disabledControlTextColor))
                     }
                 }

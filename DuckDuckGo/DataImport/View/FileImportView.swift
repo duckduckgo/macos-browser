@@ -30,7 +30,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Open **%s**
         %d In a fresh tab, click %@ then **Google Password Manager → Settings**
         %d Find “Export Passwords” and click **Download File**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Google Chrome browser.
@@ -50,7 +50,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Click %@ to open the application menu then click **Password Manager**
         %d Click %@ **at the top left** of the Password Manager and select **Settings**
         %d Find “Export Passwords” and click **Download File**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Brave browser.
@@ -71,7 +71,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Open **%s**
         %d In a fresh tab, click %@ then **Password Manager → Settings**
         %d Find “Export Passwords” and click **Download File**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Chromium-based browsers.
@@ -88,9 +88,9 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
     case (.coccoc, .passwords):
         NSLocalizedString("import.csv.instructions.coccoc", value: """
         %d Open **%s**
-        %d Type “_coccoc://settings/passwords_” into the Address field
+        %d Type “_coccoc://settings/passwords_” into the Address bar
         %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Chromium-based browsers.
@@ -110,7 +110,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Use the Menu Bar to select **View → Show Password Manager**
         %d Select **Settings**
         %d Find “Export Passwords” and click **Download File**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Chromium-based browsers.
@@ -125,7 +125,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
     case (.vivaldi, .passwords):
         NSLocalizedString("import.csv.instructions.vivaldi", value: """
         %d Open **%s**
-        %d Type “_chrome://settings/passwords_” into the Address field
+        %d Type “_chrome://settings/passwords_” into the Address bar
         %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
         %d Save the file someplace you can find it (e.g., Desktop)
         %d %@
@@ -146,7 +146,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Open **%s**
         %d Use the Menu Bar to select **View → Show Password Manager**
         %d Click %@ (on the right from _Saved Passwords_) and select **Export passwords**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Chromium-based browsers.
@@ -166,7 +166,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Click %@ to open the application menu then click **Passwords and cards**
         %d Click %@ then **Export passwords**
         %d Choose **To a text file (not secure)** and click **Export**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Yandex Browser.
@@ -278,7 +278,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         NSLocalizedString("import.csv.instructions.safari", value: """
         %d Open **Safari**
         %d Select **File → Export → Passwords**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Safari.
@@ -292,7 +292,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         NSLocalizedString("import.html.instructions.safari", value: """
         %d Open **Safari**
         %d Select **File → Export → Bookmarks**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Bookmarks exported as HTML from Safari.
@@ -307,7 +307,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Open **%s**
         %d Click %@ to open the application menu then click **Passwords**
         %d Click %@ then **Export Logins…**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Firefox.
@@ -347,7 +347,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Select **File → Export** from the Menu Bar and choose the account you want to export
         %d Enter your 1Password account password
         %d Select the File Format: **CSV (Logins and Passwords only)**
-        %d Click Export Data and save the file someplace you can find it (e.g. Desktop)
+        %d Click Export Data and save the file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from 1Password 8.
@@ -361,11 +361,11 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
     case (.onePassword7, .passwords):
         NSLocalizedString("import.csv.instructions.onePassword7", value: """
         %d Open and unlock **%s**
-        %d Select the vault you want to Export (You cannot export from “All Vaults.”)
+        %d Select the vault you want to export (you can only export one vault at a time)
         %d Select **File → Export → All Items** from the Menu Bar
         %d Enter your 1Password master or account password
         %d Select the File Format: **iCloud Keychain (.csv)**
-        %d Save the passwords file someplace you can find it (e.g. Desktop)
+        %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from 1Password 7.
@@ -381,8 +381,8 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Open and unlock **%s**
         %d Select **File → Export vault** from the Menu Bar
         %d Select the File Format: **.csv**
-        %d Enter your Bitwarden Master password
-        %d Click %@ and save the file someplace you can find it (e.g. Desktop)
+        %d Enter your Bitwarden master password
+        %d Click %@ and save the file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
         Instructions to import Passwords as CSV from Bitwarden.
@@ -485,9 +485,18 @@ struct FileImportView: View {
             if [.onePassword7, .onePassword8].contains(source) {
                 HStack {
                     Image(.info)
-                    Text("""
-                    You can find your version by selecting **\(source.importSourceName) → About \(source.importSourceName)** from the Menu Bar
-                    """, comment: "Instructions how to find an installed 1Password password manager app version. %1$@, %2$@ - app name (1Password)")
+                    // markdown not supported on macOS 11
+                    InstructionsView {
+                        NSLocalizedString("import.onePassword.app.version.info", value: """
+                        You can find your version by selecting **%s → About %s** from the Menu Bar.
+                        """, comment: """
+                        Instructions how to find an installed 1Password password manager app version.
+                        %1$s, %2$s - app name (1Password)
+                        """)
+                        source.importSourceName
+                        source.importSourceName
+                    }
+
                     Spacer()
                 }
                 .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
@@ -819,7 +828,7 @@ struct CircleNumberView: View {
 
 #Preview {
     HStack {
-        FileImportView(source: .yandex, dataType: .passwords, isButtonDisabled: false)
+        FileImportView(source: .onePassword8, dataType: .passwords, isButtonDisabled: false)
             .padding()
             .frame(width: 512 - 20)
     }

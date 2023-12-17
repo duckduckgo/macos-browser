@@ -34,16 +34,8 @@
     "**%lld** tracking attempts blocked" : {
 
     },
-    "%@ does not support storing %@" : {
-      "comment" : "Data Import disabled checkbox message about a browser (%1$@) not supporting storing a data type (%2$@ - Bookmarks or Passwords)",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ does not support storing %2$@"
-          }
-        }
-      }
+    "%@ does not support storing passwords" : {
+      "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
     },
     "%lld" : {
 
@@ -3429,7 +3421,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "HTML Bookmarks File"
+            "value" : "HTML Bookmarks File (for other browsers)"
           }
         }
       }
@@ -3525,7 +3517,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden Master password\n%6$d Click %7$@ and save the file someplace you can find it (e.g. Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export vault** from the Menu Bar\n%4$d Select the File Format: **.csv**\n%5$d Enter your Bitwarden master password\n%6$d Click %7$@ and save the file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         }
       }
@@ -3537,7 +3529,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Password Manager**\n%5$d Click %6$@ **at the top left** of the Password Manager and select **Settings**\n%7$d Find “Export Passwords” and click **Download File**\n%8$d Save the passwords file someplace you can find it (e.g. Desktop)\n%9$d %10$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Password Manager**\n%5$d Click %6$@ **at the top left** of the Password Manager and select **Settings**\n%7$d Find “Export Passwords” and click **Download File**\n%8$d Save the passwords file someplace you can find it (e.g., Desktop)\n%9$d %10$@"
           }
         }
       }
@@ -3549,7 +3541,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d In a fresh tab, click %4$@ then **Google Password Manager → Settings**\n%5$d Find “Export Passwords” and click **Download File**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d In a fresh tab, click %4$@ then **Google Password Manager → Settings**\n%5$d Find “Export Passwords” and click **Download File**\n%6$d Save the passwords file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
           }
         }
       }
@@ -3561,7 +3553,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d In a fresh tab, click %4$@ then **Password Manager → Settings**\n%5$d Find “Export Passwords” and click **Download File**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d In a fresh tab, click %4$@ then **Password Manager → Settings**\n%5$d Find “Export Passwords” and click **Download File**\n%6$d Save the passwords file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
           }
         }
       }
@@ -3573,7 +3565,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d Type “_coccoc://settings/passwords_” into the Address field\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Type “_coccoc://settings/passwords_” into the Address bar\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the passwords file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
           }
         }
       }
@@ -3585,7 +3577,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Passwords**\n%5$d Click %6$@ then **Export Logins…**\n%7$d Save the passwords file someplace you can find it (e.g. Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Passwords**\n%5$d Click %6$@ then **Export Logins…**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         }
       }
@@ -3621,7 +3613,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to Export (You cannot export from “All Vaults.”)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password master or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g. Desktop)\n%8$d %9$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select the vault you want to export (you can only export one vault at a time)\n%4$d Select **File → Export → All Items** from the Menu Bar\n%5$d Enter your 1Password master or account password\n%6$d Select the File Format: **iCloud Keychain (.csv)**\n%7$d Save the passwords file someplace you can find it (e.g., Desktop)\n%8$d %9$@"
           }
         }
       }
@@ -3633,7 +3625,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export** from the Menu Bar and choose the account you want to export\n%4$d Enter your 1Password account password\n%5$d Select the File Format: **CSV (Logins and Passwords only)**\n%6$d Click Export Data and save the file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open and unlock **%2$s**\n%3$d Select **File → Export** from the Menu Bar and choose the account you want to export\n%4$d Enter your 1Password account password\n%5$d Select the File Format: **CSV (Logins and Passwords only)**\n%6$d Click Export Data and save the file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
           }
         }
       }
@@ -3645,7 +3637,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **View → Show Password Manager**\n%4$d Select **Settings**\n%5$d Find “Export Passwords” and click **Download File**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **View → Show Password Manager**\n%4$d Select **Settings**\n%5$d Find “Export Passwords” and click **Download File**\n%6$d Save the passwords file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
           }
         }
       }
@@ -3657,7 +3649,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **View → Show Password Manager**\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the passwords file someplace you can find it (e.g. Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Use the Menu Bar to select **View → Show Password Manager**\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the passwords file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
           }
         }
       }
@@ -3669,7 +3661,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **Safari**\n%2$d Select **File → Export → Passwords**\n%3$d Save the passwords file someplace you can find it (e.g. Desktop)\n%4$d %5$@"
+            "value" : "%1$d Open **Safari**\n%2$d Select **File → Export → Passwords**\n%3$d Save the passwords file someplace you can find it (e.g., Desktop)\n%4$d %5$@"
           }
         }
       }
@@ -3681,7 +3673,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d Type “_chrome://settings/passwords_” into the Address field\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Type “_chrome://settings/passwords_” into the Address bar\n%4$d Click %5$@ (on the right from _Saved Passwords_) and select **Export passwords**\n%6$d Save the file someplace you can find it (e.g., Desktop)\n%7$d %8$@"
           }
         }
       }
@@ -3693,7 +3685,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Passwords and cards**\n%5$d Click %6$@ then **Export passwords**\n%7$d Choose **To a text file (not secure)** and click **Export**\n%8$d Save the passwords file someplace you can find it (e.g. Desktop)\n%9$d %10$@"
+            "value" : "%1$d Open **%2$s**\n%3$d Click %4$@ to open the application menu then click **Passwords and cards**\n%5$d Click %6$@ then **Export passwords**\n%7$d Choose **To a text file (not secure)** and click **Export**\n%8$d Save the passwords file someplace you can find it (e.g., Desktop)\n%9$d %10$@"
           }
         }
       }
@@ -3782,14 +3774,38 @@
         }
       }
     },
-    "import.data.skip.format" : {
-      "comment" : "Button text to skip a kind of imported data (Bookmarks or Passwords - %@)",
+    "import.data.skip" : {
+      "comment" : "Button text to skip an import step",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Skip %@"
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "import.data.skip.bookmarks" : {
+      "comment" : "Button text to skip bookmarks manual import",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Skip bookmarks"
+          }
+        }
+      }
+    },
+    "import.data.skip.passwords" : {
+      "comment" : "Button text to skip bookmarks manual import",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Skip passwords"
           }
         }
       }
@@ -3861,7 +3877,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "%1$d Open **Safari**\n%2$d Select **File → Export → Bookmarks**\n%3$d Save the passwords file someplace you can find it (e.g. Desktop)\n%4$d %5$@"
+            "value" : "%1$d Open **Safari**\n%2$d Select **File → Export → Bookmarks**\n%3$d Save the passwords file someplace you can find it (e.g., Desktop)\n%4$d %5$@"
           }
         }
       }
@@ -3897,7 +3913,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "CSV Passwords File"
+            "value" : "CSV Passwords File (for other browsers)"
           }
         }
       }
@@ -3934,6 +3950,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Select %@ CSV File…"
+          }
+        }
+      }
+    },
+    "import.onePassword.app.version.info" : {
+      "comment" : "Instructions how to find an installed 1Password password manager app version.\n%1$s, %2$s - app name (1Password)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You can find your version by selecting **%1$s → About %2$s** from the Menu Bar."
           }
         }
       }
@@ -5890,6 +5918,12 @@
     "Password import complete. You can now delete the saved passwords file." : {
       "comment" : "message about Passwords Data Import completion"
     },
+    "Password import failed: " : {
+      "comment" : "Data import summary format of how many passwords (%lld) failed to import."
+    },
+    "Password import failed." : {
+      "comment" : "Data import summary message of failed passwords import."
+    },
     "password.manager" : {
       "comment" : "Section header",
       "extractionState" : "extracted_with_value",
@@ -5901,12 +5935,6 @@
           }
         }
       }
-    },
-    "Passwords import failed: " : {
-      "comment" : "Data import summary format of how many passwords (%lld) failed to import."
-    },
-    "Passwords import failed." : {
-      "comment" : "Data import summary message of failed passwords import."
     },
     "Passwords:" : {
       "comment" : "Data import summary format of how many passwords (%lld) were successfully imported."
@@ -8524,6 +8552,12 @@
     "Transformations" : {
       "comment" : "Main Menu Edit item"
     },
+    "Try importing bookmarks manually instead." : {
+      "comment" : "Data import error subtitle: suggestion to import Bookmarks manually by selecting a CSV or HTML file."
+    },
+    "Try importing passwords manually instead." : {
+      "comment" : "Data import error subtitle: suggestion to import Passwords manually by selecting a CSV or HTML file."
+    },
     "Undo" : {
       "comment" : "Main Menu Edit item"
     },
@@ -8973,19 +9007,17 @@
         }
       }
     },
-    "We couldn‘t find any %@…" : {
-      "comment" : "Data import error message: Bookmarks or Passwords (%@) weren‘t found."
+    "We couldn‘t find any bookmarks." : {
+      "comment" : "Data import error message: Bookmarks weren‘t found."
     },
-    "We were unable to import %@ directly from %@." : {
-      "comment" : "Message when data import fails from a browser. %1$@ - Bookmarks or Passwords; %2$@ - a browser name",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We were unable to import %1$@ directly from %2$@."
-          }
-        }
-      }
+    "We couldn‘t find any passwords." : {
+      "comment" : "Data import error message: Passwords weren‘t found."
+    },
+    "We were unable to import bookmarks directly from %@." : {
+      "comment" : "Message when data import fails from a browser. %@ - a browser name"
+    },
+    "We were unable to import passwords directly from %@." : {
+      "comment" : "Message when data import fails from a browser. %@ - a browser name"
     },
     "web.tracking.protection.explenation" : {
       "comment" : "feature explanation in settings",
@@ -9013,12 +9045,6 @@
     },
     "Window" : {
       "comment" : "Main Menu "
-    },
-    "You can find your version by selecting **%@ → About 1Password** from the Menu Bar" : {
-
-    },
-    "You could try importing %@ manually." : {
-      "comment" : "Data import error subtitle: suggestion to import Bookmarks or Passwords (%@) manually by selecting a CSV or HTML file."
     },
     "You must be eligible to use this service." : {
 

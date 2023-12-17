@@ -26,9 +26,15 @@ struct DataImportErrorView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("We were unable to import \(dataType.displayName) directly from \(source.importSourceName).",
-                 comment: "Message when data import fails from a browser. %1$@ - Bookmarks or Passwords; %2$@ - a browser name")
-            .bold()
+            switch dataType {
+            case .bookmarks:
+                Text("We were unable to import bookmarks directly from \(source.importSourceName).",
+                     comment: "Message when data import fails from a browser. %@ - a browser name")
+                .bold()
+            case .passwords:
+                Text("We were unable to import passwords directly from \(source.importSourceName).",
+                     comment: "Message when data import fails from a browser. %@ - a browser name")
+            }
 
             Text("Let’s try doing it manually. It won’t take long.",
                  comment: "Suggestion to switch to a Manual File Data Import when data import fails.")

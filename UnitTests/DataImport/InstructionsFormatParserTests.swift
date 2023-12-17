@@ -105,7 +105,7 @@ final class InstructionsFormatParserTests: XCTestCase {
         %d Open **%s**
         %d In a fresh tab, click %@ then **Google __Password__ Manager → Settings **
         %d Find “Export _Passwords_” and click **Download File**
-        %d __Save the* passwords **file** someplace__ you can_find it (e.g. Desktop)
+        %d __Save the* passwords **file** someplace__ you can_find it (e.g., Desktop)
         %d %@
         """
         let parsed = try InstructionsFormatParser().parse(format: format)
@@ -113,7 +113,7 @@ final class InstructionsFormatParserTests: XCTestCase {
         XCTAssertEqual(parsed[safe: 0], [.number(argIndex: 1), .text("Open "), .string(argIndex: 2, bold: true)])
         XCTAssertEqual(parsed[safe: 1], [.number(argIndex: 3), .text("In a fresh tab, click "), .object(argIndex: 4), .text(" then "), .text("Google ", bold: true), .text("Password", bold: true, italic: true), .text(" Manager → Settings ", bold: true)])
         XCTAssertEqual(parsed[safe: 2], [.number(argIndex: 5), .text("Find “Export "), .text("Passwords", italic: true), .text("” and click "), .text("Download File", bold: true)])
-        XCTAssertEqual(parsed[safe: 3], [.number(argIndex: 6), .text("Save the* passwords ", italic: true), .text("file", bold: true, italic: true), .text(" someplace", italic: true), .text(" you can_find it (e.g. Desktop)")])
+        XCTAssertEqual(parsed[safe: 3], [.number(argIndex: 6), .text("Save the* passwords ", italic: true), .text("file", bold: true, italic: true), .text(" someplace", italic: true), .text(" you can_find it (e.g., Desktop)")])
         XCTAssertEqual(parsed[safe: 4], [.number(argIndex: 7), .object(argIndex: 8)])
         XCTAssertNil(parsed[safe: 5])
     }

@@ -553,8 +553,8 @@ struct UserText {
 
     // MARK: - Login Import & Export
 
-    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Passwords File", comment: "Title text for the CSV importer")
-    static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File", comment: "Title text for the HTML Bookmarks importer")
+    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Passwords File (for other browsers)", comment: "Title text for the CSV importer")
+    static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File (for other browsers)", comment: "Title text for the HTML Bookmarks importer")
     static let importBookmarksSelectHTMLFile = NSLocalizedString("import.bookmarks.select-html-file", value: "Select Bookmarks HTML File…", comment: "Button text for selecting HTML Bookmarks file")
     static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a CSV file")
     static func importLoginsSelectCSVFile(from source: DataImport.Source) -> String {
@@ -564,7 +564,9 @@ struct UserText {
     static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")
 
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
-    static let skipImportFormat = NSLocalizedString("import.data.skip.format", value: "Skip %@", comment: "Button text to skip a kind of imported data (Bookmarks or Passwords - %@)")
+    static let skipBookmarksImport = NSLocalizedString("import.data.skip.bookmarks", value: "Skip bookmarks", comment: "Button text to skip bookmarks manual import")
+    static let skipPasswordsImport = NSLocalizedString("import.data.skip.passwords", value: "Skip passwords", comment: "Button text to skip bookmarks manual import")
+    static let skip = NSLocalizedString("import.data.skip", value: "Skip", comment: "Button text to skip an import step")
     static let done = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
     static let manualImport = NSLocalizedString("import.data.manual", value: "Manual import…", comment: "Button text for initiating manual data import using a HTML or CSV file when automatic import has failed")
 

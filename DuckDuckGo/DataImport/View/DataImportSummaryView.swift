@@ -88,7 +88,7 @@ struct DataImportSummaryView: View {
                 case (.passwords, .failure):
                     HStack {
                         failureImage()
-                        Text("Passwords import failed.",
+                        Text("Password import failed.",
                              comment: "Data import summary message of failed passwords import.")
                     }
 
@@ -103,7 +103,7 @@ struct DataImportSummaryView: View {
                     if summary.failed > 0 {
                         HStack {
                             failureImage()
-                            Text("Passwords import failed: ",
+                            Text("Password import failed: ",
                                  comment: "Data import summary format of how many passwords (%lld) failed to import.")
                             + Text(" " as String)
                             + Text(String(summary.failed)).bold()

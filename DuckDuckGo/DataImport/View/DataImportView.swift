@@ -90,7 +90,9 @@ struct DataImportView: View {
             }
 #endif
         }
-        .font(.custom("SF Pro Text", size: 13))
+        .font(Font(NSFont(name: "SF Pro Text", size: 13)
+                   // fallback when SF Pro Text is missing
+                   ?? NSFont.systemFont(ofSize: 13) as CTFont))
         .frame(width: 512)
         .fixedSize()
     }
@@ -103,7 +105,7 @@ struct DataImportView: View {
 
             // browser to import data from picker popup
             if case .feedback = model.screen {} else {
-                DataImportSourcePicker(selectedSource: model.importSource) { importSource in
+                DataImportSourcePicker(importSources: model.availableImportSources, selectedSource: model.importSource) { importSource in
                     model.update(with: importSource)
                 }
                 .disabled(model.isImportSourcePickerDisabled)
@@ -242,7 +244,11 @@ struct DataImportView: View {
                     .padding(.leading, 20)
                 Spacer()
                 if case .normal = NSApp.runType {
-                    Button("⛌" as String) { debugViewDisabled.toggle() }
+                    Button {
+                        debugViewDisabled.toggle()
+                    } label: {
+                        Image(.closeLarge)
+                    }
                         .buttonStyle(.borderless)
                         .padding(.trailing, 20)
                 }
@@ -353,7 +359,14 @@ extension DataImportViewModel.ButtonType {
         case .initiateImport:
             UserText.initiateImport
         case .skip:
-            String(format: UserText.skipImportFormat, dataType?.displayName ?? "")
+            switch dataType {
+            case .bookmarks:
+                UserText.skipBookmarksImport
+            case .passwords:
+                UserText.skipPasswordsImport
+            case nil:
+                UserText.skip
+            }
         case .cancel:
             UserText.cancel
         case .back:
