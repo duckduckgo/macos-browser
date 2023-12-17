@@ -25,7 +25,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(spacing: 8) {
-                syncDisabledView()
+                syncUnavailableView()
                 syncWithAnotherDeviceView()
                 SyncUIViews.TextDetailSecondary(text: UserText.beginSyncFooter)
                     .padding(.bottom, 24)
@@ -62,7 +62,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
     }
 
     @ViewBuilder
-    fileprivate func syncDisabledView() -> some View {
+    fileprivate func syncUnavailableView() -> some View {
         if !model.isSyncAvailable || !model.isConnectingDevicesAvailable {
             SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningSyncDisabled)
                 .padding(.top, 16)

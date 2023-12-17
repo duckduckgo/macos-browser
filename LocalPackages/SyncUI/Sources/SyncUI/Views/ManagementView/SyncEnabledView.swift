@@ -25,6 +25,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     var body: some View {
         // Errors
         VStack(alignment: .leading, spacing: 16) {
+            syncUnavailableView()
             if model.isSyncBookmarksPaused {
                 syncPaused(for: .bookmarks)
             }
@@ -145,6 +146,15 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             case .credentials:
                 model.manageLogins()
             }
+        }
+    }
+
+    @ViewBuilder
+    fileprivate func syncUnavailableView() -> some View {
+        if !model.isSyncAvailable {
+            SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningSyncDisabled)
+        } else {
+            EmptyView()
         }
     }
 

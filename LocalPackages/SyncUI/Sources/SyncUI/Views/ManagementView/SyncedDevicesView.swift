@@ -27,7 +27,7 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
     let timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             SyncedDevicesList(devices: model.devices,
                               presentDeviceDetails: model.presentDeviceDetails,
                               presentRemoveDevice: model.presentRemoveDevice)
@@ -41,15 +41,14 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
             .onDisappear {
                 isVisible = false
             }
-            SyncPreferencesRow {
-            } centerContent: {
-                Button {
-                    model.syncWithAnotherDevicePressed()
-                } label: {
-                    Text("Sync with Another Device")
-                        .frame(height: 24)
-                }
+            Button {
+                model.syncWithAnotherDevicePressed()
+            } label: {
+                Text(UserText.beginSyncButton)
             }
+            .disabled(!model.isConnectingDevicesAvailable)
+            .padding(.horizontal, 10)
+            .padding(.bottom, 8)
         }
         .roundedBorder()
     }
