@@ -102,7 +102,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private func updateSyncFeatureFlag(_ syncFeatureFlag: SyncFeatureFlag) {
         isSyncAvailable = syncFeatureFlag.rawValue > SyncFeatureFlag.dataSyncingNotAvailable.rawValue
         isConnectingDevicesAvailable = syncFeatureFlag.rawValue > SyncFeatureFlag.setupFlowsNotAvailable.rawValue
-        isCreatingAccountAvailable = syncFeatureFlag.rawValue > SyncFeatureFlag.accountCreationNotAvailable.rawValue
+        isCreatingAccountAvailable = false // syncFeatureFlag.rawValue > SyncFeatureFlag.accountCreationNotAvailable.rawValue
     }
 
     var recoveryCode: String? {

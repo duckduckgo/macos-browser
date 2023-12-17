@@ -34,14 +34,14 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Sync Enabled
-        PreferencePaneSection(vericalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 12) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
                 .frame(width: 513, alignment: .topLeading)
         }
 
         // Synced Devices
-        PreferencePaneSection(vericalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 12) {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
@@ -51,7 +51,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Options
-        PreferencePaneSection(vericalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 12) {
             Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
@@ -94,7 +94,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Recovery
-        PreferencePaneSection(vericalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(UserText.recovery)
                     .font(Const.Fonts.preferencePaneSectionHeader)
@@ -112,7 +112,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Turn Off and Delate Data
-        PreferencePaneSection(vericalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 12) {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
@@ -138,28 +138,14 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return UserText.credentialsLimitExceededAction
             }
         }
-        PreferencePaneSection(vericalPadding: 16) {
-            HStack(alignment: .top, spacing: 8) {
-                Text("⚠️")
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(UserText.syncLimitExceededTitle)
-                        .bold()
-                    Text(description)
-                    Button(actionTitle) {
-                        switch itemType {
-                        case .bookmarks:
-                            model.manageBookmarks()
-                        case .credentials:
-                            model.manageLogins()
-                        }
-                    }
-                    .padding(.top, 8)
-                }
+        SyncWarningMessage(title: UserText.syncLimitExceededTitle, message: description, buttonTitle: actionTitle) {
+            switch itemType {
+            case .bookmarks:
+                model.manageBookmarks()
+            case .credentials:
+                model.manageLogins()
             }
-            .padding(.horizontal, 16)
         }
-        .frame(width: 512, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
     }
 
     enum LimitedItemType {
