@@ -44,12 +44,16 @@ extension View {
     @available(macOS, obsoleted: 14.0, message: "This needs to be removed as it‘s no longer necessary.")
     @ViewBuilder
     func legacyOnDismiss(_ onDismiss: @escaping () -> Void) -> some View {
-        if #unavailable(macOS 14.0), let presentationModeKey = \EnvironmentValues.presentationMode as? WritableKeyPath {
+        if #available(macOS 14.0, *) {
+            self
+
+        } else if let presentationModeKey = \EnvironmentValues.presentationMode as? WritableKeyPath {
             // hacky way to set the @Environment.presentationMode.
             // here we downcast a (non-writable) \.presentationMode KeyPath to a WritableKeyPath
             self.environment(presentationModeKey, Binding<PresentationMode>(onDismiss: onDismiss))
         } else {
-            self
+            // macOS 11 compatibility:
+            self.environment(\.legacyDismiss, onDismiss)
         }
     }
 }
@@ -83,11 +87,30 @@ struct DismissAction {
         dismiss()
     }
 }
+
+@available(macOS, obsoleted: 12.0, message: "This needs to be removed as it‘s no longer necessary.")
+struct LegacyDismissAction: EnvironmentKey {
+    static var defaultValue: () -> Void { { } }
+}
+
 extension EnvironmentValues {
     @available(macOS, obsoleted: 12.0, message: "This extension needs to be removed as it‘s no longer necessary.")
     var dismiss: DismissAction {
         DismissAction {
-            presentationMode.wrappedValue.dismiss()
+            if \EnvironmentValues.presentationMode as? WritableKeyPath != nil {
+                presentationMode.wrappedValue.dismiss()
+            } else {
+                self[LegacyDismissAction.self]()
+            }
+        }
+    }
+    @available(macOS, obsoleted: 12.0, message: "This extension needs to be removed as it‘s no longer necessary.")
+    fileprivate var legacyDismiss: () -> Void {
+        get {
+            self[LegacyDismissAction.self]
+        }
+        set {
+            self[LegacyDismissAction.self] = newValue
         }
     }
 }
