@@ -71,7 +71,14 @@ final class PreferencesSidebarModel: ObservableObject {
             let includingVPN = false
 #endif
 
-            return PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPN: includingVPN)
+//            let includingSync = privacyConfigurationManager.privacyConfig.isEnabled(featureKey: .sync)
+            let includingSync = NSApp.delegateTyped.internalUserDecider.isInternalUser
+
+            return PreferencesSection.defaultSections(
+                includingDuckPlayer: includeDuckPlayer,
+                includingSync: includingSync,
+                includingVPN: includingVPN
+            )
         }
 
         self.init(loadSections: loadSections,
