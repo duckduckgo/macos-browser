@@ -35,14 +35,10 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
             VStack(alignment: .leading, spacing: 12) {
                 SyncUIViews.TextHeader2(text: UserText.otherOptionsSectionTitle)
                 VStack(alignment: .leading, spacing: 8) {
-                    SyncUIViews.TextLink(text: UserText.syncThisDeviceLink)
-                        .onTapGesture {
-                            model.syncWithServerPressed()
-                        }
-                    SyncUIViews.TextLink(text: UserText.recoverDataLink)
-                        .onTapGesture {
-                            model.recoverDataPressed()
-                        }
+                    TextButton(UserText.syncThisDeviceLink, weight: .semibold, action: model.syncWithServerPressed)
+                        .disabled(!model.isCreatingAccountAvailable)
+                    TextButton(UserText.recoverDataLink, weight: .semibold, action: model.recoverDataPressed)
+                        .disabled(!model.isAccountRecoveryAvailable)
                 }
             }
         }
@@ -56,17 +52,9 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 SyncUIViews.TextDetailSecondary(text: UserText.beginSyncDescription)
             }
             .padding(.bottom, 16)
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color("LinkBlueColor"))
-                    .frame(width: 220, height: 32)
-                Text(UserText.beginSyncButton)
-                    .foregroundColor(.white)
-                    .bold()
-            }
-            .onTapGesture {
-                model.syncWithAnotherDevicePressed()
-            }
+            Button(UserText.beginSyncButton, action: model.syncWithAnotherDevicePressed)
+                .buttonStyle(SyncWithAnotherDeviceButtonStyle(enabled: model.isConnectingDevicesAvailable))
+                .disabled(!model.isConnectingDevicesAvailable)
         }
         .frame(width: 512, height: 254)
         .roundedBorder()
@@ -84,5 +72,30 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
         } else {
             EmptyView()
         }
+    }
+}
+
+private struct SyncWithAnotherDeviceButtonStyle: ButtonStyle {
+
+    public let enabled: Bool
+
+    public init(enabled: Bool) {
+        self.enabled = enabled
+    }
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+
+        let enabledBackgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let disabledBackgroundColor = Color.gray.opacity(0.1)
+        let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
+
+        configuration.label
+            .lineLimit(1)
+            .font(.body.bold())
+            .frame(width: 220, height: 32)
+            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
+            .foregroundColor(labelColor)
+            .cornerRadius(8)
+
     }
 }

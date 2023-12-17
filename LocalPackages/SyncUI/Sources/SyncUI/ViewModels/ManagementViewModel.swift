@@ -23,6 +23,7 @@ public protocol ManagementViewModel: ObservableObject {
     var isSyncAvailable: Bool { get }
     var isConnectingDevicesAvailable: Bool { get }
     var isCreatingAccountAvailable: Bool { get }
+    var isAccountRecoveryAvailable: Bool { get }
 
     var isSyncEnabled: Bool { get }
     var isCreatingAccount: Bool { get }

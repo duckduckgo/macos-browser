@@ -98,11 +98,13 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isSyncAvailable: Bool = true
     @Published var isConnectingDevicesAvailable: Bool = true
     @Published var isCreatingAccountAvailable: Bool = true
+    @Published var isAccountRecoveryAvailable: Bool = true
 
     private func updateSyncFeatureFlag(_ syncFeatureFlag: SyncFeatureFlag) {
-        isSyncAvailable = syncFeatureFlag.rawValue > SyncFeatureFlag.dataSyncingNotAvailable.rawValue
-        isConnectingDevicesAvailable = syncFeatureFlag.rawValue > SyncFeatureFlag.setupFlowsNotAvailable.rawValue
-        isCreatingAccountAvailable = false // syncFeatureFlag.rawValue > SyncFeatureFlag.accountCreationNotAvailable.rawValue
+        isSyncAvailable = syncFeatureFlag.isSyncAvailable
+        isConnectingDevicesAvailable = syncFeatureFlag.canConnectNewDevice
+        isCreatingAccountAvailable = syncFeatureFlag.canCreateAccount
+        isAccountRecoveryAvailable = syncFeatureFlag.canRestoreAccount
     }
 
     var recoveryCode: String? {
@@ -135,6 +137,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
 
     private func setUpObservables() {
         syncService.featureFlagPublisher
+            .dropFirst()
             .removeDuplicates()
             .assign(to: \.syncFeatureFlag, onWeaklyHeld: self)
             .store(in: &cancellables)
