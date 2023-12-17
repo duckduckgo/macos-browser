@@ -23,16 +23,28 @@ struct EditableTextView: NSViewRepresentable {
 
     @Binding var text: String
 
-    var isEditable: Bool = true
-    var font: NSFont? = .systemFont(ofSize: 14, weight: .regular)
-    var onEditingChanged: () -> Void = {}
-    var onCommit: () -> Void = {}
-    var onTextChange: (String) -> Void = { _ in }
+    var isEditable: Bool
+    var font: NSFont
+    var onEditingChanged: () -> Void
+    var onCommit: () -> Void
+    var onTextChange: (String) -> Void
     var maxLength: Int?
     var insets: NSSize?
 
+    init(text: Binding<String>, isEditable: Bool = true, font: NSFont?, onEditingChanged: @escaping () -> Void = {}, onCommit: @escaping () -> Void = {}, onTextChange: @escaping (String) -> Void = { _ in }, maxLength: Int? = nil, insets: NSSize? = nil) {
+
+        self._text = text
+        self.isEditable = isEditable
+        self.font = font ?? .systemFont(ofSize: 13, weight: .regular)
+        self.onEditingChanged = onEditingChanged
+        self.onCommit = onCommit
+        self.onTextChange = onTextChange
+        self.maxLength = maxLength
+        self.insets = insets
+    }
+
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+        return Coordinator(self)
     }
 
     func makeNSView(context: Context) -> CustomTextView {
@@ -40,9 +52,9 @@ struct EditableTextView: NSViewRepresentable {
             text: text,
             isEditable: isEditable,
             font: font,
-            insets: insets
+            insets: insets,
+            delegate: context.coordinator
         )
-        textView.delegate = context.coordinator
         return textView
     }
 
@@ -74,15 +86,15 @@ extension EditableTextView {
         }
 
         func textDidChange(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else {
-                return
-            }
+            guard let textView = notification.object as? NSTextView else { return }
 
             if let maxLength = parent.maxLength, textView.string.count > maxLength {
                 textView.string = String(textView.string.prefix(maxLength))
             }
 
-            self.parent.text = textView.string
+            if self.parent.text != textView.string {
+                self.parent.text = textView.string
+            }
             self.selectedRanges = textView.selectedRanges
         }
 
@@ -94,30 +106,36 @@ extension EditableTextView {
 
 final class CustomTextView: NSView {
 
-    private let isEditable: Bool
-    private let font: NSFont?
-    private let insets: NSSize?
     weak var delegate: NSTextViewDelegate?
 
     var text: String {
         didSet {
-            textView.string = text
+            if textView.string != text {
+                textView.string = text
+            }
         }
     }
 
     var selectedRanges: [NSValue] = [] {
         didSet {
-            guard selectedRanges.count > 0 else {
-                return
-            }
-
+            guard !selectedRanges.isEmpty else { return }
             textView.selectedRanges = selectedRanges
         }
     }
 
-    private lazy var scrollView: NSScrollView = {
-        let scrollView = NSScrollView()
+    let scrollView: NSScrollView
+    let textView: NSTextView
 
+    // MARK: - Init
+
+    init(text: String = "", isEditable: Bool, font: NSFont, insets: NSSize? = nil, delegate: NSTextViewDelegate? = nil, selectedRanges: [NSValue] = []) {
+
+        self.text = text
+        self.selectedRanges = selectedRanges
+
+        self.delegate = delegate
+
+        scrollView = NSScrollView()
         scrollView.drawsBackground = true
         scrollView.borderType = .noBorder
         scrollView.hasVerticalScroller = true
@@ -125,10 +143,6 @@ final class CustomTextView: NSView {
         scrollView.autoresizingMask = [.width, .height]
         scrollView.translatesAutoresizingMaskIntoConstraints = false
 
-        return scrollView
-    }()
-
-    private lazy var textView: NSTextView = {
         let contentSize = scrollView.contentSize
         let textStorage = NSTextStorage()
         let layoutManager = NSLayoutManager()
@@ -139,33 +153,27 @@ final class CustomTextView: NSView {
         textContainer.containerSize = NSSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
         layoutManager.addTextContainer(textContainer)
 
-        let textView = NSTextView(frame: .zero, textContainer: textContainer)
+        textView = NSTextView(frame: .zero, textContainer: textContainer)
         textView.autoresizingMask = .width
         textView.backgroundColor = NSColor(named: "PWMEditingControlColor")!
         textView.delegate = self.delegate
         textView.drawsBackground = true
-        textView.font = self.font
-        textView.isEditable = self.isEditable
+        textView.font = font
+        textView.isEditable = isEditable
         textView.isHorizontallyResizable = false
         textView.isVerticallyResizable = true
         textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
         textView.minSize = NSSize(width: 0, height: contentSize.height)
         textView.textColor = NSColor.labelColor
         textView.allowsUndo = true
+        textView.string = text
+
         if let insets {
             textView.textContainerInset = insets
         }
-
-        return textView
-    }()
-
-    // MARK: - Init
-
-    init(text: String, isEditable: Bool, font: NSFont?, insets: NSSize?) {
-        self.font = font
-        self.isEditable = isEditable
-        self.text = text
-        self.insets = insets
+        if !selectedRanges.isEmpty {
+            textView.selectedRanges = selectedRanges
+        }
 
         super.init(frame: .zero)
     }
@@ -197,4 +205,5 @@ final class CustomTextView: NSView {
     func setupTextView() {
         scrollView.documentView = textView
     }
+
 }
