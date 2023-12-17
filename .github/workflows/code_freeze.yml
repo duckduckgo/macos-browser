@@ -58,6 +58,12 @@ jobs:
             | jq -r .data.new_task.gid)"
           echo "asana_task_url=https://app.asana.com/0/0/${asana_task_id}/f" >> $GITHUB_OUTPUT
 
+          curl -fLSs -X POST "https://app.asana.com/api/1.0/sections/${{ vars.MACOS_APP_DEVELOPMENT_RELEASE_SECTION_ID }}/addTask" \
+            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --output /dev/null \
+            -d "{\"data\": {\"task\": \"${asana_task_id}\"}}"
+
           assignee_id="$(curl -fLSs https://raw.githubusercontent.com/duckduckgo/BrowserServicesKit/main/.github/actions/asana-failed-pr-checks/user_ids.json \
             | jq -r .${{ github.actor }})"
 
