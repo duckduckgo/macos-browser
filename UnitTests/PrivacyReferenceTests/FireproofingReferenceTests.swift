@@ -77,7 +77,7 @@ final class FireproofingReferenceTests: XCTestCase {
             return
         }
 
-        Task { @MainActor () -> Void in
+        Task { @MainActor in
             await dataStore.cookieStore?.setCookie(cookie)
             await webCacheManager.clear()
 
