@@ -129,7 +129,7 @@ struct DataImportViewModel {
 
     init(importSource: Source? = nil,
          screen: Screen? = nil,
-         availableImportSources: [DataImport.Source] = ThirdPartyBrowser.installedBrowsers.map(\.importSource),
+         availableImportSources: [DataImport.Source] = Source.allCases.filter { $0.canImportData },
          preferredImportSources: [Source] = [.chrome, .firefox, .safari],
          summary: [DataTypeImportResult] = [],
          loadProfiles: @escaping (ThirdPartyBrowser) -> BrowserProfileList = { $0.browserProfiles() },

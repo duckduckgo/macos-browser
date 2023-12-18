@@ -49,10 +49,6 @@ enum ThirdPartyBrowser: CaseIterable {
     case onePassword7
     case onePassword8
 
-    static var installedBrowsers: [ThirdPartyBrowser] {
-        return allCases.filter(\.isInstalled)
-    }
-
     // swiftlint:disable:next cyclomatic_complexity
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
