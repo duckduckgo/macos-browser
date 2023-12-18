@@ -32,7 +32,6 @@ public final class AppStoreRestoreFlow {
         case failedToFetchAccountDetails
         case failedToFetchSubscriptionDetails
         case subscriptionExpired(accountDetails: RestoredAccountDetails)
-        case somethingWentWrong
     }
 
     public static func restoreAccountFromPastPurchase() async -> Result<Void, AppStoreRestoreFlow.Error> {

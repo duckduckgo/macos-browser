@@ -25,15 +25,11 @@ public final class AppStorePurchaseFlow {
 
     public enum Error: Swift.Error {
         case noProductsFound
-
         case activeSubscriptionAlreadyPresent
         case authenticatingWithTransactionFailed
         case accountCreationFailed
         case purchaseFailed
-
         case missingEntitlements
-
-        case somethingWentWrong
     }
 
     public static func subscriptionOptions() async -> Result<SubscriptionOptions, AppStorePurchaseFlow.Error> {
