@@ -471,7 +471,7 @@ extension MainViewController: NSDraggingDestination {
     func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
         guard let url = draggingInfo.draggingPasteboard.url else { return false }
 
-        browserTabViewController.openNewTab(with: .url(url))
+        browserTabViewController.openNewTab(with: .url(url, source: .appOpenUrl))
         return true
     }
 

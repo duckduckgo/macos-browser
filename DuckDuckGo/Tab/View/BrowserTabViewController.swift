@@ -39,7 +39,6 @@ final class BrowserTabViewController: NSViewController {
 
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
-    private var cookieConsentCancellable: AnyCancellable?
     private var activeUserDialogCancellable: Cancellable?
     private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
@@ -53,8 +52,6 @@ final class BrowserTabViewController: NSViewController {
     private var hoverLabelWorkItem: DispatchWorkItem?
 
     private var transientTabContentViewController: NSViewController?
-
-    private var cookieConsentPopoverManager = CookieConsentPopoverManager()
 
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
@@ -146,7 +143,7 @@ final class BrowserTabViewController: NSViewController {
         guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController else { return }
 
         self.previouslySelectedTab = tabCollectionViewModel.selectedTab
-        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionInContextSignupLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -214,7 +211,6 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
-                self.subscribeToCookieConsentPrompt(of: selectedTabViewModel)
             }
             .store(in: &cancellables)
     }
@@ -358,19 +354,6 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
-    private func subscribeToCookieConsentPrompt(of tabViewModel: TabViewModel?) {
-        cookieConsentCancellable = tabViewModel?.tab.cookieConsentPromptRequestPublisher.sink { [weak self, weak tab=tabViewModel?.tab] request in
-            guard let self, let tab, let request else {
-                self?.cookieConsentPopoverManager.close(animated: false)
-                return
-            }
-            self.cookieConsentPopoverManager.show(on: self.view, animated: true) { [weak request] result in
-                request?.submit(result)
-            }
-            self.cookieConsentPopoverManager.currentTab = tab
-        }
-    }
-
     private func subscribeToErrorViewState() {
         errorViewStateCancellable = tabViewModel?.$errorViewState.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.displayErrorView(
@@ -448,6 +431,7 @@ final class BrowserTabViewController: NSViewController {
         bookmarksViewController?.removeCompletely()
 #if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
+        dataBrokerProtectionHomeViewController = nil
 #endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
@@ -614,11 +598,11 @@ extension BrowserTabViewController: NSDraggingDestination {
               let selectedTab = tabCollectionViewModel.selectedTab,
               !selectedTab.isPinned else {
 
-            self.openNewTab(with: .url(url))
+            self.openNewTab(with: .url(url, source: .appOpenUrl))
             return true
         }
 
-        selectedTab.setContent(.url(url))
+        selectedTab.setContent(.url(url, source: .appOpenUrl))
         return true
     }
 

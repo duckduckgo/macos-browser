@@ -56,7 +56,6 @@ extension Tab: NSSecureCoding {
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
-                  shouldLoadFromCache: true,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 
         _=self.awakeAfter(using: decoder)
@@ -101,7 +100,7 @@ private extension Tab.TabContent {
             self = .homePage
         case .url:
             guard let url = url else { return nil }
-            self = .url(url)
+            self = .url(url, source: .stateRestoration)
         case .bookmarks:
             self = .bookmarks
         case .preferences:
@@ -110,7 +109,7 @@ private extension Tab.TabContent {
             self = .onboarding
         case .duckPlayer:
             guard let videoID = videoID else { return nil }
-            self = .url(.duckPlayer(videoID, timestamp: timestamp))
+            self = .url(.duckPlayer(videoID, timestamp: timestamp), source: .stateRestoration)
         case .dataBrokerProtection:
             self = .dataBrokerProtection
         }

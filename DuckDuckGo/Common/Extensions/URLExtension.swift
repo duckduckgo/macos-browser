@@ -443,7 +443,7 @@ extension URL {
     }
 
     func stripUnsupportedCredentials() -> String {
-        if let atIndex = self.absoluteString.firstIndex(of: "@") {
+        if self.absoluteString.firstIndex(of: "@") != nil {
             let authPattern = "([^:]+):\\/\\/[^\\/]*@"
             let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
             let uuid = UUID().uuidString.lowercased()

@@ -75,8 +75,6 @@ final class PopoverMessageViewController: NSHostingController<PopoverMessageView
     }
 
     func show(onParent parent: NSViewController, relativeTo view: NSView) {
-        let rect = view.bounds
-
         // Set the content size to match the SwiftUI view's intrinsic size
         self.preferredContentSize = self.view.fittingSize
 

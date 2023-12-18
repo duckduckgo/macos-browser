@@ -76,3 +76,4 @@ excluded:
   - release
   - vendor
   - DerivedData
+  - .ruby-lsp

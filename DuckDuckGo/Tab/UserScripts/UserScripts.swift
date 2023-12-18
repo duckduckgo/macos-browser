@@ -19,6 +19,7 @@
 import Foundation
 import BrowserServicesKit
 import UserScript
+import WebKit
 
 @MainActor
 final class UserScripts: UserScriptsProvider {
@@ -40,7 +41,7 @@ final class UserScripts: UserScriptsProvider {
     let contentScopeUserScriptIsolated: ContentScopeUserScript
     let autofillScript: WebsiteAutofillUserScript
     let specialPages: SpecialPagesUserScript?
-    let autoconsentUserScript: UserScriptWithAutoconsent?
+    let autoconsentUserScript: UserScriptWithAutoconsent
     let youtubeOverlayScript: YoutubeOverlayUserScript?
     let youtubePlayerUserScript: YoutubePlayerUserScript?
 
@@ -59,8 +60,7 @@ final class UserScripts: UserScriptsProvider {
 
         autofillScript = WebsiteAutofillUserScript(scriptSourceProvider: sourceProvider.autofillSourceProvider!)
 
-        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider,
-                                                      config: sourceProvider.privacyConfigurationManager.privacyConfig)
+        autoconsentUserScript = AutoconsentUserScript(scriptSource: sourceProvider, config: sourceProvider.privacyConfigurationManager.privacyConfig)
 
         if DuckPlayer.shared.isAvailable {
             youtubeOverlayScript = YoutubeOverlayUserScript()
@@ -72,14 +72,13 @@ final class UserScripts: UserScriptsProvider {
             specialPages = nil
         }
 
-        if let autoconsentUserScript = autoconsentUserScript {
-            userScripts.append(autoconsentUserScript)
-        }
-        if let youtubeOverlayScript = youtubeOverlayScript {
+        userScripts.append(autoconsentUserScript)
+
+        if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
         }
 
-        if let youtubePlayerUserScript = youtubePlayerUserScript {
+        if let youtubePlayerUserScript {
             if let specialPages = specialPages {
                 specialPages.registerSubfeature(delegate: youtubePlayerUserScript)
                 userScripts.append(specialPages)
