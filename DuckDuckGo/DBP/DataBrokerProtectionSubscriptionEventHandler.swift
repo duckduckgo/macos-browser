@@ -25,11 +25,14 @@ final class DataBrokerProtectionSubscriptionEventHandler {
 
     private let accountManager: Account.AccountManaging
     private let authRepository: AuthenticationRepository
+    private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
     init(accountManager: Account.AccountManaging = Account.AccountManager(),
-         authRepository: AuthenticationRepository = KeychainAuthenticationData()) {
+         authRepository: AuthenticationRepository = KeychainAuthenticationData(),
+         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.accountManager = accountManager
         self.authRepository = authRepository
+        self.featureDisabler = featureDisabler
     }
 
     func registerForSubscriptionAccountManagerEvents() {
@@ -47,7 +50,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignOut() {
-        print("We need to disable DBP")
+        featureDisabler.disableAndDelete()
     }
 }
 

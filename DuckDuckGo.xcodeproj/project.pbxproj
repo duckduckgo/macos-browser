@@ -2923,6 +2923,7 @@
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
 		BB5789722B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */; };
+		BB5789732B2CC0300009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */; };
 		BBDFDC5A2B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
 		BBDFDC5C2B2B8D7000F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
 		BBDFDC5D2B2B8E2100F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
@@ -10870,6 +10871,7 @@
 				4B957B8F2AC7AE700062CA31 /* Assertions.swift in Sources */,
 				4B957B902AC7AE700062CA31 /* BookmarkViewModel.swift in Sources */,
 				4B957B912AC7AE700062CA31 /* DaxSpeech.swift in Sources */,
+				BB5789732B2CC0300009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift in Sources */,
 				4B957B922AC7AE700062CA31 /* DuckPlayerSchemeHandler.swift in Sources */,
 				4B957B932AC7AE700062CA31 /* FirePopoverViewModel.swift in Sources */,
 				4B957B942AC7AE700062CA31 /* BWCommand.swift in Sources */,
