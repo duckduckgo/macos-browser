@@ -201,7 +201,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 #else
         if #available(macOS 12.0, *) {
             let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-            let progressViewController = await ProgressViewController(title: "Purchase in progress...")
+            let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)
 
             defer {
                 Task {
@@ -248,7 +248,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 return nil
             }
 
-            await progressViewController.updateTitleText("Completing purchase...")
+            await progressViewController.updateTitleText(UserText.completingPurchaseTitle)
 
             os_log(.info, log: .subscription, "[Purchase] Completing purchase")
 
@@ -276,7 +276,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                     if #available(macOS 12.0, *) {
                         Task {
                             let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                            let progressViewController = ProgressViewController(title: "Restoring subscription...")
+                            let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
 
                             defer { mainViewController?.dismiss(progressViewController) }
 
@@ -332,7 +332,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
     func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-        let progressViewController = await ProgressViewController(title: "Completing purchase...")
+        let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
 
         await mainViewController?.presentAsSheet(progressViewController)
         await StripePurchaseFlow.completeSubscriptionPurchase()
