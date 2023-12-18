@@ -103,11 +103,11 @@ extension Preferences {
             }, changePlanOrBilling: {
                 self.changePlanOrBilling()
             }, openVPN: {
-                print("openVPN")
+                NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
             }, openPersonalInformationRemoval: {
-                print("openPersonalInformationRemoval")
+                NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             }, openIdentityTheftRestoration: {
-                print("openIdentityTheftRestoration")
+                NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
             })
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {

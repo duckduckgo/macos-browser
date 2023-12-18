@@ -20,8 +20,8 @@ import Foundation
 import Common
 
 public extension Notification.Name {
-    static let accountDidSignIn = Notification.Name("com.duckduckgo.browserServicesKit.AccountDidSignIn")
-    static let accountDidSignOut = Notification.Name("com.duckduckgo.browserServicesKit.AccountDidSignOut")
+    static let accountDidSignIn = Notification.Name("com.duckduckgo.subscription.AccountDidSignIn")
+    static let accountDidSignOut = Notification.Name("com.duckduckgo.subscription.AccountDidSignOut")
 }
 
 public protocol AccountManagerKeychainAccessDelegate: AnyObject {

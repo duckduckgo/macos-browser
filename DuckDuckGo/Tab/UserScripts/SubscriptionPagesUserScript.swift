@@ -310,9 +310,27 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             return nil
         }
 
-        print(">>> Selected a feature -- show the corresponding UI", featureSelection)
+        guard let subscriptionFeatureName = SubscriptionFeatureName(rawValue: featureSelection.feature) else {
+            assertionFailure("SubscriptionPagesUserScript: feature name does not matches mapping")
+            return nil
+        }
 
-        // TODO: implement selection
+        switch subscriptionFeatureName {
+        case .privateBrowsing:
+            NotificationCenter.default.post(name: .openPrivateBrowsing, object: self, userInfo: nil)
+        case .privateSearch:
+            NotificationCenter.default.post(name: .openPrivateSearch, object: self, userInfo: nil)
+        case .emailProtection:
+            NotificationCenter.default.post(name: .openEmailProtection, object: self, userInfo: nil)
+        case .appTrackingProtection:
+            NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
+        case .vpn:
+            NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+        case .personalInformationRemoval:
+            NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+        case .identityTheftRestoration:
+            NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+        }
 
         return nil
     }
