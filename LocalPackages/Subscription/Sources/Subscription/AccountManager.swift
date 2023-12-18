@@ -215,4 +215,30 @@ public class AccountManager {
             }
         }
     }
+
+    @discardableResult
+    public static func checkForEntitlements(wait waitTime: Double, retry retryCount: Int) async -> Bool {
+        var count = 0
+        var hasEntitlements = false
+
+        repeat {
+            hasEntitlements = await !AccountManager().fetchEntitlements().isEmpty
+
+            if hasEntitlements {
+                break
+            } else {
+                count += 1
+                try? await Task.sleep(seconds: waitTime)
+            }
+        } while !hasEntitlements && count < retryCount
+
+        return hasEntitlements
+    }
+}
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: Double) async throws {
+        let duration = UInt64(seconds * 1_000_000_000)
+        try await Task.sleep(nanoseconds: duration)
+    }
 }
