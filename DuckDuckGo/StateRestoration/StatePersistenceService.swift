@@ -105,7 +105,7 @@ final class StatePersistenceService {
         guard let data = fileStore.decrypt(archive) else {
             throw CocoaError(.fileReadNoSuchFile)
         }
-        let unarchiver = try NSKeyedUnarchiver.init(forReadingFrom: data)
+        let unarchiver = try NSKeyedUnarchiver(forReadingFrom: data)
         try restore(unarchiver)
     }
 

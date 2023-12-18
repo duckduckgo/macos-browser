@@ -7912,13 +7912,13 @@
 				378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */,
 				3706FA79293F65D500E42796 /* Check Embedded Config URLs */,
 				3706FA7A293F65D500E42796 /* Sources */,
-				3706FCA5293F65D500E42796 /* Swift Lint */,
 				3706FCA6293F65D500E42796 /* Frameworks */,
 				3706FCB1293F65D500E42796 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B69D061C2A4C0BC10032D14D /* PBXTargetDependency */,
 				4B5F14FE2A1529230060320F /* PBXTargetDependency */,
 			);
 			name = "DuckDuckGo Privacy Browser App Store";
@@ -7956,6 +7956,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B69D06182A4C0AD20032D14D /* PBXTargetDependency */,
 				37079A93294236F20031BB3C /* PBXTargetDependency */,
 			);
 			name = "Unit Tests App Store";
@@ -7979,6 +7980,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B69D061A2A4C0AD80032D14D /* PBXTargetDependency */,
 				B6EC37F429B5DA94001ACE79 /* PBXTargetDependency */,
 				37079A95294236FA0031BB3C /* PBXTargetDependency */,
 			);
@@ -7998,6 +8000,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B69D06162A4C0ACD0032D14D /* PBXTargetDependency */,
 				B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */,
 				4B1AD8A325FC27E200261379 /* PBXTargetDependency */,
 			);
@@ -8021,6 +8024,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6080B9F2B20AF7B00B418EF /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionSystemExtension;
 			packageProductDependencies = (
@@ -8046,6 +8050,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6080BA32B20AF8300B418EF /* PBXTargetDependency */,
 				7BEC18312AD5DA3300D30536 /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoVPN;
@@ -8074,6 +8079,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6080BA52B20AF8800B418EF /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoVPNAppStore;
 			packageProductDependencies = (
@@ -8098,6 +8104,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6080BA12B20AF7F00B418EF /* PBXTargetDependency */,
 				4B4BEC4A2A11B627001D9AC5 /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoNotifications;
@@ -8118,6 +8125,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6080B9D2B20AF7700B418EF /* PBXTargetDependency */,
 				4B4D60532A0B29CB00BCD287 /* PBXTargetDependency */,
 			);
 			name = NetworkProtectionAppExtension;
@@ -8138,7 +8146,6 @@
 				4B9579432AC7AE700062CA31 /* Assert Xcode version */,
 				4B9579442AC7AE700062CA31 /* Check Embedded Config URLs */,
 				4B9579452AC7AE700062CA31 /* Sources */,
-				4B957BD32AC7AE700062CA31 /* Swift Lint */,
 				4B957BD42AC7AE700062CA31 /* Frameworks */,
 				4B957BEC2AC7AE700062CA31 /* Resources */,
 				4B957C322AC7AE700062CA31 /* Make /Applications symlink, remove app on Clean build */,
@@ -8194,6 +8201,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6080B9B2B20AF6400B418EF /* PBXTargetDependency */,
 				7B4CE8E026F02108009134B1 /* PBXTargetDependency */,
 			);
 			name = "UI Tests";
@@ -8208,11 +8216,12 @@
 				9D9AE8B62AAA39A70026E7DC /* Sources */,
 				9D9AE8C62AAA39A70026E7DC /* Frameworks */,
 				9D9AE8C92AAA39A70026E7DC /* Resources */,
-				7BB34F502AD98394005691AE /* ShellScript */,
+				7BB34F502AD98394005691AE /* Copy Swift Package resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B6080BA92B20AF8F00B418EF /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoDBPBackgroundAgent;
 			packageProductDependencies = (
@@ -8235,6 +8244,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B6080BAB2B20AF9200B418EF /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoDBPBackgroundAgentAppStore;
 			packageProductDependencies = (
@@ -8253,7 +8263,6 @@
 				CBCCF59E299667B700C02DFE /* Assert Xcode version */,
 				3705272528992C8A000C06A2 /* Check Embedded Config URLs */,
 				AA585D7A248FD31100E9A3E2 /* Sources */,
-				AA8EDF2824925E940071C2E8 /* Swift Lint */,
 				AA585D7B248FD31100E9A3E2 /* Frameworks */,
 				AA585D7C248FD31100E9A3E2 /* Resources */,
 				B6F2C8722A7A4C7D000498CF /* Make /Applications symlink, remove app on Clean build */,
@@ -8262,6 +8271,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B692D0DF2B209FB7003F2548 /* PBXTargetDependency */,
 				4B5F14FC2A15291D0060320F /* PBXTargetDependency */,
 				31C6E9AD2B0C07BA0086DC30 /* PBXTargetDependency */,
 			);
@@ -8308,6 +8318,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B69D06142A4C0AC50032D14D /* PBXTargetDependency */,
 				AA585D92248FD31400E9A3E2 /* PBXTargetDependency */,
 			);
 			name = "Unit Tests";
@@ -8787,25 +8798,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\nif [ \"$CONFIGURATION\" == \"Release\" ]; then\n   \"${SRCROOT}/scripts/update_embedded.sh\" -c\nfi\n";
 		};
-		3706FCA5293F65D500E42796 /* Swift Lint */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Swift Lint";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/zsh;
-			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n./lint.sh\n";
-		};
 		378E2798296F6D1D00FCADA2 /* Validate PRODUCT_NAME */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -8899,25 +8891,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if [ \"$CONFIGURATION\" == \"Release\" ]; then\n   \"${SRCROOT}/scripts/update_embedded.sh\" -c\nfi\n";
 		};
-		4B957BD32AC7AE700062CA31 /* Swift Lint */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Swift Lint";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/zsh;
-			shellScript = "./lint.sh\n";
-		};
 		4B957C322AC7AE700062CA31 /* Make /Applications symlink, remove app on Clean build */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -8939,6 +8912,7 @@
 		};
 		7B31FD922AD126C40086AA24 /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -8974,7 +8948,7 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -z \"${SYSEX_BUNDLE_ID}\" ]]; then\n    echo \"Required build settings are not defined, please check xcconfig files\"\n    exit 1\nfi\n\n\necho \"ditto ${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID}.systemextension $BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}.systemextension\"\n\nditto \"${BUILT_PRODUCTS_DIR}/${SYSEX_BUNDLE_ID}.systemextension\" \"$BUILT_PRODUCTS_DIR/${CONTENTS_FOLDER_PATH}/Library/SystemExtensions/${SYSEX_BUNDLE_ID}.systemextension\" || exit 1\n";
 		};
-		7BB34F502AD98394005691AE /* ShellScript */ = {
+		7BB34F502AD98394005691AE /* Copy Swift Package resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -8984,6 +8958,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Copy Swift Package resources";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -8991,25 +8966,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/ContentScopeScripts_ContentScopeScripts.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/DataBrokerProtection_DataBrokerProtection.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
-		};
-		AA8EDF2824925E940071C2E8 /* Swift Lint */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Swift Lint";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/zsh;
-			shellScript = "if [ \"$ENABLE_PREVIEWS\" = \"YES\" ]; then exit 0; fi\n./lint.sh\n";
 		};
 		B6BD8F0A2A260E5900B6A41F /* embed libswift_Concurrency.dylib */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9028,7 +8984,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "FRAMEWORKS_DIR=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nDYLIB_TARGET_PATH=\"${FRAMEWORKS_DIR}/libswift_Concurrency.dylib\"\n\nif [ ! -e \"${DYLIB_TARGET_PATH}\" ]; then\n\n    DYLIB_PATH=$(find \"${TOOLCHAIN_DIR}/usr/lib\" -path \"*/${HOST_PLATFORM}/libswift_Concurrency.dylib\")\n    echo \"copy ${DYLIB_PATH} to ${DYLIB_TARGET_PATH}\"\n\n    mkdir -p \"${FRAMEWORKS_DIR}\"\n    cp \"${DYLIB_PATH}\" \"${DYLIB_TARGET_PATH}\" || exit 1\n\nelse\n    echo \"${DYLIB_TARGET_PATH} exists\"\nfi\n";
+			shellScript = "FRAMEWORKS_DIR=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nDYLIB_TARGET_PATH=\"${FRAMEWORKS_DIR}/libswift_Concurrency.dylib\"\n\nif [ ! -e \"${DYLIB_TARGET_PATH}\" ]; then\n\n    DYLIB_PATH=$(find \"${TOOLCHAIN_DIR}/usr/lib\" -path \"*/${HOST_PLATFORM}/libswift_Concurrency.dylib\")\n    echo \"copy ${DYLIB_PATH} to ${DYLIB_TARGET_PATH}\"\n\n    mkdir -p \"${FRAMEWORKS_DIR}\"\n    cp \"${DYLIB_PATH}\" \"${DYLIB_TARGET_PATH}\" || exit 1\n\nelse\n    echo \"${DYLIB_TARGET_PATH} exists 👌\"\nfi\n";
 		};
 		B6F2C8722A7A4C7D000498CF /* Make /Applications symlink, remove app on Clean build */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9047,7 +9003,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ \"${CONFIGURATION}\" != \"Debug\" ]]; then\n    # run only for Debug builds\n    exit 0\nfi\n\n# if Xcode created real Applications directory inside BUILT_PRODUCTS_DIR \nif [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # we only get here on clean build, remove an existing app in /Applications/DEBUG on clean build\n    echo \"rm -rf /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # create /Applications/DEBUG dir\n    echo \"mkdir -p /${INSTALL_PATH}\"\n    mkdir -p \"/${INSTALL_PATH}\"\n\n    # move the app bundle to /Applications/DEBUG\n    echo \"mv ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    mv \"${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\" \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"rm -rf ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf \"${BUILT_PRODUCTS_DIR}/Applications\"\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    echo \"ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\"\n    ln -s /Applications \"${BUILT_PRODUCTS_DIR}/Applications\"\nfi\n";
+			shellScript = "if [[ \"${CONFIGURATION}\" != \"Debug\" ]]; then\n    # run only for Debug builds\n    exit 0\nfi\n\n# if Xcode created real Applications directory inside BUILT_PRODUCTS_DIR \nif [[ ! -L ${BUILT_PRODUCTS_DIR}/Applications ]]; then\n    # we only get here on clean build, remove an existing app in /Applications/DEBUG on clean build\n    echo \"rm -rf /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    rm -rf \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # create /Applications/DEBUG dir\n    echo \"mkdir -p /${INSTALL_PATH}\"\n    mkdir -p \"/${INSTALL_PATH}\"\n\n    # move the app bundle to /Applications/DEBUG\n    echo \"mv ${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app /${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n    mv \"${DSTROOT}/${INSTALL_PATH}/${PRODUCT_NAME}.app\" \"/${INSTALL_PATH}/${PRODUCT_NAME}.app\"\n\n    # rm ${BUILT_PRODUCTS_DIR}/Applications directory created by Xcode\n    echo \"rm -rf ${BUILT_PRODUCTS_DIR}/Applications\" \n    rm -rf \"${BUILT_PRODUCTS_DIR}/Applications\"\n    # create ${BUILT_PRODUCTS_DIR}/Applications symlink to /Applications\n    echo \"ln -s /Applications ${BUILT_PRODUCTS_DIR}/Applications\"\n    ln -s /Applications \"${BUILT_PRODUCTS_DIR}/Applications\"\nelse\n    echo \"/Applications symlink 👌\"\nfi\n";
 		};
 		CBCCF59E299667B700C02DFE /* Assert Xcode version */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -11910,6 +11866,66 @@
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
 			targetProxy = AA585D91248FD31400E9A3E2 /* PBXContainerItemProxy */;
 		};
+		B6080B9B2B20AF6400B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080B9A2B20AF6400B418EF /* SwiftLintPlugin */;
+		};
+		B6080B9D2B20AF7700B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080B9C2B20AF7700B418EF /* SwiftLintPlugin */;
+		};
+		B6080B9F2B20AF7B00B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080B9E2B20AF7B00B418EF /* SwiftLintPlugin */;
+		};
+		B6080BA12B20AF7F00B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080BA02B20AF7F00B418EF /* SwiftLintPlugin */;
+		};
+		B6080BA32B20AF8300B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080BA22B20AF8300B418EF /* SwiftLintPlugin */;
+		};
+		B6080BA52B20AF8800B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080BA42B20AF8800B418EF /* SwiftLintPlugin */;
+		};
+		B6080BA72B20AF8B00B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080BA62B20AF8B00B418EF /* SwiftLintPlugin */;
+		};
+		B6080BA92B20AF8F00B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080BA82B20AF8F00B418EF /* SwiftLintPlugin */;
+		};
+		B6080BAB2B20AF9200B418EF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B6080BAA2B20AF9200B418EF /* SwiftLintPlugin */;
+		};
+		B692D0DF2B209FB7003F2548 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B692D0DE2B209FB7003F2548 /* SwiftLintPlugin */;
+		};
+		B69D06142A4C0AC50032D14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B69D06132A4C0AC50032D14D /* SwiftLintPlugin */;
+		};
+		B69D06162A4C0ACD0032D14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B69D06152A4C0ACD0032D14D /* SwiftLintPlugin */;
+		};
+		B69D06182A4C0AD20032D14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B69D06172A4C0AD20032D14D /* SwiftLintPlugin */;
+		};
+		B69D061A2A4C0AD80032D14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B69D06192A4C0AD80032D14D /* SwiftLintPlugin */;
+		};
+		B69D061C2A4C0BC10032D14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B69D061B2A4C0BC10032D14D /* SwiftLintPlugin */;
+		};
 		B6EC37F229B5DA8F001ACE79 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B6EC37E729B5DA2A001ACE79 /* tests-server */;
@@ -12720,7 +12736,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 94.0.2;
+				version = 94.0.3;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -13174,6 +13190,76 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		B6080B9A2B20AF6400B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080B9C2B20AF7700B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080B9E2B20AF7B00B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080BA02B20AF7F00B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080BA22B20AF8300B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080BA42B20AF8800B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080BA62B20AF8B00B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080BA82B20AF8F00B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B6080BAA2B20AF9200B418EF /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B692D0DE2B209FB7003F2548 /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B69D06132A4C0AC50032D14D /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B69D06152A4C0ACD0032D14D /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B69D06172A4C0AD20032D14D /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B69D06192A4C0AD80032D14D /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:SwiftLintPlugin";
+		};
+		B69D061B2A4C0BC10032D14D /* SwiftLintPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:SwiftLintPlugin";
 		};
 		B6AE39F229374AEC00C37AA4 /* OHHTTPStubs */ = {
 			isa = XCSwiftPackageProductDependency;
