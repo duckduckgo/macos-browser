@@ -89,4 +89,22 @@ enum UserText {
     static let manageEmailButton = NSLocalizedString("subscription.modal.manage.email.button", value: "Manage", comment: "Button for opening manage email address page")
     static let enterEmailButton = NSLocalizedString("subscription.modal.enter.email.button", value: "Enter Email", comment: "Button for opening page to enter email address")
     static let goToSyncSettingsButton = NSLocalizedString("subscription.modal.sync.settings.button", value: "Go to Sync Settings", comment: "Button to open sync settings")
+
+    // MARK: - Alerts
+    static let okButtonTitle = NSLocalizedString("subscription.alert.button.ok", value: "OK", comment: "Alert button for confirming it")
+    static let cancelButtonTitle = NSLocalizedString("subscription.alert.button.cancel", value: "Cancel", comment: "Alert button for dismissing it")
+    static let viewPlansButtonTitle = NSLocalizedString("subscription.alert.button.view.plans", value: "View Plans", comment: "Alert button for viewing subscription plans")
+    static let restoreButtonTitle = NSLocalizedString("subscription.alert.button.restore", value: "Restore", comment: "Alert button for restoring past subscription purchases")
+
+    static let somethingWentWrongAlertTitle = NSLocalizedString("subscription.alert.something.went.wrong.title", value: "Something Went Wrong", comment: "Alert title when unknown error has occurred")
+    static let somethingWentWrongAlertDescription = NSLocalizedString("subscription.alert.something.went.wrong.description", value: "The App Store was not able to process your purchase. Please try again later.", comment: "Alert message when unknown error has occurred")
+
+    static let subscriptionNotFoundAlertTitle = NSLocalizedString("subscription.alert.subscription.not.found.title", value: "Subscription Not Found", comment: "Alert title when subscription was not found")
+    static let subscriptionNotFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.not.found.description", value: "We couldn’t find a subscription associated with this Apple ID.", comment: "Alert message when subscription was not found")
+
+    static let subscriptionInactiveAlertTitle = NSLocalizedString("subscription.alert.subscription.inactive.title", value: "Subscription Not Found", comment: "Alert title when subscription was inactive")
+    static let subscriptionInactiveAlertDescription = NSLocalizedString("subscription.alert.subscription.inactive.description", value: "The subscription associated with this Apple ID is no longer active.", comment: "Alert message when subscription was inactive")
+
+    static let subscriptionFoundAlertTitle = NSLocalizedString("subscription.alert.subscription.found.title", value: "Subscription Found", comment: "Alert title when subscription was found")
+    static let subscriptionFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.found.description", value: "We found a subscription associated with this Apple ID.", comment: "Alert message when subscription was found")
 }

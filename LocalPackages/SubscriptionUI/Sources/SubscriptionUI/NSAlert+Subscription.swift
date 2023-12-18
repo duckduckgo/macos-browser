@@ -23,36 +23,36 @@ public extension NSAlert {
 
     static func somethingWentWrongAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Something Went Wrong"
-        alert.informativeText = "The App Store was not able to process your purchase. Please try again later."
-        alert.addButton(withTitle: "OK")
+        alert.messageText = UserText.somethingWentWrongAlertTitle
+        alert.informativeText = UserText.somethingWentWrongAlertDescription
+        alert.addButton(withTitle: UserText.okButtonTitle)
         return alert
     }
 
     static func subscriptionNotFoundAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Subscription Not Found"
-        alert.informativeText = "We couldn’t find a subscription associated with this Apple ID."
-        alert.addButton(withTitle: "View Plans")
-        alert.addButton(withTitle: "Cancel")
+        alert.messageText = UserText.subscriptionNotFoundAlertTitle
+        alert.informativeText = UserText.subscriptionNotFoundAlertDescription
+        alert.addButton(withTitle: UserText.viewPlansButtonTitle)
+        alert.addButton(withTitle: UserText.cancelButtonTitle)
         return alert
     }
 
     static func subscriptionInactiveAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Subscription Not Found"
-        alert.informativeText = "The subscription associated with this Apple ID is no longer active."
-        alert.addButton(withTitle: "View Plans")
-        alert.addButton(withTitle: "Cancel")
+        alert.messageText = UserText.subscriptionInactiveAlertTitle
+        alert.informativeText = UserText.subscriptionInactiveAlertDescription
+        alert.addButton(withTitle: UserText.viewPlansButtonTitle)
+        alert.addButton(withTitle: UserText.cancelButtonTitle)
         return alert
     }
 
     static func subscriptionFoundAlert() -> NSAlert {
         let alert = NSAlert()
-        alert.messageText = "Subscription Found"
-        alert.informativeText = "We found a subscription associated with this Apple ID."
-        alert.addButton(withTitle: "Restore")
-        alert.addButton(withTitle: "Cancel")
+        alert.messageText = UserText.subscriptionFoundAlertTitle
+        alert.informativeText = UserText.subscriptionFoundAlertDescription
+        alert.addButton(withTitle: UserText.restoreButtonTitle)
+        alert.addButton(withTitle: UserText.cancelButtonTitle)
         return alert
     }
 }
