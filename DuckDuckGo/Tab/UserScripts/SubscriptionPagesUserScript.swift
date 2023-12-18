@@ -163,7 +163,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .success(let subscriptionOptions):
             return subscriptionOptions
         case .failure:
-            // TODO: handle errors - no products found
             return nil
         }
 #else
@@ -172,7 +171,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             case .success(let subscriptionOptions):
                 return subscriptionOptions
             case .failure:
-                // TODO: handle errors - no products found
                 return nil
             }
         }
@@ -217,17 +215,6 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
             os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
 
             await mainViewController?.presentAsSheet(progressViewController)
-
-            // Trigger sign in pop-up
-
-            /* TODO: Disabling for now
-            switch await PurchaseManager.shared.syncAppleIDAccount() {
-            case .success:
-                break
-            case .failure:
-                return nil
-            }
-             */
 
             // Check for active subscriptions
             if await PurchaseManager.hasActiveSubscription() {
