@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "dominik/sync-feature-flags",
-        "revision" : "526e3ff0886f58c4c22d7b6f9fac7a31e5604885"
+        "revision" : "137e833a89cdd853981161d5a3cea0ce70e3c2f0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "dbecae0df07650a21b5632a92fa2e498c96af7b5",
-        "version" : "10.0.1"
+        "revision" : "5597bc17709c8acf454ecaad4f4082007986242a",
+        "version" : "10.0.2"
       }
     },
     {

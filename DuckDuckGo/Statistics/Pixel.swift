@@ -113,7 +113,7 @@ final class Pixel {
         case .initial:
             if repetition() != .initial { return }
         case .dailyFirst:
-            if repetition() == .repetitive { return } // Pixel alredy fired today
+            if repetition() == .repetitive { return } // Pixel already fired today
         case .repetitive: break
         }
 

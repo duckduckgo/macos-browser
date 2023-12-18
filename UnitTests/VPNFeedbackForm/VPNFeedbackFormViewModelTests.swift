@@ -26,7 +26,6 @@ final class VPNFeedbackFormViewModelTests: XCTestCase {
     func testWhenCreatingViewModel_ThenInitialStateIsFeedbackPending() throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let delegate = MockVPNFeedbackFormViewModelDelegate()
         let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
 
         XCTAssertEqual(viewModel.viewState, .feedbackPending)
@@ -36,7 +35,6 @@ final class VPNFeedbackFormViewModelTests: XCTestCase {
     func testWhenSendingFeedbackSucceeds_ThenFeedbackIsSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let delegate = MockVPNFeedbackFormViewModelDelegate()
         let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
         let text = "Some feedback report text"
         viewModel.selectedFeedbackCategory = .unableToInstall
@@ -52,7 +50,6 @@ final class VPNFeedbackFormViewModelTests: XCTestCase {
     func testWhenSendingFeedbackFails_ThenFeedbackIsNotSent() async throws {
         let collector = MockVPNMetadataCollector()
         let sender = MockVPNFeedbackSender()
-        let delegate = MockVPNFeedbackFormViewModelDelegate()
         let viewModel = VPNFeedbackFormViewModel(metadataCollector: collector, feedbackSender: sender)
         let text = "Some feedback report text"
         viewModel.selectedFeedbackCategory = .unableToInstall
