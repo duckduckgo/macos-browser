@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionManager.swift
+//  DataBrokerProtectionBackgroundManager.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -52,7 +52,7 @@ public final class DataBrokerProtectionBackgroundManager {
                                                   thirdPartyCredentialsProvider: false)
 
         let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties.init(gpcEnabled: false,
+        let prefs = ContentScopeProperties(gpcEnabled: false,
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 

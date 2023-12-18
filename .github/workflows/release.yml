@@ -13,6 +13,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
     secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
@@ -70,6 +74,7 @@ jobs:
       release-type: release
       create-dmg: true
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      branch: ${{ inputs.branch }}
     secrets:
       BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
       P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
@@ -99,6 +104,7 @@ jobs:
     with:
       destination: appstore
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      branch: ${{ inputs.branch }}
     secrets:
       SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
       APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}

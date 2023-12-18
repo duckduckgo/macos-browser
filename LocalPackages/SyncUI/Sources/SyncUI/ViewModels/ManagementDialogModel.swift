@@ -40,12 +40,12 @@ public final class ManagementDialogModel: ObservableObject {
     public var codeToDisplay: String?
 
     @Published public var shouldShowErrorMessage: Bool = false
-    @Published public var errorMessage: String?
+    @Published public var syncErrorMessage: SyncErrorMessage?
 
     public weak var delegate: ManagementDialogModelDelegate?
 
     public init() {
-        shouldShowErrorMessageCancellable = $errorMessage
+        shouldShowErrorMessageCancellable = $syncErrorMessage
             .map { $0 != nil }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] hasError in

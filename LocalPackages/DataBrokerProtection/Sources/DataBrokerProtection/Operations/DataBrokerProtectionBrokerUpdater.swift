@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionUpdater.swift
+//  DataBrokerProtectionBrokerUpdater.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //

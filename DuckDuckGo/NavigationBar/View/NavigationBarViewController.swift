@@ -63,6 +63,8 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
     @IBOutlet var logoWidthConstraint: NSLayoutConstraint!
 
+    private let downloadListCoordinator: DownloadListCoordinator
+
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
         let width: CGFloat = 27.0
@@ -111,12 +113,14 @@ final class NavigationBarViewController: NSViewController {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 #endif
 
-    required init?(coder: NSCoder) {
-        fatalError("NavigationBarViewController: Bad initializer")
+#if NETWORK_PROTECTION
+    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(), downloadListCoordinator: DownloadListCoordinator = .shared) -> NavigationBarViewController {
+        NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator)
+        }!
     }
 
-#if NETWORK_PROTECTION
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore()) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator) {
 
         let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
         let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
@@ -129,20 +133,32 @@ final class NavigationBarViewController: NSViewController {
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager)
         self.isBurner = isBurner
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
+        self.downloadListCoordinator = downloadListCoordinator
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
 #else
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator = .shared) -> NavigationBarViewController {
+        NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, downloadListCoordinator: downloadListCoordinator)
+        }!
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator) {
         self.popovers = NavigationBarPopovers()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = isBurner
+        self.downloadListCoordinator = downloadListCoordinator
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
 #endif
+
+    required init?(coder: NSCoder) {
+        fatalError("NavigationBarViewController: Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -583,7 +599,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
-        DownloadListCoordinator.shared.updates
+        downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
                 guard let self = self else { return }
@@ -607,11 +623,11 @@ final class NavigationBarViewController: NSViewController {
                 self.updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
-        DownloadListCoordinator.shared.progress
+        downloadListCoordinator.progress
             .publisher(for: \.fractionCompleted)
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .map { _ in
-                let progress = DownloadListCoordinator.shared.progress
+            .map { [downloadListCoordinator] _ in
+                let progress = downloadListCoordinator.progress
                 return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
             }
             .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
@@ -709,7 +725,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
+        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
         downloadsButton.image = hasActiveDownloads ? Self.Constants.activeDownloadsImage : Self.Constants.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
 
@@ -755,7 +771,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func hideDownloadButtonIfPossible() {
         if LocalPinningManager.shared.isPinned(.downloads) ||
-            DownloadListCoordinator.shared.hasActiveDownloads ||
+            downloadListCoordinator.hasActiveDownloads ||
             popovers.isDownloadsPopoverShown { return }
 
         downloadsButton.isHidden = true

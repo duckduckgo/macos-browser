@@ -150,8 +150,8 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [
             .mockNotUrl,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
@@ -177,8 +177,8 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [
             selectedUrlTab,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
@@ -203,8 +203,8 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [
             .mockUrl,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = dataSource.tabs.first
 
@@ -228,7 +228,7 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [.mockNotUrl]
         for _ in 0..<(2 * maxNumberOfLazyLoadedTabs) {
-            dataSource.tabs.append(TabMock.init(isUrl: true, reloadExpectation: reloadExpectation))
+            dataSource.tabs.append(TabMock(isUrl: true, reloadExpectation: reloadExpectation))
         }
         dataSource.selectedTab = dataSource.tabs.first
 
@@ -254,11 +254,11 @@ class TabLazyLoaderTests: XCTestCase {
 
         dataSource.tabs = [
             selectedUrlTab,
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation),
-            TabMock.init(isUrl: true, reloadExpectation: reloadExpectation)
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation),
+            TabMock(isUrl: true, reloadExpectation: reloadExpectation)
         ]
         dataSource.selectedTab = selectedUrlTab
 
