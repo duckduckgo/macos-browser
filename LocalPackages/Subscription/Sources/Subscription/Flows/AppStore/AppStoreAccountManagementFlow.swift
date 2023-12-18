@@ -20,6 +20,7 @@ import Foundation
 import StoreKit
 import Common
 
+@available(macOS 12.0, iOS 15.0, *)
 public final class AppStoreAccountManagementFlow {
 
         public enum Error: Swift.Error {
@@ -37,20 +38,18 @@ public final class AppStoreAccountManagementFlow {
         if case let .failure(validateTokenError) = await AuthService.validateToken(accessToken: authToken) {
             os_log(.error, log: .subscription, "[AppStoreAccountManagementFlow] validateToken error: %{public}s", String(reflecting: validateTokenError))
 
-            if #available(macOS 12.0, iOS 15.0, *) {
-                // In case of invalid token attempt store based authentication to obtain a new one
-                guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return .failure(.noPastTransaction) }
+            // In case of invalid token attempt store based authentication to obtain a new one
+            guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return .failure(.noPastTransaction) }
 
-                switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
-                case .success(let response):
-                    if response.externalID == AccountManager().externalID {
-                        authToken = response.authToken
-                        AccountManager().storeAuthToken(token: authToken)
-                    }
-                case .failure(let storeLoginError):
-                    os_log(.error, log: .subscription, "[AppStoreAccountManagementFlow] storeLogin error: %{public}s", String(reflecting: storeLoginError))
-                    return .failure(.authenticatingWithTransactionFailed)
+            switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            case .success(let response):
+                if response.externalID == AccountManager().externalID {
+                    authToken = response.authToken
+                    AccountManager().storeAuthToken(token: authToken)
                 }
+            case .failure(let storeLoginError):
+                os_log(.error, log: .subscription, "[AppStoreAccountManagementFlow] storeLogin error: %{public}s", String(reflecting: storeLoginError))
+                return .failure(.authenticatingWithTransactionFailed)
             }
         }
 

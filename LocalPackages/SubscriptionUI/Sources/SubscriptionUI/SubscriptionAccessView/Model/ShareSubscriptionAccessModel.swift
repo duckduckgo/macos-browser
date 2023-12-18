@@ -67,7 +67,11 @@ public final class ShareSubscriptionAccessModel: SubscriptionAccessModel {
             let url: URL = hasEmail ? .manageSubscriptionEmail : .addEmailToSubscription
 
             Task {
-                await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
+                if SubscriptionPurchaseEnvironment.current == .appStore {
+                    if #available(macOS 12.0, iOS 15.0, *) {
+                        await AppStoreAccountManagementFlow.refreshAuthTokenIfNeeded()
+                    }
+                }
 
                 DispatchQueue.main.async {
                     self.actionHandlers.openURLHandler(url)
