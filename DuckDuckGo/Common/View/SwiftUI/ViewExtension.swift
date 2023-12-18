@@ -1,5 +1,5 @@
 //
-//  View+RoundedCorners.swift
+//  ViewExtension.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //

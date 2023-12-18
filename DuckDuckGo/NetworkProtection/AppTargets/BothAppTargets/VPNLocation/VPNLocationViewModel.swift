@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionVPNLocationViewModel.swift
+//  VPNLocationViewModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -89,7 +89,6 @@ final class VPNLocationViewModel: ObservableObject {
             case .location(let location):
                 isCountrySelected = location.country == currentLocation.country
                 cityPickerItems = currentLocation.cities.map { currentCity in
-                    let isCitySelected = currentCity.name == location.city
                     return CityItem(cityName: currentCity.name)
                 }
                 selectedCityItem = location.city.flatMap(CityItem.init(cityName:)) ?? .nearest
@@ -157,7 +156,7 @@ struct VPNCityItemModel: Identifiable, Hashable {
 
 extension VPNCityItemModel {
     static var nearest: VPNCityItemModel {
-        Self.init(cityName: UserText.vpnLocationNearest)
+        VPNCityItemModel(cityName: UserText.vpnLocationNearest)
     }
 }
 

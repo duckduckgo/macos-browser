@@ -395,7 +395,7 @@ extension URL {
     func sanitizedForQuarantine() -> URL? {
         guard !self.isFileURL,
               !["data", "blob"].contains(self.scheme),
-              var components = URLComponents.init(url: self, resolvingAgainstBaseURL: false)
+              var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
         else {
             return nil
         }

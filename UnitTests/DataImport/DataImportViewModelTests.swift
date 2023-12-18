@@ -359,7 +359,7 @@ import XCTest
         var e2: XCTestExpectation!
         setupModel(with: .firefox, profiles: [BrowserProfile.test]) { _, _, _, p in
             ImporterMock(password: p, accessValidator: { importer, _ in
-                if let password = importer.password {
+                if importer.password != nil {
                     return [:]
                 } else {
                     return [.passwords: FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil)]
@@ -928,11 +928,6 @@ import XCTest
     // initial -> import passwords -> only file import supported for passwords -> [Next] -> file import
     func testWhenBrowserOnlySelectedPasswordsCannotBeImported_manualImportSuggested() throws {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
-            guard let browser = ThirdPartyBrowser.browser(for: source) else {
-                XCTFail("no ThirdPartyBrowser for \(source)")
-                continue
-            }
-
             setupModel(with: source, profiles: [BrowserProfile.test, BrowserProfile.default, BrowserProfile.test2], dataImporterFactory: { src, dataType, _, _ in
                 XCTAssertEqual(src, source)
                 XCTAssertNil(dataType)

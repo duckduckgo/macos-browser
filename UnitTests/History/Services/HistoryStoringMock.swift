@@ -76,6 +76,7 @@ final class HistoryStoringMock: HistoryStoring {
         saveCalled = true
         savedHistoryEntries.append(entry)
         for visit in entry.visits {
+            // swiftlint:disable:next legacy_random
             visit.identifier = URL(string: "x-coredata://FBEAB2C4-8C32-4F3F-B34F-B79F293CDADD/VisitManagedObject/\(arc4random())")
         }
 
