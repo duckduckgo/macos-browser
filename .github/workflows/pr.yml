@@ -133,6 +133,7 @@ jobs:
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
+          -skipPackagePluginValidation \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-skip-testing:${{ matrix.integration-tests-target }}" \
@@ -146,6 +147,7 @@ jobs:
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
+          -skipPackagePluginValidation \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-only-testing:${{ matrix.integration-tests-target }}" \
@@ -320,6 +322,7 @@ jobs:
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "Release" \
+          -skipPackagePluginValidation \
           | tee release-xcodebuild.log \
           | xcbeautify
 
