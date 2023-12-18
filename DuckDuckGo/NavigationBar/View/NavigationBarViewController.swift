@@ -99,8 +99,6 @@ final class NavigationBarViewController: NSViewController {
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
-    private var networkProtectionCancellable: AnyCancellable?
-    private var networkProtectionInterruptionCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
@@ -393,17 +391,9 @@ final class NavigationBarViewController: NSViewController {
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
                 case .homeButton:
                     self.updateHomeButton()
-                case .networkProtection:
 #if NETWORK_PROTECTION
-                    guard NetworkProtectionKeychainTokenStore().isFeatureActivated else {
-                        LocalPinningManager.shared.unpin(.networkProtection)
-                        networkProtectionButtonModel.isPinned = false
-                        return
-                    }
-
-                    networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
-#else
-                    assertionFailure("Tried to toggle NetP when the feature was disabled")
+                case .networkProtection:
+                    networkProtectionButtonModel.updateVisibility()
 #endif
                 }
             } else {
@@ -641,7 +631,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func updatePasswordManagementButton() {
         let menu = NSMenu()
-        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
+        let title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
         menu.addItem(withTitle: title, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
 
         passwordManagementButton.menu = menu
@@ -713,7 +703,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
         let menu = NSMenu()
-        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        let title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
         menu.addItem(withTitle: title, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
 
         downloadsButton.menu = menu
@@ -778,7 +768,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateBookmarksButton() {
         let menu = NSMenu()
-        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
+        let title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
         menu.addItem(withTitle: title, action: #selector(toggleBookmarksPanelPinning(_:)), keyEquivalent: "")
 
         bookmarkListButton.menu = menu
@@ -876,20 +866,20 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         HomeButtonMenuFactory.addToMenu(menu)
 
-        let autofillTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
+        let autofillTitle = LocalPinningManager.shared.shortcutTitle(for: .autofill)
         menu.addItem(withTitle: autofillTitle, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "A")
 
-        let bookmarksTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
+        let bookmarksTitle = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
         menu.addItem(withTitle: bookmarksTitle, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "K")
 
-        let downloadsTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        let downloadsTitle = LocalPinningManager.shared.shortcutTitle(for: .downloads)
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
 
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
         if !isPopUpWindow && networkProtectionFeatureActivation.isFeatureActivated {
-            let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+            let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
 #endif
@@ -912,7 +902,9 @@ extension NavigationBarViewController: NSMenuDelegate {
 
     @objc
     private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
+#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+#endif
     }
 
     // MARK: - Network Protection
@@ -929,19 +921,38 @@ extension NavigationBarViewController: NSMenuDelegate {
         }
     }
 
+    /// Sets up the Network Protection button.
+    ///
+    /// This method should be run just once during the lifecycle of this view.
+    /// .
     private func setupNetworkProtectionButton() {
-        networkProtectionCancellable = networkProtectionButtonModel.$showButton
+        assert(networkProtectionButton.menu == nil)
+
+        let menuItem = NSMenuItem(title: LocalPinningManager.shared.shortcutTitle(for: .networkProtection), action: #selector(toggleNetworkProtectionPanelPinning), target: self)
+        let menu = NSMenu(items: [menuItem])
+        networkProtectionButton.menu = menu
+
+        networkProtectionButtonModel.$shortcutTitle
+            .receive(on: RunLoop.main)
+            .sink { title in
+                menuItem.title = title
+            }
+            .store(in: &cancellables)
+
+        networkProtectionButtonModel.$showButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
                 let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
                 self?.networkProtectionButton.isHidden =  isPopUpWindow || !show
             }
+            .store(in: &cancellables)
 
-        networkProtectionInterruptionCancellable = networkProtectionButtonModel.$buttonImage
+        networkProtectionButtonModel.$buttonImage
             .receive(on: RunLoop.main)
             .sink { [weak self] image in
                 self?.networkProtectionButton.image = image
             }
+            .store(in: &cancellables)
     }
 #endif
 
