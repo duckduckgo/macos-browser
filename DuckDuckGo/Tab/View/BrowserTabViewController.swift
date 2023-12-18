@@ -530,7 +530,10 @@ final class BrowserTabViewController: NSViewController {
     var preferencesViewController: PreferencesViewController?
     private func preferencesViewControllerCreatingIfNeeded() -> PreferencesViewController {
         return preferencesViewController ?? {
-            let preferencesViewController = PreferencesViewController()
+            guard let syncService = NSApp.delegateTyped.syncService else {
+                fatalError("Sync service is nil")
+            }
+            let preferencesViewController = PreferencesViewController(syncService: syncService)
             preferencesViewController.delegate = self
             self.preferencesViewController = preferencesViewController
             return preferencesViewController
