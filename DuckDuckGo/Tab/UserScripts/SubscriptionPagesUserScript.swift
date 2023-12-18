@@ -193,7 +193,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .success(let purchaseUpdate):
             await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
         case .failure:
-            // TODO: handle errors - failed prepare purchae
+            // TODO: handle error with alert?
             return nil
         }
 #else
