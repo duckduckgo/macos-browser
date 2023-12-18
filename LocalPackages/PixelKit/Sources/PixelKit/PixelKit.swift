@@ -121,16 +121,23 @@ public final class PixelKit {
 
     private func fire(pixelNamed pixelName: String,
                       frequency: Frequency,
-                      withHeaders headers: [String: String]? = nil,
-                      withAdditionalParameters params: [String: String]? = nil,
-                      allowedQueryReservedCharacters: CharacterSet? = nil,
-                      includeAppVersionParameter: Bool = true,
-                      onComplete: @escaping CompletionBlock = { _, _ in }) {
+                      withHeaders headers: [String: String]?,
+                      withAdditionalParameters params: [String: String]?,
+                      withError error: Error?,
+                      allowedQueryReservedCharacters: CharacterSet?,
+                      includeAppVersionParameter: Bool,
+                      onComplete: @escaping CompletionBlock) {
 
         var newParams = params ?? [:]
+
         if includeAppVersionParameter {
             newParams[Parameters.appVersion] = appVersion
         }
+
+        if let error {
+            newParams.appendErrorPixelParams(error: error)
+        }
+
         #if DEBUG
             newParams[Parameters.test] = Values.test
         #endif
@@ -203,6 +210,7 @@ public final class PixelKit {
                      frequency: Frequency = .standard,
                      withHeaders headers: [String: String]? = nil,
                      withAdditionalParameters params: [String: String]? = nil,
+                     withError error: Error? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
                      onComplete: @escaping CompletionBlock = { _, _ in }) {
@@ -235,6 +243,7 @@ public final class PixelKit {
              frequency: frequency,
              withHeaders: headers,
              withAdditionalParameters: newParams,
+             withError: error,
              allowedQueryReservedCharacters: allowedQueryReservedCharacters,
              includeAppVersionParameter: includeAppVersionParameter,
              onComplete: onComplete)
@@ -244,6 +253,7 @@ public final class PixelKit {
                             frequency: Frequency = .standard,
                             withHeaders headers: [String: String] = [:],
                             withAdditionalParameters parameters: [String: String]? = nil,
+                            withError error: Error? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
                             includeAppVersionParameter: Bool = true,
                             onComplete: @escaping CompletionBlock = { _, _ in }) {
@@ -252,6 +262,7 @@ public final class PixelKit {
                           frequency: frequency,
                           withHeaders: headers,
                           withAdditionalParameters: parameters,
+                          withError: error,
                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                           includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)
@@ -307,6 +318,25 @@ public final class PixelKit {
         dryRun
             ? "com.duckduckgo.network-protection.pixel.\(pixelName).dry-run"
             : "com.duckduckgo.network-protection.pixel.\(pixelName)"
+    }
+
+}
+
+extension Dictionary where Key == String, Value == String {
+
+    mutating func appendErrorPixelParams(error: Error) {
+        let nsError = error as NSError
+
+        self[PixelKit.Parameters.errorCode] = "\(nsError.code)"
+        self[PixelKit.Parameters.errorDomain] = nsError.domain
+
+        if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
+            self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            self[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
+        } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {
+            self[PixelKit.Parameters.underlyingErrorCode] = "\(sqlErrorCode.intValue)"
+            self[PixelKit.Parameters.underlyingErrorDomain] = "NSSQLiteErrorDomain"
+        }
     }
 
 }

@@ -106,10 +106,7 @@ final class MainWindowController: NSWindowController {
 
     private var trafficLightsAlphaCancellable: AnyCancellable?
     private func subscribeToTrafficLightsAlpha() {
-        guard let tabBarViewController = mainViewController.tabBarViewController else {
-            assertionFailure("MainWindowController: tabBarViewController is nil" )
-            return
-        }
+        let tabBarViewController = mainViewController.tabBarViewController
 
         // slide tabs to the left in full screen
         trafficLightsAlphaCancellable = window?.standardWindowButton(.closeButton)?
@@ -150,11 +147,11 @@ final class MainWindowController: NSWindowController {
     }
 
     private func moveTabBarView(toTitlebarView: Bool) {
-        guard let newParentView = toTitlebarView ? titlebarView : mainViewController.view,
-              let tabBarViewController = mainViewController.tabBarViewController else {
+        guard let newParentView = toTitlebarView ? titlebarView : mainViewController.view else {
             assertionFailure("Failed to move tab bar view")
             return
         }
+        let tabBarViewController = mainViewController.tabBarViewController
 
         tabBarViewController.view.removeFromSuperview()
         if toTitlebarView {

@@ -81,7 +81,13 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Connection Status
 
-    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(statusObserver: ConnectionStatusObserverThroughSession(platformNotificationCenter: NSWorkspace.shared.notificationCenter, platformDidWakeNotification: NSWorkspace.didWakeNotification), transitionTimeout: .seconds(4))
+    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(
+        statusObserver: ConnectionStatusObserverThroughSession(
+            platformNotificationCenter: NSWorkspace.shared.notificationCenter,
+            platformDidWakeNotification: NSWorkspace.didWakeNotification
+        ),
+        transitionTimeout: .seconds(10)
+    )
 
     // MARK: - Tunnel Manager
 
@@ -243,6 +249,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
             // kill switch
             protocolConfiguration.enforceRoutes = settings.enforceRoutes
+
             // this setting breaks Connection Tester
             protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 
@@ -277,15 +284,14 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
-    // MARK: - Ensure things are working
+    // MARK: - Activate System Extension
 
 #if NETP_SYSTEM_EXTENSION
     /// Ensures that the system extension is activated if necessary.
     ///
     private func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
         do {
-            try await networkExtensionController.activateSystemExtension(
-                waitingForUserApproval: waitingForUserApproval)
+            try await networkExtensionController.activateSystemExtension(waitingForUserApproval: waitingForUserApproval)
         } catch {
             switch error {
             case OSSystemExtensionError.requestSuperseded:
@@ -294,18 +300,20 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionSystemSettings
             case SystemExtensionRequestError.unknownRequestResult:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionUnknownActivationError
-
-                PixelKit.fire(
-                    NetworkProtectionPixelEvent.networkProtectionSystemExtensionUnknownActivationResult,
-                    frequency: .standard,
-                    includeAppVersionParameter: true)
             case SystemExtensionRequestError.willActivateAfterReboot:
                 controllerErrorStore.lastErrorMessage = UserText.networkProtectionPleaseReboot
             default:
                 controllerErrorStore.lastErrorMessage = error.localizedDescription
             }
 
-            return
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionSystemExtensionActivationFailure,
+                frequency: .standard,
+                withError: error,
+                includeAppVersionParameter: true
+            )
+
+            throw error
         }
 
         self.controllerErrorStore.lastErrorMessage = nil
@@ -387,6 +395,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 try await start(tunnelManager)
             }
         } catch {
+            PixelKit.fire(
+                NetworkProtectionPixelEvent.networkProtectionStartFailed, frequency: .standard, withError: error, includeAppVersionParameter: true
+            )
+
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
         }
