@@ -52,8 +52,10 @@ extension View {
             // here we downcast a (non-writable) \.presentationMode KeyPath to a WritableKeyPath
             self.environment(presentationModeKey, Binding<PresentationMode>(onDismiss: onDismiss))
         } else {
+#if !APPSTORE
             // macOS 11 compatibility:
             self.environment(\.legacyDismiss, onDismiss)
+#endif
         }
     }
 }

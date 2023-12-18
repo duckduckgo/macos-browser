@@ -599,7 +599,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Lock Autofill after computer is idle for"
+            "value" : "Lock autofill after computer is idle for"
           }
         }
       }
@@ -635,7 +635,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Never lock Autofill"
+            "value" : "Never lock autofill"
           }
         }
       }
@@ -731,7 +731,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Login saved for %@"
+            "value" : "Password saved for %@"
           }
         }
       }
@@ -5046,6 +5046,18 @@
         }
       }
     },
+    "network.protection.vpn.location.country.item.formatted.cities.count" : {
+      "comment" : "Subtitle of countries item when there are multiple cities, example : ",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%d cities"
+          }
+        }
+      }
+    },
     "New Tab" : {
       "comment" : "Main Menu File item"
     },
@@ -5886,7 +5898,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Logins"
+            "value" : "Passwords"
           }
         }
       }
@@ -6606,7 +6618,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "If your logins are saved in another browser, you can import them into DuckDuckGo."
+            "value" : "If your passwords are saved in another browser, you can import them into DuckDuckGo."
           }
         }
       }
@@ -6618,7 +6630,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "No Logins or Payment Methods saved yet"
+            "value" : "No passwords or credit cards saved yet"
           }
         }
       }
@@ -6642,7 +6654,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "No Logins"
+            "value" : "No passwords"
           }
         }
       }
@@ -6713,7 +6725,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your Autofill info will remain unlocked until your computer is idle for %@."
+            "value" : "Your autofill info will remain unlocked until your computer is idle for %@."
           }
         }
       }
@@ -6749,7 +6761,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "unlock access to your Autofill info"
+            "value" : "unlock access to your autofill info"
           }
         }
       }
@@ -6761,7 +6773,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "change your Autofill info access settings"
+            "value" : "change your autofill info access settings"
           }
         }
       }
@@ -6785,7 +6797,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "unlock access to your Autofill info"
+            "value" : "unlock access to your autofill info"
           }
         }
       }
@@ -6941,7 +6953,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Login"
+            "value" : "Password"
           }
         }
       }
@@ -7157,7 +7169,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Save Login?"
+            "value" : "Save password?"
           }
         }
       }
@@ -7169,7 +7181,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "New Login Saved"
+            "value" : "New Password Saved"
           }
         }
       }
@@ -8907,6 +8919,114 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "General"
+          }
+        }
+      }
+    },
+    "vpn.location.change.button.title" : {
+      "comment" : "Title of the VPN location preference change button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change..."
+          }
+        }
+      }
+    },
+    "vpn.location.custom.section.title" : {
+      "comment" : "Title of the VPN location list cancel button\n   Title of the VPN location list custom section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Custom"
+          }
+        }
+      }
+    },
+    "vpn.location.description.nearest" : {
+      "comment" : "Nearest city setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nearest"
+          }
+        }
+      }
+    },
+    "vpn.location.description.nearest.available" : {
+      "comment" : "Nearest available location setting description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nearest Available"
+          }
+        }
+      }
+    },
+    "vpn.location.list.title" : {
+      "comment" : "Title of the VPN location list screen",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "VPN Location"
+          }
+        }
+      }
+    },
+    "vpn.location.nearest.available.title" : {
+      "comment" : "Subtitle underneath the nearest available vpn location preference text.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Automatically connect to the nearest server we can find."
+          }
+        }
+      }
+    },
+    "vpn.location.recommended.section.title" : {
+      "comment" : "Title of the VPN location list recommended section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Recommended"
+          }
+        }
+      }
+    },
+    "vpn.location.submit.button.title" : {
+      "comment" : "Title of the VPN location list submit button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Submit"
+          }
+        }
+      }
+    },
+    "vpn.location.title" : {
+      "comment" : "Location section title in VPN settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Location"
           }
         }
       }
