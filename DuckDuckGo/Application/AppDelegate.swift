@@ -69,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
     private var isSyncInProgressCancellable: AnyCancellable?
+    private var syncFeatureFlagsCancellable: AnyCancellable?
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
@@ -342,6 +343,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
         syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
+
+        let privacyConfigurationManager = ContentBlocking.shared.privacyConfigurationManager
+
+        syncFeatureFlagsCancellable = privacyConfigurationManager.updatesPublisher
+            .compactMap { [weak privacyConfigurationManager] () -> PrivacyConfiguration? in
+                privacyConfigurationManager?.privacyConfig
+            }
+            .prepend(privacyConfigurationManager.privacyConfig)
+            .map { privacyConfig -> SyncFeatureFlag in
+                let isSyncFeatureEnabled = privacyConfig.isEnabled(featureKey: .sync)
+                if !privacyConfig.isSubfeatureEnabled(SyncSubfeature.level0ShowSync) {
+                    return SyncFeatureFlag.unavailable
+                }
+                if !privacyConfig.isSubfeatureEnabled(SyncSubfeature.level1AllowDataSyncing) {
+                    return SyncFeatureFlag.dataSyncingNotAvailable
+                }
+                if !privacyConfig.isSubfeatureEnabled(SyncSubfeature.level2AllowSetupFlows) {
+                    return SyncFeatureFlag.setupFlowsNotAvailable
+                }
+                if !privacyConfig.isSubfeatureEnabled(SyncSubfeature.level3AllowCreateAccount) {
+                    return SyncFeatureFlag.accountCreationNotAvailable
+                }
+                return SyncFeatureFlag.fullyAvailable
+            }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak syncService] featureFlag in
+                syncService?.featureFlag = featureFlag
+            }
 
         // This is also called in applicationDidBecomeActive, but we're also calling it here, since
         // syncService can be nil when applicationDidBecomeActive is called during startup, if a modal
