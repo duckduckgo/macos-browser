@@ -34,6 +34,7 @@ extension Preferences {
     struct AutofillView: View {
         @ObservedObject var model: AutofillPreferencesModel
         @ObservedObject var bitwardenManager = BWManager.shared
+        @State private var showingResetNeverPromptSitesSheet = false
 
         var passwordManagerBinding: Binding<PasswordManager> {
             .init {
@@ -117,7 +118,22 @@ extension Preferences {
                     TextMenuItemCaption(text: UserText.autofillAskToSaveExplanation)
                 }
 
-                // SECTION 3: Auto-Lock:
+                // SECTION 3: Reset excluded (aka never prompt to save) sites:
+                // This is only displayed if the user has never prompt sites saved & not using Bitwarden
+                if model.hasNeverPromptWebsites && model.passwordManager == .duckduckgo {
+                    PreferencePaneSection {
+                        TextMenuItemHeader(text: UserText.autofillExcludedSites)
+                        TextMenuItemCaption(text: UserText.autofillExcludedSitesExplanation)
+                            .padding(.top, -8)
+                        Button(UserText.autofillExcludedSitesReset) {
+                            showingResetNeverPromptSitesSheet.toggle()
+                        }
+                    }.sheet(isPresented: $showingResetNeverPromptSitesSheet) {
+                        ResetNeverPromptSitesSheet(autofillPreferencesModel: model, isSheetPresented: $showingResetNeverPromptSitesSheet)
+                    }
+                }
+
+                // SECTION 4: Auto-Lock:
 
                 PreferencePaneSection {
                     TextMenuItemHeader(text: UserText.autofillAutoLock)
@@ -286,6 +302,50 @@ private struct BitwardenStatusView: View {
             }
         }
 
+    }
+
+}
+
+struct ResetNeverPromptSitesSheet: View {
+
+    @ObservedObject var autofillPreferencesModel: AutofillPreferencesModel
+    @Binding var isSheetPresented: Bool
+
+    var body: some View {
+        VStack(alignment: .center) {
+            Text(UserText.autofillExcludedSitesResetActionTitle)
+                .font(Preferences.Const.Fonts.preferencePaneTitle)
+                .padding(.top, 10)
+
+                Text(UserText.autofillExcludedSitesResetActionMessage)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 20)
+                .frame(width: 300)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Divider()
+
+            HStack(alignment: .center) {
+                Spacer()
+                Button(UserText.cancel) {
+                    isSheetPresented.toggle()
+                }
+                Button(action: {
+                    saveChanges()
+                }, label: {
+                    Text(UserText.autofillExcludedSitesReset)
+                        .foregroundColor(.red)
+                })
+            }.padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 15))
+
+        }
+        .padding(.vertical, 10)
+    }
+
+    private func saveChanges() {
+        autofillPreferencesModel.resetNeverPromptWebsites()
+        isSheetPresented.toggle()
     }
 
 }
