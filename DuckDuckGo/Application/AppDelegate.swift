@@ -357,8 +357,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             .filter { $0 }
             .asVoid()
             .prefix(1)
-            .sink {
+            .sink { [weak syncService] in
                 Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+                syncService?.syncDailyStats.sendStatusIfNeeded(handler: { params in
+                    Pixel.fire(.syncSuccessRateDaily, withAdditionalParameters: params)
+                })
             }
 
         subscribeSyncQueueToScreenLockedNotifications()
