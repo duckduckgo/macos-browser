@@ -24,6 +24,7 @@ public extension PixelKit {
         public static let duration = "duration"
         public static let test = "test"
         public static let appVersion = "appVersion"
+        public static let pixelSource = "pixelSource"
         public static let osMajorVersion = "osMajorVersion"
 
         public static let errorCode = "e"
