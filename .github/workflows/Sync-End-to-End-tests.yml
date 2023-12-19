@@ -16,6 +16,7 @@ on:
 
 jobs:
   test:
+    runs-on: macos-13-xlarge
     steps:
       - name: Check out the code
         uses: actions/checkout@v3
