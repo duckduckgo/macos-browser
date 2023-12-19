@@ -1,0 +1,17 @@
+disabled_rules:
+  - file_length
+  - unused_closure_parameter
+  - type_name
+  - force_cast
+  - force_try
+  - function_body_length
+  - cyclomatic_complexity
+  - identifier_name
+  - blanket_disable_command
+  - type_body_length
+  - explicit_non_final_class
+  - enforce_os_log_wrapper
+
+large_tuple:
+  warning: 6
+  error: 10

@@ -1,7 +1,7 @@
 //
-//  AddEditFavoriteWindow.swift
+//  NSLayoutConstraintExtension.swift
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,21 +16,14 @@
 //  limitations under the License.
 //
 
-import Cocoa
+import AppKit
+import Foundation
 
-final class AddEditFavoriteWindow: NSWindow {
+extension NSLayoutConstraint {
 
-    enum Size {
-        static let width: CGFloat = 450
-        static let height: CGFloat = 175
+    func priority(_ priority: Float) -> Self {
+        self.priority = .init(priority)
+        return self
     }
-
-    override var canBecomeMain: Bool { false }
-
-    // swiftlint:disable force_cast
-    var addEditFavoriteViewController: AddEditFavoriteViewController {
-        contentViewController as! AddEditFavoriteViewController
-    }
-    // swiftlint:enable force_cast
 
 }

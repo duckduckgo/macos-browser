@@ -28,7 +28,7 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenTimestampIsNotPresent_ThenStateIsNotJoinedQueue() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         let viewModel = WaitlistViewModel(waitlistRequest: request,
                                                            waitlistStorage: storage,
                                                            notificationService: MockNotificationService(),
@@ -44,7 +44,7 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenTimestampIsPresentAndInviteCodeIsNil_ThenStateIsJoinedQueue() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         storage.store(waitlistTimestamp: 12345)
         let notificationService = MockNotificationService(authorizationStatus: .authorized)
 
@@ -63,7 +63,7 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenTimestampIsPresentAndInviteCodeIsPresent_ThenStateIsInvited() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         storage.store(waitlistTimestamp: 12345)
         storage.store(waitlistToken: "token")
         storage.store(inviteCode: "ABCD1234")
@@ -108,7 +108,7 @@ final class WaitlistViewModelTests: XCTestCase {
     @MainActor
     func testWhenAcceptingTermsAndConditions_ThenAuthTokenIsFetched_AndTermsAndConditionsAreMarkedAsAccepted() async {
         let request = MockWaitlistRequest.failure()
-        let storage = MockWaitlistStorage.init()
+        let storage = MockWaitlistStorage()
         storage.store(waitlistTimestamp: 12345)
         storage.store(waitlistToken: "token")
         storage.store(inviteCode: "ABCD1234")
