@@ -1,4 +1,4 @@
-name: Sync-End-to-End tests
+name: sync-end-to-end-tests
 
 on:
   workflow_dispatch:
