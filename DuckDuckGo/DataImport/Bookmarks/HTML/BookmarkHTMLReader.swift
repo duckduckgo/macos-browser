@@ -361,7 +361,7 @@ private extension XMLNode {
     }
 
     var bookmark: ImportedBookmarks.BookmarkOrFolder? {
-        guard htmlTag == .a, 
+        guard htmlTag == .a,
               let name = text,
               let element = self as? XMLElement else { return nil }
 
