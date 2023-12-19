@@ -3034,13 +3034,6 @@
 			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
 			remoteInfo = "DuckDuckGo Privacy Browser";
 		};
-		565E46E32B2725DD0013AC2A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = "DuckDuckGo Privacy Browser";
-		};
 		7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -8267,7 +8260,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				565E46E42B2725DD0013AC2A /* PBXTargetDependency */,
 			);
 			name = SyncE2EUITests;
 			productName = DuckDuckGoSyncUITests;
@@ -12018,10 +12010,6 @@
 			isa = PBXTargetDependency;
 			productRef = B6080BA42B20AF8800B418EF /* SwiftLintPlugin */;
 		};
-		B6080BA72B20AF8B00B418EF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6080BA62B20AF8B00B418EF /* SwiftLintPlugin */;
-		};
 		B6080BA92B20AF8F00B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = B6080BA82B20AF8F00B418EF /* SwiftLintPlugin */;
@@ -12941,8 +12929,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 94.0.3;
+				branch = "sam/enhance-vpn-pixels";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -13423,11 +13411,6 @@
 			productName = "plugin:SwiftLintPlugin";
 		};
 		B6080BA42B20AF8800B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
-		B6080BA62B20AF8B00B418EF /* SwiftLintPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = "plugin:SwiftLintPlugin";
