@@ -1,19 +1,21 @@
 name: sync-end-to-end-tests
 
-on:
+on: 
   push:
-    branches:
-      - sabrina/sync_e2e_ci
+    branches: [ main, "release/**" ]
   pull_request:
-    branches:
-      - sabrina/sync_e2e_ci
-  # schedule:
-  #   - cron: '0 5 * * *' # run at 5 AM UTC
+  workflow_call:
+    inputs:
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
 
 jobs:
-  sync-e2e-tests:
-    name: Sync End to end Tests
-    runs-on: macos-13-xlarge
+  test:
 
     steps:
       - name: Check out the code
