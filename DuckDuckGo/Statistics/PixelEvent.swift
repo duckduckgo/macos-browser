@@ -310,7 +310,6 @@ extension Pixel {
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
-            case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -753,7 +752,6 @@ extension Pixel.Event.Debug {
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
-        case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"
