@@ -64,6 +64,8 @@ public extension PixelKit {
         public static let vpnBreakageCategory = "breakageCategory"
         public static let vpnBreakageDescription = "breakageDescription"
         public static let vpnBreakageMetadata = "breakageMetadata"
+
+        public static let reason = "reason"
     }
 
     enum Values {

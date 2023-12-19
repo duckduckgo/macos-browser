@@ -107,6 +107,46 @@ final class CriticalPathsTests: XCTestCase {
         XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
     }
 
+    func testCanRemoveData() {
+        // Go to Sync Set up
+        let newTabWindow = app.windows["New Tab"]
+        newTabWindow.children(matching: .button).element(boundBy: 4).click()
+        newTabWindow.menuItems["openPreferences:"].click()
+        let settingsWindow = app.windows["Settings"]
+        settingsWindow.buttons["Sync & Backup"].click()
+
+        // Create Account
+        let sheetsQuery = settingsWindow.sheets
+        settingsWindow.staticTexts["Sync and Back Up This Device"].click()
+        sheetsQuery.buttons["Turn on Sync & Backup"].click()
+        sheetsQuery.buttons["Copy Code"].click()
+        sheetsQuery.buttons["Next"].click()
+        sheetsQuery.buttons["Done"].click()
+        let syncEnabledElement = settingsWindow.staticTexts["Sync Enabled"]
+        XCTAssertTrue(syncEnabledElement.exists, "Sync Enabled text is not visible")
+
+        // Delete Data
+        settingsWindow.swipeUp()
+        settingsWindow.buttons["Turn Off and Delete Server Data"].click()
+        sheetsQuery.buttons["Delete Data"].click()
+        let beginSync = settingsWindow.staticTexts["Begin Syncing"]
+        beginSync.click()
+        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
+
+        // Log In and check error
+        settingsWindow.staticTexts["Sync with Another Device"].click()
+        let settingsSheetsQuery = settingsWindow.sheets
+        settingsSheetsQuery.staticTexts["Enter Code"].click()
+        settingsSheetsQuery.buttons["Paste"].click()
+        let alertSheet = sheetsQuery.sheets["alert"]
+        alertSheet.staticTexts["Sync Error"].click()
+        XCTAssertTrue(alertSheet.exists, "Sync Error text is not visible")
+
+        // Clean Up
+        debugMenuBarItem.click()
+        internaluserstateMenuItem.click()
+    }
+
     func testCanLoginToExistingSyncAccount() {
         guard let code = ProcessInfo.processInfo.environment["CODE"] else {
             XCTFail("CODE not set")

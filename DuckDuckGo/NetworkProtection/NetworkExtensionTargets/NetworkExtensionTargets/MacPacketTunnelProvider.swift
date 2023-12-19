@@ -104,8 +104,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionKeychainDeleteError(status: status)
             case .wireGuardCannotLocateTunnelFileDescriptor:
                 domainEvent = .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
-            case .wireGuardInvalidState:
-                domainEvent = .networkProtectionWireguardErrorInvalidState
+            case .wireGuardInvalidState(let reason):
+                domainEvent = .networkProtectionWireguardErrorInvalidState(reason: reason)
             case .wireGuardDnsResolution:
                 domainEvent = .networkProtectionWireguardErrorFailedDNSResolution
             case .wireGuardSetNetworkSettings(let error):

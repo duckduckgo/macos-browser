@@ -146,7 +146,6 @@ public struct UserDefaultsWrapper<T> {
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
-        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
         case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // Network Protection: Shared Defaults
@@ -190,6 +189,7 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
         case networkProtectionShouldExcludeLocalNetworks = "netp.exclude-local-routes"
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
+        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
     }
 
     private let key: Key
