@@ -151,10 +151,10 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     @ViewBuilder
     fileprivate func syncUnavailableView() -> some View {
-        if !model.isSyncAvailable {
-            SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningSyncDisabled)
-        } else {
+        if model.isDataSyncingAvailable {
             EmptyView()
+        } else {
+            SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningSyncDisabled)
         }
     }
 

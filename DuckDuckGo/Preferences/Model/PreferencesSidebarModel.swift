@@ -50,11 +50,11 @@ final class PreferencesSidebarModel: ObservableObject {
             .removeDuplicates()
             .asVoid()
 
-        let syncFeatureFlagDidChange = syncService.featureFlagPublisher.map(\.isSyncVisible)
+        let syncFeatureFlagsDidChange = syncService.featureFlagsPublisher.map { $0.contains(.userInterface) }
             .removeDuplicates()
             .asVoid()
 
-        Publishers.Merge(duckPlayerFeatureFlagDidChange, syncFeatureFlagDidChange)
+        Publishers.Merge(duckPlayerFeatureFlagDidChange, syncFeatureFlagsDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshSections()
@@ -82,7 +82,7 @@ final class PreferencesSidebarModel: ObservableObject {
 
             return PreferencesSection.defaultSections(
                 includingDuckPlayer: includeDuckPlayer,
-                includingSync: syncService.featureFlag.isSyncVisible,
+                includingSync: syncService.featureFlags.contains(.userInterface),
                 includingVPN: includingVPN
             )
         }

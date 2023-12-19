@@ -89,22 +89,22 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private var isScreenLocked: Bool = false
     private var recoveryKey: SyncCode.RecoveryKey?
 
-    @Published var syncFeatureFlag: SyncFeatureFlag {
+    @Published var syncFeatureFlags: SyncFeatureFlags {
         didSet {
-            updateSyncFeatureFlag(syncFeatureFlag)
+            updateSyncFeatureFlags(syncFeatureFlags)
         }
     }
 
-    @Published var isSyncAvailable: Bool = true
+    @Published var isDataSyncingAvailable: Bool = true
     @Published var isConnectingDevicesAvailable: Bool = true
-    @Published var isCreatingAccountAvailable: Bool = true
+    @Published var isAccountCreationAvailable: Bool = true
     @Published var isAccountRecoveryAvailable: Bool = true
 
-    private func updateSyncFeatureFlag(_ syncFeatureFlag: SyncFeatureFlag) {
-        isSyncAvailable = syncFeatureFlag.isSyncAvailable
-        isConnectingDevicesAvailable = syncFeatureFlag.canConnectNewDevice
-        isCreatingAccountAvailable = syncFeatureFlag.canCreateAccount
-        isAccountRecoveryAvailable = syncFeatureFlag.canRestoreAccount
+    private func updateSyncFeatureFlags(_ syncFeatureFlags: SyncFeatureFlags) {
+        isDataSyncingAvailable = syncFeatureFlags.contains(.dataSyncing)
+        isConnectingDevicesAvailable = syncFeatureFlags.contains(.connectFlows)
+        isAccountCreationAvailable = syncFeatureFlags.contains(.accountCreation)
+        isAccountRecoveryAvailable = syncFeatureFlags.contains(.accountRecovery)
     }
 
     var recoveryCode: String? {
@@ -120,7 +120,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
         self.appearancePreferences = appearancePreferences
-        self.syncFeatureFlag = syncService.featureFlag
+        self.syncFeatureFlags = syncService.featureFlags
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
@@ -130,16 +130,16 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
 
-        updateSyncFeatureFlag(self.syncFeatureFlag)
+        updateSyncFeatureFlags(self.syncFeatureFlags)
         setUpObservables()
         setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
     }
 
     private func setUpObservables() {
-        syncService.featureFlagPublisher
+        syncService.featureFlagsPublisher
             .dropFirst()
             .removeDuplicates()
-            .assign(to: \.syncFeatureFlag, onWeaklyHeld: self)
+            .assign(to: \.syncFeatureFlags, onWeaklyHeld: self)
             .store(in: &cancellables)
 
         syncService.authStatePublisher

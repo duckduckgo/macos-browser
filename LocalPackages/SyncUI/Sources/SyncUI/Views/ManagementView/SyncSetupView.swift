@@ -36,7 +36,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 SyncUIViews.TextHeader2(text: UserText.otherOptionsSectionTitle)
                 VStack(alignment: .leading, spacing: 8) {
                     TextButton(UserText.syncThisDeviceLink, weight: .semibold, action: model.syncWithServerPressed)
-                        .disabled(!model.isCreatingAccountAvailable)
+                        .disabled(!model.isAccountCreationAvailable)
                     TextButton(UserText.recoverDataLink, weight: .semibold, action: model.recoverDataPressed)
                         .disabled(!model.isAccountRecoveryAvailable)
                 }
@@ -63,10 +63,10 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
 
     @ViewBuilder
     fileprivate func syncUnavailableView() -> some View {
-        if !model.isSyncAvailable || !model.isConnectingDevicesAvailable {
+        if !model.isDataSyncingAvailable || !model.isConnectingDevicesAvailable {
             SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningSyncDisabled)
                 .padding(.top, 16)
-        } else if !model.isCreatingAccountAvailable {
+        } else if !model.isAccountCreationAvailable {
             SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningAccountCreationDisabled)
                 .padding(.top, 16)
         } else {
