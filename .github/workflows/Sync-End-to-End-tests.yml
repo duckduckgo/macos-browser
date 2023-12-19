@@ -3,7 +3,7 @@ name: Sync-End-to-End tests
 on:
   workflow_dispatch:
   push:
-     branches:
+    branches:
       - sabrina/sync_e2e_ci
   schedule:
     - cron: '0 5 * * *' # run at 5 AM UTC
