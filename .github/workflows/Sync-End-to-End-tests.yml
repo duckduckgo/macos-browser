@@ -9,7 +9,7 @@ on:
     - cron: '0 5 * * *' # run at 5 AM UTC
 
 jobs:
-  sync-end-to-end-tests:
+  e2e:
     name: Sync End to end Tests
     runs-on: macos-13-xlarge
 
