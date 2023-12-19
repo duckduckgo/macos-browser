@@ -112,21 +112,4 @@ jobs:
           | tee xcodebuild.log \
           | xcbeautify
 
-    # - name: Create Asana task when workflow failed
-    #   if: ${{ failure() }}
-    #   run: |
-    #     curl -s "https://app.asana.com/api/1.0/tasks" \
-    #       --header "Accept: application/json" \
-    #       --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
-    #       --header "Content-Type: application/json" \
-    #       --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
-
-    - name: Upload logs when workflow failed
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: BuildLogs
-        path: |
-          xcodebuild.log
-          DerivedData/Logs/Test/*.xcresult
-        retention-days: 7
+   
