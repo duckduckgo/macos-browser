@@ -45,5 +45,6 @@ jobs:
         set -o pipefail && xcodebuild test \
           -scheme "Sync End-to-End UI Tests" \
           -derivedDataPath "DerivedData" \
+          -skipPackagePluginValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo \
         | tee xcodebuild.log \
         | xcbeautify
