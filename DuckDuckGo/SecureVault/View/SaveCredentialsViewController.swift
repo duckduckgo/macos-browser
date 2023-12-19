@@ -48,7 +48,7 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
 
-    @IBOutlet var notNowButton: NSButton!
+    @IBOutlet var notNowSegmentedControl: NSSegmentedControl!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
     @IBOutlet var dontUpdateButton: NSButton!
@@ -81,6 +81,7 @@ final class SaveCredentialsViewController: NSViewController {
 
         visiblePasswordField.isHidden = true
         saveButton.becomeFirstResponder()
+        updateSaveSegmentedControl()
     }
 
     override func viewWillAppear() {
@@ -120,7 +121,7 @@ final class SaveCredentialsViewController: NSViewController {
         visiblePasswordField.setEditable(editable)
 
         if editable || passwordManagerCoordinator.isEnabled {
-            notNowButton.isHidden = passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
+            notNowSegmentedControl.isHidden = passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
             passwordManagerNotNowButton.isHidden = !passwordManagerCoordinator.isEnabled || credentials?.account.id != nil
             saveButton.isHidden = credentials?.account.id != nil || passwordManagerCoordinator.isLocked
             updateButton.isHidden = credentials?.account.id == nil || passwordManagerCoordinator.isLocked
@@ -137,7 +138,7 @@ final class SaveCredentialsViewController: NSViewController {
             titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
             usernameField.makeMeFirstResponder()
         } else {
-            notNowButton.isHidden = true
+            notNowSegmentedControl.isHidden = true
             saveButton.isHidden = true
             updateButton.isHidden = true
             dontUpdateButton.isHidden = true
@@ -148,6 +149,13 @@ final class SaveCredentialsViewController: NSViewController {
             titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
             view.window?.makeFirstResponder(nil)
         }
+    }
+
+    private func updateSaveSegmentedControl() {
+        if notNowSegmentedControl.segmentCount > 1 {
+            notNowSegmentedControl.setShowsMenuIndicator(true, forSegment: 1)
+        }
+        notNowSegmentedControl.selectedSegment = -1
     }
 
     @IBAction func onSaveClicked(sender: Any?) {
@@ -203,6 +211,29 @@ final class SaveCredentialsViewController: NSViewController {
         delegate?.shouldCloseSaveCredentialsViewController(self)
     }
 
+    @IBAction func onNotNowSegmentedControlClicked(_ sender: Any) {
+        if notNowSegmentedControl.selectedSegment == 0 {
+            onNotNowClicked(sender: sender)
+        } else {
+            displayMenuForSecondSegment()
+        }
+    }
+
+    func displayMenuForSecondSegment() {
+        let item = NSMenuItem(title: UserText.neverForThisSite, action: #selector(onNeverPromptClicked), target: self, keyEquivalent: "")
+        let menu = NSMenu(title: "", items: [item])
+
+        let segmentWidth = notNowSegmentedControl.bounds.width - 64.0
+        let segmentFrame = CGRect(x: segmentWidth, y: 0, width: segmentWidth, height: notNowSegmentedControl.bounds.height)
+
+        if let contentView = notNowSegmentedControl.window?.contentView {
+            let menuOrigin = notNowSegmentedControl.convert(segmentFrame.origin, to: contentView)
+            let finalMenuOrigin = CGPoint(x: menuOrigin.x, y: menuOrigin.y - segmentFrame.height - 5.0)
+            menu.popUp(positioning: nil, at: finalMenuOrigin, in: contentView)
+        }
+
+    }
+
     @IBAction func onNotNowClicked(sender: Any?) {
         func notifyDelegate() {
             delegate?.shouldCloseSaveCredentialsViewController(self)
@@ -234,6 +265,16 @@ final class SaveCredentialsViewController: NSViewController {
             notifyDelegate()
         }
 
+    }
+
+    @objc func onNeverPromptClicked() {
+        do {
+            _ = try AutofillNeverPromptWebsitesManager.shared.saveNeverPromptWebsite(domainLabel.stringValue)
+        } catch {
+            os_log("%: failed to save never prompt for website %s", type: .error, #function, error.localizedDescription)
+        }
+
+        onNotNowClicked(sender: nil)
     }
 
     @IBAction func onOpenPasswordManagerClicked(sender: Any?) {
