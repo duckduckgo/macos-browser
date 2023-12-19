@@ -273,6 +273,7 @@ final class SaveCredentialsViewController: NSViewController {
         } catch {
             os_log("%: failed to save never prompt for website %s", type: .error, #function, error.localizedDescription)
         }
+        Pixel.fire(.autofillLoginsSaveLoginModalExcludeSiteConfirmed)
 
         onNotNowClicked(sender: nil)
     }

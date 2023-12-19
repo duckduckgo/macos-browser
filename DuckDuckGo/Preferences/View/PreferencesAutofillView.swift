@@ -127,6 +127,9 @@ extension Preferences {
                             .padding(.top, -8)
                         Button(UserText.autofillExcludedSitesReset) {
                             showingResetNeverPromptSitesSheet.toggle()
+                            if showingResetNeverPromptSitesSheet {
+                                Pixel.fire(.autofillLoginsSettingsResetExcludedDisplayed)
+                            }
                         }
                     }.sheet(isPresented: $showingResetNeverPromptSitesSheet) {
                         ResetNeverPromptSitesSheet(autofillPreferencesModel: model, isSheetPresented: $showingResetNeverPromptSitesSheet)
@@ -330,6 +333,7 @@ struct ResetNeverPromptSitesSheet: View {
                 Spacer()
                 Button(UserText.cancel) {
                     isSheetPresented.toggle()
+                    Pixel.fire(.autofillLoginsSettingsResetExcludedDismissed)
                 }
                 Button(action: {
                     saveChanges()
@@ -346,6 +350,7 @@ struct ResetNeverPromptSitesSheet: View {
     private func saveChanges() {
         autofillPreferencesModel.resetNeverPromptWebsites()
         isSheetPresented.toggle()
+        Pixel.fire(.autofillLoginsSettingsResetExcludedConfirmed)
     }
 
 }
