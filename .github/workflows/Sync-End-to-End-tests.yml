@@ -5,11 +5,13 @@ on:
     branches:
       - sabrina/sync_e2e_ci
   pull_request:
-  schedule:
-    - cron: '0 5 * * *' # run at 5 AM UTC
+    branches:
+      - sabrina/sync_e2e_ci
+  # schedule:
+  #   - cron: '0 5 * * *' # run at 5 AM UTC
 
 jobs:
-  e2e:
+  sync-e2e-tests:
     name: Sync End to end Tests
     runs-on: macos-13-xlarge
 
