@@ -34,6 +34,7 @@ struct DataImportErrorView: View {
             case .passwords:
                 Text("We were unable to import passwords directly from \(source.importSourceName).",
                      comment: "Message when data import fails from a browser. %@ - a browser name")
+                .bold()
             }
 
             Text("Let’s try doing it manually. It won’t take long.",
