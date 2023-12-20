@@ -21,7 +21,7 @@ import Networking
 
 protocol HomePageRemoteMessagingRequest {
 
-    func fetchHomePageRemoteMessages(completion: @escaping (Result<[NetworkProtectionRemoteMessage], Error>) -> Void)
+    func fetchHomePageRemoteMessages<T: Decodable>(completion: @escaping (Result<[T], Error>) -> Void)
 
 }
 
@@ -45,8 +45,8 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
 
         var url: URL {
             switch self {
-            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages-v2-debug.json")!
-            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages-v2.json")!
+            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages-debug.json")!
+            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/dbp/messages.json")!
             }
         }
     }
@@ -92,6 +92,7 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
                     let decoded = try decoder.decode([T].self, from: responseData)
                     completion(Result.success(decoded))
                 } catch {
+                    print("DEBUG: Error \(error), request \(self.endpointURL)")
                     completion(.failure(HomePageRemoteMessagingRequestError.failedToDecodeMessages))
                 }
             } else {

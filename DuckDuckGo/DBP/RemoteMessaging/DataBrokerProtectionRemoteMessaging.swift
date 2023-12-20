@@ -70,7 +70,6 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
     }
 
     func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-
         if let lastRefreshDate = lastRefreshDate(), lastRefreshDate.addingTimeInterval(minimumRefreshInterval) > Date() {
             fetchCompletion?()
             return
@@ -83,13 +82,16 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
 
             guard let self else { return }
 
+            // Cast the generic parameter to a concrete type:
+            let result: Result<[DataBrokerProtectionRemoteMessage], Error> = result
+
             switch result {
             case .success(let messages):
                 do {
                     try self.messageStorage.store(messages: messages)
                     self.updateLastRefreshDate() // Update last refresh date on success, otherwise let the app try again next time
                 } catch {
-                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
+                    // Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
                 }
             case .failure(let error):
                 // Ignore 403 errors, those happen when a file can't be found on S3
@@ -98,10 +100,9 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
                     return
                 }
 
-                Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
+                // Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
             }
         }
-
     }
 
     /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.

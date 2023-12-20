@@ -83,6 +83,9 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
             guard let self else { return }
 
+            // Cast the generic parameter to a concrete type:
+            let result: Result<[DataBrokerProtectionRemoteMessage], Error> = result
+
             switch result {
             case .success(let messages):
                 do {

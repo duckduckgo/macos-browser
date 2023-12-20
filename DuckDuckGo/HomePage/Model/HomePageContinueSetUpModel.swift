@@ -41,9 +41,12 @@ extension HomePage.Models {
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION && DBP
         let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
-        let appGroupUserDefaults: UserDefaults
+        let networkProtectionUserDefaults: UserDefaults
+
+        let dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging
+        let dataBrokerProtectionUserDefaults: UserDefaults
 #endif
 
         var isDay0SurveyEnabled: Bool {
@@ -135,7 +138,7 @@ extension HomePage.Models {
 
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION && DBP
         init(defaultBrowserProvider: DefaultBrowserProvider,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
@@ -143,7 +146,9 @@ extension HomePage.Models {
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
-             appGroupUserDefaults: UserDefaults,
+             dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging,
+             networkProtectionUserDefaults: UserDefaults,
+             dataBrokerProtectionUserDefaults: UserDefaults,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
@@ -152,9 +157,13 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.duckPlayerPreferences = duckPlayerPreferences
             self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
-            self.appGroupUserDefaults = appGroupUserDefaults
+            self.dataBrokerProtectionRemoteMessaging = dataBrokerProtectionRemoteMessaging
+            self.networkProtectionUserDefaults = networkProtectionUserDefaults
+            self.dataBrokerProtectionUserDefaults = dataBrokerProtectionUserDefaults
             self.privacyConfigurationManager = privacyConfigurationManager
+
             refreshFeaturesMatrix()
+
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
         }
@@ -247,6 +256,15 @@ extension HomePage.Models {
 #if DBP
             if shouldDBPWaitlistCardBeVisible {
                 features.append(.dataBrokerProtectionWaitlistInvited)
+            }
+
+            for message in dataBrokerProtectionRemoteMessaging.presentableRemoteMessages() {
+                features.append(.dataBrokerProtectionRemoteMessage(message))
+//                DailyPixel.fire(
+//                    pixel: .networkProtectionRemoteMessageDisplayed(messageID: message.id),
+//                    frequency: .dailyOnly,
+//                    includeAppVersionParameter: true
+//                )
             }
 #endif
 
@@ -444,7 +462,28 @@ extension HomePage.Models {
 
         @MainActor private func handle(remoteMessage: DataBrokerProtectionRemoteMessage) {
 #if DBP
-            // TODO
+            guard let actionType = remoteMessage.action.actionType else {
+                // Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                refreshFeaturesMatrix()
+                return
+            }
+
+            switch actionType {
+            case .openDataBrokerProtection:
+                break
+                // NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+            case .openSurveyURL, .openURL:
+                if let surveyURL = remoteMessage.presentableSurveyURL() {
+                    let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
+                    tabCollectionViewModel.append(tab: tab)
+                    // Pixel.fire(.networkProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+
+                    // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
+                    dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                    refreshFeaturesMatrix()
+                }
+            }
 #endif
         }
     }
