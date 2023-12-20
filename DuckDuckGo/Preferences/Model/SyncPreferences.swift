@@ -139,6 +139,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService.featureFlagsPublisher
             .dropFirst()
             .removeDuplicates()
+            .receive(on: DispatchQueue.main)
             .assign(to: \.syncFeatureFlags, onWeaklyHeld: self)
             .store(in: &cancellables)
 
