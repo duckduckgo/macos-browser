@@ -8286,8 +8286,6 @@
 				7B4CE8E026F02108009134B1 /* PBXTargetDependency */,
 			);
 			name = "UI Tests";
-			packageProductDependencies = (
-			);
 			productName = "UI Tests";
 			productReference = 7B4CE8DA26F02108009134B1 /* UI Tests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
