@@ -143,6 +143,12 @@ class MockDDGSyncing: DDGSyncing {
 
     var dataProvidersSource: DataProvidersSource?
 
+    @Published var featureFlags: SyncFeatureFlags = .all
+
+    var featureFlagsPublisher: AnyPublisher<SyncFeatureFlags, Never> {
+        $featureFlags.eraseToAnyPublisher()
+    }
+
     @Published var authState: SyncAuthState = .inactive
 
     var authStatePublisher: AnyPublisher<SyncAuthState, Never> {
@@ -161,7 +167,7 @@ class MockDDGSyncing: DDGSyncing {
         $isSyncInProgress.eraseToAnyPublisher()
     }
 
-    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling, isSyncInProgress: Bool) {
+    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling = CapturingScheduler(), isSyncInProgress: Bool) {
         self.dataProvidersSource = dataProvidersSource
         self.authState = authState
         self.account = account

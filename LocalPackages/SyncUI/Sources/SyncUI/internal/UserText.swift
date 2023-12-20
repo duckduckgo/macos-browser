@@ -157,4 +157,9 @@ enum UserText {
     static let fetchFaviconsOnboardingTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-title", value: "Download Missing Icons?", comment: "Title for fetch favicons onboarding dialog")
     static let fetchFaviconsOnboardingMessage = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-message", value: "Do you want this device to automatically download icons for any new bookmarks synced from your other devices? This will expose the download to your network any time a bookmark is synced.", comment: "Text for fetch favicons onboarding dialog")
     static let keepFaviconsUpdated = NSLocalizedString("prefrences.sync.keep-favicons-updated", value: "Keep Bookmarks Icons Updated", comment: "Title of the confirmation button for favicons fetching")
+
+    // Sync Feature Flags
+    static let serviceUnavailable = NSLocalizedString("sync.warning.service-unavailable", value: "Service Unavailable", comment: "Title of the warning message")
+    static let warningSyncDisabled = NSLocalizedString("sync.warning.sync-disabled", value: "We apologize, but the service is currently unavailable. Please try again later.", comment: "Sync unavailable warning message")
+    static let warningAccountCreationDisabled = NSLocalizedString("sync.warning.account-creation-disabled", value: "We apologize, but new account creation is currently unavailable for this service. Please try again later.", comment: "Sync unavailable warning message")
 }

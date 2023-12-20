@@ -15,7 +15,7 @@ let package = Package(
         .package(path: "../Account"),
         .package(path: "../Purchase"),
         .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "96.0.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "97.0.0"),
     ],
     targets: [
         .target(

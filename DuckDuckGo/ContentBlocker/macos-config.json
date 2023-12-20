@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1702579565498,
+    "version": 1703003631137,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -246,6 +246,9 @@
                     "domain": "metro.co.uk"
                 },
                 {
+                    "domain": "youtube.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -264,7 +267,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9ab9e1acdb6a8617c77109acc1e3943c"
+            "hash": "a1060783f1bf56f5cc661b994c9c9e56"
         },
         "autofill": {
             "exceptions": [
@@ -1030,12 +1033,16 @@
                     {
                         "domain": "flysas.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                    },
+                    {
+                        "domain": "facebook.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1641"
                     }
                 ]
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "d757f6509e9a9a20140c755ed0f21ea2"
+            "hash": "6ed03febdd780fd845cc1f7d6ce74ecf"
         },
         "dbp": {
             "state": "enabled",
@@ -2011,6 +2018,23 @@
                             {
                                 "selector": "[data-targeting]",
                                 "type": "override"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "dexerto.com",
+                        "rules": [
+                            {
+                                "selector": "#leaderboard-top-adhesion",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-cy='Ad']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-cy='VidazooPlayer']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -3678,7 +3702,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "c34713afaf78e090b587a923f132ed56"
+            "hash": "8551081ffe228a4bef49deba3fe37b19"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3933,10 +3957,13 @@
                 },
                 {
                     "domain": "airbnb.com.br"
+                },
+                {
+                    "domain": "zoom.us"
                 }
             ],
             "state": "enabled",
-            "hash": "75e673ce365430652fc7cc896ed49a5f"
+            "hash": "82ebfddf791575ada285a49b7fdc71ca"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4460,6 +4487,11 @@
             "state": "disabled",
             "hash": "5e792dd491428702bc0104240fbce0ce"
         },
+        "sync": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "trackerAllowlist": {
             "state": "enabled",
             "settings": {
@@ -4750,8 +4782,7 @@
                             {
                                 "rule": "analytics.analytics-egain.com/onetag/",
                                 "domains": [
-                                    "landsend.com",
-                                    "support.norton.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5323,6 +5354,7 @@
                                     "asics.com",
                                     "brooklinen.com",
                                     "carters.com",
+                                    "otterbox.com",
                                     "seatosummit.com"
                                 ]
                             }
@@ -5378,6 +5410,16 @@
                                     "espn.com.mx",
                                     "espn.in",
                                     "espnfc.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "egain.cloud": {
+                        "rules": [
+                            {
+                                "rule": "egain.cloud/",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5509,8 +5551,7 @@
                             {
                                 "rule": "app.five9.com",
                                 "domains": [
-                                    "gmsdnv.com",
-                                    "machiassavings.bank"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5750,6 +5791,12 @@
                                     "rawstory.com",
                                     "usatoday.com"
                                 ]
+                            },
+                            {
+                                "rule": "storage.googleapis.com/code.snapengage.com/",
+                                "domains": [
+                                    "<all>"
+                                ]
                             }
                         ]
                     },
@@ -5977,15 +6024,9 @@
                     "gorgias.chat": {
                         "rules": [
                             {
-                                "rule": "config.gorgias.chat",
+                                "rule": "gorgias.chat",
                                 "domains": [
-                                    "help.athleticbrewing.com"
-                                ]
-                            },
-                            {
-                                "rule": "assets.gorgias.chat",
-                                "domains": [
-                                    "help.athleticbrewing.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -7509,7 +7550,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "5cecb6d28193f468b28b9afdaca04da1"
+            "hash": "b6996e16fe1785f6d75cd6302da1f48e"
         },
         "trackingCookies1p": {
             "settings": {
