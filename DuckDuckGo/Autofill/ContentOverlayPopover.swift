@@ -43,7 +43,7 @@ public final class ContentOverlayPopover {
             layer.masksToBounds = true
             layer.cornerRadius = 6
             layer.borderWidth = 0.5
-            layer.borderColor = CGColor.init(gray: 0, alpha: 0.3) // Looks a little lighter than 0.2 in the CSS
+            layer.borderColor = CGColor(gray: 0, alpha: 0.3) // Looks a little lighter than 0.2 in the CSS
         }
         viewController.view.window?.backgroundColor = .clear
         viewController.view.window?.acceptsMouseMovedEvents = true

@@ -27,10 +27,12 @@ public extension PixelKit {
         public static let osMajorVersion = "osMajorVersion"
 
         public static let errorCode = "e"
+        public static let errorDomain = "errorDomain"
         public static let errorDesc = "d"
         public static let errorCount = "c"
         public static let errorSource = "error_source"
         public static let underlyingErrorCode = "ue"
+        public static let underlyingErrorDomain = "underlyingErrorDomain"
         public static let underlyingErrorDesc = "ud"
         public static let underlyingErrorSQLiteCode = "sqlrc"
         public static let underlyingErrorSQLiteExtendedCode = "sqlerc"
@@ -62,6 +64,8 @@ public extension PixelKit {
         public static let vpnBreakageCategory = "breakageCategory"
         public static let vpnBreakageDescription = "breakageDescription"
         public static let vpnBreakageMetadata = "breakageMetadata"
+
+        public static let reason = "reason"
     }
 
     enum Values {

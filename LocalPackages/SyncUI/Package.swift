@@ -12,16 +12,24 @@ let package = Package(
             targets: ["SyncUI"]),
     ],
     dependencies: [
-        .package(path: "../SwiftUIExtensions")
+        .package(path: "../SwiftUIExtensions"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "95.0.0"),
     ],
     targets: [
         .target(
             name: "SyncUI",
             dependencies: [
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
-            ]),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
         .testTarget(
             name: "SyncUITests",
-            dependencies: ["SyncUI"]),
+            dependencies: ["SyncUI"],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )

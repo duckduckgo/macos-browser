@@ -299,7 +299,7 @@ extension MainViewController {
 
     @objc func openLocation(_ sender: Any?) {
         makeKeyIfNeeded()
-        guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
+        guard let addressBarTextField = navigationBarViewController.addressBarViewController?.addressBarTextField else {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
@@ -369,9 +369,9 @@ extension MainViewController {
                 }
                 navigationBarViewController = wc.mainViewController.navigationBarViewController
             }
-            navigationBarViewController?.view.window?.makeKeyAndOrderFront(nil)
+            navigationBarViewController.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
+        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
     @objc func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -480,7 +480,7 @@ extension MainViewController {
         }
         makeKeyIfNeeded()
 
-        navigationBarViewController?
+        navigationBarViewController
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
@@ -493,7 +493,7 @@ extension MainViewController {
         }
         makeKeyIfNeeded()
 
-        navigationBarViewController?
+        navigationBarViewController
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
@@ -693,6 +693,12 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+    }
+
+    @objc func internalUserState(_ sender: Any?) {
+        guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
+        let state = internalUserDecider.isInternalUser
+        internalUserDecider.debugSetInternalUserState(!state)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {

@@ -342,7 +342,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(NSImage(named: "DBP-Icon"))
             items.append(dataBrokerProtectionItem)
 
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()

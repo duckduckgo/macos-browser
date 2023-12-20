@@ -46,7 +46,7 @@ final class CLLocationManagerMock: CLLocationManager {
     override init() {
         super.init()
 
-        selfRef = NSValue.init(nonretainedObject: self)
+        selfRef = NSValue(nonretainedObject: self)
         Self.instances.append(selfRef)
     }
 

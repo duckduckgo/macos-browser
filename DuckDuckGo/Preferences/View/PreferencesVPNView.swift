@@ -1,5 +1,5 @@
 //
-//  PreferencesPrivacyView.swift
+//  PreferencesVPNView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -32,6 +32,13 @@ extension Preferences {
                 // TITLE
 
                 TextMenuTitle(text: UserText.vpn)
+
+                if model.shouldShowLocationItem {
+                    PreferencePaneSection {
+                        TextMenuItemHeader(text: UserText.vpnLocationTitle)
+                        VPNLocationPreferenceItem(model: model.locationItem)
+                    }
+                }
 
                 // SECTION: Manage VPN
 
