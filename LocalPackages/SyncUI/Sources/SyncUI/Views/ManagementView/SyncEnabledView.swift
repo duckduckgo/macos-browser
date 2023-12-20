@@ -154,7 +154,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         if model.isDataSyncingAvailable {
             EmptyView()
         } else {
-            SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningSyncDisabled)
+            SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
         }
     }
 
