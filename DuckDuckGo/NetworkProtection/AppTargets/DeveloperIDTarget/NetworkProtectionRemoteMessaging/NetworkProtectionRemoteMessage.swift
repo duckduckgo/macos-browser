@@ -33,16 +33,6 @@ struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
 
 struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
 
-    enum SurveyURLParameters: String, CaseIterable {
-        case atb = "atb"
-        case atbVariant = "var"
-        case daysSinceActivated = "delta"
-        case macosVersion = "mv"
-        case appVersion = "ddgv"
-        case hardwareModel = "mo"
-        case lastDayActive = "da"
-    }
-
     let id: String
     let cardTitle: String
     let cardDescription: String
@@ -52,7 +42,6 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
     let requiresNetworkProtectionAccess: Bool
     let action: NetworkProtectionRemoteMessageAction
 
-    // swiftlint:disable:next cyclomatic_complexity
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
         activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
@@ -60,7 +49,6 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model
     ) -> URL? {
-        // First check whether the action type dictates that the URL should not have survey parameters appended
         if let actionType = action.actionType, actionType == .openURL, let urlString = action.actionURL, let url = URL(string: urlString) {
             return url
         }
@@ -69,43 +57,19 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
             return nil
         }
 
-        guard var components = URLComponents(string: surveyURL) else {
-            return URL(string: surveyURL)
+        if let actionURL = action.actionURL {
+            let surveyURLBuilder = SurveyURLBuilder(
+                statisticsStore: statisticsStore,
+                operatingSystemVersion: operatingSystemVersion,
+                appVersion: appVersion,
+                hardwareModel: hardwareModel,
+                daysSinceActivation: activationDateStore.daysSinceActivation(),
+                daysSinceLastActive: activationDateStore.daysSinceLastActive()
+            )
+
+            return surveyURLBuilder.buildSurveyURL(from: actionURL)
+        } else {
+            return nil
         }
-
-        var queryItems = components.queryItems ?? []
-
-        for parameter in SurveyURLParameters.allCases {
-            switch parameter {
-            case .atb:
-                if let atb = statisticsStore.atb {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: atb))
-                }
-            case .atbVariant:
-                if let variant = statisticsStore.variant {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: variant))
-                }
-            case .daysSinceActivated:
-                if let daysSinceActivated = activationDateStore.daysSinceActivation() {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: String(describing: daysSinceActivated)))
-                }
-            case .macosVersion:
-                queryItems.append(URLQueryItem(name: parameter.rawValue, value: operatingSystemVersion))
-            case .appVersion:
-                queryItems.append(URLQueryItem(name: parameter.rawValue, value: appVersion))
-            case .hardwareModel:
-                if let hardwareModel = hardwareModel?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: hardwareModel))
-                }
-            case .lastDayActive:
-                if let lastDayActive = activationDateStore.daysSinceLastActive() {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: String(describing: lastDayActive)))
-                }
-            }
-        }
-
-        components.queryItems = queryItems
-
-        return components.url
     }
 }
