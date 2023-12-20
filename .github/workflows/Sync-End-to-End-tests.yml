@@ -63,54 +63,53 @@ jobs:
             -scheme "Sync End-to-End UI Tests" \
             -configuration "CI" \
             -derivedDataPath "DerivedData" \
-            -only-testing:CriticalPathsTests/testCanCreateSyncAccount \
           | tee xcodebuild.log \
           | xcbeautify
 
-      - name: Run clean-app.sh review
-        run: |
-          ./clean-app.sh review
-
-      - name: Build and run Sync e2e test 2
-        run: |
-          set -o pipefail && xcodebuild test \
-            -scheme "Sync End-to-End UI Tests" \
-            -configuration "CI" \
-            -derivedDataPath "DerivedData" \
-            -only-testing:CriticalPathsTests/testCanRecoverSyncAccount \
-          | tee xcodebuild.log \
-          | xcbeautify
-
-      - name: Run clean-app.sh review
-        run: |
-          ./clean-app.sh review
-
-      - name: Build and run Sync e2e test 3
-        env:
-          CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
-        run: |
-          set -o pipefail && xcodebuild test \
-            -scheme "Sync End-to-End UI Tests" \
-            -configuration "CI" \
-            -derivedDataPath "DerivedData" \
-            -only-testing:CriticalPathsTests/testCanLoginToExistingSyncAccount \
-          | tee xcodebuild.log \
-          | xcbeautify
-
-      - name: Run clean-app.sh review
-        run: |
-          ./clean-app.sh review
-
-      - name: Build and run Sync e2e test 4
-        env:
-          CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
-        run: |
-          set -o pipefail && xcodebuild test \
-            -scheme "Sync End-to-End UI Tests" \
-            -configuration "CI" \
-            -derivedDataPath "DerivedData" \
-            -only-testing:CriticalPathsTests/testCanSyncData \
-          | tee xcodebuild.log \
-          | xcbeautify
+#      - name: Run clean-app.sh review
+#        run: |
+#          ./clean-app.sh review
+#
+#      - name: Build and run Sync e2e test 2
+#        run: |
+#          set -o pipefail && xcodebuild test \
+#            -scheme "Sync End-to-End UI Tests" \
+#            -configuration "CI" \
+#            -derivedDataPath "DerivedData" \
+#            -only-testing:CriticalPathsTests/testCanRecoverSyncAccount \
+#          | tee xcodebuild.log \
+#          | xcbeautify
+#
+#      - name: Run clean-app.sh review
+#        run: |
+#          ./clean-app.sh review
+#
+#      - name: Build and run Sync e2e test 3
+#        env:
+#          CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
+#        run: |
+#          set -o pipefail && xcodebuild test \
+#            -scheme "Sync End-to-End UI Tests" \
+#            -configuration "CI" \
+#            -derivedDataPath "DerivedData" \
+#            -only-testing:CriticalPathsTests/testCanLoginToExistingSyncAccount \
+#          | tee xcodebuild.log \
+#          | xcbeautify
+#
+#      - name: Run clean-app.sh review
+#        run: |
+#          ./clean-app.sh review
+#
+#      - name: Build and run Sync e2e test 4
+#        env:
+#          CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
+#        run: |
+#          set -o pipefail && xcodebuild test \
+#            -scheme "Sync End-to-End UI Tests" \
+#            -configuration "CI" \
+#            -derivedDataPath "DerivedData" \
+#            -only-testing:CriticalPathsTests/testCanSyncData \
+#          | tee xcodebuild.log \
+#          | xcbeautify
 
    
