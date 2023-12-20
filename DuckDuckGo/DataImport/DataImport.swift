@@ -338,7 +338,14 @@ enum DataImport {
         }
 
         static func < (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
-            return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
+            // first sort by profiles folder name if multiple profiles folders are present (Chrome, Chrome Canary…)
+            let profilesDirName1 = lhs.profileURL.deletingLastPathComponent().lastPathComponent
+            let profilesDirName2 = rhs.profileURL.deletingLastPathComponent().lastPathComponent
+            if profilesDirName1 == profilesDirName2 {
+                return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
+            } else {
+                return profilesDirName1.localizedCompare(profilesDirName2) == .orderedAscending
+            }
         }
 
         static func == (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
