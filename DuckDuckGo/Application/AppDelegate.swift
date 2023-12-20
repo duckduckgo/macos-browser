@@ -358,7 +358,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             .asVoid()
             .sink { [weak syncService] in
                 Pixel.fire(.syncDaily, limitTo: .dailyFirst)
-                syncService?.syncDailyStats.sendStatusIfNeeded(handler: { params in
+                syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
                     Pixel.fire(.syncSuccessRateDaily, withAdditionalParameters: params)
                 })
             }
