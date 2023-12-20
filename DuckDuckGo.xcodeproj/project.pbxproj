@@ -2369,6 +2369,7 @@
 		98A50964294B691800D10880 /* Persistence in Frameworks */ = {isa = PBXBuildFile; productRef = 98A50963294B691800D10880 /* Persistence */; };
 		98A944B52B327322004671B3 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 98A944B42B327322004671B3 /* TestUtils */; };
 		98A944B72B32732D004671B3 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 98A944B62B32732D004671B3 /* TestUtils */; };
+		98A944BB2B32FC84004671B3 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 98A944BA2B32FC84004671B3 /* Networking */; };
 		98A95D88299A2DF900B9B81A /* BookmarkMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */; };
 		98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */; };
 		9D6983F92AC773C3002C02FC /* PixelKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9D6983F82AC773C3002C02FC /* PixelKit */; };
@@ -4462,6 +4463,7 @@
 				4B4D60B12A0C83B900BCD287 /* NetworkProtectionUI in Frameworks */,
 				98A944B52B327322004671B3 /* TestUtils in Frameworks */,
 				1E25269C28F8741A00E44DFA /* Common in Frameworks */,
+				98A944BB2B32FC84004671B3 /* Networking in Frameworks */,
 				98A50964294B691800D10880 /* Persistence in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8384,6 +8386,7 @@
 				7B5DD6992AE51FFA001DE99C /* PixelKit */,
 				31A3A4E22B0C115F0021063C /* DataBrokerProtection */,
 				98A944B42B327322004671B3 /* TestUtils */,
+				98A944BA2B32FC84004671B3 /* Networking */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -13361,6 +13364,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = TestUtils;
+		};
+		98A944BA2B32FC84004671B3 /* Networking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Networking;
 		};
 		9D6983F82AC773C3002C02FC /* PixelKit */ = {
 			isa = XCSwiftPackageProductDependency;
