@@ -356,7 +356,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         isSyncInProgressCancellable = syncService.isSyncInProgressPublisher
             .filter { $0 }
             .asVoid()
-            .prefix(1)
             .sink { [weak syncService] in
                 Pixel.fire(.syncDaily, limitTo: .dailyFirst)
                 syncService?.syncDailyStats.sendStatusIfNeeded(handler: { params in
