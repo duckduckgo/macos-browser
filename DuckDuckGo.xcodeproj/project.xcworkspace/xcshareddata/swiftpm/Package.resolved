@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "bartek/sync-rate-pixel",
-        "revision" : "98c80e7051322f81e754342942135078e9f98c2d"
+        "revision" : "e5c9e31b19b3cf78e2b704a60882ba24b9bc680d",
+        "version" : "96.0.0"
       }
     },
     {
