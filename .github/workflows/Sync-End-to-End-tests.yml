@@ -15,6 +15,19 @@ on:
         required: true
 
 jobs:
+
+  swiftlint:
+
+    name: SwiftLint
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: SwiftLint
+        uses: docker://norionomura/swiftlint:0.54.0
+        with:
+          args: swiftlint --reporter github-actions-logging --strict
   test:
     runs-on: macos-13-xlarge
     steps:
