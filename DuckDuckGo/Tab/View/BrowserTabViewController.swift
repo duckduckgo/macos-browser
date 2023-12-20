@@ -219,11 +219,28 @@ final class BrowserTabViewController: NSViewController {
         tabCollectionViewModel.tabCollection.$tabs
             .sink(receiveValue: setDelegate())
             .store(in: &cancellables)
+
+        tabCollectionViewModel.tabCollection.$tabs
+            .sink(receiveValue: removeDataBrokerViewIfNecessary())
+            .store(in: &cancellables)
     }
 
     private func subscribeToPinnedTabs() {
         pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
             .sink(receiveValue: setDelegate())
+    }
+
+    private func removeDataBrokerViewIfNecessary() -> ([Tab]) -> Void {
+        { [weak self] (tabs: [Tab]) in
+            guard let self else { return }
+#if DBP
+            if let dataBrokerProtectionHomeViewController,
+               !tabs.contains(where: { $0.content == .dataBrokerProtection }) {
+                dataBrokerProtectionHomeViewController.removeCompletely()
+                self.dataBrokerProtectionHomeViewController = nil
+            }
+#endif
+        }
     }
 
     private func setDelegate() -> ([Tab]) -> Void {
@@ -431,7 +448,6 @@ final class BrowserTabViewController: NSViewController {
         bookmarksViewController?.removeCompletely()
 #if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
-        dataBrokerProtectionHomeViewController = nil
 #endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
