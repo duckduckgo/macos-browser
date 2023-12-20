@@ -952,6 +952,8 @@
 		37534CA3281132CB002621E7 /* TabLazyLoaderDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA2281132CB002621E7 /* TabLazyLoaderDataSource.swift */; };
 		37534CA52811987D002621E7 /* AdjacentItemEnumeratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA42811987D002621E7 /* AdjacentItemEnumeratorTests.swift */; };
 		37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37534CA62811988E002621E7 /* AdjacentItemEnumerator.swift */; };
+		375CF2352B330D2600BC1A64 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 375CF2342B330D2600BC1A64 /* TestUtils */; };
+		375CF2372B330D2C00BC1A64 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 375CF2362B330D2C00BC1A64 /* TestUtils */; };
 		376113CC2B29CD5B00E794BB /* CriticalPathsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E46DF2B2725DD0013AC2A /* CriticalPathsTests.swift */; };
 		376705AF27EB488600DD8D76 /* RoundedSelectionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */; };
 		3767190028E58513003A2A15 /* DuckPlayerURLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376718FF28E58513003A2A15 /* DuckPlayerURLExtensionTests.swift */; };
@@ -981,7 +983,6 @@
 		378F44EB29B4C73E00899924 /* View+RoundedCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378F44EA29B4C73E00899924 /* View+RoundedCorners.swift */; };
 		378F44EC29B4C73E00899924 /* View+RoundedCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378F44EA29B4C73E00899924 /* View+RoundedCorners.swift */; };
 		3793FDD829535EBA00A2E28F /* Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E319372953446000DD3BCF /* Assertions.swift */; };
-		3795323E2B330C4C00623FD0 /* TestUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 3795323D2B330C4C00623FD0 /* TestUtils */; };
 		379DE4BD27EA31AC002CC3DE /* PreferencesAutofillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */; };
 		379E877629E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */; };
 		379E877729E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */; };
@@ -4279,6 +4280,7 @@
 			files = (
 				3706FE88293F661700E42796 /* OHHTTPStubs in Frameworks */,
 				3706FE89293F661700E42796 /* OHHTTPStubsSwift in Frameworks */,
+				375CF2372B330D2C00BC1A64 /* TestUtils in Frameworks */,
 				4B81AD372B29513100706C96 /* PixelKitTestingUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4410,7 +4412,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3795323E2B330C4C00623FD0 /* TestUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4474,6 +4475,7 @@
 			files = (
 				B6DA44172616C13800DD1EC2 /* OHHTTPStubs in Frameworks */,
 				B6DA44192616C13800DD1EC2 /* OHHTTPStubsSwift in Frameworks */,
+				375CF2352B330D2600BC1A64 /* TestUtils in Frameworks */,
 				4B81AD352B29512B00706C96 /* PixelKitTestingUtilities in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8011,6 +8013,7 @@
 				3706FDD6293F661700E42796 /* OHHTTPStubs */,
 				3706FDD8293F661700E42796 /* OHHTTPStubsSwift */,
 				4B81AD362B29513100706C96 /* PixelKitTestingUtilities */,
+				375CF2362B330D2C00BC1A64 /* TestUtils */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = 3706FE99293F661700E42796 /* Unit Tests App Store.xctest */;
@@ -8289,7 +8292,6 @@
 			);
 			name = "UI Tests";
 			packageProductDependencies = (
-				3795323D2B330C4C00623FD0 /* TestUtils */,
 			);
 			productName = "UI Tests";
 			productReference = 7B4CE8DA26F02108009134B1 /* UI Tests.xctest */;
@@ -8413,6 +8415,7 @@
 				B6DA44162616C13800DD1EC2 /* OHHTTPStubs */,
 				B6DA44182616C13800DD1EC2 /* OHHTTPStubsSwift */,
 				4B81AD342B29512B00706C96 /* PixelKitTestingUtilities */,
+				375CF2342B330D2600BC1A64 /* TestUtils */,
 			);
 			productName = DuckDuckGoTests;
 			productReference = AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */;
@@ -13067,6 +13070,16 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = DDGSync;
 		};
+		375CF2342B330D2600BC1A64 /* TestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = TestUtils;
+		};
+		375CF2362B330D2C00BC1A64 /* TestUtils */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = TestUtils;
+		};
 		378F44E329B4BDE900899924 /* SwiftUIExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftUIExtensions;
@@ -13074,11 +13087,6 @@
 		378F44E529B4BDEE00899924 /* SwiftUIExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftUIExtensions;
-		};
-		3795323D2B330C4C00623FD0 /* TestUtils */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = TestUtils;
 		};
 		37A5E2EF298AA1B20047046B /* Persistence */ = {
 			isa = XCSwiftPackageProductDependency;
