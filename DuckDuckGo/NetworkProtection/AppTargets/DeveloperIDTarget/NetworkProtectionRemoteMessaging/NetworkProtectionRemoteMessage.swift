@@ -31,7 +31,7 @@ struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
     let actionURL: String?
 }
 
-struct NetworkProtectionRemoteMessage: Codable, Equatable, Hashable {
+struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashable {
 
     let id: String
     let cardTitle: String

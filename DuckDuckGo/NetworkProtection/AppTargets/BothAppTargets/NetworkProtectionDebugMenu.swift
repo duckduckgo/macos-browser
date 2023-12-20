@@ -501,7 +501,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @objc func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
-        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultHomePageRemoteMessagingStorage().removeStoredAndDismissedMessages()
         DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
     }
 

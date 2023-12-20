@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessagingStorage.swift
+//  HomePageRemoteMessagingStorage.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,17 +18,17 @@
 
 import Foundation
 
-protocol NetworkProtectionRemoteMessagingStorage {
+protocol HomePageRemoteMessagingStorage {
 
-    func store(messages: [NetworkProtectionRemoteMessage]) throws
-    func storedMessages() -> [NetworkProtectionRemoteMessage]
+    func store<Message: Codable>(messages: [Message]) throws
+    func storedMessages<Message: Codable>() -> [Message]
 
     func dismissRemoteMessage(with id: String)
     func dismissedMessageIDs() -> [String]
 
 }
 
-final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRemoteMessagingStorage {
+final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorage {
 
     private enum Constants {
         static let dismissedMessageIdentifiersKey = "home.page.network-protection.dismissed-message-identifiers"
@@ -43,21 +43,21 @@ final class DefaultNetworkProtectionRemoteMessagingStorage: NetworkProtectionRem
 
     init(
         userDefaults: UserDefaults = .standard,
-        messagesURL: URL = DefaultNetworkProtectionRemoteMessagingStorage.applicationSupportURL
+        messagesURL: URL = DefaultHomePageRemoteMessagingStorage.applicationSupportURL
     ) {
         self.userDefaults = userDefaults
         self.messagesURL = messagesURL
     }
 
-    func store(messages: [NetworkProtectionRemoteMessage]) throws {
+    func store<Message: Codable>(messages: [Message]) throws {
         let encoded = try JSONEncoder().encode(messages)
         try encoded.write(to: messagesURL)
     }
 
-    func storedMessages() -> [NetworkProtectionRemoteMessage] {
+    func storedMessages<Message: Codable>() -> [Message] {
         do {
             let messagesData = try Data(contentsOf: messagesURL)
-            let messages = try JSONDecoder().decode([NetworkProtectionRemoteMessage].self, from: messagesData)
+            let messages = try JSONDecoder().decode([Message].self, from: messagesData)
 
             return messages
         } catch {

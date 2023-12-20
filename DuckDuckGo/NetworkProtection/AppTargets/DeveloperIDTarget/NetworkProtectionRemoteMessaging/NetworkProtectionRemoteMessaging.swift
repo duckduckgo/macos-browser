@@ -36,7 +36,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     private let messageRequest: HomePageRemoteMessagingRequest
-    private let messageStorage: NetworkProtectionRemoteMessagingStorage
+    private let messageStorage: HomePageRemoteMessagingStorage
     private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
     private let networkProtectionVisibility: NetworkProtectionFeatureVisibility
@@ -53,7 +53,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
     init(
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.networkProtectionMessagesRequest(),
-        messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
+        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection", keychainAppGroup: Bundle.main.appGroup(bundle: .netP)),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
@@ -107,7 +107,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
     func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
-        let possibleMessages = messageStorage.storedMessages()
+        let possibleMessages: [NetworkProtectionRemoteMessage] = messageStorage.storedMessages()
 
         // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
         // has used Network Protection for.

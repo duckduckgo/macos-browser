@@ -80,7 +80,7 @@
 		1E25269C28F8741A00E44DFA /* Common in Frameworks */ = {isa = PBXBuildFile; productRef = 1E25269B28F8741A00E44DFA /* Common */; };
 		1E2AE4C72ACB215900684E0A /* NetworkProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */; };
 		1E2AE4C82ACB216B00684E0A /* HoverTrackingArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B140872ABDBCC1004F8E85 /* HoverTrackingArea.swift */; };
-		1E2AE4C92ACB217800684E0A /* NetworkProtectionRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */; };
+		1E2AE4C92ACB217800684E0A /* HomePageRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* HomePageRemoteMessagingStorage.swift */; };
 		1E2AE4CA2ACB21A000684E0A /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
 		1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9579202AC687170062CA31 /* HardwareModel.swift */; };
 		1E2AE4CC2ACB224A00684E0A /* HomePageRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DC2ABB8CFC0083F6DF /* HomePageRemoteMessagingRequest.swift */; };
@@ -2061,6 +2061,7 @@
 		4BA7E71A2B327D390069203F /* DataBrokerProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7192B327D390069203F /* DataBrokerProtectionRemoteMessage.swift */; };
 		4BA7E71B2B327D390069203F /* DataBrokerProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7192B327D390069203F /* DataBrokerProtectionRemoteMessage.swift */; };
 		4BA7E71C2B327D390069203F /* DataBrokerProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7192B327D390069203F /* DataBrokerProtectionRemoteMessage.swift */; };
+		4BA7E7212B3360960069203F /* HomePageRemoteMessagingStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFF2AC0FC4E00B580EE /* HomePageRemoteMessagingStorageTests.swift */; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -2093,17 +2094,17 @@
 		4BC2621D293996410087A482 /* PixelEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC2621C293996410087A482 /* PixelEventTests.swift */; };
 		4BCF15D72ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */; };
 		4BCF15D92ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
-		4BCF15DB2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */; };
+		4BCF15DB2ABB8CED0083F6DF /* HomePageRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* HomePageRemoteMessagingStorage.swift */; };
 		4BCF15DD2ABB8CFC0083F6DF /* HomePageRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DC2ABB8CFC0083F6DF /* HomePageRemoteMessagingRequest.swift */; };
 		4BCF15EC2ABB9AF80083F6DF /* NetworkProtectionRemoteMessageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15E42ABB98990083F6DF /* NetworkProtectionRemoteMessageTests.swift */; };
 		4BCF15ED2ABB9B180083F6DF /* network-protection-messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15E92ABB99470083F6DF /* network-protection-messages.json */; };
 		4BCF15EE2ABBDBFD0083F6DF /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
 		4BCF15EF2ABBDBFF0083F6DF /* NetworkProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */; };
-		4BCF15F02ABBDC010083F6DF /* NetworkProtectionRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */; };
+		4BCF15F02ABBDC010083F6DF /* HomePageRemoteMessagingStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DA2ABB8CED0083F6DF /* HomePageRemoteMessagingStorage.swift */; };
 		4BCF15F12ABBDC030083F6DF /* HomePageRemoteMessagingRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15DC2ABB8CFC0083F6DF /* HomePageRemoteMessagingRequest.swift */; };
 		4BD18F01283F0BC500058124 /* BookmarksBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */; };
 		4BD18F05283F151F00058124 /* BookmarksBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4BD18F04283F151F00058124 /* BookmarksBar.storyboard */; };
-		4BD57C012AC0FF7500B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */; };
+		4BD57C012AC0FF7500B580EE /* HomePageRemoteMessagingStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFF2AC0FC4E00B580EE /* HomePageRemoteMessagingStorageTests.swift */; };
 		4BD57C042AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */; };
 		4BD57C052AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */; };
 		4BDFA4AE27BF19E500648192 /* ToggleableScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */; };
@@ -3568,13 +3569,13 @@
 		4BC2621C293996410087A482 /* PixelEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelEventTests.swift; sourceTree = "<group>"; };
 		4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessaging.swift; sourceTree = "<group>"; };
 		4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessage.swift; sourceTree = "<group>"; };
-		4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingStorage.swift; sourceTree = "<group>"; };
+		4BCF15DA2ABB8CED0083F6DF /* HomePageRemoteMessagingStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageRemoteMessagingStorage.swift; sourceTree = "<group>"; };
 		4BCF15DC2ABB8CFC0083F6DF /* HomePageRemoteMessagingRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageRemoteMessagingRequest.swift; sourceTree = "<group>"; };
 		4BCF15E42ABB98990083F6DF /* NetworkProtectionRemoteMessageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessageTests.swift; sourceTree = "<group>"; };
 		4BCF15E92ABB99470083F6DF /* network-protection-messages.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "network-protection-messages.json"; sourceTree = "<group>"; };
 		4BD18EFF283F0BC500058124 /* BookmarksBarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarksBarViewController.swift; sourceTree = "<group>"; };
 		4BD18F04283F151F00058124 /* BookmarksBar.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BookmarksBar.storyboard; sourceTree = "<group>"; };
-		4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingStorageTests.swift; sourceTree = "<group>"; };
+		4BD57BFF2AC0FC4E00B580EE /* HomePageRemoteMessagingStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageRemoteMessagingStorageTests.swift; sourceTree = "<group>"; };
 		4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionRemoteMessagingTests.swift; sourceTree = "<group>"; };
 		4BDFA4AD27BF19E500648192 /* ToggleableScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleableScrollView.swift; sourceTree = "<group>"; };
 		4BE0DF0426781961006337B7 /* NSStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSStoryboardExtension.swift; sourceTree = "<group>"; };
@@ -5633,6 +5634,7 @@
 			children = (
 				4BA7E7142B3278300069203F /* SurveyURLBuilder.swift */,
 				4BCF15DC2ABB8CFC0083F6DF /* HomePageRemoteMessagingRequest.swift */,
+				4BCF15DA2ABB8CED0083F6DF /* HomePageRemoteMessagingStorage.swift */,
 			);
 			path = Surveys;
 			sourceTree = "<group>";
@@ -5743,7 +5745,6 @@
 			children = (
 				4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */,
 				4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */,
-				4BCF15DA2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift */,
 			);
 			path = NetworkProtectionRemoteMessaging;
 			sourceTree = "<group>";
@@ -5753,7 +5754,7 @@
 			children = (
 				4BCF15E62ABB98A20083F6DF /* Resources */,
 				4BCF15E42ABB98990083F6DF /* NetworkProtectionRemoteMessageTests.swift */,
-				4BD57BFF2AC0FC4E00B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift */,
+				4BD57BFF2AC0FC4E00B580EE /* HomePageRemoteMessagingStorageTests.swift */,
 				4BD57C032AC112DF00B580EE /* NetworkProtectionRemoteMessagingTests.swift */,
 			);
 			path = NetworkProtection;
@@ -9606,7 +9607,7 @@
 				4B41EDB52B168C55001EEDF4 /* VPNFeedbackFormViewModel.swift in Sources */,
 				3706FBDD293F65D500E42796 /* PaddedImageButton.swift in Sources */,
 				37CEFCAA2A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
-				4BCF15F02ABBDC010083F6DF /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
+				4BCF15F02ABBDC010083F6DF /* HomePageRemoteMessagingStorage.swift in Sources */,
 				3706FBDE293F65D500E42796 /* EncryptionKeyStoring.swift in Sources */,
 				4B4D60E32A0C883A00BCD287 /* AppMain.swift in Sources */,
 				37197EA12942441700394917 /* Tab+UIDelegate.swift in Sources */,
@@ -9873,6 +9874,7 @@
 				3706FDE9293F661700E42796 /* StateRestorationManagerTests.swift in Sources */,
 				374EF08429B7575B003D2E87 /* RecentlyClosedCoordinatorTests.swift in Sources */,
 				3706FDEA293F661700E42796 /* BookmarkNodeTests.swift in Sources */,
+				4BA7E7212B3360960069203F /* HomePageRemoteMessagingStorageTests.swift in Sources */,
 				3706FDEB293F661700E42796 /* WebsiteDataStoreTests.swift in Sources */,
 				3706FDEC293F661700E42796 /* TabCollectionViewModelTests.swift in Sources */,
 				3706FDED293F661700E42796 /* EncryptionKeyStoreMock.swift in Sources */,
@@ -10944,7 +10946,7 @@
 				4BF0E50A2AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
 				4B957BBA2AC7AE700062CA31 /* URLExtension.swift in Sources */,
 				4B957BBB2AC7AE700062CA31 /* Tab+UIDelegate.swift in Sources */,
-				1E2AE4C92ACB217800684E0A /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
+				1E2AE4C92ACB217800684E0A /* HomePageRemoteMessagingStorage.swift in Sources */,
 				4B957BBD2AC7AE700062CA31 /* NSStoryboardExtension.swift in Sources */,
 				4B957BBE2AC7AE700062CA31 /* PreferencesViewController.swift in Sources */,
 				4B957BBF2AC7AE700062CA31 /* FireproofDomains.swift in Sources */,
@@ -11704,7 +11706,7 @@
 				AA72D5FE25FFF94E00C77619 /* NSMenuItemExtension.swift in Sources */,
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
-				4BCF15DB2ABB8CED0083F6DF /* NetworkProtectionRemoteMessagingStorage.swift in Sources */,
+				4BCF15DB2ABB8CED0083F6DF /* HomePageRemoteMessagingStorage.swift in Sources */,
 				987799F62999996B005D8EB6 /* BookmarkDatabase.swift in Sources */,
 				4BE53374286E39F10019DBFD /* ChromiumKeychainPrompt.swift in Sources */,
 				B6553692268440D700085A79 /* WKProcessPool+GeolocationProvider.swift in Sources */,
@@ -11811,7 +11813,7 @@
 				B60C6F8129B1B4AD007BFAA8 /* TestRunHelper.swift in Sources */,
 				4B9DB0582A983B55000927DB /* MockNetworkProtectionCodeRedeemer.swift in Sources */,
 				4B9292BE2667103100AD2C21 /* PasteboardFolderTests.swift in Sources */,
-				4BD57C012AC0FF7500B580EE /* NetworkProtectionRemoteMessagingStorageTests.swift in Sources */,
+				4BD57C012AC0FF7500B580EE /* HomePageRemoteMessagingStorageTests.swift in Sources */,
 				4B9292C52667104B00AD2C21 /* CoreDataTestUtilities.swift in Sources */,
 				4B723E1926B000DC00E14D75 /* TemporaryFileCreator.swift in Sources */,
 				98EB5D1027516A4800681FE6 /* AppPrivacyConfigurationTests.swift in Sources */,
