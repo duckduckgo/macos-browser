@@ -203,6 +203,8 @@ extension HomePage.Models {
                 visitSurvey(day: .day7)
             case .networkProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
+            case .dataBrokerProtectionRemoteMessage(let message):
+                handle(remoteMessage: message)
             case .dataBrokerProtectionWaitlistInvited:
 #if DBP
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
@@ -228,6 +230,10 @@ extension HomePage.Models {
 #if NETWORK_PROTECTION
                 networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
+#endif
+            case .dataBrokerProtectionRemoteMessage(let message):
+#if DBP
+                break // TODO
 #endif
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
@@ -281,10 +287,8 @@ extension HomePage.Models {
                     if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
-                case .networkProtectionRemoteMessage:
-                    break // Do nothing, NetP remote messages get appended first
-                case .dataBrokerProtectionWaitlistInvited:
-                    break // Do nothing. The feature is being set for everyone invited in the waitlist
+                case .networkProtectionRemoteMessage, .dataBrokerProtectionRemoteMessage, .dataBrokerProtectionWaitlistInvited:
+                    break // Do nothing, these messages get appended first
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -437,6 +441,12 @@ extension HomePage.Models {
             }
 #endif
         }
+
+        @MainActor private func handle(remoteMessage: DataBrokerProtectionRemoteMessage) {
+#if DBP
+            // TODO
+#endif
+        }
     }
 
     // MARK: Feature Type
@@ -456,6 +466,7 @@ extension HomePage.Models {
         case surveyDay0
         case surveyDay7
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
+        case dataBrokerProtectionRemoteMessage(DataBrokerProtectionRemoteMessage)
         case dataBrokerProtectionWaitlistInvited
 
         var title: String {
@@ -473,6 +484,8 @@ extension HomePage.Models {
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7CardTitle
             case .networkProtectionRemoteMessage(let message):
+                return message.cardTitle
+            case .dataBrokerProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Personal Information Removal"
@@ -495,6 +508,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7Summary
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
+            case .dataBrokerProtectionRemoteMessage(let message):
+                return message.cardDescription
             case .dataBrokerProtectionWaitlistInvited:
                 return "You're invited to try Personal Information Removal beta!"
             }
@@ -515,6 +530,8 @@ extension HomePage.Models {
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Action
             case .networkProtectionRemoteMessage(let message):
+                return message.action.actionTitle
+            case .dataBrokerProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Get Started"
@@ -539,6 +556,8 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
+            case .dataBrokerProtectionRemoteMessage(let message):
+                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
                 return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             }
