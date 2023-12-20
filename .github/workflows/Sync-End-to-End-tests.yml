@@ -65,6 +65,7 @@ jobs:
             -scheme "Sync End-to-End UI Tests" \
             -configuration "CI" \
             -derivedDataPath "DerivedData" \
+            -skipPackagePluginValidation \
           | tee xcodebuild.log \
           | xcbeautify
 
