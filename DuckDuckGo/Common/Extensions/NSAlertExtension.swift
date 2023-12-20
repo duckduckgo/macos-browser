@@ -221,7 +221,7 @@ extension NSAlert {
         return alert
     }
 
-    static func dataSyncingDisabledByFeatureFlag(upgradeRequired: Bool) -> NSAlert {
+    static func dataSyncingDisabledByFeatureFlag(upgradeRequired: Bool = false) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.syncPausedTitle
         alert.informativeText = upgradeRequired ? UserText.syncUnavailableMessageUpgradeRequired : UserText.syncUnavailableMessage

@@ -176,6 +176,7 @@ public struct UserDefaultsWrapper<T> {
         case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
+        case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
     }
 
     enum RemovedKeys: String, CaseIterable {
