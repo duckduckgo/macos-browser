@@ -30,23 +30,47 @@ protocol HomePageRemoteMessagingStorage {
 
 final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorage {
 
-    private enum Constants {
+    enum NetworkProtectionConstants {
         static let dismissedMessageIdentifiersKey = "home.page.network-protection.dismissed-message-identifiers"
         static let networkProtectionMessagesFileName = "network-protection-messages.json"
     }
 
+    enum DataBrokerProtectionConstants {
+        static let dismissedMessageIdentifiersKey = "home.page.dbp.dismissed-message-identifiers"
+        static let networkProtectionMessagesFileName = "dbp-messages.json"
+    }
+
     private let userDefaults: UserDefaults
     private let messagesURL: URL
+    private let dismissedMessageIdentifiersKey: String
+
     private static var applicationSupportURL: URL {
-        URL.sandboxApplicationSupportURL.appendingPathComponent(Constants.networkProtectionMessagesFileName)
+        URL.sandboxApplicationSupportURL
+    }
+
+    static func networkProtection() -> DefaultHomePageRemoteMessagingStorage {
+        return DefaultHomePageRemoteMessagingStorage(
+            messagesFileName: NetworkProtectionConstants.networkProtectionMessagesFileName,
+            dismissedMessageIdentifiersKey: NetworkProtectionConstants.dismissedMessageIdentifiersKey
+        )
+    }
+
+    static func dataBrokerProtection() -> DefaultHomePageRemoteMessagingStorage {
+        return DefaultHomePageRemoteMessagingStorage(
+            messagesFileName: DataBrokerProtectionConstants.networkProtectionMessagesFileName,
+            dismissedMessageIdentifiersKey: DataBrokerProtectionConstants.dismissedMessageIdentifiersKey
+        )
     }
 
     init(
         userDefaults: UserDefaults = .standard,
-        messagesURL: URL = DefaultHomePageRemoteMessagingStorage.applicationSupportURL
+        messagesDirectoryURL: URL = DefaultHomePageRemoteMessagingStorage.applicationSupportURL,
+        messagesFileName: String,
+        dismissedMessageIdentifiersKey: String
     ) {
         self.userDefaults = userDefaults
-        self.messagesURL = messagesURL
+        self.messagesURL = messagesDirectoryURL.appendingPathComponent(messagesFileName)
+        self.dismissedMessageIdentifiersKey = dismissedMessageIdentifiersKey
     }
 
     func store<Message: Codable>(messages: [Message]) throws {
@@ -75,16 +99,16 @@ final class DefaultHomePageRemoteMessagingStorage: HomePageRemoteMessagingStorag
         }
 
         dismissedMessages.append(id)
-        userDefaults.set(dismissedMessages, forKey: Constants.dismissedMessageIdentifiersKey)
+        userDefaults.set(dismissedMessages, forKey: dismissedMessageIdentifiersKey)
     }
 
     func dismissedMessageIDs() -> [String] {
-        let messages = userDefaults.array(forKey: Constants.dismissedMessageIdentifiersKey) as? [String]
+        let messages = userDefaults.array(forKey: dismissedMessageIdentifiersKey) as? [String]
         return messages ?? []
     }
 
     func removeStoredAndDismissedMessages() {
-        userDefaults.removeObject(forKey: Constants.dismissedMessageIdentifiersKey)
+        userDefaults.removeObject(forKey: dismissedMessageIdentifiersKey)
         try? FileManager.default.removeItem(at: messagesURL)
     }
 

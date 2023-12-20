@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessaging.swift
+//  DataBrokerProtectionRemoteMessaging.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,20 +19,20 @@
 import Foundation
 import Networking
 
-#if NETWORK_PROTECTION
+#if DBP
 
-protocol NetworkProtectionRemoteMessaging {
+protocol DataBrokerProtectionRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
-    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage]
-    func dismiss(message: NetworkProtectionRemoteMessage)
+    func presentableRemoteMessages() -> [DataBrokerProtectionRemoteMessage]
+    func dismiss(message: DataBrokerProtectionRemoteMessage)
 
 }
 
-final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
+final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging {
 
     enum Constants {
-        static let lastRefreshDateKey = "network-protection.remote-messaging.last-refresh-date"
+        static let lastRefreshDateKey = "data-broker-protection.remote-messaging.last-refresh-date"
     }
 
     private let messageRequest: HomePageRemoteMessagingRequest
@@ -52,9 +52,9 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     init(
-        messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.networkProtectionMessagesRequest(),
-        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.networkProtection(),
-        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection", keychainAppGroup: Bundle.main.appGroup(bundle: .netP)),
+        messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.dataBrokerProtectionMessagesRequest(),
+        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.dataBrokerProtection(),
+        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "dbp", keychainAppGroup: Bundle.main.appGroup(bundle: .dbp)),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
         minimumRefreshInterval: TimeInterval,
@@ -105,9 +105,9 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
-    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
+    func presentableRemoteMessages() -> [DataBrokerProtectionRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
-        let possibleMessages: [NetworkProtectionRemoteMessage] = messageStorage.storedMessages()
+        let possibleMessages: [DataBrokerProtectionRemoteMessage] = messageStorage.storedMessages()
 
         // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
         // has used Network Protection for.
@@ -120,7 +120,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // First, check messages that require a number of days of NetP usage
-            if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled,
+            if let requiredDaysSinceActivation = message.daysSinceDataBrokerProtectionEnabled,
                let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {
                     return true
@@ -130,12 +130,12 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // Next, check if the message requires access to NetP but it's not visible:
-            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() {
+            if message.requiresDataBrokerProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() { // TODO
                 return false
             }
 
             // Finally, check if the message requires NetP usage, and check if the user has used it at all:
-            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
+            if message.requiresDataBrokerProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil { // TODO
                 return false
             }
 
@@ -146,7 +146,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         return filteredMessages
     }
 
-    func dismiss(message: NetworkProtectionRemoteMessage) {
+    func dismiss(message: DataBrokerProtectionRemoteMessage) {
         messageStorage.dismissRemoteMessage(with: message.id)
     }
 
@@ -177,3 +177,4 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 }
 
 #endif
+

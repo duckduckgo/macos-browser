@@ -2062,6 +2062,9 @@
 		4BA7E71B2B327D390069203F /* DataBrokerProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7192B327D390069203F /* DataBrokerProtectionRemoteMessage.swift */; };
 		4BA7E71C2B327D390069203F /* DataBrokerProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7192B327D390069203F /* DataBrokerProtectionRemoteMessage.swift */; };
 		4BA7E7212B3360960069203F /* HomePageRemoteMessagingStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD57BFF2AC0FC4E00B580EE /* HomePageRemoteMessagingStorageTests.swift */; };
+		4BA7E7232B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7222B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift */; };
+		4BA7E7242B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7222B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift */; };
+		4BA7E7252B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7E7222B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift */; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -3537,6 +3540,7 @@
 		4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedValueTransformerTests.swift; sourceTree = "<group>"; };
 		4BA7E7142B3278300069203F /* SurveyURLBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyURLBuilder.swift; sourceTree = "<group>"; };
 		4BA7E7192B327D390069203F /* DataBrokerProtectionRemoteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionRemoteMessage.swift; sourceTree = "<group>"; };
+		4BA7E7222B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionRemoteMessaging.swift; sourceTree = "<group>"; };
 		4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cryptography.swift; sourceTree = "<group>"; };
 		4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugUserScript.swift; sourceTree = "<group>"; };
 		4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtensions.swift; sourceTree = "<group>"; };
@@ -5643,6 +5647,7 @@
 			isa = PBXGroup;
 			children = (
 				4BA7E7192B327D390069203F /* DataBrokerProtectionRemoteMessage.swift */,
+				4BA7E7222B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift */,
 			);
 			path = RemoteMessaging;
 			sourceTree = "<group>";
@@ -9794,6 +9799,7 @@
 				3706FC75293F65D500E42796 /* ChromeDataImporter.swift in Sources */,
 				3706FC76293F65D500E42796 /* PixelDataRecord.swift in Sources */,
 				7BFE955A2A9DF4550081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */,
+				4BA7E7242B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift in Sources */,
 				3706FC77293F65D500E42796 /* PageObserverUserScript.swift in Sources */,
 				4BF0E5132AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				3706FC78293F65D500E42796 /* SecureVaultErrorReporter.swift in Sources */,
@@ -10342,6 +10348,7 @@
 				4B9579842AC7AE700062CA31 /* TabInstrumentation.swift in Sources */,
 				4B9579852AC7AE700062CA31 /* BrowserImportViewController.swift in Sources */,
 				4B9579862AC7AE700062CA31 /* NSPopUpButtonExtension.swift in Sources */,
+				4BA7E7252B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift in Sources */,
 				4B9579872AC7AE700062CA31 /* ConfigurationManager.swift in Sources */,
 				4B9579882AC7AE700062CA31 /* YoutubePlayerUserScript.swift in Sources */,
 				4B9579892AC7AE700062CA31 /* PixelParameters.swift in Sources */,
@@ -11387,6 +11394,7 @@
 				AAC5E4D125D6A709007F5990 /* BookmarkManager.swift in Sources */,
 				37CD54CD27F2FDD100F1F7B9 /* AboutModel.swift in Sources */,
 				4BE65476271FCD41008D1D63 /* PasswordManagementCreditCardItemView.swift in Sources */,
+				4BA7E7232B336C630069203F /* DataBrokerProtectionRemoteMessaging.swift in Sources */,
 				AA5C8F59258FE21F00748EB7 /* NSTextFieldExtension.swift in Sources */,
 				3706FEC8293F6F7500E42796 /* BWManagement.swift in Sources */,
 				B6830961274CDE99004B46BB /* FireproofDomainsContainer.swift in Sources */,

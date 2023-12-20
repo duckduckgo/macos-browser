@@ -21,7 +21,8 @@ import XCTest
 
 final class HomePageRemoteMessagingStorageTests: XCTestCase {
 
-    private let temporaryFileURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json", isDirectory: false)
+    private let temporaryFileURL: URL = FileManager.default.temporaryDirectory
+    private let temporaryFileName: String = UUID().uuidString + ".json"
     private var defaults: UserDefaults!
     private let testGroupName = "remote-messaging-storage"
 
@@ -36,7 +37,13 @@ final class HomePageRemoteMessagingStorageTests: XCTestCase {
     }
 
     func testWhenStoringMessages_ThenMessagesCanBeReadFromDisk() throws {
-        let storage = DefaultHomePageRemoteMessagingStorage(userDefaults: defaults, messagesURL: temporaryFileURL)
+        let storage = DefaultHomePageRemoteMessagingStorage(
+            userDefaults: defaults,
+            messagesDirectoryURL: temporaryFileURL,
+            messagesFileName: temporaryFileName,
+            dismissedMessageIdentifiersKey: "dismissed-messages-key"
+        )
+
         let message = mockMessage(id: "123")
         try storage.store(messages: [message])
         let storedMessages: [NetworkProtectionRemoteMessage] = storage.storedMessages()
@@ -45,7 +52,12 @@ final class HomePageRemoteMessagingStorageTests: XCTestCase {
     }
 
     func testWhenStoringMessages_ThenOldMessagesAreOverwritten() throws {
-        let storage = DefaultHomePageRemoteMessagingStorage(userDefaults: defaults, messagesURL: temporaryFileURL)
+        let storage = DefaultHomePageRemoteMessagingStorage(
+            userDefaults: defaults,
+            messagesDirectoryURL: temporaryFileURL,
+            messagesFileName: temporaryFileName,
+            dismissedMessageIdentifiersKey: "dismissed-messages-key"
+        )
 
         let message1 = mockMessage(id: "123")
         let message2 = mockMessage(id: "456")
