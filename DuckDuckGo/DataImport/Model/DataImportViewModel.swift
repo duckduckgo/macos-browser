@@ -75,6 +75,10 @@ struct DataImportViewModel {
             if case .fileImport = self { true } else { false }
         }
 
+        var isGetReadPermission: Bool {
+            if case .getReadPermission = self { true } else { false }
+        }
+
         var fileImportDataType: DataType? {
             switch self {
             case .fileImport(dataType: let dataType, summary: _):
@@ -166,7 +170,7 @@ struct DataImportViewModel {
             assertionFailure("URL not provided")
             return
         }
-        assert(actionButton == .initiateImport(disabled: false) || screen.fileImportDataType != nil)
+        assert(actionButton == .initiateImport(disabled: false) || screen.fileImportDataType != nil || screen.isGetReadPermission)
 
         // are we handling file import or browser selected data types import?
         let dataType: DataType? = self.screen.fileImportDataType
