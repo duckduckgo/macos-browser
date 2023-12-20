@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "95.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "97.0.0"),
     ],
     targets: [
         .target(
