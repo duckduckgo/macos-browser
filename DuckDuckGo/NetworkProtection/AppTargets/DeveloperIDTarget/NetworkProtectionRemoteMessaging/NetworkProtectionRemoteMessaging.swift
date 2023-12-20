@@ -35,7 +35,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         static let lastRefreshDateKey = "network-protection.remote-messaging.last-refresh-date"
     }
 
-    private let messageRequest: NetworkProtectionRemoteMessagingRequest
+    private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: NetworkProtectionRemoteMessagingStorage
     private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
@@ -52,7 +52,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     init(
-        messageRequest: NetworkProtectionRemoteMessagingRequest = DefaultNetworkProtectionRemoteMessagingRequest(),
+        messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.networkProtectionMessagesRequest(),
         messageStorage: NetworkProtectionRemoteMessagingStorage = DefaultNetworkProtectionRemoteMessagingStorage(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection", keychainAppGroup: Bundle.main.appGroup(bundle: .netP)),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
@@ -76,7 +76,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             return
         }
 
-        self.messageRequest.fetchNetworkProtectionRemoteMessages { [weak self] result in
+        self.messageRequest.fetchHomePageRemoteMessages { [weak self] result in
             defer {
                 fetchCompletion?()
             }

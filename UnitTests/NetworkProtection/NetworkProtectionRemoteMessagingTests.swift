@@ -308,12 +308,12 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
 
 // MARK: - Mocks
 
-private final class MockNetworkProtectionRemoteMessagingRequest: NetworkProtectionRemoteMessagingRequest {
+private final class MockNetworkProtectionRemoteMessagingRequest: HomePageRemoteMessagingRequest {
 
     var result: Result<[NetworkProtectionRemoteMessage], Error>!
     var didFetchMessages: Bool = false
 
-    func fetchNetworkProtectionRemoteMessages(completion: @escaping (Result<[NetworkProtectionRemoteMessage], Error>) -> Void) {
+    func fetchHomePageRemoteMessages(completion: @escaping (Result<[NetworkProtectionRemoteMessage], Error>) -> Void) {
         didFetchMessages = true
         completion(result)
     }
