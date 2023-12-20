@@ -21,6 +21,7 @@ import Combine
 import Persistence
 import SyncUI
 import XCTest
+import TestUtils
 @testable import BrowserServicesKit
 @testable import DDGSync
 @testable import DuckDuckGo_Privacy_Browser
@@ -136,6 +137,7 @@ final class SyncPreferencesTests: XCTestCase {
 }
 
 class MockDDGSyncing: DDGSyncing {
+
     let registeredDevices = [RegisteredDevice(id: "1", name: "Device 1", type: "desktop"), RegisteredDevice(id: "2", name: "Device 2", type: "mobile"), RegisteredDevice(id: "3", name: "Device 1", type: "desktop")]
     var disconnectCalled = false
 
@@ -150,6 +152,8 @@ class MockDDGSyncing: DDGSyncing {
     var account: SyncAccount?
 
     var scheduler: Scheduling
+
+    var syncDailyStats = SyncDailyStats(store: MockKeyValueStore())
 
     @Published var isSyncInProgress: Bool
 
