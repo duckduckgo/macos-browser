@@ -57,7 +57,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
         userDefaults.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
-        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.shouldShowNetworkProtectionSystemExtensionUpgradePrompt.rawValue)
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
         capturingDataImportProvider = CapturingDataImportProvider()
         tabCollectionVM = TabCollectionViewModel()
