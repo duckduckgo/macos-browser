@@ -379,6 +379,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             }
 
         subscribeSyncQueueToScreenLockedNotifications()
+        subscribeToSyncFeatureFlags(syncService)
+    }
+
+    @UserDefaultsWrapper(key: .syncDidShowSyncPausedByFeatureFlagAlert, defaultValue: false)
+    private var syncDidShowSyncPausedByFeatureFlagAlert: Bool
+
+    private func subscribeToSyncFeatureFlags(_ syncService: DDGSync) {
+        syncFeatureFlagsCancellable = syncService.featureFlagsPublisher
+            .dropFirst()
+            .map { $0.contains(.dataSyncing) }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self, weak syncService] isDataSyncingAvailable in
+                if isDataSyncingAvailable {
+                    self?.syncDidShowSyncPausedByFeatureFlagAlert = false
+                } else if syncService?.authState == .active, self?.syncDidShowSyncPausedByFeatureFlagAlert == false {
+                    let isSyncUIVisible = syncService?.featureFlags.contains(.userInterface) == true
+                    let alert = NSAlert.dataSyncingDisabledByFeatureFlag(showLearnMore: isSyncUIVisible)
+                    let response = alert.runModal()
+                    self?.syncDidShowSyncPausedByFeatureFlagAlert = true
+
+                    switch response {
+                    case .alertSecondButtonReturn:
+                        alert.window.sheetParent?.endSheet(alert.window)
+                        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                    default:
+                        break
+                    }
+                }
+            }
     }
 
     private func subscribeSyncQueueToScreenLockedNotifications() {

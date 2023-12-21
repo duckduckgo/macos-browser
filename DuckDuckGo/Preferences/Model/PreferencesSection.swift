@@ -92,6 +92,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         self.init(rawValue: path)
     }
 
+    @MainActor
     var displayName: String {
         switch self {
         case .general:
@@ -99,7 +100,9 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         case .sync:
             let isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
             let isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
-            if isSyncBookmarksPaused || isSyncCredentialsPaused {
+            let syncService = NSApp.delegateTyped.syncService
+            let isDataSyncingDisabled = syncService?.featureFlags.contains(.dataSyncing) == false && syncService?.authState == .active
+            if isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
                 return UserText.sync + " ⚠️"
             }
             return UserText.sync
