@@ -57,23 +57,31 @@ struct ReportFeedbackView: View {
             }
             .padding(.bottom, 24)
 
-            ZStack(alignment: .top) {
-                EditableTextView(text: $model.text,
-                                 font: NSFont(name: "SF Pro Text", size: 13),
-                                 insets: NSSize(width: 11, height: 11))
-                .cornerRadius(6)
-                .frame(height: 114)
-                .shadow(radius: 1, x: 0, y: 1)
-
-                if model.text.isEmpty {
-                    HStack {
+            EditableTextView(text: $model.text,
+                             font: .systemFont(ofSize: 13),
+                             insets: NSSize(width: 7, height: 12),
+                             cornerRadius: 6,
+                             backgroundColor: .textBackgroundColor,
+                             textColor: .textColor,
+                             focusRingType: .exterior,
+                             isFocusedOnAppear: true)
+            .frame(height: 114)
+            .shadow(color: Color.addressBarShadow, radius: 1, x: 0, y: 1)
+            .overlay(
+                VStack(alignment: .leading) {
+                    HStack(alignment: .top) {
                         Text("Add any details that you think may help us fix the problem",
                              comment: "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem.")
-                            .foregroundColor(Color(.placeholderTextColor))
+                        .foregroundColor(Color(.placeholderTextColor))
+                        .padding(.leading, 11)
                         Spacer()
-                    }.padding(EdgeInsets(top: 11, leading: 11, bottom: 0, trailing: 11))
+                    }
+                    .padding(.top, 11)
+                    Spacer()
                 }
-            }
+                    .visibility(model.text.isEmpty ? .visible : .gone)
+                    .allowsHitTesting(false)
+            )
         }
     }
 
@@ -108,31 +116,38 @@ private struct InfoItemView: View {
 
 }
 
-#Preview {
+#Preview { {
 
-    ReportFeedbackView(model: .constant(.init(importSource: .safari, importSourceVersion: UserAgent.safariVersion, error: {
-        enum ImportError: DataImportError {
-            enum OperationType: Int {
-                case imp
-            }
-
-            var type: OperationType { .imp }
-            var action: DataImportAction { .generic }
-            var underlyingError: Error? {
-                if case .err(let err) = self {
-                    return err
+    struct PreviewView: View {
+        @State var model = DataImportReportModel(importSource: .safari, importSourceVersion: UserAgent.safariVersion, error: {
+            enum ImportError: DataImportError {
+                enum OperationType: Int {
+                    case imp
                 }
-                return nil
+
+                var type: OperationType { .imp }
+                var action: DataImportAction { .generic }
+                var underlyingError: Error? {
+                    if case .err(let err) = self {
+                        return err
+                    }
+                    return nil
+                }
+
+                static var errorDomain: String { "ReportFeedbackPreviewError" }
+                var errorType: DataImport.ErrorType { .noData }
+
+                case err(Error)
             }
+            return ImportError.err(CocoaError(.fileReadUnknown))
+        }(), retryNumber: 1)
 
-            static var errorDomain: String { "ReportFeedbackPreviewError" }
-            var errorType: DataImport.ErrorType { .noData }
-
-            case err(Error)
+        var body: some View {
+            ReportFeedbackView(model: $model)
+                .frame(width: 512 - 20)
+                .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
         }
-        return ImportError.err(CocoaError(.fileReadUnknown))
-    }(), retryNumber: 1)))
-        .frame(width: 512 - 20)
-        .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+    }
+    return PreviewView()
 
-}
+} ()}

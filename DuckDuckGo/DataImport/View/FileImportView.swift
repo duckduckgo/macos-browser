@@ -832,6 +832,6 @@ struct CircleNumberView: View {
             .padding()
             .frame(width: 512 - 20)
     }
-    .font(.custom("SF Pro Text", size: 13))
+    .font(.system(size: 13))
     .background(Color.white)
 }

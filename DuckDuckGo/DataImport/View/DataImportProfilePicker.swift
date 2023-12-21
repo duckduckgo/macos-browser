@@ -78,5 +78,5 @@ struct DataImportProfilePicker: View {
     })
     .padding()
     .frame(width: 512)
-    .font(.custom("SF Pro Text", size: 13))
+    .font(.system(size: 13))
 }

@@ -90,9 +90,7 @@ struct DataImportView: View {
             }
 #endif
         }
-        .font(Font(NSFont(name: "SF Pro Text", size: 13)
-                   // fallback when SF Pro Text is missing
-                   ?? NSFont.systemFont(ofSize: 13) as CTFont))
+        .font(.system(size: 13))
         .frame(width: 512)
         .fixedSize()
     }

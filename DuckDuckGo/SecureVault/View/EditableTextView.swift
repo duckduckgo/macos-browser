@@ -16,32 +16,24 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import SwiftUI
 
 struct EditableTextView: NSViewRepresentable {
 
+    var isEditable: Bool = true
+
     @Binding var text: String
 
-    var isEditable: Bool
-    var font: NSFont
-    var onEditingChanged: () -> Void
-    var onCommit: () -> Void
-    var onTextChange: (String) -> Void
+    var font: NSFont = .systemFont(ofSize: 13, weight: .regular)
     var maxLength: Int?
     var insets: NSSize?
-
-    init(text: Binding<String>, isEditable: Bool = true, font: NSFont?, onEditingChanged: @escaping () -> Void = {}, onCommit: @escaping () -> Void = {}, onTextChange: @escaping (String) -> Void = { _ in }, maxLength: Int? = nil, insets: NSSize? = nil) {
-
-        self._text = text
-        self.isEditable = isEditable
-        self.font = font ?? .systemFont(ofSize: 13, weight: .regular)
-        self.onEditingChanged = onEditingChanged
-        self.onCommit = onCommit
-        self.onTextChange = onTextChange
-        self.maxLength = maxLength
-        self.insets = insets
-    }
+    var cornerRadius: CGFloat = 0
+    var backgroundColor: NSColor? = .textEditorBackgroundColor
+    var textColor: NSColor? = .textColor
+    var focusRingType: NSFocusRingType = .default
+    var isFocusedOnAppear: Bool = true
 
     func makeCoordinator() -> Coordinator {
         return Coordinator(self)
@@ -52,7 +44,12 @@ struct EditableTextView: NSViewRepresentable {
             text: text,
             isEditable: isEditable,
             font: font,
+            textColor: textColor,
             insets: insets,
+            isFocusedOnAppear: isFocusedOnAppear,
+            focusRingType: focusRingType,
+            cornerRadius: cornerRadius,
+            backgroundColor: backgroundColor,
             delegate: context.coordinator
         )
         return textView
@@ -67,22 +64,13 @@ struct EditableTextView: NSViewRepresentable {
 
 extension EditableTextView {
 
-    final class Coordinator: NSObject, NSTextViewDelegate {
+    final class Coordinator: NSObject, NSTextViewDelegate, NSControlTextEditingDelegate {
 
         var parent: EditableTextView
         var selectedRanges: [NSValue] = []
 
         init(_ parent: EditableTextView) {
             self.parent = parent
-        }
-
-        func textDidBeginEditing(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else {
-                return
-            }
-
-            self.parent.text = textView.string
-            self.parent.onEditingChanged()
         }
 
         func textDidChange(_ notification: Notification) {
@@ -106,13 +94,10 @@ extension EditableTextView {
 
 final class CustomTextView: NSView {
 
-    weak var delegate: NSTextViewDelegate?
-
     var text: String {
         didSet {
-            if textView.string != text {
-                textView.string = text
-            }
+            guard textView.string != text else { return }
+            textView.string = text
         }
     }
 
@@ -123,74 +108,88 @@ final class CustomTextView: NSView {
         }
     }
 
+    private let isFocusedOnAppear: Bool
+
     let scrollView: NSScrollView
     let textView: NSTextView
 
     // MARK: - Init
 
-    init(text: String = "", isEditable: Bool, font: NSFont, insets: NSSize? = nil, delegate: NSTextViewDelegate? = nil, selectedRanges: [NSValue] = []) {
+    init(text: String = "", isEditable: Bool, font: NSFont, textColor: NSColor? = nil, insets: NSSize? = nil, isFocusedOnAppear: Bool = false, focusRingType: NSFocusRingType = .default, cornerRadius: CGFloat = 0, backgroundColor: NSColor? = nil, delegate: NSTextViewDelegate? = nil, selectedRanges: [NSValue] = []) {
 
         self.text = text
         self.selectedRanges = selectedRanges
+        self.isFocusedOnAppear = isFocusedOnAppear
 
-        self.delegate = delegate
+        self.scrollView = RoundedCornersScrollView(cornerRadius: cornerRadius)
 
-        scrollView = NSScrollView()
-        scrollView.drawsBackground = true
+        let textStorage = NSTextStorage()
+        let layoutManager = NSLayoutManager()
+        textStorage.addLayoutManager(layoutManager)
+
+        let textContainer = NSTextContainer(containerSize: .zero)
+        textContainer.widthTracksTextView = true
+        textContainer.containerSize = NSSize(width: scrollView.contentSize.width, height: CGFloat.greatestFiniteMagnitude)
+        layoutManager.addTextContainer(textContainer)
+
+        self.textView = NSTextView(frame: .zero, textContainer: textContainer)
+
+        super.init(frame: .zero)
+
+        setupScrollView(cornerRadius: cornerRadius, focusRingType: focusRingType, backgroundColor: backgroundColor)
+        setupTextView(isEditable: isEditable, font: font, textColor: textColor, insets: insets, delegate: delegate)
+        setupScrollViewConstraints()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("CustomTextView: Bad initializer")
+    }
+
+    private func setupScrollView(cornerRadius: CGFloat, focusRingType: NSFocusRingType, backgroundColor: NSColor?) {
         scrollView.borderType = .noBorder
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalRuler = false
         scrollView.autoresizingMask = [.width, .height]
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+        if let backgroundColor {
+            scrollView.drawsBackground = true
+            scrollView.backgroundColor = backgroundColor
+        } else {
+            scrollView.drawsBackground = false
+        }
+        scrollView.focusRingType = focusRingType
+        if cornerRadius > 0 {
+            scrollView.wantsLayer = true
+            scrollView.layer!.cornerRadius = cornerRadius
+        }
+    }
 
-        let contentSize = scrollView.contentSize
-        let textStorage = NSTextStorage()
-        let layoutManager = NSLayoutManager()
-        textStorage.addLayoutManager(layoutManager)
-
-        let textContainer = NSTextContainer(containerSize: scrollView.frame.size)
-        textContainer.widthTracksTextView = true
-        textContainer.containerSize = NSSize(width: contentSize.width, height: CGFloat.greatestFiniteMagnitude)
-        layoutManager.addTextContainer(textContainer)
-
-        textView = NSTextView(frame: .zero, textContainer: textContainer)
+    private func setupTextView(isEditable: Bool, font: NSFont, textColor: NSColor?, insets: NSSize?, delegate: NSTextViewDelegate?) {
         textView.autoresizingMask = .width
-        textView.backgroundColor = NSColor(named: "PWMEditingControlColor")!
-        textView.delegate = self.delegate
-        textView.drawsBackground = true
+        textView.delegate = delegate
+        textView.drawsBackground = false
         textView.font = font
         textView.isEditable = isEditable
         textView.isHorizontallyResizable = false
         textView.isVerticallyResizable = true
         textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        textView.minSize = NSSize(width: 0, height: contentSize.height)
-        textView.textColor = NSColor.labelColor
+        textView.minSize = NSSize(width: 0, height: scrollView.contentSize.height)
         textView.allowsUndo = true
         textView.string = text
+        textView.wantsLayer = true
 
+        if let textColor {
+            textView.textColor = textColor
+        }
         if let insets {
             textView.textContainerInset = insets
         }
         if !selectedRanges.isEmpty {
             textView.selectedRanges = selectedRanges
         }
-
-        super.init(frame: .zero)
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    // MARK: - Life cycle
-
-    override func viewWillDraw() {
-        super.viewWillDraw()
-        setupScrollViewConstraints()
-        setupTextView()
-    }
-
-    func setupScrollViewConstraints() {
+    private func setupScrollViewConstraints() {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(scrollView)
 
@@ -200,10 +199,66 @@ final class CustomTextView: NSView {
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor)
         ])
-    }
 
-    func setupTextView() {
         scrollView.documentView = textView
     }
 
+    // MARK: - Life cycle
+
+    override func viewDidMoveToWindow() {
+        if isFocusedOnAppear, let window {
+            window.makeFirstResponder(textView)
+        }
+    }
 }
+
+final class RoundedCornersScrollView: NSScrollView {
+
+    let cornerRadius: CGFloat
+
+    init(frame: NSRect = .zero, cornerRadius: CGFloat) {
+        self.cornerRadius = cornerRadius
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("RoudedCornersScrollView: Bad initializer")
+    }
+
+    override func drawFocusRingMask() {
+        NSBezierPath(roundedRect: bounds, xRadius: cornerRadius, yRadius: cornerRadius).fill()
+    }
+
+}
+
+#Preview { {
+
+    struct PreviewView: View {
+        @State var text = """
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor)
+        ])
+        """
+
+        var body: some View {
+            VStack(spacing: 10) {
+                EditableTextView(text: $text,
+                                 font: .systemFont(ofSize: 18),
+                                 insets: NSSize(width: 15, height: 10),
+                                 cornerRadius: 15,
+                                 backgroundColor: .textBackgroundColor,
+                                 textColor: .purple,
+                                 focusRingType: .exterior,
+                                 isFocusedOnAppear: true)
+
+                TextField("", text: .constant(""))
+            }.padding(EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20))
+        }
+
+    }
+    return PreviewView()
+
+}() }
