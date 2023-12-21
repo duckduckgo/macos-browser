@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import BrowserServicesKit
 import Combine
+import DDGSync
+import SwiftUI
 
 final class PreferencesSidebarModel: ObservableObject {
 
@@ -33,7 +34,8 @@ final class PreferencesSidebarModel: ObservableObject {
     init(
         loadSections: @escaping () -> [PreferencesSection],
         tabSwitcherTabs: [Tab.TabContent],
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        privacyConfigurationManager: PrivacyConfigurationManaging,
+        syncService: DDGSyncing
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
@@ -41,12 +43,18 @@ final class PreferencesSidebarModel: ObservableObject {
         resetTabSelectionIfNeeded()
         refreshSections()
 
-        privacyConfigurationManager.updatesPublisher
+        let duckPlayerFeatureFlagDidChange = privacyConfigurationManager.updatesPublisher
             .map { [weak privacyConfigurationManager] in
                 privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
             }
             .removeDuplicates()
             .asVoid()
+
+        let syncFeatureFlagsDidChange = syncService.featureFlagsPublisher.map { $0.contains(.userInterface) }
+            .removeDuplicates()
+            .asVoid()
+
+        Publishers.Merge(duckPlayerFeatureFlagDidChange, syncFeatureFlagsDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshSections()
@@ -62,6 +70,7 @@ final class PreferencesSidebarModel: ObservableObject {
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+        syncService: DDGSyncing,
         includeDuckPlayer: Bool
     ) {
         let loadSections = {
@@ -71,12 +80,17 @@ final class PreferencesSidebarModel: ObservableObject {
             let includingVPN = false
 #endif
 
-            return PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer, includingVPN: includingVPN)
+            return PreferencesSection.defaultSections(
+                includingDuckPlayer: includeDuckPlayer,
+                includingSync: syncService.featureFlags.contains(.userInterface),
+                includingVPN: includingVPN
+            )
         }
 
         self.init(loadSections: loadSections,
                   tabSwitcherTabs: tabSwitcherTabs,
-                  privacyConfigurationManager: privacyConfigurationManager)
+                  privacyConfigurationManager: privacyConfigurationManager,
+                  syncService: syncService)
     }
 
     // MARK: - Setup

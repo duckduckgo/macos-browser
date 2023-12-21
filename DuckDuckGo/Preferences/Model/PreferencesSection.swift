@@ -24,7 +24,7 @@ struct PreferencesSection: Hashable, Identifiable {
     let panes: [PreferencePaneIdentifier]
 
     @MainActor
-    static func defaultSections(includingDuckPlayer: Bool, includingVPN: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
 #if SUBSCRIPTION
             var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
@@ -37,7 +37,7 @@ struct PreferencesSection: Hashable, Identifiable {
 #else
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
 
-            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
+            if includingSync {
                 panes.insert(.sync, at: 1)
             }
 #endif

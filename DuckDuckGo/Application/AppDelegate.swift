@@ -69,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
     private var isSyncInProgressCancellable: AnyCancellable?
+    private var syncFeatureFlagsCancellable: AnyCancellable?
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
@@ -339,7 +340,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let environment = defaultEnvironment
 #endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
+        let syncService = DDGSync(
+            dataProvidersSource: syncDataProviders,
+            errorEvents: SyncErrorHandler(),
+            privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+            log: OSLog.sync,
+            environment: environment
+        )
         syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 
@@ -356,9 +363,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         isSyncInProgressCancellable = syncService.isSyncInProgressPublisher
             .filter { $0 }
             .asVoid()
-            .prefix(1)
-            .sink {
+            .sink { [weak syncService] in
                 Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+                syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
+                    Pixel.fire(.syncSuccessRateDaily, withAdditionalParameters: params)
+                })
             }
 
         subscribeSyncQueueToScreenLockedNotifications()

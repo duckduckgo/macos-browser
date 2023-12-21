@@ -25,6 +25,13 @@ import Navigation
 import UserScript
 import WebKit
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+import NetworkProtectionIPC
+#endif
+
+// swiftlint:disable file_length
+
 protocol TabDelegate: ContentOverlayUserScriptDelegate {
     func tabWillStartNavigation(_ tab: Tab, isUserInitiated: Bool)
     func tabDidStartNavigation(_ tab: Tab)
@@ -246,6 +253,10 @@ protocol NewWindowPolicyDecisionMaker {
     private let internalUserDecider: InternalUserDecider?
     let pinnedTabsManager: PinnedTabsManager
 
+#if NETWORK_PROTECTION
+    private var tunnelController: NetworkProtectionIPCTunnelController?
+#endif
+
     private let webViewConfiguration: WKWebViewConfiguration
 
     let startupPreferences: StartupPreferences
@@ -431,8 +442,21 @@ protocol NewWindowPolicyDecisionMaker {
                 self?.onDuckDuckGoEmailSignOut(notification)
             }
 
-        addDeallocationChecks(for: webView)
+#if NETWORK_PROTECTION
+        netPOnboardStatusCancellabel = DefaultNetworkProtectionVisibility().onboardStatusPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] onboardingStatus in
+                guard onboardingStatus == .completed else { return }
 
+                let machServiceName = Bundle.main.vpnMenuAgentBundleId
+                let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
+                ipcClient.register()
+
+                self?.tunnelController = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
+            }
+#endif
+
+        addDeallocationChecks(for: webView)
     }
 
 #if DEBUG
@@ -896,6 +920,10 @@ protocol NewWindowPolicyDecisionMaker {
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
 
+#if NETWORK_PROTECTION
+    private var netPOnboardStatusCancellabel: AnyCancellable?
+#endif
+
     private func setupWebView(shouldLoadInBackground: Bool) {
         webView.navigationDelegate = navigationDelegate
         webView.uiDelegate = self
@@ -1130,6 +1158,12 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         invalidateInteractionStateData()
         webViewDidFinishNavigationPublisher.send()
         statisticsLoader?.refreshRetentionAtb(isSearch: navigation.url.isDuckDuckGoSearch)
+
+#if NETWORK_PROTECTION
+        if navigation.url.isDuckDuckGoSearch, tunnelController?.isConnected == true {
+            DailyPixel.fire(pixel: .networkProtectionEnabledOnSearch, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        }
+#endif
     }
 
     @MainActor
@@ -1195,3 +1229,5 @@ extension Tab {
     }
 
 }
+
+// swiftlint:enable file_length

@@ -18,6 +18,16 @@
 
 import Foundation
 
+protocol DateProtocol {
+    var now: Date { get }
+}
+
+struct SystemDate: DateProtocol {
+    var now: Date {
+        return Date()
+    }
+}
+
 struct OperationPreferredDateCalculator {
 
     func dateForScanOperation(currentPreferredRunDate: Date?,
@@ -52,7 +62,8 @@ struct OperationPreferredDateCalculator {
     func dateForOptOutOperation(currentPreferredRunDate: Date?,
                                 historyEvents: [HistoryEvent],
                                 extractedProfileID: Int64?,
-                                schedulingConfig: DataBrokerScheduleConfig) throws -> Date? {
+                                schedulingConfig: DataBrokerScheduleConfig,
+                                date: DateProtocol = SystemDate()) throws -> Date? {
 
         guard let lastEvent = historyEvents.last else {
             throw DataBrokerProtectionError.cantCalculatePreferredRunDate
@@ -63,12 +74,12 @@ struct OperationPreferredDateCalculator {
             if let extractedProfileID = extractedProfileID, shouldScheduleNewOptOut(events: historyEvents,
                                                                                     extractedProfileId: extractedProfileID,
                                                                                     schedulingConfig: schedulingConfig) {
-                return Date()
+                return date.now
             } else {
                 return currentPreferredRunDate
             }
         case .error:
-            return Date().addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
+            return date.now.addingTimeInterval(schedulingConfig.retryError.hoursToSeconds)
         case .optOutStarted, .scanStarted, .noMatchFound:
             return currentPreferredRunDate
         case .optOutConfirmed, .optOutRequested:
@@ -84,6 +95,7 @@ struct OperationPreferredDateCalculator {
             return false
         }
 
-        return lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds) < Date()
+        let lastRemovalEventDate = lastRemovalEvent.date.addingTimeInterval(schedulingConfig.maintenanceScan.hoursToSeconds)
+        return lastRemovalEventDate < Date()
     }
 }

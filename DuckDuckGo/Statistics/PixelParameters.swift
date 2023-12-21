@@ -130,6 +130,7 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
+             .networkProtectionEnabledOnSearch,
              .syncSignupDirect,
              .syncSignupConnect,
              .syncLogin,

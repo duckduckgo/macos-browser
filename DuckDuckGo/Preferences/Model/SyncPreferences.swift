@@ -89,14 +89,38 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private var isScreenLocked: Bool = false
     private var recoveryKey: SyncCode.RecoveryKey?
 
+    @Published var syncFeatureFlags: SyncFeatureFlags {
+        didSet {
+            updateSyncFeatureFlags(syncFeatureFlags)
+        }
+    }
+
+    @Published var isDataSyncingAvailable: Bool = true
+    @Published var isConnectingDevicesAvailable: Bool = true
+    @Published var isAccountCreationAvailable: Bool = true
+    @Published var isAccountRecoveryAvailable: Bool = true
+
+    private func updateSyncFeatureFlags(_ syncFeatureFlags: SyncFeatureFlags) {
+        isDataSyncingAvailable = syncFeatureFlags.contains(.dataSyncing)
+        isConnectingDevicesAvailable = syncFeatureFlags.contains(.connectFlows)
+        isAccountCreationAvailable = syncFeatureFlags.contains(.accountCreation)
+        isAccountRecoveryAvailable = syncFeatureFlags.contains(.accountRecovery)
+    }
+
     var recoveryCode: String? {
         syncService.account?.recoveryCode
     }
 
-    init(syncService: DDGSyncing, syncBookmarksAdapter: SyncBookmarksAdapter, appearancePreferences: AppearancePreferences = .shared, managementDialogModel: ManagementDialogModel = ManagementDialogModel()) {
+    init(
+        syncService: DDGSyncing,
+        syncBookmarksAdapter: SyncBookmarksAdapter,
+        appearancePreferences: AppearancePreferences = .shared,
+        managementDialogModel: ManagementDialogModel = ManagementDialogModel()
+    ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
         self.appearancePreferences = appearancePreferences
+        self.syncFeatureFlags = syncService.featureFlags
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
@@ -106,11 +130,19 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         self.managementDialogModel = managementDialogModel
         self.managementDialogModel.delegate = self
 
+        updateSyncFeatureFlags(self.syncFeatureFlags)
         setUpObservables()
         setUpSyncOptionsObservables(apperancePreferences: appearancePreferences)
     }
 
     private func setUpObservables() {
+        syncService.featureFlagsPublisher
+            .dropFirst()
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.syncFeatureFlags, onWeaklyHeld: self)
+            .store(in: &cancellables)
+
         syncService.authStatePublisher
             .removeDuplicates()
             .asVoid()

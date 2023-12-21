@@ -90,6 +90,8 @@ final class AddBookmarkModalViewController: NSViewController {
         updateWithCurrentTabWebsite()
         updateWithExistingBookmark()
         updateAddButton()
+        bookmarkTitleTextField.setAccessibilityIdentifier("Title Text Field")
+        urlTextField.setAccessibilityIdentifier("URL Text Field")
     }
 
     override func viewWillAppear() {
