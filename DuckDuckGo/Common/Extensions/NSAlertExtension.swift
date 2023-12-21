@@ -221,13 +221,15 @@ extension NSAlert {
         return alert
     }
 
-    static func dataSyncingDisabledByFeatureFlag(upgradeRequired: Bool = false) -> NSAlert {
+    static func dataSyncingDisabledByFeatureFlag(showLearnMore: Bool, upgradeRequired: Bool = false) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.syncPausedTitle
         alert.informativeText = upgradeRequired ? UserText.syncUnavailableMessageUpgradeRequired : UserText.syncUnavailableMessage
         alert.alertStyle = .warning
         alert.addButton(withTitle: UserText.ok)
-        alert.addButton(withTitle: UserText.learnMore)
+        if showLearnMore {
+            alert.addButton(withTitle: UserText.learnMore)
+        }
         return alert
     }
 

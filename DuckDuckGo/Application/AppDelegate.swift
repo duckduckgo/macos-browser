@@ -386,7 +386,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 if isDataSyncingAvailable {
                     self?.syncDidShowSyncPausedByFeatureFlagAlert = false
                 } else if syncService?.authState == .active, self?.syncDidShowSyncPausedByFeatureFlagAlert == false {
-                    let alert = NSAlert.dataSyncingDisabledByFeatureFlag()
+                    let isSyncUIVisible = syncService?.featureFlags.contains(.userInterface) == true
+                    let alert = NSAlert.dataSyncingDisabledByFeatureFlag(showLearnMore: isSyncUIVisible)
                     let response = alert.runModal()
                     self?.syncDidShowSyncPausedByFeatureFlagAlert = true
 
