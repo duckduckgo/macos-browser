@@ -61,6 +61,9 @@ final class ConfigurationManager {
     @UserDefaultsWrapper(key: .configLastUpdated, defaultValue: .distantPast)
     private(set) var lastUpdateTime: Date
 
+    @UserDefaultsWrapper(key: .configLastInstalled, defaultValue: nil)
+    private(set) var lastConfigurationInstallDate: Date?
+
     private var timerCancellable: AnyCancellable?
     private var lastRefreshCheckTime: Date = Date()
 
@@ -200,6 +203,7 @@ final class ConfigurationManager {
     }
 
     private func updateTrackerBlockingDependencies() {
+        lastConfigurationInstallDate = Date()
         ContentBlocking.shared.trackerDataManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .trackerDataSet),
                                                          data: ConfigurationStore.shared.loadData(for: .trackerDataSet))
         ContentBlocking.shared.privacyConfigurationManager.reload(etag: ConfigurationStore.shared.loadEtag(for: .privacyConfiguration),

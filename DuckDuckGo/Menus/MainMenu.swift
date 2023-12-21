@@ -635,8 +635,14 @@ import Subscription
     }
 
     private func updateRemoteConfigurationInfo() {
-        let dateString = DateFormatter.localizedString(from: ConfigurationManager.shared.lastUpdateTime, dateStyle: .short, timeStyle: .medium)
-        configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        var dateString: String
+        if let date = ConfigurationManager.shared.lastConfigurationInstallDate {
+            dateString = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+            configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        } else {
+            dateString = "Last Update Time: -"
+        }
+        configurationDateAndTimeMenuItem.title = dateString
         customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
     }
 

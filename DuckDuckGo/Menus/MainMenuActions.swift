@@ -733,7 +733,7 @@ extension MainViewController {
     @objc func reloadConfigurationNow(_ sender: Any?) {
         OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
 
-        ConfigurationManager.shared.forceRefresh()
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
