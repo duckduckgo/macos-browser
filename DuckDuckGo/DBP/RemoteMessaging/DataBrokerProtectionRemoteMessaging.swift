@@ -91,7 +91,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
                     try self.messageStorage.store(messages: messages)
                     self.updateLastRefreshDate() // Update last refresh date on success, otherwise let the app try again next time
                 } catch {
-                    // Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
+                    Pixel.fire(.debug(event: .dataBrokerProtectionRemoteMessageStorageFailed, error: error))
                 }
             case .failure(let error):
                 // Ignore 403 errors, those happen when a file can't be found on S3
@@ -100,7 +100,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
                     return
                 }
 
-                // Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
+                Pixel.fire(.debug(event: .dataBrokerProtectionRemoteMessageFetchingFailed, error: error))
             }
         }
     }
@@ -178,4 +178,3 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
 }
 
 #endif
-

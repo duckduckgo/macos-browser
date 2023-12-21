@@ -151,7 +151,10 @@ extension Pixel.Event {
              .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
              .homeButtonLeft,
              .homeButtonRight,
-             .homeButtonHidden:
+             .homeButtonHidden,
+             .dataBrokerProtectionRemoteMessageOpened,
+             .dataBrokerProtectionRemoteMessageDisplayed,
+             .dataBrokerProtectionRemoteMessageDismissed:
             return nil
         }
     }
