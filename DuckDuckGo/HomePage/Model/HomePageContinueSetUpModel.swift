@@ -115,9 +115,6 @@ extension HomePage.Models {
         @UserDefaultsWrapper(key: .firstLaunchDate, defaultValue: Calendar.current.date(byAdding: .month, value: -1, to: Date())!)
         private var firstLaunchDate: Date
 
-        @UserDefaultsWrapper(key: .shouldShowNetworkProtectionSystemExtensionUpgradePrompt, defaultValue: true)
-        private var shouldShowNetworkProtectionSystemExtensionUpgradePrompt: Bool
-
         var isMoreOrLessButtonNeeded: Bool {
             return featuresMatrix.count > itemsRowCountWhenCollapsed
         }
@@ -182,7 +179,6 @@ extension HomePage.Models {
         }
 #endif
 
-        // swiftlint:disable cyclomatic_complexity
         @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
@@ -207,17 +203,12 @@ extension HomePage.Models {
                 visitSurvey(day: .day7)
             case .networkProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
-            case .networkProtectionSystemExtensionUpgrade:
-#if NETWORK_PROTECTION
-                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
-#endif
             case .dataBrokerProtectionWaitlistInvited:
 #if DBP
                 DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .cardUI)
 #endif
             }
         }
-        // swiftlint:enable cyclomatic_complexity
 
         func removeItem(for featureType: FeatureType) {
             switch featureType {
@@ -238,15 +229,13 @@ extension HomePage.Models {
                 networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
 #endif
-            case .networkProtectionSystemExtensionUpgrade:
-                shouldShowNetworkProtectionSystemExtensionUpgradePrompt = false
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
             }
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable cyclomatic_complexity function_body_length
+        // swiftlint:disable:next cyclomatic_complexity
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 #if DBP
@@ -256,15 +245,6 @@ extension HomePage.Models {
 #endif
 
 #if NETWORK_PROTECTION
-
-            // Only show the upgrade card to users who have used the VPN before:
-            let activationStore = DefaultWaitlistActivationDateStore()
-            if shouldShowNetworkProtectionSystemExtensionUpgradePrompt,
-               appGroupUserDefaults.networkProtectionOnboardingStatusRawValue != OnboardingStatus.completed.rawValue,
-               activationStore.daysSinceActivation() != nil {
-                features.append(.networkProtectionSystemExtensionUpgrade)
-            }
-
             for message in networkProtectionRemoteMessaging.presentableRemoteMessages() {
                 features.append(.networkProtectionRemoteMessage(message))
                 DailyPixel.fire(
@@ -301,7 +281,7 @@ extension HomePage.Models {
                     if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
-                case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
+                case .networkProtectionRemoteMessage:
                     break // Do nothing, NetP remote messages get appended first
                 case .dataBrokerProtectionWaitlistInvited:
                     break // Do nothing. The feature is being set for everyone invited in the waitlist
@@ -309,7 +289,6 @@ extension HomePage.Models {
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
         }
-        // swiftlint:enable cyclomatic_complexity function_body_length
 
         // Helper Functions
         @objc private func newTabOpenNotification(_ notification: Notification) {
@@ -477,7 +456,6 @@ extension HomePage.Models {
         case surveyDay0
         case surveyDay7
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
-        case networkProtectionSystemExtensionUpgrade
         case dataBrokerProtectionWaitlistInvited
 
         var title: String {
@@ -496,8 +474,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7CardTitle
             case .networkProtectionRemoteMessage(let message):
                 return message.cardTitle
-            case .networkProtectionSystemExtensionUpgrade:
-                return "VPN Update Available"
             case .dataBrokerProtectionWaitlistInvited:
                 return "Personal Information Removal"
             }
@@ -519,8 +495,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7Summary
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
-            case .networkProtectionSystemExtensionUpgrade:
-                return "Allow VPN system software again to continue testing Network Protection."
             case .dataBrokerProtectionWaitlistInvited:
                 return "You're invited to try Personal Information Removal beta!"
             }
@@ -542,8 +516,6 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7Action
             case .networkProtectionRemoteMessage(let message):
                 return message.action.actionTitle
-            case .networkProtectionSystemExtensionUpgrade:
-                return "Update VPN"
             case .dataBrokerProtectionWaitlistInvited:
                 return "Get Started"
             }
@@ -565,7 +537,7 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .surveyDay7:
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
-            case .networkProtectionRemoteMessage, .networkProtectionSystemExtensionUpgrade:
+            case .networkProtectionRemoteMessage:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
                 return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!

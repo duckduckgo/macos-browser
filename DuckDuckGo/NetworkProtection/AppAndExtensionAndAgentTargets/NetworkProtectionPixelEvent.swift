@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionPixel.swift
+//  NetworkProtectionPixelEvent.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -67,7 +67,7 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionKeychainDeleteError(status: Int32)
 
     case networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
-    case networkProtectionWireguardErrorInvalidState
+    case networkProtectionWireguardErrorInvalidState(reason: String)
     case networkProtectionWireguardErrorFailedDNSResolution
     case networkProtectionWireguardErrorCannotSetNetworkSettings(error: Error)
     case networkProtectionWireguardErrorCannotStartWireguardBackend(code: Int32)
@@ -265,6 +265,11 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
                 PixelKit.Parameters.errorCode: String(code)
             ]
 
+        case .networkProtectionWireguardErrorInvalidState(reason: let reason):
+            return [
+                PixelKit.Parameters.reason: reason
+            ]
+
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
              .networkProtectionTunnelConfigurationCouldNotSelectClosestServer,
              .networkProtectionTunnelConfigurationCouldNotGetPeerPublicKey,
@@ -282,7 +287,6 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionNoAuthTokenFoundError,
              .networkProtectionRekeyCompleted,
              .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
-             .networkProtectionWireguardErrorInvalidState,
              .networkProtectionWireguardErrorFailedDNSResolution,
              .networkProtectionSystemExtensionActivationFailure,
              .networkProtectionActiveUser,

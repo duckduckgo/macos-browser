@@ -130,6 +130,7 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDisplayed,
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
+             .networkProtectionEnabledOnSearch,
              .syncSignupDirect,
              .syncSignupConnect,
              .syncLogin,
@@ -148,6 +149,7 @@ extension Pixel.Event {
              .dataBrokerProtectionWaitlistCardUITapped,
              .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
              .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
+             .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn,
              .homeButtonLeft,
              .homeButtonRight,
              .homeButtonHidden:

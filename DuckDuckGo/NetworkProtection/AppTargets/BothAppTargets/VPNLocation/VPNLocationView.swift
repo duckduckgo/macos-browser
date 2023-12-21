@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionVPNLocationView.swift
+//  VPNLocationView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -61,7 +61,7 @@ struct VPNLocationView: View {
 
     @ViewBuilder
     private func nearest(isSelected: Bool) -> some View {
-        PreferencePaneSection(vericalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 12) {
             Text(UserText.vpnLocationRecommendedSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
@@ -98,7 +98,7 @@ struct VPNLocationView: View {
             EmptyView()
                 .listRowBackground(Color.clear)
         case .loaded(let countryItems):
-            PreferencePaneSection(vericalPadding: 12) {
+            PreferencePaneSection(verticalPadding: 12) {
                 Text(UserText.vpnLocationCustomSectionTitle)
                     .font(.system(size: 15))
                     .foregroundColor(.primary)
