@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/add-netp-subscription-auth-support",
-        "revision" : "22506de8f9fcadddf2a949ac922ad4377b0a3188"
+        "revision" : "a2e41dbf95c49f66120497002c680b929e969f97"
       }
     },
     {
