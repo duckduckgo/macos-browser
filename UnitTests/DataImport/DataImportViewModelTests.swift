@@ -114,14 +114,11 @@ import XCTest
     }
 
     func testWhenProfilesAreLoaded_defaultProfileIsSelected() {
-        model = DataImportViewModel(importSource: .firefox, loadProfiles: { source in
-            XCTAssertEqual(source, .firefox)
-            return .init(browser: source, profiles: [.test(for: source), .default(for: source)])
-        })
+        setupModel(with: .firefox, profiles: [BrowserProfile.test, BrowserProfile.default, BrowserProfile.test2])
         XCTAssertEqual(model.selectedProfile, .default(for: .firefox))
     }
 
-    func testWhenInvalidProfilesArePresent_onlyValidProfilesShown() {
+    func testWhenInvalidProfilesArePresent_onlyValidProfilesShownAndFirstValidProfileSelected() {
         for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
             guard let browser = ThirdPartyBrowser.browser(for: source) else { continue }
 
@@ -147,12 +144,63 @@ import XCTest
                 .test(for: browser),
                 .test2(for: browser),
                 .test3(for: browser),
-            ])
+            ], "\(browser)")
+            XCTAssertEqual(model.selectedProfile, .test(for: browser), "\(browser)")
+        }
+    }
+
+    func testWhenDefaultProfileIsInvalidAndOnlyOneValidProfileIsPresent_validProfileSelected() {
+        for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
+            guard let browser = ThirdPartyBrowser.browser(for: source) else { continue }
+
+            model = DataImportViewModel(importSource: source, loadProfiles: { browser in
+                    .init(browser: browser, profiles: [
+                        .default(for: browser),
+                        .test(for: browser),
+                    ]) { profile in
+                        { // swiftlint:disable:this opening_brace
+                            switch profile {
+                            case .default(for: browser): .init(logins: .unavailable(path: "test"), bookmarks: .unavailable(path: "test"))
+                            default: .init(logins: .available, bookmarks: .available)
+                            }
+                        }
+                    }
+            })
+
+            XCTAssertEqual(model.selectedProfile, .test(for: browser))
+        }
+    }
+
+    func testWhenNoValidProfilesPresent_noProfilesShownAndDefaultProfileSelected() {
+        for source in Source.allCases where source.initialScreen == .profileAndDataTypesPicker {
+            guard let browser = ThirdPartyBrowser.browser(for: source) else { continue }
+
+            model = DataImportViewModel(importSource: source, loadProfiles: { browser in
+                    .init(browser: browser, profiles: [
+                        .default(for: browser),
+                        .test(for: browser),
+                        .test2(for: browser),
+                        .test3(for: browser),
+                    ]) { profile in
+                        { // swiftlint:disable:this opening_brace
+                            switch profile {
+                            case .default(for: browser): .init(logins: .unavailable(path: "test"), bookmarks: .unavailable(path: "test"))
+                            case .test(for: browser): .init(logins: .unavailable(path: "test"), bookmarks: .unavailable(path: "test"))
+                            case .test2(for: browser): .init(logins: .unavailable(path: "test"), bookmarks: .unavailable(path: "test"))
+                            default: .init(logins: .unavailable(path: "test"), bookmarks: .unavailable(path: "test"))
+                            }
+                        }
+                    }
+            })
+
+            XCTAssertEqual(model.browserProfiles?.validImportableProfiles, [], "\(browser)")
+            XCTAssertEqual(model.selectedProfile, .default(for: browser), "\(browser)")
         }
     }
 
     func testWhenImportSourceChanged_AnotherDefaultProfileIsSelected() {
-        model = DataImportViewModel(importSource: .firefox, loadProfiles: { .init(browser: $0, profiles: [ .test(for: $0), .default(for: $0) ]) })
+        setupModel(with: .firefox, profiles: [BrowserProfile.test, BrowserProfile.default, BrowserProfile.test2])
+        model.selectedProfile = .test(for: .firefox)
         model.update(with: .chromium)
         XCTAssertEqual(model.selectedProfile, .default(for: .chrome))
     }

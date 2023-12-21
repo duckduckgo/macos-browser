@@ -202,15 +202,25 @@ enum DataImport {
         }
 
         var defaultProfile: BrowserProfile? {
+            let preferredProfileName: String?
             switch browser {
             case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
-                return profiles.first { $0.profileName == Constants.chromiumDefaultProfileName } ?? profiles.first
+                preferredProfileName = Constants.chromiumDefaultProfileName
+                return validImportableProfiles.first { $0.profileName == Constants.chromiumDefaultProfileName } ?? validImportableProfiles.first ?? profiles.first
             case .firefox, .tor:
-                return profiles.first { $0.profileName == Constants.firefoxDefaultProfileName } ?? profiles.first
+                preferredProfileName = Constants.firefoxDefaultProfileName
             case .safari, .safariTechnologyPreview, .bitwarden, .lastPass, .onePassword7, .onePassword8:
-                return profiles.first
+                preferredProfileName = nil
             }
+            lazy var validImportableProfiles = self.validImportableProfiles
+            if let preferredProfileName,
+               let preferredProfile = validImportableProfiles.first(where: { $0.profileName == Constants.firefoxDefaultProfileName }) {
+
+                return preferredProfile
+            }
+            return validImportableProfiles.first ?? profiles.first
         }
+
     }
 
     struct BrowserProfile: Comparable {
