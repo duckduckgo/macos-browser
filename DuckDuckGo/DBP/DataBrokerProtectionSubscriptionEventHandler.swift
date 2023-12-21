@@ -39,7 +39,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
 
     @objc private func handleAccountDidSignIn() {
         guard let token = accountManager.token else {
-            Pixel.fire(.dataBrokerProtectionSubscriptionErrorWhenFetchingToken)
+            Pixel.fire(.dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn)
             assertionFailure("[DBP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }

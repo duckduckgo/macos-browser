@@ -198,7 +198,7 @@ extension Pixel {
         case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
 
         // DataBrokerProtection Other
-        case dataBrokerProtectionSubscriptionErrorWhenFetchingToken
+        case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
         // 28-day Home Button
         case homeButtonHidden
@@ -542,8 +542,8 @@ extension Pixel.Event {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
-        case .dataBrokerProtectionSubscriptionErrorWhenFetchingToken:
-            return "m_mac_dbp_subscription_error_when_fetching_token"
+        case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
+            return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
 
             // 28-day Home Button
         case .homeButtonHidden:
