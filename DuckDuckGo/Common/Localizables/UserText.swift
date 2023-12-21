@@ -397,7 +397,7 @@ struct UserText {
     static let autofillAddresses = NSLocalizedString("autofill.addresses", value: "Addresses", comment: "Autofill autosaved data type")
     static let autofillPaymentMethods = NSLocalizedString("autofill.payment-methods", value: "Payment methods", comment: "Autofill autosaved data type")
     static let autofillExcludedSites = NSLocalizedString("autofill.excluded-sites", value: "Excluded Sites", comment: "Autofill settings section title")
-    static let autofillExcludedSitesExplanation = NSLocalizedString("autofill.excluded-sites.explanation", value: "Websites where you selected to never save your password.", comment: "Subtitle providing additional information about the excluded sites section")
+    static let autofillExcludedSitesExplanation = NSLocalizedString("autofill.excluded-sites.explanation", value: "Websites you selected to never ask to save your password.", comment: "Subtitle providing additional information about the excluded sites section")
     static let autofillExcludedSitesReset = NSLocalizedString("autofill.excluded-sites.reset", value: "Reset", comment: "Button title allowing users to reset their list of excluded sites")
     static let autofillExcludedSitesResetActionTitle = NSLocalizedString("autofill.excluded-sites.reset.action.title", value:"Reset Excluded Sites?", comment: "Alert title")
     static let autofillExcludedSitesResetActionMessage = NSLocalizedString("autofill.excluded-sites.reset.action.message", value:"If you reset excluded sites, you will be prompted to save your password next time you sign in to any of these sites.", comment: "Alert title")
