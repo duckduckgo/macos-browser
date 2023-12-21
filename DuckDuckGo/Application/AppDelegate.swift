@@ -74,6 +74,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
+#if DBP && SUBSCRIPTION
+    private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
+#endif
+
     private var didFinishLaunching = false
 
 #if SPARKLE
@@ -241,6 +245,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 #if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
+#endif
+
+#if DBP && SUBSCRIPTION
+        dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
 #endif
 
 #if DBP
