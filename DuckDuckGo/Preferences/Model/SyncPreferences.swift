@@ -503,10 +503,6 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 return
             }
         }
-        //            catch {
-        //                managementDialogModel.syncErrorMessage
-        //                = SyncErrorMessage(type: .unableToSync, description: error.localizedDescription)
-        //            }
     }
 
     @MainActor
