@@ -51,7 +51,18 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     func userDisabledProtection(forDomain: String) {}
 }
 
+final class MockInternalUserStoring: InternalUserStoring {
+    var isInternalUser: Bool = false
+}
+
+extension DefaultInternalUserDecider {
+    convenience init(mockedStore: MockInternalUserStoring = MockInternalUserStoring()) {
+        self.init(store: mockedStore)
+    }
+}
+
 final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
+    
     var embeddedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData {
         fatalError("not implemented")
     }
@@ -70,6 +81,7 @@ final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManag
 
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
+    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider()
 }
 
 #endif
