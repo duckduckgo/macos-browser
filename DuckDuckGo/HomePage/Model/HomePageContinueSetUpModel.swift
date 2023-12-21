@@ -252,7 +252,7 @@ extension HomePage.Models {
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable:next cyclomatic_complexity
+        // swiftlint:disable:next cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 #if DBP
