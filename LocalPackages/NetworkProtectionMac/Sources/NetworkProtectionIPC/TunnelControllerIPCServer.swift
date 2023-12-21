@@ -39,7 +39,7 @@ public protocol IPCServerInterface: AnyObject {
 
     /// Debug commands
     ///
-    func debugCommand(_ command: DebugCommand) async
+    func debugCommand(_ command: DebugCommand) async throws
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -65,11 +65,15 @@ protocol XPCServerInterface {
 
     /// Debug commands
     ///
-    func debugCommand(_ payload: Data, completion: @escaping () -> Void)
+    func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void)
 }
 
 public final class TunnelControllerIPCServer {
     let xpc: XPCServer<XPCClientInterface, XPCServerInterface>
+
+    enum IPCError: Error {
+        case cannotDecodeDebugCommand
+    }
 
     /// The delegate.
     ///
@@ -148,15 +152,19 @@ extension TunnelControllerIPCServer: XPCServerInterface {
         serverDelegate?.stop()
     }
 
-    func debugCommand(_ payload: Data, completion: @escaping () -> Void) {
+    func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void) {
         guard let command = try? JSONDecoder().decode(DebugCommand.self, from: payload) else {
-            completion()
+            completion(IPCError.cannotDecodeDebugCommand)
             return
         }
 
         Task {
-            await serverDelegate?.debugCommand(command)
-            completion()
+            do {
+                try await serverDelegate?.debugCommand(command)
+                completion(nil)
+            } catch {
+                completion(error)
+            }
         }
     }
 }

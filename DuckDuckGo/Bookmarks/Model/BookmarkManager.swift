@@ -46,7 +46,6 @@ protocol BookmarkManager: AnyObject {
     func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
 
     func handleFavoritesAfterDisablingSync()
-    var didMigrateToFormFactorSpecificFavorites: Bool { get }
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -58,13 +57,13 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {
-        self.subscribeToFavoritesDisplayMode()
-    }
-
-    init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
-        self.bookmarkStore = bookmarkStore
-        self.faviconManagement = faviconManagement
+    init(bookmarkStore: BookmarkStore? = nil, faviconManagement: FaviconManagement? = nil) {
+        if let bookmarkStore {
+            self.bookmarkStore = bookmarkStore
+        }
+        if let faviconManagement {
+            self.faviconManagement = faviconManagement
+        }
         self.subscribeToFavoritesDisplayMode()
     }
 
@@ -81,10 +80,6 @@ final class LocalBookmarkManager: BookmarkManager {
 
     @Published private(set) var list: BookmarkList?
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
-
-    var didMigrateToFormFactorSpecificFavorites: Bool {
-        bookmarkStore.didMigrateToFormFactorSpecificFavorites
-    }
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared

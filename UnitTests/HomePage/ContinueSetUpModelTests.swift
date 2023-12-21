@@ -1,5 +1,5 @@
 //
-//  SetUpModelTests.swift
+//  ContinueSetUpModelTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -50,7 +50,6 @@ final class ContinueSetUpModelTests: XCTestCase {
     var emailStorage: MockEmailStorage!
     var privacyPreferences: PrivacySecurityPreferences!
     var duckPlayerPreferences: DuckPlayerPreferencesPersistor!
-    var delegate: CapturingSetUpVewModelDelegate!
     var privacyConfigManager: MockPrivacyConfigurationManager!
     let userDefaults = UserDefaults(suiteName: "\(Bundle.main.bundleIdentifier!).\(NSApplication.runType)")!
 
@@ -58,7 +57,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         UserDefaultsWrapper<Any>.clearAll()
         userDefaults.set(Date(), forKey: UserDefaultsWrapper<Date>.Key.firstLaunchDate.rawValue)
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
-        userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.shouldShowNetworkProtectionSystemExtensionUpgradePrompt.rawValue)
         capturingDefaultBrowserProvider = CapturingDefaultBrowserProvider()
         capturingDataImportProvider = CapturingDataImportProvider()
         tabCollectionVM = TabCollectionViewModel()
@@ -97,9 +95,6 @@ final class ContinueSetUpModelTests: XCTestCase {
             privacyConfigurationManager: privacyConfigManager
         )
 #endif
-
-        delegate = CapturingSetUpVewModelDelegate()
-        vm.delegate = delegate
     }
 
     override func tearDown() {
@@ -161,7 +156,7 @@ final class ContinueSetUpModelTests: XCTestCase {
     }
 
     func testWhenInitializedForTheFirstTimeTheMatrixHasAllElementsInTheRightOrder() {
-        var expectedMatrix = [[HomePage.Models.FeatureType.duckplayer, HomePage.Models.FeatureType.cookiePopUp]]
+        var expectedMatrix = [[HomePage.Models.FeatureType.duckplayer, .emailProtection]]
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, expectedMatrix)
 
@@ -329,19 +324,8 @@ final class ContinueSetUpModelTests: XCTestCase {
         XCTAssertTrue(vm.visibleFeaturesMatrix[0].count <= vm.itemsPerRow)
     }
 
-    @MainActor func testWhenAskedToPerformActionForCookieConsentThenShowsCookiePopUp() {
-        let numberOfFeatures = HomePage.Models.FeatureType.allCases.count - 1
-        vm.shouldShowAllFeatures = true
-        XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures)
-
-        vm.performAction(for: .cookiePopUp)
-
-        XCTAssertTrue(delegate.showCookieConsentPopUpCalled)
-        XCTAssertEqual(vm.visibleFeaturesMatrix.flatMap { $0 }.count, numberOfFeatures - 1)
-    }
-
     @MainActor func testWhenUserHasCookieConsentEnabledThenCorrectElementsAreVisible() {
-        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7, .cookiePopUp])
+        let expectedMatrix = expectedFeatureMatrixWithout(types: [.surveyDay7])
 
         privacyPreferences.autoconsentEnabled = true
         vm = HomePage.Models.ContinueSetUpModel.fixture(privacyPreferences: privacyPreferences, appGroupUserDefaults: userDefaults)
@@ -509,9 +493,6 @@ final class ContinueSetUpModelTests: XCTestCase {
 
         vm.removeItem(for: .emailProtection)
         XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.emailProtection))
-
-        vm.removeItem(for: .cookiePopUp)
-        XCTAssertFalse(vm.visibleFeaturesMatrix.flatMap { $0 }.contains(.cookiePopUp))
 
         let vm2 = HomePage.Models.ContinueSetUpModel.fixture(appGroupUserDefaults: userDefaults)
         XCTAssertTrue(vm2.visibleFeaturesMatrix.flatMap { $0 }.isEmpty)

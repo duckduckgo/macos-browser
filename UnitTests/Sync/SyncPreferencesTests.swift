@@ -16,32 +16,67 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DDGSync
+import Bookmarks
 import Combine
-@testable import DuckDuckGo_Privacy_Browser
-@testable import BrowserServicesKit
+import Persistence
 import SyncUI
+import XCTest
+import TestUtils
+@testable import BrowserServicesKit
+@testable import DDGSync
+@testable import DuckDuckGo_Privacy_Browser
 
 final class SyncPreferencesTests: XCTestCase {
 
     let scheduler = CapturingScheduler()
     let managementDialogModel = ManagementDialogModel()
     var ddgSyncing: MockDDGSyncing!
+    var syncBookmarksAdapter: SyncBookmarksAdapter!
     var appearancePersistor = MockPersistor()
     var appearancePreferences: AppearancePreferences!
     var syncPreferences: SyncPreferences!
     var testRecoveryCode = "some code"
 
+    var bookmarksDatabase: CoreDataDatabase!
+    var location: URL!
+
     override func setUp() {
+        setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
-        syncPreferences = SyncPreferences(syncService: ddgSyncing, apperancePreferences: appearancePreferences, managementDialogModel: managementDialogModel)
+
+        syncBookmarksAdapter = SyncBookmarksAdapter(database: bookmarksDatabase, appearancePreferences: appearancePreferences)
+
+        syncPreferences = SyncPreferences(
+            syncService: ddgSyncing,
+            syncBookmarksAdapter: syncBookmarksAdapter,
+            appearancePreferences: appearancePreferences,
+            managementDialogModel: managementDialogModel
+        )
     }
 
     override func tearDown() {
         ddgSyncing = nil
         syncPreferences = nil
+        tearDownDatabase()
+    }
+
+    private func setUpDatabase() {
+        location = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+
+        let bundle = Bookmarks.bundle
+        guard let model = CoreDataDatabase.loadModel(from: bundle, named: "BookmarksModel") else {
+            XCTFail("Failed to load model")
+            return
+        }
+        bookmarksDatabase = CoreDataDatabase(name: className, containerLocation: location, model: model)
+        bookmarksDatabase.loadStore()
+    }
+
+    private func tearDownDatabase() {
+        try? bookmarksDatabase.tearDown(deleteStores: true)
+        bookmarksDatabase = nil
+        try? FileManager.default.removeItem(at: location)
     }
 
     func testOnInitDelegateIsSet() {
@@ -64,26 +99,19 @@ final class SyncPreferencesTests: XCTestCase {
     }
 
     @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
-        syncPreferences.presentRecoverSyncAccountDialog()
+        syncPreferences.recoverDataPressed()
 
-        XCTAssertEqual(managementDialogModel.currentDialog, .recoverAccount)
+        XCTAssertEqual(managementDialogModel.currentDialog, .recoverSyncedData)
     }
 
-    @MainActor func testOnPresentManuallyEnterCodeDialogThenManuallyEnterCodeShown() {
-        syncPreferences.presentManuallyEnterCodeDialog()
+    @MainActor func testOnSyncWithServerPressedThenSyncWithServerDialogShown() {
+        syncPreferences.syncWithServerPressed()
 
-        XCTAssertEqual(managementDialogModel.currentDialog, .manuallyEnterCode)
-    }
-
-    @MainActor func testOnPresentShowTextCodeDialogThenShowTextCodeShown() {
-        syncPreferences.codeToDisplay = "adfasdf"
-        syncPreferences.presentShowTextCodeDialog()
-
-        XCTAssertEqual(managementDialogModel.currentDialog, .showTextCode(syncPreferences.codeToDisplay ?? ""))
+        XCTAssertEqual(managementDialogModel.currentDialog, .syncWithServer)
     }
 
     @MainActor func testOnPresentTurnOffSyncConfirmDialogThenTurnOffSyncShown() {
-        syncPreferences.presentTurnOffSyncConfirmDialog()
+        syncPreferences.turnOffSyncPressed()
 
         XCTAssertEqual(managementDialogModel.currentDialog, .turnOffSync)
     }
@@ -109,10 +137,17 @@ final class SyncPreferencesTests: XCTestCase {
 }
 
 class MockDDGSyncing: DDGSyncing {
+
     let registeredDevices = [RegisteredDevice(id: "1", name: "Device 1", type: "desktop"), RegisteredDevice(id: "2", name: "Device 2", type: "mobile"), RegisteredDevice(id: "3", name: "Device 1", type: "desktop")]
     var disconnectCalled = false
 
     var dataProvidersSource: DataProvidersSource?
+
+    @Published var featureFlags: SyncFeatureFlags = .all
+
+    var featureFlagsPublisher: AnyPublisher<SyncFeatureFlags, Never> {
+        $featureFlags.eraseToAnyPublisher()
+    }
 
     @Published var authState: SyncAuthState = .inactive
 
@@ -124,13 +159,15 @@ class MockDDGSyncing: DDGSyncing {
 
     var scheduler: Scheduling
 
+    var syncDailyStats = SyncDailyStats(store: MockKeyValueStore())
+
     @Published var isSyncInProgress: Bool
 
     var isSyncInProgressPublisher: AnyPublisher<Bool, Never> {
         $isSyncInProgress.eraseToAnyPublisher()
     }
 
-    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling, isSyncInProgress: Bool) {
+    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling = CapturingScheduler(), isSyncInProgress: Bool) {
         self.dataProvidersSource = dataProvidersSource
         self.authState = authState
         self.account = account
@@ -211,6 +248,7 @@ struct MockRemoteConnecting: RemoteConnecting {
 }
 
 struct MockPersistor: AppearancePreferencesPersistor {
+
     var homeButtonPosition: HomeButtonPosition = .hidden
 
     var showFullURL: Bool = false

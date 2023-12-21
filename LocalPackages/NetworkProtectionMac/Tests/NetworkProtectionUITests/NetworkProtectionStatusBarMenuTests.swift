@@ -49,7 +49,7 @@ final class StatusBarMenuTests: XCTestCase {
             statusReporter: MockNetworkProtectionStatusReporter(),
             controller: TestTunnelController(),
             iconProvider: MenuIconProvider(),
-            menuItems: [])
+            menuItems: { [] })
 
         menu.show()
 
@@ -65,7 +65,7 @@ final class StatusBarMenuTests: XCTestCase {
             statusReporter: MockNetworkProtectionStatusReporter(),
             controller: TestTunnelController(),
             iconProvider: MenuIconProvider(),
-            menuItems: [])
+            menuItems: { [] })
 
         menu.hide()
 

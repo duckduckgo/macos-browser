@@ -104,10 +104,10 @@ final class URLEventHandler {
             handleNetworkProtectionURL(url)
         } else {
             WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
-            WindowControllersManager.shared.show(url: url, newTab: true)
+            WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
         }
 #else
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
 #endif
     }
 
@@ -121,6 +121,10 @@ final class URLEventHandler {
             Task {
                 await WindowControllersManager.shared.showNetworkProtectionStatus()
             }
+        case AppLaunchCommand.showSettings.launchURL:
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
+        case AppLaunchCommand.shareFeedback.launchURL:
+            WindowControllersManager.shared.showShareFeedbackModal()
         default:
             return
         }

@@ -47,7 +47,7 @@ extension NetworkProtectionStatusView {
 
         @MainActor
         @Published
-        private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected
+        private var connectionStatus: NetworkProtection.ConnectionStatus = .default
 
         /// The type of extension that's being used for NetP
         ///
@@ -68,7 +68,7 @@ extension NetworkProtectionStatusView {
 
         // MARK: - Extra Menu Items
 
-        public let menuItems: [MenuItem]
+        public let menuItems: () -> [MenuItem]
 
         // MARK: - Misc
 
@@ -90,7 +90,7 @@ extension NetworkProtectionStatusView {
         public init(controller: TunnelController,
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
-                    menuItems: [MenuItem],
+                    menuItems: @escaping () -> [MenuItem],
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller

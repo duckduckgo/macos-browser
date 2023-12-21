@@ -41,15 +41,21 @@ final class BookmarksBarViewController: NSViewController {
     @UserDefaultsWrapper(key: .bookmarksBarPromptShown, defaultValue: false)
     var bookmarksBarPromptShown: Bool
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) -> BookmarksBarViewController {
+        NSStoryboard(name: "BookmarksBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+        }!
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager) {
         self.tabCollectionViewModel = tabCollectionViewModel
-        self.viewModel = BookmarksBarViewModel(bookmarkManager: LocalBookmarkManager.shared, tabCollectionViewModel: tabCollectionViewModel)
+        self.viewModel = BookmarksBarViewModel(bookmarkManager: bookmarkManager, tabCollectionViewModel: tabCollectionViewModel)
 
         super.init(coder: coder)
     }
 
     required init?(coder: NSCoder) {
-        fatalError("TabBarViewController: Bad initializer")
+        fatalError("BookmarksBarViewController: Bad initializer")
     }
 
     // MARK: - View Lifecycle
@@ -221,10 +227,10 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
         switch action {
         case .openInNewTab:
             guard let url = bookmark.urlObject else { return }
-            tabCollectionViewModel.appendNewTab(with: .url(url), selected: true)
+            tabCollectionViewModel.appendNewTab(with: .url(url, source: .bookmark), selected: true)
         case .openInNewWindow:
             guard let url = bookmark.urlObject else { return }
-            WindowsManager.openNewWindow(with: url, isBurner: false)
+            WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
         case .clickItem:
             WindowControllersManager.shared.open(bookmark: bookmark)
         case .addToFavorites:

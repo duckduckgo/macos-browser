@@ -102,6 +102,7 @@ struct PasswordManagementLoginItemView: View {
                     secondaryButton: cancelButton
                 )
             }
+            .accessibility(identifier: "Login item View")
         }
     }
 
@@ -175,6 +176,7 @@ private struct UsernameView: View {
                 TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
+                    .accessibility(identifier: "Username TextField")
 
             } else {
 
@@ -439,6 +441,7 @@ private struct WebsiteView: View {
             TextField("", text: $model.domain)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.bottom, interItemSpacing)
+                .accessibility(identifier: "Website TextField")
 
         } else {
             if let domainURL = model.domain.url {
@@ -470,10 +473,10 @@ private struct NotesView: View {
 
         if model.isEditing || model.isNew {
 #if APPSTORE
-            FocusableTextEditor()
+            FocusableTextEditor(text: $model.notes)
 #else
             if #available(macOS 12, *) {
-                FocusableTextEditor()
+                FocusableTextEditor(text: $model.notes)
             } else {
                 TextEditor(text: $model.notes)
                     .frame(height: 197.0)
@@ -507,41 +510,6 @@ private struct NotesView: View {
         }
     }
 
-}
-
-@available(macOS 12, *)
-struct FocusableTextEditor: View {
-
-    @EnvironmentObject var model: PasswordManagementLoginModel
-    @FocusState var isFocused: Bool
-
-    let cornerRadius: CGFloat = 8.0
-    let borderWidth: CGFloat = 0.4
-    let characterLimit: Int = 10000
-
-    var body: some View {
-        TextEditor(text: $model.notes)
-            .frame(height: 197.0)
-            .font(.body)
-            .foregroundColor(.primary)
-            .focused($isFocused)
-            .padding(EdgeInsets(top: 3.0, leading: 6.0, bottom: 5.0, trailing: 0.0))
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius,
-                                        style: .continuous))
-            .onChange(of: model.notes) {
-                model.notes = String($0.prefix(characterLimit))
-            }
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: cornerRadius).stroke(Color.accentColor.opacity(0.5), lineWidth: 4).opacity(isFocused ? 1 : 0).scaleEffect(isFocused ? 1 : 1.04)
-                        .animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .stroke(Color(NSColor.textEditorBorderColor), lineWidth: borderWidth)
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(Color(NSColor.textEditorBackgroundColor))
-                }
-            )
-    }
 }
 
 private struct DatesView: View {

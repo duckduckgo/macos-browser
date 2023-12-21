@@ -64,7 +64,16 @@ final class BookmarkListViewController: NSViewController {
     }()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, treeController: treeController)
+        BookmarkOutlineViewDataSource(
+            contentMode: .bookmarksAndFolders,
+            treeController: treeController,
+            presentFaviconsFetcherOnboarding: { [weak self] in
+                guard let self, let window = self.view.window else {
+                    return
+                }
+                self.faviconsFetcherOnboarding?.presentOnboardingIfNeeded(in: window)
+            }
+        )
     }()
 
     private var selectedNodes: [BookmarkNode] {
@@ -73,6 +82,14 @@ final class BookmarkListViewController: NSViewController {
         }
         return [BookmarkNode]()
     }
+
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -313,7 +330,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: bookmark.urlObject, newTab: true)
+        WindowControllersManager.shared.show(url: bookmark.urlObject, source: .bookmark, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -324,7 +341,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         guard let urlObject = bookmark.urlObject else {
             return
         }
-        WindowsManager.openNewWindow(with: urlObject, isBurner: false)
+        WindowsManager.openNewWindow(with: urlObject, source: .bookmark, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -405,7 +422,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0, source: .bookmark), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
         tabCollection.append(tabs: tabs)
     }
 

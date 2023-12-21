@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1700746434940,
+    "version": 1703003631137,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -246,6 +246,9 @@
                     "domain": "metro.co.uk"
                 },
                 {
+                    "domain": "youtube.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -264,7 +267,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9ab9e1acdb6a8617c77109acc1e3943c"
+            "hash": "a1060783f1bf56f5cc661b994c9c9e56"
         },
         "autofill": {
             "exceptions": [
@@ -1030,12 +1033,37 @@
                     {
                         "domain": "flysas.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                    },
+                    {
+                        "domain": "facebook.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1641"
                     }
                 ]
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "d757f6509e9a9a20140c755ed0f21ea2"
+            "hash": "6ed03febdd780fd845cc1f7d6ce74ecf"
+        },
+        "dbp": {
+            "state": "enabled",
+            "features": {
+                "waitlistBetaActive": {
+                    "state": "enabled"
+                },
+                "waitlist": {
+                    "state": "enabled",
+                    "rollout": {
+                        "steps": [
+                            {
+                                "percent": 3
+                            }
+                        ]
+                    }
+                }
+            },
+            "exceptions": [],
+            "minSupportedVersion": "1.68.0",
+            "hash": "784ab72b62adf8b5c07f656f167a28d2"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -1196,6 +1224,10 @@
                         "type": "hide-empty"
                     },
                     {
+                        "selector": ".ad-unit-wrapper",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".column-ad",
                         "type": "hide-empty"
                     },
@@ -1281,6 +1313,10 @@
                     },
                     {
                         "selector": ".ad-banner-container",
+                        "type": "hide-empty"
+                    },
+                    {
+                        "selector": "#banner_ad",
                         "type": "hide-empty"
                     },
                     {
@@ -1372,6 +1408,10 @@
                         "type": "hide-empty"
                     },
                     {
+                        "selector": "[aria-label='advertisement']",
+                        "type": "hide-empty"
+                    },
+                    {
                         "selector": ".ads__inline",
                         "type": "closest-empty"
                     },
@@ -1413,10 +1453,6 @@
                     },
                     {
                         "selector": "[class*='container--ads']",
-                        "type": "hide-empty"
-                    },
-                    {
-                        "selector": "[class*='l-ad']",
                         "type": "hide-empty"
                     },
                     {
@@ -1624,6 +1660,56 @@
                 ],
                 "domains": [
                     {
+                        "domain": "10minutemail.com",
+                        "rules": [
+                            {
+                                "selector": "#secondary_ads",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#vi-smartbanner",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "3bmeteo.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": "#admasthead",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#ads_container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "9gag.com",
+                        "rules": [
+                            {
+                                "selector": ".billboard",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".inline-ad-container",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".salt-section",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#top-adhesion",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "abc.es",
                         "rules": [
                             {
@@ -1793,6 +1879,19 @@
                         ]
                     },
                     {
+                        "domain": "businessinsider.com",
+                        "rules": [
+                            {
+                                "selector": ".in-post-sticky",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".subnav-ad-layout",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "carandclassic.com",
                         "rules": [
                             {
@@ -1919,6 +2018,49 @@
                             {
                                 "selector": "[data-targeting]",
                                 "type": "override"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "dexerto.com",
+                        "rules": [
+                            {
+                                "selector": "#leaderboard-top-adhesion",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-cy='Ad']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-cy='VidazooPlayer']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "dpreview.com",
+                        "rules": [
+                            {
+                                "selector": ".ad-wrapper",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "drugs.com",
+                        "rules": [
+                            {
+                                "selector": ".topbanner-wrap",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".display-ad-wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='ddc-sidebox-ad-stacked-wrap']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -2169,6 +2311,35 @@
                         ]
                     },
                     {
+                        "domain": "gbnews.com",
+                        "rules": [
+                            {
+                                "selector": ".video-inbody",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".ad--billboard",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".ad--placeholder",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".stiky_sky",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "[position='sticky_banner']",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".ad-inbody",
+                                "type": "hide"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "getpocket.com",
                         "rules": [
                             {
@@ -2271,6 +2442,23 @@
                         ]
                     },
                     {
+                        "domain": "healthline.com",
+                        "rules": [
+                            {
+                                "selector": "[data-testid='header-leaderboard']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-testid='sticky-inline-ad']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-ad='true']",
+                                "type": "closest-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "hindustantimes.com",
                         "rules": [
                             {
@@ -2366,6 +2554,10 @@
                         "rules": [
                             {
                                 "selector": ".in-post-sticky",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".subnav-ad-layout",
                                 "type": "hide-empty"
                             }
                         ]
@@ -2722,6 +2914,35 @@
                         ]
                     },
                     {
+                        "domain": "pcgamesn.com",
+                        "rules": [
+                            {
+                                "selector": ".static_mpu_wrap",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#nn_astro_wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".ad-nextpage",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".legion_primiswrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".nn_mobile_mpu_wrapper",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".nn-sticky",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "petapixel.com",
                         "rules": [
                             {
@@ -3012,6 +3233,18 @@
                             {
                                 "selector": "[class*='Advert']",
                                 "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "startpagina.nl",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": ".ad-widget",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -3348,6 +3581,10 @@
                             {
                                 "selector": "[data-content='Advertisement']",
                                 "type": "hide-empty"
+                            },
+                            {
+                                "selector": "#YDC-Lead-Stack",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -3465,7 +3702,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "f7159b77a56eda4e99ca452521b4872b"
+            "hash": "8551081ffe228a4bef49deba3fe37b19"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3720,10 +3957,13 @@
                 },
                 {
                     "domain": "airbnb.com.br"
+                },
+                {
+                    "domain": "zoom.us"
                 }
             ],
             "state": "enabled",
-            "hash": "75e673ce365430652fc7cc896ed49a5f"
+            "hash": "82ebfddf791575ada285a49b7fdc71ca"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4247,6 +4487,11 @@
             "state": "disabled",
             "hash": "5e792dd491428702bc0104240fbce0ce"
         },
+        "sync": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "trackerAllowlist": {
             "state": "enabled",
             "settings": {
@@ -4277,6 +4522,16 @@
                                 "rule": "prebid.a-mo.net/a/c",
                                 "domains": [
                                     "aternos.org"
+                                ]
+                            }
+                        ]
+                    },
+                    "a2z.com": {
+                        "rules": [
+                            {
+                                "rule": "assets.brightspot.abebooks.a2z.com/",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -4527,7 +4782,17 @@
                             {
                                 "rule": "analytics.analytics-egain.com/onetag/",
                                 "domains": [
-                                    "support.norton.com"
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "appboycdn.com": {
+                        "rules": [
+                            {
+                                "rule": "js.appboycdn.com/web-sdk/3.1/appboy.min.js",
+                                "domains": [
+                                    "edx.org"
                                 ]
                             }
                         ]
@@ -4948,6 +5213,16 @@
                             }
                         ]
                     },
+                    "datadoghq-browser-agent.com": {
+                        "rules": [
+                            {
+                                "rule": "www.datadoghq-browser-agent.com/datadog-logs-v4.js",
+                                "domains": [
+                                    "shapermint.com"
+                                ]
+                            }
+                        ]
+                    },
                     "datadome.co": {
                         "rules": [
                             {
@@ -5032,6 +5307,7 @@
                                     "ah.nl",
                                     "nytimes.com",
                                     "rocketnews24.com",
+                                    "uwbadgers.com",
                                     "wunderground.com",
                                     "youmath.it"
                                 ]
@@ -5078,6 +5354,7 @@
                                     "asics.com",
                                     "brooklinen.com",
                                     "carters.com",
+                                    "otterbox.com",
                                     "seatosummit.com"
                                 ]
                             }
@@ -5133,6 +5410,16 @@
                                     "espn.com.mx",
                                     "espn.in",
                                     "espnfc.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "egain.cloud": {
+                        "rules": [
+                            {
+                                "rule": "egain.cloud/",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5221,6 +5508,12 @@
                                 ]
                             },
                             {
+                                "rule": "connect.facebook.net/en_UK/sdk.js",
+                                "domains": [
+                                    "globalcyclingnetwork.com"
+                                ]
+                            },
+                            {
                                 "rule": "facebook.net",
                                 "domains": [
                                     "nextdoor.com"
@@ -5258,8 +5551,7 @@
                             {
                                 "rule": "app.five9.com",
                                 "domains": [
-                                    "gmsdnv.com",
-                                    "machiassavings.bank"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5392,6 +5684,7 @@
                                 "domains": [
                                     "doterra.com",
                                     "easyjet.com",
+                                    "edx.org",
                                     "worlddutyfree.com"
                                 ]
                             },
@@ -5488,6 +5781,7 @@
                             {
                                 "rule": "imasdk.googleapis.com/js/sdkloader/ima3.js",
                                 "domains": [
+                                    "arkadium.com",
                                     "bloomberg.com",
                                     "gamak.tv",
                                     "games.washingtonpost.com",
@@ -5496,6 +5790,12 @@
                                     "paper-io.com",
                                     "rawstory.com",
                                     "usatoday.com"
+                                ]
+                            },
+                            {
+                                "rule": "storage.googleapis.com/code.snapengage.com/",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5515,6 +5815,9 @@
                             {
                                 "rule": "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
                                 "domains": [
+                                    "air-journal.fr",
+                                    "arcadepunks.com",
+                                    "daotranslate.com",
                                     "drakescans.com",
                                     "duden.de",
                                     "magicgameworld.com",
@@ -5554,7 +5857,8 @@
                             {
                                 "rule": "googletagmanager.com/gtag/js",
                                 "domains": [
-                                    "abril.com.br"
+                                    "abril.com.br",
+                                    "cosmicbook.news"
                                 ]
                             }
                         ]
@@ -5720,15 +6024,9 @@
                     "gorgias.chat": {
                         "rules": [
                             {
-                                "rule": "config.gorgias.chat",
+                                "rule": "gorgias.chat",
                                 "domains": [
-                                    "help.athleticbrewing.com"
-                                ]
-                            },
-                            {
-                                "rule": "assets.gorgias.chat",
-                                "domains": [
-                                    "help.athleticbrewing.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5838,6 +6136,16 @@
                                 "domains": [
                                     "cox.com",
                                     "cox.net"
+                                ]
+                            }
+                        ]
+                    },
+                    "inmobi.com": {
+                        "rules": [
+                            {
+                                "rule": "cmp.inmobi.com",
+                                "domains": [
+                                    "express.co.uk"
                                 ]
                             }
                         ]
@@ -5967,7 +6275,9 @@
                                 "rule": "www.klaviyo.com/media/js/public/klaviyo_subscribe.js",
                                 "domains": [
                                     "fearofgod.com",
-                                    "shopyalehome.com"
+                                    "restrap.com",
+                                    "shopyalehome.com",
+                                    "silhouetteu.com"
                                 ]
                             },
                             {
@@ -6093,6 +6403,16 @@
                                 "rule": "survey.medallia.com/",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "mediavine.com": {
+                        "rules": [
+                            {
+                                "rule": "scripts.mediavine.com/tags/cosmic-book-news.js",
+                                "domains": [
+                                    "cosmicbook.news"
                                 ]
                             }
                         ]
@@ -6235,6 +6555,16 @@
                                 "rule": "omtrdc.net",
                                 "domains": [
                                     "pizzahut.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "onesignal.com": {
+                        "rules": [
+                            {
+                                "rule": "cdn.onesignal.com/sdks/OneSignalSDK.js",
+                                "domains": [
+                                    "cosmicbook.news"
                                 ]
                             }
                         ]
@@ -6494,17 +6824,6 @@
                             }
                         ]
                     },
-                    "protection-widget.route.com": {
-                        "rules": [
-                            {
-                                "rule": "protection-widget.route.com/protect.core.js",
-                                "domains": [
-                                    "littleunicorn.com",
-                                    "olfactif.com"
-                                ]
-                            }
-                        ]
-                    },
                     "pubmatic.com": {
                         "rules": [
                             {
@@ -6602,7 +6921,7 @@
                             {
                                 "rule": "protection-widget.route.com/protect.core.js",
                                 "domains": [
-                                    "littleunicorn.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6809,6 +7128,16 @@
                             }
                         ]
                     },
+                    "tfaforms.net": {
+                        "rules": [
+                            {
+                                "rule": "tfaforms.net",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            }
+                        ]
+                    },
                     "theplatform.com": {
                         "rules": [
                             {
@@ -6876,7 +7205,15 @@
                             {
                                 "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js",
                                 "domains": [
-                                    "domesticandgeneral.com"
+                                    "azurestandard.com",
+                                    "domesticandgeneral.com",
+                                    "www.hotpoint.co.uk"
+                                ]
+                            },
+                            {
+                                "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js",
+                                "domains": [
+                                    "www.hotpoint.co.uk"
                                 ]
                             }
                         ]
@@ -6985,12 +7322,32 @@
                             }
                         ]
                     },
+                    "visualwebsiteoptimizer.com": {
+                        "rules": [
+                            {
+                                "rule": "dev.visualwebsiteoptimizer.com/j.php",
+                                "domains": [
+                                    "searchhudforeclosures.com"
+                                ]
+                            }
+                        ]
+                    },
                     "voxmedia.com": {
                         "rules": [
                             {
                                 "rule": "voxmedia.com/sso/unison_request",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "wovn.io": {
+                        "rules": [
+                            {
+                                "rule": "j.wovn.io/1",
+                                "domains": [
+                                    "tamashiiweb.com"
                                 ]
                             }
                         ]
@@ -7193,7 +7550,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "89f1bcc3af578886467432bfe855bb00"
+            "hash": "b6996e16fe1785f6d75cd6302da1f48e"
         },
         "trackingCookies1p": {
             "settings": {
@@ -7577,20 +7934,10 @@
                                 "value": "enabled"
                             }
                         ]
-                    },
-                    {
-                        "domain": "kia.com",
-                        "patchSettings": [
-                            {
-                                "op": "replace",
-                                "path": "/safariObject",
-                                "value": "disabled"
-                            }
-                        ]
                     }
                 ]
             },
-            "hash": "4e09593afeef6d21db6dbfef6e6a5ca7"
+            "hash": "1a7df2f0fbf4e5838e7c4b21627d2086"
         },
         "windowsPermissionUsage": {
             "exceptions": [],

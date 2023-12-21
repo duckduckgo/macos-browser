@@ -149,11 +149,15 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist &&  DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
+        #if SUBSCRIPTION
+        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+        #else
+        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
         }
+        #endif
     }
 #endif // DBP
 
@@ -340,7 +344,7 @@ final class MoreOptionsMenu: NSMenu {
                 .withImage(NSImage(named: "DBP-Icon"))
             items.append(dataBrokerProtectionItem)
 
-            DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
 
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
@@ -488,7 +492,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func manageAccountAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -521,7 +525,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 }

@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Subscription",
-    platforms: [ .macOS(.v11) ],
+    platforms: [ .macOS("11.4") ],
     products: [
         .library(
             name: "Subscription",
@@ -14,7 +14,8 @@ let package = Package(
     dependencies: [
         .package(path: "../Account"),
         .package(path: "../Purchase"),
-        .package(path: "../SwiftUIExtensions")
+        .package(path: "../SwiftUIExtensions"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "98.0.1"),
     ],
     targets: [
         .target(
@@ -26,9 +27,16 @@ let package = Package(
             ],
             resources: [
                 .process("Resources")
-            ]),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
         .testTarget(
             name: "SubscriptionTests",
-            dependencies: ["Subscription"]),
+            dependencies: ["Subscription"],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )

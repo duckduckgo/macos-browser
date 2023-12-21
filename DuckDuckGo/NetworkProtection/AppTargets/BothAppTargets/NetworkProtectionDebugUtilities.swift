@@ -38,10 +38,15 @@ final class NetworkProtectionDebugUtilities {
 
     private let loginItemsManager: LoginItemsManager
 
+    // MARK: - Settings
+
+    private let settings: VPNSettings
+
     // MARK: - Initializers
 
-    init(loginItemsManager: LoginItemsManager = .init()) {
+    init(loginItemsManager: LoginItemsManager = .init(), settings: VPNSettings = .init(defaults: .netP)) {
         self.loginItemsManager = loginItemsManager
+        self.settings = settings
 
         let ipcClient = TunnelControllerIPCClient(machServiceName: Bundle.main.vpnMenuAgentBundleId)
 
@@ -51,8 +56,14 @@ final class NetworkProtectionDebugUtilities {
 
     // MARK: - Debug commands for the extension
 
-    func resetAllState(keepAuthToken: Bool) async throws {
-        networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
+    func resetAllState(keepAuthToken: Bool) async {
+        let uninstalledSuccessfully = await networkProtectionFeatureDisabler.disable(keepAuthToken: keepAuthToken, uninstallSystemExtension: true)
+
+        guard uninstalledSuccessfully else {
+            return
+        }
+
+        settings.resetToDefaults()
 
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         DefaultWaitlistActivationDateStore().removeDates()
@@ -63,16 +74,16 @@ final class NetworkProtectionDebugUtilities {
     }
 
     func removeSystemExtensionAndAgents() async throws {
-        await networkProtectionFeatureDisabler.removeSystemExtension()
+        try await networkProtectionFeatureDisabler.removeSystemExtension()
         networkProtectionFeatureDisabler.disableLoginItems()
     }
 
     func sendTestNotificationRequest() async throws {
-        await ipcClient.debugCommand(.sendTestNotification)
+        try await ipcClient.debugCommand(.sendTestNotification)
     }
 
-    func expireRegistrationKeyNow() async {
-        await ipcClient.debugCommand(.expireRegistrationKey)
+    func expireRegistrationKeyNow() async throws {
+        try await ipcClient.debugCommand(.expireRegistrationKey)
     }
 }
 

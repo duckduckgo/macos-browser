@@ -49,12 +49,17 @@ struct MapperToUI {
     }
 
     func initialScanState(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIInitialScanState {
-        let totalScans = brokerProfileQueryData.reduce(0) { accumulator, element in
-            return accumulator + element.totalScans
+        // Total and current scans are misleading. The UI are counting this per broker and
+        // not by the total real cans that the app is doing.
+        let profileQueriesGroupedByBroker = Dictionary(grouping: brokerProfileQueryData, by: { $0.dataBroker.name })
+
+        let totalScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+            return accumulator + element.value.totalScans
         }
-        let currentScans = brokerProfileQueryData.reduce(0) { accumulator, element in
-            return accumulator + element.currentScans
+        let currentScans = profileQueriesGroupedByBroker.reduce(0) { accumulator, element in
+            return accumulator + element.value.currentScans
         }
+
         let scanProgress = DBPUIScanProgress(currentScans: currentScans, totalScans: totalScans)
         let matches = mapMatchesToUI(brokerProfileQueryData)
 
@@ -62,9 +67,11 @@ struct MapperToUI {
     }
 
     private func mapMatchesToUI(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> [DBPUIDataBrokerProfileMatch] {
-        let matches = brokerProfileQueryData.compactMap {
+        return brokerProfileQueryData.flatMap {
+            var profiles = [DBPUIDataBrokerProfileMatch]()
             for extractedProfile in $0.extractedProfiles where !$0.profileQuery.deprecated {
-                var profiles = [mapToUI($0.dataBroker, extractedProfile: extractedProfile)]
+                profiles.append(mapToUI($0.dataBroker, extractedProfile: extractedProfile))
+
                 if !$0.dataBroker.mirrorSites.isEmpty {
                     let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
                         if mirrorSite.shouldWeIncludeMirrorSite() {
@@ -75,14 +82,10 @@ struct MapperToUI {
                     }
                     profiles.append(contentsOf: mirrorSitesMatches)
                 }
-
-                return profiles
             }
 
-            return nil
+            return profiles
         }
-
-        return matches.flatMap { $0 }
     }
 
     func maintenanceScanState(_ brokerProfileQueryData: [BrokerProfileQueryData]) -> DBPUIScanAndOptOutMaintenanceState {
@@ -90,7 +93,7 @@ struct MapperToUI {
         var removedProfiles = [DBPUIDataBrokerProfileMatch]()
 
         let scansThatRanAtLeastOnce = brokerProfileQueryData.flatMap { $0.sitesScanned }
-        let sitesScanned = Dictionary.init(grouping: scansThatRanAtLeastOnce, by: { $0 }).count
+        let sitesScanned = Dictionary(grouping: scansThatRanAtLeastOnce, by: { $0 }).count
 
         brokerProfileQueryData.forEach {
             let dataBroker = $0.dataBroker
@@ -120,7 +123,7 @@ struct MapperToUI {
             }
         }
 
-        let completedOptOutsDictionary = Dictionary.init(grouping: removedProfiles, by: { $0.dataBroker })
+        let completedOptOutsDictionary = Dictionary(grouping: removedProfiles, by: { $0.dataBroker })
         let completedOptOuts = completedOptOutsDictionary.map { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
             DBPUIOptOutMatch(dataBroker: key, matches: value.count)
         }
@@ -138,7 +141,7 @@ struct MapperToUI {
     private func getLastScanInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                         currentDate: Date = Date(),
                                         format: String = "dd/MM/yyyy") -> DBUIScanDate {
-        let scansGroupedByLastRunDate = Dictionary.init(grouping: brokerProfileQueryData, by: { $0.scanOperationData.lastRunDate?.toFormat(format) })
+        let scansGroupedByLastRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.lastRunDate?.toFormat(format) })
         let closestScansBeforeToday = scansGroupedByLastRunDate
             .filter { $0.key != nil && $0.key!.toDate(using: format) < currentDate }
             .sorted { $0.key! < $1.key! }
@@ -151,7 +154,7 @@ struct MapperToUI {
     private func getNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                          currentDate: Date = Date(),
                                          format: String = "dd/MM/yyyy") -> DBUIScanDate {
-        let scansGroupedByPreferredRunDate = Dictionary.init(grouping: brokerProfileQueryData, by: { $0.scanOperationData.preferredRunDate?.toFormat(format) })
+        let scansGroupedByPreferredRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.preferredRunDate?.toFormat(format) })
         let closestScansAfterToday = scansGroupedByPreferredRunDate
             .filter { $0.key != nil && $0.key!.toDate(using: format) > currentDate }
             .sorted { $0.key! < $1.key! }
@@ -206,22 +209,6 @@ extension String {
 
 fileprivate extension BrokerProfileQueryData {
 
-    var totalScans: Int {
-        if profileQuery.deprecated {
-            return 0
-        } else {
-            return 1 + dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
-        }
-    }
-
-    var currentScans: Int {
-        if scanOperationData.lastRunDate != nil && !profileQuery.deprecated {
-            return 1 + dataBroker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
-        } else {
-            return 0
-        }
-    }
-
     var sitesScanned: [String] {
         if scanOperationData.lastRunDate != nil {
             let scanEvents = scanOperationData.scanStartedEvents()
@@ -241,6 +228,34 @@ fileprivate extension BrokerProfileQueryData {
         }
 
         return [String]()
+    }
+}
+
+fileprivate extension Array where Element == BrokerProfileQueryData {
+
+    var totalScans: Int {
+        guard let broker = self.first?.dataBroker else { return 0 }
+
+        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
+
+        if areAllQueriesDeprecated {
+            return 0
+        } else {
+            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        }
+    }
+
+    var currentScans: Int {
+        guard let broker = self.first?.dataBroker else { return 0 }
+
+        let areAllQueriesDeprecated = allSatisfy { $0.profileQuery.deprecated }
+        let didAllQueriesFinished = allSatisfy { $0.scanOperationData.lastRunDate != nil }
+
+        if areAllQueriesDeprecated || !didAllQueriesFinished {
+            return 0
+        } else {
+            return 1 + broker.mirrorSites.filter { $0.shouldWeIncludeMirrorSite() }.count
+        }
     }
 }
 

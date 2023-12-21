@@ -12,5 +12,7 @@
 	<string>$(MAIN_BUNDLE_IDENTIFIER)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
+	<key>DBP_APP_GROUP</key>
+	<string>$(DBP_APP_GROUP)</string>
 </dict>
 </plist>

@@ -5,14 +5,14 @@ import PackageDescription
 
 let package = Package(
     name: "Account",
-    platforms: [ .macOS(.v11) ],
+    platforms: [ .macOS("11.4") ],
     products: [
         .library(
             name: "Account",
             targets: ["Account"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "85.0.2"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "98.0.1"),
         .package(path: "../Purchase")
     ],
     targets: [
@@ -21,9 +21,16 @@ let package = Package(
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
                 .product(name: "Purchase", package: "Purchase")
-            ]),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
         .testTarget(
             name: "AccountTests",
-            dependencies: ["Account"]),
+            dependencies: ["Account"],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )
