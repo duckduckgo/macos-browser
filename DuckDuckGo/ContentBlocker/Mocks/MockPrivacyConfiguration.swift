@@ -62,7 +62,6 @@ extension DefaultInternalUserDecider {
 }
 
 final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
-    
     var embeddedConfigData: BrowserServicesKit.PrivacyConfigurationManager.ConfigurationData {
         fatalError("not implemented")
     }
