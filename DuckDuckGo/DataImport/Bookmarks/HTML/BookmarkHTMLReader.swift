@@ -26,14 +26,13 @@ struct HTMLImportedBookmarks {
 final class BookmarkHTMLReader {
 
     struct ImportError: DataImportError {
+        // !! do not change the order
+        // cases 2,3 and 6 are reserved for removed errors
         enum OperationType: Int {
             case parseXml = 0
             case validationBody = 1
-            // case validationH1
-            // case findTopLevelFolder
             case proceedToTopLevelFolder = 4
             case readFolder = 5
-            // case bookmarkRead
             case unknown = 7
         }
 
