@@ -51,8 +51,5 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
                 }
             }
         }
-        .alert(isPresented: $model.shouldShowErrorMessage) {
-            Alert(title: Text("Unable to turn on Sync"), message: Text(model.errorMessage ?? "An error occurred"), dismissButton: .default(Text(UserText.ok)))
-        }
     }
 }

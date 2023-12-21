@@ -36,6 +36,19 @@ public struct ManagementDialog: View {
     @ObservedObject public var model: ManagementDialogModel
     @ObservedObject public var recoveryCodeModel: RecoveryCodeViewModel
 
+    var errorTitle: String {
+        return model.syncErrorMessage?.type.title ?? "Sync Error"
+    }
+
+    var errorDescription: String {
+        guard let typeDescription = model.syncErrorMessage?.type.description,
+              let errorDescription = model.syncErrorMessage?.errorDescription
+        else {
+            return ""
+        }
+        return typeDescription + "\n" + errorDescription
+    }
+
     public init(model: ManagementDialogModel, recoveryCodeModel: RecoveryCodeViewModel = .init()) {
         self.model = model
         self.recoveryCodeModel = recoveryCodeModel
@@ -45,9 +58,11 @@ public struct ManagementDialog: View {
         content
             .alert(isPresented: $model.shouldShowErrorMessage) {
                 Alert(
-                    title: Text("Unable to turn on Sync"),
-                    message: Text(model.errorMessage ?? "An error occurred"),
-                    dismissButton: .default(Text(UserText.ok))
+                    title: Text(errorTitle),
+                    message: Text(errorDescription),
+                    dismissButton: .default(Text(UserText.ok)) {
+                        model.endFlow()
+                    }
                 )
             }
     }

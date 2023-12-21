@@ -37,8 +37,6 @@ final class HomePageViewController: NSViewController {
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
 
-    private weak var host: NSView?
-
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
@@ -53,12 +51,11 @@ final class HomePageViewController: NSViewController {
         fatalError("HomePageViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          bookmarkManager: BookmarkManager,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireViewModel: FireViewModel? = nil,
-          onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
+    init(tabCollectionViewModel: TabCollectionViewModel,
+         bookmarkManager: BookmarkManager,
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         fireViewModel: FireViewModel? = nil,
+         onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -66,14 +63,10 @@ final class HomePageViewController: NSViewController {
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
         self.onboardingViewModel = onboardingViewModel
 
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        refreshModelsOnAppBecomingActive()
-
+    override func loadView() {
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
@@ -93,11 +86,11 @@ final class HomePageViewController: NSViewController {
                 self?.view.makeMeFirstResponder()
             }
 
-        let host = NSHostingView(rootView: rootView)
-        host.frame = view.frame
-        view.addSubview(host)
-        self.host = host
+        self.view = NSHostingView(rootView: rootView)
+    }
 
+    override func viewDidLoad() {
+        refreshModelsOnAppBecomingActive()
         subscribeToBookmarks()
         subscribeToBurningData()
     }
@@ -115,11 +108,6 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
-    }
-
-    override func viewDidLayout() {
-        super.viewDidLayout()
-        host?.frame = self.view.frame
     }
 
     override func viewWillDisappear() {
@@ -256,32 +244,9 @@ final class HomePageViewController: NSViewController {
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
-        // swiftlint:disable force_cast
-        let windowController = NSStoryboard.homePage.instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
-        // swiftlint:enable force_cast
+        let addEditFavoriteViewController = AddEditFavoriteViewController.create(bookmark: bookmark)
 
-        guard let window = windowController.window as? AddEditFavoriteWindow else {
-            assertionFailure("HomePageViewController: Failed to present AddEditFavoriteWindowController")
-            return
-        }
-
-        guard let screen = window.screen else {
-            assertionFailure("HomePageViewController: No screen")
-            return
-        }
-
-        if let bookmark = bookmark {
-            window.addEditFavoriteViewController.edit(bookmark: bookmark)
-        }
-
-        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
-                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
-                                 width: AddEditFavoriteWindow.Size.width,
-                                 height: AddEditFavoriteWindow.Size.height)
-
-        view.window?.addChildWindow(window, ordered: .above)
-        window.setFrame(windowFrame, display: true)
-        window.makeKey()
+        self.beginSheet(addEditFavoriteViewController)
     }
 
     private var burningDataCancellable: AnyCancellable?
@@ -303,11 +268,5 @@ final class HomePageViewController: NSViewController {
                 self?.refreshModels()
             }
     }
-
-}
-
-fileprivate extension NSStoryboard {
-
-    static let homePage = NSStoryboard(name: "HomePage", bundle: .main)
 
 }

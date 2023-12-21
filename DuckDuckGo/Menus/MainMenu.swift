@@ -383,6 +383,7 @@ import Subscription
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateInternalUserItem()
         updateRemoteConfigurationInfo()
     }
 
@@ -534,6 +535,8 @@ import Subscription
 
     // MARK: - Debug
 
+    let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
+
     // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
@@ -593,6 +596,7 @@ import Subscription
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
+        debugMenu.addItem(internalUserItem)
         debugMenu.autoenablesItems = false
         return debugMenu
     }
@@ -623,6 +627,10 @@ import Subscription
         return menu
     }
 
+    private func updateInternalUserItem() {
+        internalUserItem.title = NSApp.delegateTyped.internalUserDecider.isInternalUser ? "Remove Internal User State" : "Set Internal User State"
+    }
+
     private func updateLoggingMenuItems() {
         guard let loggingMenu else { return }
 
@@ -635,8 +643,14 @@ import Subscription
     }
 
     private func updateRemoteConfigurationInfo() {
-        let dateString = DateFormatter.localizedString(from: ConfigurationManager.shared.lastUpdateTime, dateStyle: .short, timeStyle: .medium)
-        configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        var dateString: String
+        if let date = ConfigurationManager.shared.lastConfigurationInstallDate {
+            dateString = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+            configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        } else {
+            dateString = "Last Update Time: -"
+        }
+        configurationDateAndTimeMenuItem.title = dateString
         customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
     }
 

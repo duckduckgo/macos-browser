@@ -57,13 +57,13 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {
-        self.subscribeToFavoritesDisplayMode()
-    }
-
-    init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
-        self.bookmarkStore = bookmarkStore
-        self.faviconManagement = faviconManagement
+    init(bookmarkStore: BookmarkStore? = nil, faviconManagement: FaviconManagement? = nil) {
+        if let bookmarkStore {
+            self.bookmarkStore = bookmarkStore
+        }
+        if let faviconManagement {
+            self.faviconManagement = faviconManagement
+        }
         self.subscribeToFavoritesDisplayMode()
     }
 

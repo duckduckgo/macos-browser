@@ -21,6 +21,7 @@ import Combine
 import Persistence
 import SyncUI
 import XCTest
+import TestUtils
 @testable import BrowserServicesKit
 @testable import DDGSync
 @testable import DuckDuckGo_Privacy_Browser
@@ -136,10 +137,17 @@ final class SyncPreferencesTests: XCTestCase {
 }
 
 class MockDDGSyncing: DDGSyncing {
+
     let registeredDevices = [RegisteredDevice(id: "1", name: "Device 1", type: "desktop"), RegisteredDevice(id: "2", name: "Device 2", type: "mobile"), RegisteredDevice(id: "3", name: "Device 1", type: "desktop")]
     var disconnectCalled = false
 
     var dataProvidersSource: DataProvidersSource?
+
+    @Published var featureFlags: SyncFeatureFlags = .all
+
+    var featureFlagsPublisher: AnyPublisher<SyncFeatureFlags, Never> {
+        $featureFlags.eraseToAnyPublisher()
+    }
 
     @Published var authState: SyncAuthState = .inactive
 
@@ -151,13 +159,15 @@ class MockDDGSyncing: DDGSyncing {
 
     var scheduler: Scheduling
 
+    var syncDailyStats = SyncDailyStats(store: MockKeyValueStore())
+
     @Published var isSyncInProgress: Bool
 
     var isSyncInProgressPublisher: AnyPublisher<Bool, Never> {
         $isSyncInProgress.eraseToAnyPublisher()
     }
 
-    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling, isSyncInProgress: Bool) {
+    init(dataProvidersSource: DataProvidersSource? = nil, authState: SyncAuthState, account: SyncAccount? = nil, scheduler: Scheduling = CapturingScheduler(), isSyncInProgress: Bool) {
         self.dataProvidersSource = dataProvidersSource
         self.authState = authState
         self.account = account

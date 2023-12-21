@@ -1,5 +1,5 @@
 //
-//  TargetSourcesChecker.swift
+//  InputFilesChecker.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -44,7 +44,8 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("VPNMetadataCollector.swift", .source),
     .init("VPNFeedbackCategory.swift", .source),
     .init("VPNFeedbackSender.swift", .source),
-    .init("DuckDuckGoDBPBackgroundAgent.app", .unknown)
+    .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
+    .init("DataBrokerProtectionSubscriptionEventHandler.swift", .source)
 ]
 
 /**

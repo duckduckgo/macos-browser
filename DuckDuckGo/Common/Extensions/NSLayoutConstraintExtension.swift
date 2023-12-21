@@ -1,4 +1,7 @@
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//
+//  NSLayoutConstraintExtension.swift
+//
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,13 +16,14 @@
 //  limitations under the License.
 //
 
-#include "TestsTargetsBase.xcconfig"
+import AppKit
+import Foundation
 
-ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+extension NSLayoutConstraint {
 
-FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION
+    func priority(_ priority: Float) -> Self {
+        self.priority = .init(priority)
+        return self
+    }
 
-INFOPLIST_FILE = DuckDuckGoDBPTests/Info.plist
-PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.macos.browser.DuckDuckGoDBPTests
-
-TEST_HOST=$(BUILT_PRODUCTS_DIR)/DuckDuckGoDBP.app/Contents/MacOS/DuckDuckGoDBP
+}

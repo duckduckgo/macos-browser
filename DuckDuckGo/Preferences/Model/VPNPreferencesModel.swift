@@ -1,5 +1,5 @@
 //
-//  PrivacyPreferencesModel.swift
+//  VPNPreferencesModel.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -23,8 +23,12 @@ import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionUI
+import BrowserServicesKit
 
 final class VPNPreferencesModel: ObservableObject {
+
+    let shouldShowLocationItem: Bool
+    @Published var locationItem: VPNLocationPreferenceItemModel
 
     @Published var alwaysON = true
 
@@ -66,7 +70,8 @@ final class VPNPreferencesModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init(settings: VPNSettings = .init(defaults: .netP),
-         defaults: UserDefaults = .netP) {
+         defaults: UserDefaults = .netP,
+         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
         self.settings = settings
 
         connectOnLogin = settings.connectOnLogin
@@ -75,13 +80,23 @@ final class VPNPreferencesModel: ObservableObject {
         showInMenuBar = settings.showInMenuBar
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
+        locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
+        shouldShowLocationItem = featureFlagger.isFeatureOn(.vpnGeoswitching)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
+        subscribeToLocationSettingChanges()
     }
 
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
         defaults.networkProtectionOnboardingStatusPublisher
             .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToLocationSettingChanges() {
+        settings.selectedLocationPublisher
+            .map(VPNLocationPreferenceItemModel.init(selectedLocation:))
+            .assign(to: \.locationItem, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
