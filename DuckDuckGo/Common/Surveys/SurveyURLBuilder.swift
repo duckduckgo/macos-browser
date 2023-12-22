@@ -25,7 +25,7 @@ final class SurveyURLBuilder {
         case atb = "atb"
         case atbVariant = "var"
         case daysSinceActivated = "delta"
-        case macosVersion = "mv"
+        case macOSVersion = "mv"
         case appVersion = "ddgv"
         case hardwareModel = "mo"
         case lastDayActive = "da"
