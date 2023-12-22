@@ -478,7 +478,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </customView>
-                            <textField focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
+                            <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="le0-Hn-ZAC">
                                 <rect key="frame" x="359" y="8" width="8" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" refusesFirstResponder="YES" alignment="center" usesSingleLineMode="YES" id="rpt-TE-48N">
                                     <font key="font" metaFont="system"/>

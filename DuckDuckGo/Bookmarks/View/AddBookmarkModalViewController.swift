@@ -38,7 +38,7 @@ final class AddBookmarkModalViewController: NSViewController {
         let title: String?
 
         init?(_ tab: Tab) {
-            guard case let .url(url, credential: _, userEntered: _) = tab.content else {
+            guard case let .url(url, _, _) = tab.content else {
                 return nil
             }
             self.url = url
@@ -90,6 +90,8 @@ final class AddBookmarkModalViewController: NSViewController {
         updateWithCurrentTabWebsite()
         updateWithExistingBookmark()
         updateAddButton()
+        bookmarkTitleTextField.setAccessibilityIdentifier("Title Text Field")
+        urlTextField.setAccessibilityIdentifier("URL Text Field")
     }
 
     override func viewWillAppear() {

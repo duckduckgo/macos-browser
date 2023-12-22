@@ -23,7 +23,9 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
+        // Errors
         VStack(alignment: .leading, spacing: 16) {
+            syncUnavailableView()
             if model.isSyncBookmarksPaused {
                 syncPaused(for: .bookmarks)
             }
@@ -31,15 +33,16 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 syncPaused(for: .credentials)
             }
         }
-        .padding(.top, 20)
 
-        PreferencePaneSection(vericalPadding: 12) {
+        // Sync Enabled
+        PreferencePaneSection(verticalPadding: 12) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
                 .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
+        // Synced Devices
+        PreferencePaneSection(verticalPadding: 12) {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
@@ -48,27 +51,38 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
-            Text(UserText.syncNewDevice)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
-            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.recoveryCode ?? "")
-                .environmentObject(model)
-        }
-
-        PreferencePaneSection(vericalPadding: 12) {
+        // Options
+        PreferencePaneSection(verticalPadding: 12) {
             Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
+            Toggle(isOn: $model.isFaviconsFetchingEnabled) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(UserText.fetchFaviconsOptionTitle)
+                        Text(UserText.fetchFaviconsOptionCaption)
+                            .font(Const.Fonts.preferencePaneCaption)
+                            .foregroundColor(Color("BlackWhite60"))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.leading)
+                    }
+                    Spacer(minLength: 30)
+                }
+            }
+            .padding(.horizontal, 16)
+            .toggleStyle(.switch)
+            .padding(.vertical, 12)
+            .roundedBorder()
+            .frame(width: 513, alignment: .topLeading)
             Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                 HStack {
-                    IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
                     VStack(alignment: .leading, spacing: 8) {
                         Text(UserText.shareFavoritesOptionTitle)
-                            .font(Const.Fonts.preferencePaneOptionTitle)
                         Text(UserText.shareFavoritesOptionCaption)
                             .font(Const.Fonts.preferencePaneCaption)
                             .foregroundColor(Color("BlackWhite60"))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.leading)
                     }
                     Spacer(minLength: 30)
                 }
@@ -80,7 +94,8 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
+        // Recovery
+        PreferencePaneSection(verticalPadding: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(UserText.recovery)
                     .font(Const.Fonts.preferencePaneSectionHeader)
@@ -97,7 +112,8 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
+        // Turn Off and Delate Data
+        PreferencePaneSection(verticalPadding: 12) {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
@@ -123,28 +139,23 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return UserText.credentialsLimitExceededAction
             }
         }
-        PreferencePaneSection(vericalPadding: 16) {
-            HStack(alignment: .top, spacing: 8) {
-                Text("⚠️")
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(UserText.syncLimitExceededTitle)
-                        .bold()
-                    Text(description)
-                    Button(actionTitle) {
-                        switch itemType {
-                        case .bookmarks:
-                            model.manageBookmarks()
-                        case .credentials:
-                            model.manageLogins()
-                        }
-                    }
-                    .padding(.top, 8)
-                }
+        SyncWarningMessage(title: UserText.syncLimitExceededTitle, message: description, buttonTitle: actionTitle) {
+            switch itemType {
+            case .bookmarks:
+                model.manageBookmarks()
+            case .credentials:
+                model.manageLogins()
             }
-            .padding(.horizontal, 16)
         }
-        .frame(width: 512, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
+    }
+
+    @ViewBuilder
+    fileprivate func syncUnavailableView() -> some View {
+        if model.isDataSyncingAvailable {
+            EmptyView()
+        } else {
+            SyncWarningMessage(title: UserText.serviceUnavailable, message: UserText.warningSyncDisabled)
+        }
     }
 
     enum LimitedItemType {

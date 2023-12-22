@@ -46,34 +46,60 @@ internal class ChromiumDataImporter: DataImporter {
         return [.passwords, .bookmarks]
     }
 
-    /// Start import process. Can throw synchronously if pre-import checks fail (e.g. file access)
     func importData(types: Set<DataImport.DataType>) -> DataImportTask {
         .detachedWithProgress { updateProgress in
-            await self.importData(types: types, updateProgress: updateProgress)
+            do {
+                let result = try await self.importDataSync(types: types, updateProgress: updateProgress)
+                return result
+            } catch is CancellationError {
+            } catch {
+                assertionFailure("Only CancellationError should be thrown here")
+            }
+            return [:]
         }
     }
 
-    private func importData(types: Set<DataImport.DataType>, updateProgress: DataImportProgressCallback) async -> DataImportSummary {
+    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: @escaping DataImportProgressCallback) async throws -> DataImportSummary {
         var summary = DataImportSummary()
 
+        let dataTypeFraction = 1.0 / Double(types.count)
+
         if types.contains(.passwords), let loginImporter {
+            try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
+
             let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: profile.profileURL, source: source)
             let loginResult = loginReader.readLogins(modalWindow: nil)
 
-            let loginsSummary = loginResult.flatMap { logins in
+            let loginsSummary = try loginResult.flatMap { logins in
                 do {
-                    return try .success(loginImporter.importLogins(logins))
+                    return try .success(loginImporter.importLogins(logins) { count in
+                        try updateProgress(.importingPasswords(numberOfPasswords: count,
+                                                               fraction: dataTypeFraction * (0.5 + Double(count) / Double(logins.count))))
+                    })
+                } catch is CancellationError {
+                    throw CancellationError()
                 } catch {
                     return .failure(LoginImporterError(error: error))
                 }
             }
 
             summary[.passwords] = loginsSummary
+
+            try updateProgress(.importingPasswords(numberOfPasswords: try? loginResult.get().count, fraction: dataTypeFraction * 1.0))
         }
 
-        if types.contains(.bookmarks) {
+        let passwordsFraction: Double = types.contains(.passwords) ? 0.5 : 0.0
+        if types.contains(.bookmarks)
+            // don‘t proceed with bookmarks import on Keychain prompt denial
+            && (summary[.passwords]?.error as? ChromiumLoginReader.ImportError)?.type != .userDeniedKeychainPrompt {
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: nil, fraction: passwordsFraction + 0.0))
+
             let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: profile.profileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 0.5))
 
             let bookmarksSummary = bookmarkResult.map { bookmarks in
                 bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
@@ -84,6 +110,9 @@ internal class ChromiumDataImporter: DataImporter {
             }
 
             summary[.bookmarks] = bookmarksSummary.map { .init($0) }
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 1.0))
         }
 
         return summary

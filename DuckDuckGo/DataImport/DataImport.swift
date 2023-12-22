@@ -22,7 +22,7 @@ import PixelKit
 
 enum DataImport {
 
-    enum Source: CaseIterable, Equatable {
+    enum Source: String, RawRepresentable, CaseIterable, Equatable {
         case brave
         case chrome
         case chromium
@@ -148,7 +148,8 @@ enum DataImport {
 
     }
 
-    enum DataType: String, Hashable, CaseIterable {
+    enum DataType: String, Hashable, CaseIterable, CustomStringConvertible {
+
         case bookmarks
         case passwords
 
@@ -158,12 +159,30 @@ enum DataImport {
             case .passwords: UserText.importLoginsPasswords
             }
         }
+
+        var description: String { rawValue }
+
+        var importAction: DataImportAction {
+            switch self {
+            case .bookmarks: .bookmarks
+            case .passwords: .passwords
+            }
+        }
+
     }
 
     struct DataTypeSummary: Equatable {
         let successful: Int
         let duplicate: Int
         let failed: Int
+
+        var isEmpty: Bool {
+            self == .empty
+        }
+
+        static var empty: Self {
+            DataTypeSummary(successful: 0, duplicate: 0, failed: 0)
+        }
 
         init(successful: Int, duplicate: Int, failed: Int) {
             self.successful = successful
@@ -186,29 +205,39 @@ enum DataImport {
         let browser: ThirdPartyBrowser
         let profiles: [BrowserProfile]
 
+        typealias ProfileDataValidator = (BrowserProfile) -> () -> BrowserProfile.ProfileDataValidationResult?
+        private let validateProfileData: ProfileDataValidator
+
         var validImportableProfiles: [BrowserProfile] {
-            return profiles.filter { $0.validateProfileData()?.containsValidData == true }
+            return profiles.filter { validateProfileData($0)()?.containsValidData == true }
         }
 
-        init(browser: ThirdPartyBrowser, profiles: [BrowserProfile]) {
+        init(browser: ThirdPartyBrowser, profiles: [BrowserProfile], validateProfileData: @escaping ProfileDataValidator = BrowserProfile.validateProfileData) {
             self.browser = browser
             self.profiles = profiles
-        }
-
-        var shouldShowProfilePicker: Bool {
-            return validImportableProfiles.count > 1
+            self.validateProfileData = validateProfileData
         }
 
         var defaultProfile: BrowserProfile? {
+            let preferredProfileName: String?
             switch browser {
             case .brave, .chrome, .chromium, .coccoc, .edge, .opera, .operaGX, .vivaldi, .yandex:
-                return profiles.first { $0.profileName == Constants.chromiumDefaultProfileName } ?? profiles.first
+                preferredProfileName = Constants.chromiumDefaultProfileName
+                return validImportableProfiles.first { $0.profileName == Constants.chromiumDefaultProfileName } ?? validImportableProfiles.first ?? profiles.first
             case .firefox, .tor:
-                return profiles.first { $0.profileName == Constants.firefoxDefaultProfileName } ?? profiles.first
+                preferredProfileName = Constants.firefoxDefaultProfileName
             case .safari, .safariTechnologyPreview, .bitwarden, .lastPass, .onePassword7, .onePassword8:
-                return profiles.first
+                preferredProfileName = nil
             }
+            lazy var validImportableProfiles = self.validImportableProfiles
+            if let preferredProfileName,
+               let preferredProfile = validImportableProfiles.first(where: { $0.profileName == preferredProfileName }) {
+
+                return preferredProfile
+            }
+            return validImportableProfiles.first ?? profiles.first
         }
+
     }
 
     struct BrowserProfile: Comparable {
@@ -299,7 +328,7 @@ enum DataImport {
             let profileDirectoryContentsSet = Set(profileDirectoryContents)
 
             return .init(logins: validateLoginsData(profileDirectoryContents: profileDirectoryContentsSet),
-                    bookmarks: validateBookmarksData(profileDirectoryContents: profileDirectoryContentsSet))
+                         bookmarks: validateBookmarksData(profileDirectoryContents: profileDirectoryContentsSet))
         }
 
         private func validateLoginsData(profileDirectoryContents: Set<String>) -> ProfileDataItemValidationResult {
@@ -358,7 +387,14 @@ enum DataImport {
         }
 
         static func < (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
-            return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
+            // first sort by profiles folder name if multiple profiles folders are present (Chrome, Chrome Canary…)
+            let profilesDirName1 = lhs.profileURL.deletingLastPathComponent().lastPathComponent
+            let profilesDirName2 = rhs.profileURL.deletingLastPathComponent().lastPathComponent
+            if profilesDirName1 == profilesDirName2 {
+                return lhs.profileName.localizedCompare(rhs.profileName) == .orderedAscending
+            } else {
+                return profilesDirName1.localizedCompare(profilesDirName2) == .orderedAscending
+            }
         }
 
         static func == (lhs: DataImport.BrowserProfile, rhs: DataImport.BrowserProfile) -> Bool {
@@ -370,13 +406,30 @@ enum DataImport {
         }
     }
 
+    enum ErrorType: String, CustomStringConvertible, CaseIterable {
+        case noData
+        case decryptionError
+        case dataCorrupted
+        case keychainError
+        case other
+
+        var description: String { rawValue }
+    }
+
 }
 
-enum DataImportAction {
+enum DataImportAction: String, RawRepresentable {
     case bookmarks
-    case logins
+    case passwords
     case favicons
     case generic
+
+    init(_ type: DataImport.DataType) {
+        switch type {
+        case .bookmarks: self = .bookmarks
+        case .passwords: self = .passwords
+        }
+    }
 }
 
 protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters, LocalizedError {
@@ -385,6 +438,8 @@ protocol DataImportError: Error, CustomNSError, ErrorWithPixelParameters, Locali
     var action: DataImportAction { get }
     var type: OperationType { get }
     var underlyingError: Error? { get }
+
+    var errorType: DataImport.ErrorType { get }
 
 }
 extension DataImportError /* : CustomNSError */ {
@@ -437,6 +492,7 @@ protocol DataImporter {
 
     /// validate file access/encryption password requirement before starting import. Returns non-empty dictionary with failures if access validation fails.
     func validateAccess(for types: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]?
+    /// Start import process. Returns cancellable TaskWithProgress
     func importData(types: Set<DataImport.DataType>) -> DataImportTask
 
     func requiresKeychainPassword(for selectedDataTypes: Set<DataImport.DataType>) -> Bool
@@ -459,7 +515,7 @@ extension DataImporter {
 
 }
 
-enum DataImportResult<T> {
+enum DataImportResult<T>: CustomStringConvertible {
     case success(T)
     case failure(any DataImportError)
 
@@ -506,10 +562,10 @@ enum DataImportResult<T> {
     /// - Parameter transform: A closure that takes the success value of the instance.
     /// - Returns: A `Result` instance, either from the closure or the previous
     ///   `.failure`.
-    @inlinable public func flatMap<NewT>(_ transform: (T) -> DataImportResult<NewT>) -> DataImportResult<NewT> {
+    @inlinable public func flatMap<NewT>(_ transform: (T) throws -> DataImportResult<NewT>) rethrows -> DataImportResult<NewT> {
         switch self {
         case .success(let value):
-            switch transform(value) {
+            switch try transform(value) {
             case .success(let transformedValue):
                 return .success(transformedValue)
             case .failure(let error):
@@ -520,12 +576,21 @@ enum DataImportResult<T> {
         }
     }
 
+    var description: String {
+        switch self {
+        case .success(let value):
+            ".success(\(value))"
+        case .failure(let error):
+            ".failure(\(error))"
+        }
+    }
+
 }
 
 extension DataImportResult: Equatable where T: Equatable {
     static func == (lhs: DataImportResult<T>, rhs: DataImportResult<T>) -> Bool {
         switch lhs {
-        case .success(let value): 
+        case .success(let value):
             if case .success(value) = rhs {
                 true
             } else {
@@ -547,14 +612,14 @@ struct LoginImporterError: DataImportError {
     private let error: Error?
     private let _type: OperationType?
 
-    var action: DataImportAction { .logins }
+    var action: DataImportAction { .passwords }
 
     init(error: Error?, type: OperationType? = nil) {
         self.error = error
         self._type = type
     }
 
-    struct OperationType: RawRepresentable {
+    struct OperationType: RawRepresentable, Equatable {
         let rawValue: Int
 
         static let malformedCSV = OperationType(rawValue: -2)
@@ -592,6 +657,34 @@ struct LoginImporterError: DataImportError {
         default:
             return error
         }
+    }
+
+    var errorType: DataImport.ErrorType {
+        if case .malformedCSV = type {
+            return .dataCorrupted
+        }
+        if let secureStorageError = error as? SecureStorageError {
+            switch secureStorageError {
+            case .initFailed,
+                 .authError,
+                 .failedToOpenDatabase,
+                 .databaseError:
+                return .keychainError
+
+            case .keystoreError, .secError:
+                return .keychainError
+
+            case .authRequired,
+                 .invalidPassword,
+                 .noL1Key,
+                 .noL2Key,
+                 .duplicateRecord,
+                 .generalCryptoError,
+                 .encodingFailed:
+                return .decryptionError
+            }
+        }
+        return .other
     }
 
 }

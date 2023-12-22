@@ -19,6 +19,7 @@
 #if NETWORK_PROTECTION
 
 import BrowserServicesKit
+import Combine
 import Common
 import NetworkExtension
 import NetworkProtection
@@ -34,7 +35,9 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     private let featureDisabler: NetworkProtectionFeatureDisabling
     private let featureOverrides: WaitlistBetaOverriding
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
+    private let networkProtectionWaitlist = NetworkProtectionWaitlist()
     private let privacyConfigurationManager: PrivacyConfigurationManaging
+    private let defaults: UserDefaults
 
     var waitlistIsOngoing: Bool {
         isWaitlistEnabled && isWaitlistBetaActive
@@ -44,12 +47,14 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
          networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(),
          featureOverrides: WaitlistBetaOverriding = DefaultWaitlistBetaOverrides(),
          featureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler(),
+         defaults: UserDefaults = .netP,
          log: OSLog = .networkProtection) {
 
         self.privacyConfigurationManager = privacyConfigurationManager
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
         self.featureDisabler = featureDisabler
         self.featureOverrides = featureOverrides
+        self.defaults = defaults
     }
 
     /// Calculates whether Network Protection is visible.
@@ -61,6 +66,18 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
         isEasterEggUser || waitlistIsOngoing
+    }
+
+    /// Whether the user is fully onboarded
+    /// 
+    var isOnboarded: Bool {
+        defaults.networkProtectionOnboardingStatus == .completed
+    }
+
+    /// A publisher for the onboarding status
+    ///
+    var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> {
+        defaults.networkProtectionOnboardingStatusPublisher
     }
 
     /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).
@@ -77,7 +94,13 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     /// Waitlist users are users that have the waitlist enabled and active
     ///
     private var isWaitlistUser: Bool {
-        NetworkProtectionWaitlist().waitlistStorage.isWaitlistUser
+        networkProtectionWaitlist.waitlistStorage.isWaitlistUser
+    }
+
+    /// Waitlist users are users that have the waitlist enabled and active and are invited
+    ///
+    private var isInvitedWaitlistUser: Bool {
+        networkProtectionWaitlist.waitlistStorage.isWaitlistUser && networkProtectionWaitlist.waitlistStorage.isInvited
     }
 
     private var isWaitlistBetaActive: Bool {
@@ -107,7 +130,9 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     }
 
     func disableForAllUsers() {
-        featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        Task {
+            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        }
     }
 
     func disableForWaitlistUsers() {
@@ -115,7 +140,9 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
             return
         }
 
-        featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        Task {
+            await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
+        }
     }
 }
 

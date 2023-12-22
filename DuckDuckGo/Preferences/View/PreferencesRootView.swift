@@ -59,6 +59,12 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+
+#if NETWORK_PROTECTION
+                            case .vpn:
+                                VPNView(model: VPNPreferencesModel())
+#endif
+
 #if SUBSCRIPTION
                             case .subscription:
                                 makeSubscriptionView()
@@ -94,7 +100,7 @@ extension Preferences {
 #if SUBSCRIPTION
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }, manageSubscriptionInAppStore: {
                 NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
             }, openVPN: {
@@ -108,7 +114,7 @@ extension Preferences {
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 AccountManager().signInByRestoringPastPurchases()
             }, openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }, goToSyncPreferences: {
                 self.model.selectPane(.sync)
             })
@@ -123,8 +129,8 @@ extension Preferences {
 struct SyncView: View {
 
     var body: some View {
-        if let syncService = NSApp.delegateTyped.syncService {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        if let syncService = NSApp.delegateTyped.syncService, let syncDataProviders = NSApp.delegateTyped.syncDataProviders {
+            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService, syncBookmarksAdapter: syncDataProviders.bookmarksAdapter))
                 .onAppear {
                     requestSync()
                 }

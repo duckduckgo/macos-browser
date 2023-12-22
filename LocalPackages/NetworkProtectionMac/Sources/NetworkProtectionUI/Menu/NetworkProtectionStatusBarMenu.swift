@@ -48,7 +48,7 @@ public final class StatusBarMenu {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
-                menuItems: [MenuItem]) {
+                menuItems: @escaping () -> [MenuItem]) {
 
         self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)

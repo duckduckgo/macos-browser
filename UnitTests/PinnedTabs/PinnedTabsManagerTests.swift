@@ -129,6 +129,6 @@ class PinnedTabsManagerTests: XCTestCase {
 private extension Tab {
     @MainActor
     convenience init(_ urlString: String) {
-        self.init(content: .url(urlString.url!))
+        self.init(content: .url(urlString.url!, source: .link))
     }
 }

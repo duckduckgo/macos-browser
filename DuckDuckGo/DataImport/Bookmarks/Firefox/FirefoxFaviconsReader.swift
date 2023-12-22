@@ -35,6 +35,8 @@ final class FirefoxFaviconsReader {
         var action: DataImportAction { .favicons }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .other }
     }
 
     final class FirefoxFavicon: FetchableRecord {

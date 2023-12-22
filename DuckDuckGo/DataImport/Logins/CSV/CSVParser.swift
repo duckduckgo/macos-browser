@@ -28,6 +28,7 @@ struct CSVParser {
         var parser = Parser()
 
         for character in string {
+            try Task.checkCancellation()
             try parser.accept(character)
         }
 

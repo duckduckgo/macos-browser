@@ -34,7 +34,8 @@ struct RequestFilePermissionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("DuckDuckGo needs your permission to read the \(source.importSourceName) bookmarks file. Select the \(source.importSourceName) folder to import bookmarks.")
+            Text("DuckDuckGo needs your permission to read the \(source.importSourceName) bookmarks file. Select the \(source.importSourceName) folder to import bookmarks.",
+                 comment: "Data import warning that DuckDuckGo browser requires file reading permissions for another browser name (%1$@), and instruction to select its (same browser name - %2$@) bookmarks folder.")
             Button("Select \(source.importSourceName) Folder…") {
                 if let url = requestDataDirectoryPermission(url) {
                     callback(url)

@@ -122,7 +122,7 @@ class CSVImporterTests: XCTestCase {
 extension CSVImporter.ColumnPositions {
 
     init?(csvValues: [String]) {
-        self.init(csv: [csvValues, Array.init(repeating: "", count: csvValues.count)])
+        self.init(csv: [csvValues, Array(repeating: "", count: csvValues.count)])
     }
 
 }

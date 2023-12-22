@@ -75,15 +75,3 @@ struct EnableNetworkProtectionViewData: EnableWaitlistFeatureViewData {
 }
 
 #endif
-
-#if DBP
-
-struct EnableDataBrokerProtectionViewData: EnableWaitlistFeatureViewData {
-    var headerImageName: String = "DBP-JoinWaitlistHeader"
-    var title: String = UserText.dataBrokerProtectionWaitlistEnableTitle
-    var subtitle: String = UserText.dataBrokerProtectionWaitlistEnableSubtitle
-    var availabilityDisclaimer: String = UserText.dataBrokerProtectionWaitlistAvailabilityDisclaimer
-    var buttonConfirmLabel: String = UserText.dataBrokerProtectionWaitlistButtonGotIt
-}
-
-#endif

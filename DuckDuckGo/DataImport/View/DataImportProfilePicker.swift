@@ -22,29 +22,41 @@ struct DataImportProfilePicker: View {
 
     private let profiles: [DataImport.BrowserProfile]
     @Binding private var selectedProfile: DataImport.BrowserProfile?
+    private let shouldDisplayFolderName: Bool
 
     init(profileList: DataImport.BrowserProfileList?, selectedProfile: Binding<DataImport.BrowserProfile?>) {
-        self.profiles = profileList?.profiles ?? []
+        self.profiles = profileList?.validImportableProfiles ?? []
         self._selectedProfile = selectedProfile
+        shouldDisplayFolderName = Set(self.profiles.map {
+            $0.profileURL.deletingLastPathComponent()
+        }).count > 1
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if profiles.count > 1 {
-                Text("Select Profile:")
-                    .font(.headline)
+            Text("Select Profile:", comment: "Browser Profile picker title for Data Import")
+                .bold()
 
-                Picker(selection: Binding {
-                    selectedProfile.flatMap(profiles.firstIndex(of:)) ?? 0
-                } set: {
-                    selectedProfile = profiles[safe: $0]
-                }) {
-                    ForEach(profiles.indices, id: \.self) { idx in
+            Picker(selection: Binding {
+                selectedProfile.flatMap(profiles.firstIndex(of:)) ?? 0
+            } set: {
+                selectedProfile = profiles[safe: $0]
+            }) {
+                ForEach(profiles.indices, id: \.self) { idx in
+                    // display profiles folder name if multiple profiles folders are present (Chrome, Chrome Canary…)
+                    if shouldDisplayFolderName {
+                        Text(profiles[idx].profileName + "  ")
+                        + Text(profiles[idx].profileURL
+                            .deletingLastPathComponent().lastPathComponent)
+                            .font(.system(size: 10))
+                            .fontWeight(.light)
+                    } else {
                         Text(profiles[idx].profileName)
                     }
-                } label: {}
-                    .pickerStyle(MenuPickerStyle())
-            }
+                }
+            } label: {}
+                .pickerStyle(.menu)
+                .controlSize(.large)
         }
     }
 
@@ -53,15 +65,18 @@ struct DataImportProfilePicker: View {
 #Preview {
     DataImportProfilePicker(profileList: .init(browser: .chrome, profiles: [
         .init(browser: .chrome,
-              profileURL: URL(fileURLWithPath: "/test/Default Profile")),
+              profileURL: URL(fileURLWithPath: "/Chrome/Default Profile")),
         .init(browser: .chrome,
-              profileURL: URL(fileURLWithPath: "/test/Profile 1")),
+              profileURL: URL(fileURLWithPath: "/Chrome Dev/Profile 1")),
         .init(browser: .chrome,
-              profileURL: URL(fileURLWithPath: "/test/Profile 2")),
-    ]), selectedProfile: Binding {
+              profileURL: URL(fileURLWithPath: "/Chrome Canary/Profile 2")),
+    ], validateProfileData: { _ in { .init(logins: .available, bookmarks: .available) } }), selectedProfile: Binding {
         .init(browser: .chrome,
               profileURL: URL(fileURLWithPath: "/test/Profile 1"))
     } set: {
         print("Profile selected:", $0?.profileURL.lastPathComponent ?? "<nil>")
     })
+    .padding()
+    .frame(width: 512)
+    .font(.system(size: 13))
 }

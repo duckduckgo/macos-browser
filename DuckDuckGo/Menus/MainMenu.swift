@@ -383,6 +383,7 @@ import Subscription
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateInternalUserItem()
         updateRemoteConfigurationInfo()
     }
 
@@ -534,6 +535,8 @@ import Subscription
 
     // MARK: - Debug
 
+    let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
+
     // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
@@ -570,7 +573,7 @@ import Subscription
             NSMenuItem(title: "User Scripts") {
                 NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
             }
-            NSMenuItem(title: "Sync")
+            NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
 
 #if DBP
@@ -593,6 +596,7 @@ import Subscription
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
+        debugMenu.addItem(internalUserItem)
         debugMenu.autoenablesItems = false
         return debugMenu
     }
@@ -621,6 +625,10 @@ import Subscription
 
         self.loggingMenu = menu
         return menu
+    }
+
+    private func updateInternalUserItem() {
+        internalUserItem.title = NSApp.delegateTyped.internalUserDecider.isInternalUser ? "Remove Internal User State" : "Set Internal User State"
     }
 
     private func updateLoggingMenuItems() {

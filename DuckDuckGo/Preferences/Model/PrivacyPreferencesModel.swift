@@ -56,14 +56,14 @@ final class PrivacyPreferencesModel: ObservableObject {
 
     @MainActor
     func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
     }
 
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
         isGPCEnabled = privacySecurityPreferences.gpcEnabled
-        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled ?? false
+        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled
     }
 
     private let privacySecurityPreferences: PrivacySecurityPreferences

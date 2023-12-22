@@ -33,14 +33,14 @@ struct BrowserImportMoreInfoView: View {
             If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.
 
             Imported passwords are stored securely using encryption.
-            """)
+            """, comment: "Warning that Chromium data import would require entering system passwords.")
 
         case .firefox:
             Text("""
             You'll be asked to enter your Primary Password for \(source.importSourceName).
 
             Imported passwords are encrypted and only stored on this computer.
-            """)
+            """, comment: "Warning that Firefox-based browser name (%@) data import would require entering a Primary Password for the browser.")
 
         case .safari, .safariTechnologyPreview, .yandex, .csv, .bitwarden, .lastPass, .onePassword7, .onePassword8, .bookmarksHTML, .tor:
             fatalError("Unsupported source for more info")

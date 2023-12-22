@@ -1,5 +1,5 @@
 //
-//  LoginItem.swift
+//  LoginItem+DataBrokerProtection.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -22,7 +22,7 @@ import LoginItems
 
 extension LoginItem {
 
-    static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, log: .dbp)
+    static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, defaults: .dbp, log: .dbp)
 
 }
 

@@ -48,7 +48,7 @@ final class BookmarksHTMLImporterTests: XCTestCase {
     }
 
     func testWhenValidBookmarksFileIsLoadedThenBookmarksImportIsSuccessful() async {
-        underlyingBookmarkImporter.importBookmarks = { (_, _) in 
+        underlyingBookmarkImporter.importBookmarks = { (_, _) in
             .init(successful: 42, duplicates: 2, failed: 3)
         }
 

@@ -54,11 +54,19 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
             DispatchQueue.main.async {
                 let viewModel = WaitlistViewModel(waitlist: NetworkProtectionWaitlist(),
                                                   notificationPermissionState: state,
+                                                  showNotificationSuccessState: true,
                                                   termsAndConditionActionHandler: NetworkProtectionWaitlistTermsAndConditionsActionHandler(),
                                                   featureSetupHandler: NetworkProtectionWaitlistFeatureSetupHandler())
 
                 let viewController = WaitlistModalViewController(viewModel: viewModel, contentView: NetworkProtectionWaitlistRootView())
                 windowController.mainViewController.beginSheet(viewController) { _ in
+                    // If the user dismissed the waitlist flow without signing up, hide the button.
+                    var waitlist = NetworkProtectionWaitlist()
+                    if !waitlist.waitlistStorage.isOnWaitlist {
+                        waitlist.waitlistSignUpPromptDismissed = true
+                        NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
+                    }
+
                     completion?()
                 }
             }
@@ -85,7 +93,7 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
         guard let windowController = WindowControllersManager.shared.lastKeyMainWindowController else {
             return
         }
-        DailyPixel.fire(pixel: .dataBrokerProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistIntroDisplayed, frequency: .dailyAndCount)
 
         // This is a hack to get around an issue with the waitlist notification screen showing the wrong state while it animates in, and then
         // jumping to the correct state as soon as the animation is complete. This works around that problem by providing the correct state up front,
@@ -96,6 +104,7 @@ struct DataBrokerProtectionWaitlistViewControllerPresenter: WaitlistViewControll
             DispatchQueue.main.async {
                 let viewModel = WaitlistViewModel(waitlist: DataBrokerProtectionWaitlist(),
                                                   notificationPermissionState: state,
+                                                  showNotificationSuccessState: false,
                                                   termsAndConditionActionHandler: DataBrokerProtectionWaitlistTermsAndConditionsActionHandler(),
                                                   featureSetupHandler: DataBrokerProtectionWaitlistFeatureSetupHandler())
 

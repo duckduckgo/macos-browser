@@ -23,13 +23,17 @@ struct DataImportSourcePicker: View {
 
     @State private var viewModel: DataImportSourceViewModel
 
+    private let onSelectedSourceChanged: (DataImport.Source) -> Void
+
     private var importSources: [DataImport.Source?] {
         viewModel.importSources
     }
 
-    init(selectedSource: DataImport.Source,
+    init(importSources: [DataImport.Source],
+         selectedSource: DataImport.Source,
          onSelectedSourceChanged: @escaping (DataImport.Source) -> Void) {
-        self.viewModel = DataImportSourceViewModel(selectedSource: selectedSource, onSelectedSourceChanged: onSelectedSourceChanged)
+        self.viewModel = DataImportSourceViewModel(importSources: importSources, selectedSource: selectedSource)
+        self.onSelectedSourceChanged = onSelectedSourceChanged
     }
 
     var body: some View {
@@ -47,17 +51,20 @@ struct DataImportSourcePicker: View {
                 }
             }
         } label: {}
+            .pickerStyle(.menu)
+            .controlSize(.large)
             .onChange(of: viewModel.selectedSourceIndex) { idx in
                 guard let importSource = importSources[idx] else { return }
-                viewModel.onSelectedSourceChanged(importSource)
+                onSelectedSourceChanged(importSource)
             }
-            .pickerStyle(MenuPickerStyle())
     }
 
 }
 
 #Preview {
-    DataImportSourcePicker(selectedSource: .csv) {
+    DataImportSourcePicker(importSources: DataImport.Source.allCases, selectedSource: .csv) {
         print("selection:", $0)
     }
+    .padding()
+    .frame(width: 500)
 }

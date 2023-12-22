@@ -28,7 +28,7 @@ import SwiftUI
 @MainActor
 final class NetworkProtectionSimulateFailureMenu: NSMenu {
 
-    private let simulateControllerFailureMenuItem = NSMenuItem(title: "Enable NetP &gt; Controller Failure",
+    private let simulateControllerFailureMenuItem = NSMenuItem(title: "Enable NetP Controller Failure",
                                                                action: #selector(NetworkProtectionSimulateFailureMenu.simulateControllerFailure))
     private let simulateTunnelFailureMenuItem = NSMenuItem(title: "Tunnel Failure",
                                                            action: #selector(NetworkProtectionSimulateFailureMenu.simulateTunnelFailure))

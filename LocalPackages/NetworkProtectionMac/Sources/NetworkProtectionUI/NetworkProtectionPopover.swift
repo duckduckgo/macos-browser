@@ -48,7 +48,7 @@ public final class NetworkProtectionPopover: NSPopover {
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
-                         menuItems: [MenuItem]) {
+                         menuItems: @escaping () -> [MenuItem]) {
 
         self.statusReporter = statusReporter
 
@@ -67,7 +67,7 @@ public final class NetworkProtectionPopover: NSPopover {
     private func setupContentController(controller: TunnelController,
                                         onboardingStatusPublisher: OnboardingStatusPublisher,
                                         statusReporter: NetworkProtectionStatusReporter,
-                                        menuItems: [MenuItem]) {
+                                        menuItems: @escaping () -> [MenuItem]) {
 
         let model = NetworkProtectionStatusView.Model(controller: controller,
                                                       onboardingStatusPublisher: onboardingStatusPublisher,

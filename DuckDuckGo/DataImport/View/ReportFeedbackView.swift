@@ -22,50 +22,66 @@ struct ReportFeedbackView: View {
 
     @Binding var model: DataImportReportModel
 
-    private var title: LocalizedStringKey {
-        if model.retryNumber <= 1 {
-            "Please submit a report to help us fix the issue."
-        } else {
-            "That didn’t work either. Please submit a report to help us fix the issue."
-        }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-            Text(title)
-                .font(.headline)
-            Spacer().frame(height: 8)
+            {
+                if model.retryNumber <= 1 {
+                    Text("Please submit a report to help us fix the issue.",
+                         comment: "Data import failure Report dialog title.")
+                } else {
+                    Text("That didn’t work either. Please submit a report to help us fix the issue.",
+                         comment: "Data import failure Report dialog title containing a message that not only automatic data import has failed failed but manual browser data import didn‘t work either.")
+                }
+            }()
+                .bold()
+                .padding(.bottom, 8)
 
             VStack(alignment: .leading, spacing: 12) {
                 Text("""
                 The following information will be sent to DuckDuckGo. No personally identifiable information will be sent.
-                """)
+                """, comment: "Data import failure Report dialog subtitle about the data being collected with the report.")
 
-                InfoItemView("macOS version", model.osVersion)
-                InfoItemView("DuckDuckGo browser version", model.appVersion)
-                InfoItemView("The version of the browser you are trying to import from", model.importSourceDescription)
-                InfoItemView("Error message & code", model.error.localizedDescription)
-            }
-            Spacer().frame(height: 24)
-
-            ZStack(alignment: .top) {
-                EditableTextView(text: $model.text,
-                                 font: NSFont(name: "SF Pro Text", size: 13),
-                                 insets: NSSize(width: 11, height: 11))
-                .cornerRadius(6)
-                .frame(height: 114)
-                .shadow(radius: 1, x: 0, y: 1)
-
-                if model.text.isEmpty {
-                    HStack {
-                        Text("Add any details that you think may help us fix the problem")
-                            .font(.custom("SF Pro Text", size: 13))
-                            .foregroundColor(Color(.placeholderTextColor))
-                        Spacer()
-                    }.padding(EdgeInsets(top: 11, leading: 11, bottom: 0, trailing: 11))
+                InfoItemView(model.osVersion) {
+                    Text("macOS version", comment: "Data import failure Report dialog description of a report field providing user‘s macOS version")
+                }
+                InfoItemView(model.appVersion) {
+                    Text("DuckDuckGo browser version", comment: "Data import failure Report dialog description of a report field providing current DuckDuckGo Browser version")
+                }
+                InfoItemView(model.importSourceDescription) {
+                    Text("The version of the browser you are trying to import from", comment: "Data import failure Report dialog description of a report field providing version of a browser user is trying to import data from")
+                }
+                InfoItemView(model.error.localizedDescription) {
+                    Text("Error message & code", comment: "")
                 }
             }
+            .padding(.bottom, 24)
+
+            EditableTextView(text: $model.text,
+                             font: .systemFont(ofSize: 13),
+                             insets: NSSize(width: 7, height: 12),
+                             cornerRadius: 6,
+                             backgroundColor: .textBackgroundColor,
+                             textColor: .textColor,
+                             focusRingType: .exterior,
+                             isFocusedOnAppear: true)
+            .frame(height: 114)
+            .shadow(color: Color.addressBarShadow, radius: 1, x: 0, y: 1)
+            .overlay(
+                VStack(alignment: .leading) {
+                    HStack(alignment: .top) {
+                        Text("Add any details that you think may help us fix the problem",
+                             comment: "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem.")
+                        .foregroundColor(Color(.placeholderTextColor))
+                        .padding(.leading, 11)
+                        Spacer()
+                    }
+                    .padding(.top, 11)
+                    Spacer()
+                }
+                    .visibility(model.text.isEmpty ? .visible : .gone)
+                    .allowsHitTesting(false)
+            )
         }
     }
 
@@ -73,11 +89,11 @@ struct ReportFeedbackView: View {
 
 private struct InfoItemView: View {
 
-    let text: LocalizedStringKey
+    let text: () -> Text
     let data: String
     @State private var isPopoverVisible = false
 
-    init(_ text: LocalizedStringKey, _ data: String) {
+    init(_ data: String, text: @escaping () -> Text) {
         self.text = text
         self.data = data
     }
@@ -94,36 +110,44 @@ private struct InfoItemView: View {
                 Text(data).padding()
             }
 
-            Text(text)
+            text()
         }
     }
 
 }
 
-#Preview {
+#Preview { {
 
-    ReportFeedbackView(model: .constant(.init(importSource: .safari, importSourceVersion: UserAgent.safariVersion, error: {
-        enum ImportError: DataImportError {
-            enum OperationType: Int {
-                case imp
-            }
-
-            var type: OperationType { .imp }
-            var action: DataImportAction { .generic }
-            var underlyingError: Error? {
-                if case .err(let err) = self {
-                    return err
+    struct PreviewView: View {
+        @State var model = DataImportReportModel(importSource: .safari, importSourceVersion: UserAgent.safariVersion, error: {
+            enum ImportError: DataImportError {
+                enum OperationType: Int {
+                    case imp
                 }
-                return nil
+
+                var type: OperationType { .imp }
+                var action: DataImportAction { .generic }
+                var underlyingError: Error? {
+                    if case .err(let err) = self {
+                        return err
+                    }
+                    return nil
+                }
+
+                static var errorDomain: String { "ReportFeedbackPreviewError" }
+                var errorType: DataImport.ErrorType { .noData }
+
+                case err(Error)
             }
+            return ImportError.err(CocoaError(.fileReadUnknown))
+        }(), retryNumber: 1)
 
-            static var errorDomain: String { "ReportFeedbackPreviewError" }
-
-            case err(Error)
+        var body: some View {
+            ReportFeedbackView(model: $model)
+                .frame(width: 512 - 20)
+                .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
         }
-        return ImportError.err(CocoaError(.fileReadUnknown))
-    }(), retryNumber: 1)))
-        .frame(width: 512 - 20)
-        .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+    }
+    return PreviewView()
 
-}
+} ()}

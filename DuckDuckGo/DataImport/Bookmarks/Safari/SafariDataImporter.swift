@@ -16,14 +16,17 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 final class SafariDataImporter: DataImporter {
 
     @MainActor
-    static func requestDataDirectoryPermission(for dataDirectoryUrl: URL) -> URL? {
+    static func requestDataDirectoryPermission(for fileUrl: URL) -> URL? {
         let openPanel = NSOpenPanel()
-        openPanel.directoryURL = dataDirectoryUrl
+        // if file does not exist, grant permission to its parent folder
+        openPanel.directoryURL = fileUrl.deletingLastPathComponent()
+        openPanel.directoryURL = fileUrl
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false

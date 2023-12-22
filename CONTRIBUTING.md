@@ -27,7 +27,7 @@ We're always open to contributions from the community! There are different appro
 * If you're looking for a bug to work on, see the [Help Wanted](https://github.com/duckduckgo/macOS/issues?q=is%3Aissue+is%3Aopen+label%3A%22Help+Wanted%22) tag for a list of open issues.
 
 ### Style Guide
-We care about clean code. Refer to our [style guide](https://github.com/duckduckgo/iOS/blob/develop/styleguide/STYLEGUIDE.md).
+We care about clean code. Refer to our [style guide](https://github.com/duckduckgo/iOS/blob/main/styleguide/STYLEGUIDE.md).
 
 ### Commit Messages
 See Chris Beams' guide to writing good commit messages https://chris.beams.io/posts/git-commit/

@@ -117,7 +117,7 @@ extension DataImportAction: CustomStringConvertible {
     var description: String {
         switch self {
         case .bookmarks: return "bookmarks"
-        case .logins: return "logins"
+        case .passwords: return "logins"
         case .favicons: return "favicons"
         case .generic: return "generic"
         }

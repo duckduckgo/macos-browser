@@ -26,6 +26,8 @@ import ServiceManagement
 public struct LoginItem: Equatable, Hashable {
 
     let agentBundleID: String
+    private let launchInformation: LoginItemLaunchInformation
+    private let defaults: UserDefaults
     private let log: OSLog
 
     public var isRunning: Bool {
@@ -70,8 +72,10 @@ public struct LoginItem: Equatable, Hashable {
         return Status(SMAppService.loginItem(identifier: agentBundleID).status)
     }
 
-    public init(bundleId: String, log: OSLog = .disabled) {
+    public init(bundleId: String, defaults: UserDefaults, log: OSLog = .disabled) {
         self.agentBundleID = bundleId
+        self.defaults = defaults
+        self.launchInformation = LoginItemLaunchInformation(agentBundleID: bundleId, defaults: defaults)
         self.log = log
     }
 
@@ -83,6 +87,8 @@ public struct LoginItem: Equatable, Hashable {
         } else {
             SMLoginItemSetEnabled(agentBundleID as CFString, true)
         }
+
+        launchInformation.updateLastEnabledTimestamp()
     }
 
     public func disable() throws {

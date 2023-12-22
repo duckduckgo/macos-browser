@@ -49,10 +49,6 @@ enum ThirdPartyBrowser: CaseIterable {
     case onePassword7
     case onePassword8
 
-    static var installedBrowsers: [ThirdPartyBrowser] {
-        return allCases.filter(\.isInstalled)
-    }
-
     // swiftlint:disable:next cyclomatic_complexity
     static func browser(for source: DataImport.Source) -> ThirdPartyBrowser? {
         switch source {
@@ -196,11 +192,14 @@ enum ThirdPartyBrowser: CaseIterable {
 
     func browserProfiles(applicationSupportURL: URL? = nil) -> DataImport.BrowserProfileList {
         var potentialProfileURLs: [URL] {
-            guard let profilePath = profilesDirectory(applicationSupportURL: applicationSupportURL) else { return [] }
-            let potentialProfileURLs = (try? FileManager.default.contentsOfDirectory(at: profilePath,
-                                                                                     includingPropertiesForKeys: nil,
-                                                                                     options: [.skipsHiddenFiles]).filter(\.hasDirectoryPath)) ?? []
-            return potentialProfileURLs + [profilePath]
+            let fm = FileManager()
+            let profilesDirectories = self.profilesDirectories(applicationSupportURL: applicationSupportURL)
+            return profilesDirectories.reduce(into: []) { result, profilesDir in
+                result.append(contentsOf: (try? fm.contentsOfDirectory(at: profilesDir,
+                                                                       includingPropertiesForKeys: nil,
+                                                                       options: [.skipsHiddenFiles])
+                    .filter(\.hasDirectoryPath)) ?? [])
+            } + profilesDirectories
         }
 
         let profiles: [DataImport.BrowserProfile]
@@ -208,7 +207,7 @@ enum ThirdPartyBrowser: CaseIterable {
         case .safari, .safariTechnologyPreview:
             // Safari is an exception, as it may need permissions granted before being able to read the contents of the profile path. To be safe,
             // return the profile anyway and check the file system permissions when preparing to import.
-            guard let profileURL = profilesDirectory(applicationSupportURL: applicationSupportURL) else {
+            guard let profileURL = profilesDirectories(applicationSupportURL: applicationSupportURL).first else {
                 assertionFailure("Unexpected nil profileURL for Safari")
                 profiles = []
                 break
@@ -256,23 +255,28 @@ enum ThirdPartyBrowser: CaseIterable {
 
     // Returns the URL to the profiles for a given browser. This directory will contain a list of directories, each representing a profile.
     // swiftlint:disable:next cyclomatic_complexity
-    func profilesDirectory(applicationSupportURL: URL? = nil) -> URL? {
+    func profilesDirectories(applicationSupportURL: URL? = nil) -> [URL] {
         let applicationSupportURL = applicationSupportURL ?? URL.nonSandboxApplicationSupportDirectoryURL
-        switch self {
-        case .brave: return applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")
-        case .chrome: return applicationSupportURL.appendingPathComponent("Google/Chrome/")
-        case .chromium: return applicationSupportURL.appendingPathComponent("Chromium/")
-        case .coccoc: return  applicationSupportURL.appendingPathComponent("Coccoc/")
-        case .edge: return applicationSupportURL.appendingPathComponent("Microsoft Edge/")
-        case .firefox: return applicationSupportURL.appendingPathComponent("Firefox/Profiles/")
-        case .opera: return applicationSupportURL.appendingPathComponent("com.operasoftware.Opera/")
-        case .operaGX: return applicationSupportURL.appendingPathComponent("com.operasoftware.OperaGX/")
-        case .safari: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")
-        case .safariTechnologyPreview: return URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("SafariTechnologyPreview/")
-        case .tor: return applicationSupportURL.appendingPathComponent("TorBrowser-Data/Browser/")
-        case .vivaldi: return applicationSupportURL.appendingPathComponent("Vivaldi/")
-        case .yandex: return applicationSupportURL.appendingPathComponent("Yandex/YandexBrowser/")
-        case .bitwarden, .lastPass, .onePassword7, .onePassword8: return nil
+        return switch self {
+        case .brave: [applicationSupportURL.appendingPathComponent("BraveSoftware/Brave-Browser/")]
+        case .chrome: [
+            applicationSupportURL.appendingPathComponent("Google/Chrome/"),
+            applicationSupportURL.appendingPathComponent("Google/Chrome Beta/"),
+            applicationSupportURL.appendingPathComponent("Google/Chrome Dev/"),
+            applicationSupportURL.appendingPathComponent("Google/Chrome Canary/"),
+        ]
+        case .chromium: [applicationSupportURL.appendingPathComponent("Chromium/")]
+        case .coccoc:  [applicationSupportURL.appendingPathComponent("Coccoc/")]
+        case .edge: [applicationSupportURL.appendingPathComponent("Microsoft Edge/")]
+        case .firefox: [applicationSupportURL.appendingPathComponent("Firefox/Profiles/")]
+        case .opera: [applicationSupportURL.appendingPathComponent("com.operasoftware.Opera/")]
+        case .operaGX: [applicationSupportURL.appendingPathComponent("com.operasoftware.OperaGX/")]
+        case .safari: [URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("Safari/")]
+        case .safariTechnologyPreview: [URL.nonSandboxLibraryDirectoryURL.appendingPathComponent("SafariTechnologyPreview/")]
+        case .tor: [applicationSupportURL.appendingPathComponent("TorBrowser-Data/Browser/")]
+        case .vivaldi: [applicationSupportURL.appendingPathComponent("Vivaldi/")]
+        case .yandex: [applicationSupportURL.appendingPathComponent("Yandex/YandexBrowser/")]
+        case .bitwarden, .lastPass, .onePassword7, .onePassword8: []
         }
     }
 
