@@ -65,27 +65,27 @@ final class SurveyURLBuilder {
             switch parameter {
             case .atb:
                 if let atb = statisticsStore.atb {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: atb))
+                    queryItems.append(queryItem(parameter: parameter, value: atb))
                 }
             case .atbVariant:
                 if let variant = statisticsStore.variant {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: variant))
+                    queryItems.append(queryItem(parameter: parameter, value: variant))
                 }
             case .daysSinceActivated:
                 if let daysSinceActivation {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: String(describing: daysSinceActivation)))
+                    queryItems.append(queryItem(parameter: parameter, value: daysSinceActivation))
                 }
             case .macOSVersion:
-                queryItems.append(URLQueryItem(name: parameter.rawValue, value: operatingSystemVersion))
+                queryItems.append(queryItem(parameter: parameter, value: operatingSystemVersion))
             case .appVersion:
-                queryItems.append(URLQueryItem(name: parameter.rawValue, value: appVersion))
+                queryItems.append(queryItem(parameter: parameter, value: appVersion))
             case .hardwareModel:
-                if let hardwareModel = hardwareModel?.addingPercentEncoding(withAllowedCharacters: .alphanumerics) {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: hardwareModel))
+                if let hardwareModel = hardwareModel {
+                    queryItems.append(queryItem(parameter: parameter, value: hardwareModel))
                 }
             case .lastDayActive:
                 if let daysSinceLastActive {
-                    queryItems.append(URLQueryItem(name: parameter.rawValue, value: String(describing: daysSinceLastActive)))
+                    queryItems.append(queryItem(parameter: parameter, value: daysSinceLastActive))
                 }
             }
         }
@@ -93,6 +93,15 @@ final class SurveyURLBuilder {
         components.queryItems = queryItems
 
         return components.url
+    }
+
+    private func queryItem(parameter: SurveyURLParameters, value: String) -> URLQueryItem {
+        let sanitizedValue = value.addingPercentEncoding(withAllowedCharacters: .alphanumerics)
+        return URLQueryItem(name: parameter.rawValue, value: sanitizedValue)
+    }
+
+    private func queryItem(parameter: SurveyURLParameters, value: Int) -> URLQueryItem {
+        return URLQueryItem(name: parameter.rawValue, value: String(describing: value))
     }
 
 }
