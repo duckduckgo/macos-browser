@@ -27,6 +27,10 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 #endif
 
+#if SUBSCRIPTION
+import SubscriptionUI
+#endif
+
 // swiftlint:disable:next type_body_length
 final class NavigationBarViewController: NSViewController {
 
@@ -1026,8 +1030,8 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
 #if SUBSCRIPTION
-    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu) {
-        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .subscription)
+    func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
+        WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
     }
 #endif
 

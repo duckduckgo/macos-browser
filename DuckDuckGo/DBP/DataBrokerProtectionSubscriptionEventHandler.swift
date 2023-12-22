@@ -18,15 +18,15 @@
 #if DBP && SUBSCRIPTION
 
 import Foundation
-import Account
+import Subscription
 import DataBrokerProtection
 
 final class DataBrokerProtectionSubscriptionEventHandler {
 
-    private let accountManager: Account.AccountManaging
+    private let accountManager: Subscription.AccountManaging
     private let authRepository: AuthenticationRepository
 
-    init(accountManager: Account.AccountManaging = Account.AccountManager(),
+    init(accountManager: Subscription.AccountManaging = Subscription.AccountManager(),
          authRepository: AuthenticationRepository = KeychainAuthenticationData()) {
         self.accountManager = accountManager
         self.authRepository = authRepository
@@ -38,7 +38,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard let token = accountManager.token else {
+        guard let token = accountManager.accessToken else {
             Pixel.fire(.dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn)
             assertionFailure("[DBP Subscription] AccountManager signed in but token could not be retrieved")
             return
