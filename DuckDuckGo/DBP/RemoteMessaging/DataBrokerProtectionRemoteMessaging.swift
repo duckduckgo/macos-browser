@@ -105,13 +105,12 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
         }
     }
 
-    /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
+    /// Uses the "days since DBP activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
     func presentableRemoteMessages() -> [DataBrokerProtectionRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
         let possibleMessages: [DataBrokerProtectionRemoteMessage] = messageStorage.storedMessages()
 
-        // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
-        // has used Network Protection for.
+        // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user has used DBP for.
         let filteredMessages = possibleMessages.filter { message in
 
             // Don't show messages that have already been dismissed. If you need to show the same message to a user again,
@@ -120,7 +119,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
                 return false
             }
 
-            // First, check messages that require a number of days of NetP usage
+            // First, check messages that require a number of days of DBP usage
             if let requiredDaysSinceActivation = message.daysSinceDataBrokerProtectionEnabled,
                let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {
@@ -130,12 +129,12 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
                 }
             }
 
-            // Next, check if the message requires access to NetP but it's not visible:
+            // Next, check if the message requires access to DBP but it's not visible:
             if message.requiresDataBrokerProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() { // TODO
                 return false
             }
 
-            // Finally, check if the message requires NetP usage, and check if the user has used it at all:
+            // Finally, check if the message requires DBP usage, and check if the user has used it at all:
             if message.requiresDataBrokerProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil { // TODO
                 return false
             }
