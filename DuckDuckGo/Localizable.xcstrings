@@ -8186,6 +8186,42 @@
         }
       }
     },
+    "subscription.progress.view.completing.purchase" : {
+      "comment" : "Progress view title when completing the purchase",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Completing purchase..."
+          }
+        }
+      }
+    },
+    "subscription.progress.view.purchasing.subscription" : {
+      "comment" : "Progress view title when starting the purchase",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Purchase in progress..."
+          }
+        }
+      }
+    },
+    "subscription.progress.view.restoring.subscription" : {
+      "comment" : "Progress view title when restoring past subscription purchase",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Restoring subscription..."
+          }
+        }
+      }
+    },
     "Substitutions" : {
       "comment" : "Main Menu Edit item"
     },
