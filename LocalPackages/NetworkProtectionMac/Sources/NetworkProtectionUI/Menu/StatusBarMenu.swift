@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionStatusBarMenu.swift
+//  StatusBarMenu.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -24,8 +24,11 @@ import NetworkProtection
 
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///
-public final class StatusBarMenu {
+@objc
+public final class StatusBarMenu: NSObject {
     public typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
+
+    private let model: StatusBarMenuModel
 
     private let statusItem: NSStatusItem
     private let popover: NetworkProtectionPopover
@@ -43,37 +46,42 @@ public final class StatusBarMenu {
     ///     - statusItem: (meant for testing) this allows us to inject our own status `NSStatusItem` to make automated testing easier..
     ///
     @MainActor
-    public init(statusItem: NSStatusItem? = nil,
+    public init(model: StatusBarMenuModel,
+                statusItem: NSStatusItem? = nil,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
                 menuItems: @escaping () -> [MenuItem]) {
 
-        self.statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        self.model = model
+        let statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        self.statusItem = statusItem
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)
 
         popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
         popover.behavior = .transient
 
-        self.statusItem.button?.image = .image(for: iconPublisher.icon)
-        self.statusItem.button?.target = self
-        self.statusItem.button?.action = #selector(statusBarButtonTapped)
+        super.init()
+
+        statusItem.button?.image = .image(for: iconPublisher.icon)
+        statusItem.button?.target = self
+        statusItem.button?.action = #selector(statusBarButtonTapped)
+        statusItem.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
 
         subscribeToIconUpdates()
     }
 
     @objc
     private func statusBarButtonTapped() {
-        if popover.isShown {
-            popover.close()
-        } else {
-            guard let button = statusItem.button else {
-                return
-            }
+        let isRightClick = NSApp.currentEvent?.type == .rightMouseUp
 
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
+        guard !isRightClick else {
+            showContextMenu()
+            return
         }
+
+        togglePopover()
     }
 
     private func subscribeToIconUpdates() {
@@ -85,6 +93,36 @@ public final class StatusBarMenu {
         }
     }
 
+    // MARK: - Popover
+
+    private func togglePopover() {
+        if popover.isShown {
+            popover.close()
+        } else {
+            guard let button = statusItem.button else {
+                return
+            }
+
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
+        }
+    }
+
+    // MARK: - Context
+
+    private func showContextMenu() {
+        if popover.isShown {
+            popover.close()
+        }
+
+        let menu = NSMenu()
+        menu.delegate = self
+        menu.items = model.contextMenuItems
+
+        menu.popUp(positioning: nil,
+                   at: .zero,
+                   in: statusItem.button)
+    }
+
     // MARK: - Showing & Hiding the menu
 
     public func show() {
@@ -93,5 +131,14 @@ public final class StatusBarMenu {
 
     public func hide() {
         statusItem.isVisible = false
+    }
+}
+
+extension StatusBarMenu: NSMenuDelegate {
+    public func menuDidClose(_ menu: NSMenu) {
+        // We need to remove the context menu when it's closed because otherwise
+        // macOS will bypass our custom click-handling code and will proceed directly
+        // to always showing the context menu (ignoring if it's a left or right click).
+        statusItem.menu = nil
     }
 }
