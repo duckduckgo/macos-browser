@@ -74,10 +74,6 @@ extension NSColor {
         NSColor(named: "FindInPageFocusedBackgroundColor")!
     }
 
-    static var inactiveSearchBarBackground: NSColor {
-        NSColor(named: "InactiveSearchBarBackground")!
-    }
-
     static var suggestionTextColor: NSColor {
         NSColor(named: "SuggestionTextColor")!
     }
@@ -137,14 +133,6 @@ extension NSColor {
     static var dialogPanelBackgroundColor: NSColor {
         NSColor(named: "DialogPanelBackground")!
     }
-
-    static let bookmarkFilledTint = NSColor(named: "BookmarkFilledTint")!
-
-    static let bookmarkRepresentingColor1 = NSColor(named: "BookmarkRepresentingColor1")!
-    static let bookmarkRepresentingColor2 = NSColor(named: "BookmarkRepresentingColor2")!
-    static let bookmarkRepresentingColor3 = NSColor(named: "BookmarkRepresentingColor3")!
-    static let bookmarkRepresentingColor4 = NSColor(named: "BookmarkRepresentingColor4")!
-    static let bookmarkRepresentingColor5 = NSColor(named: "BookmarkRepresentingColor5")!
 
     static var buttonMouseDownColor: NSColor {
         NSColor(named: "ButtonMouseDownColor")!

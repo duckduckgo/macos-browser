@@ -33,14 +33,13 @@ extension NSOpenPanel {
         return panel
     }
 
-    static func filePanel(allowedExtension: String) -> NSOpenPanel {
-        let panel = NSOpenPanel()
+    convenience init(allowedFileTypes: [UTType], directoryURL: URL? = nil) {
+        self.init()
 
-        panel.directoryURL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
-        panel.canChooseFiles = true
-        panel.allowedContentTypes = UTType(filenameExtension: allowedExtension).map { [$0] } ?? []
-        panel.canChooseDirectories = false
-
-        return panel
+        self.directoryURL = directoryURL
+        canChooseFiles = true
+        allowedContentTypes = allowedFileTypes
+        canChooseDirectories = false
     }
+
 }

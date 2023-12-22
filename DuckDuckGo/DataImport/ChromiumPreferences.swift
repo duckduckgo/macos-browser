@@ -1,5 +1,5 @@
 //
-//  ChromePreferences.swift
+//  ChromiumPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,28 +18,45 @@
 
 import AppKit
 
-struct ChromePreferences: Decodable {
+struct ChromiumPreferences: Decodable {
 
     struct AccountInfo: Decodable {
         let email: String?
         let fullName: String?
     }
     struct Profile: Decodable {
-        let name: String
+        let name: String?
         let createdByVersion: String?
+    }
+    struct Extensions: Decodable {
+        let lastChromeVersion: String?
+        let lastOperaVersion: String?
+    }
+
+    enum Constants {
+        static let chromiumPreferencesFileName = "Preferences"
     }
 
     let accountInfo: [AccountInfo]?
     let profile: Profile
 
+    let extensions: Extensions?
+
     init(from data: Data) throws {
-        var decoder = JSONDecoder()
+        let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         self = try decoder.decode(Self.self, from: data)
     }
 
-    var profileName: String {
+    init(profileURL: URL, fileStore: FileStore = FileManager.default) throws {
+        guard let preferencesData = fileStore.loadData(at: profileURL.appendingPathComponent(Constants.chromiumPreferencesFileName)) else {
+            throw CocoaError(.fileReadUnknown)
+        }
+        try self.init(from: preferencesData)
+    }
+
+    var profileName: String? {
         for account in accountInfo ?? [] {
             switch (account.fullName, account.email) {
             case (.some(let fullName), .some(let email)):
@@ -52,6 +69,12 @@ struct ChromePreferences: Decodable {
             }
         }
         return profile.name
+    }
+
+    var appVersion: String? {
+        // profile.createdByVersion updated on Chrome launch;
+        // if it‘s missing - check extensions.last_chrome_version or last_opera_version - for Opera[GX]
+        profile.createdByVersion ?? extensions?.lastChromeVersion ?? extensions?.lastOperaVersion
     }
 
 }
