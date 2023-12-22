@@ -18,7 +18,10 @@
 
 import Foundation
 import SwiftUI
+
+#if SUBSCRIPTION
 import Subscription
+#endif
 
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
