@@ -59,7 +59,10 @@ public final class StatusBarMenu: NSObject {
         self.statusItem = statusItem
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: statusReporter, iconProvider: iconProvider)
 
-        popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
+        popover = NetworkProtectionPopover(controller: controller,
+                                           onboardingStatusPublisher: onboardingStatusPublisher,
+                                           statusReporter: statusReporter,
+                                           menuItems: menuItems)
         popover.behavior = .transient
 
         super.init()
@@ -74,6 +77,7 @@ public final class StatusBarMenu: NSObject {
 
     @objc
     private func statusBarButtonTapped() {
+        let isOptionKeyPressed = NSApp.currentEvent?.modifierFlags.contains(.option) ?? false
         let isRightClick = NSApp.currentEvent?.type == .rightMouseUp
 
         guard !isRightClick else {
@@ -81,7 +85,7 @@ public final class StatusBarMenu: NSObject {
             return
         }
 
-        togglePopover()
+        togglePopover(isOptionKeyPressed: isOptionKeyPressed)
     }
 
     private func subscribeToIconUpdates() {
@@ -95,7 +99,7 @@ public final class StatusBarMenu: NSObject {
 
     // MARK: - Popover
 
-    private func togglePopover() {
+    private func togglePopover(isOptionKeyPressed: Bool) {
         if popover.isShown {
             popover.close()
         } else {
@@ -103,6 +107,7 @@ public final class StatusBarMenu: NSObject {
                 return
             }
 
+            popover.setShowsDebugInformation(isOptionKeyPressed)
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .maxY)
         }
     }
