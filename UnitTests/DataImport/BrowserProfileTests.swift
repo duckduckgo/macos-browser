@@ -246,7 +246,6 @@ class BrowserProfileTests: XCTestCase {
         let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
 
         XCTAssertNil(profile.appVersion)
-        // TODO: dependency
         XCTAssertEqual(profile.installedAppsMajorVersionDescription()?.sorted(), DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile)?.sorted())
     }
 
