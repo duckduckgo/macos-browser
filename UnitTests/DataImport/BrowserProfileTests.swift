@@ -164,6 +164,30 @@ class BrowserProfileTests: XCTestCase {
         XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "118")
     }
 
+    func testWhenLastOperaVersionIsPresent_InstalledAppsReturnsMajorVersion() {
+        let profileURL = profile(named: "System Profile")
+        let fileStore = FileStoreMock()
+
+        let json = """
+        {
+            "profile": {
+            },
+            "extensions": {
+                "last_opera_version": "117.0.5938.13"
+            }
+        }
+        """
+
+        fileStore.storage["Preferences"] = json.utf8data
+        fileStore.directoryStorage[profileURL.absoluteString] = ["Preferences"]
+
+        let profile = DataImport.BrowserProfile(browser: .chrome, profileURL: profileURL, fileStore: fileStore)
+
+        XCTAssertEqual(profile.appVersion, "117.0.5938.13")
+        XCTAssertEqual(profile.installedAppsMajorVersionDescription(), "117")
+        XCTAssertEqual(DataImport.Source.chrome.installedAppsMajorVersionDescription(selectedProfile: profile), "117")
+    }
+
     func testWhenLastChromiumVersionIsNotPresentInProfile_CreatedByVersionIsReturned() {
         let profileURL = profile(named: "System Profile")
         let fileStore = FileStoreMock()

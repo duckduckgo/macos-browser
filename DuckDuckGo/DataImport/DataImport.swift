@@ -140,7 +140,7 @@ enum DataImport {
             }
             return Set(installedVersions.map {
                 // get major version
-                $0.components(separatedBy: ".")[0]
+                $0.components(separatedBy: ".")[0] // [0] component is always there even if no "."
             }.sorted())
             // list installed browsers major versions separated
             .joined(separator: "; ")

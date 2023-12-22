@@ -30,6 +30,7 @@ struct ChromiumPreferences: Decodable {
     }
     struct Extensions: Decodable {
         let lastChromeVersion: String?
+        let lastOperaVersion: String?
     }
 
     enum Constants {
@@ -71,7 +72,9 @@ struct ChromiumPreferences: Decodable {
     }
 
     var appVersion: String? {
-        profile.createdByVersion ?? extensions?.lastChromeVersion
+        // profile.createdByVersion updated on Chrome launch;
+        // if it‘s missing - check extensions.last_chrome_version or last_opera_version - for Opera[GX]
+        profile.createdByVersion ?? extensions?.lastChromeVersion ?? extensions?.lastOperaVersion
     }
 
 }
