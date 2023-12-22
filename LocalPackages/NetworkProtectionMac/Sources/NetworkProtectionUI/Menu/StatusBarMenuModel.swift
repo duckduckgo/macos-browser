@@ -28,7 +28,7 @@ public final class StatusBarMenuModel {
     }
 
     var hideVPNMenu: NSMenuItem {
-        let item = NSMenuItem(title: "Don't Show VPN in Menu Bar", action: #selector(hideVPNMenuItemAction), keyEquivalent: "")
+        let item = NSMenuItem(title: "Don’t Show VPN in Menu Bar", action: #selector(hideVPNMenuItemAction), keyEquivalent: "")
         item.target = self
         return item
     }
