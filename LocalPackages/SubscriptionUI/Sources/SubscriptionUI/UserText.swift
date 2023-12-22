@@ -98,6 +98,7 @@ enum UserText {
 
     static let somethingWentWrongAlertTitle = NSLocalizedString("subscription.alert.something.went.wrong.title", value: "Something Went Wrong", comment: "Alert title when unknown error has occurred")
     static let somethingWentWrongAlertDescription = NSLocalizedString("subscription.alert.something.went.wrong.description", value: "The App Store was not able to process your purchase. Please try again later.", comment: "Alert message when unknown error has occurred")
+    static let somethingWentWrongStripeAlertDescription = NSLocalizedString("subscription.alert.something.went.wrong.stripe.description", value: "We were not able to start your purchase process. Please try again later.", comment: "Alert message when unknown error has occurred")
 
     static let subscriptionNotFoundAlertTitle = NSLocalizedString("subscription.alert.subscription.not.found.title", value: "Subscription Not Found", comment: "Alert title when subscription was not found")
     static let subscriptionNotFoundAlertDescription = NSLocalizedString("subscription.alert.subscription.not.found.description", value: "We couldn’t find a subscription associated with this Apple ID.", comment: "Alert message when subscription was not found")

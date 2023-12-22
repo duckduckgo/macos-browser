@@ -193,7 +193,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .success(let purchaseUpdate):
             await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
         case .failure:
-            // TODO: handle error with alert?
+            await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
             return nil
         }
 #else
@@ -366,10 +366,16 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 extension MainWindowController {
 
     @MainActor
-    func showSomethingWentWrongAlert() {
+    func showSomethingWentWrongAlert(environment: SubscriptionPurchaseEnvironment.Environment = SubscriptionPurchaseEnvironment.current) {
         guard let window else { return }
 
-        window.show(.somethingWentWrongAlert())
+        switch environment {
+        case .appStore:
+            window.show(.somethingWentWrongAlert())
+        case .stripe:
+            window.show(.somethingWentWrongStripeAlert())
+        }
+
     }
 
     @MainActor
