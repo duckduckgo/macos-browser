@@ -200,6 +200,9 @@ extension Pixel {
         case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
         case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
+        // DataBrokerProtection Other
+        case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
+
         // 28-day Home Button
         case homeButtonHidden
         case homeButtonLeft
@@ -313,7 +316,6 @@ extension Pixel {
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
-            case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -545,6 +547,9 @@ extension Pixel.Event {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
+        case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
+            return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
+
         case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_dbp_remote_message_displayed_\(messageID)"
         case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
@@ -765,7 +770,6 @@ extension Pixel.Event.Debug {
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
-        case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"

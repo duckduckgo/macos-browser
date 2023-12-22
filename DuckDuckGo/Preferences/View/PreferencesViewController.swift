@@ -19,6 +19,7 @@
 import AppKit
 import SwiftUI
 import Combine
+import DDGSync
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -28,11 +29,20 @@ final class PreferencesViewController: NSViewController {
 
     weak var delegate: BrowserTabSelectionDelegate?
 
-    let model = PreferencesSidebarModel(includeDuckPlayer: DuckPlayer.shared.isAvailable)
+    let model: PreferencesSidebarModel
     private var selectedTabIndexCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 
     private var bitwardenManager: BWManagement = BWManager.shared
+
+    init(syncService: DDGSyncing, duckPlayer: DuckPlayer = DuckPlayer.shared) {
+        model = PreferencesSidebarModel(syncService: syncService, includeDuckPlayer: duckPlayer.isAvailable)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func loadView() {
         view = NSView()

@@ -26,15 +26,14 @@ struct HTMLImportedBookmarks {
 final class BookmarkHTMLReader {
 
     struct ImportError: DataImportError {
+        // !! do not change the order
+        // cases 2,3 and 6 are reserved for removed errors
         enum OperationType: Int {
-            case parseXml
-            case validationBody
-            case validationH1
-            case findTopLevelFolder
-            case proceedToTopLevelFolder
-            case readFolder
-            case bookmarkRead
-            case unknown
+            case parseXml = 0
+            case validationBody = 1
+            case proceedToTopLevelFolder = 4
+            case readFolder = 5
+            case unknown = 7
         }
 
         var action: DataImportAction { .bookmarks }
@@ -118,10 +117,6 @@ final class BookmarkHTMLReader {
 
     // MARK: - Private
 
-    private enum ReaderError: Error {
-        case noTopLevelFolder
-    }
-
     private func determineImportSource(_ cursor: inout XMLNode?) throws -> BookmarkImportSource? {
         let isInSafariFormat = try findTopLevelFolderNameNode(&cursor)
 
@@ -139,54 +134,49 @@ final class BookmarkHTMLReader {
     private func validateHTMLBookmarksDocument(_ document: XMLDocument) throws -> XMLNode? {
         let root = document.rootElement()
         guard let body = root?.child(at: 1) else { throw ImportError(type: .validationBody, underlyingError: nil) }
-
+        // get /html/body/*[0]
         let cursor = body.child(at: 0)
-        guard cursor?.htmlTag == .h1 else { throw ImportError(type: .validationH1, underlyingError: nil) }
 
         return cursor
     }
 
     private func findTopLevelFolderNameNode(_ cursor: inout XMLNode?) throws -> Bool {
         var isInSafariFormat = false
-        cursor = cursor?.nextSibling
 
-        switch cursor?.htmlTag {
-        case .dl:
-            do {
-                try proceedToTopLevelFolderNameNode(&cursor)
-            } catch ReaderError.noTopLevelFolder {
+        rootLoop: while cursor != nil {
+            switch cursor?.htmlTag {
+            case .dl:
+                let originalCursorValue = cursor
+                cursor = cursor?.child(at: 0)
+                dlLoop: while cursor != nil {
+                    switch cursor?.htmlTag {
+                    case .dd:
+                        if cursor?.child(at: 0)?.htmlTag == .h3 {
+                            cursor = cursor?.child(at: 0)
+                            break dlLoop
+                        }
+                        cursor = cursor?.nextSibling
+                    case .dt:
+                        // There is no "top-level" folder, and the first item
+                        // in the bookmarks file is a regular bookmark, not a folder.
+                        // This is specific to iOS and MacOS DuckDuckGo apps.
+                        cursor = originalCursorValue
+                        isInSafariFormat = true
+                        break dlLoop
+                    default:
+                        throw ImportError(type: .proceedToTopLevelFolder, underlyingError: nil)
+                    }
+                }
+                break rootLoop
+            case .h3:
                 isInSafariFormat = true
+                break rootLoop
+            default:
+                cursor = cursor?.nextSibling
             }
-        case .h3:
-            isInSafariFormat = true
-        default:
-            throw ImportError(type: .findTopLevelFolder, underlyingError: nil)
         }
 
         return isInSafariFormat
-    }
-
-    private func proceedToTopLevelFolderNameNode(_ cursor: inout XMLNode?) throws {
-        let originalCursorValue = cursor
-        cursor = cursor?.child(at: 0)
-        while cursor != nil {
-            guard cursor?.htmlTag == .dd else {
-                if cursor?.htmlTag == .dt {
-                    // There is no "top-level" folder, and the first item
-                    // in the bookmarks file is a regular bookmark, not a folder.
-                    // This is specific to iOS and MacOS DuckDuckGo apps.
-                    cursor = originalCursorValue
-                    throw ReaderError.noTopLevelFolder
-                } else {
-                    throw ImportError(type: .proceedToTopLevelFolder, underlyingError: nil)
-                }
-            }
-            if cursor?.child(at: 0)?.htmlTag == .h3 {
-                cursor = cursor?.child(at: 0)
-                return
-            }
-            cursor = cursor?.nextSibling
-        }
     }
 
     private func findNextItem(_ cursor: inout XMLNode?) -> XMLNode.BookmarkItemType? {
@@ -220,7 +210,7 @@ final class BookmarkHTMLReader {
     private func readItem(_ item: XMLNode.BookmarkItemType, at cursor: XMLNode?) throws -> [ImportedBookmarks.BookmarkOrFolder] {
         switch item {
         case .bookmark:
-            return [try readBookmark(cursor)]
+            return readBookmark(cursor).map { [$0] } ?? []
         case .folder:
             return [try readFolder(cursor)]
         case .safariTopLevelBookmarks:
@@ -255,7 +245,9 @@ final class BookmarkHTMLReader {
             case (.dd, .h3):
                 children.append(try readFolder(firstChild))
             case (.dt, .a):
-                children.append(try readBookmark(firstChild))
+                if let bookmark = readBookmark(firstChild) {
+                    children.append(bookmark)
+                }
             default:
                 break
             }
@@ -266,9 +258,8 @@ final class BookmarkHTMLReader {
         return children
     }
 
-    private func readBookmark(_ node: XMLNode?) throws -> ImportedBookmarks.BookmarkOrFolder {
-        guard let bookmark = node?.bookmark else { throw ImportError(type: .bookmarkRead, underlyingError: nil) }
-        return bookmark
+    private func readBookmark(_ node: XMLNode?) -> ImportedBookmarks.BookmarkOrFolder? {
+        return node?.bookmark
     }
 
     private let bookmarksFileURL: URL
@@ -369,14 +360,19 @@ private extension XMLNode {
     }
 
     var bookmark: ImportedBookmarks.BookmarkOrFolder? {
-        guard htmlTag == .a, let name = text else {
+        guard htmlTag == .a,
+              let name = text,
+              let element = self as? XMLElement else { return nil }
+
+        if element.stringValue == "---" && element.attribute(forName: "href")?.stringValue == "http://bookmark.placeholder.url/" {
+            // vivaldi separator markup
             return nil
         }
 
         return .bookmark(
             name: name,
-            urlString: (self as? XMLElement)?.attribute(forName: "href")?.stringValue,
-            isDDGFavorite: (self as? XMLElement)?.attribute(forName: "duckduckgo:favorite")?.stringValue == "true"
+            urlString: element.attribute(forName: "href")?.stringValue,
+            isDDGFavorite: element.attribute(forName: "duckduckgo:favorite")?.stringValue == "true"
         )
     }
 }

@@ -279,9 +279,6 @@ final class LocalBookmarkStore: BookmarkStore {
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
                     let rootFolder = self.bookmarksRoot(in: context)
                     let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(context)
-                    if !orphanedEntities.isEmpty {
-                        self.reportOrphanedBookmarksIfNeeded()
-                    }
                     results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
                     results = self.favoritesRoot(in: context)?.favoritesArray ?? []
@@ -297,15 +294,6 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch let error {
                 completion(nil, error)
             }
-        }
-    }
-
-    private func reportOrphanedBookmarksIfNeeded() {
-        Task { @MainActor in
-            guard let syncService = NSApp.delegateTyped.syncService, syncService.authState == .inactive else {
-                return
-            }
-            Pixel.fire(.debug(event: .orphanedBookmarksPresent))
         }
     }
 
