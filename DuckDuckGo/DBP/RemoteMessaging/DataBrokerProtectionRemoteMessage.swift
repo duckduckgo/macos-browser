@@ -44,7 +44,7 @@ struct DataBrokerProtectionRemoteMessage: Codable, Equatable, Hashable {
 
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
-        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(), // TODO: Use DBP values here instead.
+        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(userDefaults: .dbp),
         operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model

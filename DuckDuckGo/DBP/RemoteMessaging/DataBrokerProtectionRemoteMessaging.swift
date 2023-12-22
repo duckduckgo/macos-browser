@@ -55,7 +55,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.dataBrokerProtectionMessagesRequest(),
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.dataBrokerProtection(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "dbp", keychainAppGroup: Bundle.main.appGroup(bundle: .dbp)),
-        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
+        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(userDefaults: .netP),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard

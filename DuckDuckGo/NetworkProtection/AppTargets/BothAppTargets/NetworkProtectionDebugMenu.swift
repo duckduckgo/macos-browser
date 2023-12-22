@@ -518,7 +518,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func overrideNetworkProtectionActivationDate(to date: Date?) {
-        let store = DefaultWaitlistActivationDateStore()
+        let store = DefaultWaitlistActivationDateStore(userDefaults: .netP)
 
         if let date {
             store.updateActivationDate(date)

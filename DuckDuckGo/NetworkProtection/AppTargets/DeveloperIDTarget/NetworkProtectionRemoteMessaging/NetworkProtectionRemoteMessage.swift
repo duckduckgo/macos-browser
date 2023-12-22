@@ -44,7 +44,7 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashabl
 
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
-        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(),
+        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(userDefaults: .netP),
         operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model
