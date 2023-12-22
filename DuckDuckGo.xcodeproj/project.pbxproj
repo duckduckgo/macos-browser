@@ -2722,8 +2722,8 @@
 		B662D3DF275616FF0035D4D6 /* EncryptionKeyStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B662D3DD275613BB0035D4D6 /* EncryptionKeyStoreMock.swift */; };
 		B6656E0D2B29C733008798A1 /* FileImportViewLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6656E0C2B29C733008798A1 /* FileImportViewLocalizationTests.swift */; };
 		B6656E0E2B29C733008798A1 /* FileImportViewLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6656E0C2B29C733008798A1 /* FileImportViewLocalizationTests.swift */; };
-		B6656E5B2B2ADB1C008798A1 /* RequestFilePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */; };
 		B6656E122B29E3BE008798A1 /* DownloadListStoreMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693956026F1C1BC0015B914 /* DownloadListStoreMock.swift */; };
+		B6656E5B2B2ADB1C008798A1 /* RequestFilePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B5F5832B03580A008DB58A /* RequestFilePermissionView.swift */; };
 		B6676BE12AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6676BE22AA986A700525A21 /* AddressBarTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6676BE02AA986A700525A21 /* AddressBarTextEditor.swift */; };
 		B6685E3D29A602D90043D2EE /* ExternalAppSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B687B7CB2947A1E9001DEA6F /* ExternalAppSchemeHandler.swift */; };
@@ -2853,7 +2853,6 @@
 		B6B4D1C82B0B3B5400C26286 /* DataImportReportModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C42B0B3B5400C26286 /* DataImportReportModel.swift */; };
 		B6B4D1CA2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
 		B6B4D1CB2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
-		B6B4D1CC2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
 		B6B4D1CD2B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1C92B0C8C9200C26286 /* FirefoxCompatibilityPreferences.swift */; };
 		B6B4D1CF2B0E0DD000C26286 /* DataImportNoDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1CE2B0E0DD000C26286 /* DataImportNoDataView.swift */; };
 		B6B4D1D02B0E0DD000C26286 /* DataImportNoDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B4D1CE2B0E0DD000C26286 /* DataImportNoDataView.swift */; };
@@ -13057,7 +13056,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 98.0.1;
+				version = 99.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

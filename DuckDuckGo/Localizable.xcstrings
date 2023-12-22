@@ -277,6 +277,42 @@
         }
       }
     },
+    "alert.sync.warning.data-syncing-disabled-upgrade-required" : {
+      "comment" : "Data syncing unavailable warning message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sorry, but Sync & Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue."
+          }
+        }
+      }
+    },
+    "alert.sync.warning.sync-paused" : {
+      "comment" : "Title of the warning message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sync & Backup is Paused"
+          }
+        }
+      }
+    },
+    "alert.sync.warning.sync-unavailable-message" : {
+      "comment" : "Data syncing unavailable warning message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sorry, but Sync & Backup is currently unavailable. Please try again later."
+          }
+        }
+      }
+    },
     "alert.title" : {
       "comment" : "Title formatted with presenting domain",
       "extractionState" : "extracted_with_value",
