@@ -283,6 +283,7 @@ struct DataImportViewModel {
             switch error {
             // chromium user denied keychain prompt error
             case let error as ChromiumLoginReader.ImportError where error.type == .userDeniedKeychainPrompt:
+                Pixel.fire(.dataImportFailed(source: importSource, error: error))
                 // stay on the same screen
                 return true
 
@@ -304,6 +305,7 @@ struct DataImportViewModel {
                     break
                 }
                 log("file read no permission for \(url.path)")
+                Pixel.fire(.dataImportFailed(source: importSource, error: importError))
                 screen = .getReadPermission(url)
                 return true
 

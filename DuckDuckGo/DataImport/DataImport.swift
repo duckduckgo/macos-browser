@@ -214,7 +214,7 @@ enum DataImport {
             }
             lazy var validImportableProfiles = self.validImportableProfiles
             if let preferredProfileName,
-               let preferredProfile = validImportableProfiles.first(where: { $0.profileName == Constants.firefoxDefaultProfileName }) {
+               let preferredProfile = validImportableProfiles.first(where: { $0.profileName == preferredProfileName }) {
 
                 return preferredProfile
             }
@@ -449,6 +449,7 @@ protocol DataImporter {
 
     /// validate file access/encryption password requirement before starting import. Returns non-empty dictionary with failures if access validation fails.
     func validateAccess(for types: Set<DataImport.DataType>) -> [DataImport.DataType: any DataImportError]?
+    /// Start import process. Returns cancellable TaskWithProgress
     func importData(types: Set<DataImport.DataType>) -> DataImportTask
 
     func requiresKeychainPassword(for selectedDataTypes: Set<DataImport.DataType>) -> Bool

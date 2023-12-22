@@ -46,7 +46,6 @@ internal class ChromiumDataImporter: DataImporter {
         return [.passwords, .bookmarks]
     }
 
-    /// Start import process. Can throw synchronously if pre-import checks fail (e.g. file access)
     func importData(types: Set<DataImport.DataType>) -> DataImportTask {
         .detachedWithProgress { updateProgress in
             do {

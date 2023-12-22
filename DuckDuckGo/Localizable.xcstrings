@@ -3559,7 +3559,7 @@
       }
     },
     "import.csv.instructions.coccoc" : {
-      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name (Cốc Cốc)\n%5$@ - hamburger menu icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Cốc Cốc browser.\n%N$d - step number\n%2$s - browser name (Cốc Cốc)\n%5$@ - hamburger menu icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3631,7 +3631,7 @@
       }
     },
     "import.csv.instructions.opera" : {
-      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name (Opera)\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Opera browser.\n%N$d - step number\n%2$s - browser name (Opera)\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3643,7 +3643,7 @@
       }
     },
     "import.csv.instructions.operagx" : {
-      "comment" : "Instructions to import Passwords as CSV from Chromium-based browsers.\n%N$d - step number\n%2$s - browser name (Opera GX)\n%5$@ - menu button icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
+      "comment" : "Instructions to import Passwords as CSV from Opera GX browsers.\n%N$d - step number\n%2$s - browser name (Opera GX)\n%5$@ - menu button icon\n%8$@ - “Select Passwords CSV File” button\n**bold text**; _italic text_",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

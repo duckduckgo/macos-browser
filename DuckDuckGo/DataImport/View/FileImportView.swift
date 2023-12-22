@@ -93,7 +93,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
-        Instructions to import Passwords as CSV from Chromium-based browsers.
+        Instructions to import Passwords as CSV from Cốc Cốc browser.
         %N$d - step number
         %2$s - browser name (Cốc Cốc)
         %5$@ - hamburger menu icon
@@ -113,7 +113,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
-        Instructions to import Passwords as CSV from Chromium-based browsers.
+        Instructions to import Passwords as CSV from Opera browser.
         %N$d - step number
         %2$s - browser name (Opera)
         %8$@ - “Select Passwords CSV File” button
@@ -149,7 +149,7 @@ func fileImportInstructionsBuilder(source: DataImport.Source, dataType: DataImpo
         %d Save the passwords file someplace you can find it (e.g., Desktop)
         %d %@
         """, comment: """
-        Instructions to import Passwords as CSV from Chromium-based browsers.
+        Instructions to import Passwords as CSV from Opera GX browsers.
         %N$d - step number
         %2$s - browser name (Opera GX)
         %5$@ - menu button icon

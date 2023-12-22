@@ -64,7 +64,7 @@ struct EditableTextView: NSViewRepresentable {
 
 extension EditableTextView {
 
-    final class Coordinator: NSObject, NSTextViewDelegate, NSControlTextEditingDelegate {
+    final class Coordinator: NSObject, NSTextViewDelegate {
 
         var parent: EditableTextView
         var selectedRanges: [NSValue] = []
