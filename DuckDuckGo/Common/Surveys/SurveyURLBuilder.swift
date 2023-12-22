@@ -75,7 +75,7 @@ final class SurveyURLBuilder {
                 if let daysSinceActivation {
                     queryItems.append(URLQueryItem(name: parameter.rawValue, value: String(describing: daysSinceActivation)))
                 }
-            case .macosVersion:
+            case .macOSVersion:
                 queryItems.append(URLQueryItem(name: parameter.rawValue, value: operatingSystemVersion))
             case .appVersion:
                 queryItems.append(URLQueryItem(name: parameter.rawValue, value: appVersion))
