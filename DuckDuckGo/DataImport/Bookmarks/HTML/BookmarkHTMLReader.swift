@@ -37,9 +37,10 @@ final class BookmarkHTMLReader {
         }
 
         var action: DataImportAction { .bookmarks }
-        var source: DataImport.Source { .bookmarksHTML }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .dataCorrupted }
     }
 
     private var currentOperationType: ImportError.OperationType = .parseXml
@@ -275,8 +276,16 @@ private extension BookmarkImportSource {
 
         case .thirdPartyBrowser(.brave),
              .thirdPartyBrowser(.chrome),
+             .thirdPartyBrowser(.chromium),
+             .thirdPartyBrowser(.coccoc),
              .thirdPartyBrowser(.edge),
              .thirdPartyBrowser(.firefox),
+             .thirdPartyBrowser(.opera),
+             .thirdPartyBrowser(.operaGX),
+             .thirdPartyBrowser(.tor),
+             .thirdPartyBrowser(.vivaldi),
+             .thirdPartyBrowser(.yandex),
+             .thirdPartyBrowser(.bitwarden),
              .thirdPartyBrowser(.onePassword8),
              .thirdPartyBrowser(.onePassword7),
              .thirdPartyBrowser(.lastPass),

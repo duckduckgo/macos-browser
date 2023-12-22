@@ -41,12 +41,15 @@ final class SafariBookmarksReader {
             case readPlist
 
             case getTopLevelEntries
+            case getChildren
+            case entryNotDict
         }
 
         var action: DataImportAction { .bookmarks }
-        var source: DataImport.Source { .safari }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .dataCorrupted }
     }
 
     private let safariBookmarksFileURL: URL
@@ -71,17 +74,30 @@ final class SafariBookmarksReader {
         }
     }
 
+    func validateFileReadAccess() -> DataImportResult<Void> {
+        if !FileManager.default.isReadableFile(atPath: safariBookmarksFileURL.path) {
+            do {
+                try _=Data(contentsOf: safariBookmarksFileURL)
+            } catch {
+                return .failure(ImportError(type: .readPlist, underlyingError: error))
+            }
+        }
+        return .success( () )
+    }
+
     private func reallyReadBookmarks() throws -> ImportedBookmarks {
         currentOperationType = .readPlist
         let plistData = try readPropertyList()
 
-        guard let topLevelEntries = plistData[Constants.bookmarkChildrenKey] as? [[String: AnyObject]] else { throw ImportError(type: .getTopLevelEntries, underlyingError: nil) }
+        guard let children = plistData[Constants.bookmarkChildrenKey] else { throw ImportError(type: .getChildren, underlyingError: nil) }
+        guard let topLevelEntries = children as? [Any] else { throw ImportError(type: .getTopLevelEntries, underlyingError: nil) }
 
         var bookmarksBar: ImportedBookmarks.BookmarkOrFolder?
         var otherBookmarks: [ImportedBookmarks.BookmarkOrFolder] = []
 
-        for entry in topLevelEntries
-            where ((entry[Constants.typeKey] as? String) == Constants.listType) || ((entry[Constants.typeKey] as? String) == Constants.leafType) {
+        for entry in topLevelEntries {
+            guard let entry = entry as? [String: AnyObject] else { throw ImportError(type: .entryNotDict, underlyingError: nil) }
+            guard (entry[Constants.typeKey] as? String) == Constants.listType || (entry[Constants.typeKey] as? String) == Constants.leafType else { continue }
 
             if let title = entry[Constants.titleKey] as? String, title == Constants.readingListKey {
                 continue
