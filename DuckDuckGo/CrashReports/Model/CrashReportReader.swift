@@ -21,6 +21,7 @@ import Foundation
 final class CrashReportReader {
 
     static let displayName = Bundle.main.displayName
+    static let vpnExtensionDisplayName = "com.duckduckgo.macos.vpn.network-extension"
 
     func getCrashReports(since lastCheckDate: Date) -> [CrashReport] {
         var allPaths: [URL]
@@ -37,7 +38,7 @@ final class CrashReportReader {
             let systemPaths = try FileManager.default.contentsOfDirectory(at: FileManager.systemDiagnosticReports, includingPropertiesForKeys: nil)
             allPaths.append(contentsOf: systemPaths)
         } catch {
-            assertionFailure("Failed to read system crash reports")
+            assertionFailure("Failed to read system crash reports: \(error)")
         }
 #endif
 
@@ -54,7 +55,10 @@ final class CrashReportReader {
     }
 
     private func belongsToThisApp(_ path: URL) -> Bool {
-        return path.lastPathComponent.hasPrefix(Self.displayName ?? "DuckDuckGo")
+        let hasAppPrefix = path.lastPathComponent.hasPrefix(Self.displayName ?? "DuckDuckGo")
+        let hasVPNPrefix = path.lastPathComponent.hasPrefix(Self.vpnExtensionDisplayName)
+
+        return hasAppPrefix || hasVPNPrefix
     }
 
     private func isFile(at path: URL, newerThan lastCheckDate: Date) -> Bool {
@@ -85,9 +89,7 @@ fileprivate extension FileManager {
     }()
 
     static let systemDiagnosticReports: URL = {
-        let homeDirectoryURL = FileManager.default.homeDirectoryForCurrentUser
-        return homeDirectoryURL
-            .appendingPathComponent("Library/Logs/DiagnosticReports")
+        return URL(fileURLWithPath: "/Library/Logs/DiagnosticReports")
     }()
 
     func fileCreationDate(url: URL) -> Date? {
