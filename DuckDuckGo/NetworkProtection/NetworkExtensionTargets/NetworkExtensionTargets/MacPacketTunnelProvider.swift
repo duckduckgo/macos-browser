@@ -104,8 +104,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionKeychainDeleteError(status: status)
             case .wireGuardCannotLocateTunnelFileDescriptor:
                 domainEvent = .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
-            case .wireGuardInvalidState:
-                domainEvent = .networkProtectionWireguardErrorInvalidState
+            case .wireGuardInvalidState(let reason):
+                domainEvent = .networkProtectionWireguardErrorInvalidState(reason: reason)
             case .wireGuardDnsResolution:
                 domainEvent = .networkProtectionWireguardErrorFailedDNSResolution
             case .wireGuardSetNetworkSettings(let error):
@@ -379,8 +379,17 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         dryRun = false
 #endif
 
+        let source: String
+
+#if NETP_SYSTEM_EXTENSION
+        source = "vpnSystemExtension"
+#else
+        source = "vpnAppExtension"
+#endif
+
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
+                       source: source,
                        defaultHeaders: defaultHeaders,
                        log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in

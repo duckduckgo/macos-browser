@@ -45,6 +45,7 @@ final class PasswordManagementViewController: NSViewController {
 
     weak var delegate: PasswordManagementDelegate?
 
+    @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
@@ -171,6 +172,8 @@ final class PasswordManagementViewController: NSViewController {
         moreButton.sendAction(on: .leftMouseDown)
 
         exportLoginItem.title = UserText.exportLogins
+        unlockYourAutofillInfo.setAccessibilityIdentifier("Unlock Autofill")
+        addVaultItemButton.setAccessibilityIdentifier("add item")
 
         NotificationCenter.default.publisher(for: .deviceBecameLocked)
             .receive(on: DispatchQueue.main)
@@ -248,7 +251,12 @@ final class PasswordManagementViewController: NSViewController {
 
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
-
+#if DEBUG
+        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            toggleLockScreen(hidden: true)
+            return
+        }
+#endif
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
 
         authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
@@ -285,7 +293,7 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         self.dismiss()
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
@@ -777,9 +785,9 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         menu.items = [
-            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
             createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
-            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph")
+            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
+            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
         ]
 
         return menu

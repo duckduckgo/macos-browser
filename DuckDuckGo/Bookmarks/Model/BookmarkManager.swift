@@ -43,7 +43,7 @@ protocol BookmarkManager: AnyObject {
     func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
 
     func handleFavoritesAfterDisablingSync()
 
@@ -57,13 +57,13 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {
-        self.subscribeToFavoritesDisplayMode()
-    }
-
-    init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
-        self.bookmarkStore = bookmarkStore
-        self.faviconManagement = faviconManagement
+    init(bookmarkStore: BookmarkStore? = nil, faviconManagement: FaviconManagement? = nil) {
+        if let bookmarkStore {
+            self.bookmarkStore = bookmarkStore
+        }
+        if let faviconManagement {
+            self.faviconManagement = faviconManagement
+        }
         self.subscribeToFavoritesDisplayMode()
     }
 
@@ -313,7 +313,7 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Import
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
         let results = bookmarkStore.importBookmarks(bookmarks, source: source)
         loadBookmarks()
         requestSync()

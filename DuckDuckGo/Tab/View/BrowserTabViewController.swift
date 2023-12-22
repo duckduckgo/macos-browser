@@ -24,11 +24,11 @@ import SwiftUI
 import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
-    @IBOutlet weak var errorView: NSView!
-    @IBOutlet weak var homePageView: NSView!
-    @IBOutlet weak var errorMessageLabel: NSTextField!
-    @IBOutlet weak var hoverLabel: NSTextField!
-    @IBOutlet weak var hoverLabelContainer: NSView!
+    @IBOutlet var errorView: NSView!
+    @IBOutlet var homePageView: NSView!
+    @IBOutlet var errorMessageLabel: NSTextField!
+    @IBOutlet var hoverLabel: NSTextField!
+    @IBOutlet var hoverLabelContainer: NSView!
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -53,6 +53,12 @@ final class BrowserTabViewController: NSViewController {
 
     private var transientTabContentViewController: NSViewController?
 
+    static func create(tabCollectionViewModel: TabCollectionViewModel) -> BrowserTabViewController {
+        NSStoryboard(name: "BrowserTab", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        }!
+    }
+
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
@@ -63,17 +69,11 @@ final class BrowserTabViewController: NSViewController {
         super.init(coder: coder)
     }
 
-    @IBSegueAction func createHomePageViewController(_ coder: NSCoder) -> NSViewController? {
-        guard let controller = HomePageViewController(coder: coder,
-                                                      tabCollectionViewModel: tabCollectionViewModel,
-                                                      bookmarkManager: LocalBookmarkManager.shared) else {
-            fatalError("BrowserTabViewController: Failed to init HomePageViewController")
-        }
-        return controller
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: LocalBookmarkManager.shared)
+        self.addAndLayoutChild(homePageViewController, into: homePageView)
 
         hoverLabelContainer.alphaValue = 0
         subscribeToTabs()
@@ -219,11 +219,28 @@ final class BrowserTabViewController: NSViewController {
         tabCollectionViewModel.tabCollection.$tabs
             .sink(receiveValue: setDelegate())
             .store(in: &cancellables)
+
+        tabCollectionViewModel.tabCollection.$tabs
+            .sink(receiveValue: removeDataBrokerViewIfNecessary())
+            .store(in: &cancellables)
     }
 
     private func subscribeToPinnedTabs() {
         pinnedTabsDelegatesCancellable = tabCollectionViewModel.pinnedTabsCollection?.$tabs
             .sink(receiveValue: setDelegate())
+    }
+
+    private func removeDataBrokerViewIfNecessary() -> ([Tab]) -> Void {
+        { [weak self] (tabs: [Tab]) in
+            guard let self else { return }
+#if DBP
+            if let dataBrokerProtectionHomeViewController,
+               !tabs.contains(where: { $0.content == .dataBrokerProtection }) {
+                dataBrokerProtectionHomeViewController.removeCompletely()
+                self.dataBrokerProtectionHomeViewController = nil
+            }
+#endif
+        }
     }
 
     private func setDelegate() -> ([Tab]) -> Void {
@@ -431,7 +448,6 @@ final class BrowserTabViewController: NSViewController {
         bookmarksViewController?.removeCompletely()
 #if DBP
         dataBrokerProtectionHomeViewController?.removeCompletely()
-        dataBrokerProtectionHomeViewController = nil
 #endif
         if includingWebView {
             self.removeWebViewFromHierarchy()
@@ -530,7 +546,10 @@ final class BrowserTabViewController: NSViewController {
     var preferencesViewController: PreferencesViewController?
     private func preferencesViewControllerCreatingIfNeeded() -> PreferencesViewController {
         return preferencesViewController ?? {
-            let preferencesViewController = PreferencesViewController()
+            guard let syncService = NSApp.delegateTyped.syncService else {
+                fatalError("Sync service is nil")
+            }
+            let preferencesViewController = PreferencesViewController(syncService: syncService)
             preferencesViewController.delegate = self
             self.preferencesViewController = preferencesViewController
             return preferencesViewController
@@ -915,7 +934,7 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        DataImportViewController.show(completion: completion)
+        DataImportView.show(completion: completion)
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {

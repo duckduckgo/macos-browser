@@ -1,5 +1,5 @@
 //
-//  LocalPinningManager.swift
+//  LocalPinningManagerTests.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //

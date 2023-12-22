@@ -46,7 +46,7 @@ final class DBPHomeViewController: NSViewController {
 
         let privacySettings = PrivacySecurityPreferences.shared
         let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties.init(gpcEnabled: privacySettings.gpcEnabled,
+        let prefs = ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 

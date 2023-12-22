@@ -73,9 +73,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
     private var isSyncInProgressCancellable: AnyCancellable?
+    private var syncFeatureFlagsCancellable: AnyCancellable?
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
+
+#if DBP && SUBSCRIPTION
+    private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
+#endif
 
     private var didFinishLaunching = false
 
@@ -247,6 +252,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         UNUserNotificationCenter.current().delegate = self
 #endif
 
+#if DBP && SUBSCRIPTION
+        dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+#endif
+
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
 #endif
@@ -355,7 +364,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let environment = defaultEnvironment
 #endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
+        let syncService = DDGSync(
+            dataProvidersSource: syncDataProviders,
+            errorEvents: SyncErrorHandler(),
+            privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+            log: OSLog.sync,
+            environment: environment
+        )
         syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 
@@ -372,12 +387,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         isSyncInProgressCancellable = syncService.isSyncInProgressPublisher
             .filter { $0 }
             .asVoid()
-            .prefix(1)
-            .sink {
+            .sink { [weak syncService] in
                 Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+                syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
+                    Pixel.fire(.syncSuccessRateDaily, withAdditionalParameters: params)
+                })
             }
 
         subscribeSyncQueueToScreenLockedNotifications()
+        subscribeToSyncFeatureFlags(syncService)
+    }
+
+    @UserDefaultsWrapper(key: .syncDidShowSyncPausedByFeatureFlagAlert, defaultValue: false)
+    private var syncDidShowSyncPausedByFeatureFlagAlert: Bool
+
+    private func subscribeToSyncFeatureFlags(_ syncService: DDGSync) {
+        syncFeatureFlagsCancellable = syncService.featureFlagsPublisher
+            .dropFirst()
+            .map { $0.contains(.dataSyncing) }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self, weak syncService] isDataSyncingAvailable in
+                if isDataSyncingAvailable {
+                    self?.syncDidShowSyncPausedByFeatureFlagAlert = false
+                } else if syncService?.authState == .active, self?.syncDidShowSyncPausedByFeatureFlagAlert == false {
+                    let isSyncUIVisible = syncService?.featureFlags.contains(.userInterface) == true
+                    let alert = NSAlert.dataSyncingDisabledByFeatureFlag(showLearnMore: isSyncUIVisible)
+                    let response = alert.runModal()
+                    self?.syncDidShowSyncPausedByFeatureFlagAlert = true
+
+                    switch response {
+                    case .alertSecondButtonReturn:
+                        alert.window.sheetParent?.endSheet(alert.window)
+                        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                    default:
+                        break
+                    }
+                }
+            }
     }
 
     private func subscribeSyncQueueToScreenLockedNotifications() {

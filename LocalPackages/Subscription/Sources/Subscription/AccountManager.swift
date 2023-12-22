@@ -28,7 +28,13 @@ public protocol AccountManagerKeychainAccessDelegate: AnyObject {
     func accountManagerKeychainAccessFailed(accessType: AccountKeychainAccessType, error: AccountKeychainAccessError)
 }
 
-public class AccountManager {
+public protocol AccountManaging {
+
+    var accessToken: String? { get }
+
+}
+
+public class AccountManager: AccountManaging {
 
     private let storage: AccountStorage
     public weak var delegate: AccountManagerKeychainAccessDelegate?

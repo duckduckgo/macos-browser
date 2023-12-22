@@ -67,6 +67,8 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
     @IBOutlet var logoWidthConstraint: NSLayoutConstraint!
 
+    private let downloadListCoordinator: DownloadListCoordinator
+
     lazy var downloadsProgressView: CircularProgressView = {
         let bounds = downloadsButton.bounds
         let width: CGFloat = 27.0
@@ -101,8 +103,6 @@ final class NavigationBarViewController: NSViewController {
     private var pinnedViewsNotificationCancellable: AnyCancellable?
     private var navigationButtonsCancellables = Set<AnyCancellable>()
     private var downloadsCancellables = Set<AnyCancellable>()
-    private var networkProtectionCancellable: AnyCancellable?
-    private var networkProtectionInterruptionCancellable: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .homeButtonPosition, defaultValue: .right)
@@ -115,12 +115,14 @@ final class NavigationBarViewController: NSViewController {
     private let networkProtectionFeatureActivation: NetworkProtectionFeatureActivation
 #endif
 
-    required init?(coder: NSCoder) {
-        fatalError("NavigationBarViewController: Bad initializer")
+#if NETWORK_PROTECTION
+    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore(), downloadListCoordinator: DownloadListCoordinator = .shared) -> NavigationBarViewController {
+        NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, networkProtectionFeatureActivation: networkProtectionFeatureActivation, downloadListCoordinator: downloadListCoordinator)
+        }!
     }
 
-#if NETWORK_PROTECTION
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation = NetworkProtectionKeychainTokenStore()) {
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, networkProtectionFeatureActivation: NetworkProtectionFeatureActivation, downloadListCoordinator: DownloadListCoordinator) {
 
         let vpnBundleID = Bundle.main.vpnMenuAgentBundleId
         let ipcClient = TunnelControllerIPCClient(machServiceName: vpnBundleID)
@@ -133,20 +135,32 @@ final class NavigationBarViewController: NSViewController {
         self.networkProtectionButtonModel = NetworkProtectionNavBarButtonModel(popoverManager: networkProtectionPopoverManager)
         self.isBurner = isBurner
         self.networkProtectionFeatureActivation = networkProtectionFeatureActivation
+        self.downloadListCoordinator = downloadListCoordinator
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
 #else
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
+    static func create(tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator = .shared) -> NavigationBarViewController {
+        NSStoryboard(name: "NavigationBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner, downloadListCoordinator: downloadListCoordinator)
+        }!
+    }
+
+    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool, downloadListCoordinator: DownloadListCoordinator) {
         self.popovers = NavigationBarPopovers()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = isBurner
+        self.downloadListCoordinator = downloadListCoordinator
         goBackButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .back, tabCollectionViewModel: tabCollectionViewModel)
         goForwardButtonMenuDelegate = NavigationButtonMenuDelegate(buttonType: .forward, tabCollectionViewModel: tabCollectionViewModel)
         super.init(coder: coder)
     }
 #endif
+
+    required init?(coder: NSCoder) {
+        fatalError("NavigationBarViewController: Bad initializer")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -176,6 +190,7 @@ final class NavigationBarViewController: NSViewController {
         passwordManagementButton.sendAction(on: .leftMouseDown)
 
         optionsButton.toolTip = UserText.applicationMenuTooltip
+        optionsButton.setAccessibilityIdentifier("Options Button")
 
         networkProtectionButton.toolTip = UserText.networkProtectionButtonTooltip
 
@@ -381,17 +396,9 @@ final class NavigationBarViewController: NSViewController {
                     self.updateDownloadsButton(updatingFromPinnedViewsNotification: true)
                 case .homeButton:
                     self.updateHomeButton()
-                case .networkProtection:
 #if NETWORK_PROTECTION
-                    guard NetworkProtectionKeychainTokenStore().isFeatureActivated else {
-                        LocalPinningManager.shared.unpin(.networkProtection)
-                        networkProtectionButtonModel.isPinned = false
-                        return
-                    }
-
-                    networkProtectionButtonModel.isPinned = LocalPinningManager.shared.isPinned(.networkProtection)
-#else
-                    assertionFailure("Tried to toggle NetP when the feature was disabled")
+                case .networkProtection:
+                    networkProtectionButtonModel.updateVisibility()
 #endif
                 }
             } else {
@@ -586,7 +593,7 @@ final class NavigationBarViewController: NSViewController {
     }
 
     private func subscribeToDownloads() {
-        DownloadListCoordinator.shared.updates
+        downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
                 guard let self = self else { return }
@@ -610,11 +617,11 @@ final class NavigationBarViewController: NSViewController {
                 self.updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
-        DownloadListCoordinator.shared.progress
+        downloadListCoordinator.progress
             .publisher(for: \.fractionCompleted)
             .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
-            .map { _ in
-                let progress = DownloadListCoordinator.shared.progress
+            .map { [downloadListCoordinator] _ in
+                let progress = downloadListCoordinator.progress
                 return progress.fractionCompleted == 1.0 || progress.totalUnitCount == 0 ? nil : progress.fractionCompleted
             }
             .assign(to: \.progress, onWeaklyHeld: downloadsProgressView)
@@ -629,7 +636,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func updatePasswordManagementButton() {
         let menu = NSMenu()
-        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
+        let title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
         menu.addItem(withTitle: title, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "")
 
         passwordManagementButton.menu = menu
@@ -701,7 +708,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateDownloadsButton(updatingFromPinnedViewsNotification: Bool = false) {
         let menu = NSMenu()
-        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        let title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
         menu.addItem(withTitle: title, action: #selector(toggleDownloadsPanelPinning(_:)), keyEquivalent: "")
 
         downloadsButton.menu = menu
@@ -712,7 +719,7 @@ final class NavigationBarViewController: NSViewController {
             return
         }
 
-        let hasActiveDownloads = DownloadListCoordinator.shared.hasActiveDownloads
+        let hasActiveDownloads = downloadListCoordinator.hasActiveDownloads
         downloadsButton.image = hasActiveDownloads ? Self.Constants.activeDownloadsImage : Self.Constants.inactiveDownloadsImage
         let isTimerActive = downloadsButtonHidingTimer != nil
 
@@ -758,7 +765,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func hideDownloadButtonIfPossible() {
         if LocalPinningManager.shared.isPinned(.downloads) ||
-            DownloadListCoordinator.shared.hasActiveDownloads ||
+            downloadListCoordinator.hasActiveDownloads ||
             popovers.isDownloadsPopoverShown { return }
 
         downloadsButton.isHidden = true
@@ -766,7 +773,7 @@ final class NavigationBarViewController: NSViewController {
 
     private func updateBookmarksButton() {
         let menu = NSMenu()
-        let title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
+        let title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
         menu.addItem(withTitle: title, action: #selector(toggleBookmarksPanelPinning(_:)), keyEquivalent: "")
 
         bookmarkListButton.menu = menu
@@ -864,20 +871,20 @@ extension NavigationBarViewController: NSMenuDelegate {
 
         HomeButtonMenuFactory.addToMenu(menu)
 
-        let autofillTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
+        let autofillTitle = LocalPinningManager.shared.shortcutTitle(for: .autofill)
         menu.addItem(withTitle: autofillTitle, action: #selector(toggleAutofillPanelPinning), keyEquivalent: "A")
 
-        let bookmarksTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
+        let bookmarksTitle = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
         menu.addItem(withTitle: bookmarksTitle, action: #selector(toggleBookmarksPanelPinning), keyEquivalent: "K")
 
-        let downloadsTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        let downloadsTitle = LocalPinningManager.shared.shortcutTitle(for: .downloads)
         menu.addItem(withTitle: downloadsTitle, action: #selector(toggleDownloadsPanelPinning), keyEquivalent: "J")
 
 #if NETWORK_PROTECTION
         let isPopUpWindow = view.window?.isPopUpWindow ?? false
 
         if !isPopUpWindow && networkProtectionFeatureActivation.isFeatureActivated {
-            let networkProtectionTitle = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+            let networkProtectionTitle = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
             menu.addItem(withTitle: networkProtectionTitle, action: #selector(toggleNetworkProtectionPanelPinning), keyEquivalent: "N")
         }
 #endif
@@ -900,7 +907,9 @@ extension NavigationBarViewController: NSMenuDelegate {
 
     @objc
     private func toggleNetworkProtectionPanelPinning(_ sender: NSMenuItem) {
+#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+#endif
     }
 
     // MARK: - Network Protection
@@ -917,19 +926,38 @@ extension NavigationBarViewController: NSMenuDelegate {
         }
     }
 
+    /// Sets up the Network Protection button.
+    ///
+    /// This method should be run just once during the lifecycle of this view.
+    /// .
     private func setupNetworkProtectionButton() {
-        networkProtectionCancellable = networkProtectionButtonModel.$showButton
+        assert(networkProtectionButton.menu == nil)
+
+        let menuItem = NSMenuItem(title: LocalPinningManager.shared.shortcutTitle(for: .networkProtection), action: #selector(toggleNetworkProtectionPanelPinning), target: self)
+        let menu = NSMenu(items: [menuItem])
+        networkProtectionButton.menu = menu
+
+        networkProtectionButtonModel.$shortcutTitle
+            .receive(on: RunLoop.main)
+            .sink { title in
+                menuItem.title = title
+            }
+            .store(in: &cancellables)
+
+        networkProtectionButtonModel.$showButton
             .receive(on: RunLoop.main)
             .sink { [weak self] show in
                 let isPopUpWindow = self?.view.window?.isPopUpWindow ?? false
                 self?.networkProtectionButton.isHidden =  isPopUpWindow || !show
             }
+            .store(in: &cancellables)
 
-        networkProtectionInterruptionCancellable = networkProtectionButtonModel.$buttonImage
+        networkProtectionButtonModel.$buttonImage
             .receive(on: RunLoop.main)
             .sink { [weak self] image in
                 self?.networkProtectionButton.image = image
             }
+            .store(in: &cancellables)
     }
 #endif
 
@@ -964,7 +992,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu) {
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {

@@ -30,7 +30,7 @@ public final class StripePurchaseFlow {
     public static func subscriptionOptions() async -> Result<SubscriptionOptions, StripePurchaseFlow.Error> {
         os_log(.info, log: .subscription, "[StripePurchaseFlow] subscriptionOptions")
 
-        guard case let .success(products) = await SubscriptionService.getProducts(), !products.isEmpty else { 
+        guard case let .success(products) = await SubscriptionService.getProducts(), !products.isEmpty else {
             os_log(.error, log: .subscription, "[StripePurchaseFlow] Error: noProductsFound")
             return .failure(.noProductsFound)
         }

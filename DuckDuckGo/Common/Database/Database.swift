@@ -58,7 +58,9 @@ final class Database {
                                      model: .init(byMerging: [mainModel, httpsUpgradeModel])!), nil)
         }
 #if DEBUG
-        assert(![.unitTests, .xcPreviews].contains(NSApp.runType), "Use CoreData.---Container() methods for testing purposes")
+        assert(![.unitTests, .xcPreviews].contains(NSApp.runType), {
+            "Use CoreData.---Container() methods for testing purposes:\n" + Thread.callStackSymbols.description
+        }())
 #endif
 
         let keyStore: EncryptionKeyStoring

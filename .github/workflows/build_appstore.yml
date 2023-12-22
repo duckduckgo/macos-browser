@@ -26,10 +26,12 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
     secrets:
       SSH_PRIVATE_KEY_FASTLANE_MATCH:
-        required: true
-      SSH_PRIVATE_KEY_FIND_IN_PAGE:
         required: true
       APPLE_API_KEY_BASE64:
         required: true
@@ -51,7 +53,7 @@ jobs:
 
     name: Make App Store Connect Release
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
 
     env:
       destination: ${{ github.event.inputs.destination || inputs.destination }}
@@ -62,9 +64,9 @@ jobs:
     - name: Assert release branch
       if: env.destination == 'appstore'
       run: |
-        case "${{ github.ref }}" in
-          refs/heads/release/*) ;;
-          refs/heads/hotfix/*) ;;
+        case "${{ inputs.branch || github.ref_name }}" in
+          release/*) ;;
+          hotfix/*) ;;
           *) echo "👎 Not a release or hotfix branch"; exit 1 ;;
         esac
 
@@ -73,12 +75,12 @@ jobs:
       with:
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
-          ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
 
     - name: Check out the code
       uses: actions/checkout@v3
       with:
         submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
@@ -106,7 +108,7 @@ jobs:
         echo "app_version=${version}.${build_number}" >> $GITHUB_ENV
 
     - name: Upload dSYMs artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.destination }}-dSYM-${{ env.app_version }}
         path: ${{ env.dsyms_path }}

@@ -1,5 +1,5 @@
 //
-//  ConfigurationStoring.swift
+//  ConfigurationStore.swift
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //

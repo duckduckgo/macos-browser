@@ -36,10 +36,18 @@ extension URL {
      * Returns a URL pointing to `${HOME}/Library`, regardless of whether the app is sandboxed or not.
      */
     static var nonSandboxLibraryDirectoryURL: URL {
-        guard NSApp.isSandboxed else {
-            return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        if NSApp.isSandboxed {
+            return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         }
-        return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+    }
+
+    static var nonSandboxHomeDirectory: URL {
+        if NSApp.isSandboxed {
+            return FileManager.default.homeDirectoryForCurrentUser
+                .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        }
+        return FileManager.default.homeDirectoryForCurrentUser
     }
 
     /**
@@ -387,7 +395,7 @@ extension URL {
     func sanitizedForQuarantine() -> URL? {
         guard !self.isFileURL,
               !["data", "blob"].contains(self.scheme),
-              var components = URLComponents.init(url: self, resolvingAgainstBaseURL: false)
+              var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
         else {
             return nil
         }

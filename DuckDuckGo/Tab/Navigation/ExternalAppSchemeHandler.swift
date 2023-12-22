@@ -53,8 +53,8 @@ final class ExternalAppSchemeHandler {
 
 extension ExternalAppSchemeHandler: NavigationResponder {
 
-    @MainActor
-    func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+    // swiftlint:disable:next function_body_length
+    @MainActor func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         let externalUrl = navigationAction.url
         // only proceed with non-external-scheme navigations
         guard externalUrl.isExternalSchemeLink, let scheme = externalUrl.scheme else {
@@ -114,19 +114,18 @@ extension ExternalAppSchemeHandler: NavigationResponder {
         }
 
         let permissionType = PermissionType.externalScheme(scheme: scheme)
-        // use domain from the url for user-entered app schemes, otherwise use current website domain
-        let domain = navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host
-        permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace, weak self] isGranted in
+        // Check for cross-origin redirects first, then use domain from the url for user-entered app schemes, then use current website domain
+        let redirectDomain = navigationAction.redirectHistory?.reversed().first(where: { $0.url.host != navigationAction.url.host })?.url.host
+        let domain = redirectDomain ?? (navigationAction.isUserEnteredUrl ? navigationAction.url.host ?? "" : navigationAction.sourceFrame.securityOrigin.host)
+        permissionModel.permissions([permissionType], requestedForDomain: domain, url: externalUrl) { [workspace] isGranted in
             if isGranted {
                 workspace.open(externalUrl)
-
                 // if "Always allow" is set and this is the only navigation in the tab: close the tab
-                if self?.shouldCloseTabOnExternalAppOpen == true, let webView = navigationAction.targetFrame?.webView {
+                if self.shouldCloseTabOnExternalAppOpen == true, let webView = navigationAction.targetFrame?.webView {
                     webView.close()
                 }
             }
         }
-
         return .cancel
     }
 

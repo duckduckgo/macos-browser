@@ -54,17 +54,20 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     private let pinningManager: PinningManager
 
     @Published
-    private(set) var showButton = false
+    private(set) var showButton = false {
+        didSet {
+            shortcutTitle = pinningManager.shortcutTitle(for: .networkProtection)
+        }
+    }
+
+    @Published
+    private(set) var shortcutTitle: String
 
     @Published
     private(set) var buttonImage: NSImage?
 
     var isPinned: Bool {
-        didSet {
-            Task { @MainActor in
-                updateVisibility()
-            }
-        }
+        pinningManager.isPinned(.networkProtection)
     }
 
     // MARK: - NetP State
@@ -87,12 +90,12 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 statusObserver: ipcClient.connectionStatusObserver,
                 serverInfoObserver: ipcClient.serverInfoObserver,
                 connectionErrorObserver: ipcClient.connectionErrorObserver,
-                connectivityIssuesObserver: ConnectivityIssueObserverThroughDistributedNotifications(),
+                connectivityIssuesObserver: DisabledConnectivityIssueObserver(),
                 controllerErrorMessageObserver: ControllerErrorMesssageObserverThroughDistributedNotifications()
         )
         self.iconPublisher = NetworkProtectionIconPublisher(statusReporter: networkProtectionStatusReporter, iconProvider: iconProvider)
         self.pinningManager = pinningManager
-        isPinned = pinningManager.isPinned(.networkProtection)
+        self.shortcutTitle = pinningManager.shortcutTitle(for: .networkProtection)
 
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesObserver.recentValue
         buttonImage = .image(for: iconPublisher.icon)
@@ -190,7 +193,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     }
 
     @MainActor
-    private func updateVisibility() {
+    func updateVisibility() {
         // The button is visible in the case where NetP has not been activated, but the user has been invited and they haven't accepted T&Cs.
         let networkProtectionVisibility = DefaultNetworkProtectionVisibility()
         if networkProtectionVisibility.isNetworkProtectionVisible() {
@@ -227,15 +230,15 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
                 return
             }
 
-            switch status {
-            case .connecting, .connected, .reasserting, .disconnecting:
-                showButton = true
-
-                pinNetworkProtectionToNavBarIfNeverPinnedBefore()
-            default:
-                showButton = false
-            }
+            showButton = false
         }
+    }
+
+    // MARK: - Pinning
+
+    @objc
+    func togglePin() {
+        pinningManager.togglePinning(for: .networkProtection)
     }
 
     /// We want to pin Network Protection to the navigation bar the first time it's enabled, and only

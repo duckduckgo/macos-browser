@@ -4,7 +4,15 @@ on:
   push:
     branches: [ main, "release/**" ]
   pull_request:
-
+  workflow_call:
+    inputs:
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
 
 jobs:
   swiftlint:
@@ -16,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: SwiftLint
-        uses: docker://norionomura/swiftlint:0.53.0
+        uses: docker://norionomura/swiftlint:0.54.0
         with:
           args: swiftlint --reporter github-actions-logging --strict
 
@@ -28,7 +36,14 @@ jobs:
 
     steps:
     - name: Check out the code
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
       uses: actions/checkout@v3
+
+    - name: Check out the code
+      if: github.event_name != 'pull_request' && github.event_name != 'push'
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.branch || github.ref_name }}
 
     - name: Run ShellCheck
       uses: ludeeus/action-shellcheck@master
@@ -44,34 +59,26 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [ "Sandbox", "Non-Sandbox", "DBP" ]
+        flavor: [ "Sandbox", "Non-Sandbox" ]
         include:
           - scheme: DuckDuckGo Privacy Browser
             flavor: Non-Sandbox
           - scheme: DuckDuckGo Privacy Browser App Store
             flavor: Sandbox
-          - scheme: DataBrokerProtectionTests
-            flavor: DBP
           - active-arch: YES
             flavor: Non-Sandbox
           - active-arch: NO
             flavor: Sandbox
-          - active-arch: YES
-            flavor: DBP
           - integration-tests-target: Integration Tests
             flavor: Non-Sandbox
           - integration-tests-target: Integration Tests App Store
             flavor: Sandbox
-          - integration-tests-target: Integration Tests
-            flavor: DBP
           - cache-key:
             flavor: Non-Sandbox
           - cache-key: sandbox-
             flavor: Sandbox
-          - cache-key: dbp-
-            flavor: DBP
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
     timeout-minutes: 30
 
     outputs:
@@ -79,17 +86,18 @@ jobs:
       commit_author: ${{ steps.fetch_commit_author.outputs.commit_author }}
 
     steps:
-    - name: Register SSH keys for submodules access
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
-          ${{ secrets.SSH_PRIVATE_KEY_PRIVACY_DASHBOARD }}
-
     - name: Check out the code
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
       uses: actions/checkout@v3
       with:
         submodules: recursive
+
+    - name: Check out the code
+      if: github.event_name != 'pull_request' && github.event_name != 'push'
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
 
     - name: Set cache key hash
       run: |
@@ -125,6 +133,7 @@ jobs:
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
+          -skipPackagePluginValidation \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-skip-testing:${{ matrix.integration-tests-target }}" \
@@ -133,12 +142,12 @@ jobs:
           || { mv "$(grep -m 1 '.*\.xcresult' ${{ matrix.flavor }}-unittests-xcodebuild.log | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" ./${{ matrix.flavor }}-unittests.xcresult && exit 1; }
 
     - name: Run integration tests
-      if: matrix.flavor != 'DBP'
       run: |
         set -o pipefail && xcodebuild test \
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "CI" \
+          -skipPackagePluginValidation \
           ENABLE_TESTABILITY=true \
           ONLY_ACTIVE_ARCH=${{ matrix.active-arch }} \
           "-only-testing:${{ matrix.integration-tests-target }}" \
@@ -194,7 +203,7 @@ jobs:
           | xargs -L 1 ./scripts/report-failed-unit-test.sh
 
     - name: Upload failed unit tests log
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: ${{ matrix.flavor }}-unittests-xcodebuild.log
@@ -202,7 +211,7 @@ jobs:
         retention-days: 7
 
     - name: Upload failed unit tests xcresult
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: ${{ matrix.flavor }}-unittests.xcresult
@@ -210,16 +219,16 @@ jobs:
         retention-days: 7
 
     - name: Upload failed integration tests log
-      uses: actions/upload-artifact@v3
-      if: failure() && matrix.flavor != 'DBP'
+      uses: actions/upload-artifact@v4
+      if: failure()
       with:
         name: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
         path: ${{ matrix.flavor }}-integrationtests-xcodebuild.log
         retention-days: 7
 
     - name: Upload failed integration tests xcresult
-      uses: actions/upload-artifact@v3
-      if: failure() && matrix.flavor != 'DBP'
+      uses: actions/upload-artifact@v4
+      if: failure()
       with:
         name: ${{ matrix.flavor }}-integrationtests.xcresult
         path: ${{ matrix.flavor }}-integrationtests.xcresult
@@ -248,23 +257,17 @@ jobs:
     name: Make Release Build
 
     # Dependabot doesn't have access to all secrets, so we skip this job
-    if: github.actor != 'dependabot[bot]'
+    # workflow_call is used by bump_internal_release and is followed by a proper release job
+    if: github.actor != 'dependabot[bot]' && (github.event_name == 'push' || github.event_name == 'pull_request')
 
     strategy:
       matrix:
         scheme: [ "DuckDuckGo Privacy Browser", "DuckDuckGo Privacy Pro" ]
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
     timeout-minutes: 30
 
     steps:
-    - name: Register SSH keys for submodules access
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
-          ${{ secrets.SSH_PRIVATE_KEY_PRIVACY_DASHBOARD }}
-
     - name: Check out the code
       uses: actions/checkout@v3
       with:
@@ -319,11 +322,12 @@ jobs:
           -scheme "${{ matrix.scheme }}" \
           -derivedDataPath "DerivedData" \
           -configuration "Release" \
+          -skipPackagePluginValidation \
           | tee release-xcodebuild.log \
           | xcbeautify
 
     - name: Upload failed test log
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: release-xcodebuild.log
