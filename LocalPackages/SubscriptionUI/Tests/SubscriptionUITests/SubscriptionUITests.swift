@@ -1,5 +1,5 @@
 //
-//  DuckDuckGoPrivacyPro.xcconfig
+//  SubscriptionUITests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,11 +16,8 @@
 //  limitations under the License.
 //
 
-// Configuration settings file format documentation can be found at:
-// https://help.apple.com/xcode/#/dev745c5c974
+import XCTest
+@testable import SubscriptionUI
 
-#include "DuckDuckGo.xcconfig"
-
-FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION SPARKLE SUBSCRIPTION DBP STRIPE
-PRODUCT_NAME = $(PRODUCT_NAME_PREFIX) Privacy Pro
-PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser
+final class SubscriptionUITests: XCTestCase {
+}

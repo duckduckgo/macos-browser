@@ -1,5 +1,5 @@
 //
-//  DuckDuckGoPrivacyPro.xcconfig
+//  AccountStorage.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,11 +16,16 @@
 //  limitations under the License.
 //
 
-// Configuration settings file format documentation can be found at:
-// https://help.apple.com/xcode/#/dev745c5c974
+import Foundation
 
-#include "DuckDuckGo.xcconfig"
-
-FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION SPARKLE SUBSCRIPTION DBP STRIPE
-PRODUCT_NAME = $(PRODUCT_NAME_PREFIX) Privacy Pro
-PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser
+public protocol AccountStorage: AnyObject {
+    func getAuthToken() throws -> String?
+    func store(authToken: String) throws
+    func getAccessToken() throws -> String?
+    func store(accessToken: String) throws
+    func getEmail() throws -> String?
+    func store(email: String?) throws
+    func getExternalID() throws -> String?
+    func store(externalID: String?) throws
+    func clearAuthenticationState() throws
+}
