@@ -147,7 +147,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func testError1(_ sender: Any?) {
         Task { @MainActor in
-            let alert = NSAlert.init()
+            let alert = NSAlert()
             alert.messageText = "Something Went Wrong"
             alert.informativeText = "The App Store was not able to process your purchase. Please try again later."
             alert.addButton(withTitle: "OK")
@@ -158,7 +158,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     @objc
     func testError2(_ sender: Any?) {
         Task { @MainActor in
-            let alert = NSAlert.init()
+            let alert = NSAlert()
             alert.messageText = "Subscription Not Found"
             alert.informativeText = "The subscription associated with this Apple ID is no longer active."
             alert.addButton(withTitle: "View Plans")
