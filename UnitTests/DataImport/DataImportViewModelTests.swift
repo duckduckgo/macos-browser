@@ -1526,7 +1526,7 @@ import XCTest
                         XCTAssertTrue(report.error.localizedDescription.contains(error.localizedDescription))
                     }
                 }
-                XCTAssertEqual(report.importSourceDescription, Source.safari.importSourceName)
+                XCTAssertEqual(report.importSourceDescription, Source.safari.importSourceName + " " + "\(SafariVersionReader.getMajorVersion() ?? 0)")
                 XCTAssertEqual(report.appVersion, "\(AppVersion.shared.versionNumber)")
                 XCTAssertEqual(report.osVersion, "\(ProcessInfo.processInfo.operatingSystemVersion)")
                 XCTAssertEqual(report.retryNumber, 2)

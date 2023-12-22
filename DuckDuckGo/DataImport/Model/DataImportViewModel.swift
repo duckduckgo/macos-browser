@@ -248,7 +248,7 @@ struct DataImportViewModel {
                     // switch to file import of the failed data type displaying successful import results
                     nextScreen = .fileImport(dataType: dataType, summary: Set(summary.filter({ $0.value.isSuccess }).keys))
                 }
-                Pixel.fire(.dataImportFailed(source: importSource, error: error))
+                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
             }
         }
 
@@ -283,7 +283,7 @@ struct DataImportViewModel {
             switch error {
             // chromium user denied keychain prompt error
             case let error as ChromiumLoginReader.ImportError where error.type == .userDeniedKeychainPrompt:
-                Pixel.fire(.dataImportFailed(source: importSource, error: error))
+                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
                 // stay on the same screen
                 return true
 
@@ -305,7 +305,7 @@ struct DataImportViewModel {
                     break
                 }
                 log("file read no permission for \(url.path)")
-                Pixel.fire(.dataImportFailed(source: importSource, error: importError))
+                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
                 screen = .getReadPermission(url)
                 return true
 
@@ -710,8 +710,13 @@ extension DataImportViewModel {
 
     var reportModel: DataImportReportModel {
         get {
-            DataImportReportModel(importSource: importSource, error: summarizedError, text: userReportText, retryNumber: retryNumber)
-        } set {
+            DataImportReportModel(importSource: importSource,
+                                  importSourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile),
+                                  error: summarizedError,
+                                  text: userReportText,
+                                  retryNumber: retryNumber)
+        }
+        set {
             userReportText = newValue.text
         }
     }
