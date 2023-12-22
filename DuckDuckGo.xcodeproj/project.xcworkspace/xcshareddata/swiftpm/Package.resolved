@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "e4f4ae624174c1398d345cfc387db38f8f69986d",
-        "version" : "94.0.0"
+        "revision" : "2c1c2bb0aad5a23524e298fa9bea9b890ae43e23",
+        "version" : "99.0.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "dbecae0df07650a21b5632a92fa2e498c96af7b5",
-        "version" : "10.0.1"
+        "revision" : "5597bc17709c8acf454ecaad4f4082007986242a",
+        "version" : "10.0.2"
       }
     },
     {
@@ -106,6 +106,24 @@
       "state" : {
         "revision" : "c8ed701b513cf5177118a175d85fbbbcd707ab41",
         "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "swift-snapshot-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
+      "state" : {
+        "revision" : "59b663f68e69f27a87b45de48cb63264b8194605",
+        "version" : "1.15.1"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-syntax.git",
+      "state" : {
+        "revision" : "6ad4ea24b01559dde0773e3d091f1b9e36175036",
+        "version" : "509.0.2"
       }
     },
     {

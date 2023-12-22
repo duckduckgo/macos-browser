@@ -87,10 +87,26 @@ public final class PixelKit {
     private let log: OSLog
     private let fireRequest: FireRequest
 
-    /// `dryRun`: if `true`, simulate requests and "send" them at an accelerated rate (once every 2 minutes instead of once a day)
-    /// `fireRequest`: this is not triggered when `dryRun` is `true`
-    public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, defaults: UserDefaults, fireRequest: @escaping FireRequest) {
-        shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, defaults: defaults, fireRequest: fireRequest)
+    /// Sets up PixelKit for the entire app.
+    ///
+    /// - Parameters:
+    /// - `dryRun`: if `true`, simulate requests and "send" them at an accelerated rate (once every 2 minutes instead of once a day)
+    /// - `source`: if set, adds a `pixelSource` parameter to the pixel call; this can be used to specify which target is sending the pixel
+    /// - `fireRequest`: this is not triggered when `dryRun` is `true`
+    public static func setUp(dryRun: Bool = false,
+                             appVersion: String,
+                             source: String? = nil,
+                             defaultHeaders: [String: String],
+                             log: OSLog,
+                             defaults: UserDefaults,
+                             fireRequest: @escaping FireRequest) {
+        shared = PixelKit(dryRun: dryRun,
+                          appVersion: appVersion,
+                          source: source,
+                          defaultHeaders: defaultHeaders,
+                          log: log,
+                          defaults: defaults,
+                          fireRequest: fireRequest)
     }
 
     static func tearDown() {
@@ -98,10 +114,12 @@ public final class PixelKit {
     }
 
     private var dryRun: Bool
+    private let source: String?
     private let pixelCalendar: Calendar
 
     init(dryRun: Bool,
          appVersion: String,
+         source: String? = nil,
          defaultHeaders: [String: String],
          log: OSLog,
          dailyPixelCalendar: Calendar? = nil,
@@ -111,6 +129,7 @@ public final class PixelKit {
 
         self.dryRun = dryRun
         self.appVersion = appVersion
+        self.source = source
         self.defaultHeaders = defaultHeaders
         self.log = log
         self.pixelCalendar = dailyPixelCalendar ?? Self.defaultDailyPixelCalendar
@@ -119,18 +138,30 @@ public final class PixelKit {
         self.fireRequest = fireRequest
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func fire(pixelNamed pixelName: String,
                       frequency: Frequency,
-                      withHeaders headers: [String: String]? = nil,
-                      withAdditionalParameters params: [String: String]? = nil,
-                      allowedQueryReservedCharacters: CharacterSet? = nil,
-                      includeAppVersionParameter: Bool = true,
-                      onComplete: @escaping CompletionBlock = { _, _ in }) {
+                      withHeaders headers: [String: String]?,
+                      withAdditionalParameters params: [String: String]?,
+                      withError error: Error?,
+                      allowedQueryReservedCharacters: CharacterSet?,
+                      includeAppVersionParameter: Bool,
+                      onComplete: @escaping CompletionBlock) {
 
         var newParams = params ?? [:]
+
         if includeAppVersionParameter {
             newParams[Parameters.appVersion] = appVersion
         }
+
+        if let source {
+            newParams[Parameters.pixelSource] = source
+        }
+
+        if let error {
+            newParams.appendErrorPixelParams(error: error)
+        }
+
         #if DEBUG
             newParams[Parameters.test] = Values.test
         #endif
@@ -149,20 +180,33 @@ public final class PixelKit {
             if !pixelHasBeenFiredEver(pixelName) {
                 fireRequestWrapper(pixelName, headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName, parameters: newParams, skipped: true)
             }
         case .dailyOnly:
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName + "_d", parameters: newParams, skipped: true)
             }
         case .dailyAndContinuous:
             if !pixelHasBeenFiredToday(pixelName) {
                 fireRequestWrapper(pixelName + "_d", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
                 updatePixelLastFireDate(pixelName: pixelName)
+            } else {
+                printDebugInfo(pixelName: pixelName + "_d", parameters: newParams, skipped: true)
             }
 
             fireRequestWrapper(pixelName + "_c", headers, newParams, allowedQueryReservedCharacters, true, onComplete)
         }
+    }
+
+    private func printDebugInfo(pixelName: String, parameters: [String: String], skipped: Bool = false) {
+#if DEBUG
+        let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
+        os_log(.debug, log: log, "👾 [%{public}@] %{public}@ %{public}@", skipped ? "SKIPPED" : "FIRED", pixelName.replacingOccurrences(of: "_", with: "."), params)
+#endif
     }
 
     private func fireRequestWrapper(
@@ -173,8 +217,7 @@ public final class PixelKit {
         _ callBackOnMainThread: Bool,
         _ onComplete: @escaping CompletionBlock) {
         guard !dryRun else {
-            let params = parameters.filter { key, _ in !["appVersion", "test"].contains(key) }
-            os_log(.debug, log: log, "👾 %{public}@ %{public}@", pixelName.replacingOccurrences(of: "_", with: "."), params)
+            printDebugInfo(pixelName: pixelName, parameters: parameters)
 
             // simulate server response time for Dry Run mode
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -203,6 +246,7 @@ public final class PixelKit {
                      frequency: Frequency = .standard,
                      withHeaders headers: [String: String]? = nil,
                      withAdditionalParameters params: [String: String]? = nil,
+                     withError error: Error? = nil,
                      allowedQueryReservedCharacters: CharacterSet? = nil,
                      includeAppVersionParameter: Bool = true,
                      onComplete: @escaping CompletionBlock = { _, _ in }) {
@@ -235,6 +279,7 @@ public final class PixelKit {
              frequency: frequency,
              withHeaders: headers,
              withAdditionalParameters: newParams,
+             withError: error,
              allowedQueryReservedCharacters: allowedQueryReservedCharacters,
              includeAppVersionParameter: includeAppVersionParameter,
              onComplete: onComplete)
@@ -244,6 +289,7 @@ public final class PixelKit {
                             frequency: Frequency = .standard,
                             withHeaders headers: [String: String] = [:],
                             withAdditionalParameters parameters: [String: String]? = nil,
+                            withError error: Error? = nil,
                             allowedQueryReservedCharacters: CharacterSet? = nil,
                             includeAppVersionParameter: Bool = true,
                             onComplete: @escaping CompletionBlock = { _, _ in }) {
@@ -252,6 +298,7 @@ public final class PixelKit {
                           frequency: frequency,
                           withHeaders: headers,
                           withAdditionalParameters: parameters,
+                          withError: error,
                           allowedQueryReservedCharacters: allowedQueryReservedCharacters,
                           includeAppVersionParameter: includeAppVersionParameter,
                           onComplete: onComplete)
@@ -307,6 +354,25 @@ public final class PixelKit {
         dryRun
             ? "com.duckduckgo.network-protection.pixel.\(pixelName).dry-run"
             : "com.duckduckgo.network-protection.pixel.\(pixelName)"
+    }
+
+}
+
+extension Dictionary where Key == String, Value == String {
+
+    mutating func appendErrorPixelParams(error: Error) {
+        let nsError = error as NSError
+
+        self[PixelKit.Parameters.errorCode] = "\(nsError.code)"
+        self[PixelKit.Parameters.errorDomain] = nsError.domain
+
+        if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
+            self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
+            self[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
+        } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {
+            self[PixelKit.Parameters.underlyingErrorCode] = "\(sqlErrorCode.intValue)"
+            self[PixelKit.Parameters.underlyingErrorDomain] = "NSSQLiteErrorDomain"
+        }
     }
 
 }

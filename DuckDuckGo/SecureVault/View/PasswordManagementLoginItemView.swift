@@ -102,6 +102,7 @@ struct PasswordManagementLoginItemView: View {
                     secondaryButton: cancelButton
                 )
             }
+            .accessibility(identifier: "Login item View")
         }
     }
 
@@ -175,6 +176,7 @@ private struct UsernameView: View {
                 TextField("", text: $model.username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom, interItemSpacing)
+                    .accessibility(identifier: "Username TextField")
 
             } else {
 
@@ -439,6 +441,7 @@ private struct WebsiteView: View {
             TextField("", text: $model.domain)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding(.bottom, interItemSpacing)
+                .accessibility(identifier: "Website TextField")
 
         } else {
             if let domainURL = model.domain.url {

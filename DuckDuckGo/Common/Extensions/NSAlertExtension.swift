@@ -221,6 +221,18 @@ extension NSAlert {
         return alert
     }
 
+    static func dataSyncingDisabledByFeatureFlag(showLearnMore: Bool, upgradeRequired: Bool = false) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = UserText.syncPausedTitle
+        alert.informativeText = upgradeRequired ? UserText.syncUnavailableMessageUpgradeRequired : UserText.syncUnavailableMessage
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: UserText.ok)
+        if showLearnMore {
+            alert.addButton(withTitle: UserText.learnMore)
+        }
+        return alert
+    }
+
     static func customConfigurationAlert(configurationUrl: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = "Set custom configuration URL:"

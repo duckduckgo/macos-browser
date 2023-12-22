@@ -97,7 +97,7 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
     private func showAlert(title: String, message: String? = nil) {
         Task { @MainActor in
-            let alert = NSAlert.init()
+            let alert = NSAlert()
             alert.messageText = title
             if let message = message {
                 alert.informativeText = message

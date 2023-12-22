@@ -26,6 +26,14 @@
 		<string>/Library/Application Support/BraveSoftware/Brave-Browser/</string>
 		<string>/Library/Application Support/Firefox/</string>
 		<string>/Library/Application Support/Microsoft Edge/</string>
+		<string>/Library/Application Support/Vivaldi/</string>
+		<string>/Library/Application Support/com.operasoftware.Opera/</string>
+		<string>/Library/Application Support/com.operasoftware.OperaGX/</string>
+		<string>/Library/Application Support/Yandex/YandexBrowser/</string>
+		<string>/Library/Application Support/Chromium/</string>
+		<string>/Library/Application Support/Coccoc/</string>
+		<string>/Library/Application Support/TorBrowser-Data/Browser/</string>
+		<string>/Library/Application Support/Arc/User Data/</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>

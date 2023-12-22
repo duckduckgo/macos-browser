@@ -143,7 +143,7 @@ enum UserText {
     static let bookmarksLimitExceededDescription = NSLocalizedString("prefrences.sync.bookmarks-limit-exceeded-description", value: "Bookmark limit exceeded. Delete some to resume syncing.", comment: "Description for sync bookmarks limits exceeded warning")
     static let credentialsLimitExceededDescription = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-description", value: "Logins limit exceeded. Delete some to resume syncing.", comment: "Description for sync credentials limits exceeded warning")
     static let bookmarksLimitExceededAction = NSLocalizedString("prefrences.sync.bookmarks-limit-exceeded-action", value: "Manage Bookmarks", comment: "Button title for sync bookmarks limits exceeded warning to manage bookmarks")
-    static let credentialsLimitExceededAction = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-action", value: "Manage Logins", comment: "Button title for sync credentials limits exceeded warning to manage logins")
+    static let credentialsLimitExceededAction = NSLocalizedString("prefrences.sync.credentials-limit-exceeded-action", value: "Manage passwords...", comment: "Button title for sync credentials limits exceeded warning to manage logins")
     static let syncErrorAlertTitle = NSLocalizedString("alert.sync-error", value: "Sync Error", comment: "Title for sync error alert")
     static let unableToSyncDescription = NSLocalizedString("alert.unable-to-sync-description", value: "Unable to sync.", comment: "Description for unable to sync error")
     static let unableToGetDevicesDescription = NSLocalizedString("alert.unable-to-get-devices-description", value: "Unable to retrieve the list of connected devices.", comment: "Description for unable to get devices error")
@@ -157,4 +157,10 @@ enum UserText {
     static let fetchFaviconsOnboardingTitle = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-title", value: "Download Missing Icons?", comment: "Title for fetch favicons onboarding dialog")
     static let fetchFaviconsOnboardingMessage = NSLocalizedString("prefrences.sync.fetch-favicons-onboarding-message", value: "Do you want this device to automatically download icons for any new bookmarks synced from your other devices? This will expose the download to your network any time a bookmark is synced.", comment: "Text for fetch favicons onboarding dialog")
     static let keepFaviconsUpdated = NSLocalizedString("prefrences.sync.keep-favicons-updated", value: "Keep Bookmarks Icons Updated", comment: "Title of the confirmation button for favicons fetching")
+
+    // Sync Feature Flags
+    static let syncUnavailableTitle = NSLocalizedString("sync.warning.sync-unavailable", value: "Sync & Backup is Unavailable", comment: "Title of the warning message")
+    static let syncPausedTitle = NSLocalizedString("sync.warning.sync-paused", value: "Sync & Backup is Paused", comment: "Title of the warning message")
+    static let syncUnavailableMessage = NSLocalizedString("sync.warning.sync-unavailable-message", value: "Sorry, but Sync & Backup is currently unavailable. Please try again later.", comment: "Data syncing unavailable warning message")
+    static let syncUnavailableMessageUpgradeRequired = NSLocalizedString("sync.warning.data-syncing-disabled-upgrade-required", value: "Sorry, but Sync & Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.", comment: "Data syncing unavailable warning message")
 }

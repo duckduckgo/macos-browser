@@ -273,9 +273,9 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     }
 
     func testMatchFoundWithExpiredProfile_thenOptOutDateIsNow() throws {
-        let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
+        let expiredDate = Date(timeIntervalSince1970: 0).addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds * 2)
 
-        let expectedOptOutDate = Date()
+        let expectedOptOutDate = Date(timeIntervalSince1970: 0)
 
         let historyEvents = [
             HistoryEvent(extractedProfileId: 1,
@@ -293,7 +293,8 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
         let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                      historyEvents: historyEvents,
                                                                      extractedProfileID: 1,
-                                                                     schedulingConfig: schedulingConfig)
+                                                                     schedulingConfig: schedulingConfig,
+                                                                     date: MockDate())
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
@@ -476,10 +477,10 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
     /*
      If the time elapsed since the last profile removal exceeds the current date plus maintenance period (expired), we should proceed with scheduling a new opt-out request as the broker has failed to honor the previous one.
      */
-    func skipMatchFoundWithExpiredProfileWithRecentDate_thenOptOutDateDoesNotChange() throws {
-        let expiredDate = Date().addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
+    func testMatchFoundWithExpiredProfileWithRecentDate_thenOptOutDateDoesNotChange() throws {
+        let expiredDate = Date(timeIntervalSince1970: 0).addingTimeInterval(-schedulingConfig.maintenanceScan.hoursToSeconds)
 
-        let expectedOptOutDate = Date()
+        let expectedOptOutDate = Date(timeIntervalSince1970: 0)
 
         let historyEvents = [
             HistoryEvent(extractedProfileId: 1,
@@ -491,13 +492,15 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                          brokerId: 1,
                          profileQueryId: 1,
                          type: .matchesFound(count: 1))]
+        let dateProtocol = MockDate()
 
         let calculator = OperationPreferredDateCalculator()
 
         let actualOptOutDate = try calculator.dateForOptOutOperation(currentPreferredRunDate: nil,
                                                                      historyEvents: historyEvents,
                                                                      extractedProfileID: 1,
-                                                                     schedulingConfig: schedulingConfig)
+                                                                     schedulingConfig: schedulingConfig,
+                                                                     date: dateProtocol)
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
     }
@@ -599,5 +602,11 @@ final class OperationPreferredDateCalculatorTests: XCTestCase {
                                                                      schedulingConfig: schedulingConfig)
 
         XCTAssertTrue(areDatesEqualIgnoringSeconds(date1: expectedOptOutDate, date2: actualOptOutDate))
+    }
+}
+
+struct MockDate: DateProtocol {
+    var now: Date {
+        return Date(timeIntervalSince1970: 0)
     }
 }

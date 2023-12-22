@@ -58,12 +58,18 @@ extension DataBrokerScheduleConfig {
     }
 }
 
+final class InternalUserDeciderStoreMock: InternalUserStoring {
+    var isInternalUser: Bool = false
+}
+
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
     var currentConfig: Data = Data()
 
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
 
     var privacyConfig: BrowserServicesKit.PrivacyConfiguration = PrivacyConfigurationMock()
+
+    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
 
     func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
         .downloaded

@@ -24,9 +24,9 @@ public struct PreferencePaneSection<Content>: View where Content: View {
     public let verticalPadding: CGFloat
     @ViewBuilder public let content: () -> Content
 
-    public init(spacing: CGFloat = 12, vericalPadding: CGFloat = 20, @ViewBuilder content: @escaping () -> Content) {
+    public init(spacing: CGFloat = 12, verticalPadding: CGFloat = 20, @ViewBuilder content: @escaping () -> Content) {
         self.spacing = spacing
-        self.verticalPadding = vericalPadding
+        self.verticalPadding = verticalPadding
         self.content = content
     }
 

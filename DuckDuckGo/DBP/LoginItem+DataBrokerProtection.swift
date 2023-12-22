@@ -1,5 +1,5 @@
 //
-//  LoginItem.swift
+//  LoginItem+DataBrokerProtection.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //

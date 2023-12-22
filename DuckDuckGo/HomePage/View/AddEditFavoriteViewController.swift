@@ -33,7 +33,7 @@ final class AddEditFavoriteViewController: NSViewController {
 
     static func create(bookmark: Bookmark? = nil) -> AddEditFavoriteViewController {
         NSStoryboard(name: "AddEditFavoriteViewController", bundle: .main).instantiateInitialController {
-            let addEditFavoriteViewController = AddEditFavoriteViewController.init(coder: $0)
+            let addEditFavoriteViewController = AddEditFavoriteViewController(coder: $0)
             if let bookmark {
                 addEditFavoriteViewController?.edit(bookmark: bookmark)
             }

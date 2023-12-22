@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  CapturingDefaultBrowserProvider.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
