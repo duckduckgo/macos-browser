@@ -361,6 +361,16 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Removal
 
+    func removeAll(with content: Tab.TabContent) {
+        let tabs = tabCollection.tabs.filter { $0.content == content }
+
+        for tab in tabs {
+            if let index = indexInAllTabs(of: tab) {
+                remove(at: index)
+            }
+        }
+    }
+
     func remove(at index: TabIndex, published: Bool = true, forceChange: Bool = false) {
         switch index {
         case .unpinned(let i):
