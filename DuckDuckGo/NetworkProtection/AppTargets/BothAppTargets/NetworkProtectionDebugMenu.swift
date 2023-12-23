@@ -521,9 +521,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
         let store = DefaultWaitlistActivationDateStore(userDefaults: .netP)
 
         if let date {
-            store.updateActivationDate(date)
+            store.updateActivationDate(date, source: .netP)
         } else {
-            store.removeDates()
+            store.removeDates(source: .netP)
         }
     }
 

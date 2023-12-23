@@ -149,8 +149,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
             switch status {
             case .connected:
-                waitlistActivationDateStore.setActivationDateIfNecessary()
-                waitlistActivationDateStore.updateLastActiveDate()
+                waitlistActivationDateStore.setActivationDateIfNecessary(source: .netP)
+                waitlistActivationDateStore.updateLastActiveDate(source:.netP)
             default: break
             }
 

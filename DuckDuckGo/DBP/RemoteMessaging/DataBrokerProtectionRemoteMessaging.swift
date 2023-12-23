@@ -121,7 +121,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
 
             // First, check messages that require a number of days of DBP usage
             if let requiredDaysSinceActivation = message.daysSinceDataBrokerProtectionEnabled,
-               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
+               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation(source: .dbp) {
                 if requiredDaysSinceActivation <= daysSinceActivation {
                     return true
                 } else {
@@ -135,7 +135,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
             }
 
             // Finally, check if the message requires DBP usage, and check if the user has used it at all:
-            if message.requiresDataBrokerProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil { // TODO
+            if message.requiresDataBrokerProtectionUsage, waitlistActivationDateStore.daysSinceActivation(source: .dbp) == nil { // TODO
                 return false
             }
 

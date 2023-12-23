@@ -124,7 +124,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
             // First, check messages that require a number of days of NetP usage
             if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled,
-               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
+               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation(source: .netP) {
                 if requiredDaysSinceActivation <= daysSinceActivation {
                     return true
                 } else {
@@ -138,7 +138,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // Finally, check if the message requires NetP usage, and check if the user has used it at all:
-            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
+            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation(source: .netP) == nil {
                 return false
             }
 

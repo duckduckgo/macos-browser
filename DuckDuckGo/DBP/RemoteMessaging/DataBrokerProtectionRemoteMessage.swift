@@ -63,8 +63,8 @@ struct DataBrokerProtectionRemoteMessage: Codable, Equatable, Hashable {
                 operatingSystemVersion: operatingSystemVersion,
                 appVersion: appVersion,
                 hardwareModel: hardwareModel,
-                daysSinceActivation: activationDateStore.daysSinceActivation(),
-                daysSinceLastActive: activationDateStore.daysSinceLastActive()
+                daysSinceActivation: activationDateStore.daysSinceActivation(source: .dbp),
+                daysSinceLastActive: activationDateStore.daysSinceLastActive(source: .dbp)
             )
 
             return surveyURLBuilder.buildSurveyURL(from: actionURL)

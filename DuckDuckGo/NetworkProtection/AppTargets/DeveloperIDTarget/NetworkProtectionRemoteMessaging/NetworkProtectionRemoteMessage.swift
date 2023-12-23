@@ -63,8 +63,8 @@ struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashabl
                 operatingSystemVersion: operatingSystemVersion,
                 appVersion: appVersion,
                 hardwareModel: hardwareModel,
-                daysSinceActivation: activationDateStore.daysSinceActivation(),
-                daysSinceLastActive: activationDateStore.daysSinceLastActive()
+                daysSinceActivation: activationDateStore.daysSinceActivation(source: .netP),
+                daysSinceLastActive: activationDateStore.daysSinceLastActive(source: .netP)
             )
 
             return surveyURLBuilder.buildSurveyURL(from: actionURL)
