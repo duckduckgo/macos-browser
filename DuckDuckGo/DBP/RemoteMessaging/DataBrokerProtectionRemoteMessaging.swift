@@ -39,7 +39,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
     private let messageStorage: HomePageRemoteMessagingStorage
     private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
-    private let networkProtectionVisibility: NetworkProtectionFeatureVisibility
+    private let dataBrokerProtectionVisibility: DataBrokerProtectionFeatureVisibility
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
@@ -56,7 +56,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.dataBrokerProtection(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "dbp", keychainAppGroup: Bundle.main.appGroup(bundle: .dbp)),
         waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(userDefaults: .netP),
-        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+        dataBrokerProtectionVisibility: DataBrokerProtectionFeatureVisibility = DefaultDataBrokerProtectionFeatureVisibility(),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {
@@ -64,7 +64,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
         self.messageStorage = messageStorage
         self.waitlistStorage = waitlistStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
-        self.networkProtectionVisibility = networkProtectionVisibility
+        self.dataBrokerProtectionVisibility = dataBrokerProtectionVisibility
         self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
     }
@@ -130,7 +130,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
             }
 
             // Next, check if the message requires access to DBP but it's not visible:
-            if message.requiresDataBrokerProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() { // TODO
+            if message.requiresDataBrokerProtectionAccess, !dataBrokerProtectionVisibility.isFeatureVisible() { // TODO
                 return false
             }
 
