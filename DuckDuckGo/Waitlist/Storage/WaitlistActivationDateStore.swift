@@ -43,8 +43,8 @@ enum WaitlistActivationDateStoreSource {
 
 protocol WaitlistActivationDateStore {
 
-    func daysSinceActivation() -> Int?
-    func daysSinceLastActive() -> Int?
+    func daysSinceActivation(source: WaitlistActivationDateStoreSource) -> Int?
+    func daysSinceLastActive(source: WaitlistActivationDateStoreSource) -> Int?
 
 }
 
@@ -61,16 +61,16 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
         self.userDefaults = userDefaults
     }
 
-    func setActivationDateIfNecessary() {
-        if userDefaults.double(forKey: Constants.networkProtectionActivationDateKey) != 0 {
+    func setActivationDateIfNecessary(source: WaitlistActivationDateStoreSource) {
+        if userDefaults.double(forKey: source.activationDateKey) != 0 {
             return
         }
 
-        updateActivationDate(Date())
+        updateActivationDate(Date(), source: source)
     }
 
-    func daysSinceActivation() -> Int? {
-        let timestamp = userDefaults.double(forKey: Constants.networkProtectionActivationDateKey)
+    func daysSinceActivation(source: WaitlistActivationDateStoreSource) -> Int? {
+        let timestamp = userDefaults.double(forKey: source.activationDateKey)
 
         if timestamp == 0 {
             return nil
@@ -80,12 +80,12 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
         return daysSince(date: activationDate)
     }
 
-    func updateLastActiveDate() {
-        userDefaults.set(Date(), forKey: Constants.networkProtectionLastActiveDateKey)
+    func updateLastActiveDate(source: WaitlistActivationDateStoreSource) {
+        userDefaults.set(Date(), forKey: source.lastActiveDateKey)
     }
 
-    func daysSinceLastActive() -> Int? {
-        let timestamp = userDefaults.double(forKey: Constants.networkProtectionLastActiveDateKey)
+    func daysSinceLastActive(source: WaitlistActivationDateStoreSource) -> Int? {
+        let timestamp = userDefaults.double(forKey: source.lastActiveDateKey)
 
         if timestamp == 0 {
             return nil
@@ -97,15 +97,15 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
 
     // MARK: - Resetting
 
-    func removeDates() {
-        userDefaults.removeObject(forKey: Constants.networkProtectionActivationDateKey)
-        userDefaults.removeObject(forKey: Constants.networkProtectionLastActiveDateKey)
+    func removeDates(source: WaitlistActivationDateStoreSource) {
+        userDefaults.removeObject(forKey: source.activationDateKey)
+        userDefaults.removeObject(forKey: source.lastActiveDateKey)
     }
 
     // MARK: - Updating
 
-    func updateActivationDate(_ date: Date) {
-        userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: Constants.networkProtectionActivationDateKey)
+    func updateActivationDate(_ date: Date, source: WaitlistActivationDateStoreSource) {
+        userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: source.activationDateKey)
     }
 
     private func daysSince(date storedDate: Date) -> Int? {
