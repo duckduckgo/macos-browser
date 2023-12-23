@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
@@ -61,7 +62,9 @@ final class NetworkProtectionNavBarPopoverManager {
             let onboardingStatusPublisher = UserDefaults.netP.networkProtectionOnboardingStatusPublisher
             _ = VPNSettings(defaults: .netP)
 
-            let popover = NetworkProtectionPopover(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter) {
+            let popover = NetworkProtectionPopover(controller: controller,
+                                                   onboardingStatusPublisher: onboardingStatusPublisher,
+                                                   statusReporter: statusReporter) {
                 let menuItems = [
                     NetworkProtectionStatusView.Model.MenuItem(
                         name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
