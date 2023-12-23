@@ -18,6 +18,29 @@
 
 import Foundation
 
+enum WaitlistActivationDateStoreSource {
+    case netP
+    case dbp
+
+    var activationDateKey: String {
+        switch self {
+        case .netP:
+            "com.duckduckgo.network-protection.activation-date"
+        case.dbp:
+            "com.duckduckgo.dbp.activation-date"
+        }
+    }
+
+    var lastActiveDateKey: String {
+        switch self {
+        case .netP:
+            "com.duckduckgo.network-protection.last-active-date"
+        case .dbp:
+            "com.duckduckgo.dbp.last-active-date"
+        }
+    }
+}
+
 protocol WaitlistActivationDateStore {
 
     func daysSinceActivation() -> Int?
