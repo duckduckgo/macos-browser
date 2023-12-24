@@ -28,7 +28,7 @@ import NetworkProtectionUI
 #endif
 
 #if SUBSCRIPTION
-import Account
+import Subscription
 import SubscriptionUI
 #endif
 
@@ -336,7 +336,7 @@ final class NavigationBarViewController: NSViewController {
         let accountManager = AccountManager()
         let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
 
-        if accountManager.token != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
+        if accountManager.authToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
             print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
             return
         }
