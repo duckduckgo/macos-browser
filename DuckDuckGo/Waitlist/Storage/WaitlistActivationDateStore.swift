@@ -43,8 +43,8 @@ enum WaitlistActivationDateStoreSource {
 
 protocol WaitlistActivationDateStore {
 
-    func daysSinceActivation(source: WaitlistActivationDateStoreSource) -> Int?
-    func daysSinceLastActive(source: WaitlistActivationDateStoreSource) -> Int?
+    func daysSinceActivation() -> Int?
+    func daysSinceLastActive() -> Int?
 
 }
 
@@ -55,21 +55,28 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
         static let networkProtectionLastActiveDateKey = "com.duckduckgo.network-protection.last-active-date"
     }
 
+    private let source: WaitlistActivationDateStoreSource
     private let userDefaults: UserDefaults
 
-    init(userDefaults: UserDefaults) {
-        self.userDefaults = userDefaults
+    init(source: WaitlistActivationDateStoreSource) {
+        self.source = source
+        switch source {
+        case.netP:
+            self.userDefaults = .netP
+        case .dbp:
+            self.userDefaults = .dbp
+        }
     }
 
-    func setActivationDateIfNecessary(source: WaitlistActivationDateStoreSource) {
+    func setActivationDateIfNecessary() {
         if userDefaults.double(forKey: source.activationDateKey) != 0 {
             return
         }
 
-        updateActivationDate(Date(), source: source)
+        updateActivationDate(Date())
     }
 
-    func daysSinceActivation(source: WaitlistActivationDateStoreSource) -> Int? {
+    func daysSinceActivation() -> Int? {
         let timestamp = userDefaults.double(forKey: source.activationDateKey)
 
         if timestamp == 0 {
@@ -80,11 +87,11 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
         return daysSince(date: activationDate)
     }
 
-    func updateLastActiveDate(source: WaitlistActivationDateStoreSource) {
+    func updateLastActiveDate() {
         userDefaults.set(Date(), forKey: source.lastActiveDateKey)
     }
 
-    func daysSinceLastActive(source: WaitlistActivationDateStoreSource) -> Int? {
+    func daysSinceLastActive() -> Int? {
         let timestamp = userDefaults.double(forKey: source.lastActiveDateKey)
 
         if timestamp == 0 {
@@ -97,14 +104,14 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
 
     // MARK: - Resetting
 
-    func removeDates(source: WaitlistActivationDateStoreSource) {
+    func removeDates() {
         userDefaults.removeObject(forKey: source.activationDateKey)
         userDefaults.removeObject(forKey: source.lastActiveDateKey)
     }
 
     // MARK: - Updating
 
-    func updateActivationDate(_ date: Date, source: WaitlistActivationDateStoreSource) {
+    func updateActivationDate(_ date: Date) {
         userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: source.activationDateKey)
     }
 

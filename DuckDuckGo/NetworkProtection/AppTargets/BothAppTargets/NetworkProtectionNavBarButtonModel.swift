@@ -97,7 +97,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesObserver.recentValue
         buttonImage = .image(for: iconPublisher.icon)
 
-        self.waitlistActivationDateStore = DefaultWaitlistActivationDateStore(userDefaults: .netP)
+        self.waitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
         super.init()
 
         setupSubscriptions()
@@ -149,8 +149,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
 
             switch status {
             case .connected:
-                waitlistActivationDateStore.setActivationDateIfNecessary(source: .netP)
-                waitlistActivationDateStore.updateLastActiveDate(source:.netP)
+                waitlistActivationDateStore.setActivationDateIfNecessary()
+                waitlistActivationDateStore.updateLastActiveDate()
             default: break
             }
 

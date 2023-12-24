@@ -55,7 +55,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.networkProtectionMessagesRequest(),
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.networkProtection(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection", keychainAppGroup: Bundle.main.appGroup(bundle: .netP)),
-        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(userDefaults: .netP),
+        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
         networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
@@ -124,7 +124,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
 
             // First, check messages that require a number of days of NetP usage
             if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled,
-               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation(source: .netP) {
+               let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {
                     return true
                 } else {
@@ -138,7 +138,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             }
 
             // Finally, check if the message requires NetP usage, and check if the user has used it at all:
-            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation(source: .netP) == nil {
+            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
                 return false
             }
 

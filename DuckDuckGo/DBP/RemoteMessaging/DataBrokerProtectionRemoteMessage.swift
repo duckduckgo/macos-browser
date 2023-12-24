@@ -44,7 +44,7 @@ struct DataBrokerProtectionRemoteMessage: Codable, Equatable, Hashable {
 
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
-        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(userDefaults: .dbp),
+        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
         operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model
@@ -63,8 +63,8 @@ struct DataBrokerProtectionRemoteMessage: Codable, Equatable, Hashable {
                 operatingSystemVersion: operatingSystemVersion,
                 appVersion: appVersion,
                 hardwareModel: hardwareModel,
-                daysSinceActivation: activationDateStore.daysSinceActivation(source: .dbp),
-                daysSinceLastActive: activationDateStore.daysSinceLastActive(source: .dbp)
+                daysSinceActivation: activationDateStore.daysSinceActivation(),
+                daysSinceLastActive: activationDateStore.daysSinceLastActive()
             )
 
             return surveyURLBuilder.buildSurveyURL(from: actionURL)
