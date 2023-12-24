@@ -32,29 +32,25 @@ final class BookmarkHTMLImporter: DataImporter {
         (try? bookmarkReaderResult.get().bookmarks.numberOfBookmarks) ?? 0
     }
 
-    func importableTypes() -> [DataImport.DataType] {
-        [.bookmarks]
+    var importableTypes: [DataImport.DataType] {
+        return [.bookmarks]
     }
 
-    func importData(
-        types: [DataImport.DataType],
-        from profile: DataImport.BrowserProfile?,
-        modalWindow: NSWindow?,
-        completion: @escaping (DataImportResult<DataImport.Summary>) -> Void
-    ) {
-        DispatchQueue.global(qos: .userInitiated).async {
-            switch self.bookmarkReaderResult {
-            case let .success(importedData):
-                let source: BookmarkImportSource = importedData.source ?? .thirdPartyBrowser(.bookmarksHTML)
-                let bookmarksResult = self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
-                DispatchQueue.main.async {
-                    completion(.success(DataImport.Summary(bookmarksResult: bookmarksResult)))
-                }
-            case let .failure(error):
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
-            }
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        assert(types.contains(.bookmarks))
+        return .detachedWithProgress { updateProgress in
+            [.bookmarks: self.importDataSync(types: types, updateProgress: updateProgress)]
+        }
+    }
+    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: DataImportProgressCallback) -> DataImportResult<DataImport.DataTypeSummary> {
+        switch self.bookmarkReaderResult {
+        case let .success(importedData):
+            let source: BookmarkImportSource = importedData.source ?? .thirdPartyBrowser(.bookmarksHTML)
+            let bookmarksResult = self.bookmarkImporter.importBookmarks(importedData.bookmarks, source: source)
+            return .success(.init(bookmarksResult))
+
+        case let .failure(error):
+            return .failure(error)
         }
     }
 

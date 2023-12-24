@@ -34,6 +34,10 @@ import UserNotifications
 import NetworkProtection
 #endif
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
@@ -262,6 +266,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
+#endif
+
+#if SUBSCRIPTION
+        Task {
+    #if STRIPE
+            SubscriptionPurchaseEnvironment.current = .stripe
+    #else
+            SubscriptionPurchaseEnvironment.current = .appStore
+    #endif
+            await AccountManager().checkSubscriptionState()
+        }
 #endif
     }
 

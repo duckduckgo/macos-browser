@@ -12,21 +12,13 @@ let package = Package(
             targets: ["Subscription"]),
     ],
     dependencies: [
-        .package(path: "../Account"),
-        .package(path: "../Purchase"),
-        .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "98.0.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "99.0.2"),
     ],
     targets: [
         .target(
             name: "Subscription",
             dependencies: [
-                .product(name: "Account", package: "Account"),
-                .product(name: "Purchase", package: "Purchase"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
-            ],
-            resources: [
-                .process("Resources")
+                .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
