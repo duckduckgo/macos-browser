@@ -28,6 +28,7 @@ import NetworkProtectionUI
 #endif
 
 #if SUBSCRIPTION
+import Account
 import SubscriptionUI
 #endif
 
