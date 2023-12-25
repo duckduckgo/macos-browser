@@ -78,6 +78,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
 
+#if NETWORK_PROTECTION && SUBSCRIPTION
+    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+#endif
+
 #if DBP && SUBSCRIPTION
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
 #endif
@@ -246,6 +250,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         subscribeToDataImportCompleteNotification()
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
+
+#if NETWORK_PROTECTION && SUBSCRIPTION
+        networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+#endif
 
 #if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
