@@ -19,17 +19,17 @@
 #if NETWORK_PROTECTION && SUBSCRIPTION
 
 import Foundation
-import Account
+import Subscription
 import NetworkProtection
 
 final class NetworkProtectionSubscriptionEventHandler {
 
-    private let accountManager: Account.AccountManaging
+    private let accountManager: AccountManaging
     private let networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming
     private let networkProtectionTokenStorage: NetworkProtectionTokenStore
     private let networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling
 
-    init(accountManager: Account.AccountManaging = Account.AccountManager(),
+    init(accountManager: AccountManaging = AccountManager(),
          networkProtectionRedemptionCoordinator: NetworkProtectionCodeRedeeming = NetworkProtectionCodeRedemptionCoordinator(),
          networkProtectionTokenStorage: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          networkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling = NetworkProtectionFeatureDisabler()) {
@@ -45,7 +45,7 @@ final class NetworkProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard let token = accountManager.token else {
+        guard let token = accountManager.accessToken else {
             assertionFailure("[NetP Subscription] AccountManager signed in but token could not be retrieved")
             return
         }
