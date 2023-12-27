@@ -41,6 +41,8 @@ public struct UserDefaultsWrapper<T> {
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
         case configFBConfigEtag = "config.storage.fbconfig.etag"
 
+        case configLastInstalled = "config.last.installed"
+
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case areDomainsMigratedToETLDPlus1 = "com.duckduckgo.are-domains-migrated-to-etldplus1"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"

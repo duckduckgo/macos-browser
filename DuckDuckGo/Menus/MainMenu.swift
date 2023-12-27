@@ -30,7 +30,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Subscription
+import SubscriptionUI
 #endif
 
 // swiftlint:disable:next type_body_length
@@ -519,14 +519,14 @@ import Subscription
     }
 
     private func updateShortcutMenuItems() {
-        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
-        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
-        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
+        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
+        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem.isHidden = false
-            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
         } else {
             toggleNetworkProtectionShortcutMenuItem.isHidden = true
         }
@@ -643,8 +643,14 @@ import Subscription
     }
 
     private func updateRemoteConfigurationInfo() {
-        let dateString = DateFormatter.localizedString(from: ConfigurationManager.shared.lastUpdateTime, dateStyle: .short, timeStyle: .medium)
-        configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        var dateString: String
+        if let date = ConfigurationManager.shared.lastConfigurationInstallDate {
+            dateString = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+            configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        } else {
+            dateString = "Last Update Time: -"
+        }
+        configurationDateAndTimeMenuItem.title = dateString
         customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
     }
 

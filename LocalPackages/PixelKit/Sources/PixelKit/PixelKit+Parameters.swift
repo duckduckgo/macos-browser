@@ -24,6 +24,7 @@ public extension PixelKit {
         public static let duration = "duration"
         public static let test = "test"
         public static let appVersion = "appVersion"
+        public static let pixelSource = "pixelSource"
         public static let osMajorVersion = "osMajorVersion"
 
         public static let errorCode = "e"
@@ -31,6 +32,7 @@ public extension PixelKit {
         public static let errorDesc = "d"
         public static let errorCount = "c"
         public static let errorSource = "error_source"
+        public static let sourceBrowserVersion = "source_browser_version"
         public static let underlyingErrorCode = "ue"
         public static let underlyingErrorDomain = "underlyingErrorDomain"
         public static let underlyingErrorDesc = "ud"

@@ -34,6 +34,10 @@ import UserNotifications
 import NetworkProtection
 #endif
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDelegate {
 
@@ -73,6 +77,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
+
+#if NETWORK_PROTECTION && SUBSCRIPTION
+    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+#endif
 
 #if DBP && SUBSCRIPTION
     private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
@@ -184,6 +192,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
     }
 
+    // swiftlint:disable:next function_body_length
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -242,6 +251,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
+#if NETWORK_PROTECTION && SUBSCRIPTION
+        networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+#endif
+
 #if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
@@ -253,6 +266,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
+#endif
+
+#if SUBSCRIPTION
+        Task {
+    #if STRIPE
+            SubscriptionPurchaseEnvironment.current = .stripe
+    #else
+            SubscriptionPurchaseEnvironment.current = .appStore
+    #endif
+            await AccountManager().checkSubscriptionState()
+        }
 #endif
     }
 

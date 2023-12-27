@@ -42,8 +42,12 @@ final class StatusBarMenuTests: XCTestCase {
 
     @MainActor
     func testShowStatusBarMenu() {
+        let defaults = UserDefaults(suiteName: UUID().uuidString)!
         let item = NSStatusItem()
+        let model = StatusBarMenuModel(vpnSettings: .init(defaults: defaults))
+
         let menu = StatusBarMenu(
+            model: model,
             statusItem: item,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),
@@ -58,8 +62,12 @@ final class StatusBarMenuTests: XCTestCase {
 
     @MainActor
     func testHideStatusBarMenu() {
+        let defaults = UserDefaults(suiteName: UUID().uuidString)!
         let item = NSStatusItem()
+        let model = StatusBarMenuModel(vpnSettings: .init(defaults: defaults))
+
         let menu = StatusBarMenu(
+            model: model,
             statusItem: item,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
             statusReporter: MockNetworkProtectionStatusReporter(),

@@ -159,7 +159,7 @@ extension AppDelegate {
     }
 
     @objc func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @objc func openExportLogins(_ sender: Any?) {
@@ -380,7 +380,9 @@ extension MainViewController {
     }
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
+#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+#endif
     }
 
     // MARK: - History
@@ -739,7 +741,7 @@ extension MainViewController {
     @objc func reloadConfigurationNow(_ sender: Any?) {
         OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
 
-        ConfigurationManager.shared.forceRefresh()
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
@@ -750,7 +752,7 @@ extension MainViewController {
             configurationProvider.resetToDefaultConfigurationUrl()
         }
         Configuration.setURLProvider(configurationProvider)
-        ConfigurationManager.shared.forceRefresh()
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
         if let configurationUrl {
             os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
         } else {
