@@ -54,7 +54,24 @@ struct NotificationHelper {
 
         UNUserNotificationCenter.current().add(request) { error in
             if error == nil {
-               print("Notification sent")
+                print("Notification sent")
+            }
+        }
+    }
+    
+    func sendFirstRemovedNotification() {
+        let notificationContent = UNMutableNotificationContent()
+        
+        notificationContent.title = "Success! A record of your info was removed!"
+        notificationContent.body = "That’s one less creepy site storing and selling your personal info online. Check progress..."
+        
+        let notificationIdentifier = NotificationIdentifier.scanComplete
+        
+        let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: nil)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if error == nil {
+                print("Notification sent")
             }
         }
     }
