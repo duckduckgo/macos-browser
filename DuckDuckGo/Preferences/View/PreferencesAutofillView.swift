@@ -320,7 +320,7 @@ struct ResetNeverPromptSitesSheet: View {
                 .font(Preferences.Const.Fonts.preferencePaneTitle)
                 .padding(.top, 10)
 
-                Text(UserText.autofillExcludedSitesResetActionMessage)
+            Text(UserText.autofillExcludedSitesResetActionMessage)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 20)
                 .frame(width: 300)
