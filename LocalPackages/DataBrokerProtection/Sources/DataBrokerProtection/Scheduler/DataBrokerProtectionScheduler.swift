@@ -163,9 +163,14 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     public func scanAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         stopScheduler()
 
+        NotificationHelper().requestNotificationPermission()
+
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] in
             self?.startScheduler(showWebView: showWebView)
+
+            NotificationHelper().sendFirstScanCompletedNotification()
+            
             completion?(nil)
         }
     }
