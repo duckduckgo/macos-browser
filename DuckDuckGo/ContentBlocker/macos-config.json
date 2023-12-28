@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1702579565498,
+    "version": 1703251114570,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -63,6 +63,9 @@
         "ampLinks": {
             "exceptions": [
                 {
+                    "domain": "asana.com"
+                },
+                {
                     "domain": "freecodecamp.org"
                 },
                 {
@@ -110,7 +113,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "5bfae22c5e0cb13c0a25ce80531827ff"
+            "hash": "369b8aac2cb358e0df3a828c1e3b9a29"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -124,6 +127,9 @@
                 },
                 {
                     "domain": "bild.de"
+                },
+                {
+                    "domain": "breitbart.com"
                 },
                 {
                     "domain": "derstandard.de"
@@ -246,6 +252,9 @@
                     "domain": "metro.co.uk"
                 },
                 {
+                    "domain": "youtube.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -264,7 +273,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "9ab9e1acdb6a8617c77109acc1e3943c"
+            "hash": "2c63be0009057e4511dc6f6726251a47"
         },
         "autofill": {
             "exceptions": [
@@ -953,6 +962,9 @@
                     "domain": "ads.google.com"
                 },
                 {
+                    "domain": "soranews24.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -965,7 +977,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "71ad0f38f9ce2bbacae5ff7db05511ec"
+            "hash": "e37447d42ee8194f185e35e40f577f41"
         },
         "cookie": {
             "settings": {
@@ -1030,12 +1042,16 @@
                     {
                         "domain": "flysas.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
+                    },
+                    {
+                        "domain": "facebook.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1641"
                     }
                 ]
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "d757f6509e9a9a20140c755ed0f21ea2"
+            "hash": "6ed03febdd780fd845cc1f7d6ce74ecf"
         },
         "dbp": {
             "state": "enabled",
@@ -1048,7 +1064,7 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 3
+                                "percent": 10
                             }
                         ]
                     }
@@ -1056,7 +1072,7 @@
             },
             "exceptions": [],
             "minSupportedVersion": "1.68.0",
-            "hash": "784ab72b62adf8b5c07f656f167a28d2"
+            "hash": "04f130fe1e3e088c7859ef6aa4a64e5c"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -1794,6 +1810,18 @@
                         ]
                     },
                     {
+                        "domain": "beverfood.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": ".adsbygoogle",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "bild.de",
                         "rules": [
                             {
@@ -2011,6 +2039,23 @@
                             {
                                 "selector": "[data-targeting]",
                                 "type": "override"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "dexerto.com",
+                        "rules": [
+                            {
+                                "selector": "#leaderboard-top-adhesion",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-cy='Ad']",
+                                "type": "closest-empty"
+                            },
+                            {
+                                "selector": "[data-cy='VidazooPlayer']",
+                                "type": "closest-empty"
                             }
                         ]
                     },
@@ -2478,6 +2523,32 @@
                             {
                                 "selector": ".connatix-player",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".ad-container",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".bottom-right-sticky-container",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".video-container",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".top-ad-recirc",
+                                "type": "modify-style",
+                                "values": [
+                                    {
+                                        "property": "height",
+                                        "value": "auto"
+                                    },
+                                    {
+                                        "property": "min-height",
+                                        "value": "auto"
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2846,11 +2917,14 @@
                         ]
                     },
                     {
-                        "domain": "orange.fr",
+                        "domain": "oceanofcompressed.xyz",
                         "rules": [
                             {
-                                "selector": ".tag-rm",
-                                "type": "hide-empty"
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": "#sticky-ads",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -2863,6 +2937,15 @@
                             },
                             {
                                 "selector": ".lrec",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "orange.fr",
+                        "rules": [
+                            {
+                                "selector": ".tag-rm",
                                 "type": "hide-empty"
                             }
                         ]
@@ -3178,6 +3261,14 @@
                         ]
                     },
                     {
+                        "domain": "soranews24.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "spanishdict.com",
                         "rules": [
                             {
@@ -3292,6 +3383,15 @@
                             {
                                 "selector": "[class*='responsive__NativeAd']",
                                 "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "thewindowsclub.com",
+                        "rules": [
+                            {
+                                "selector": ".adtester-container",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -3678,7 +3778,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "c34713afaf78e090b587a923f132ed56"
+            "hash": "815cda75f82d989dd56864bc43f76574"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3933,10 +4033,13 @@
                 },
                 {
                     "domain": "airbnb.com.br"
+                },
+                {
+                    "domain": "zoom.us"
                 }
             ],
             "state": "enabled",
-            "hash": "75e673ce365430652fc7cc896ed49a5f"
+            "hash": "82ebfddf791575ada285a49b7fdc71ca"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4366,6 +4469,11 @@
             "state": "disabled",
             "hash": "dede7e70939822f5ecb9eb5fae577fa3"
         },
+        "privacyProtectionsPopup": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "referrer": {
             "exceptions": [
                 {
@@ -4459,6 +4567,25 @@
             ],
             "state": "disabled",
             "hash": "5e792dd491428702bc0104240fbce0ce"
+        },
+        "sync": {
+            "state": "internal",
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                }
+            },
+            "exceptions": [],
+            "hash": "4e4382e6a69f7cc99222fd924168e80f"
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -4722,6 +4849,12 @@
                                     "wxii12.com",
                                     "wyff4.com"
                                 ]
+                            },
+                            {
+                                "rule": "z-na.amazon-adsystem.com/widgets/onejs",
+                                "domains": [
+                                    "oceanofcompressed.xyz"
+                                ]
                             }
                         ]
                     },
@@ -4750,8 +4883,7 @@
                             {
                                 "rule": "analytics.analytics-egain.com/onetag/",
                                 "domains": [
-                                    "landsend.com",
-                                    "support.norton.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -4974,6 +5106,12 @@
                             },
                             {
                                 "rule": "challenges.cloudflare.com",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -5323,6 +5461,7 @@
                                     "asics.com",
                                     "brooklinen.com",
                                     "carters.com",
+                                    "otterbox.com",
                                     "seatosummit.com"
                                 ]
                             }
@@ -5378,6 +5517,16 @@
                                     "espn.com.mx",
                                     "espn.in",
                                     "espnfc.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "egain.cloud": {
+                        "rules": [
+                            {
+                                "rule": "egain.cloud/",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5509,8 +5658,7 @@
                             {
                                 "rule": "app.five9.com",
                                 "domains": [
-                                    "gmsdnv.com",
-                                    "machiassavings.bank"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -5750,6 +5898,12 @@
                                     "rawstory.com",
                                     "usatoday.com"
                                 ]
+                            },
+                            {
+                                "rule": "storage.googleapis.com/code.snapengage.com/",
+                                "domains": [
+                                    "<all>"
+                                ]
                             }
                         ]
                     },
@@ -5977,15 +6131,9 @@
                     "gorgias.chat": {
                         "rules": [
                             {
-                                "rule": "config.gorgias.chat",
+                                "rule": "gorgias.chat",
                                 "domains": [
-                                    "help.athleticbrewing.com"
-                                ]
-                            },
-                            {
-                                "rule": "assets.gorgias.chat",
-                                "domains": [
-                                    "help.athleticbrewing.com"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6057,7 +6205,13 @@
                             {
                                 "rule": "api.hubspot.com/livechat-public/v1/message/public",
                                 "domains": [
-                                    "pippintitle.com"
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "js.hubspot.com/web-interactives-embed.js",
+                                "domains": [
+                                    "<all>"
                                 ]
                             },
                             {
@@ -6104,7 +6258,7 @@
                             {
                                 "rule": "cmp.inmobi.com",
                                 "domains": [
-                                    "express.co.uk"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6362,6 +6516,16 @@
                                 "rule": "survey.medallia.com/",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "media.net": {
+                        "rules": [
+                            {
+                                "rule": "contextual.media.net/dmedianet.js",
+                                "domains": [
+                                    "oceanofcompressed.xyz"
                                 ]
                             }
                         ]
@@ -6824,7 +6988,8 @@
                             {
                                 "rule": "secure.quantserve.com/quant.js",
                                 "domains": [
-                                    "aternos.org"
+                                    "aternos.org",
+                                    "oceanofcompressed.xyz"
                                 ]
                             }
                         ]
@@ -7509,7 +7674,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "5cecb6d28193f468b28b9afdaca04da1"
+            "hash": "aef10e6a36c19d0d87312466ee852936"
         },
         "trackingCookies1p": {
             "settings": {

@@ -26,8 +26,11 @@ enum PinnableView: String {
     case autofill
     case bookmarks
     case downloads
-    case networkProtection
     case homeButton
+
+#if NETWORK_PROTECTION
+    case networkProtection
+#endif
 }
 
 protocol PinningManager {
@@ -37,6 +40,7 @@ protocol PinningManager {
     func wasManuallyToggled(_ view: PinnableView) -> Bool
     func pin(_ view: PinnableView)
     func unpin(_ view: PinnableView)
+    func shortcutTitle(for view: PinnableView) -> String
 }
 
 final class LocalPinningManager: PinningManager {
@@ -111,21 +115,15 @@ final class LocalPinningManager: PinningManager {
         return pinnedViewStrings.contains(view.rawValue)
     }
 
-    func toggleShortcutInterfaceTitle(for view: PinnableView) -> String {
+    func shortcutTitle(for view: PinnableView) -> String {
         switch view {
         case .autofill: return isPinned(.autofill) ? UserText.hideAutofillShortcut : UserText.showAutofillShortcut
         case .bookmarks: return isPinned(.bookmarks) ? UserText.hideBookmarksShortcut : UserText.showBookmarksShortcut
         case .downloads: return isPinned(.downloads) ? UserText.hideDownloadsShortcut : UserText.showDownloadsShortcut
         case .homeButton: return ""
-        case .networkProtection:
 #if NETWORK_PROTECTION
-            if !networkProtectionFeatureActivation.isFeatureActivated {
-                assertionFailure("Tried to toggle Network Protection when it was not activated")
-            }
-
+        case .networkProtection:
             return isPinned(.networkProtection) ? UserText.hideNetworkProtectionShortcut : UserText.showNetworkProtectionShortcut
-#else
-            fatalError("Tried to get Network Protection interface title when NetP was disabled")
 #endif
         }
     }

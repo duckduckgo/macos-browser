@@ -87,10 +87,26 @@ public final class PixelKit {
     private let log: OSLog
     private let fireRequest: FireRequest
 
-    /// `dryRun`: if `true`, simulate requests and "send" them at an accelerated rate (once every 2 minutes instead of once a day)
-    /// `fireRequest`: this is not triggered when `dryRun` is `true`
-    public static func setUp(dryRun: Bool = false, appVersion: String, defaultHeaders: [String: String], log: OSLog, defaults: UserDefaults, fireRequest: @escaping FireRequest) {
-        shared = PixelKit(dryRun: dryRun, appVersion: appVersion, defaultHeaders: defaultHeaders, log: log, defaults: defaults, fireRequest: fireRequest)
+    /// Sets up PixelKit for the entire app.
+    ///
+    /// - Parameters:
+    /// - `dryRun`: if `true`, simulate requests and "send" them at an accelerated rate (once every 2 minutes instead of once a day)
+    /// - `source`: if set, adds a `pixelSource` parameter to the pixel call; this can be used to specify which target is sending the pixel
+    /// - `fireRequest`: this is not triggered when `dryRun` is `true`
+    public static func setUp(dryRun: Bool = false,
+                             appVersion: String,
+                             source: String? = nil,
+                             defaultHeaders: [String: String],
+                             log: OSLog,
+                             defaults: UserDefaults,
+                             fireRequest: @escaping FireRequest) {
+        shared = PixelKit(dryRun: dryRun,
+                          appVersion: appVersion,
+                          source: source,
+                          defaultHeaders: defaultHeaders,
+                          log: log,
+                          defaults: defaults,
+                          fireRequest: fireRequest)
     }
 
     static func tearDown() {
@@ -98,10 +114,12 @@ public final class PixelKit {
     }
 
     private var dryRun: Bool
+    private let source: String?
     private let pixelCalendar: Calendar
 
     init(dryRun: Bool,
          appVersion: String,
+         source: String? = nil,
          defaultHeaders: [String: String],
          log: OSLog,
          dailyPixelCalendar: Calendar? = nil,
@@ -111,6 +129,7 @@ public final class PixelKit {
 
         self.dryRun = dryRun
         self.appVersion = appVersion
+        self.source = source
         self.defaultHeaders = defaultHeaders
         self.log = log
         self.pixelCalendar = dailyPixelCalendar ?? Self.defaultDailyPixelCalendar
@@ -119,6 +138,7 @@ public final class PixelKit {
         self.fireRequest = fireRequest
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func fire(pixelNamed pixelName: String,
                       frequency: Frequency,
                       withHeaders headers: [String: String]?,
@@ -132,6 +152,10 @@ public final class PixelKit {
 
         if includeAppVersionParameter {
             newParams[Parameters.appVersion] = appVersion
+        }
+
+        if let source {
+            newParams[Parameters.pixelSource] = source
         }
 
         if let error {

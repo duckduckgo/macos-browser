@@ -26,7 +26,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Account
+import Subscription
 #endif
 
 protocol OptionsButtonMenuDelegate: AnyObject {
@@ -47,7 +47,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
 #if SUBSCRIPTION
-    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
+    func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
 #endif
 }
 
@@ -149,11 +149,15 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
-        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist &&  DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
+        #if SUBSCRIPTION
+        actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+        #else
+        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
             DataBrokerProtectionWaitlistViewControllerPresenter.show()
         } else {
             actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
         }
+        #endif
     }
 #endif // DBP
 
@@ -235,8 +239,8 @@ final class MoreOptionsMenu: NSMenu {
     }
 
 #if SUBSCRIPTION
-    @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
+    @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
 #endif
 
@@ -298,7 +302,11 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        items.append(contentsOf: AccountManager().isSignedIn ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+        if AccountManager().isUserAuthenticated {
+            items.append(contentsOf: makeActiveSubscriptionItems())
+        } else if SubscriptionPurchaseEnvironment.canPurchase {
+            items.append(contentsOf: makeInactiveSubscriptionItems())
+        }
 #else
         items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
 #endif
@@ -348,25 +356,13 @@ final class MoreOptionsMenu: NSMenu {
 
 #endif // DBP
 
-#if SUBSCRIPTION
-        let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.image(for: .vpnIcon))
-        items.append(item1)
-
-        let item2  = NSMenuItem(title: "Placeholder B", action: #selector(openPreferences(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.image(for: .vpnIcon))
-        items.append(item2)
-#endif
-
         return items
     }
 
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
         let privacyProItem = NSMenuItem(title: "",
-                                        action: #selector(openSubscriptionPreferences(_:)),
+                                        action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "SubscriptionIcon"))

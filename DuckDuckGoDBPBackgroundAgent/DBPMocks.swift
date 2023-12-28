@@ -56,21 +56,23 @@ final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
         guard let privacyConfigurationData = try? PrivacyConfigurationData(data: data) else {
             fatalError("Could not retrieve privacy configuration data")
         }
-        let privacyConfig = privacyConfiguration(withData: privacyConfigurationData)
+        let privacyConfig = privacyConfiguration(withData: privacyConfigurationData, internalUserDecider: internalUserDecider)
         return privacyConfig
     }
+
+    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
 
     func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
         .downloaded
     }
 }
 
-func privacyConfiguration(withData data: PrivacyConfigurationData) -> PrivacyConfiguration {
+func privacyConfiguration(withData data: PrivacyConfigurationData, internalUserDecider: InternalUserDecider) -> PrivacyConfiguration {
     let domain = MockDomainsProtectionStore()
     return AppPrivacyConfiguration(data: data,
                                    identifier: UUID().uuidString,
                                    localProtection: domain,
-                                   internalUserDecider: DefaultInternalUserDecider(store: InternalUserDeciderStoreMock()))
+                                   internalUserDecider: internalUserDecider)
 }
 
 final class MockDomainsProtectionStore: DomainsProtectionStore {

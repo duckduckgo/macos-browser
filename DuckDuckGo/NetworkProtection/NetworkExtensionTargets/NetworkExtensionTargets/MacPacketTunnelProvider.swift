@@ -116,7 +116,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionNoAuthTokenFoundError
             case .unhandledError(function: let function, line: let line, error: let error):
                 domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
-            case .failedToFetchLocationList,
+            case .failedToRetrieveAuthToken,
+                    .failedToFetchLocationList,
                     .failedToParseLocationListResponse:
                 // Needs Privacy triage for macOS Geoswitching pixels
                 return
@@ -379,8 +380,17 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         dryRun = false
 #endif
 
+        let source: String
+
+#if NETP_SYSTEM_EXTENSION
+        source = "vpnSystemExtension"
+#else
+        source = "vpnAppExtension"
+#endif
+
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
+                       source: source,
                        defaultHeaders: defaultHeaders,
                        log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in

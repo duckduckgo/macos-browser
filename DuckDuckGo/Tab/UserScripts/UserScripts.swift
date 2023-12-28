@@ -86,7 +86,7 @@ final class UserScripts: UserScriptsProvider {
         }
 
 #if SUBSCRIPTION
-        subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseEmailFeature())
+        subscriptionPagesUserScript.registerSubfeature(delegate: SubscriptionPagesUseSubscriptionFeature())
         userScripts.append(subscriptionPagesUserScript)
 #endif
     }
