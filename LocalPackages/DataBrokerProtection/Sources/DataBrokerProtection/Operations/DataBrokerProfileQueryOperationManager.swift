@@ -35,6 +35,7 @@ protocol OperationsManager {
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
+                      userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
@@ -45,6 +46,7 @@ extension OperationsManager {
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                      userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await runOperation(operationData: operationData,
@@ -54,6 +56,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
+                               userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }
 }

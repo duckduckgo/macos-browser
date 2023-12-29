@@ -148,6 +148,7 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
+                                                                                userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
                     return !self.isCancelled
