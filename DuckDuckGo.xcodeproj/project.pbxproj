@@ -2027,6 +2027,7 @@
 		4BA7C4DA2B3F639800AFE511 /* NetworkProtectionTunnelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8F52402A18326600BE7131 /* NetworkProtectionTunnelController.swift */; };
 		4BA7C4DB2B3F63AE00AFE511 /* NetworkExtensionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */; };
 		4BA7C4DD2B3F64E500AFE511 /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 4BA7C4DC2B3F64E500AFE511 /* LoginItems */; };
+		4BA7C4E12B3F6F8600AFE511 /* NetworkProtectionAppExtension.appex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4B4D603D2A0B290200BCD287 /* NetworkProtectionAppExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -3085,6 +3086,13 @@
 			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
 			remoteInfo = "DuckDuckGo Privacy Browser";
 		};
+		4BA7C4DE2B3F6F4900AFE511 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B4D603C2A0B290200BCD287;
+			remoteInfo = NetworkProtectionAppExtension;
+		};
 		7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
@@ -3147,6 +3155,16 @@
 				4B957C352AC7AE700062CA31 /* DuckDuckGo Notifications.app in Embed Login Items */,
 			);
 			name = "Embed Login Items";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BA7C4E02B3F6F7500AFE511 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4BA7C4E12B3F6F8600AFE511 /* NetworkProtectionAppExtension.appex in CopyFiles */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B6EC37E629B5DA2A001ACE79 /* CopyFiles */ = {
@@ -8238,10 +8256,12 @@
 				4B2D06662A13318400DE1F49 /* Frameworks */,
 				4B2D06672A13318400DE1F49 /* Resources */,
 				4B2D067D2A13341200DE1F49 /* ShellScript */,
+				4BA7C4E02B3F6F7500AFE511 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4BA7C4DF2B3F6F4900AFE511 /* PBXTargetDependency */,
 				B6080BA52B20AF8800B418EF /* PBXTargetDependency */,
 			);
 			name = DuckDuckGoVPNAppStore;
@@ -12123,6 +12143,11 @@
 		4B9579262AC7AE700062CA31 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 4B5F14FB2A15291D0060320F /* InputFilesChecker */;
+		};
+		4BA7C4DF2B3F6F4900AFE511 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B4D603C2A0B290200BCD287 /* NetworkProtectionAppExtension */;
+			targetProxy = 4BA7C4DE2B3F6F4900AFE511 /* PBXContainerItemProxy */;
 		};
 		7B4CE8E026F02108009134B1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
