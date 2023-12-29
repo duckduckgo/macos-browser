@@ -73,6 +73,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     private let notificationCenter: NotificationCenter
     private let emailService: EmailServiceProtocol
     private let captchaService: CaptchaServiceProtocol
+    private let userNotificationService: DataBrokerProtectionUserNotificationService
 
     /// Ensures that only one scheduler operation is executed at the same time.
     ///
@@ -93,7 +94,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                                              config: DataBrokerProtectionSchedulerConfig(),
                                              operationRunnerProvider: runnerProvider,
                                              notificationCenter: notificationCenter,
-                                             pixelHandler: pixelHandler)
+                                             pixelHandler: pixelHandler,
+                                             userNotificationService: userNotificationService)
     }()
 
     public init(privacyConfigManager: PrivacyConfigurationManaging,
@@ -101,7 +103,8 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
                 dataManager: DataBrokerProtectionDataManager,
                 notificationCenter: NotificationCenter = NotificationCenter.default,
                 pixelHandler: EventMapping<DataBrokerProtectionPixels>,
-                redeemUseCase: DataBrokerProtectionRedeemUseCase
+                redeemUseCase: DataBrokerProtectionRedeemUseCase,
+                userNotificationService: DataBrokerProtectionUserNotificationService
     ) {
         activity = NSBackgroundActivityScheduler(identifier: schedulerIdentifier)
         activity.repeats = true
@@ -114,6 +117,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
         self.contentScopeProperties = contentScopeProperties
         self.pixelHandler = pixelHandler
         self.notificationCenter = notificationCenter
+        self.userNotificationService = userNotificationService
 
         self.emailService = EmailService(redeemUseCase: redeemUseCase)
         self.captchaService = CaptchaService(redeemUseCase: redeemUseCase)
@@ -163,14 +167,14 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
     public func scanAllBrokers(showWebView: Bool = false, completion: ((Error?) -> Void)? = nil) {
         stopScheduler()
 
-        NotificationHelper().requestNotificationPermission()
+        userNotificationService.requestNotificationPermission()
 
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] in
             self?.startScheduler(showWebView: showWebView)
 
-            NotificationHelper().sendFirstScanCompletedNotification()
-            
+            self?.userNotificationService.sendFirstScanCompletedNotification()
+
             completion?(nil)
         }
     }
