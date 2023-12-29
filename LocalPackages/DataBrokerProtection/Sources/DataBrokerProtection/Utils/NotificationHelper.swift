@@ -23,6 +23,9 @@ struct NotificationHelper {
     struct NotificationIdentifier {
         static let bundleID = Bundle.main.bundleIdentifier ?? "com.duckduckgo.dbp.agent"
         static let scanComplete = "\(NotificationIdentifier.bundleID).scan.complete"
+        static let firstRemoved = "\(NotificationIdentifier.bundleID).first.removed"
+        static let allRemoved = "\(NotificationIdentifier.bundleID).all.removed"
+        static let checkIn = "\(NotificationIdentifier.bundleID).check-in"
     }
 
     func requestNotificationPermission() {
@@ -42,13 +45,13 @@ struct NotificationHelper {
         }
     }
 
-    func sendFirstScanCompletedNotification() {
+    private func sendNotification(title: String, message: String, identifier: String) {
         let notificationContent = UNMutableNotificationContent()
 
-        notificationContent.title = "Scan complete!"
-        notificationContent.body = "DuckDuckGo has started the process to remove records matching your personal info online. See what we found..."
+        notificationContent.title = title
+        notificationContent.body = message
 
-        let notificationIdentifier = NotificationIdentifier.scanComplete
+        let notificationIdentifier = identifier
 
         let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: nil)
 
@@ -58,21 +61,34 @@ struct NotificationHelper {
             }
         }
     }
-    
+
+    func sendFirstScanCompletedNotification() {
+        sendNotification(title: "Scan complete!",
+                         message: "DuckDuckGo has started the process to remove records matching your personal info online. See what we found...",
+                         identifier: NotificationIdentifier.scanComplete)
+    }
+
     func sendFirstRemovedNotification() {
-        let notificationContent = UNMutableNotificationContent()
-        
-        notificationContent.title = "Success! A record of your info was removed!"
-        notificationContent.body = "That’s one less creepy site storing and selling your personal info online. Check progress..."
-        
-        let notificationIdentifier = NotificationIdentifier.scanComplete
-        
-        let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: nil)
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            if error == nil {
-                print("Notification sent")
-            }
-        }
+        sendNotification(title: "Success! A record of your info was removed!",
+                         message: "That’s one less creepy site storing and selling your personal info online. Check progress...",
+                         identifier: NotificationIdentifier.firstRemoved)
+    }
+
+    func sendAllInfoRemovedNotification() {
+        sendNotification(title: "All pending info removals complete!",
+                         message: "See all the records matching your personal info that DuckDuckGo found and removed from the web...",
+                         identifier: NotificationIdentifier.allRemoved)
+    }
+
+    func sendCheckInNotification() {
+        sendNotification(title: "We're making progress on your info removals",
+                         message: "See the records matching your personal info that DuckDuckGo found and removed from the web so far...",
+                         identifier: NotificationIdentifier.checkIn)
     }
 }
+
+
+
+
+
+
