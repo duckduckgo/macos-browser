@@ -2023,6 +2023,10 @@
 		4BA1A6E6258C270800F6F690 /* EncryptionKeyGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6E5258C270800F6F690 /* EncryptionKeyGeneratorTests.swift */; };
 		4BA1A6F6258C4F9600F6F690 /* EncryptionMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6F5258C4F9600F6F690 /* EncryptionMocks.swift */; };
 		4BA1A6FE258C5C1300F6F690 /* EncryptedValueTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA1A6FD258C5C1300F6F690 /* EncryptedValueTransformerTests.swift */; };
+		4BA7C4D92B3F61FB00AFE511 /* BundleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106B9D26A565DA0013B453 /* BundleExtension.swift */; };
+		4BA7C4DA2B3F639800AFE511 /* NetworkProtectionTunnelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8F52402A18326600BE7131 /* NetworkProtectionTunnelController.swift */; };
+		4BA7C4DB2B3F63AE00AFE511 /* NetworkExtensionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */; };
+		4BA7C4DD2B3F64E500AFE511 /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 4BA7C4DC2B3F64E500AFE511 /* LoginItems */; };
 		4BB6CE5F26B77ED000EC5860 /* Cryptography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB6CE5E26B77ED000EC5860 /* Cryptography.swift */; };
 		4BB88B4525B7B55C006F6B06 /* DebugUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4425B7B55C006F6B06 /* DebugUserScript.swift */; };
 		4BB88B4A25B7B690006F6B06 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -4405,6 +4409,7 @@
 				7BEEA5142AD1236300A9E72B /* NetworkProtectionIPC in Frameworks */,
 				EE7295EF2A545C12008C0991 /* NetworkProtection in Frameworks */,
 				4B2D067F2A1334D700DE1F49 /* NetworkProtectionUI in Frameworks */,
+				4BA7C4DD2B3F64E500AFE511 /* LoginItems in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8246,6 +8251,7 @@
 				7BA7CC602AD1211C0042E5CE /* Networking */,
 				7BEEA5132AD1236300A9E72B /* NetworkProtectionIPC */,
 				7BFCB74F2ADE7E2300DA3EA7 /* PixelKit */,
+				4BA7C4DC2B3F64E500AFE511 /* LoginItems */,
 			);
 			productName = DuckDuckGoAgentAppStore;
 			productReference = 4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */;
@@ -10295,8 +10301,10 @@
 			files = (
 				7B2DDCFB2A93B25F0039D884 /* KeychainType+ClientDefault.swift in Sources */,
 				B6F92BA32A691583002ABA6B /* UserDefaultsWrapper.swift in Sources */,
+				4BA7C4DB2B3F63AE00AFE511 /* NetworkExtensionController.swift in Sources */,
 				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
 				B6F92BAD2A6937B5002ABA6B /* OptionalExtension.swift in Sources */,
+				4BA7C4D92B3F61FB00AFE511 /* BundleExtension.swift in Sources */,
 				7BA7CC5A2AD120640042E5CE /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
 				7BA7CC3B2AD11E330042E5CE /* Bundle+Configuration.swift in Sources */,
 				EEC589DC2A4F1CE800BCD60C /* AppLauncher.swift in Sources */,
@@ -10313,6 +10321,7 @@
 				7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */,
 				7BA7CC552AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
 				7BA7CC3D2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
+				4BA7C4DA2B3F639800AFE511 /* NetworkProtectionTunnelController.swift in Sources */,
 				7BA7CC432AD11E480042E5CE /* UserText.swift in Sources */,
 				7BA7CC542AD11FCE0042E5CE /* NetworkProtectionBundle.swift in Sources */,
 			);
@@ -13405,6 +13414,10 @@
 			productName = NetworkProtection;
 		};
 		4B95793F2AC7AE700062CA31 /* LoginItems */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LoginItems;
+		};
+		4BA7C4DC2B3F64E500AFE511 /* LoginItems */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LoginItems;
 		};

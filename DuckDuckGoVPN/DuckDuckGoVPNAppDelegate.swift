@@ -64,7 +64,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         Bundle.main.networkExtensionBundleID
     }
 
-#if NETP_SYSTEM_EXTENSION
+#if NETWORK_PROTECTION
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
 #endif
 

@@ -49,10 +49,10 @@ PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
 
-FEATURE_FLAGS[arch=*][sdk=*] =
-FEATURE_FLAGS[config=CI][arch=*][sdk=*] =
-FEATURE_FLAGS[config=Debug][arch=*][sdk=*] =
-FEATURE_FLAGS[config=Review][arch=*][sdk=*] =
+FEATURE_FLAGS[arch=*][sdk=*] = NETWORK_PROTECTION
+FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_PROTECTION
+FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_PROTECTION
+FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_PROTECTION
 
 ENABLE_APP_SANDBOX = YES
 SWIFT_OBJC_BRIDGING_HEADER =
