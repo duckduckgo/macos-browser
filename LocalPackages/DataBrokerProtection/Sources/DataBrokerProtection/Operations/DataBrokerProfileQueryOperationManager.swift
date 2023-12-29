@@ -181,13 +181,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             }
 
             if !removedProfiles.isEmpty {
-                var shouldSendNotification = false
+                var shouldSendProfileRemovedNotification = false
                 for removedProfile in removedProfiles {
                     if let extractedProfileId = removedProfile.id {
                         let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
                         database.add(event)
                         database.updateRemovedDate(Date(), on: extractedProfileId)
-                        shouldSendNotification = true
+                        shouldSendProfileRemovedNotification = true
                         try updateOperationDataDates(
                             origin: .scan,
                             brokerId: brokerId,
@@ -199,7 +199,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
                         os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
 
-                        // Add a comment explaining this piece of code
                         if let attempt = database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
                             let now = Date()
                             let calculateDurationSinceLastStage = now.timeIntervalSince(attempt.lastStageDate) * 1000
@@ -209,8 +208,9 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                         }
                     }
                 }
-                if shouldSendNotification {
-                    userNotificationService.sendFirstRemovedNotificationIfPossible()
+                if shouldSendProfileRemovedNotification {
+                    sendProfileRemovedNotificationIfNecessary(userNotificationService: userNotificationService,
+                                                              database: database)
                 }
             } else {
                 try updateOperationDataDates(
@@ -235,6 +235,20 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             throw error
         }
     }
+
+    private func sendProfileRemovedNotificationIfNecessary(userNotificationService: DataBrokerProtectionUserNotificationService, database: DataBrokerProtectionRepository) {
+        let savedExtractedProfiles = database.fetchAllBrokerProfileQueryData().flatMap { $0.extractedProfiles }
+        if savedExtractedProfiles.count == 1 {
+            userNotificationService.sendAllInfoRemovedNotificationIfPossible()
+        } else {
+            if savedExtractedProfiles.allSatisfy({ $0.removedDate != nil }) {
+                userNotificationService.sendAllInfoRemovedNotificationIfPossible()
+            } else {
+                userNotificationService.sendFirstRemovedNotificationIfPossible()
+            }
+        }
+    }
+
     // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
                                      on runner: WebOperationRunner,
