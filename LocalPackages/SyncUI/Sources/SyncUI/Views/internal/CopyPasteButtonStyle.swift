@@ -33,7 +33,7 @@ struct CopyPasteButtonStyle: ButtonStyle {
         let outerShadowOpacity = colorScheme == .dark ? 0.8 : 0.0
 
         configuration.label
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 24)
             .padding(.vertical, verticalPadding)
             .background(
                 RoundedRectangle(cornerRadius: 5, style: .continuous)

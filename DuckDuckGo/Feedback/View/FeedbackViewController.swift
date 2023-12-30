@@ -260,6 +260,9 @@ final class FeedbackViewController: NSViewController {
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackFeatureRequestDescription
         case .other:
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackOtherDescription
+        case .generalFeedback, .designFeedback, .usability, .dataImport:
+            assertionFailure("unexpected flow")
+            browserFeedbackDescriptionLabel.stringValue = "\(category)"
         }
     }
 
@@ -306,6 +309,9 @@ final class FeedbackViewController: NSViewController {
             let installedSurrogates = currentTab?.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
             let ampURL = currentTab?.linkProtection.lastAMPURLString ?? ""
             let urlParametersRemoved = currentTab?.linkProtection.urlParametersRemoved ?? false
+            let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+            let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTabUrl?.host)
+
             let websiteBreakage = WebsiteBreakage(category: selectedWebsiteBreakageCategory,
                                                   description: browserFeedbackTextView.string,
                                                   siteUrlString: urlTextField.stringValue,
@@ -317,6 +323,7 @@ final class FeedbackViewController: NSViewController {
                                                   isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
                                                   ampURL: ampURL,
                                                   urlParametersRemoved: urlParametersRemoved,
+                                                  protectionsState: protectionsState,
                                                   reportFlow: .native)
             websiteBreakageSender.sendWebsiteBreakage(websiteBreakage)
         }

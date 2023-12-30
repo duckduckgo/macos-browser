@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "71e916d070cedcba9ccb3ce9431797260bf5cbea",
-        "version" : "82.1.0"
+        "revision" : "e9c344c15d550112d02853c07efeaa154e911e2b",
+        "version" : "100.0.1"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "254b23cf292140498650421bb31fd05740f4579b",
-        "version" : "4.40.0"
+        "revision" : "b7ad9843e70cede0c2ca9c4260d970f62cb28156",
+        "version" : "4.52.0"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "c8e895c8fd50dc76e8d8dc827a636ad77b7f46ff",
-        "version" : "9.0.0"
+        "revision" : "5597bc17709c8acf454ecaad4f4082007986242a",
+        "version" : "10.0.2"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "b4ac92a444e79d5651930482623b9f6dc9265667",
-        "version" : "2.0.0"
+        "revision" : "38336a574e13090764ba09a6b877d15ee514e371",
+        "version" : "3.1.1"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "f0ceaf5cc9f3f23daa0ccb6dcebd79fc96ccc7d9",
-        "version" : "2.5.0"
+        "revision" : "1f07f4096e52f19b5e7abaa697b7fc592b7ff57c",
+        "version" : "2.5.1"
       }
     },
     {
@@ -104,8 +104,26 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
-        "version" : "0.5.0"
+        "revision" : "c8ed701b513cf5177118a175d85fbbbcd707ab41",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "swift-snapshot-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
+      "state" : {
+        "revision" : "59b663f68e69f27a87b45de48cb63264b8194605",
+        "version" : "1.15.1"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-syntax.git",
+      "state" : {
+        "revision" : "6ad4ea24b01559dde0773e3d091f1b9e36175036",
+        "version" : "509.0.2"
       }
     },
     {
@@ -131,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/TrackerRadarKit.git",
       "state" : {
-        "revision" : "4684440d03304e7638a2c8086895367e90987463",
-        "version" : "1.2.1"
+        "revision" : "a6b7ba151d9dc6684484f3785293875ec01cc1ff",
+        "version" : "1.2.2"
       }
     },
     {

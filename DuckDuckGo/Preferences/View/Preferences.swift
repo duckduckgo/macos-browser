@@ -30,6 +30,10 @@ enum Preferences {
             }
         }()
 
+        enum Spacing {
+            static let groupedCheckboxesSeparation: CGFloat = 10
+        }
+
         enum Fonts {
             static let popUpButton: NSFont = .preferredFont(forTextStyle: .title1, options: [:])
             static let sideBarItem: Font = .body
@@ -79,4 +83,31 @@ enum Preferences {
         }
     }
 
+    struct ToggleMenuItemWithDescription: View {
+        let title: String
+        let description: String
+        let isOn: Binding<Bool>
+        let spacing: CGFloat
+
+        var body: some View {
+            Toggle(isOn: isOn) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .fixMultilineScrollableText()
+
+                    TextMenuItemCaption(text: description)
+                }
+            }.toggleStyle(.checkbox)
+        }
+    }
+
+    struct SpacedCheckbox<Content>: View where Content: View {
+        @ViewBuilder let content: () -> Content
+
+        var body: some View {
+            VStack(alignment: .leading) {
+                content()
+            }.padding(.bottom, Const.Spacing.groupedCheckboxesSeparation)
+        }
+    }
 }

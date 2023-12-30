@@ -72,8 +72,11 @@ final class StartupPreferences: ObservableObject {
 
     @Published var customHomePageURL: String {
         didSet {
-            if !customHomePageURL.starts(with: "http") {
-                customHomePageURL = "https://" + customHomePageURL
+            guard let urlWithScheme = urlWithScheme(customHomePageURL) else {
+                return
+            }
+            if customHomePageURL != urlWithScheme {
+                customHomePageURL = urlWithScheme
             }
             persistor.customHomePageURL = customHomePageURL
         }
@@ -90,8 +93,7 @@ final class StartupPreferences: ObservableObject {
     }
 
     var friendlyURL: String {
-        let regexPattern = "https?://"
-        var friendlyURL = customHomePageURL.replacingOccurrences(of: regexPattern, with: "", options: .regularExpression)
+        var friendlyURL = customHomePageURL
         if friendlyURL.count > 30 {
             let index = friendlyURL.index(friendlyURL.startIndex, offsetBy: 27)
             friendlyURL = String(friendlyURL[..<index]) + "..."
@@ -125,6 +127,17 @@ final class StartupPreferences: ObservableObject {
             }
             self.updateHomeButtonState()
         }
+    }
+
+    private func urlWithScheme(_ urlString: String) -> String? {
+        guard var urlWithScheme = urlString.url else {
+            return nil
+        }
+        // Force 'https' if 'http' not explicitly set by user
+        if urlWithScheme.isHttp && !urlString.hasPrefix(URL.NavigationalScheme.http.separated()) {
+            urlWithScheme = urlWithScheme.toHttps() ?? urlWithScheme
+        }
+        return urlWithScheme.toString(decodePunycode: true, dropScheme: false, dropTrailingSlash: true)
     }
 
 }

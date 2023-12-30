@@ -82,10 +82,12 @@ struct ScriptSourceProvider: ScriptSourceProviding {
 
     public func buildAutofillSource() -> AutofillUserScriptSourceProvider {
         let privacyConfig = self.privacyConfigurationManager.privacyConfig
-        return DefaultAutofillSourceProvider(privacyConfigurationManager: self.privacyConfigurationManager,
-                                             properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
-                                                                                sessionKey: self.sessionKey ?? "",
-                                                                                featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)))
+        return DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                     properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
+                                                                                        sessionKey: self.sessionKey ?? "",
+                                                                                        featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)))
+                .withJSLoading()
+                .build()
     }
 
     private func buildContentBlockerRulesConfig() -> ContentBlockerUserScriptConfig {

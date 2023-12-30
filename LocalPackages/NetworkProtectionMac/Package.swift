@@ -23,7 +23,6 @@ import PackageDescription
 let package = Package(
     name: "NetworkProtectionMac",
     platforms: [
-        .iOS("14.0"),
         .macOS("11.4")
     ],
     products: [
@@ -31,7 +30,7 @@ let package = Package(
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "82.1.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "100.0.1"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions")
     ],
@@ -43,7 +42,12 @@ let package = Package(
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "XPCHelper", package: "XPCHelper")
-            ]),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
 
         // MARK: - NetworkProtectionUI
 
@@ -55,12 +59,19 @@ let package = Package(
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
-            ]),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
         .testTarget(
             name: "NetworkProtectionUITests",
             dependencies: [
                 "NetworkProtectionUI",
                 .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
-            ])
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        )
     ]
 )

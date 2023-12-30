@@ -20,6 +20,7 @@ import BrowserServicesKit
 import Cocoa
 import Common
 import WebKit
+import Configuration
 
 // Actions are sent to objects of responder chain
 
@@ -80,7 +81,7 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url, source: .historyEntry), shouldLoadInBackground: true))
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
@@ -131,7 +132,7 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url, source: .bookmark), shouldLoadInBackground: true)
         WindowsManager.openNewWindow(with: tab)
     }
 
@@ -158,7 +159,7 @@ extension AppDelegate {
     }
 
     @objc func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @objc func openExportLogins(_ sender: Any?) {
@@ -231,7 +232,7 @@ extension AppDelegate {
             assertionFailure("No reference to main window controller")
             return
         }
-        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin, source: .ui))
     }
 
 }
@@ -277,7 +278,7 @@ extension MainViewController {
 
     @objc func openLocation(_ sender: Any?) {
         makeKeyIfNeeded()
-        guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
+        guard let addressBarTextField = navigationBarViewController.addressBarViewController?.addressBarTextField else {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
@@ -347,9 +348,9 @@ extension MainViewController {
                 }
                 navigationBarViewController = wc.mainViewController.navigationBarViewController
             }
-            navigationBarViewController?.view.window?.makeKeyAndOrderFront(nil)
+            navigationBarViewController.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
+        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
     @objc func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -379,7 +380,9 @@ extension MainViewController {
     }
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
+#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+#endif
     }
 
     // MARK: - History
@@ -413,7 +416,7 @@ extension MainViewController {
         }
 
         makeKeyIfNeeded()
-        getActiveTabAndIndex()?.tab.setContent(.contentFromURL(url))
+        getActiveTabAndIndex()?.tab.setContent(.contentFromURL(url, source: .historyEntry))
         adjustFirstResponder()
     }
 
@@ -458,7 +461,7 @@ extension MainViewController {
         }
         makeKeyIfNeeded()
 
-        navigationBarViewController?
+        navigationBarViewController
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
@@ -471,7 +474,7 @@ extension MainViewController {
         }
         makeKeyIfNeeded()
 
-        navigationBarViewController?
+        navigationBarViewController
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
@@ -500,7 +503,7 @@ extension MainViewController {
         }
 
         let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
-            Tab(content: .url($0),
+            Tab(content: .url($0, source: .bookmark),
                 shouldLoadInBackground: true,
                 burnerMode: tabCollectionViewModel.burnerMode)
         }
@@ -668,10 +671,15 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowCookie.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+    }
+
+    @objc func internalUserState(_ sender: Any?) {
+        guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
+        let state = internalUserDecider.isInternalUser
+        internalUserDecider.debugSetInternalUserState(!state)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
@@ -709,9 +717,9 @@ extension MainViewController {
         #endif
     }
 
+    /// debug menu popup window test
     @objc func showPopUpWindow(_ sender: Any?) {
-        let tabURL = Tab.TabContent.url(URL(string: "https://duckduckgo.com")!)
-        let tab = Tab(content: tabURL,
+        let tab = Tab(content: .url(.duckDuckGo, source: .ui),
                       webViewConfiguration: WKWebViewConfiguration(),
                       parentTab: nil,
                       canBeClosedWithBack: false,
@@ -724,8 +732,50 @@ extension MainViewController {
         EmailManager().resetEmailProtectionInContextPrompt()
     }
 
-    @objc func fetchConfigurationNow(_ sender: Any?) {
-        ConfigurationManager.shared.forceRefresh()
+    @objc func removeUserScripts(_ sender: Any?) {
+        tabCollectionViewModel.selectedTab?.userContentController?.cleanUpBeforeClosing()
+        tabCollectionViewModel.selectedTab?.reload()
+        os_log("User scripts removed from the current tab", type: .info)
+    }
+
+    @objc func reloadConfigurationNow(_ sender: Any?) {
+        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
+
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
+    }
+
+    private func setConfigurationUrl(_ configurationUrl: URL?) {
+        OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
+
+        var configurationProvider = AppConfigurationURLProvider(customPrivacyConfiguration: configurationUrl)
+        if configurationUrl == nil {
+            configurationProvider.resetToDefaultConfigurationUrl()
+        }
+        Configuration.setURLProvider(configurationProvider)
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
+        if let configurationUrl {
+            os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
+        } else {
+            os_log("New configuration URL reset to default", type: .info)
+        }
+    }
+
+    @objc func setCustomConfigurationURL(_ sender: Any?) {
+        let currentConfigurationURL = AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString
+        let alert = NSAlert.customConfigurationAlert(configurationUrl: currentConfigurationURL)
+        if alert.runModal() != .cancel {
+            guard let textField = alert.accessoryView as? NSTextField,
+                  let newConfigurationUrl = URL(string: textField.stringValue) else {
+                os_log("Failed to set custom configuration URL", type: .error)
+                return
+            }
+
+            setConfigurationUrl(newConfigurationUrl)
+        }
+    }
+
+    @objc func resetConfigurationToDefault(_ sender: Any?) {
+        setConfigurationUrl(nil)
     }
 
     // MARK: - Developer Tools

@@ -23,35 +23,76 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        PreferencePaneSection {
-            HStack(alignment: .top, spacing: 12) {
-                Text(UserText.syncSetupExplanation)
-                    .fixMultilineScrollableText()
-                Spacer()
-                Group {
-                    if model.isCreatingAccount {
-                        ProgressView()
-                    } else {
-                        Button(UserText.turnOnSyncWithEllipsis) {
-                            model.presentEnableSyncDialog()
-                        }
-                    }
-                }.frame(minWidth: 100)
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(spacing: 8) {
+                syncUnavailableView()
+                syncWithAnotherDeviceView()
+                SyncUIViews.TextDetailSecondary(text: UserText.beginSyncFooter)
+                    .padding(.bottom, 24)
+                    .padding(.horizontal, 110)
+                    .font(.system(size: 11))
+            }
+            VStack(alignment: .leading, spacing: 12) {
+                SyncUIViews.TextHeader2(text: UserText.otherOptionsSectionTitle)
+                VStack(alignment: .leading, spacing: 8) {
+                    TextButton(UserText.syncThisDeviceLink, weight: .semibold, action: model.syncWithServerPressed)
+                        .disabled(!model.isAccountCreationAvailable)
+                    TextButton(UserText.recoverDataLink, weight: .semibold, action: model.recoverDataPressed)
+                        .disabled(!model.isAccountRecoveryAvailable)
+                }
             }
         }
+    }
 
-        PreferencePaneSection {
-            HStack {
-                Spacer()
-                Image("SyncSetup")
-                Spacer()
+    fileprivate func syncWithAnotherDeviceView() -> some View {
+        VStack(alignment: .center, spacing: 16) {
+            Image("Sync-Pair-96")
+            VStack(alignment: .center, spacing: 8) {
+                SyncUIViews.TextHeader(text: UserText.beginSyncTitle)
+                SyncUIViews.TextDetailSecondary(text: UserText.beginSyncDescription)
             }
+            .padding(.bottom, 16)
+            Button(UserText.beginSyncButton, action: model.syncWithAnotherDevicePressed)
+                .buttonStyle(SyncWithAnotherDeviceButtonStyle(enabled: model.isConnectingDevicesAvailable))
+                .disabled(!model.isConnectingDevicesAvailable)
         }
+        .frame(width: 512, height: 254)
+        .roundedBorder()
+        .padding(.top, 20)
+    }
 
-        PreferencePaneSection {
-            TextButton(UserText.recoverSyncedData) {
-                model.presentRecoverSyncAccountDialog()
-            }
+    @ViewBuilder
+    fileprivate func syncUnavailableView() -> some View {
+        if !model.isDataSyncingAvailable || !model.isConnectingDevicesAvailable || !model.isAccountCreationAvailable {
+            SyncWarningMessage(title: UserText.syncUnavailableTitle, message: UserText.syncUnavailableMessage)
+                .padding(.top, 16)
+        } else {
+            EmptyView()
         }
+    }
+}
+
+private struct SyncWithAnotherDeviceButtonStyle: ButtonStyle {
+
+    public let enabled: Bool
+
+    public init(enabled: Bool) {
+        self.enabled = enabled
+    }
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+
+        let enabledBackgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let disabledBackgroundColor = Color.gray.opacity(0.1)
+        let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
+
+        configuration.label
+            .lineLimit(1)
+            .font(.body.bold())
+            .frame(width: 220, height: 32)
+            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
+            .foregroundColor(labelColor)
+            .cornerRadius(8)
+
     }
 }

@@ -14,7 +14,7 @@
 //  limitations under the License.
 //
 
-#include "AppStoreBuildNumber.xcconfig"
+#include "BuildNumber.xcconfig"
 
 MAIN_BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
 

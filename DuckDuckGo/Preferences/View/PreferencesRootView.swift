@@ -16,14 +16,14 @@
 //  limitations under the License.
 //
 
+import Common
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
 
 #if SUBSCRIPTION
-import Account
-import Purchase
 import Subscription
+import SubscriptionUI
 #endif
 
 fileprivate extension Preferences.Const {
@@ -58,6 +58,12 @@ extension Preferences {
                                 AppearanceView(model: .shared)
                             case .privacy:
                                 PrivacyView(model: PrivacyPreferencesModel())
+
+#if NETWORK_PROTECTION
+                            case .vpn:
+                                VPNView(model: VPNPreferencesModel())
+#endif
+
 #if SUBSCRIPTION
                             case .subscription:
                                 makeSubscriptionView()
@@ -93,27 +99,71 @@ extension Preferences {
 #if SUBSCRIPTION
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
-            }, manageSubscriptionInAppStore: {
-                NSWorkspace.shared.open(URL(string: "macappstores://apps.apple.com/account/subscriptions")!)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+            }, changePlanOrBilling: {
+                self.changePlanOrBilling()
             }, openVPN: {
-                print("openVPN")
+                NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
             }, openPersonalInformationRemoval: {
-                print("openPersonalInformationRemoval")
+                NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             }, openIdentityTheftRestoration: {
-                print("openIdentityTheftRestoration")
+                NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
             })
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                AccountManager().signInByRestoringPastPurchases()
+                self.restorePurchases()
             }, openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }, goToSyncPreferences: {
                 self.model.selectPane(.sync)
             })
 
             let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
-            return Subscription.PreferencesSubscriptionView(model: model)
+            return SubscriptionUI.PreferencesSubscriptionView(model: model)
+        }
+
+        private func changePlanOrBilling() {
+            switch SubscriptionPurchaseEnvironment.current {
+            case .appStore:
+                NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
+            case .stripe:
+                Task {
+                    guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
+                          case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                    guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
+
+                    WindowControllersManager.shared.show(url: customerPortalURL, source: .ui, newTab: true)
+                }
+            }
+        }
+
+        private func restorePurchases() {
+            if #available(macOS 12.0, *) {
+                Task {
+                    let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+                    let progressViewController = ProgressViewController(title: "Restoring subscription...")
+
+                    defer { mainViewController?.dismiss(progressViewController) }
+
+                    mainViewController?.presentAsSheet(progressViewController)
+
+                    guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
+
+                    switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+                    case .success:
+                        break
+                    case .failure(let error):
+                        switch error {
+                        case .missingAccountOrTransactions:
+                            WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
+                        case .subscriptionExpired:
+                            WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
+                        default:
+                            WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                        }
+                    }
+                }
+            }
         }
 #endif
     }
@@ -122,11 +172,23 @@ extension Preferences {
 struct SyncView: View {
 
     var body: some View {
-        if let syncService = NSApp.delegateTyped.syncService {
-            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService))
+        if let syncService = NSApp.delegateTyped.syncService, let syncDataProviders = NSApp.delegateTyped.syncDataProviders {
+            SyncUI.ManagementView(model: SyncPreferences(syncService: syncService, syncBookmarksAdapter: syncDataProviders.bookmarksAdapter))
+                .onAppear {
+                    requestSync()
+                }
         } else {
             FailedAssertionView("Failed to initialize Sync Management View")
         }
     }
 
+    private func requestSync() {
+        Task { @MainActor in
+            guard let syncService = (NSApp.delegate as? AppDelegate)?.syncService else {
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            syncService.scheduler.notifyDataChanged()
+        }
+    }
 }

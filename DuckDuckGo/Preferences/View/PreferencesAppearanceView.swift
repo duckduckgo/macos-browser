@@ -18,6 +18,7 @@
 
 import SwiftUI
 import SwiftUIExtensions
+import Bookmarks
 
 extension Preferences {
 

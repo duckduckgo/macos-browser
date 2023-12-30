@@ -85,8 +85,6 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
         try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
-            migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
-            migrator.registerMigration("v3", migrate: Self.migrateV3(database:))
         }
     }
 
@@ -146,6 +144,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
             $0.column(ProfileQueryDB.Columns.phone.name, .text)
             $0.column(ProfileQueryDB.Columns.birthYear.name, .integer)
+
+            $0.column(ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
         }
 
         try database.create(table: BrokerDB.databaseTableName) {
@@ -197,7 +197,6 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                           references: ProfileQueryDB.databaseTableName,
                           onDelete: .cascade)
 
-            //  This should be a FK but a migration will need to be considered
             $0.column(ExtractedProfileDB.Columns.profileQueryId.name, .integer).notNull()
             $0.column(ExtractedProfileDB.Columns.brokerId.name, .integer).notNull()
             $0.column(ExtractedProfileDB.Columns.profile.name, .text).notNull()
@@ -216,7 +215,9 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                           references: ProfileQueryDB.databaseTableName,
                           onDelete: .cascade)
 
-            $0.foreignKey([OptOutDB.Columns.extractedProfileId.name], references: ExtractedProfileDB.databaseTableName)
+            $0.foreignKey([OptOutDB.Columns.extractedProfileId.name],
+                          references: ExtractedProfileDB.databaseTableName,
+                          onDelete: .cascade)
 
             $0.column(OptOutDB.Columns.profileQueryId.name, .integer).notNull()
             $0.column(OptOutDB.Columns.brokerId.name, .integer).notNull()
@@ -234,16 +235,18 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 OptOutHistoryEventDB.Columns.timestamp.name
             ])
 
+            $0.foreignKey([OptOutHistoryEventDB.Columns.brokerId.name], references: BrokerDB.databaseTableName)
+            $0.foreignKey([OptOutHistoryEventDB.Columns.profileQueryId.name],
+                          references: ProfileQueryDB.databaseTableName,
+                          onDelete: .cascade)
+
             $0.column(OptOutHistoryEventDB.Columns.profileQueryId.name, .integer).notNull()
             $0.column(OptOutHistoryEventDB.Columns.brokerId.name, .integer).notNull()
             $0.column(OptOutHistoryEventDB.Columns.extractedProfileId.name, .integer).notNull()
             $0.column(OptOutHistoryEventDB.Columns.event.name, .text).notNull()
             $0.column(OptOutHistoryEventDB.Columns.timestamp.name, .datetime).notNull()
         }
-    }
-    // swiftlint:enable function_body_length
 
-    static func migrateV2(database: Database) throws {
         try database.create(table: OptOutAttemptDB.databaseTableName) {
             $0.primaryKey([OptOutAttemptDB.Columns.extractedProfileId.name])
 
@@ -256,12 +259,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
         }
     }
-
-    static func migrateV3(database: Database) throws {
-        try database.alter(table: ProfileQueryDB.databaseTableName) {
-            $0.add(column: ProfileQueryDB.Columns.deprecated.name, .boolean).notNull().defaults(to: false)
-        }
-    }
+    // swiftlint:enable function_body_length
 
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
         try db.write { db in
@@ -323,19 +321,19 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func deleteProfileData() throws {
         try db.write { db in
-            try ScanHistoryEventDB
-                .deleteAll(db)
             try OptOutHistoryEventDB
-                .deleteAll(db)
-            try ExtractedProfileDB
-                .deleteAll(db)
-            try ScanDB
                 .deleteAll(db)
             try OptOutDB
                 .deleteAll(db)
-            try BrokerDB
+            try ScanHistoryEventDB
+                .deleteAll(db)
+            try ScanDB
+                .deleteAll(db)
+            try ExtractedProfileDB
                 .deleteAll(db)
             try ProfileQueryDB
+                .deleteAll(db)
+            try BrokerDB
                 .deleteAll(db)
             try NameDB
                 .deleteAll(db)
@@ -397,7 +395,7 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
 
     func delete(_ profileQuery: ProfileQueryDB) throws {
         guard let profileQueryID = profileQuery.id else { throw DataBrokerProtectionDatabaseErrors.elementNotFound }
-        try db.write { db in
+        _ = try db.write { db in
             try ProfileQueryDB
                 .filter(Column(ProfileQueryDB.Columns.id.name) == profileQueryID)
                 .deleteAll(db)

@@ -58,7 +58,6 @@ extension Tab: NSSecureCoding {
                   snapshot: decoder.decodeIfPresent(at: NSSecureCodingKeys.snapshot),
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
-                  shouldLoadFromCache: true,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
 
         _=self.awakeAfter(using: decoder)
@@ -95,9 +94,7 @@ private extension Tab.TabContent {
         case homePage = 3
         case onboarding = 4
         case duckPlayer = 5
-#if DBP
         case dataBrokerProtection = 6
-#endif
     }
 
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
@@ -106,7 +103,7 @@ private extension Tab.TabContent {
             self = .homePage
         case .url:
             guard let url = url else { return nil }
-            self = .url(url)
+            self = .url(url, source: .stateRestoration)
         case .bookmarks:
             self = .bookmarks
         case .preferences:
@@ -115,11 +112,9 @@ private extension Tab.TabContent {
             self = .onboarding
         case .duckPlayer:
             guard let videoID = videoID else { return nil }
-            self = .url(.duckPlayer(videoID, timestamp: timestamp))
-#if DBP
+            self = .url(.duckPlayer(videoID, timestamp: timestamp), source: .stateRestoration)
         case .dataBrokerProtection:
             self = .dataBrokerProtection
-#endif
         }
     }
 
@@ -131,9 +126,7 @@ private extension Tab.TabContent {
         case .preferences: return .preferences
         case .onboarding: return .onboarding
         case .none: return .homePage
-#if DBP
         case .dataBrokerProtection: return .dataBrokerProtection
-#endif
         }
     }
 

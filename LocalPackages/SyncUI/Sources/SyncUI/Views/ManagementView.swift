@@ -23,6 +23,7 @@ enum Const {
     enum Fonts {
         static let preferencePaneTitle: Font = .title2.weight(.semibold)
         static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
+        static let preferencePaneOptionTitle: Font = .title3
         static let preferencePaneCaption: Font = .subheadline
     }
 }
@@ -36,34 +37,19 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Work in Progress")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.black)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(UserText.sync)
+                    .font(.system(size: 17))
+                    .bold()
 
-                // swiftlint:disable line_length
-                Text("This feature is viewable to internal users only and is still being developed and tested. Currently you can create accounts, connect and manage devices, and sync bookmarks, favorites, Autofill logins and Email Protection status. **[More Info](https://app.asana.com/0/1201493110486074/1203756800930481/f)**")
-                    .foregroundColor(.black)
-                    .font(.system(size: 11, weight: .regular))
-                // swiftlint:enable line_length
+                if model.isSyncEnabled {
+                    SyncEnabledView<ViewModel>()
+                        .environmentObject(model)
+                } else {
+                    SyncSetupView<ViewModel>()
+                        .environmentObject(model)
+                }
             }
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(.yellow))
-            .padding(.bottom, 10)
-
-            Text(UserText.sync)
-                .font(Const.Fonts.preferencePaneTitle)
-
-            if model.isSyncEnabled {
-                SyncEnabledView<ViewModel>()
-                    .environmentObject(model)
-            } else {
-                SyncSetupView<ViewModel>()
-                    .environmentObject(model)
-            }
-        }
-        .alert(isPresented: $model.shouldShowErrorMessage) {
-            Alert(title: Text("Unable to turn on Sync"), message: Text(model.errorMessage ?? "An error occurred"), dismissButton: .default(Text(UserText.ok)))
         }
     }
 }

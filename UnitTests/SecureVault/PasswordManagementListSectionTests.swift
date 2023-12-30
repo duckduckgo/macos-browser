@@ -44,10 +44,6 @@ final class PasswordManagementListSectionTests: XCTestCase {
         login(named: "š")
     ]
 
-    override func setUp() {
-        super.setUp()
-    }
-
     func testWhenSortingEmptyArray_ThenNoSectionsAreReturned() {
         let sections = PasswordManagementListSection.sections(with: [], by: \.id, order: .ascending)
         XCTAssertTrue(sections.isEmpty)

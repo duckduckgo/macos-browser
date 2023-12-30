@@ -29,17 +29,22 @@ import SwiftUI
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
 
+    private let environmentMenu = NSMenu()
+
     private let preferredServerMenu: NSMenu
     private let preferredServerAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setSelectedServer))
 
     private let registrationKeyValidityMenu: NSMenu
     private let registrationKeyValidityAutomaticItem = NSMenuItem(title: "Automatic", action: #selector(NetworkProtectionDebugMenu.setRegistrationKeyValidity))
 
+    private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
+
     private let exclusionsMenu = NSMenu()
 
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
     private let connectOnLogInMenuItem = NSMenuItem(title: "Connect on Log In", action: #selector(NetworkProtectionDebugMenu.toggleConnectOnLogInAction))
+    private let disableRekeyingMenuItem = NSMenuItem(title: "Disable Rekeying", action: #selector(NetworkProtectionDebugMenu.toggleRekeyingDisabled))
 
     private let excludeLocalNetworksMenuItem = NSMenuItem(title: "excludeLocalNetworks", action: #selector(NetworkProtectionDebugMenu.toggleShouldExcludeLocalRoutes))
 
@@ -61,17 +66,23 @@ final class NetworkProtectionDebugMenu: NSMenu {
         super.init(title: "Network Protection")
 
         buildItems {
-            NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
-                .targetting(self)
+            NSMenuItem(title: "Reset") {
+                NSMenuItem(title: "Reset All State Keeping Invite", action: #selector(NetworkProtectionDebugMenu.resetAllKeepingInvite))
+                    .targetting(self)
 
-            NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
-                .targetting(self)
+                NSMenuItem(title: "Reset All State", action: #selector(NetworkProtectionDebugMenu.resetAllState))
+                    .targetting(self)
 
-            NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
-                .targetting(self)
+                resetToDefaults
+                    .targetting(self)
 
-            NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
-                .targetting(self)
+                NSMenuItem(title: "Remove System Extension and Login Items", action: #selector(NetworkProtectionDebugMenu.removeSystemExtensionAndAgents))
+                    .targetting(self)
+
+                NSMenuItem(title: "Reset Remote Messages", action: #selector(NetworkProtectionDebugMenu.resetNetworkProtectionRemoteMessages))
+                    .targetting(self)
+            }
+
             NSMenuItem.separator()
 
             connectOnLogInMenuItem
@@ -87,10 +98,15 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Onboarding")
                 .submenu(NetworkProtectionOnboardingMenu())
 
+            NSMenuItem(title: "Environment")
+                .submenu(environmentMenu)
+
             NSMenuItem(title: "Preferred Server").submenu(preferredServerMenu)
 
             NSMenuItem(title: "Registration Key") {
                 NSMenuItem(title: "Expire Now", action: #selector(NetworkProtectionDebugMenu.expireRegistrationKeyNow))
+                    .targetting(self)
+                disableRekeyingMenuItem
                     .targetting(self)
 
 #if DEBUG
@@ -134,6 +150,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "NetP Waitlist Feature Flag Overrides")
                 .submenu(NetworkProtectionWaitlistFeatureFlagOverridesMenu())
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Kill Switch (alternative approach)") {
@@ -148,6 +165,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
         }
 
         preferredServerMenu.autoenablesItems = false
+        populateNetworkProtectionEnvironmentListMenuItems()
         populateNetworkProtectionServerListMenuItems()
         populateNetworkProtectionRegistrationKeyValidityMenuItems()
 
@@ -162,7 +180,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Tunnel Settings
 
-    private let settings = TunnelSettings(defaults: .shared)
+    private let settings = VPNSettings(defaults: .netP)
 
     // MARK: - Debug Logic
 
@@ -175,12 +193,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetAllState(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-
-            do {
-                try await debugUtilities.resetAllState(keepAuthToken: false)
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
+            await debugUtilities.resetAllState(keepAuthToken: false)
         }
     }
 
@@ -189,13 +202,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetAllKeepingInvite(_ sender: Any?) {
         Task { @MainActor in
             guard case .alertFirstButtonReturn = await NSAlert.resetNetworkProtectionAlert().runModal() else { return }
-
-            do {
-                try await debugUtilities.resetAllState(keepAuthToken: true)
-            } catch {
-                await NSAlert(error: error).runModal()
-            }
+            await debugUtilities.resetAllState(keepAuthToken: true)
         }
+    }
+
+    @objc func resetSettings(_ sender: Any?) {
+        settings.resetToDefaults()
     }
 
     /// Removes the system extension and agents for Network Protection.
@@ -228,7 +240,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func setSelectedServer(_ menuItem: NSMenuItem) {
         let title = menuItem.title
-        let selectedServer: TunnelSettings.SelectedServer
+        let selectedServer: VPNSettings.SelectedServer
 
         if title == "Automatic" {
             selectedServer = .automatic
@@ -244,8 +256,12 @@ final class NetworkProtectionDebugMenu: NSMenu {
     ///
     @objc func expireRegistrationKeyNow(_ sender: Any?) {
         Task {
-            await debugUtilities.expireRegistrationKeyNow()
+            try? await debugUtilities.expireRegistrationKeyNow()
         }
+    }
+
+    @objc func toggleRekeyingDisabled(_ sender: Any?) {
+        settings.disableRekeying.toggle()
     }
 
     /// Sets the registration key validity.
@@ -292,6 +308,13 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     // MARK: Populating Menu Items
+
+    private func populateNetworkProtectionEnvironmentListMenuItems() {
+        environmentMenu.items = [
+            NSMenuItem(title: "Production", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+            NSMenuItem(title: "Staging", action: #selector(setSelectedEnvironment(_:)), target: self, keyEquivalent: ""),
+        ]
+    }
 
     private func populateNetworkProtectionServerListMenuItems() {
         let networkProtectionServerStore = NetworkProtectionServerListFileSystemStore(errorEvents: nil)
@@ -356,14 +379,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
     private func populateExclusionsMenuItems() {
         exclusionsMenu.removeAllItems()
 
-        for item in settings.exclusionList {
+        for item in settings.excludedRoutes {
             let menuItem: NSMenuItem
             switch item {
             case .section(let title):
                 menuItem = NSMenuItem(title: title, action: nil, target: nil)
                 menuItem.isEnabled = false
 
-            case .exclusion(range: let range, description: let description, default: _):
+            case .range(let range, let description):
                 menuItem = NSMenuItem(title: "\(range)\(description != nil ? " (\(description!))" : "")",
                                       action: #selector(toggleExclusionAction),
                                       target: self,
@@ -381,10 +404,24 @@ final class NetworkProtectionDebugMenu: NSMenu {
     // MARK: - Menu State Update
 
     override func update() {
+        updateEnvironmentMenu()
         updatePreferredServerMenu()
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
         updateNetworkProtectionItems()
+    }
+
+    private func updateEnvironmentMenu() {
+        let selectedEnvironment = settings.selectedEnvironment
+
+        switch selectedEnvironment {
+        case .production:
+            environmentMenu.items.first?.state = .on
+            environmentMenu.items.last?.state = .off
+        case .staging:
+            environmentMenu.items.first?.state = .off
+            environmentMenu.items.last?.state = .on
+        }
     }
 
     private func updatePreferredServerMenu() {
@@ -435,10 +472,11 @@ final class NetworkProtectionDebugMenu: NSMenu {
         shouldEnforceRoutesMenuItem.state = settings.enforceRoutes ? .on : .off
         shouldIncludeAllNetworksMenuItem.state = settings.includeAllNetworks ? .on : .off
         excludeLocalNetworksMenuItem.state = settings.excludeLocalNetworks ? .on : .off
+        disableRekeyingMenuItem.state = settings.disableRekeying ? .on : .off
     }
 
     private func updateNetworkProtectionItems() {
-        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier)
+        let waitlistStorage = WaitlistKeychainStore(waitlistIdentifier: NetworkProtectionWaitlist.identifier, keychainAppGroup: NetworkProtectionWaitlist.keychainAppGroup)
         waitlistTokenItem.title = "Waitlist Token: \(waitlistStorage.getWaitlistToken() ?? "N/A")"
         waitlistInviteCodeItem.title = "Waitlist Invite Code: \(waitlistStorage.getWaitlistInviteCode() ?? "N/A")"
 
@@ -455,7 +493,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     // MARK: Waitlist
 
     @objc func sendNetworkProtectionWaitlistAvailableNotification(_ sender: Any?) {
-        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification()
+        NetworkProtectionWaitlist().sendInviteCodeAvailableNotification(completion: nil)
     }
 
     @objc func resetNetworkProtectionActivationDate(_ sender: Any?) {
@@ -492,6 +530,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     @objc func resetNetworkProtectionWaitlistState(_ sender: Any?) {
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
+        UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionWaitlistSignUpPromptDismissed.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)
     }
 
@@ -531,6 +570,28 @@ final class NetworkProtectionDebugMenu: NSMenu {
             return textField.stringValue
         } else {
             return ""
+        }
+    }
+
+    // MARK: Environment
+    @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
+        let title = menuItem.title
+        let selectedEnvironment: VPNSettings.SelectedEnvironment
+
+        if title == "Staging" {
+            selectedEnvironment = .staging
+        } else {
+            selectedEnvironment = .production
+        }
+
+        settings.selectedEnvironment = selectedEnvironment
+
+        Task {
+            _ = try await NetworkProtectionDeviceManager.create().refreshServerList()
+            await MainActor.run {
+                populateNetworkProtectionServerListMenuItems()
+            }
+            settings.selectedServer = .automatic
         }
     }
 }

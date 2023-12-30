@@ -26,7 +26,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Account
+import Subscription
 #endif
 
 protocol OptionsButtonMenuDelegate: AnyObject {
@@ -47,7 +47,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
     func optionsButtonMenuRequestedDataBrokerProtection(_ menu: NSMenu)
 #endif
 #if SUBSCRIPTION
-    func optionsButtonMenuRequestedSubscriptionPreferences(_ menu: NSMenu)
+    func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
 #endif
 }
 
@@ -149,7 +149,15 @@ final class MoreOptionsMenu: NSMenu {
 
 #if DBP
     @objc func openDataBrokerProtection(_ sender: NSMenuItem) {
+        #if SUBSCRIPTION
         actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+        #else
+        if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist && DataBrokerProtectionWaitlistViewControllerPresenter.shouldPresentWaitlist() {
+            DataBrokerProtectionWaitlistViewControllerPresenter.show()
+        } else {
+            actionDelegate?.optionsButtonMenuRequestedDataBrokerProtection(self)
+        }
+        #endif
     }
 #endif // DBP
 
@@ -231,8 +239,8 @@ final class MoreOptionsMenu: NSMenu {
     }
 
 #if SUBSCRIPTION
-    @objc func openSubscriptionPreferences(_ sender: NSMenuItem) {
-        actionDelegate?.optionsButtonMenuRequestedSubscriptionPreferences(self)
+    @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
 #endif
 
@@ -294,7 +302,11 @@ final class MoreOptionsMenu: NSMenu {
         var items: [NSMenuItem] = []
 
 #if SUBSCRIPTION
-        items.append(contentsOf: AccountManager().isSignedIn ? makeActiveSubscriptionItems() : makeInactiveSubscriptionItems())
+        if AccountManager().isUserAuthenticated {
+            items.append(contentsOf: makeActiveSubscriptionItems())
+        } else if SubscriptionPurchaseEnvironment.canPurchase {
+            items.append(contentsOf: makeInactiveSubscriptionItems())
+        }
 #else
         items.append(contentsOf: makeActiveSubscriptionItems()) // this only adds NETP and DBP (if enabled)
 #endif
@@ -328,39 +340,21 @@ final class MoreOptionsMenu: NSMenu {
 #endif // NETWORK_PROTECTION
 
 #if DBP
-        var regionCode: String?
-        if #available(macOS 13, *) {
-            regionCode = Locale.current.region?.identifier
-        } else {
-            regionCode = Locale.current.regionCode
-        }
-
-        #if DEBUG // Always assume US for debug builds
-        regionCode = "US"
-        #endif
-
-        // Only show Private Information Removal (DBP) for US based users
-        if (regionCode ?? "US") == "US" {
+        if DefaultDataBrokerProtectionFeatureVisibility().isFeatureVisible() {
             let dataBrokerProtectionItem = NSMenuItem(title: UserText.dataBrokerProtectionOptionsMenuItem,
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "BurnerWindowIcon2")) // PLACEHOLDER: Change it once we have the final icon
+                .withImage(NSImage(named: "DBP-Icon"))
             items.append(dataBrokerProtectionItem)
+
+            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
+
+        } else {
+            DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
         }
+
 #endif // DBP
-
-#if SUBSCRIPTION
-        let item1  = NSMenuItem(title: "Placeholder A", action: #selector(openPreferences(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.image(for: .vpnIcon))
-        items.append(item1)
-
-        let item2  = NSMenuItem(title: "Placeholder B", action: #selector(openPreferences(_:)), keyEquivalent: "")
-            .targetting(self)
-            .withImage(.image(for: .vpnIcon))
-        items.append(item2)
-#endif
 
         return items
     }
@@ -368,7 +362,7 @@ final class MoreOptionsMenu: NSMenu {
 #if SUBSCRIPTION
     private func makeInactiveSubscriptionItems() -> [NSMenuItem] {
         let privacyProItem = NSMenuItem(title: "",
-                                        action: #selector(openSubscriptionPreferences(_:)),
+                                        action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
             .withImage(NSImage(named: "SubscriptionIcon"))
@@ -502,7 +496,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func manageAccountAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionAccountLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 
@@ -535,7 +529,7 @@ final class EmailOptionsButtonSubMenu: NSMenu {
     }
 
     @objc func turnOnEmailAction(_ sender: NSMenuItem) {
-        let tab = Tab(content: .url(EmailUrls().emailProtectionLink), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+        let tab = Tab(content: .url(EmailUrls().emailProtectionLink, source: .ui), shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
         tabCollectionViewModel.append(tab: tab)
     }
 }
@@ -719,4 +713,4 @@ final class LoginsSubMenu: NSMenu {
 
 }
 
-extension MoreOptionsMenu: EmailManagerRequestDelegate { }
+extension MoreOptionsMenu: EmailManagerRequestDelegate {}

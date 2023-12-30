@@ -21,6 +21,7 @@ import Common
 import Foundation
 import LoginItems
 import NetworkProtection
+import NetworkProtectionUI
 import NetworkProtectionIPC
 import NetworkExtension
 
@@ -120,6 +121,11 @@ final class NetworkProtectionAppEvents {
             versionStore.lastVersionRun = currentVersion
         }
 
+#if DEBUG
+        // For debug builds we always want to restart the VPN and VPN menu app to ensure
+        // the latest is loaded
+        restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
+#else
         // should‘ve been run at least once with NetP enabled
         guard let lastVersionRun = versionStore.lastVersionRun else {
             os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
@@ -130,6 +136,7 @@ final class NetworkProtectionAppEvents {
             os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
             restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
         }
+#endif
     }
 
     private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
@@ -168,7 +175,7 @@ final class NetworkProtectionAppEvents {
     // MARK: - Legacy Login Item and Extension
 
     private func removeLegacyLoginItemAndVPNConfiguration() async {
-        LoginItem(bundleId: legacyAgentBundleID).forceStop()
+        LoginItem(bundleId: legacyAgentBundleID, defaults: .netP).forceStop()
 
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
         let tunnel = tunnels?.first {
@@ -178,6 +185,8 @@ final class NetworkProtectionAppEvents {
         guard let tunnel else {
             return
         }
+
+        UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 
         try? await tunnel.removeFromPreferences()
     }

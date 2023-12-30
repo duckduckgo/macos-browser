@@ -30,7 +30,7 @@ protocol BookmarkManager: AnyObject {
     func getBookmark(forUrl url: String) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool) -> Bookmark?
     @discardableResult func makeBookmark(for url: URL, title: String, isFavorite: Bool, index: Int?, parent: BookmarkFolder?) -> Bookmark?
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void)
     func remove(bookmark: Bookmark)
     func remove(folder: BookmarkFolder)
     func remove(objectsWithUUIDs uuids: [String])
@@ -43,7 +43,9 @@ protocol BookmarkManager: AnyObject {
     func canMoveObjectWithUUID(objectUUID uuid: String, to parent: BookmarkFolder) -> Bool
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void)
     func moveFavorites(with objectUUIDs: [String], toIndex: Int?, completion: @escaping (Error?) -> Void)
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary
+
+    func handleFavoritesAfterDisablingSync()
 
     // Wrapper definition in a protocol is not supported yet
     var listPublisher: Published<BookmarkList?>.Publisher { get }
@@ -55,11 +57,25 @@ final class LocalBookmarkManager: BookmarkManager {
 
     static let shared = LocalBookmarkManager()
 
-    private init() {}
+    init(bookmarkStore: BookmarkStore? = nil, faviconManagement: FaviconManagement? = nil) {
+        if let bookmarkStore {
+            self.bookmarkStore = bookmarkStore
+        }
+        if let faviconManagement {
+            self.faviconManagement = faviconManagement
+        }
+        self.subscribeToFavoritesDisplayMode()
+    }
 
-    init(bookmarkStore: BookmarkStore, faviconManagement: FaviconManagement) {
-        self.bookmarkStore = bookmarkStore
-        self.faviconManagement = faviconManagement
+    private func subscribeToFavoritesDisplayMode() {
+        favoritesDisplayMode = AppearancePreferences.shared.favoritesDisplayMode
+        favoritesDisplayModeCancellable = AppearancePreferences.shared.$favoritesDisplayMode
+            .dropFirst()
+            .sink { [weak self] displayMode in
+                self?.favoritesDisplayMode = displayMode
+                self?.bookmarkStore.applyFavoritesDisplayMode(displayMode)
+                self?.loadBookmarks()
+            }
     }
 
     @Published private(set) var list: BookmarkList?
@@ -67,6 +83,9 @@ final class LocalBookmarkManager: BookmarkManager {
 
     private lazy var bookmarkStore: BookmarkStore = LocalBookmarkStore(bookmarkDatabase: BookmarkDatabase.shared)
     private lazy var faviconManagement: FaviconManagement = FaviconManager.shared
+
+    private var favoritesDisplayMode: FavoritesDisplayMode = .displayNative(.desktop)
+    private var favoritesDisplayModeCancellable: AnyCancellable?
 
     // MARK: - Bookmarks
 
@@ -187,6 +206,7 @@ final class LocalBookmarkManager: BookmarkManager {
         bookmarkStore.update(bookmark: bookmark)
         loadBookmarks()
         requestSync()
+
     }
 
     func update(folder: BookmarkFolder) {
@@ -216,19 +236,18 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Folders
 
-    @discardableResult func makeFolder(for title: String, parent: BookmarkFolder?) -> BookmarkFolder {
+    func makeFolder(for title: String, parent: BookmarkFolder?, completion: @escaping (BookmarkFolder) -> Void) {
+
         let folder = BookmarkFolder(id: UUID().uuidString, title: title, parentFolderUUID: parent?.id, children: [])
 
         bookmarkStore.save(folder: folder, parent: parent) { [weak self] success, _  in
             guard success else {
                 return
             }
-
             self?.loadBookmarks()
             self?.requestSync()
+            completion(folder)
         }
-
-        return folder
     }
 
     func add(bookmark: Bookmark, to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
@@ -266,6 +285,7 @@ final class LocalBookmarkManager: BookmarkManager {
                 self?.requestSync()
             }
             completion(error)
+
         }
     }
 
@@ -276,6 +296,7 @@ final class LocalBookmarkManager: BookmarkManager {
                 self?.requestSync()
             }
             completion(error)
+
         }
     }
 
@@ -292,12 +313,28 @@ final class LocalBookmarkManager: BookmarkManager {
 
     // MARK: - Import
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
         let results = bookmarkStore.importBookmarks(bookmarks, source: source)
         loadBookmarks()
         requestSync()
 
         return results
+    }
+
+    // MARK: - Sync
+
+    func handleFavoritesAfterDisablingSync() {
+        bookmarkStore.handleFavoritesAfterDisablingSync()
+    }
+
+    func requestSync() {
+        Task { @MainActor in
+            guard let syncService = NSApp.delegateTyped.syncService else {
+                return
+            }
+            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
+            syncService.scheduler.notifyDataChanged()
+        }
     }
 
     // MARK: - Debugging
@@ -310,16 +347,7 @@ final class LocalBookmarkManager: BookmarkManager {
         store.resetBookmarks { [self] _ in
             self.loadBookmarks()
             self.requestSync()
-        }
-    }
 
-    func requestSync() {
-        Task { @MainActor in
-            guard let syncService = NSApp.delegateTyped.syncService else {
-                return
-            }
-            os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
-            syncService.scheduler.notifyDataChanged()
         }
     }
 }

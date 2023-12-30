@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -9,7 +9,7 @@
         <!--Bookmarks-->
         <scene sceneID="q4A-kX-Gcw">
             <objects>
-                <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
                         <splitViewItem holdingPriority="255" behavior="contentList" id="Gzb-7F-4E7"/>
                         <splitViewItem id="Z59-qq-Yho"/>
@@ -34,17 +34,17 @@
                 </splitViewController>
                 <customObject id="5Sa-aZ-qTG" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-91" y="-29"/>
+            <point key="canvasLocation" x="120" y="-30"/>
         </scene>
         <!--Bookmark Management Sidebar View Controller-->
         <scene sceneID="kSB-yp-ZWy">
             <objects>
-                <viewController id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="oQD-6b-AhT">
                         <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eJ4-cO-2QO" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eJ4-cO-2QO" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -58,7 +58,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="234" height="410"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="234" height="410"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
@@ -99,9 +99,6 @@
                             </scrollView>
                             <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="oJB-Na-CzV">
                                 <rect key="frame" x="18" y="422" width="217" height="60"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="60" id="gqw-kD-NlW"/>
-                                </constraints>
                                 <popUpButtonCell key="cell" type="bevel" title="Bookmarks" bezelStyle="rounded" alignment="left" controlSize="large" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" selectedItem="Pxw-Jh-Zh0" id="Hfh-Gh-9qt">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system" size="22"/>
@@ -111,6 +108,9 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="gqw-kD-NlW"/>
+                                </constraints>
                             </popUpButton>
                         </subviews>
                         <constraints>
@@ -140,17 +140,17 @@
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="468" y="-354"/>
+            <point key="canvasLocation" x="703" y="-354"/>
         </scene>
         <!--Bookmark Management Detail View Controller-->
         <scene sceneID="6Fs-Ad-ECj">
             <objects>
-                <viewController id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="0G1-O6-fPI">
                         <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="pWh-Hk-YzZ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="pWh-Hk-YzZ" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -266,17 +266,17 @@
                                     <constraint firstItem="LTY-g7-MLc" firstAttribute="top" secondItem="mrh-3F-46f" secondAttribute="bottom" constant="8" id="xB2-zS-Uxz"/>
                                 </constraints>
                             </customView>
-                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="194" y="573" width="110" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
-                                    <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
-                                </constraints>
                                 <buttonCell key="cell" type="square" title="  New Folder" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="leading" alignment="center" inset="2" id="luj-VO-HpO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="110" id="fCv-XV-yrO"/>
+                                    <constraint firstAttribute="height" constant="24" id="ys9-mF-qNi"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -292,17 +292,17 @@
                                     <action selector="presentAddFolderModal:" target="nlv-9S-Ioa" id="Dv0-j9-4ha"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" imageHugsTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="48" y="573" width="130" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
-                                    <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
-                                </constraints>
                                 <buttonCell key="cell" type="square" title="  New Bookmark" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="leading" alignment="center" inset="2" id="hNH-Va-fKg">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="24" id="CKf-3f-aSt"/>
+                                    <constraint firstAttribute="width" constant="130" id="hTU-md-bGM"/>
+                                </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                         <color key="value" name="ButtonMouseOverColor"/>
@@ -358,28 +358,44 @@
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="669" y="408.5"/>
+            <point key="canvasLocation" x="912" y="404"/>
         </scene>
-        <!--Bookmark Popover View Controller-->
+        <!--Bookmark Add Popover View Controller-->
         <scene sceneID="3pH-Ju-wLu">
             <objects>
-                <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkPopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkAddPopoverViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="2fn-ed-4g2">
                         <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <box boxType="custom" borderType="none" cornerRadius="4" title="Box" id="c5O-sc-fwL" userLabel="Background View">
-                                <rect key="frame" x="-114" y="-160" width="527" height="568"/>
+                                <rect key="frame" x="0.0" y="0.0" width="300" height="229"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <view key="contentView" id="Z2T-oF-iTc">
-                                    <rect key="frame" x="0.0" y="0.0" width="527" height="568"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="229"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kcs-Uu-pnC">
+                                            <rect key="frame" x="253" y="112" width="28" height="23"/>
+                                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="AddFolder" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Hek-hA-hbk">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <accessibility identifier="bookmark.add.new.folder.button"/>
+                                            <connections>
+                                                <action selector="addFolder:" target="vCQ-b9-yaB" id="ORd-09-yPN"/>
+                                            </connections>
+                                        </button>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="kcs-Uu-pnC" secondAttribute="trailing" constant="20" symbolic="YES" id="tvw-lm-reC"/>
+                                    </constraints>
                                 </view>
                                 <color key="fillColor" name="PopoverBackgroundColor"/>
                             </box>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="b7R-iD-UcK">
                                 <rect key="frame" x="17" y="189" width="266" height="16"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmark added" id="zKL-Gb-RmD">
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Bookmark Added" id="zKL-Gb-RmD">
                                     <font key="font" metaFont="systemBold"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -392,9 +408,10 @@
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
+                                <accessibility identifier="bookmark.add.name.textfield"/>
                             </textField>
-                            <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Zd-n4-XJh" userLabel="Folder Picker Pop Up Button">
-                                <rect key="frame" x="16" y="110" width="269" height="25"/>
+                            <popUpButton horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Zd-n4-XJh" userLabel="Folder Picker Pop Up Button">
+                                <rect key="frame" x="16" y="110" width="232" height="25"/>
                                 <popUpButtonCell key="cell" type="push" title="Bookmarks" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="jZh-eA-Xed" id="n67-W5-fMS">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
@@ -406,8 +423,9 @@
                                         </items>
                                     </menu>
                                 </popUpButtonCell>
+                                <accessibility identifier="bookmark.add.folder.dropdown"/>
                             </popUpButton>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                 <rect key="frame" x="19" y="94" width="262" height="1"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="pce-i3-i0O"/>
@@ -425,6 +443,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <color key="contentTintColor" name="ButtonColor"/>
+                                <accessibility identifier="bookmark.add.add.to.favorites.button"/>
                                 <connections>
                                     <action selector="favoritesButtonAction:" target="vCQ-b9-yaB" id="5Ku-TZ-qPS"/>
                                 </connections>
@@ -438,6 +457,7 @@
 DQ
 </string>
                                 </buttonCell>
+                                <accessibility description="bookmark.add.done.button" identifier="bookmark.add.done.button"/>
                                 <connections>
                                     <action selector="doneButtonAction:" target="vCQ-b9-yaB" id="zDN-yP-TrH"/>
                                 </connections>
@@ -448,6 +468,7 @@ DQ
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
+                                <accessibility identifier="bookmark.add.remove.button"/>
                                 <connections>
                                     <action selector="removeButtonAction:" target="vCQ-b9-yaB" id="gID-s8-sUP"/>
                                 </connections>
@@ -458,17 +479,18 @@ DQ
                             <constraint firstAttribute="trailing" secondItem="3zg-6l-JsQ" secondAttribute="trailing" constant="19" id="4Im-c8-shf"/>
                             <constraint firstAttribute="bottom" secondItem="3zg-6l-JsQ" secondAttribute="bottom" constant="19" id="4VU-Sj-j46"/>
                             <constraint firstItem="PHK-0Q-PGv" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="19" id="CFv-YC-M55"/>
+                            <constraint firstItem="kcs-Uu-pnC" firstAttribute="leading" secondItem="3Zd-n4-XJh" secondAttribute="trailing" constant="10" id="Edm-fk-iQY"/>
                             <constraint firstItem="3Zd-n4-XJh" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="19" id="FpS-ER-cY3"/>
                             <constraint firstAttribute="trailing" secondItem="fju-6w-rFQ" secondAttribute="trailing" constant="19" id="Mnn-Cv-HyE"/>
                             <constraint firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" constant="19" id="S67-Qw-Hrf"/>
                             <constraint firstItem="3zg-6l-JsQ" firstAttribute="top" secondItem="fju-6w-rFQ" secondAttribute="bottom" constant="19" id="Sh2-xQ-AIH"/>
+                            <constraint firstItem="kcs-Uu-pnC" firstAttribute="top" secondItem="Ich-82-cIb" secondAttribute="bottom" constant="10" id="Vs9-wk-SWT"/>
                             <constraint firstItem="3Zd-n4-XJh" firstAttribute="top" secondItem="Ich-82-cIb" secondAttribute="bottom" constant="10" id="WPl-UX-KoC"/>
                             <constraint firstItem="Ich-82-cIb" firstAttribute="top" secondItem="b7R-iD-UcK" secondAttribute="bottom" constant="23" id="Xlg-4G-fmw"/>
                             <constraint firstItem="fju-6w-rFQ" firstAttribute="top" secondItem="PHK-0Q-PGv" secondAttribute="bottom" constant="19" id="YnI-lp-IvQ"/>
                             <constraint firstItem="3zg-6l-JsQ" firstAttribute="leading" secondItem="0eB-pX-cZ5" secondAttribute="trailing" constant="10" id="eW9-QH-hDN"/>
                             <constraint firstItem="b7R-iD-UcK" firstAttribute="top" secondItem="2fn-ed-4g2" secondAttribute="top" constant="19" id="iBs-wS-tC7"/>
                             <constraint firstAttribute="trailing" secondItem="PHK-0Q-PGv" secondAttribute="trailing" constant="19" id="iZq-Ix-Png"/>
-                            <constraint firstAttribute="trailing" secondItem="3Zd-n4-XJh" secondAttribute="trailing" constant="19" id="jSv-NC-qdJ"/>
                             <constraint firstItem="fju-6w-rFQ" firstAttribute="leading" secondItem="2fn-ed-4g2" secondAttribute="leading" constant="19" id="w6B-zZ-zdT"/>
                             <constraint firstItem="Ich-82-cIb" firstAttribute="trailing" secondItem="b7R-iD-UcK" secondAttribute="trailing" id="wRZ-Zo-CRe"/>
                             <constraint firstItem="PHK-0Q-PGv" firstAttribute="top" secondItem="3Zd-n4-XJh" secondAttribute="bottom" constant="19" id="wfS-U1-SFY"/>
@@ -478,18 +500,19 @@ DQ
                     </view>
                     <connections>
                         <outlet property="favoriteButton" destination="fju-6w-rFQ" id="4Ya-ca-ym6"/>
+                        <outlet property="folderAddButton" destination="kcs-Uu-pnC" id="SyE-eF-PqD"/>
                         <outlet property="folderPickerPopUpButton" destination="3Zd-n4-XJh" id="7cN-jA-5l3"/>
                         <outlet property="textField" destination="Ich-82-cIb" id="VaB-Bb-pHa"/>
                     </connections>
                 </viewController>
                 <customObject id="AD4-gD-7Lp" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-588" y="-93"/>
+            <point key="canvasLocation" x="-613" y="-93"/>
         </scene>
         <!--Add Bookmark Modal View Controller-->
         <scene sceneID="D4i-le-BSY">
             <objects>
-                <viewController storyboardIdentifier="AddBookmarkModalViewController" id="iFE-Lt-gjz" customClass="AddBookmarkModalViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddBookmarkModalViewController" id="iFE-Lt-gjz" customClass="AddBookmarkModalViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="LEv-d8-u9h">
                         <rect key="frame" x="0.0" y="0.0" width="437" height="164"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -596,12 +619,12 @@ Gw
                 </viewController>
                 <customObject id="omR-6r-6qA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-521.5" y="433"/>
+            <point key="canvasLocation" x="-1116" y="412"/>
         </scene>
         <!--Add Folder Modal View Controller-->
         <scene sceneID="Ggh-5g-8vh">
             <objects>
-                <viewController storyboardIdentifier="AddFolderModalViewController" id="6vl-fZ-16D" customClass="AddFolderModalViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddFolderModalViewController" id="6vl-fZ-16D" customClass="AddFolderModalViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="zwT-eh-oPu">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="131"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -683,12 +706,12 @@ Gw
                 </viewController>
                 <customObject id="zAL-EC-rqe" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-513" y="668"/>
+            <point key="canvasLocation" x="-1117" y="633"/>
         </scene>
         <!--Bookmark List View Controller-->
         <scene sceneID="zFa-lt-gPi">
             <objects>
-                <viewController storyboardIdentifier="BookmarkListViewController" id="Scx-gG-IP9" customClass="BookmarkListViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkListViewController" id="Scx-gG-IP9" customClass="BookmarkListViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" autoresizesSubviews="NO" id="xb9-2G-g28">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="453"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -716,17 +739,17 @@ Gw
                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0If-Lj-8IG">
                                 <rect key="frame" x="303" y="417" width="97" height="28"/>
                                 <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="9mk-iy-mXT"/>
-                                            <constraint firstAttribute="width" constant="28" id="kiL-Lk-pWq"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="KBc-mO-g1J">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="9mk-iy-mXT"/>
+                                            <constraint firstAttribute="width" constant="28" id="kiL-Lk-pWq"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -742,17 +765,17 @@ Gw
                                             <action selector="newBookmarkButtonClicked:" target="Scx-gG-IP9" id="65N-1I-jOo"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                         <rect key="frame" x="32" y="0.0" width="28" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="BWu-UC-Ow7"/>
-                                            <constraint firstAttribute="width" constant="28" id="wml-gt-OK1"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EkA-sE-QuN">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="BWu-UC-Ow7"/>
+                                            <constraint firstAttribute="width" constant="28" id="wml-gt-OK1"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -775,16 +798,16 @@ Gw
                                             <constraint firstAttribute="height" constant="18" id="rtz-NW-cwa"/>
                                         </constraints>
                                     </box>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                         <rect key="frame" x="81" y="0.0" width="16" height="28"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="28" id="rgG-V6-CDn"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="28" id="rgG-V6-CDn"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -820,7 +843,7 @@ Gw
                                     <rect key="frame" x="0.0" y="0.0" width="420" height="408"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="408" height="408"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
@@ -953,7 +976,135 @@ Gw
                     </connections>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="-991" y="22"/>
+            <point key="canvasLocation" x="-1124" y="22"/>
+        </scene>
+        <!--Bookmark Add Folder Popover View Controller-->
+        <scene sceneID="3YF-3W-2Ph">
+            <objects>
+                <viewController storyboardIdentifier="BookmarkAddFolderPopoverViewController" id="pTx-lh-HJH" customClass="BookmarkAddFolderPopoverViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="rpa-zP-EkD">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <box boxType="custom" borderType="none" cornerRadius="4" title="Box" id="Qma-qX-emV" userLabel="Background View">
+                                <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <view key="contentView" id="RDX-H7-yqo">
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="51d-9M-50p">
+                                            <rect key="frame" x="18" y="156" width="60" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Location:" id="rWd-pS-Wzg">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iw1-vd-fVj" userLabel="Folder Picker Pop Up Button">
+                                            <rect key="frame" x="15" y="125" width="269" height="25"/>
+                                            <popUpButtonCell key="cell" type="push" title="Bookmarks" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="FEu-1c-JD0" id="EkS-ZU-IVt">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" id="Uak-fG-9As">
+                                                    <items>
+                                                        <menuItem title="Bookmarks" state="on" id="FEu-1c-JD0">
+                                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                                        </menuItem>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <accessibility identifier="bookmark.folder.folder.dropdown"/>
+                                        </popUpButton>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pvl-XC-NDQ">
+                                            <rect key="frame" x="18" y="97" width="44" height="16"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Name:" id="BBr-NV-Nre">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="iw1-vd-fVj" firstAttribute="top" secondItem="51d-9M-50p" secondAttribute="bottom" constant="7" id="2yS-ST-OFs"/>
+                                        <constraint firstItem="51d-9M-50p" firstAttribute="leading" secondItem="Pvl-XC-NDQ" secondAttribute="leading" id="3TU-3J-wwH"/>
+                                        <constraint firstItem="iw1-vd-fVj" firstAttribute="top" secondItem="RDX-H7-yqo" secondAttribute="top" constant="75" id="Hcl-SR-Xnp"/>
+                                        <constraint firstItem="Pvl-XC-NDQ" firstAttribute="top" secondItem="iw1-vd-fVj" secondAttribute="bottom" constant="16" id="b89-wc-zmk"/>
+                                        <constraint firstAttribute="trailing" secondItem="iw1-vd-fVj" secondAttribute="trailing" constant="20" id="gFm-f7-DYT"/>
+                                        <constraint firstItem="51d-9M-50p" firstAttribute="leading" secondItem="RDX-H7-yqo" secondAttribute="leading" constant="20" symbolic="YES" id="kN7-Um-Tok"/>
+                                        <constraint firstItem="iw1-vd-fVj" firstAttribute="leading" secondItem="RDX-H7-yqo" secondAttribute="leading" constant="18" id="yma-af-cAF"/>
+                                    </constraints>
+                                </view>
+                                <color key="fillColor" name="PopoverBackgroundColor"/>
+                            </box>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2xu-NS-EUn">
+                                <rect key="frame" x="17" y="189" width="266" height="16"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="New Folder" id="c0Y-a6-4mT">
+                                    <font key="font" metaFont="systemBold"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ulo-yp-xTO">
+                                <rect key="frame" x="19" y="71" width="262" height="22"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" bezelStyle="round" id="R1h-R3-XtY">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <accessibility identifier="bookmark.folder.name.textfield"/>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="upG-Q3-IUg">
+                                <rect key="frame" x="187" y="12" width="101" height="32"/>
+                                <buttonCell key="cell" type="push" title="Add Folder" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="T8I-rp-dq3">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <accessibility identifier="bookmark.add.add.folder.button"/>
+                                <connections>
+                                    <action selector="save:" target="pTx-lh-HJH" id="nbV-kT-UAi"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="S2g-pz-0cZ">
+                                <rect key="frame" x="115" y="12" width="76" height="32"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Yyw-2k-2no">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <accessibility identifier="bookmark.add.cancel.button"/>
+                                <connections>
+                                    <action selector="cancel:" target="pTx-lh-HJH" id="oOv-wy-LPC"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="ulo-yp-xTO" firstAttribute="leading" secondItem="2xu-NS-EUn" secondAttribute="leading" id="DEk-6E-4We"/>
+                            <constraint firstItem="2xu-NS-EUn" firstAttribute="top" secondItem="rpa-zP-EkD" secondAttribute="top" constant="19" id="Ihl-mo-0ja"/>
+                            <constraint firstItem="upG-Q3-IUg" firstAttribute="leading" secondItem="S2g-pz-0cZ" secondAttribute="trailing" constant="10" id="QSk-tc-icO"/>
+                            <constraint firstAttribute="trailing" secondItem="2xu-NS-EUn" secondAttribute="trailing" constant="19" id="VSU-gH-qXv"/>
+                            <constraint firstItem="2xu-NS-EUn" firstAttribute="leading" secondItem="rpa-zP-EkD" secondAttribute="leading" constant="19" id="bUq-ez-ZZ4"/>
+                            <constraint firstAttribute="bottom" secondItem="S2g-pz-0cZ" secondAttribute="bottom" constant="19" id="d5h-V0-cSk"/>
+                            <constraint firstItem="ulo-yp-xTO" firstAttribute="top" secondItem="2xu-NS-EUn" secondAttribute="bottom" constant="96" id="h0x-Gd-ck3"/>
+                            <constraint firstItem="ulo-yp-xTO" firstAttribute="trailing" secondItem="2xu-NS-EUn" secondAttribute="trailing" id="yX1-cs-SZa"/>
+                            <constraint firstAttribute="bottom" secondItem="upG-Q3-IUg" secondAttribute="bottom" constant="19" id="z9e-7e-fNv"/>
+                            <constraint firstAttribute="trailing" secondItem="upG-Q3-IUg" secondAttribute="trailing" constant="19" id="za5-nf-hhD"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="addFolderButton" destination="upG-Q3-IUg" id="8wq-ul-mWF"/>
+                        <outlet property="folderNameTextField" destination="ulo-yp-xTO" id="pu2-Xj-UDa"/>
+                        <outlet property="folderPickerPopUpButton" destination="iw1-vd-fVj" id="uPr-Q8-O6b"/>
+                    </connections>
+                </viewController>
+                <customObject id="h5O-4J-o19" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-613" y="221"/>
         </scene>
     </scenes>
     <resources>

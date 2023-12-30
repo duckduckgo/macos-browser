@@ -125,7 +125,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {
@@ -145,11 +145,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
         if let url = (entity as? Bookmark)?.urlObject {
             if NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-                WindowsManager.openNewWindow(with: url, isBurner: false)
+                WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
             } else if NSApplication.shared.isCommandPressed {
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
             } else {
-                WindowControllersManager.shared.show(url: url, newTab: true)
+                WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
             }
         } else if let folder = entity as? BookmarkFolder {
             resetSelections()
@@ -254,6 +254,13 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         bookmarkManager.remove(objectsWithUUIDs: entityUUIDs)
     }
 
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 }
 
 // MARK: - Modal Delegates
@@ -279,9 +286,9 @@ extension BookmarkManagementDetailViewController: AddBookmarkModalViewController
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         if case let .folder(selectedFolder) = selectionState {
-            bookmarkManager.makeFolder(for: name, parent: selectedFolder)
+            bookmarkManager.makeFolder(for: name, parent: selectedFolder, completion: { _ in })
         } else {
-            bookmarkManager.makeFolder(for: name, parent: nil)
+            bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })
         }
     }
 
@@ -325,6 +332,10 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
             if let bookmark = entity as? Bookmark {
                 cell.update(from: bookmark)
                 cell.editing = bookmark.id == editingBookmarkIndex?.uuid
+
+                if bookmark.favicon(.small) == nil {
+                    faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
+                }
             } else if let folder = entity as? BookmarkFolder {
                 cell.update(from: folder)
                 cell.editing = folder.id == editingBookmarkIndex?.uuid
@@ -484,13 +495,12 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
 
         let tabs = bookmarks.compactMap { $0.urlObject }.map {
-            Tab(content: .url($0),
+            Tab(content: .url($0, source: .bookmark),
                 shouldLoadInBackground: true,
                 burnerMode: tabCollection.burnerMode)
         }
         tabCollection.append(tabs: tabs)
     }
-
 }
 
 // MARK: - BookmarkTableCellViewDelegate
@@ -637,7 +647,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: url, newTab: true)
+        WindowControllersManager.shared.show(url: url, source: .bookmark, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -647,7 +657,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowsManager.openNewWindow(with: url, isBurner: false)
+        WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {

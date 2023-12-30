@@ -21,7 +21,8 @@ import Foundation
 
 extension UserDefaults {
     /// The app group's shared UserDefaults
-    static let shared = UserDefaults(suiteName: Bundle.main.appGroupName)!
+    static let netP = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .netP))!
+    static let dbp = UserDefaults(suiteName: Bundle.main.appGroup(bundle: .dbp))!
 }
 
 @propertyWrapper
@@ -39,6 +40,8 @@ public struct UserDefaultsWrapper<T> {
         case configStorageSurrogatesEtag = "config.storage.surrogates.etag"
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
         case configFBConfigEtag = "config.storage.fbconfig.etag"
+
+        case configLastInstalled = "config.last.installed"
 
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case areDomainsMigratedToETLDPlus1 = "com.duckduckgo.are-domains-migrated-to-etldplus1"
@@ -105,7 +108,6 @@ public struct UserDefaultsWrapper<T> {
         case homePageShowImport = "home.page.show.import"
         case homePageShowDuckPlayer = "home.page.show.duck.player"
         case homePageShowEmailProtection = "home.page.show.email.protection"
-        case homePageShowCookie = "home.page.show.cookie"
         case homePageShowSurveyDay0 = "home.page.show.survey.0"
         case homePageUserInteractedWithSurveyDay0 = "home.page.user.interacted.with.survey.0"
         case homePageShowSurveyDay7 = "home.page.show.survey.7"
@@ -135,12 +137,18 @@ public struct UserDefaultsWrapper<T> {
         case loggingCategories = "logging.categories"
 
         case firstLaunchDate = "first.app.launch.date"
+        case customConfigurationUrl = "custom.configuration.url"
+
+        // Data Broker Protection
+
+        case dataBrokerProtectionTermsAndConditionsAccepted = "data-broker-protection.waitlist-terms-and-conditions.accepted"
+        case shouldShowDBPWaitlistInvitedCardUI = "shouldShowDBPWaitlistInvitedCardUI"
 
         // Network Protection
 
         case networkProtectionExcludedRoutes = "netp.excluded-routes"
-
         case networkProtectionTermsAndConditionsAccepted = "network-protection.waitlist-terms-and-conditions.accepted"
+        case networkProtectionWaitlistSignUpPromptDismissed = "network-protection.waitlist.sign-up-prompt-dismissed"
 
         // Network Protection: Shared Defaults
         // ---
@@ -161,6 +169,16 @@ public struct UserDefaultsWrapper<T> {
         // Sync
 
         case syncEnvironment = "sync.environment"
+        case favoritesDisplayMode = "sync.favorites-display-mode"
+        case syncBookmarksPaused = "sync.bookmarks-paused"
+        case syncCredentialsPaused = "sync.credentials-paused"
+        case syncBookmarksPausedErrorDisplayed = "sync.bookmarks-paused-error-displayed"
+        case syncCredentialsPausedErrorDisplayed = "sync.credentials-paused-error-displayed"
+        case syncIsFaviconsFetcherEnabled = "sync.is-favicons-fetcher-enabled"
+        case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
+        case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
+        case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
+        case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
     }
 
     enum RemovedKeys: String, CaseIterable {
@@ -174,6 +192,7 @@ public struct UserDefaultsWrapper<T> {
         case networkProtectionConnectionTesterEnabled = "netp.connection-tester-enabled"
         case networkProtectionShouldExcludeLocalNetworks = "netp.exclude-local-routes"
         case networkProtectionRegistrationKeyValidity = "com.duckduckgo.network-protection.NetworkProtectionTunnelController.registrationKeyValidityKey"
+        case shouldShowNetworkProtectionSystemExtensionUpgradePrompt = "network-protection.show-system-extension-upgrade-prompt"
     }
 
     private let key: Key

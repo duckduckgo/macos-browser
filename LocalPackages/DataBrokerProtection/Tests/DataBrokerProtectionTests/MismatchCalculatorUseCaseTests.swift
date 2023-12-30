@@ -47,12 +47,11 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        XCTAssertEqual(
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired,
-                .parentChildMatches(parent: "parent",
-                                    child: "child",
-                                    value: MismatchValues.parentSiteHasMoreMatches.rawValue)
-        )
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
+        XCTAssertEqual(lastPixel.name, pixelName)
+        XCTAssertEqual(Int((lastPixel.params?["value"])!),
+                       MismatchValues.parentSiteHasMoreMatches.rawValue)
     }
 
     func testWhenChildHasMoreMatches_thenChildSiteHasMoreMatchesPixelIsFired() {
@@ -73,12 +72,11 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        XCTAssertEqual(
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired,
-                .parentChildMatches(parent: "parent",
-                                    child: "child",
-                                    value: MismatchValues.childSiteHasMoreMatches.rawValue)
-        )
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
+        XCTAssertEqual(lastPixel.name, pixelName)
+        XCTAssertEqual(Int((lastPixel.params?["value"])!),
+                       MismatchValues.childSiteHasMoreMatches.rawValue)
     }
 
     func testWhenBrokersHaveNoMatches_thenNoMismatchesPixelIsFired() {
@@ -99,12 +97,11 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        XCTAssertEqual(
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired,
-                .parentChildMatches(parent: "parent",
-                                    child: "child",
-                                    value: MismatchValues.noMismatch.rawValue)
-        )
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
+        XCTAssertEqual(lastPixel.name, pixelName)
+        XCTAssertEqual(Int((lastPixel.params?["value"])!),
+                       MismatchValues.noMismatch.rawValue)
     }
 
     func testWhenBrokersHaveSameMatches_thenNoMismatchesPixelIsFired() {
@@ -125,12 +122,11 @@ final class MismatchCalculatorUseCaseTests: XCTestCase {
 
         sut.calculateMismatches()
 
-        XCTAssertEqual(
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired,
-                .parentChildMatches(parent: "parent",
-                                    child: "child",
-                                    value: MismatchValues.noMismatch.rawValue)
-        )
+        let lastPixel = MockDataBrokerProtectionPixelsHandler.lastPixelFired!
+        let pixelName = DataBrokerProtectionPixels.parentChildMatches(parent: "", child: "", value: 0).name
+        XCTAssertEqual(lastPixel.name, pixelName)
+        XCTAssertEqual(Int((lastPixel.params?["value"])!),
+                       MismatchValues.noMismatch.rawValue)
     }
 
     func testWhenParentBrokerHasNoChildren_thenNothingIsFired() {

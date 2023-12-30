@@ -265,7 +265,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updateBookmarkButtonVisibility() {
         guard view.window?.isPopUpWindow == false else { return }
-
+        bookmarkButton.setAccessibilityIdentifier("Bookmarks Button")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
         var isUrlBookmarked = false
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
@@ -288,7 +288,7 @@ final class AddressBarButtonsViewController: NSViewController {
         if !bookmarkPopover.isShown {
             bookmarkButton.isHidden = false
             bookmarkPopover.isNew = result.isNew
-            bookmarkPopover.viewController.bookmark = bookmark
+            bookmarkPopover.bookmark = bookmark
             bookmarkPopover.show(positionedBelow: bookmarkButton)
         } else {
             updateBookmarkButtonVisibility()
@@ -771,7 +771,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .url(let url, credential: _, userEntered: _):
+        case .url(let url, _, _):
             guard let host = url.host else { break }
 
             let isNotSecure = url.scheme == URL.NavigationalScheme.http.rawValue
@@ -802,7 +802,7 @@ final class AddressBarButtonsViewController: NSViewController {
               let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
 
         switch selectedTabViewModel.tab.content {
-        case .url(let url, credential: _, userEntered: _):
+        case .url(let url, _, _):
             // Don't play the shield animation if mouse is over
             guard !privacyEntryPointButton.isAnimationViewVisible else {
                 break
@@ -974,6 +974,16 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 }
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
+
+    func popoverWillClose(_ notification: Notification) {
+        switch notification.object as? NSPopover {
+        case bookmarkPopover:
+            bookmarkPopover?.popoverWillClose()
+
+        default:
+            break
+        }
+    }
 
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {

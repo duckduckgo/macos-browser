@@ -54,6 +54,7 @@ final class LoginItemsManager {
             do {
                 try action(item)()
             } catch let error as NSError {
+                Pixel.fire(.debug(event: .loginItemUpdateError, error: error))
                 logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
             }
         }

@@ -45,6 +45,7 @@ final class PasswordManagementViewController: NSViewController {
 
     weak var delegate: PasswordManagementDelegate?
 
+    @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
     @IBOutlet var addVaultItemButton: NSButton!
@@ -103,6 +104,7 @@ final class PasswordManagementViewController: NSViewController {
     var emptyStateCancellable: AnyCancellable?
     var editingCancellable: AnyCancellable?
     var reloadDataAfterSyncCancellable: AnyCancellable?
+    var cancellables = Set<AnyCancellable>()
 
     var domain: String?
     var isEditing = false
@@ -170,14 +172,22 @@ final class PasswordManagementViewController: NSViewController {
         moreButton.sendAction(on: .leftMouseDown)
 
         exportLoginItem.title = UserText.exportLogins
+        unlockYourAutofillInfo.setAccessibilityIdentifier("Unlock Autofill")
+        addVaultItemButton.setAccessibilityIdentifier("add item")
 
-        NotificationCenter.default.addObserver(forName: .deviceBecameLocked, object: nil, queue: .main) { [weak self] _ in
-            self?.displayLockScreen()
-        }
+        NotificationCenter.default.publisher(for: .deviceBecameLocked)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.displayLockScreen()
+            }
+            .store(in: &cancellables)
 
-        NotificationCenter.default.addObserver(forName: .dataImportComplete, object: nil, queue: .main) { [weak self] _ in
-            self?.refreshData()
-        }
+        NotificationCenter.default.publisher(for: .dataImportComplete)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshData()
+            }
+            .store(in: &cancellables)
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {
@@ -241,7 +251,12 @@ final class PasswordManagementViewController: NSViewController {
 
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
-
+#if DEBUG
+        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            toggleLockScreen(hidden: true)
+            return
+        }
+#endif
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
 
         authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
@@ -278,7 +293,7 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         self.dismiss()
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
@@ -770,9 +785,9 @@ final class PasswordManagementViewController: NSViewController {
         }
 
         menu.items = [
-            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
             createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
-            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph")
+            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
+            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
         ]
 
         return menu

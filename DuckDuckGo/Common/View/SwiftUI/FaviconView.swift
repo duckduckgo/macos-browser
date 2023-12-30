@@ -25,6 +25,7 @@ struct FaviconView: View {
 
     let url: URL?
     let size: CGFloat
+    let onFaviconMissing: (() -> Void)?
 
     var domain: String {
         url?.host ?? ""
@@ -33,9 +34,10 @@ struct FaviconView: View {
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(url: URL?, size: CGFloat = 32) {
+    init(url: URL?, size: CGFloat = 32, onFaviconMissing: (() -> Void)? = nil) {
         self.url = url
         self.size = size
+        self.onFaviconMissing = onFaviconMissing
     }
 
     @MainActor(unsafe)
@@ -45,12 +47,13 @@ struct FaviconView: View {
             return
         }
 
-        if let url = url {
+        if faviconManagement.areFaviconsLoaded, let url = url {
             let image = faviconManagement.getCachedFavicon(for: url, sizeCategory: .medium)?.image
             if image?.size.isSmaller(than: CGSize(width: 16, height: 16)) == false {
                 self.image = image
                 return
             }
+            onFaviconMissing?()
         }
 
         image = nil

@@ -51,9 +51,11 @@ final class AutofillTabExtension: TabExtension {
             autofillScript?.currentOverlayTab = self.delegate
         }
     }
+
     private var emailManager: AutofillEmailDelegate?
     private var vaultManager: AutofillSecureVaultDelegate?
     private var passwordManagerCoordinator: PasswordManagerCoordinating = PasswordManagerCoordinator.shared
+    private let privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager
     private let isBurner: Bool
 
     @Published var autofillDataToSave: AutofillData?
@@ -177,6 +179,28 @@ extension AutofillTabExtension: SecureVaultManagerDelegate {
 
     func secureVaultManager(_: SecureVaultManager, didRequestPasswordManagerForDomain domain: String) {
         // no-op
+    }
+
+    func secureVaultManager(_: SecureVaultManager, didRequestRuntimeConfigurationForDomain domain: String, completionHandler: @escaping (String?) -> Void) {
+        let runtimeConfiguration = DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
+                                                                         properties: buildContentScopePropertiesForDomain(domain))
+            .build()
+            .buildRuntimeConfigResponse()
+
+        completionHandler(runtimeConfiguration)
+    }
+
+    private func buildContentScopePropertiesForDomain(_ domain: String) -> ContentScopeProperties {
+        var supportedFeatures = ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfigurationManager.privacyConfig)
+
+        if !passwordManagerCoordinator.isEnabled,
+           AutofillNeverPromptWebsitesManager.shared.hasNeverPromptWebsitesFor(domain: domain) {
+            supportedFeatures.passwordGeneration = false
+        }
+
+        return ContentScopeProperties(gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                      sessionKey: autofillScript?.sessionKey ?? "",
+                                      featureToggles: supportedFeatures)
     }
 }
 

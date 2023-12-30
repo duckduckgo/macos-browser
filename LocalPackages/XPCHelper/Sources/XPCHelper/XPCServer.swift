@@ -23,35 +23,45 @@ private class XPCConnectionsManager: NSObject, NSXPCListenerDelegate {
 
     private let clientInterface: NSXPCInterface
     private let serverInterface: NSXPCInterface
+    private let queue: DispatchQueue
     weak var delegate: AnyObject?
 
     /// The active connections
     ///
     private(set) var connections = Set<NSXPCConnection>()
 
-    init(clientInterface: NSXPCInterface, serverInterface: NSXPCInterface) {
+    init(clientInterface: NSXPCInterface,
+         serverInterface: NSXPCInterface,
+         queue: DispatchQueue = DispatchQueue(label: "com.duckduckgo.XPCConnectionsManager.queue")) {
+
         self.clientInterface = clientInterface
         self.serverInterface = serverInterface
+        self.queue = queue
     }
 
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
-        newConnection.exportedInterface = serverInterface
-        newConnection.exportedObject = delegate
-        newConnection.remoteObjectInterface = clientInterface
 
-        let closeConnection = { [weak self, weak newConnection] in
-            guard let self,
-                  let newConnection else {
-                return
+        queue.sync {
+            newConnection.exportedInterface = serverInterface
+            newConnection.exportedObject = delegate
+            newConnection.remoteObjectInterface = clientInterface
+
+            let closeConnection = { [weak self, weak newConnection] in
+                guard let self,
+                      let newConnection else {
+                    return
+                }
+
+                self.queue.async {
+                    self.connections.remove(newConnection)
+                }
             }
 
-            self.connections.remove(newConnection)
+            newConnection.interruptionHandler = closeConnection
+            newConnection.invalidationHandler = closeConnection
+            connections.insert(newConnection)
+            newConnection.activate()
         }
-
-        newConnection.interruptionHandler = closeConnection
-        newConnection.invalidationHandler = closeConnection
-        connections.insert(newConnection)
-        newConnection.activate()
 
         return true
     }

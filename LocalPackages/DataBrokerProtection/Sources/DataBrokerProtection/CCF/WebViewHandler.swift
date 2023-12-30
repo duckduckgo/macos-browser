@@ -75,7 +75,7 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
     func load(url: URL) async throws {
         webView?.load(url)
         os_log("Loading URL: %@", log: .action, String(describing: url.absoluteString))
-        try await waitForWebViewLoad(timeoutInSeconds: 60)
+        try await waitForWebViewLoad(timeoutInSeconds: 120)
     }
 
     func finish() {
@@ -140,6 +140,27 @@ extension DataBrokerProtectionWebViewHandler: WKNavigationDelegate {
         os_log("WebViewHandler didFail: %{public}@", log: .action, String(describing: error.localizedDescription))
         self.activeContinuation?.resume(throwing: error)
         self.activeContinuation = nil
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        os_log("WebViewHandler didFailProvisionalNavigation: %{public}@", log: .action, String(describing: error.localizedDescription))
+        self.activeContinuation?.resume(throwing: error)
+        self.activeContinuation = nil
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        guard let statusCode = (navigationResponse.response as? HTTPURLResponse)?.statusCode else {
+            // if there's no http status code to act on, exit and allow navigation
+            return .allow
+        }
+
+        if statusCode >= 400 {
+            os_log("WebViewHandler failed with status code: %{public}@", log: .action, String(describing: statusCode))
+            self.activeContinuation?.resume(throwing: DataBrokerProtectionError.httpError(code: statusCode))
+            self.activeContinuation = nil
+        }
+
+        return .allow
     }
 
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge,

@@ -33,8 +33,8 @@ final class DefaultNetworkProtectionRemoteMessagingRequest: NetworkProtectionRem
 
         var url: URL {
             switch self {
-            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-debug.json")!
-            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages.json")!
+            case .debug: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2-debug.json")!
+            case .production: return URL(string: "https://staticcdn.duckduckgo.com/macos-desktop-browser/network-protection/messages-v2.json")!
             }
         }
     }

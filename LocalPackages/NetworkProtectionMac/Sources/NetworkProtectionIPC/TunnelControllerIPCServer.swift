@@ -37,13 +37,9 @@ public protocol IPCServerInterface: AnyObject {
     ///
     func stop()
 
-    /// Resets all of Network Protection's state that's handled by the server
-    ///
-    func resetAll(uninstallSystemExtension: Bool) async
-
     /// Debug commands
     ///
-    func debugCommand(_ command: DebugCommand) async
+    func debugCommand(_ command: DebugCommand) async throws
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -67,17 +63,17 @@ protocol XPCServerInterface {
     ///
     func stop()
 
-    /// Resets all of Network Protection's state that's handled by the server
-    ///
-    func resetAll(uninstallSystemExtension: Bool) async
-
     /// Debug commands
     ///
-    func debugCommand(_ payload: Data) async
+    func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void)
 }
 
 public final class TunnelControllerIPCServer {
     let xpc: XPCServer<XPCClientInterface, XPCServerInterface>
+
+    enum IPCError: Error {
+        case cannotDecodeDebugCommand
+    }
 
     /// The delegate.
     ///
@@ -156,15 +152,19 @@ extension TunnelControllerIPCServer: XPCServerInterface {
         serverDelegate?.stop()
     }
 
-    func resetAll(uninstallSystemExtension: Bool) async {
-        await serverDelegate?.resetAll(uninstallSystemExtension: uninstallSystemExtension)
-    }
-
-    func debugCommand(_ payload: Data) async {
+    func debugCommand(_ payload: Data, completion: @escaping (Error?) -> Void) {
         guard let command = try? JSONDecoder().decode(DebugCommand.self, from: payload) else {
+            completion(IPCError.cannotDecodeDebugCommand)
             return
         }
 
-        await serverDelegate?.debugCommand(command)
+        Task {
+            do {
+                try await serverDelegate?.debugCommand(command)
+                completion(nil)
+            } catch {
+                completion(error)
+            }
+        }
     }
 }

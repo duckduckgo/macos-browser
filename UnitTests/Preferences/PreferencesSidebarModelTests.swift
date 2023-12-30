@@ -31,7 +31,12 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     private func PreferencesSidebarModel(loadSections: [PreferencesSection]? = nil, tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes) -> DuckDuckGo_Privacy_Browser.PreferencesSidebarModel {
-        return DuckDuckGo_Privacy_Browser.PreferencesSidebarModel(loadSections: { loadSections ?? PreferencesSection.defaultSections(includingDuckPlayer: false) }, tabSwitcherTabs: tabSwitcherTabs, privacyConfigurationManager: MockPrivacyConfigurationManager())
+        return DuckDuckGo_Privacy_Browser.PreferencesSidebarModel(
+            loadSections: { loadSections ?? PreferencesSection.defaultSections(includingDuckPlayer: false, includingSync: false, includingVPN: false) },
+            tabSwitcherTabs: tabSwitcherTabs,
+            privacyConfigurationManager: MockPrivacyConfigurationManager(),
+            syncService: MockDDGSyncing(authState: .inactive, isSyncInProgress: false)
+        )
     }
 
     func testWhenInitializedThenFirstPaneInFirstSectionIsSelected() throws {

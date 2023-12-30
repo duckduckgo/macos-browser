@@ -18,13 +18,13 @@
 
 import Foundation
 
-struct ImportedBookmarks: Decodable {
+struct ImportedBookmarks: Codable, Equatable {
 
-    struct BookmarkOrFolder: Decodable {
+    struct BookmarkOrFolder: Codable, Equatable {
         let name: String
         let type: String
         let urlString: String?
-        let isDDGFavorite: Bool
+        var isDDGFavorite: Bool = false
 
         let children: [BookmarkOrFolder]?
 
@@ -62,15 +62,6 @@ struct ImportedBookmarks: Decodable {
             case children
         }
 
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            name = try container.decode(String.self, forKey: .name)
-            type = try container.decode(String.self, forKey: .type)
-            urlString = try container.decodeIfPresent(String.self, forKey: .urlString)
-            children = try container.decodeIfPresent([BookmarkOrFolder].self, forKey: .children)
-            isDDGFavorite = false
-        }
-
         init(name: String, type: String, urlString: String?, children: [BookmarkOrFolder]?, isDDGFavorite: Bool = false) {
             self.name = name.trimmingWhitespace()
             self.type = type
@@ -80,7 +71,7 @@ struct ImportedBookmarks: Decodable {
         }
     }
 
-    struct TopLevelFolders: Decodable {
+    struct TopLevelFolders: Codable, Equatable {
         let bookmarkBar: BookmarkOrFolder
         let otherBookmarks: BookmarkOrFolder
 

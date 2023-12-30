@@ -16,12 +16,17 @@
 //  limitations under the License.
 //
 
+import Bookmarks
 import BrowserServicesKit
 import Combine
 import Common
 import DDGSync
 import Persistence
 import SyncDataProviders
+
+extension SettingsProvider.Setting {
+    static let favoritesDisplayMode = SettingsProvider.Setting(key: "favorites_display_mode")
+}
 
 final class SyncSettingsAdapter {
 
@@ -33,7 +38,11 @@ final class SyncSettingsAdapter {
         syncDidCompletePublisher = syncDidCompleteSubject.eraseToAnyPublisher()
     }
 
-    func setUpProviderIfNeeded(metadataDatabase: CoreDataDatabase, metadataStore: SyncMetadataStore) {
+    func setUpProviderIfNeeded(
+        metadataDatabase: CoreDataDatabase,
+        metadataStore: SyncMetadataStore,
+        metricsEventsHandler: EventMapping<MetricsEvent>? = nil
+    ) {
         guard provider == nil else {
             return
         }
@@ -42,7 +51,8 @@ final class SyncSettingsAdapter {
         let provider = SettingsProvider(
             metadataDatabase: metadataDatabase,
             metadataStore: metadataStore,
-            emailManager: emailManager,
+            settingsHandlers: [FavoritesDisplayModeSyncHandler(), EmailProtectionSyncHandler(emailManager: emailManager)],
+            metricsEvents: metricsEventsHandler,
             syncDidUpdateData: { [weak self] in
                 self?.syncDidCompleteSubject.send()
             }

@@ -20,80 +20,106 @@ import Foundation
 
 internal class ChromiumDataImporter: DataImporter {
 
-    var processName: String {
-        fatalError("Subclasses must provide their own process name")
-    }
-
-    var source: DataImport.Source {
-        fatalError("Subclasses must return a source")
-    }
-
-    private let applicationDataDirectoryURL: URL
     private let bookmarkImporter: BookmarkImporter
-    private let loginImporter: LoginImporter
+    private let loginImporter: LoginImporter?
     private let faviconManager: FaviconManagement
+    private let profile: DataImport.BrowserProfile
+    private var source: DataImport.Source {
+        profile.browser.importSource
+    }
 
-    init(applicationDataDirectoryURL: URL, loginImporter: LoginImporter, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
-        self.applicationDataDirectoryURL = applicationDataDirectoryURL
+    init(profile: DataImport.BrowserProfile, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter, faviconManager: FaviconManagement) {
+        self.profile = profile
         self.loginImporter = loginImporter
         self.bookmarkImporter = bookmarkImporter
         self.faviconManager = faviconManager
     }
 
-    func importableTypes() -> [DataImport.DataType] {
-        return [.logins, .bookmarks]
+    convenience init(profile: DataImport.BrowserProfile, loginImporter: LoginImporter?, bookmarkImporter: BookmarkImporter) {
+        self.init(profile: profile,
+                  loginImporter: loginImporter,
+                  bookmarkImporter: bookmarkImporter,
+                  faviconManager: FaviconManager.shared)
     }
 
-    func importData(types: [DataImport.DataType],
-                    from profile: DataImport.BrowserProfile?,
-                    modalWindow: NSWindow? = nil,
-                    completion: @escaping (DataImportResult<DataImport.Summary>) -> Void) {
-        let result = importData(types: types, from: profile, modalWindow: modalWindow)
-        completion(result)
+    var importableTypes: [DataImport.DataType] {
+        return [.passwords, .bookmarks]
     }
 
-    func importData(types: [DataImport.DataType], from profile: DataImport.BrowserProfile?, modalWindow: NSWindow?) -> DataImportResult<DataImport.Summary> {
-        var summary = DataImport.Summary()
-        let dataDirectoryURL = profile?.profileURL ?? applicationDataDirectoryURL
-
-        if types.contains(.logins) {
-            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source, processName: processName)
-            let loginResult = loginReader.readLogins(modalWindow: modalWindow)
-
-            switch loginResult {
-            case .success(let logins):
-                do {
-                    let result = try loginImporter.importLogins(logins)
-                    summary.loginsResult = .completed(result)
-                } catch {
-                    return .failure(LoginImporterError(source: source, error: error))
-                }
-            case .failure(let error):
-                return .failure(error)
+    func importData(types: Set<DataImport.DataType>) -> DataImportTask {
+        .detachedWithProgress { updateProgress in
+            do {
+                let result = try await self.importDataSync(types: types, updateProgress: updateProgress)
+                return result
+            } catch is CancellationError {
+            } catch {
+                assertionFailure("Only CancellationError should be thrown here")
             }
+            return [:]
+        }
+    }
+
+    private func importDataSync(types: Set<DataImport.DataType>, updateProgress: @escaping DataImportProgressCallback) async throws -> DataImportSummary {
+        var summary = DataImportSummary()
+
+        let dataTypeFraction = 1.0 / Double(types.count)
+
+        if types.contains(.passwords), let loginImporter {
+            try updateProgress(.importingPasswords(numberOfPasswords: nil, fraction: 0.0))
+
+            let loginReader = ChromiumLoginReader(chromiumDataDirectoryURL: profile.profileURL, source: source)
+            let loginResult = loginReader.readLogins(modalWindow: nil)
+
+            let loginsSummary = try loginResult.flatMap { logins in
+                do {
+                    return try .success(loginImporter.importLogins(logins) { count in
+                        try updateProgress(.importingPasswords(numberOfPasswords: count,
+                                                               fraction: dataTypeFraction * (0.5 + Double(count) / Double(logins.count))))
+                    })
+                } catch is CancellationError {
+                    throw CancellationError()
+                } catch {
+                    return .failure(LoginImporterError(error: error))
+                }
+            }
+
+            summary[.passwords] = loginsSummary
+
+            try updateProgress(.importingPasswords(numberOfPasswords: try? loginResult.get().count, fraction: dataTypeFraction * 1.0))
         }
 
-        if types.contains(.bookmarks) {
-            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source)
+        let passwordsFraction: Double = types.contains(.passwords) ? 0.5 : 0.0
+        if types.contains(.bookmarks)
+            // don‘t proceed with bookmarks import on Keychain prompt denial
+            && (summary[.passwords]?.error as? ChromiumLoginReader.ImportError)?.type != .userDeniedKeychainPrompt {
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: nil, fraction: passwordsFraction + 0.0))
+
+            let bookmarkReader = ChromiumBookmarksReader(chromiumDataDirectoryURL: profile.profileURL)
             let bookmarkResult = bookmarkReader.readBookmarks()
 
-            importFavicons(from: dataDirectoryURL)
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 0.5))
 
-            switch bookmarkResult {
-            case .success(let bookmarks):
-                summary.bookmarksResult = bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
-
-            case .failure(let error):
-                return .failure(error)
+            let bookmarksSummary = bookmarkResult.map { bookmarks in
+                bookmarkImporter.importBookmarks(bookmarks, source: .thirdPartyBrowser(source))
             }
+
+            if case .success = bookmarksSummary {
+                await importFavicons()
+            }
+
+            summary[.bookmarks] = bookmarksSummary.map { .init($0) }
+
+            try updateProgress(.importingBookmarks(numberOfBookmarks: try? bookmarkResult.get().numberOfBookmarks,
+                                                   fraction: passwordsFraction + dataTypeFraction * 1.0))
         }
 
-        return .success(summary)
+        return summary
     }
 
-    @MainActor(unsafe)
-    func importFavicons(from dataDirectoryURL: URL) {
-        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: dataDirectoryURL, source: source)
+    private func importFavicons() async {
+        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: profile.profileURL)
         let faviconsResult = faviconsReader.readFavicons()
 
         switch faviconsResult {
@@ -110,11 +136,15 @@ internal class ChromiumDataImporter: DataImporter {
                 }
                 result[pageURL] = favicons
             }
-            faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
+            await faviconManager.handleFaviconsByDocumentUrl(faviconsByDocument)
 
         case .failure(let error):
-            Pixel.fire(.dataImportFailed(error))
+            Pixel.fire(.dataImportFailed(source: source, sourceVersion: profile.installedAppsMajorVersionDescription(), error: error))
         }
+    }
+
+    func requiresKeychainPassword(for selectedDataTypes: Set<DataImport.DataType>) -> Bool {
+        return selectedDataTypes.contains(.passwords)
     }
 
 }

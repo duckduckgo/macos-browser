@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionDeviceManager+EventMapping.swift
+//  EventMapping+NetworkProtectionError.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -48,8 +48,7 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionKeychainDeleteError(status: status)
         case .noAuthTokenFound:
             domainEvent = .networkProtectionNoAuthTokenFoundError
-        case
-                .noServerRegistrationInfo,
+        case .noServerRegistrationInfo,
                 .couldNotSelectClosestServer,
                 .couldNotGetPeerPublicKey,
                 .couldNotGetPeerHostName,
@@ -70,7 +69,10 @@ extension EventMapping where Event == NetworkProtectionError {
                 .wireGuardInvalidState,
                 .wireGuardDnsResolution,
                 .wireGuardSetNetworkSettings,
-                .startWireGuardBackend:
+                .startWireGuardBackend,
+                .failedToRetrieveAuthToken,
+                .failedToFetchLocationList,
+                .failedToParseLocationListResponse:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)
             return
         case .unhandledError(function: let function, line: let line, error: let error):

@@ -20,7 +20,7 @@
 
 import SwiftUI
 
-struct WaitlistRootView: View {
+struct NetworkProtectionWaitlistRootView: View {
     @EnvironmentObject var model: WaitlistViewModel
 
     var body: some View {
@@ -39,6 +39,43 @@ struct WaitlistRootView: View {
                 }
             case .readyToEnable:
                 EnableWaitlistFeatureView(viewData: EnableNetworkProtectionViewData())
+            }
+        }
+        .environmentObject(model)
+    }
+}
+
+#endif
+
+#if DBP
+
+import SwiftUI
+
+struct DataBrokerProtectionWaitlistRootView: View {
+    @EnvironmentObject var model: WaitlistViewModel
+
+    var body: some View {
+        Group {
+            switch model.viewState {
+            case .notOnWaitlist, .joiningWaitlist:
+                JoinWaitlistView(viewData: DataBrokerProtectionJoinWaitlistViewData())
+            case .joinedWaitlist(let state):
+                JoinedWaitlistView(viewData: DataBrokerProtectionJoinedWaitlistViewData(),
+                                   notificationsAllowed: state == .notificationAllowed)
+            case .invited:
+                InvitedToWaitlistView(viewData: DataBrokerProtectionInvitedToWaitlistViewData())
+            case .termsAndConditions:
+                WaitlistTermsAndConditionsView(viewData: DataBrokerProtectionWaitlistTermsAndConditionsViewData()) {
+                    DataBrokerProtectionTermsAndConditionsContentView()
+                }
+            case .readyToEnable:
+                // Hack to skip the readyToEnable step and close the modal
+                Text("")
+                    .onAppear {
+                        Task {
+                            await model.perform(action: .closeAndConfirmFeature)
+                        }
+                    }
             }
         }
         .environmentObject(model)

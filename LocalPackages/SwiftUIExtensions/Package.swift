@@ -5,16 +5,24 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftUIExtensions",
-    platforms: [ .macOS(.v11) ],
+    platforms: [ .macOS("11.4") ],
     products: [
         .library(
             name: "SwiftUIExtensions",
-            targets: ["SwiftUIExtensions"]),
+            targets: ["SwiftUIExtensions"]
+        ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "100.0.1"),
+    ],
     targets: [
         .target(
             name: "SwiftUIExtensions",
-            dependencies: []),
+            dependencies: [],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )

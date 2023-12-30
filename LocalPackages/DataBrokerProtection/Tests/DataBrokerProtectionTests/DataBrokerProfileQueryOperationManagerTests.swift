@@ -1,5 +1,5 @@
 //
-//  OperationsTests.swift
+//  DataBrokerProfileQueryOperationManagerTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -353,13 +353,36 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
         }
     }
 
-    func testWhenExtractdProfileHasRemovedDate_thenNothingHappens() async {
+    func testWhenExtractedProfileHasRemovedDate_thenNothingHappens() async {
         do {
             _ = try await sut.runOptOutOperation(
                 for: .mockWithRemovedDate,
                 on: mockWebOperationRunner,
                 brokerProfileQueryData: .init(
                     dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                shouldRunNextStep: { true }
+            )
+            XCTAssertFalse(mockDatabase.wasDatabaseCalled)
+            XCTAssertFalse(mockWebOperationRunner.wasOptOutCalled)
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testWhenBrokerHasParentOptOut_thenNothingHappens() async {
+        do {
+            _ = try await sut.runOptOutOperation(
+                for: .mockWithRemovedDate,
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mockWithParentOptOut,
                     profileQuery: .mock,
                     scanOperationData: .mock,
                     optOutOperationsData: [OptOutOperationData.mock(with: .mockWithRemovedDate)]
@@ -650,7 +673,27 @@ extension DataBroker {
         DataBroker(
             id: 1,
             name: "Test broker",
-            steps: [Step](),
+            steps: [
+                Step(type: .scan, actions: [Action]()),
+                Step(type: .optOut, actions: [Action]())
+            ],
+            version: "1.0",
+            schedulingConfig: DataBrokerScheduleConfig(
+                retryError: 0,
+                confirmOptOutScan: 0,
+                maintenanceScan: 0
+            )
+        )
+    }
+
+    static var mockWithParentOptOut: DataBroker {
+        DataBroker(
+            id: 1,
+            name: "Test broker",
+            steps: [
+                Step(type: .scan, actions: [Action]()),
+                Step(type: .optOut, actions: [Action](), optOutType: .parentSiteOptOut)
+            ],
             version: "1.0",
             schedulingConfig: DataBrokerScheduleConfig(
                 retryError: 0,
@@ -697,6 +740,10 @@ extension ExtractedProfile {
 
     static var mockWithoutId: ExtractedProfile {
         ExtractedProfile(name: "Some name", profileUrl: "someOtherURL")
+    }
+
+    static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date)
     }
 }
 // swiftlint:enable type_body_length

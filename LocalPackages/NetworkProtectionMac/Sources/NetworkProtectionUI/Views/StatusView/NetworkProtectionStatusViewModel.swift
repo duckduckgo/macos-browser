@@ -47,7 +47,7 @@ extension NetworkProtectionStatusView {
 
         @MainActor
         @Published
-        private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected
+        private var connectionStatus: NetworkProtection.ConnectionStatus = .default
 
         /// The type of extension that's being used for NetP
         ///
@@ -66,9 +66,18 @@ extension NetworkProtectionStatusView {
         ///
         private let statusReporter: NetworkProtectionStatusReporter
 
+        /// The debug information publisher
+        ///
+        private let debugInformationPublisher: AnyPublisher<Bool, Never>
+
+        /// Whether we're showing debug information
+        ///
+        @Published
+        var showDebugInformation: Bool
+
         // MARK: - Extra Menu Items
 
-        public let menuItems: [MenuItem]
+        public let menuItems: () -> [MenuItem]
 
         // MARK: - Misc
 
@@ -81,7 +90,6 @@ extension NetworkProtectionStatusView {
         // MARK: - Dispatch Queues
 
         private static let statusDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.statusDispatchQueue", qos: .userInteractive)
-        private static let connectivityIssuesDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.connectivityIssuesDispatchQueue", qos: .userInteractive)
         private static let serverInfoDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.serverInfoDispatchQueue", qos: .userInteractive)
         private static let tunnelErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.tunnelErrorDispatchQueue", qos: .userInteractive)
         private static let controllerErrorDispatchQueue = DispatchQueue(label: "com.duckduckgo.NetworkProtectionStatusView.controllerErrorDispatchQueue", qos: .userInteractive)
@@ -91,12 +99,14 @@ extension NetworkProtectionStatusView {
         public init(controller: TunnelController,
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
-                    menuItems: [MenuItem],
+                    debugInformationPublisher: AnyPublisher<Bool, Never>,
+                    menuItems: @escaping () -> [MenuItem],
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
             self.statusReporter = statusReporter
+            self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
             self.runLoopMode = runLoopMode
 
@@ -108,11 +118,14 @@ extension NetworkProtectionStatusView {
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
             lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
             lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
+            showDebugInformation = false
 
             // Particularly useful when unit testing with an initial status of our choosing.
+            subscribeToStatusChanges()
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
+            subscribeToDebugInformationChanges()
 
             onboardingStatusPublisher
                 .receive(on: DispatchQueue.main)
@@ -122,19 +135,18 @@ extension NetworkProtectionStatusView {
             .store(in: &cancellables)
         }
 
+        private func subscribeToStatusChanges() {
+            statusReporter.statusObserver.publisher
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.connectionStatus, onWeaklyHeld: self)
+                .store(in: &cancellables)
+        }
+
         private func subscribeToConnectivityIssues() {
             statusReporter.connectivityIssuesObserver.publisher
-                .subscribe(on: Self.connectivityIssuesDispatchQueue)
-                .sink { [weak self] isHavingConnectivityIssues in
-
-                guard let self else {
-                    return
-                }
-
-                Task { @MainActor in
-                    self.isHavingConnectivityIssues = isHavingConnectivityIssues
-                }
-            }.store(in: &cancellables)
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.isHavingConnectivityIssues, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         private func subscribeToTunnelErrorMessages() {
@@ -167,6 +179,14 @@ extension NetworkProtectionStatusView {
             }.store(in: &cancellables)
         }
 
+        private func subscribeToDebugInformationChanges() {
+            debugInformationPublisher
+                .removeDuplicates()
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.showDebugInformation, onWeaklyHeld: self)
+                .store(in: &cancellables)
+        }
+
         // MARK: - Connection Status: Errors
 
         @Published
@@ -195,11 +215,11 @@ extension NetworkProtectionStatusView {
                 }
             }
 
-            if let lastControllerErrorMessage = lastControllerErrorMessage {
+            if let lastControllerErrorMessage {
                 return lastControllerErrorMessage
             }
 
-            if let lastTunnelErrorMessage = lastTunnelErrorMessage {
+            if let lastTunnelErrorMessage {
                 return lastTunnelErrorMessage
             }
 

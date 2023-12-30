@@ -48,6 +48,20 @@
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DataBrokerProtectionTests"
+               BuildableName = "DataBrokerProtectionTests"
+               BlueprintName = "DataBrokerProtectionTests"
+               ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -178,6 +192,16 @@
                BuildableName = "PixelKitTests"
                BlueprintName = "PixelKitTests"
                ReferencedContainer = "container:LocalPackages/PixelKit">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DataBrokerProtectionTests"
+               BuildableName = "DataBrokerProtectionTests"
+               BlueprintName = "DataBrokerProtectionTests"
+               ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
             </BuildableReference>
          </TestableReference>
       </Testables>

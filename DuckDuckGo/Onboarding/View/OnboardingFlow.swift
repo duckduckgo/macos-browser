@@ -43,11 +43,10 @@ struct OnboardingFlow: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
 
                 ZStack {
-                    let welcomeText = model.isNewOnboarding ? UserText.onboardingWelcomeTextV2 : UserText.onboardingWelcomeText
-                    CallToAction(text: welcomeText,
+                    CallToAction(text: UserText.onboardingWelcomeText,
                                  cta: UserText.onboardingStartButton) {
                         model.onStartPressed()
-                    }.visibility(model.state == .welcome || model.isNewOnboarding ? .visible : .gone)
+                    }.visibility(model.state == .welcome ? .visible : .gone)
 
                     ActionSpeech(text: UserText.onboardingImportDataText,
                                  actionName: UserText.onboardingImportDataButton) {
@@ -64,7 +63,7 @@ struct OnboardingFlow: View {
                     }.visibility(model.state == .setDefault ? .visible : .gone)
 
                     DaxSpeech(text: UserText.onboardingStartBrowsingText, onTypingFinished: nil)
-                        .visibility(model.state == .startBrowsing && !model.isNewOnboarding ? .visible : .gone)
+                        .visibility(model.state == .startBrowsing ? .visible : .gone)
 
                 }.visibility(showDialogs ? .visible : .gone)
 

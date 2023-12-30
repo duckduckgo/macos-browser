@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionIPCClient.swift
+//  NetworkProtectionIPCTunnelController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -32,12 +32,14 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
         self.ipcClient = ipcClient
     }
 
+    @MainActor
     func start() async {
         enableLoginItems()
 
         ipcClient.start()
     }
 
+    @MainActor
     func stop() async {
         enableLoginItems()
 

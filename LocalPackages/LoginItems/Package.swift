@@ -5,16 +5,24 @@ import PackageDescription
 
 let package = Package(
     name: "LoginItems",
-    platforms: [ .macOS(.v10_15) ],
+    platforms: [ .macOS("11.4") ],
     products: [
         .library(
             name: "LoginItems",
-            targets: ["LoginItems"]),
+            targets: ["LoginItems"]
+        ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "100.0.1"),
+    ],
     targets: [
         .target(
             name: "LoginItems",
-            dependencies: []),
+            dependencies: [],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
     ]
 )

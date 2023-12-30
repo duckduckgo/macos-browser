@@ -243,11 +243,11 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     private weak var timer: Timer?
 
-    private var previousConnectionStatus: NetworkProtection.ConnectionStatus = .disconnected
+    private var previousConnectionStatus: NetworkProtection.ConnectionStatus = .default
 
     @MainActor
     @Published
-    private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected {
+    private var connectionStatus: NetworkProtection.ConnectionStatus = .default {
         didSet {
             detectAndRefreshExternalToggleSwitching()
             previousConnectionStatus = oldValue
