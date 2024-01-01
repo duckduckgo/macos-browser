@@ -176,9 +176,17 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         dryRun = false
 #endif
 
+        let pixelSource: String
+
+#if NETP_SYSTEM_EXTENSION
+        pixelSource = "vpnAgent"
+#else
+        pixelSource = "vpnAgentAppStore"
+#endif
+
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
-                       source: "vpnAgent",
+                       source: pixelSource,
                        defaultHeaders: [:],
                        log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
