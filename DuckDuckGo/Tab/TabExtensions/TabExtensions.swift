@@ -69,6 +69,7 @@ protocol TabExtensionDependencies {
     var downloadManager: FileDownloadManagerProtocol { get }
     var cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? { get }
     var duckPlayer: DuckPlayer { get }
+    var onboardingManager: OnboardingManager { get }
 }
 
 // swiftlint:disable:next large_tuple
@@ -177,6 +178,10 @@ extension TabExtensionsBuilder {
                                    isBurner: args.isTabBurner,
                                    scriptsPublisher: userScripts.compactMap { $0 },
                                    webViewPublisher: args.webViewFuture)
+        }
+
+        add {
+            OnboardingTabExtension(onboardingManager: dependencies.onboardingManager)
         }
     }
 
