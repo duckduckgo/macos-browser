@@ -17,7 +17,7 @@
 
 // Since we're using nonstandard bundle IDs we'll just define them here, but we should consider
 // standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX
-BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios
+BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios.vpn.agent
 
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements

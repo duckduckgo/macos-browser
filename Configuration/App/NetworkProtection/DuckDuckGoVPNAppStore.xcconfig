@@ -16,13 +16,11 @@
 #include "../AppTargetsBase.xcconfig"
 #include "../../AppStore.xcconfig"
 
-BUNDLE_IDENTIFIER_PREFIX = HKE973VLUW.com.duckduckgo.macos.browser.network-protection.agent
-
 // Override AppTargetsBase.xcconfig until we resolve bundle IDs.
-PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX)
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
 
 INFOPLIST_FILE = DuckDuckGoVPN/Info-AppStore.plist
 GENERATE_INFOPLIST_FILE = YES
