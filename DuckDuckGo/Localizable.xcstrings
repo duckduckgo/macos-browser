@@ -616,6 +616,66 @@
         }
       }
     },
+    "autofill.excluded-sites" : {
+      "comment" : "Autofill settings section title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Excluded Sites"
+          }
+        }
+      }
+    },
+    "autofill.excluded-sites.explanation" : {
+      "comment" : "Subtitle providing additional information about the excluded sites section",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Websites you selected to never ask to save your password."
+          }
+        }
+      }
+    },
+    "autofill.excluded-sites.reset" : {
+      "comment" : "Button title allowing users to reset their list of excluded sites",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "autofill.excluded-sites.reset.action.message" : {
+      "comment" : "Alert title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If you reset excluded sites, you will be prompted to save your password next time you sign in to any of these sites."
+          }
+        }
+      }
+    },
+    "autofill.excluded-sites.reset.action.title" : {
+      "comment" : "Alert title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Reset Excluded Sites?"
+          }
+        }
+      }
+    },
     "autofill.hide-password" : {
       "comment" : "Tooltip for the Autofill panel's Hide Password button",
       "extractionState" : "extracted_with_value",
@@ -5090,6 +5150,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%d cities"
+          }
+        }
+      }
+    },
+    "never.for.this.site" : {
+      "comment" : "Never ask to save login credentials for this site button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Never Ask for This Site"
           }
         }
       }
