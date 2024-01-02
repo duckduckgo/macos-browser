@@ -26,7 +26,6 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("BWManager.swift", .source),
     .init("UpdateController.swift", .source),
     .init("DuckDuckGo VPN.app", .unknown),
-    .init("DuckDuckGo Notifications.app", .unknown),
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionSubscriptionEventHandler.swift", .source),
     .init("DBPHomeViewController.swift", .source),
@@ -54,7 +53,9 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
 let extraInputFiles: [TargetName: Set<InputFile>] = [
     "DuckDuckGo Privacy Browser": nonSandboxedExtraInputFiles,
 
-    "DuckDuckGo Privacy Browser App Store": [],
+    "DuckDuckGo Privacy Browser App Store": [
+        .init("DuckDuckGo VPN App Store.app", .unknown),
+    ],
 
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
 

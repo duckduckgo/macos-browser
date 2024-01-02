@@ -2121,6 +2121,8 @@
 		4BF97ADB2B43C5E000EB4240 /* VPNMetadataCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B05265D2B1AE5C70054955A /* VPNMetadataCollector.swift */; };
 		4BF97ADC2B43C5E200EB4240 /* VPNFeedbackSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0526602B1D55320054955A /* VPNFeedbackSender.swift */; };
 		4BF97ADD2B43C5FC00EB4240 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
+		4BF97ADF2B43C8F200EB4240 /* DuckDuckGo Notifications.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4B4BEC202A11B4E2001D9AC5 /* DuckDuckGo Notifications.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4BF97AE02B43C8FE00EB4240 /* DuckDuckGo VPN App Store.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5601FECD29B7973D00068905 /* TabBarViewItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5601FECC29B7973D00068905 /* TabBarViewItemTests.swift */; };
 		5603D90629B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5603D90529B7B746007F9F01 /* MockTabViewItemDelegate.swift */; };
 		5603D90729B7B746007F9F01 /* MockTabViewItemDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5603D90529B7B746007F9F01 /* MockTabViewItemDelegate.swift */; };
@@ -3175,6 +3177,17 @@
 			dstSubfolderSpec = 13;
 			files = (
 				4BA7C4E12B3F6F8600AFE511 /* NetworkProtectionAppExtension.appex in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BF97ADE2B43C8D500EB4240 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				4BF97AE02B43C8FE00EB4240 /* DuckDuckGo VPN App Store.app in CopyFiles */,
+				4BF97ADF2B43C8F200EB4240 /* DuckDuckGo Notifications.app in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8085,6 +8098,7 @@
 				3706FA7A293F65D500E42796 /* Sources */,
 				3706FCA6293F65D500E42796 /* Frameworks */,
 				3706FCB1293F65D500E42796 /* Resources */,
+				4BF97ADE2B43C8D500EB4240 /* CopyFiles */,
 			);
 			buildRules = (
 			);
