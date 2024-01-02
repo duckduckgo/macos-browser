@@ -152,7 +152,7 @@ final class OnboardingUserScript: NSObject, Subfeature {
     @MainActor
     func requestImport(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         let response: Response = try await withCheckedThrowingContinuation { continuation in
-            DataImportViewController.show {
+            DataImportView.show {
                 let response = Response()
                 continuation.resume(returning: response)
             }
