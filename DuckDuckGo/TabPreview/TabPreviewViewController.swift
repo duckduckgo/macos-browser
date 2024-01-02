@@ -54,12 +54,12 @@ extension TabPreviewViewController {
         }
         faviconImageView.image = tabViewModel.favicon
 
-        if isSelected {
+        if !isSelected, let preview = tabViewModel.tab.tabPreview {
+            screenshotImageView.image = tabViewModel.tab.tabPreview
+            screenshotImageViewHeightConstraint.constant = getHeight(for: tabViewModel.tab.tabPreview)
+        } else {
             screenshotImageView.image = nil
             screenshotImageViewHeightConstraint.constant = 0
-        } else {
-            screenshotImageView.image = tabViewModel.tab.snapshot
-            screenshotImageViewHeightConstraint.constant = getHeight(for: tabViewModel.tab.snapshot)
         }
     }
 

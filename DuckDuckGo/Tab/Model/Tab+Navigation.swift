@@ -78,6 +78,9 @@ extension Tab: NavigationResponder {
             // Find In Page
             .weak(nullable: self.findInPage),
 
+            // Tab Previews
+            .weak(nullable: self.tabPreviews),
+
             // should be the last, for Unit Tests navigation events tracking
             .struct(nullable: testsClosureNavigationResponder)
         )

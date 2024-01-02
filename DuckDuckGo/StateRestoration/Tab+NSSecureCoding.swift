@@ -69,7 +69,6 @@ extension Tab: NSSecureCoding {
         content.urlForWebView.map(coder.encode(forKey: NSSecureCodingKeys.url))
         title.map(coder.encode(forKey: NSSecureCodingKeys.title))
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
-        snapshot.map(coder.encode(forKey: NSSecureCodingKeys.snapshot))
 
         getActualInteractionStateData().map(coder.encode(forKey: NSSecureCodingKeys.interactionStateData))
 

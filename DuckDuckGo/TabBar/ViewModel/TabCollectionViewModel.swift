@@ -85,6 +85,7 @@ final class TabCollectionViewModel: NSObject {
     @Published private(set) var selectedTabViewModel: TabViewModel? {
         didSet {
             previouslySelectedTabViewModel = oldValue
+            oldValue?.tab.generateTabPreview()
         }
     }
     private weak var previouslySelectedTabViewModel: TabViewModel?
