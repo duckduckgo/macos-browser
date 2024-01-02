@@ -28,12 +28,7 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("DuckDuckGo VPN.app", .unknown),
     .init("DuckDuckGo Notifications.app", .unknown),
     .init("PFMoveApplication.m", .source),
-    .init("NetworkProtectionBundle.swift", .source),
-    .init("NetworkProtectionAppEvents.swift", .source),
-    .init("NetworkProtectionIPCTunnelController.swift", .source),
-    .init("NetworkProtectionNavBarPopoverManager.swift", .source),
     .init("NetworkProtectionSubscriptionEventHandler.swift", .source),
-    .init("KeychainType+ClientDefault.swift", .source),
     .init("DBPHomeViewController.swift", .source),
     .init("DataBrokerProtectionManager.swift", .source),
     .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
@@ -42,9 +37,6 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("DataBrokerProtectionFeatureVisibility.swift", .source),
     .init("DataBrokerProtectionFeatureDisabler.swift", .source),
     .init("DataBrokerProtectionAppEvents.swift", .source),
-    .init("VPNMetadataCollector.swift", .source),
-    .init("VPNFeedbackCategory.swift", .source),
-    .init("VPNFeedbackSender.swift", .source),
     .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
     .init("DataBrokerProtectionSubscriptionEventHandler.swift", .source)
 ]
