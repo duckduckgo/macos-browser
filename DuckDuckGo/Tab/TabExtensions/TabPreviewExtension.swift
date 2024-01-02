@@ -21,13 +21,19 @@ import Common
 import Foundation
 import Navigation
 
-// 1. Use from the outside
-// 2. Finish the inside
-// 3. Fix timing of the preview
-
 final class TabPreviewExtension {
 
-    private(set) var preview: NSImage?
+    struct PreviewData {
+        var url: URL
+        var scrollPosition: CGFloat
+        var image: NSImage
+    }
+
+    private var previewData: PreviewData?
+
+    var preview: NSImage? {
+        return previewData?.image
+    }
 
     private var cancellables = Set<AnyCancellable>()
     private weak var webView: WKWebView?
@@ -39,33 +45,40 @@ final class TabPreviewExtension {
     }
 
     @MainActor
-    func generatePreview() {
+    func generatePreviewIfNeeded() {
         dispatchPrecondition(condition: .onQueue(.main))
-
-        let config = WKSnapshotConfiguration()
-        config.afterScreenUpdates = false
-        config.snapshotWidth = NSNumber(floatLiteral: TabPreviewWindowController.Size.width.rawValue)
 
         guard let webView else {
             assertionFailure("WebView is missing")
             return
         }
 
+        guard let url = webView.url else { return }
+
+        // Avoid unnecessary generations
+        if let previewData, previewData.url == url { return }
+
+        let config = WKSnapshotConfiguration()
+        config.afterScreenUpdates = false
+        config.snapshotWidth = NSNumber(floatLiteral: TabPreviewWindowController.Size.width.rawValue)
+
         webView.takeSnapshot(with: config) { [weak self] image, _ in
             guard let image = image else {
                 os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
                 return
             }
-            self?.preview = image
+            self?.previewData = PreviewData(url: url, scrollPosition: 0, image: image)
+
+            //TODO: remove
+            os_log("!preview generated \(webView.url)", type: .info)
         }
 
-        //TODO: remove
-        os_log("generatePreview \(webView.url)", type: .info)
+
     }
 
     @MainActor
     private func clearPreview() {
-        preview = nil
+        previewData = nil
     }
 
 }
@@ -96,7 +109,7 @@ extension TabPreviewExtension: NavigationResponder {
 
     @MainActor
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
-        generatePreview()
+        generatePreviewIfNeeded()
     }
 
 }
@@ -104,7 +117,7 @@ extension TabPreviewExtension: NavigationResponder {
 protocol TabPreviewExtensionProtocol: AnyObject, NavigationResponder {
 
     var preview: NSImage? { get }
-    func generatePreview()
+    func generatePreviewIfNeeded()
 
 }
 
@@ -124,7 +137,7 @@ extension Tab {
 
     // Called from the outside of extension when a tab is switched
     func generateTabPreview() {
-        self.tabPreviews?.generatePreview()
+        self.tabPreviews?.generatePreviewIfNeeded()
     }
 
 }
