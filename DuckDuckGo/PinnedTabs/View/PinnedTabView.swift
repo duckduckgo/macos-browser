@@ -96,7 +96,17 @@ struct PinnedTabView: View {
 
         fireproofAction
         Divider()
-
+        switch collectionModel.audioStateView {
+        case .muted, .unmuted:
+            let audioStateText = collectionModel.audioStateView == .muted ? UserText.unmuteTab : UserText.muteTab
+            Button(audioStateText) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.muteOrUmute(model)
+            }
+            Divider()
+        case .notSupported:
+            EmptyView()
+        }
         Button(UserText.closeTab) { [weak collectionModel, weak model] in
             guard let model = model else { return }
             collectionModel?.close(model)

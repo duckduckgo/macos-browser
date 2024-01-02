@@ -934,6 +934,14 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
+    func muteUnmuteTab() {
+        webView.muteOrUnmute()
+    }
+
+    func audioState() -> WKWebView.AudioState {
+        webView.audioState()
+    }
+
     @MainActor(unsafe)
     @discardableResult
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10,18 +10,26 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY" userLabel="Tab Bar View Item">
-            <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
+            <rect key="frame" x="0.0" y="0.0" width="300" height="34"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
+                <imageView hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Dwg-SU-uiu" userLabel="Muted Tab Icon">
+                    <rect key="frame" x="255" y="3" width="16.5" height="27"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="16" id="ILs-aB-D7E"/>
+                        <constraint firstAttribute="width" constant="16" id="Qyf-Aw-VnE"/>
+                    </constraints>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSTouchBarAudioOutputMuteTemplate" id="nSg-1b-1pf"/>
+                </imageView>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="jlg-2n-tzm" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="1" width="300" height="32"/>
+                    <rect key="frame" x="0.0" y="1" width="300" height="33"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                             <color key="value" name="TabMouseOverColor"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
-                <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
+                <textField wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DFD-8r-YGx" userLabel="Title Text Field">
                     <rect key="frame" x="30" y="9" width="264" height="16"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="16" id="vWW-sG-CAf"/>
@@ -116,7 +124,7 @@
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="890-3t-v5O" userLabel="Mouse Click View" customClass="MouseOverView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="0.0" width="300" height="33"/>
+                    <rect key="frame" x="0.0" y="0.0" width="300" height="34"/>
                     <connections>
                         <outlet property="delegate" destination="4MN-w4-aCk" id="Fnb-31-k2v"/>
                     </connections>
@@ -125,6 +133,7 @@
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="jlg-2n-tzm" secondAttribute="trailing" id="0eL-gX-odc"/>
                 <constraint firstItem="DFD-8r-YGx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="32" id="4P8-mH-XGb"/>
+                <constraint firstItem="Dwg-SU-uiu" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="A6g-eG-dOW" secondAttribute="leading" constant="4" id="6RL-TB-P8q"/>
                 <constraint firstItem="XdB-Qn-iD9" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="6wl-2B-Woa"/>
                 <constraint firstAttribute="trailing" secondItem="XdB-Qn-iD9" secondAttribute="trailing" priority="900" constant="8" id="BAO-r4-OkC"/>
                 <constraint firstItem="jlg-2n-tzm" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="DOd-Y3-APh"/>
@@ -133,10 +142,12 @@
                 <constraint firstItem="opQ-Od-dCO" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="J32-aM-9m2"/>
                 <constraint firstAttribute="trailing" secondItem="DFD-8r-YGx" secondAttribute="trailing" constant="8" id="L7J-mr-jLh"/>
                 <constraint firstAttribute="bottom" secondItem="890-3t-v5O" secondAttribute="bottom" id="N7I-JC-tT1"/>
+                <constraint firstItem="Dwg-SU-uiu" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="OVJ-fQ-oPs"/>
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="centerX" secondItem="Hz6-mo-xeY" secondAttribute="centerX" priority="250" id="PF1-mZ-U4m"/>
                 <constraint firstAttribute="bottom" secondItem="vuD-rY-Vzl" secondAttribute="bottom" constant="8" id="Pgs-Ex-Cp9"/>
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="8" id="TSx-41-S2A"/>
                 <constraint firstAttribute="trailing" secondItem="opQ-Od-dCO" secondAttribute="trailing" id="WPC-fb-K22"/>
+                <constraint firstItem="vuD-rY-Vzl" firstAttribute="leading" secondItem="Dwg-SU-uiu" secondAttribute="trailing" constant="4" id="XaB-33-dqa"/>
                 <constraint firstItem="A6g-eG-dOW" firstAttribute="centerY" secondItem="Hz6-mo-xeY" secondAttribute="centerY" id="aQg-CK-diJ"/>
                 <constraint firstItem="890-3t-v5O" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="giH-0s-4s4"/>
                 <constraint firstItem="vuD-rY-Vzl" firstAttribute="leading" secondItem="XdB-Qn-iD9" secondAttribute="trailing" constant="4" id="lqC-R5-KOi"/>
@@ -158,12 +169,14 @@
                 <outlet property="faviconWrapperViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>
                 <outlet property="faviconWrapperViewLeadingConstraint" destination="TSx-41-S2A" id="342-tk-EzF"/>
                 <outlet property="mouseOverView" destination="jlg-2n-tzm" id="mX4-Hq-XHD"/>
+                <outlet property="mutedTabIcon" destination="Dwg-SU-uiu" id="Ldr-sj-ufG"/>
                 <outlet property="permissionButton" destination="XdB-Qn-iD9" id="Cav-HW-zvK"/>
                 <outlet property="permissionCloseButtonTrailingConstraint" destination="lqC-R5-KOi" id="G6L-Zh-eBV"/>
                 <outlet property="rightSeparatorView" destination="opQ-Od-dCO" id="k6U-n5-y4S"/>
                 <outlet property="tabLoadingPermissionLeadingConstraint" destination="uNR-JN-6RT" id="r7F-38-4Nx"/>
                 <outlet property="titleTextField" destination="DFD-8r-YGx" id="6mj-b0-Oq3"/>
                 <outlet property="titleTextFieldLeadingConstraint" destination="4P8-mH-XGb" id="mKz-Wl-mQJ"/>
+                <outlet property="titleTextFieldTrailingConstraint" destination="L7J-mr-jLh" id="EfM-60-PKT"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="DwG-v1-cn3"/>
             </connections>
         </collectionViewItem>
@@ -171,6 +184,7 @@
     <resources>
         <image name="Camera-Tab-Active" width="16" height="12"/>
         <image name="Close" width="16" height="16"/>
+        <image name="NSTouchBarAudioOutputMuteTemplate" width="17" height="20"/>
         <namedColor name="ButtonColor">
             <color red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

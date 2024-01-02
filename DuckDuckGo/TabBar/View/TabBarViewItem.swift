@@ -42,7 +42,9 @@ protocol TabBarViewItemDelegate: AnyObject {
     func tabBarViewItemMoveToNewWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemMoveToNewBurnerWindowAction(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemFireproofSite(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem)
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem)
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState
 
@@ -53,6 +55,8 @@ final class TabBarViewItem: NSCollectionViewItem {
     enum Constants {
         static let textFieldPadding: CGFloat = 32
         static let textFieldPaddingNoFavicon: CGFloat = 12
+        static let textFieldTrailingNoMuteIcon: CGFloat = 8
+        static let textFieldTrailingMuteIconPresent: CGFloat = 32
     }
 
     var widthStage: WidthStage {
@@ -94,6 +98,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var titleTextFieldLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleTextFieldTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -104,6 +109,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailingConstraint: NSLayoutConstraint!
 
+    @IBOutlet weak var mutedTabIcon: NSImageView!
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
     private var currentURL: URL?
@@ -121,6 +127,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         setupMenu()
         updateTitleTextFieldMask()
         closeButton.isHidden = true
+        setupMuteOrUnmutedIcon()
     }
 
     override func viewDidLayout() {
@@ -128,6 +135,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         updateSubviews()
         updateTitleTextFieldMask()
+        setupMuteOrUnmutedIcon()
     }
 
     override func viewWillDisappear() {
@@ -176,6 +184,11 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @objc func fireproofSiteAction(_ sender: NSButton) {
         delegate?.tabBarViewItemFireproofSite(self)
+    }
+
+    @objc func muteUnmuteSiteAction(_ sender: NSButton) {
+        delegate?.tabBarViewItemMuteUnmuteSite(self)
+        setupMuteOrUnmutedIcon()
     }
 
     @objc func removeFireproofingAction(_ sender: NSButton) {
@@ -418,6 +431,17 @@ final class TabBarViewItem: NSCollectionViewItem {
         faviconImageView.image = favicon
     }
 
+    private func setupMuteOrUnmutedIcon() {
+        switch delegate?.tabBarViewItemAudioState(self) {
+        case .muted:
+            mutedTabIcon.isHidden = false
+        default:
+            mutedTabIcon.isHidden = true
+        }
+
+        titleTextFieldTrailingConstraint.constant = mutedTabIcon.isHidden ? Constants.textFieldTrailingNoMuteIcon : Constants.textFieldTrailingMuteIconPresent
+    }
+
 }
 
 extension TabBarViewItem: NSMenuDelegate {
@@ -438,6 +462,9 @@ extension TabBarViewItem: NSMenuDelegate {
         // Section 2
         addBookmarkMenuItem(to: menu)
         addFireproofMenuItem(to: menu)
+        menu.addItem(NSMenuItem.separator())
+
+        addMuteUnmuteMenuItem(to: menu)
         menu.addItem(NSMenuItem.separator())
 
         // Section 3
@@ -481,6 +508,19 @@ extension TabBarViewItem: NSMenuDelegate {
         menuItem.target = self
         menu.addItem(menuItem)
     }
+
+    #if !APPSTORE
+    private func addMuteUnmuteMenuItem(to menu: NSMenu) {
+        let audioState = delegate?.tabBarViewItemAudioState(self) ?? .notSupported
+
+        if audioState != .notSupported {
+            let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
+            var muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
+            muteUnmuteMenuItem.target = self
+            menu.addItem(muteUnmuteMenuItem)
+        }
+    }
+    #endif
 
     private func addCloseMenuItem(to menu: NSMenu) {
         let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
