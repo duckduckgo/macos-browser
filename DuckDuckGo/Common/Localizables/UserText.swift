@@ -27,10 +27,12 @@ struct UserText {
     static let ok = NSLocalizedString("ok", value: "OK", comment: "OK button")
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
+    static let neverForThisSite = NSLocalizedString("never.for.this.site", value: "Never Ask for This Site", comment: "Never ask to save login credentials for this site button")
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
     static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
     static let submit = NSLocalizedString("submit", value: "Submit", comment: "Submit button")
+    static let submitReport = NSLocalizedString("submit.report", value: "Submit Report", comment: "Submit Report button")
     static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
     static let copySelection = NSLocalizedString("copy-selection", value: "Copy", comment: "Copy selection menu item")
@@ -395,6 +397,11 @@ struct UserText {
     static let autofillUsernamesAndPasswords = NSLocalizedString("autofill.usernames-and-passwords", value: "Usernames and passwords", comment: "Autofill autosaved data type")
     static let autofillAddresses = NSLocalizedString("autofill.addresses", value: "Addresses", comment: "Autofill autosaved data type")
     static let autofillPaymentMethods = NSLocalizedString("autofill.payment-methods", value: "Payment methods", comment: "Autofill autosaved data type")
+    static let autofillExcludedSites = NSLocalizedString("autofill.excluded-sites", value: "Excluded Sites", comment: "Autofill settings section title")
+    static let autofillExcludedSitesExplanation = NSLocalizedString("autofill.excluded-sites.explanation", value: "Websites you selected to never ask to save your password.", comment: "Subtitle providing additional information about the excluded sites section")
+    static let autofillExcludedSitesReset = NSLocalizedString("autofill.excluded-sites.reset", value: "Reset", comment: "Button title allowing users to reset their list of excluded sites")
+    static let autofillExcludedSitesResetActionTitle = NSLocalizedString("autofill.excluded-sites.reset.action.title", value:"Reset Excluded Sites?", comment: "Alert title")
+    static let autofillExcludedSitesResetActionMessage = NSLocalizedString("autofill.excluded-sites.reset.action.message", value:"If you reset excluded sites, you will be prompted to save your password next time you sign in to any of these sites.", comment: "Alert title")
     static let autofillAutoLock = NSLocalizedString("autofill.auto-lock", value: "Auto-lock", comment: "Autofill settings section title")
     static let autofillLockWhenIdle = NSLocalizedString("autofill.lock-when-idle", value: "Lock autofill after computer is idle for", comment: "Autofill auto-lock setting")
     static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock autofill", comment: "Autofill auto-lock setting")
@@ -415,8 +422,11 @@ struct UserText {
     static let passwordManagementLock = NSLocalizedString("passsword.management.lock", value: "Lock", comment: "Lock Logins Vault menu")
     static let passwordManagementUnlock = NSLocalizedString("passsword.management.unlock", value: "Unlock", comment: "Unlock Logins Vault menu")
 
-    static let importBookmarks = NSLocalizedString("import.browser.data", value: "Import Bookmarks…", comment: "Opens Import Browser Data dialog")
-    static let importPasswords = NSLocalizedString("import.browser.data", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
+    static let importBookmarks = NSLocalizedString("import.browser.data.bookmarks", value: "Import Bookmarks…", comment: "Opens Import Browser Data dialog")
+    static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
+
+    static let importDataTitle = NSLocalizedString("import.browser.data", value: "Import Browser Data", comment: "Import Browser Data dialog title")
+
     static let exportLogins = NSLocalizedString("export.logins.data", value: "Export Passwords…", comment: "Opens Export Logins Data dialog")
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
@@ -503,6 +513,9 @@ struct UserText {
     static let syncBookmarkPausedAlertDescription = NSLocalizedString("alert.sync-bookmarks-paused-description", value: "You have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up.", comment: "Description for alert shown when sync bookmarks paused for too many items")
     static let syncCredentialsPausedAlertTitle = NSLocalizedString("alert.sync-credentials-paused-title", value: "Passwords Sync is Paused", comment: "Title for alert shown when sync credentials paused for too many items")
     static let syncCredentialsPausedAlertDescription = NSLocalizedString("alert.sync-credentials-paused-description", value: "You have exceeded the passwords sync limit. Try deleting some passwords. Until this is resolved your passwords will not be backed up.", comment: "Description for alert shown when sync credentials paused for too many items")
+    static let syncPausedTitle = NSLocalizedString("alert.sync.warning.sync-paused", value: "Sync & Backup is Paused", comment: "Title of the warning message")
+    static let syncUnavailableMessage = NSLocalizedString("alert.sync.warning.sync-unavailable-message", value: "Sorry, but Sync & Backup is currently unavailable. Please try again later.", comment: "Data syncing unavailable warning message")
+    static let syncUnavailableMessageUpgradeRequired = NSLocalizedString("alert.sync.warning.data-syncing-disabled-upgrade-required", value: "Sorry, but Sync & Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.", comment: "Data syncing unavailable warning message")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
     static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
@@ -573,50 +586,24 @@ struct UserText {
 
     // MARK: - Login Import & Export
 
-    static let safariPreferences = NSLocalizedString("import.logins.safari.preferences", value: "Preferences", comment: "Title of the Safari Preferences menu (up to and including macOS 12)")
-    static let safariSettings = NSLocalizedString("import.logins.safari.settings", value: "Settings", comment: "Title of the Safari Settings menu (macOS 13 and above)")
-
-    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Password File", comment: "Title text for the CSV importer")
-    static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File", comment: "Title text for the HTML Bookmarks importer")
-    static let importBookmarksSelectHTMLFile = NSLocalizedString("import.bookmarks.select-html-file", value: "Select HTML Bookmarks File…", comment: "Button text for selecting HTML Bookmarks file")
-    static let importBookmarksSelectAnotherFile = NSLocalizedString("import.bookmarks.select-another-file", value: "Select Another HTML File…", comment: "Button text for selecting another file")
-    static let importBookmarksFailedToReadHTMLFile = NSLocalizedString("import.bookmarks.failed-to-read-file", value: "Failed to read HTML file", comment: "Error text when importing a HTML file")
-
-    static func importingFile(validBookmarks: Int) -> String {
-        let localized = NSLocalizedString("import.bookmarks.html.valid-bookmarks",
-                                          value: "Contains %@ bookmarks",
-                                          comment: "Displays the number of the bookmarks being imported")
-        return String(format: localized, String(validBookmarks))
+    static let importLoginsCSV = NSLocalizedString("import.logins.csv.title", value: "CSV Passwords File (for other browsers)", comment: "Title text for the CSV importer")
+    static let importBookmarksHTML = NSLocalizedString("import.bookmarks.html.title", value: "HTML Bookmarks File (for other browsers)", comment: "Title text for the HTML Bookmarks importer")
+    static let importBookmarksSelectHTMLFile = NSLocalizedString("import.bookmarks.select-html-file", value: "Select Bookmarks HTML File…", comment: "Button text for selecting HTML Bookmarks file")
+    static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a CSV file")
+    static func importLoginsSelectCSVFile(from source: DataImport.Source) -> String {
+        String(format: NSLocalizedString("import.logins.select-csv-file.source", value: "Select %@ CSV File…", comment: "Button text for selecting a CSV file exported from (LastPass or Bitwarden or 1Password - %@)"), source.importSourceName)
     }
 
-    static let csvImportDescription = NSLocalizedString("import.logins.csv.description", value: "The CSV importer will try to match column headers to their position.\nIf there is no header, it supports two formats:\n\n1. URL, Username, Password\n2. Title, URL, Username, Password", comment: "Description text for the CSV importer")
-    static let importLoginsSelectCSVFile = NSLocalizedString("import.logins.select-csv-file", value: "Select CSV File…", comment: "Button text for selecting a CSV file")
-    static let importLoginsSelectSafariCSVFile = NSLocalizedString("import.logins.select-safari-csv-file", value: "Select Passwords CSV File…", comment: "Button text for selecting a Safari CSV file")
-    static let importLoginsSelect1PasswordCSVFile = NSLocalizedString("import.logins.select-1password-csv-file", value: "Select 1Password CSV File…", comment: "Button text for selecting a 1Password CSV file")
-    static let importLoginsSelectLastPassCSVFile = NSLocalizedString("import.logins.select-lastpass-csv-file", value: "Select LastPass CSV File…", comment: "Button text for selecting a LastPass CSV file")
-
-    static let importLoginsSelectAnotherFile = NSLocalizedString("import.logins.select-another-file", value: "Select Another CSV File…", comment: "Button text for selecting another file")
-    static let importLoginsFailedToReadCSVFile = NSLocalizedString("import.logins.failed-to-read-file", value: "Failed to get CSV file URL", comment: "Error text when importing a CSV file")
-
-    static func importingFile(validLogins: Int) -> String {
-        let localized = NSLocalizedString("import.logins.csv.valid-logins",
-                                          value: "Contains %@ valid passwords",
-                                          comment: "Displays the number of the logins being imported")
-        return String(format: localized, String(validLogins))
-    }
+    static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")
 
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
-    static let doneImporting = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
-
-    static let dataImportFailedTitle = NSLocalizedString("import.data.import-failed.title", value: "Sorry, we weren't able to import your data.", comment: "Alert title when the data import fails")
-
-    static let dataImportSubmitFeedback = NSLocalizedString("import.data.submit-feedback", value: "submit feedback", comment: "Link text used in the data import failure alert")
-    static let dataImportFailedBody = NSLocalizedString("import.data.import-failed.body",
-                                                        value: "Please submit feedback so we can address this issue.",
-                                                        comment: "Alert body text used in the data import failure alert")
+    static let skipBookmarksImport = NSLocalizedString("import.data.skip.bookmarks", value: "Skip bookmarks", comment: "Button text to skip bookmarks manual import")
+    static let skipPasswordsImport = NSLocalizedString("import.data.skip.passwords", value: "Skip passwords", comment: "Button text to skip bookmarks manual import")
+    static let skip = NSLocalizedString("import.data.skip", value: "Skip", comment: "Button text to skip an import step")
+    static let done = NSLocalizedString("import.data.done", value: "Done", comment: "Button text for finishing the data import")
+    static let manualImport = NSLocalizedString("import.data.manual", value: "Manual import…", comment: "Button text for initiating manual data import using a HTML or CSV file when automatic import has failed")
 
     static let dataImportAlertImport = NSLocalizedString("import.data.alert.import", value: "Import", comment: "Import button for data import alerts")
-    static let dataImportAlertAccept = NSLocalizedString("import.data.alert.accept", value: "Okay", comment: "Accept button for data import alerts")
     static let dataImportAlertCancel = NSLocalizedString("import.data.alert.cancel", value: "Cancel", comment: "Cancel button for data import alerts")
 
     static func dataImportRequiresPasswordTitle(_ source: DataImport.Source) -> String {
@@ -633,77 +620,9 @@ struct UserText {
         return String(format: localized, source.importSourceName)
     }
 
-    static func dataImportBrowserMustBeClosed(_ source: DataImport.Source) -> String {
-        let localized = NSLocalizedString("import.data.close-browser",
-                                          value: "Please ensure that %@ is not running before importing data",
-                                          comment: "Alert body text when the data import fails due to the browser being open")
-        return String(format: localized, source.importSourceName)
-    }
-
-    static func dataImportQuitBrowserTitle(_ source: DataImport.Source) -> String {
-        let localized = NSLocalizedString("import.data.quit-browser.title",
-                                          value: "Would you like to quit %@ now?",
-                                          comment: "Alert title text when prompting to close the browser")
-        return String(format: localized, source.importSourceName)
-    }
-
-    static func dataImportQuitBrowserBody(_ source: DataImport.Source) -> String {
-        let localized = NSLocalizedString("import.data.quit-browser.body",
-                                          value: "You must quit %@ before importing data.",
-                                          comment: "Alert body text when prompting to close the browser")
-        return String(format: localized, source.importSourceName)
-    }
-
-    static func dataImportQuitBrowserButton(_ source: DataImport.Source) -> String {
-        let localized = NSLocalizedString("import.data.quit-browser.accept-button",
-                                          value: "Quit %@",
-                                          comment: "Accept button text when prompting to close the browser")
-        return String(format: localized, source.importSourceName)
-    }
-
-    static func loginImportSuccessfulCSVImports(totalSuccessfulImports: Int) -> String {
-        let localized = NSLocalizedString("import.logins.csv.successful-imports",
-                                          value: "New passwords: %@",
-                                          comment: "Status text indicating the number of successful CSV login imports")
-        return String(format: localized, String(totalSuccessfulImports))
-    }
-
-    static func loginImportSuccessfulBrowserImports(totalSuccessfulImports: Int) -> String {
-        let localized = NSLocalizedString("import.logins.browser.successful-imports",
-                                          value: "Passwords: %@",
-                                          comment: "Status text indicating the number of successful browser login imports")
-        return String(format: localized, String(totalSuccessfulImports))
-    }
-
-    static func successfulBookmarkImports(_ totalSuccessfulImports: Int) -> String {
-        let localized = NSLocalizedString("import.bookmarks.browser.successful-imports",
-                                          value: "Bookmarks: %@",
-                                          comment: "Status text indicating the number of successful browser bookmark imports")
-        return String(format: localized, String(totalSuccessfulImports))
-    }
-
-    static func duplicateBookmarkImports(_ totalFailedImports: Int) -> String {
-        let localized = NSLocalizedString("import.bookmarks.browser.duplicate-imports",
-                                          value: "Duplicate Bookmarks Skipped: %@",
-                                          comment: "Status text indicating the number of duplicate browser bookmark imports")
-        return String(format: localized, String(totalFailedImports))
-    }
-
-    static func failedBookmarkImports(_ totalFailedImports: Int) -> String {
-        let localized = NSLocalizedString("import.bookmarks.browser.failed-imports",
-                                          value: "Failed Imports: %@",
-                                          comment: "Status text indicating the number of failed browser bookmark imports")
-        return String(format: localized, String(totalFailedImports))
-    }
-
-    static let bookmarkImportSafariPermissionDescription = NSLocalizedString("import.bookmarks.safari.permission-description", value: "DuckDuckGo needs your permission to read the Safari bookmarks file. Select the Safari folder to import bookmarks.", comment: "Description text for the Safari bookmark import permission screen")
     static let bookmarkImportSafariRequestPermissionButtonTitle = NSLocalizedString("import.bookmarks.safari.permission-button.title", value: "Select Safari Folder…", comment: "Text for the Safari data import permission button")
 
-    static let bookmarkImportBookmarksBar = NSLocalizedString("import.bookmarks.folder.bookmarks-bar", value: "Bookmarks Bar", comment: "Title text for Bookmarks Bar import folder")
-    static let bookmarkImportOtherBookmarks = NSLocalizedString("import.bookmarks.folder.other-bookmarks", value: "Other Bookmarks", comment: "Title text for Other Bookmarks import folder")
-
     static let bookmarkImportBookmarks = NSLocalizedString("import.bookmarks.bookmarks", value: "Bookmarks", comment: "Title text for the Bookmarks import option")
-    static let bookmarkImportBookmarksAndFavorites = NSLocalizedString("import.bookmarks.bookmarks-and-favorites", value: "Bookmarks & Favorites", comment: "Title text for the Bookmarks & Favorites import option")
 
     static let openDeveloperTools = NSLocalizedString("main.menu.show.inspector", value: "Open Developer Tools", comment: "Show Web Inspector/Open Developer Tools")
     static let closeDeveloperTools = NSLocalizedString("main.menu.close.inspector", value: "Close Developer Tools", comment: "Hide Web Inspector/Close Developer Tools")
@@ -754,13 +673,23 @@ struct UserText {
     static let onboardingSetDefaultButton = NSLocalizedString("onboarding.setdefault.button", value: "Let's Do It!", comment: "Launch the set default UI")
     static let onboardingNotNowButton = NSLocalizedString("onboarding.notnow.button", value: "Maybe Later", comment: "Skip a step of the onboarding flow")
 
-    static let importFromChromiumMoreInfo = NSLocalizedString("import.from.chromium.info", value: """
-    If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.
+    static func importingBookmarks(_ numberOfBookmarks: Int?) -> String {
+        if let numberOfBookmarks, numberOfBookmarks > 0 {
+            let localized = NSLocalizedString("import.bookmarks.number.progress.text", value: "Importing %d bookmarks…", comment: "Operation progress info message about %d number of bookmarks being imported")
+            return String(format: localized, numberOfBookmarks)
+        } else {
+            return NSLocalizedString("import.bookmarks.indefinite.progress.text", value: "Importing bookmarks…", comment: "Operation progress info message about indefinite number of bookmarks being imported")
+        }
+    }
 
-    Imported passwords are stored securely using encryption.
-    """, comment: "More info when importing from Chromium")
-
-    static let importFromFirefoxMoreInfo = NSLocalizedString("import.from.firefox.info", value: "You'll be asked to enter your Primary Password for Firefox.\n\nImported passwords are encrypted and only stored on this computer.", comment: "More info when importing from Firefox")
+    static func importingPasswords(_ numberOfPasswords: Int?) -> String {
+        if let numberOfPasswords, numberOfPasswords > 0 {
+            let localized = NSLocalizedString("import.passwords.number.progress.text", value: "Importing %d passwords…", comment: "Operation progress info message about %d number of passwords being imported")
+            return String(format: localized, numberOfPasswords)
+        } else {
+            return NSLocalizedString("import.passwords.indefinite.progress.text", value: "Importing passwords…", comment: "Operation progress info message about indefinite number of passwords being imported")
+        }
+    }
 
     static let moreOrLessCollapse = NSLocalizedString("more.or.less.collapse", value: "Show Less", comment: "For collapsing views to show less.")
     static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "Show More", comment: "For expanding views to show more.")
@@ -1059,5 +988,9 @@ struct UserText {
 #if SUBSCRIPTION
     static let subscriptionOptionsMenuItem = NSLocalizedString("subscription.menu.item", value: "Privacy Pro", comment: "Title for Subscription item in the options menu")
     static let subscription = NSLocalizedString("preferences.subscription", value: "Privacy Pro", comment: "Show subscription preferences")
+
+    static let purchasingSubscriptionTitle = NSLocalizedString("subscription.progress.view.purchasing.subscription", value: "Purchase in progress...", comment: "Progress view title when starting the purchase")
+    static let restoringSubscriptionTitle = NSLocalizedString("subscription.progress.view.restoring.subscription", value: "Restoring subscription...", comment: "Progress view title when restoring past subscription purchase")
+    static let completingPurchaseTitle = NSLocalizedString("subscription.progress.view.completing.purchase", value: "Completing purchase...", comment: "Progress view title when completing the purchase")
 #endif
 }

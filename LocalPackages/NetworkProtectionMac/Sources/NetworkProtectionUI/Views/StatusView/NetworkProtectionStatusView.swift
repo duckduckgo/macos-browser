@@ -65,6 +65,10 @@ public struct NetworkProtectionStatusView: View {
             TunnelControllerView(model: model.tunnelControllerViewModel)
                 .disabled(model.tunnelControllerViewDisabled)
 
+            if model.showDebugInformation {
+                DebugInformationView(model: DebugInformationViewModel())
+            }
+
             bottomMenuView()
         }
         .padding(5)

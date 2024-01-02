@@ -76,14 +76,11 @@ class ThirdPartyBrowserTests: XCTestCase {
         let mockApplicationSupportDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
         try mockApplicationSupportDirectory.writeToTemporaryDirectory()
 
-        guard let list = ThirdPartyBrowser.firefox.browserProfiles(supportDirectoryURL: mockApplicationSupportDirectoryURL) else {
-            XCTFail("Failed to get profile list")
-            return
-        }
+        let list = ThirdPartyBrowser.firefox.browserProfiles(applicationSupportURL: mockApplicationSupportDirectoryURL)
 
-        XCTAssertEqual(list.profiles.count, 2)
+        let validProfiles = list.profiles.filter { $0.validateProfileData()?.containsValidData == true }
+        XCTAssertEqual(validProfiles.count, 2)
         XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
-        XCTAssertTrue(list.profiles.allSatisfy { profile in return profile.hasBrowserData })
     }
 
     func testWhenGettingBrowserProfiles_AndFirefoxProfileOnlyHasBookmarksData_ThenFirefoxProfileIsReturned() throws {
@@ -102,14 +99,11 @@ class ThirdPartyBrowserTests: XCTestCase {
         let mockApplicationSupportDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent(mockApplicationSupportDirectoryName)
         try mockApplicationSupportDirectory.writeToTemporaryDirectory()
 
-        guard let list = ThirdPartyBrowser.firefox.browserProfiles(supportDirectoryURL: mockApplicationSupportDirectoryURL) else {
-            XCTFail("Failed to get profile list")
-            return
-        }
+        let list = ThirdPartyBrowser.firefox.browserProfiles(applicationSupportURL: mockApplicationSupportDirectoryURL)
 
-        XCTAssertEqual(list.profiles.count, 1)
+        let validProfiles = list.profiles.filter { $0.validateProfileData()?.containsValidData == true }
+        XCTAssertEqual(validProfiles.count, 1)
         XCTAssertEqual(list.defaultProfile?.profileName, "default-release")
-        XCTAssertTrue(list.profiles.allSatisfy { profile in return profile.hasBrowserData })
     }
 
     private func key4DatabaseURL() -> URL {
