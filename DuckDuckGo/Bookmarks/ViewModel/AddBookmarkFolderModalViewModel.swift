@@ -37,6 +37,7 @@ struct AddBookmarkFolderModalViewModel {
          bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          completionHandler: @escaping (BookmarkFolder?) -> Void = { _ in }) {
         self.bookmarkManager = bookmarkManager
+        self.folderName = folder.title
         self.originalFolder = folder
         self.parent = nil
         self.title = UserText.renameFolder
