@@ -151,8 +151,17 @@
     "Actual Size" : {
       "comment" : "Main Menu View item"
     },
+    "Add" : {
+      "comment" : "Button to confim a bookmark creation"
+    },
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
+    },
+    "Add Folder" : {
+
+    },
+    "Add to Favorites" : {
+
     },
     "add.favorite" : {
       "comment" : "Button for adding a favorite bookmark",
@@ -192,6 +201,9 @@
     },
     "Address" : {
 
+    },
+    "Address:" : {
+      "comment" : "Add Bookmark dialog bookmark url field heading"
     },
     "address.bar.search.suffix" : {
       "comment" : "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo",
@@ -1236,11 +1248,26 @@
         }
       }
     },
+    "Bookmark Added" : {
+
+    },
     "Bookmark import failed:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) failed to import."
     },
     "Bookmark import failed." : {
       "comment" : "Data import summary message of failed bookmarks import."
+    },
+    "bookmark.dialog.add" : {
+      "comment" : "Button to confim a bookmark creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add"
+          }
+        }
+      }
     },
     "bookmark.page" : {
       "comment" : "Context menu item",
@@ -1290,6 +1317,9 @@
         }
       }
     },
+    "Bookmarks" : {
+
+    },
     "Bookmarks Import Complete:" : {
       "comment" : "Bookmarks Data Import result summary headline"
     },
@@ -1298,6 +1328,18 @@
     },
     "Bookmarks…" : {
       "comment" : "Main Menu File-Export item"
+    },
+    "bookmarks.add.dialog.title" : {
+      "comment" : "Bookmark creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Bookmark"
+          }
+        }
+      }
     },
     "bookmarks.bar.context-menu.copy" : {
       "comment" : "Copy menu item for the bookmarks bar context menu",
@@ -1585,6 +1627,9 @@
           }
         }
       }
+    },
+    "Cancel" : {
+
     },
     "cannot.open.file.alert.header" : {
       "comment" : "Header of the alert dialog informing user it is not possible to open the file",
@@ -2247,6 +2292,9 @@
     "Display progress" : {
 
     },
+    "Done" : {
+
+    },
     "dont.quit" : {
       "comment" : "Don’t Quit button",
       "extractionState" : "extracted_with_value",
@@ -2656,6 +2704,9 @@
           }
         }
       }
+    },
+    "Enter folder name" : {
+
     },
     "Enter Full Screen" : {
       "comment" : "Main Menu View item"
@@ -3184,6 +3235,12 @@
           }
         }
       }
+    },
+    "Folder Picker" : {
+
+    },
+    "Folder:" : {
+
     },
     "folder.optionsMenu.deleteFolder" : {
       "comment" : "Option for deleting a folder",
@@ -4128,6 +4185,9 @@
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails."
     },
+    "Location:" : {
+
+    },
     "looking.for.bitwarden" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -4265,6 +4325,9 @@
           }
         }
       }
+    },
+    "Name:" : {
+
     },
     "navigate.back" : {
       "comment" : "Context menu item",
@@ -5165,6 +5228,9 @@
           }
         }
       }
+    },
+    "New Folder" : {
+
     },
     "New Tab" : {
       "comment" : "Main Menu File item"
@@ -7934,6 +8000,9 @@
         }
       }
     },
+    "Remove" : {
+
+    },
     "remove-favorite" : {
       "comment" : "Remove Favorite button",
       "extractionState" : "extracted_with_value",
@@ -8380,6 +8449,9 @@
     },
     "The version of the browser you are trying to import from" : {
       "comment" : "Data import failure Report dialog description of a report field providing version of a browser user is trying to import data from"
+    },
+    "Title:" : {
+      "comment" : "Add Bookmark dialog bookmark title field heading"
     },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",

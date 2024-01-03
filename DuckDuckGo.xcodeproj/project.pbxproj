@@ -347,7 +347,7 @@
 		3706FB6D293F65D500E42796 /* SuggestionListCharacteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB8203B26B2DE0D00788AC3 /* SuggestionListCharacteristics.swift */; };
 		3706FB6F293F65D500E42796 /* BookmarkListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */; };
 		3706FB70293F65D500E42796 /* SecureVaultLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF326B0002B00E14D75 /* SecureVaultLoginImporter.swift */; };
-		3706FB71293F65D500E42796 /* AddBookmarkModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CB2667123700AD2C21 /* AddBookmarkModalViewController.swift */; };
+		3706FB71293F65D500E42796 /* AddBookmarkModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */; };
 		3706FB72293F65D500E42796 /* RecentlyClosedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5C1DD4285C780C0089850C /* RecentlyClosedCoordinator.swift */; };
 		3706FB74293F65D500E42796 /* FaviconHostReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6197C5276B3168008396F0 /* FaviconHostReference.swift */; };
 		3706FB75293F65D500E42796 /* WebsiteBreakageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD8078427B3F3BE00CF7703 /* WebsiteBreakageSender.swift */; };
@@ -1245,7 +1245,7 @@
 		4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */; };
 		4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */; };
 		4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */; };
-		4B9292D32667123700AD2C21 /* AddBookmarkModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CB2667123700AD2C21 /* AddBookmarkModalViewController.swift */; };
+		4B9292D32667123700AD2C21 /* AddBookmarkModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */; };
 		4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */; };
 		4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */; };
 		4B9292D72667124000AD2C21 /* NSPopUpButtonExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */; };
@@ -1533,7 +1533,7 @@
 		4B957A692AC7AE700062CA31 /* BookmarkListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */; };
 		4B957A6A2AC7AE700062CA31 /* SecureVaultLoginImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B723DF326B0002B00E14D75 /* SecureVaultLoginImporter.swift */; };
 		4B957A6B2AC7AE700062CA31 /* WKProcessPoolExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B645D8F529FA95440024461F /* WKProcessPoolExtension.swift */; };
-		4B957A6C2AC7AE700062CA31 /* AddBookmarkModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CB2667123700AD2C21 /* AddBookmarkModalViewController.swift */; };
+		4B957A6C2AC7AE700062CA31 /* AddBookmarkModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */; };
 		4B957A6D2AC7AE700062CA31 /* LoginItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */; };
 		4B957A6E2AC7AE700062CA31 /* PixelExperiment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857E5AF42A79045800FC0FB4 /* PixelExperiment.swift */; };
 		4B957A6F2AC7AE700062CA31 /* DuckPlayerTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C416A6294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift */; };
@@ -2961,6 +2961,12 @@
 		B6F92BA32A691583002ABA6B /* UserDefaultsWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C6A29525CC1FFD00EEB5F1 /* UserDefaultsWrapper.swift */; };
 		B6F92BAC2A6937B3002ABA6B /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */; };
 		B6F92BAD2A6937B5002ABA6B /* OptionalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B637273C26CCF0C200C8CB02 /* OptionalExtension.swift */; };
+		B6F9BDD82B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */; };
+		B6F9BDD92B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */; };
+		B6F9BDDA2B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */; };
+		B6F9BDDC2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */; };
+		B6F9BDDD2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */; };
+		B6F9BDDE2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */; };
 		B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
@@ -3521,7 +3527,7 @@
 		4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSplitViewController.swift; sourceTree = "<group>"; };
 		4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTableRowView.swift; sourceTree = "<group>"; };
 		4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddFolderModalViewController.swift; sourceTree = "<group>"; };
-		4B9292CB2667123700AD2C21 /* AddBookmarkModalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkModalViewController.swift; sourceTree = "<group>"; };
+		4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkModalView.swift; sourceTree = "<group>"; };
 		4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListViewController.swift; sourceTree = "<group>"; };
 		4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewController.swift; sourceTree = "<group>"; };
 		4B9292D62667124000AD2C21 /* NSPopUpButtonExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPopUpButtonExtension.swift; sourceTree = "<group>"; };
@@ -4267,6 +4273,8 @@
 		B6F56566299A414300A04298 /* WKWebViewMockingExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewMockingExtension.swift; sourceTree = "<group>"; };
 		B6F7127D29F6779000594A45 /* QRSharingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRSharingService.swift; sourceTree = "<group>"; };
 		B6F7128029F681EB00594A45 /* QuickLookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookUI.framework; path = System/Library/Frameworks/QuickLookUI.framework; sourceTree = SDKROOT; };
+		B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBookmarkModalViewModel.swift; sourceTree = "<group>"; };
+		B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteInfo.swift; sourceTree = "<group>"; };
 		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
@@ -7104,6 +7112,7 @@
 			isa = PBXGroup;
 			children = (
 				AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */,
+				B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -7176,7 +7185,7 @@
 			children = (
 				7BEC20412B0F505F00243D3E /* BookmarkAddFolderPopoverViewController.swift */,
 				7BEC20402B0F505F00243D3E /* BookmarkAddPopoverViewController.swift */,
-				4B9292CB2667123700AD2C21 /* AddBookmarkModalViewController.swift */,
+				4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */,
 				4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */,
 				4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */,
 				4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */,
@@ -7215,6 +7224,7 @@
 				AAC5E4CF25D6A709007F5990 /* BookmarkList.swift */,
 				AAC5E4CE25D6A709007F5990 /* BookmarkManager.swift */,
 				379E877529E98729001C8BB0 /* BookmarksCleanupErrorHandling.swift */,
+				B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -9339,6 +9349,7 @@
 				B6BCC54B2AFDF24B002C5499 /* TaskWithProgress.swift in Sources */,
 				3706FACE293F65D500E42796 /* SuggestionViewController.swift in Sources */,
 				7BFE95552A9DF2990081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
+				B6F9BDDD2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */,
 				3706FAD1293F65D500E42796 /* VisitViewModel.swift in Sources */,
 				3706FAD2293F65D500E42796 /* Atb.swift in Sources */,
 				3706FAD3293F65D500E42796 /* DownloadsViewController.swift in Sources */,
@@ -9509,6 +9520,7 @@
 				3706FB5E293F65D500E42796 /* EncryptionKeyStore.swift in Sources */,
 				3706FB60293F65D500E42796 /* PasswordManagementIdentityItemView.swift in Sources */,
 				3706FB61293F65D500E42796 /* ProgressExtension.swift in Sources */,
+				B6F9BDD92B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */,
 				3706FB62293F65D500E42796 /* CSVParser.swift in Sources */,
 				3706FB64293F65D500E42796 /* PixelDataModel.xcdatamodeld in Sources */,
 				B626A75B29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */,
@@ -9530,7 +9542,7 @@
 				4B4D60C62A0C849600BCD287 /* NetworkProtectionInviteCodeViewModel.swift in Sources */,
 				3706FB6F293F65D500E42796 /* BookmarkListViewController.swift in Sources */,
 				3706FB70293F65D500E42796 /* SecureVaultLoginImporter.swift in Sources */,
-				3706FB71293F65D500E42796 /* AddBookmarkModalViewController.swift in Sources */,
+				3706FB71293F65D500E42796 /* AddBookmarkModalView.swift in Sources */,
 				3706FB72293F65D500E42796 /* RecentlyClosedCoordinator.swift in Sources */,
 				3706FB74293F65D500E42796 /* FaviconHostReference.swift in Sources */,
 				4B67854B2AA8DE76008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */,
@@ -10372,6 +10384,7 @@
 				4B95794E2AC7AE700062CA31 /* JoinWaitlistView.swift in Sources */,
 				4B95794F2AC7AE700062CA31 /* LazyLoadable.swift in Sources */,
 				4B9579502AC7AE700062CA31 /* ClickToLoadModel.swift in Sources */,
+				B6F9BDDE2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */,
 				4B9579512AC7AE700062CA31 /* KeyedCodingExtension.swift in Sources */,
 				4B9579522AC7AE700062CA31 /* PrivacyDashboardTabExtension.swift in Sources */,
 				4B9579542AC7AE700062CA31 /* DownloadListStore.swift in Sources */,
@@ -10673,7 +10686,7 @@
 				4B957A692AC7AE700062CA31 /* BookmarkListViewController.swift in Sources */,
 				4B957A6A2AC7AE700062CA31 /* SecureVaultLoginImporter.swift in Sources */,
 				4B957A6B2AC7AE700062CA31 /* WKProcessPoolExtension.swift in Sources */,
-				4B957A6C2AC7AE700062CA31 /* AddBookmarkModalViewController.swift in Sources */,
+				4B957A6C2AC7AE700062CA31 /* AddBookmarkModalView.swift in Sources */,
 				4B957A6D2AC7AE700062CA31 /* LoginItemsManager.swift in Sources */,
 				4B957A6E2AC7AE700062CA31 /* PixelExperiment.swift in Sources */,
 				4B957A6F2AC7AE700062CA31 /* DuckPlayerTabExtension.swift in Sources */,
@@ -10860,6 +10873,7 @@
 				B66CA4212AD910B300447CF0 /* DataImportView.swift in Sources */,
 				4B957B162AC7AE700062CA31 /* Downloads.xcdatamodeld in Sources */,
 				4B957B172AC7AE700062CA31 /* TabPreviewViewController.swift in Sources */,
+				B6F9BDDA2B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */,
 				4B957B182AC7AE700062CA31 /* PreferencesPrivacyView.swift in Sources */,
 				4B957B192AC7AE700062CA31 /* NSPasteboardExtension.swift in Sources */,
 				4B957B1A2AC7AE700062CA31 /* OnboardingViewModel.swift in Sources */,
@@ -11382,6 +11396,7 @@
 				B65E6BA026D9F10600095F96 /* NSBezierPathExtension.swift in Sources */,
 				4B4D60E02A0C875F00BCD287 /* NetworkProtectionBundle.swift in Sources */,
 				AA6820E425502F19005ED0D5 /* WebsiteDataStore.swift in Sources */,
+				B6F9BDDC2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */,
 				4B67854A2AA8DE75008A5004 /* NetworkProtectionFeatureVisibility.swift in Sources */,
 				B64C852A26942AC90048FEBE /* PermissionContextMenu.swift in Sources */,
 				85D438B6256E7C9E00F3BAF8 /* ContextMenuUserScript.swift in Sources */,
@@ -11422,7 +11437,7 @@
 				4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */,
 				4B723E0D26B0006100E14D75 /* SecureVaultLoginImporter.swift in Sources */,
 				B645D8F629FA95440024461F /* WKProcessPoolExtension.swift in Sources */,
-				4B9292D32667123700AD2C21 /* AddBookmarkModalViewController.swift in Sources */,
+				4B9292D32667123700AD2C21 /* AddBookmarkModalView.swift in Sources */,
 				9D9AE86B2AA76CF90026E7DC /* LoginItemsManager.swift in Sources */,
 				857E5AF52A79045800FC0FB4 /* PixelExperiment.swift in Sources */,
 				B6C416A7294A4AE500C4F2E7 /* DuckPlayerTabExtension.swift in Sources */,
@@ -11507,6 +11522,7 @@
 				AA6EF9B525081B4C004754E6 /* MainMenuActions.swift in Sources */,
 				B63D466925BEB6C200874977 /* WKWebView+SessionState.swift in Sources */,
 				4B4D60C02A0C848D00BCD287 /* NetworkProtectionControllerErrorStore.swift in Sources */,
+				B6F9BDD82B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */,
 				4B723E1226B0006E00E14D75 /* DataImport.swift in Sources */,
 				7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */,
 				B6085D092743AAB600A9C456 /* FireproofDomains.xcdatamodeld in Sources */,
