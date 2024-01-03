@@ -30,6 +30,7 @@ final class TabPreviewExtension {
     }
 
     private var previewData: PreviewData?
+    private var generatePreviewAfterLoad = false
 
     var preview: NSImage? {
         return previewData?.image
@@ -37,15 +38,20 @@ final class TabPreviewExtension {
 
     private var cancellables = Set<AnyCancellable>()
     private weak var webView: WKWebView?
+    private var tabContent: Tab.TabContent?
 
-    init(webViewPublisher: some Publisher<WKWebView, Never>) {
+    init(webViewPublisher: some Publisher<WKWebView, Never>, contentPublisher: some Publisher<Tab.TabContent, Never>) {
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView
+        }.store(in: &cancellables)
+
+        contentPublisher.sink { [weak self] tabContent in
+            self?.tabContent = tabContent
         }.store(in: &cancellables)
     }
 
     @MainActor
-    func generatePreviewIfNeeded() {
+    func generatePreview() async {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let webView else {
@@ -55,18 +61,25 @@ final class TabPreviewExtension {
 
         guard let url = webView.url else { return }
 
+        guard let tabContent, tabContent.isUrl else {
+            //TODO: Generate preview from SwiftUI views
+            return
+        }
+
         // Avoid unnecessary generations
-        if let previewData, previewData.url == url { return }
+        let scrollPosition = try? await getScrollPosition()
+        if let previewData, previewData.url == url, previewData.scrollPosition == scrollPosition {
+            // Preview is already generated
+            return
+        }
 
-        let config = WKSnapshotConfiguration()
-        config.afterScreenUpdates = false
-        config.snapshotWidth = NSNumber(floatLiteral: TabPreviewWindowController.Size.width.rawValue)
-
-        webView.takeSnapshot(with: config) { [weak self] image, _ in
+        let configuration = WKSnapshotConfiguration.makeConfiguration()
+        webView.takeSnapshot(with: configuration) { [weak self] image, _ in
             guard let image = image else {
-                os_log("BrowserTabViewController: failed to create a snapshot of webView", type: .error)
+                os_log("TabPreviewExtension: failed to create a snapshot of webView", type: .error)
                 return
             }
+            self?.generatePreviewAfterLoad = false
             self?.previewData = PreviewData(url: url, scrollPosition: 0, image: image)
 
             //TODO: remove
@@ -74,6 +87,24 @@ final class TabPreviewExtension {
         }
 
 
+    }
+
+    @MainActor
+    private func getScrollPosition() async throws -> CGFloat? {
+        guard let webView else {
+            assertionFailure("WebView is missing")
+            return nil
+        }
+
+        do {
+            let result = try await webView.evaluateJavaScript("window.scrollY")
+            if let scrollPosition = result as? CGFloat {
+                return scrollPosition
+            }
+            return nil
+        } catch {
+            throw error
+        }
     }
 
     @MainActor
@@ -86,16 +117,31 @@ final class TabPreviewExtension {
 extension TabPreviewExtension: NSCodingExtension {
 
     private enum NSSecureCodingKeys {
-        static let tabPreview = "tabPreview"
+        static let tabPreviewImage = "tabPreviewImage"
+        static let tabPreviewUrl = "tabPreviewUrl"
+        static let tabPreviewScrollPosition = "tabPreviewScrollPosition"
     }
 
     func awakeAfter(using decoder: NSCoder) {
-        //TODO: Uncomment
-//        preview = decoder.decodeObject(of: [NSImage.self], forKey: NSSecureCodingKeys.tabPreview) as? NSImage
+        //TODO: Decoding and encoding
+//        guard let urlString = decoder.decodeObject(forKey: NSSecureCodingKeys.tabPreviewUrl) as? NSString,
+//              let url = URL(string: urlString as String),
+//              let image = decoder.decodeObject(forKey: NSSecureCodingKeys.tabPreviewImage) as? NSImage else {
+//            return
+//        }
+//        let scrollPosition = CGFloat(decoder.decodeDouble(forKey: NSSecureCodingKeys.tabPreviewScrollPosition))
+//
+//        previewData = PreviewData(url: url, scrollPosition: scrollPosition, image: image)
+        //TODO: If we don't have data
+        generatePreviewAfterLoad = true
     }
 
     func encode(using coder: NSCoder) {
-        coder.encode(preview, forKey: NSSecureCodingKeys.tabPreview)
+//        if let previewData {
+//            coder.encode(previewData.url.absoluteString as NSString, forKey: NSSecureCodingKeys.tabPreviewUrl)
+//            coder.encode(Double(previewData.scrollPosition), forKey: NSSecureCodingKeys.tabPreviewScrollPosition)
+//            coder.encode(previewData.image, forKey: NSSecureCodingKeys.tabPreviewImage)
+//        }
     }
 
 }
@@ -109,7 +155,11 @@ extension TabPreviewExtension: NavigationResponder {
 
     @MainActor
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
-        generatePreviewIfNeeded()
+        if generatePreviewAfterLoad {
+            Task {
+                await generatePreview()
+            }
+        }
     }
 
 }
@@ -117,7 +167,7 @@ extension TabPreviewExtension: NavigationResponder {
 protocol TabPreviewExtensionProtocol: AnyObject, NavigationResponder {
 
     var preview: NSImage? { get }
-    func generatePreviewIfNeeded()
+    func generatePreview() async
 
 }
 
@@ -137,7 +187,20 @@ extension Tab {
 
     // Called from the outside of extension when a tab is switched
     func generateTabPreview() {
-        self.tabPreviews?.generatePreviewIfNeeded()
+        Task { [weak self] in
+            await self?.tabPreviews?.generatePreview()
+        }
+    }
+
+}
+
+fileprivate extension WKSnapshotConfiguration {
+
+    static func makeConfiguration() -> WKSnapshotConfiguration {
+        let configuration = WKSnapshotConfiguration()
+        configuration.afterScreenUpdates = false
+        configuration.snapshotWidth = NSNumber(floatLiteral: TabPreviewWindowController.Size.width.rawValue)
+        return configuration
     }
 
 }
