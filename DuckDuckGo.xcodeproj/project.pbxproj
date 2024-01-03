@@ -2970,6 +2970,9 @@
 		B6F9BDE02B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */; };
 		B6F9BDE12B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */; };
 		B6F9BDE22B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */; };
+		B6F9BDE42B45CD1900677B33 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDE32B45CD1900677B33 /* ModalView.swift */; };
+		B6F9BDE52B45CD1900677B33 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDE32B45CD1900677B33 /* ModalView.swift */; };
+		B6F9BDE62B45CD1900677B33 /* ModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDE32B45CD1900677B33 /* ModalView.swift */; };
 		B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
@@ -4279,6 +4282,7 @@
 		B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBookmarkModalViewModel.swift; sourceTree = "<group>"; };
 		B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteInfo.swift; sourceTree = "<group>"; };
 		B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBookmarkFolderModalViewModel.swift; sourceTree = "<group>"; };
+		B6F9BDE32B45CD1900677B33 /* ModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalView.swift; sourceTree = "<group>"; };
 		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
@@ -6102,6 +6106,7 @@
 				B690152B2ACBF4DA00AD0BAB /* MenuPreview.swift */,
 				B6DE57F52B05EA9000CD54B9 /* SheetHostingWindow.swift */,
 				4B44FEF22B1FEF5A000619D8 /* FocusableTextEditor.swift */,
+				B6F9BDE32B45CD1900677B33 /* ModalView.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -9872,6 +9877,7 @@
 				3706FC64293F65D500E42796 /* SuggestionContainer.swift in Sources */,
 				3706FC65293F65D500E42796 /* HomePageViewController.swift in Sources */,
 				3706FC67293F65D500E42796 /* OperatingSystemVersionExtension.swift in Sources */,
+				B6F9BDE52B45CD1900677B33 /* ModalView.swift in Sources */,
 				B677FC502B06376B0099EB04 /* ReportFeedbackView.swift in Sources */,
 				3706FC68293F65D500E42796 /* ToggleableScrollView.swift in Sources */,
 				3706FC69293F65D500E42796 /* UserScripts.swift in Sources */,
@@ -10771,6 +10777,7 @@
 				4B957AB02AC7AE700062CA31 /* HoverUserScript.swift in Sources */,
 				4B957AB12AC7AE700062CA31 /* MainMenuActions.swift in Sources */,
 				4B957AB22AC7AE700062CA31 /* WKWebView+SessionState.swift in Sources */,
+				B6F9BDE62B45CD1900677B33 /* ModalView.swift in Sources */,
 				4B957AB32AC7AE700062CA31 /* NetworkProtectionControllerErrorStore.swift in Sources */,
 				4B957AB42AC7AE700062CA31 /* DataImport.swift in Sources */,
 				4B957AB52AC7AE700062CA31 /* NetworkProtectionDebugMenu.swift in Sources */,
@@ -11777,6 +11784,7 @@
 				F41D174125CB131900472416 /* NSColorExtension.swift in Sources */,
 				AA7E919C2875C65000AB6B62 /* Stored.swift in Sources */,
 				AAC5E4F625D6BF2C007F5990 /* AddressBarButtonsViewController.swift in Sources */,
+				B6F9BDE42B45CD1900677B33 /* ModalView.swift in Sources */,
 				1D2DC0072901679C008083A1 /* BWError.swift in Sources */,
 				B68C92C42750EF76002AC6B0 /* PixelDataRecord.swift in Sources */,
 				853014D625E671A000FB8205 /* PageObserverUserScript.swift in Sources */,

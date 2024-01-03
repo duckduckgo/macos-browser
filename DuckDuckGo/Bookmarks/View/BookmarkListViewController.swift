@@ -171,7 +171,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportView.show()
+        DataImportView().show()
     }
 
     // MARK: NSOutlineView Configuration
