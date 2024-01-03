@@ -25,7 +25,7 @@ struct AddBookmarkFolderModalView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("New Folder", comment: "Title for New bookmark folder dialog")
+            Text(model.title)
                 .fontWeight(.semibold)
 
             HStack(spacing: 16) {
@@ -47,11 +47,8 @@ struct AddBookmarkFolderModalView: View {
                 }
                 .keyboardShortcut(.cancelAction)
 
-                Button {
+                Button(model.addButtonTitle) {
                     model.addFolder(dismiss: dismiss.callAsFunction)
-                } label: {
-                    Text("Add", comment: "Button to confim a folder creation")
-
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(model.isAddButtonDisabled)

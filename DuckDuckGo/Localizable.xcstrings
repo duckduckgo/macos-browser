@@ -152,7 +152,7 @@
       "comment" : "Main Menu View item"
     },
     "Add" : {
-      "comment" : "Button to confim a bookmark creation\nButton to confim a folder creation"
+      "comment" : "Button to confim a bookmark creation"
     },
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
@@ -2705,9 +2705,6 @@
         }
       }
     },
-    "Enter folder name:" : {
-      "comment" : "New bookmark folder   dialog folder name field heading"
-    },
     "Enter Full Screen" : {
       "comment" : "Main Menu View item"
     },
@@ -4339,7 +4336,7 @@
       }
     },
     "Name:" : {
-
+      "comment" : "New bookmark folder dialog folder name field heading"
     },
     "navigate.back" : {
       "comment" : "Context menu item",
