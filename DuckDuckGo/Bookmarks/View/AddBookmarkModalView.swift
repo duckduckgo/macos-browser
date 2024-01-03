@@ -44,6 +44,7 @@ struct AddBookmarkModalView: View {
                     TextField("", text: $model.bookmarkAddress)
                         .accessibilityIdentifier("URL Text Field")
                         .textFieldStyle(.roundedBorder)
+                        .disableAutocorrection(true)
                 }
             }
             .padding(.bottom, 4)
