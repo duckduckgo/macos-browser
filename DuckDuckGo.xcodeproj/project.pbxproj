@@ -225,7 +225,7 @@
 		3706FADC293F65D500E42796 /* FirefoxLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93826B48A5100879451 /* FirefoxLoginReader.swift */; };
 		3706FADD293F65D500E42796 /* AtbParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50382726A12400758A2B /* AtbParser.swift */; };
 		3706FADE293F65D500E42796 /* PreferencesDuckPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */; };
-		3706FADF293F65D500E42796 /* AddFolderModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */; };
+		3706FADF293F65D500E42796 /* AddBookmarkFolderModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */; };
 		3706FAE0293F65D500E42796 /* BookmarkSidebarTreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92929426670D2A00AD2C21 /* BookmarkSidebarTreeController.swift */; };
 		3706FAE1293F65D500E42796 /* HomePageFavoritesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E8627BBB8F20038AD11 /* HomePageFavoritesModel.swift */; };
 		3706FAE2293F65D500E42796 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -1244,7 +1244,7 @@
 		4B9292CF2667123700AD2C21 /* BookmarkManagementSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */; };
 		4B9292D02667123700AD2C21 /* BookmarkManagementSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */; };
 		4B9292D12667123700AD2C21 /* BookmarkTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */; };
-		4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */; };
+		4B9292D22667123700AD2C21 /* AddBookmarkFolderModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */; };
 		4B9292D32667123700AD2C21 /* AddBookmarkModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */; };
 		4B9292D42667123700AD2C21 /* BookmarkListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */; };
 		4B9292D52667123700AD2C21 /* BookmarkManagementDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */; };
@@ -1359,7 +1359,7 @@
 		4B9579B52AC7AE700062CA31 /* FirefoxLoginReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8AC93826B48A5100879451 /* FirefoxLoginReader.swift */; };
 		4B9579B62AC7AE700062CA31 /* AtbParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69B50382726A12400758A2B /* AtbParser.swift */; };
 		4B9579B72AC7AE700062CA31 /* PreferencesDuckPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F19A6428E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift */; };
-		4B9579B82AC7AE700062CA31 /* AddFolderModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */; };
+		4B9579B82AC7AE700062CA31 /* AddBookmarkFolderModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */; };
 		4B9579B92AC7AE700062CA31 /* BookmarkSidebarTreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92929426670D2A00AD2C21 /* BookmarkSidebarTreeController.swift */; };
 		4B9579BA2AC7AE700062CA31 /* HomePageFavoritesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85589E8627BBB8F20038AD11 /* HomePageFavoritesModel.swift */; };
 		4B9579BB2AC7AE700062CA31 /* SequenceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB88B4925B7B690006F6B06 /* SequenceExtensions.swift */; };
@@ -2967,6 +2967,9 @@
 		B6F9BDDC2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */; };
 		B6F9BDDD2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */; };
 		B6F9BDDE2B45B7EE00677B33 /* WebsiteInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */; };
+		B6F9BDE02B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */; };
+		B6F9BDE12B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */; };
+		B6F9BDE22B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */; };
 		B6FA893D269C423100588ECD /* PrivacyDashboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */; };
 		B6FA893F269C424500588ECD /* PrivacyDashboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */; };
 		B6FA8941269C425400588ECD /* PrivacyDashboardPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */; };
@@ -3526,7 +3529,7 @@
 		4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSidebarViewController.swift; sourceTree = "<group>"; };
 		4B9292C82667123700AD2C21 /* BookmarkManagementSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementSplitViewController.swift; sourceTree = "<group>"; };
 		4B9292C92667123700AD2C21 /* BookmarkTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTableRowView.swift; sourceTree = "<group>"; };
-		4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddFolderModalViewController.swift; sourceTree = "<group>"; };
+		4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkFolderModalView.swift; sourceTree = "<group>"; };
 		4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddBookmarkModalView.swift; sourceTree = "<group>"; };
 		4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkListViewController.swift; sourceTree = "<group>"; };
 		4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkManagementDetailViewController.swift; sourceTree = "<group>"; };
@@ -4275,6 +4278,7 @@
 		B6F7128029F681EB00594A45 /* QuickLookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookUI.framework; path = System/Library/Frameworks/QuickLookUI.framework; sourceTree = SDKROOT; };
 		B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBookmarkModalViewModel.swift; sourceTree = "<group>"; };
 		B6F9BDDB2B45B7EE00677B33 /* WebsiteInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteInfo.swift; sourceTree = "<group>"; };
+		B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBookmarkFolderModalViewModel.swift; sourceTree = "<group>"; };
 		B6FA893C269C423100588ECD /* PrivacyDashboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = PrivacyDashboard.storyboard; sourceTree = "<group>"; };
 		B6FA893E269C424500588ECD /* PrivacyDashboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardViewController.swift; sourceTree = "<group>"; };
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
@@ -7113,6 +7117,7 @@
 			children = (
 				AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */,
 				B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */,
+				B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -7186,7 +7191,7 @@
 				7BEC20412B0F505F00243D3E /* BookmarkAddFolderPopoverViewController.swift */,
 				7BEC20402B0F505F00243D3E /* BookmarkAddPopoverViewController.swift */,
 				4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */,
-				4B9292CA2667123700AD2C21 /* AddFolderModalViewController.swift */,
+				4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */,
 				4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */,
 				4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */,
 				4B9292C72667123700AD2C21 /* BookmarkManagementSidebarViewController.swift */,
@@ -9365,7 +9370,7 @@
 				3706FADE293F65D500E42796 /* PreferencesDuckPlayerView.swift in Sources */,
 				EEC4A65E2B277E8D00F7C0AA /* NetworkProtectionVPNCountryLabelsModel.swift in Sources */,
 				B66260E729ACAE4B00E9E3EE /* NavigationHotkeyHandler.swift in Sources */,
-				3706FADF293F65D500E42796 /* AddFolderModalViewController.swift in Sources */,
+				3706FADF293F65D500E42796 /* AddBookmarkFolderModalView.swift in Sources */,
 				3706FAE0293F65D500E42796 /* BookmarkSidebarTreeController.swift in Sources */,
 				3706FAE1293F65D500E42796 /* HomePageFavoritesModel.swift in Sources */,
 				3706FAE2293F65D500E42796 /* SequenceExtensions.swift in Sources */,
@@ -9606,6 +9611,7 @@
 				3706FB97293F65D500E42796 /* ActionSpeech.swift in Sources */,
 				3706FB99293F65D500E42796 /* PrivacySecurityPreferences.swift in Sources */,
 				B6AFE6BD29A5D621002FF962 /* HTTPSUpgradeTabExtension.swift in Sources */,
+				B6F9BDE12B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */,
 				3706FB9A293F65D500E42796 /* FireproofDomainsStore.swift in Sources */,
 				3706FB9B293F65D500E42796 /* PrivacyDashboardPermissionHandler.swift in Sources */,
 				3706FB9C293F65D500E42796 /* TabCollectionViewModel.swift in Sources */,
@@ -10489,7 +10495,7 @@
 				4B9579B52AC7AE700062CA31 /* FirefoxLoginReader.swift in Sources */,
 				4B9579B62AC7AE700062CA31 /* AtbParser.swift in Sources */,
 				4B9579B72AC7AE700062CA31 /* PreferencesDuckPlayerView.swift in Sources */,
-				4B9579B82AC7AE700062CA31 /* AddFolderModalViewController.swift in Sources */,
+				4B9579B82AC7AE700062CA31 /* AddBookmarkFolderModalView.swift in Sources */,
 				4B41EDB62B169883001EEDF4 /* VPNFeedbackFormViewController.swift in Sources */,
 				4B9579B92AC7AE700062CA31 /* BookmarkSidebarTreeController.swift in Sources */,
 				4B9579BA2AC7AE700062CA31 /* HomePageFavoritesModel.swift in Sources */,
@@ -10792,6 +10798,7 @@
 				4B957AC92AC7AE700062CA31 /* CSVImporter.swift in Sources */,
 				4B957ACA2AC7AE700062CA31 /* StartupPreferences.swift in Sources */,
 				4B957ACB2AC7AE700062CA31 /* UserDefaults+NetworkProtectionWaitlist.swift in Sources */,
+				B6F9BDE22B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */,
 				4B957ACC2AC7AE700062CA31 /* MainMenu.swift in Sources */,
 				4B957ACE2AC7AE700062CA31 /* BrowserTabViewController.swift in Sources */,
 				4B957ACF2AC7AE700062CA31 /* CallToAction.swift in Sources */,
@@ -11173,6 +11180,7 @@
 				1D1A33492A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				14505A08256084EF00272CC6 /* UserAgent.swift in Sources */,
 				987799F12999993C005D8EB6 /* LegacyBookmarkStore.swift in Sources */,
+				B6F9BDE02B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift in Sources */,
 				4B8AC93526B3B2FD00879451 /* NSAlert+DataImport.swift in Sources */,
 				AA7412BD24D2BEEE00D22FE0 /* MainWindow.swift in Sources */,
 				AAD6D8882696DF6D002393B3 /* CrashReportPromptViewController.swift in Sources */,
@@ -11248,7 +11256,7 @@
 				4B8AC93926B48A5100879451 /* FirefoxLoginReader.swift in Sources */,
 				B69B503E2726A12500758A2B /* AtbParser.swift in Sources */,
 				37F19A6528E1B3FB00740DC6 /* PreferencesDuckPlayerView.swift in Sources */,
-				4B9292D22667123700AD2C21 /* AddFolderModalViewController.swift in Sources */,
+				4B9292D22667123700AD2C21 /* AddBookmarkFolderModalView.swift in Sources */,
 				4B92929E26670D2A00AD2C21 /* BookmarkSidebarTreeController.swift in Sources */,
 				EEC4A6712B2C90AB00F7C0AA /* VPNLocationPreferenceItem.swift in Sources */,
 				85589E8727BBB8F20038AD11 /* HomePageFavoritesModel.swift in Sources */,

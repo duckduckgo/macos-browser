@@ -141,11 +141,11 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
-        let newFolderViewController = AddFolderModalViewController.create()
-        newFolderViewController.delegate = self
-
         delegate?.popover(shouldPreventClosure: true)
-        beginSheetFromMainWindow(newFolderViewController)
+        AddBookmarkFolderModalView()
+            .show(in: parent?.view.window) { [weak delegate] in
+                delegate?.popover(shouldPreventClosure: false)
+            }
     }
 
     @IBAction func openManagementInterface(_ sender: NSButton) {
@@ -247,23 +247,6 @@ final class BookmarkListViewController: NSViewController {
         manageBookmarksButton.translatesAutoresizingMaskIntoConstraints = false
         let widthConstraint = NSLayoutConstraint(item: manageBookmarksButton!, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: buttonWidth)
         NSLayoutConstraint.activate([widthConstraint])
-    }
-}
-
-// MARK: - Modal Delegates
-
-extension BookmarkListViewController: AddFolderModalViewControllerDelegate {
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        bookmarkManager.update(folder: folder)
-    }
-
-    func addFolderViewControllerWillClose() {
-        delegate?.popover(shouldPreventClosure: false)
     }
 }
 
@@ -383,10 +366,10 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
         delegate?.popover(shouldPreventClosure: true)
 
-        let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.edit(folder: folder)
-        addFolderViewController.delegate = self
-        beginSheetFromMainWindow(addFolderViewController)
+        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
+            .show(in: parent?.view.window) { [weak delegate] in
+                delegate?.popover(shouldPreventClosure: false)
+            }
     }
 
     func deleteFolder(_ sender: NSMenuItem) {

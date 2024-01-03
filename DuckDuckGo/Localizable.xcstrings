@@ -152,7 +152,7 @@
       "comment" : "Main Menu View item"
     },
     "Add" : {
-      "comment" : "Button to confim a bookmark creation"
+      "comment" : "Button to confim a bookmark creation\nButton to confim a folder creation"
     },
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
@@ -2705,8 +2705,8 @@
         }
       }
     },
-    "Enter folder name" : {
-
+    "Enter folder name:" : {
+      "comment" : "New bookmark folder   dialog folder name field heading"
     },
     "Enter Full Screen" : {
       "comment" : "Main Menu View item"
@@ -3241,6 +3241,18 @@
     },
     "Folder:" : {
 
+    },
+    "folder.dialog.add" : {
+      "comment" : "Button to confim a bookmark folder creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add"
+          }
+        }
+      }
     },
     "folder.optionsMenu.deleteFolder" : {
       "comment" : "Option for deleting a folder",
@@ -5230,7 +5242,7 @@
       }
     },
     "New Folder" : {
-
+      "comment" : "Title for New bookmark folder dialog"
     },
     "New Tab" : {
       "comment" : "Main Menu File item"
