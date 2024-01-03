@@ -574,7 +574,7 @@ final class TabBarViewController: NSViewController {
         }
 
         let position = scrollView.frame.minX + tabBarViewItem.view.frame.minX - clipView.bounds.origin.x
-        showTabPreview(for: tabViewModel, from: position, after: .init(from: tabBarViewItem.widthStage))
+        showTabPreview(for: tabViewModel, from: position)
     }
 
     private func showPinnedTabPreview(at index: Int) {
@@ -584,14 +584,12 @@ final class TabBarViewController: NSViewController {
         }
 
         let position = pinnedTabsContainerView.frame.minX + PinnedTabView.Const.dimension * CGFloat(index)
-        showTabPreview(for: tabViewModel, from: position, after: .init(from: .withoutTitle))
+        showTabPreview(for: tabViewModel, from: position)
     }
 
     private func showTabPreview(
         for tabViewModel: TabViewModel,
-        from xPosition: CGFloat,
-        after interval: TabPreviewWindowController.TimerInterval
-    ) {
+        from xPosition: CGFloat) {
         let isSelected = tabCollectionViewModel.selectedTabViewModel === tabViewModel
         tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel,
                                                                     isSelected: isSelected)
@@ -605,7 +603,7 @@ final class TabBarViewController: NSViewController {
         point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
         point.x += xPosition
         let pointInWindow = view.convert(point, to: nil)
-        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPointInWindow: pointInWindow)
+        tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)
     }
 
     func hideTabPreview() {

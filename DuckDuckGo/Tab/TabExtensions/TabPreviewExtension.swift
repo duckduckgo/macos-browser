@@ -198,7 +198,6 @@ fileprivate extension WKSnapshotConfiguration {
 
     static func makeConfiguration() -> WKSnapshotConfiguration {
         let configuration = WKSnapshotConfiguration()
-        configuration.afterScreenUpdates = false
         configuration.snapshotWidth = NSNumber(floatLiteral: TabPreviewWindowController.Size.width.rawValue)
         return configuration
     }
