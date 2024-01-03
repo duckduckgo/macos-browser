@@ -376,6 +376,8 @@ final class PasswordManagementItemListModel: ObservableObject {
             itemsByCategory = itemsByCategory.filter { $0.item(matches: filter) }
         }
 
+        clearSelection()
+
         if displayedItems.isEmpty && items.isEmpty {
             return
         }
