@@ -150,8 +150,14 @@ final class URLEventHandler {
     /// Handles DBP URLs
     ///
     private static func handleDataBrokerProtectionURL(_ url: URL) {
-        WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+        switch url {
+        case DataBrokerProtectionNotificationCommand.showDashboard.url:
+            WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+        default:
+            return
+        }
     }
+
 #endif
 
 }

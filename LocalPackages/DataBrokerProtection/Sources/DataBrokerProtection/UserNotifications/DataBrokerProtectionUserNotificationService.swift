@@ -21,6 +21,14 @@ import UserNotifications
 import Common
 import AppKit
 
+public enum DataBrokerProtectionNotificationCommand: String {
+    case showDashboard = "databrokerprotection://show_dashboard"
+
+    public var url: URL {
+        URL(string: self.rawValue)!
+    }
+}
+
 public protocol DataBrokerProtectionUserNotificationService {
     func requestNotificationPermission()
     func sendFirstScanCompletedNotification()
@@ -47,19 +55,7 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     }
 
     public func requestNotificationPermission() {
-        userNotificationCenter.requestAuthorization(options: [.alert]) { granted, error in
-            // TODO: Send pixel with permission status?
-            if let error = error {
-                // Handle the error
-                print("Error requesting notification permission: \(error.localizedDescription)")
-            } else if granted {
-                // Permission granted
-                print("Notification permission granted")
-            } else {
-                // Permission denied
-                print("Notification permission denied")
-            }
-        }
+        userNotificationCenter.requestAuthorization(options: [.alert]) { _, _ in }
     }
 
     private func sendNotification(_ notification: UserNotification, afterDays days: Int? = nil) {
@@ -133,11 +129,9 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         switch UNNotificationRequest.Identifier(rawValue: response.notification.request.identifier) {
         case .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .checkIn:
-            if let url = URL(string: "databrokerprotection://opendashboard") {
-                NSWorkspace.shared.open(url)
-            }
+            NSWorkspace.shared.open(DataBrokerProtectionNotificationCommand.showDashboard.url)
         case .none:
-            print("Do nothing")
+            return
         }
     }
 }
