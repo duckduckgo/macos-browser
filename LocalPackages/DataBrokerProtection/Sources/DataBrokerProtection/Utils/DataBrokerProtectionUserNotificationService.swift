@@ -28,18 +28,25 @@ public protocol DataBrokerProtectionUserNotificationService {
     func scheduleCheckInNotificationIfPossible()
 }
 
-public struct DefaultDataBrokerProtectionUserNotificationService: DataBrokerProtectionUserNotificationService {
+public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataBrokerProtectionUserNotificationService {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
+    private let userNotificationCenter: UNUserNotificationCenter
 
-    public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>, userDefaults: UserDefaults = .standard) {
+    public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                userDefaults: UserDefaults = .standard,
+                userNotificationCenter: UNUserNotificationCenter = .current()) {
         self.pixelHandler = pixelHandler
         self.userDefaults = userDefaults
+        self.userNotificationCenter = userNotificationCenter
+
+        super.init()
+
+        self.userNotificationCenter.delegate = self
     }
 
     public func requestNotificationPermission() {
-        let center = UNUserNotificationCenter.current()
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        userNotificationCenter.requestAuthorization(options: [.alert]) { granted, error in
             // TODO: Send pixel with permission status?
             if let error = error {
                 // Handle the error
@@ -54,44 +61,37 @@ public struct DefaultDataBrokerProtectionUserNotificationService: DataBrokerProt
         }
     }
 
-    private func sendNotification(_ notification: UserNotification) {
+    private func sendNotification(_ notification: UserNotification, afterDays days: Int? = nil) {
         let notificationContent = UNMutableNotificationContent()
-
         notificationContent.title = notification.title
         notificationContent.body = notification.message
 
-        let notificationIdentifier = notification.identifier
+        if #available(macOS 12, *) {
+            notificationContent.interruptionLevel = .active
+        }
 
-        let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: nil)
+        let request: UNNotificationRequest
 
-        UNUserNotificationCenter.current().add(request) { error in
-            if error == nil {
-                print("Notification sent")
+        if let days = days {
+            let calendar = Calendar.current
+            guard let date = calendar.date(byAdding: .day, value: days, to: Date()) else {
+                os_log("Notification scheduled for an invalid date", log: .dataBrokerProtection)
+                return
             }
+            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            request = UNNotificationRequest(identifier: notification.identifier, content: notificationContent, trigger: trigger)
+        } else {
+            request = UNNotificationRequest(identifier: notification.identifier, content: notificationContent, trigger: nil)
         }
-    }
 
-    private func sendScheduledNotification(_ notification: UserNotification, forAfterDays days: Int) {
-        let notificationContent = UNMutableNotificationContent()
-        notificationContent.title = notification.title
-        notificationContent.body = notification.message
-
-        let notificationIdentifier = notification.identifier
-
-        let calendar = Calendar.current
-        guard let date = calendar.date(byAdding: .day, value: days, to: Date()) else {
-            os_log("Notification scheduled for a invalid date", log: .dataBrokerProtection)
-            return
-        }
-        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
-
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-
-        let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: trigger)
-
-        UNUserNotificationCenter.current().add(request) { error in
+        userNotificationCenter.add(request) { error in
             if error == nil {
-                print("Notification scheduled")
+                if days != nil {
+                    os_log("Notification scheduled", log: .dataBrokerProtection)
+                } else {
+                    os_log("Notification sent", log: .dataBrokerProtection)
+                }
             }
         }
     }
@@ -116,11 +116,37 @@ public struct DefaultDataBrokerProtectionUserNotificationService: DataBrokerProt
 
     public func scheduleCheckInNotificationIfPossible() {
        // if userDefaults[.didSendCheckedInNotification] != true {
-        sendScheduledNotification(.checkIn, forAfterDays: 14)
+        sendNotification(.checkIn, afterDays: 14)
             userDefaults[.didSendCheckedInNotification]  = true
        // }
     }
 
+}
+
+extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotificationCenterDelegate {
+
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        return .banner
+    }
+
+    public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+        switch UNNotificationRequest.Identifier(rawValue: response.notification.request.identifier) {
+        case .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .checkIn:
+            print("Open app")
+        case .none:
+            print("Do nothing")
+        }
+    }
+}
+
+extension UNNotificationRequest {
+
+    enum Identifier: String {
+        case firstScanComplete = "dbp.scan.complete"
+        case firstProfileRemoved = "dbp.first.removed"
+        case allInfoRemoved = "dbp.all.removed"
+        case checkIn = "dbp.check-in"
+    }
 }
 
 private enum UserNotification {
@@ -156,17 +182,15 @@ private enum UserNotification {
     }
 
     var identifier: String {
-        let notificationPrefix = "data.broker.protection.user.notification"
-
         switch self {
         case .firstScanComplete:
-            return "\(notificationPrefix).scan.complete"
+            return UNNotificationRequest.Identifier.firstScanComplete.rawValue
         case .firstProfileRemoved:
-            return "\(notificationPrefix).first.removed"
+            return UNNotificationRequest.Identifier.firstProfileRemoved.rawValue
         case .allInfoRemoved:
-            return "\(notificationPrefix).all.removed"
+            return UNNotificationRequest.Identifier.allInfoRemoved.rawValue
         case .checkIn:
-            return "\(notificationPrefix).check-in"
+            return UNNotificationRequest.Identifier.checkIn.rawValue
         }
     }
 }
