@@ -123,7 +123,6 @@ final class DataBrokerProtectionProcessor {
         }
 
         operationQueue.addBarrierBlock { [weak self] in
-            self?.userNotificationService.sendAllInfoRemovedNotificationIfPossible()
             completion()
         }
     }
