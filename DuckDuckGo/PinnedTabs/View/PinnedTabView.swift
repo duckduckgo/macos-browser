@@ -198,10 +198,30 @@ struct PinnedTabInnerView: View {
     }
 
     @ViewBuilder
+    var mutedTabIndicator: some View {
+        switch model.audioState {
+        case .muted:
+            ZStack {
+                Circle()
+                    .foregroundColor(.black)
+                    .frame(width: 12, height: 12)
+                Image(systemName: "speaker.slash.fill")
+                    .resizable()
+                    .foregroundColor(.white)
+                    .frame(width: 10, height: 10)
+            }.offset(x: 6, y: -2)
+        default: EmptyView()
+        }
+    }
+
+    @ViewBuilder
     var favicon: some View {
         if let favicon = model.favicon {
-            Image(nsImage: favicon)
-                .resizable()
+            ZStack(alignment: .topTrailing) {
+                Image(nsImage: favicon)
+                    .resizable()
+                mutedTabIndicator
+            }
         } else if let domain = model.content.url?.host, let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain), let firstLetter = eTLDplus1.capitalized.first.flatMap(String.init) {
             ZStack {
                 Rectangle()
@@ -209,11 +229,15 @@ struct PinnedTabInnerView: View {
                 Text(firstLetter)
                     .font(.caption)
                     .foregroundColor(.white)
+                mutedTabIndicator
             }
             .cornerRadius(4.0)
         } else {
-            Image(nsImage: #imageLiteral(resourceName: "Web"))
-                .resizable()
+            ZStack {
+                Image(nsImage: #imageLiteral(resourceName: "Web"))
+                    .resizable()
+                mutedTabIndicator
+            }
         }
     }
 }

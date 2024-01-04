@@ -116,7 +116,7 @@ final class PinnedTabsViewModel: ObservableObject {
     }
 
     private func updateTabAudioState(tab: Tab) {
-        let audioState = tab.audioState()
+        let audioState = tab.audioState
         switch audioState {
         case .muted:
             audioStateView = .muted
@@ -193,5 +193,6 @@ extension PinnedTabsViewModel {
 
     func muteOrUmute(_ tab: Tab) {
         contextMenuActionSubject.send(.muteOrUnmute(tab))
+        updateTabAudioState(tab: tab)
     }
 }

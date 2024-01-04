@@ -1132,7 +1132,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
             return .notSupported
         }
 
-        return tab.audioState()
+        return tab.audioState
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

@@ -488,6 +488,7 @@ protocol NewWindowPolicyDecisionMaker {
             }
 #endif
 
+        self.audioState = webView.audioState()
         addDeallocationChecks(for: webView)
     }
 
@@ -934,12 +935,12 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
+    @Published private(set) var audioState: WKWebView.AudioState = .notSupported
+
     func muteUnmuteTab() {
         webView.muteOrUnmute()
-    }
 
-    func audioState() -> WKWebView.AudioState {
-        webView.audioState()
+        audioState = webView.audioState()
     }
 
     @MainActor(unsafe)
