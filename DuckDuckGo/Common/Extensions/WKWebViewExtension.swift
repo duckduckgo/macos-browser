@@ -135,8 +135,8 @@ extension WKWebView {
     }
 #endif
 
-#if !APPSTORE
     func muteOrUnmute() {
+#if !APPSTORE
         guard self.responds(to: #selector(WKWebView._setPageMuted(_:))) else {
             assertionFailure("WKWebView does not respond to selector _stopMediaCapture")
             return
@@ -154,7 +154,7 @@ extension WKWebView {
         }
         guard newState != mutedState else { return }
         self._setPageMuted(newState)
-
+#endif
         return
     }
 
@@ -164,6 +164,7 @@ extension WKWebView {
     ///            `unmuted` if the web view is unmuted
     ///            `notSupported` if the web view does not support fetching the current audio state
     func audioState() -> AudioState {
+#if !APPSTORE
         guard self.responds(to: #selector(WKWebView._mediaMutedState)) else {
             assertionFailure("WKWebView does not respond to selector _mediaMutedState")
             return .notSupported
@@ -172,8 +173,10 @@ extension WKWebView {
         let mutedState = self._mediaMutedState()
 
         return mutedState.contains(.audioMuted) ? .muted : .unmuted
-    }
+#else
+        return .notSupported
 #endif
+    }
 
     func stopMediaCapture() {
         guard #available(macOS 12.0, *) else {
