@@ -100,9 +100,9 @@ protocol NewWindowPolicyDecisionMaker {
                 switch self {
                 case .pendingStateRestoration, .historyEntry:
                     .returnCacheDataElseLoad
-                case .reload:
+                case .reload, .loadedByStateRestoration:
                     .reloadIgnoringCacheData
-                case .loadedByStateRestoration, .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
+                case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
                     .useProtocolCachePolicy
                 }
             }
