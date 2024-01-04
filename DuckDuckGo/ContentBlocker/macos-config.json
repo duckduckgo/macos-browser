@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1703251114570,
+    "version": 1703694473333,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1017,6 +1017,9 @@
                     "domain": "optout.networkadvertising.org"
                 },
                 {
+                    "domain": "news.ti.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -1030,7 +1033,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "e41dbd0af3841636937030d91bc305b1"
+            "hash": "37a27966915571085613911b47e6e2eb"
         },
         "customUserAgent": {
             "settings": {
@@ -3993,6 +3996,9 @@
                     "domain": "hyatt.com"
                 },
                 {
+                    "domain": "proton.me"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -4039,7 +4045,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "82ebfddf791575ada285a49b7fdc71ca"
+            "hash": "37e16df501e3e68416a13f991b4e4147"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4168,6 +4174,9 @@
                     "domain": "chime.com"
                 },
                 {
+                    "domain": "tirerack.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -4189,7 +4198,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "57800fe9cefcdf8ae18bfcbd0b0fb7a4"
+            "hash": "1a1373bcf16647d63220659fce650a83"
         },
         "harmfulApis": {
             "settings": {
