@@ -59,7 +59,8 @@ protocol NewWindowPolicyDecisionMaker {
         case dataBrokerProtection
 
         enum URLSource: Equatable {
-            case stateRestoration
+            case pendingStateRestoration
+            case loadedByStateRestoration
             case userEntered(String)
             case historyEntry
             case bookmark
@@ -86,9 +87,9 @@ protocol NewWindowPolicyDecisionMaker {
                 switch self {
                 case .userEntered:
                     .custom(.userEnteredUrl)
-                case .stateRestoration:
+                case .pendingStateRestoration:
                     .sessionRestoration
-                case .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
+                case .loadedByStateRestoration, .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
                     .custom(.tabContentUpdate)
                 case .reload:
                     .reload
@@ -97,11 +98,11 @@ protocol NewWindowPolicyDecisionMaker {
 
             var cachePolicy: URLRequest.CachePolicy {
                 switch self {
-                case .stateRestoration, .historyEntry:
+                case .pendingStateRestoration, .historyEntry:
                     .returnCacheDataElseLoad
                 case .reload:
                     .reloadIgnoringCacheData
-                case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
+                case .loadedByStateRestoration, .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
                     .useProtocolCachePolicy
                 }
             }
@@ -221,15 +222,6 @@ protocol NewWindowPolicyDecisionMaker {
                 return source.userEnteredValue
             default:
                 return nil
-            }
-        }
-
-        var isStateRestoration: Bool {
-            switch self {
-            case .url(_, credential: _, source: let source):
-                return source == .stateRestoration
-            default:
-                return false
             }
         }
 
@@ -826,9 +818,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         if webView.url == nil, content.isUrl {
-            if !content.isStateRestoration {
-                self.content = content.forceReload()
-            }
+            self.content = content.forceReload()
             // load from cache or interactionStateData when called by lazy loader
             reloadIfNeeded(shouldLoadInBackground: true)
         } else {
