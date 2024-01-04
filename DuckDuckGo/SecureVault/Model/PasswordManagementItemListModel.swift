@@ -247,6 +247,7 @@ final class PasswordManagementItemListModel: ObservableObject {
                 return
             }
 
+            clearSelection()
             updateFilteredData()
 
             // Select first item if no previous selection was provided
@@ -383,8 +384,6 @@ final class PasswordManagementItemListModel: ObservableObject {
         if !filter.isEmpty {
             itemsByCategory = itemsByCategory.filter { $0.item(matches: filter) }
         }
-
-        clearSelection()
 
         if displayedItems.isEmpty && items.isEmpty {
             return
