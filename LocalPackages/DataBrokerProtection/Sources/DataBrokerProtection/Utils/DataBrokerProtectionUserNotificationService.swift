@@ -25,7 +25,7 @@ public protocol DataBrokerProtectionUserNotificationService {
     func sendFirstScanCompletedNotification()
     func sendFirstRemovedNotificationIfPossible()
     func sendAllInfoRemovedNotificationIfPossible()
-    func sendCheckInNotificationIfPossible()
+    func scheduleCheckInNotificationIfPossible()
 }
 
 public struct DefaultDataBrokerProtectionUserNotificationService: DataBrokerProtectionUserNotificationService {
@@ -71,6 +71,31 @@ public struct DefaultDataBrokerProtectionUserNotificationService: DataBrokerProt
         }
     }
 
+    private func sendScheduledNotification(_ notification: UserNotification, forAfterDays days: Int) {
+        let notificationContent = UNMutableNotificationContent()
+        notificationContent.title = notification.title
+        notificationContent.body = notification.message
+
+        let notificationIdentifier = notification.identifier
+
+        let calendar = Calendar.current
+        guard let date = calendar.date(byAdding: .day, value: days, to: Date()) else {
+            os_log("Notification scheduled for a invalid date", log: .dataBrokerProtection)
+            return
+        }
+        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+
+        let request = UNNotificationRequest(identifier: notificationIdentifier, content: notificationContent, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if error == nil {
+                print("Notification scheduled")
+            }
+        }
+    }
+
     public func sendFirstScanCompletedNotification() {
         sendNotification(.firstScanComplete)
     }
@@ -89,12 +114,13 @@ public struct DefaultDataBrokerProtectionUserNotificationService: DataBrokerProt
        // }
     }
 
-    public func sendCheckInNotificationIfPossible() {
+    public func scheduleCheckInNotificationIfPossible() {
        // if userDefaults[.didSendCheckedInNotification] != true {
-            sendNotification(.checkIn)
+        sendScheduledNotification(.checkIn, forAfterDays: 14)
             userDefaults[.didSendCheckedInNotification]  = true
        // }
     }
+
 }
 
 private enum UserNotification {

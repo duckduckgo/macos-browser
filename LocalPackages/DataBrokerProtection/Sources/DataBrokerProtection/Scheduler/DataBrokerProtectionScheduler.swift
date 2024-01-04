@@ -177,6 +177,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             if self.dataManager.hasMatches() {
                 self.userNotificationService.sendFirstScanCompletedNotification()
+                self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
             completion?(nil)
