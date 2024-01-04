@@ -34,6 +34,12 @@ FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 
+NETP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection
+NETP_APP_GROUP[config=CI][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
+NETP_APP_GROUP[config=Review][sdk=macos*] = $(NETP_BASE_APP_GROUP).review
+NETP_APP_GROUP[config=Debug][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
+NETP_APP_GROUP[config=Release][sdk=macos*] = $(NETP_BASE_APP_GROUP)
+
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
 PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
 PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
