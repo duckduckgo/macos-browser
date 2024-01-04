@@ -462,7 +462,6 @@ extension TabBarViewItem: NSMenuDelegate {
         // Section 2
         addBookmarkMenuItem(to: menu)
         addFireproofMenuItem(to: menu)
-        menu.addItem(NSMenuItem.separator())
 
         addMuteUnmuteMenuItem(to: menu)
         menu.addItem(NSMenuItem.separator())
@@ -509,18 +508,17 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(menuItem)
     }
 
-    #if !APPSTORE
     private func addMuteUnmuteMenuItem(to menu: NSMenu) {
         let audioState = delegate?.tabBarViewItemAudioState(self) ?? .notSupported
 
         if audioState != .notSupported {
+            menu.addItem(NSMenuItem.separator())
             let menuItemTitle = audioState == .muted ? UserText.unmuteTab : UserText.muteTab
             var muteUnmuteMenuItem = NSMenuItem(title: menuItemTitle, action: #selector(muteUnmuteSiteAction(_:)), keyEquivalent: "")
             muteUnmuteMenuItem.target = self
             menu.addItem(muteUnmuteMenuItem)
         }
     }
-    #endif
 
     private func addCloseMenuItem(to menu: NSMenu) {
         let closeMenuItem = NSMenuItem(title: UserText.closeTab, action: #selector(closeButtonAction(_:)), keyEquivalent: "")
