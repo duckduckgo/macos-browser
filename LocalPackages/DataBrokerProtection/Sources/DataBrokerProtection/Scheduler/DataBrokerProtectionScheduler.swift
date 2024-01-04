@@ -171,9 +171,13 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
         os_log("Scanning all brokers...", log: .dataBrokerProtection)
         dataBrokerProcessor.runAllScanOperations(showWebView: showWebView) { [weak self] in
-            self?.startScheduler(showWebView: showWebView)
+            guard let self = self else { return }
 
-            self?.userNotificationService.sendFirstScanCompletedNotification()
+            self.startScheduler(showWebView: showWebView)
+
+            if self.dataManager.hasMatches() {
+                self.userNotificationService.sendFirstScanCompletedNotification()
+            }
 
             completion?(nil)
         }
