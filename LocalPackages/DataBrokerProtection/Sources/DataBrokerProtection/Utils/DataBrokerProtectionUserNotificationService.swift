@@ -19,6 +19,7 @@
 import Foundation
 import UserNotifications
 import Common
+import AppKit
 
 public protocol DataBrokerProtectionUserNotificationService {
     func requestNotificationPermission()
@@ -132,7 +133,9 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         switch UNNotificationRequest.Identifier(rawValue: response.notification.request.identifier) {
         case .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .checkIn:
-            print("Open app")
+            if let url = URL(string: "databrokerprotection://opendashboard") {
+                NSWorkspace.shared.open(url)
+            }
         case .none:
             print("Do nothing")
         }
