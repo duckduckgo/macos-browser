@@ -224,6 +224,15 @@ protocol NewWindowPolicyDecisionMaker {
             }
         }
 
+        var isStateRestoration: Bool {
+            switch self {
+            case .url(_, credential: _, source: let source):
+                return source == .stateRestoration
+            default:
+                return false
+            }
+        }
+
         var isUserEnteredUrl: Bool {
             userEnteredValue != nil
         }
@@ -817,7 +826,9 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         if webView.url == nil, content.isUrl {
-            self.content = content.forceReload()
+            if !content.isStateRestoration {
+                self.content = content.forceReload()
+            }
             // load from cache or interactionStateData when called by lazy loader
             reloadIfNeeded(shouldLoadInBackground: true)
         } else {
