@@ -102,7 +102,7 @@ private extension Tab.TabContent {
             self = .homePage
         case .url:
             guard let url = url else { return nil }
-            self = .url(url, source: .stateRestoration)
+            self = .url(url, source: .pendingStateRestoration)
         case .bookmarks:
             self = .bookmarks
         case .preferences:
@@ -111,7 +111,7 @@ private extension Tab.TabContent {
             self = .onboarding
         case .duckPlayer:
             guard let videoID = videoID else { return nil }
-            self = .url(.duckPlayer(videoID, timestamp: timestamp), source: .stateRestoration)
+            self = .url(.duckPlayer(videoID, timestamp: timestamp), source: .pendingStateRestoration)
         case .dataBrokerProtection:
             self = .dataBrokerProtection
         }
