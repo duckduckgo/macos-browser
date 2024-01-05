@@ -172,6 +172,7 @@ final class MainViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         registerForBookmarkBarPromptNotifications()
+        registerForMouseEnteredAndExitedEvents()
     }
 
     var bookmarkBarPromptObserver: Any?
@@ -586,6 +587,37 @@ extension MainViewController {
 
         return event
 
+    }
+
+    func registerForMouseEnteredAndExitedEvents() {
+        let trackingArea = NSTrackingArea(rect: self.view.bounds,
+                                          options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
+                                          owner: self,
+                                          userInfo: nil)
+        self.view.addTrackingArea(trackingArea)
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        guard event.window === self.view.window else { return }
+        let point = view.convert(event.locationInWindow, from: nil)
+
+        if !view.bounds.contains(point) {
+            navigationBarViewController.addressBarViewController?
+                .addressBarButtonsViewController?.isMouseOverNavigationBar = false
+        }
+
+        super.mouseExited(with: event)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        guard event.window === self.view.window else { return }
+        let point = self.view.convert(event.locationInWindow, from: nil)
+        let webContainerViewTopY = webContainerView.frame.maxY
+
+        navigationBarViewController.addressBarViewController?
+            .addressBarButtonsViewController?.isMouseOverNavigationBar = point.y > webContainerViewTopY
+
+        super.mouseMoved(with: event)
     }
 
 }
