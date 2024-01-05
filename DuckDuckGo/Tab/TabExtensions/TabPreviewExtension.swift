@@ -48,6 +48,8 @@ final class TabPreviewExtension {
         contentPublisher.sink { [weak self] tabContent in
             self?.tabContent = tabContent
         }.store(in: &cancellables)
+
+        generatePreviewAfterLoad = true
     }
 
     @MainActor
@@ -55,7 +57,6 @@ final class TabPreviewExtension {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let webView else {
-            assertionFailure("WebView is missing")
             return
         }
 
