@@ -89,7 +89,7 @@ final class TabPreviewWindowController: NSWindowController {
 
     }
 
-    func hide(allowQuickRedisplay: Boolq) {
+    func hide(allowQuickRedisplay: Bool) {
         func removePreview() -> Bool {
             guard let window = window, window.isVisible else {
                 return false
