@@ -175,8 +175,9 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
             self.startScheduler(showWebView: showWebView)
 
+            self.userNotificationService.sendFirstScanCompletedNotification()
+
             if self.dataManager.hasMatches() {
-                self.userNotificationService.sendFirstScanCompletedNotification()
                 self.userNotificationService.scheduleCheckInNotificationIfPossible()
             }
 
