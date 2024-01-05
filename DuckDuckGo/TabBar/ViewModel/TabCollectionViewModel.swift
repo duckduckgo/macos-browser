@@ -37,6 +37,7 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 }
 
 @MainActor
+// swiftlint:disable:next type_body_length
 final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
