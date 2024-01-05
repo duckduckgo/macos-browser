@@ -38,10 +38,7 @@ final class MainViewController: NSViewController {
     private var bookmarksBarHeightConstraint: NSLayoutConstraint!
 
     private lazy var mouseAboveWebViewTrackingArea: NSTrackingArea = {
-        NSTrackingArea(rect: self.view.bounds,
-                                          options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
-                                          owner: self,
-                                          userInfo: nil)
+        NSTrackingArea(rect: view.bounds, options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved], owner: self, userInfo: nil)
     }()
 
     private let divider = ColorView(frame: .zero, backgroundColor: .separatorColor)
