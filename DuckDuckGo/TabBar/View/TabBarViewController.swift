@@ -281,7 +281,7 @@ final class TabBarViewController: NSViewController {
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 if self.view.isMouseLocationInsideBounds() == false {
-                    self.hideTabPreview()
+                    self.hideTabPreview(allowQuickRedisplay: true)
                 }
             }
         }
@@ -506,7 +506,7 @@ final class TabBarViewController: NSViewController {
                 guard let self = self else { return }
                 self.updateLayout()
                 self.enableScrollButtons()
-                self.hideTabPreview()
+                self.hideTabPreview(allowQuickRedisplay: true)
             })
         }
     }
@@ -524,7 +524,7 @@ final class TabBarViewController: NSViewController {
 
     @objc private func scrollViewBoundsDidChange(_ sender: Any) {
         enableScrollButtons()
-        hideTabPreview()
+        hideTabPreview(allowQuickRedisplay: true)
     }
 
     private func enableScrollButtons() {
@@ -606,8 +606,8 @@ final class TabBarViewController: NSViewController {
         tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)
     }
 
-    func hideTabPreview() {
-        tabPreviewWindowController.hide()
+    func hideTabPreview(allowQuickRedisplay: Bool = false) {
+        tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)
     }
 
 }
@@ -989,8 +989,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
                 showTabPreview(for: tabBarViewItem)
             }
         } else {
-//            tabPreviewWindowController.scheduleHiding()
-            tabPreviewWindowController.hide()
+            tabPreviewWindowController.hide(allowQuickRedisplay: true)
         }
     }
 

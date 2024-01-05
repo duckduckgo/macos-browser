@@ -59,7 +59,6 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     func show(parentWindow: NSWindow, topLeftPointInWindow: CGPoint) {
-
         func presentPreview(tabPreviewWindow: NSWindow) {
             parentWindow.addChildWindow(tabPreviewWindow, ordered: .above)
             self.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
@@ -90,7 +89,7 @@ final class TabPreviewWindowController: NSWindowController {
 
     }
 
-    func hide() {
+    func hide(allowQuickRedisplay: Boolq) {
         func removePreview() -> Bool {
             guard let window = window, window.isVisible else {
                 return false
@@ -110,7 +109,7 @@ final class TabPreviewWindowController: NSWindowController {
         // Hide the preview
         if removePreview() {
             // Record the hide time
-            lastHideTime = Date()
+            lastHideTime = allowQuickRedisplay ? Date() : nil
         }
     }
 
@@ -129,7 +128,7 @@ final class TabPreviewWindowController: NSWindowController {
 extension TabPreviewWindowController {
 
     @objc func suggestionWindowOpenNotification(_ notification: Notification) {
-        hide()
+        hide(allowQuickRedisplay: false)
     }
 
 }
