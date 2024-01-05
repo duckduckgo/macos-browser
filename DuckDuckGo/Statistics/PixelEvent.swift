@@ -205,16 +205,6 @@ extension Pixel {
         // DataBrokerProtection Other
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
-        // DataBrokerProtection User Notifications
-        case dataBrokerProtectionNotificationSentFirstScanComplete
-        case dataBrokerProtectionNotificationOpenedFirstScanComplete
-        case dataBrokerProtectionNotificationSentFirstRemoval
-        case dataBrokerProtectionNotificationOpenedFirstRemoval
-        case dataBrokerProtectionNotificationScheduled2WeeksCheckIn
-        case dataBrokerProtectionNotificationOpened2WeeksCheckIn
-        case dataBrokerProtectionNotificationSentAllRecordsRemoved
-        case dataBrokerProtectionNotificationOpenedAllRecordsRemoved
-
         // 28-day Home Button
         case homeButtonHidden
         case homeButtonLeft
@@ -567,22 +557,6 @@ extension Pixel.Event {
             return "m_mac_dbp_ev_terms_accepted"
         case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
             return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
-        case .dataBrokerProtectionNotificationSentFirstScanComplete:
-            return "m_mac_dbp_notification_sent_first_scan_complete"
-        case .dataBrokerProtectionNotificationOpenedFirstScanComplete:
-            return "m_mac_dbp_notification_opened_first_scan_complete"
-        case .dataBrokerProtectionNotificationSentFirstRemoval:
-            return "m_mac_dbp_notification_sent_first_removal"
-        case .dataBrokerProtectionNotificationOpenedFirstRemoval:
-            return "m_mac_dbp_notification_opened_first_removal"
-        case .dataBrokerProtectionNotificationScheduled2WeeksCheckIn:
-            return "m_mac_dbp_notification_scheduled_2_weeks_check_in"
-        case .dataBrokerProtectionNotificationOpened2WeeksCheckIn:
-            return "m_mac_dbp_notification_opened_2_weeks_check_in"
-        case .dataBrokerProtectionNotificationSentAllRecordsRemoved:
-            return "m_mac_dbp_notification_sent_all_records_removed"
-        case .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
-            return "m_mac_dbp_notification_opened_all_records_removed"
 
             // 28-day Home Button
         case .homeButtonHidden:

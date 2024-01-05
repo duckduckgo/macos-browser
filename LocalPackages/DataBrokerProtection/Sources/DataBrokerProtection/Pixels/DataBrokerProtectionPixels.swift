@@ -243,6 +243,16 @@ public enum DataBrokerProtectionPixels {
     case disableLoginItem
     case resetLoginItem
 
+    // DataBrokerProtection User Notifications
+    case dataBrokerProtectionNotificationSentFirstScanComplete
+    case dataBrokerProtectionNotificationOpenedFirstScanComplete
+    case dataBrokerProtectionNotificationSentFirstRemoval
+    case dataBrokerProtectionNotificationOpenedFirstRemoval
+    case dataBrokerProtectionNotificationScheduled2WeeksCheckIn
+    case dataBrokerProtectionNotificationOpened2WeeksCheckIn
+    case dataBrokerProtectionNotificationSentAllRecordsRemoved
+    case dataBrokerProtectionNotificationOpenedAllRecordsRemoved
+
     // Scan/Search pixels
     case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int)
     case scanFailed(dataBroker: String, duration: Double, tries: Int)
@@ -302,6 +312,24 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .restartLoginItem: return "m_mac_dbp_login-item_restart"
         case .disableLoginItem: return "m_mac_dbp_login-item_disable"
         case .resetLoginItem: return "m_mac_dbp_login-item_reset"
+
+        // User Notifications
+        case .dataBrokerProtectionNotificationSentFirstScanComplete:
+            return "m_mac_dbp_notification_sent_first_scan_complete"
+        case .dataBrokerProtectionNotificationOpenedFirstScanComplete:
+            return "m_mac_dbp_notification_opened_first_scan_complete"
+        case .dataBrokerProtectionNotificationSentFirstRemoval:
+            return "m_mac_dbp_notification_sent_first_removal"
+        case .dataBrokerProtectionNotificationOpenedFirstRemoval:
+            return "m_mac_dbp_notification_opened_first_removal"
+        case .dataBrokerProtectionNotificationScheduled2WeeksCheckIn:
+            return "m_mac_dbp_notification_scheduled_2_weeks_check_in"
+        case .dataBrokerProtectionNotificationOpened2WeeksCheckIn:
+            return "m_mac_dbp_notification_opened_2_weeks_check_in"
+        case .dataBrokerProtectionNotificationSentAllRecordsRemoved:
+            return "m_mac_dbp_notification_sent_all_records_removed"
+        case .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
+            return "m_mac_dbp_notification_opened_all_records_removed"
         }
     }
 
@@ -356,7 +384,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .enableLoginItem,
                 .restartLoginItem,
                 .disableLoginItem,
-                .resetLoginItem:
+                .resetLoginItem,
+                .dataBrokerProtectionNotificationSentFirstScanComplete,
+                .dataBrokerProtectionNotificationOpenedFirstScanComplete,
+                .dataBrokerProtectionNotificationSentFirstRemoval,
+                .dataBrokerProtectionNotificationOpenedFirstRemoval,
+                .dataBrokerProtectionNotificationScheduled2WeeksCheckIn,
+                .dataBrokerProtectionNotificationOpened2WeeksCheckIn,
+                .dataBrokerProtectionNotificationSentAllRecordsRemoved,
+                .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -422,7 +458,16 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
-                    .scanError:
+                    .scanError,
+                    .dataBrokerProtectionNotificationSentFirstScanComplete,
+                    .dataBrokerProtectionNotificationOpenedFirstScanComplete,
+                    .dataBrokerProtectionNotificationSentFirstRemoval,
+                    .dataBrokerProtectionNotificationOpenedFirstRemoval,
+                    .dataBrokerProtectionNotificationScheduled2WeeksCheckIn,
+                    .dataBrokerProtectionNotificationOpened2WeeksCheckIn,
+                    .dataBrokerProtectionNotificationSentAllRecordsRemoved,
+                    .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
+
                 PixelKit.fire(event)
             }
         }
