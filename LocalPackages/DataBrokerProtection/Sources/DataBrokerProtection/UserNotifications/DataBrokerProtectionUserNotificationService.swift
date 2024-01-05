@@ -95,27 +95,34 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
 
     public func sendFirstScanCompletedNotification() {
         sendNotification(.firstScanComplete)
+        pixelHandler.fire(.dataBrokerProtectionNotificationSentFirstScanComplete)
     }
 
     public func sendFirstRemovedNotificationIfPossible() {
-       // if userDefaults[.didSendFirstRemovedNotification] != true {
+        if userDefaults[.didSendFirstRemovedNotification] != true {
             sendNotification(.firstProfileRemoved)
             userDefaults[.didSendFirstRemovedNotification]  = true
-       // }
+
+            pixelHandler.fire(.dataBrokerProtectionNotificationSentFirstRemoval)
+        }
     }
 
     public func sendAllInfoRemovedNotificationIfPossible() {
-      //  if userDefaults[.didSendAllInfoRemovedNotification] != true {
+        if userDefaults[.didSendAllInfoRemovedNotification] != true {
             sendNotification(.allInfoRemoved)
             userDefaults[.didSendAllInfoRemovedNotification]  = true
-       // }
+
+            pixelHandler.fire(.dataBrokerProtectionNotificationSentAllRecordsRemoved)
+        }
     }
 
     public func scheduleCheckInNotificationIfPossible() {
-       // if userDefaults[.didSendCheckedInNotification] != true {
-        sendNotification(.checkIn, afterDays: 14)
+        if userDefaults[.didSendCheckedInNotification] != true {
+            sendNotification(.twoWeeksCheckIn, afterDays: 14)
             userDefaults[.didSendCheckedInNotification]  = true
-       // }
+
+            pixelHandler.fire(.dataBrokerProtectionNotificationScheduled2WeeksCheckIn)
+        }
     }
 
 }
@@ -127,11 +134,20 @@ extension DefaultDataBrokerProtectionUserNotificationService: UNUserNotification
     }
 
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        switch UNNotificationRequest.Identifier(rawValue: response.notification.request.identifier) {
-        case .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .checkIn:
+        guard let identifier = UNNotificationRequest.Identifier(rawValue: response.notification.request.identifier) else { return }
+
+        let pixelMapper: [UNNotificationRequest.Identifier: DataBrokerProtectionPixels] = [.firstScanComplete: .dataBrokerProtectionNotificationSentFirstScanComplete,
+                                                                                           .firstProfileRemoved: .dataBrokerProtectionNotificationOpenedFirstRemoval,
+                                                                                           .allInfoRemoved: .dataBrokerProtectionNotificationOpenedAllRecordsRemoved,
+                                                                                           .twoWeeksCheckIn: .dataBrokerProtectionNotificationOpened2WeeksCheckIn]
+
+        switch identifier {
+        case .firstScanComplete, .firstProfileRemoved, .allInfoRemoved, .twoWeeksCheckIn:
             NSWorkspace.shared.open(DataBrokerProtectionNotificationCommand.showDashboard.url)
-        case .none:
-            return
+
+            if let pixel = pixelMapper[identifier] {
+                pixelHandler.fire(pixel)
+            }
         }
     }
 }
@@ -142,7 +158,7 @@ extension UNNotificationRequest {
         case firstScanComplete = "dbp.scan.complete"
         case firstProfileRemoved = "dbp.first.removed"
         case allInfoRemoved = "dbp.all.removed"
-        case checkIn = "dbp.check-in"
+        case twoWeeksCheckIn = "dbp.2-weeks-check-in"
     }
 }
 
@@ -150,7 +166,7 @@ private enum UserNotification {
     case firstScanComplete
     case firstProfileRemoved
     case allInfoRemoved
-    case checkIn
+    case twoWeeksCheckIn
 
     var title: String {
         switch self {
@@ -160,7 +176,7 @@ private enum UserNotification {
             return "Success! A record of your info was removed!"
         case .allInfoRemoved:
             return "All pending info removals complete!"
-        case .checkIn:
+        case .twoWeeksCheckIn:
             return "We're making progress on your info removals"
         }
     }
@@ -173,7 +189,7 @@ private enum UserNotification {
             return "That’s one less creepy site storing and selling your personal info online. Check progress..."
         case .allInfoRemoved:
             return "See all the records matching your personal info that DuckDuckGo found and removed from the web..."
-        case .checkIn:
+        case .twoWeeksCheckIn:
             return "See the records matching your personal info that DuckDuckGo found and removed from the web so far..."
         }
     }
@@ -186,8 +202,8 @@ private enum UserNotification {
             return UNNotificationRequest.Identifier.firstProfileRemoved.rawValue
         case .allInfoRemoved:
             return UNNotificationRequest.Identifier.allInfoRemoved.rawValue
-        case .checkIn:
-            return UNNotificationRequest.Identifier.checkIn.rawValue
+        case .twoWeeksCheckIn:
+            return UNNotificationRequest.Identifier.twoWeeksCheckIn.rawValue
         }
     }
 }
