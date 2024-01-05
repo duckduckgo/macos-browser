@@ -37,6 +37,13 @@ final class MainViewController: NSViewController {
     private var addressBarHeightConstraint: NSLayoutConstraint!
     private var bookmarksBarHeightConstraint: NSLayoutConstraint!
 
+    private lazy var mouseAboveWebViewTrackingArea: NSTrackingArea = {
+        NSTrackingArea(rect: self.view.bounds,
+                                          options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
+                                          owner: self,
+                                          userInfo: nil)
+    }()
+
     private let divider = ColorView(frame: .zero, backgroundColor: .separatorColor)
 
     let tabBarViewController: TabBarViewController
@@ -171,8 +178,8 @@ final class MainViewController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
+        setMouseAboveWebViewTrackingAreaEnabled(true)
         registerForBookmarkBarPromptNotifications()
-        registerForMouseEnteredAndExitedEvents()
     }
 
     var bookmarkBarPromptObserver: Any?
@@ -188,6 +195,7 @@ final class MainViewController: NSViewController {
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
+        setMouseAboveWebViewTrackingAreaEnabled(false)
         if let bookmarkBarPromptObserver {
             NotificationCenter.default.removeObserver(bookmarkBarPromptObserver)
         }
@@ -589,12 +597,12 @@ extension MainViewController {
 
     }
 
-    func registerForMouseEnteredAndExitedEvents() {
-        let trackingArea = NSTrackingArea(rect: self.view.bounds,
-                                          options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved],
-                                          owner: self,
-                                          userInfo: nil)
-        self.view.addTrackingArea(trackingArea)
+    func setMouseAboveWebViewTrackingAreaEnabled(_ isEnabled: Bool) {
+        if isEnabled {
+            view.addTrackingArea(mouseAboveWebViewTrackingArea)
+        } else {
+            view.removeTrackingArea(mouseAboveWebViewTrackingArea)
+        }
     }
 
     override func mouseExited(with event: NSEvent) {
