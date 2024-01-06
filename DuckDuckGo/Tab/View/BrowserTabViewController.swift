@@ -205,6 +205,7 @@ final class BrowserTabViewController: NSViewController {
             .sink { [weak self] selectedTabViewModel in
 
                 guard let self = self else { return }
+                generateNativePreviewIfNeeded()
                 self.tabViewModel = selectedTabViewModel
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
@@ -526,6 +527,15 @@ final class BrowserTabViewController: NSViewController {
         let isDifferentTabDisplayed = webView != tabViewModel.tab.webView
 
         return isDifferentTabDisplayed || tabIsNotOnScreen || (isPinnedTab && isKeyWindow)
+    }
+
+    func generateNativePreviewIfNeeded() {
+        switch tabViewModel?.tab.content {
+        case .bookmarks, .preferences, .onboarding, .homePage, .dataBrokerProtection:
+            tabViewModel?.tab.tabPreviews?.generateNativePreview(from: view)
+        default:
+            return
+        }
     }
 
 #if DBP
