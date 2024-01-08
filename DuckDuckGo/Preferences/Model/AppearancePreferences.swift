@@ -243,15 +243,7 @@ final class AppearancePreferences: ObservableObject {
 
     @Published var homeButtonPosition: HomeButtonPosition {
         didSet {
-            persistor.homeButtonPosition = homeButtonPosition
-            switch homeButtonPosition {
-            case .hidden:
-                Pixel.fire(.homeButtonHidden)
-            case .left:
-                Pixel.fire(.homeButtonLeft)
-            case .right:
-                Pixel.fire(.homeButtonRight)
-            }
+            persistor.homeButtonPosition = homeButtonPosition            
         }
     }
 
