@@ -187,7 +187,7 @@ final class MainView: NSView {
         var bounds = bounds
         bounds.size.height -= webContainerView.bounds.maxY
         bounds.origin.y += webContainerView.bounds.maxY
-        return NSTrackingArea(rect: bounds, options: [.activeAlways, .mouseEnteredAndExited, .mouseMoved], owner: self, userInfo: nil)
+        return NSTrackingArea(rect: bounds, options: [.activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
     }
 
     private var mouseAboveWebViewTrackingArea: NSTrackingArea?
