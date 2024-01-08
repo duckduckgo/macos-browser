@@ -212,6 +212,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
+//                firePixelIfNeeded(error: error, event: <#T##Pixel.Event#>)
             }
         }
     }
@@ -607,6 +608,13 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func recoveryCodePasted(_ code: String, fromRecoveryScreen: Bool) {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
+    }
+
+    private func firePixelIfNeeded(error: Error, event: Pixel.Event) {
+        guard let syncError = error as? SyncError else { return }
+        if !syncError.isServerError {
+            Pixel.fire(event)
+        }
     }
 
 }
