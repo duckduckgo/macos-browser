@@ -24,10 +24,6 @@ import Navigation
 import WebKit
 import UserScript
 
-extension NSImage {
-    static let duckPlayer: NSImage = #imageLiteral(resourceName: "DuckPlayer")
-}
-
 enum DuckPlayerMode: Equatable, Codable {
     case enabled, alwaysAsk, disabled
 

@@ -32,11 +32,16 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
     typealias KeyReaderFileLineError = FileLineError<FirefoxEncryptionKeyReader>
 
+    init() {
+    }
+
     func getEncryptionKey(key3DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data> {
         var operationType: FirefoxLoginReader.ImportError.OperationType = .key3readerStage1
         do {
             let data = try getEncryptionKey(key3DatabaseURL: key3DatabaseURL, primaryPassword: primaryPassword, operationType: &operationType)
             return .success(data)
+        } catch let error as FirefoxLoginReader.ImportError {
+            return .failure(error)
         } catch {
             return .failure(FirefoxLoginReader.ImportError(type: operationType, underlyingError: error))
         }
@@ -84,7 +89,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         } catch let error as FirefoxLoginReader.ImportError {
             return .failure(error)
         } catch {
-            return .failure(FirefoxLoginReader.ImportError(type: operationType, underlyingError: KeyReaderFileLineError()))
+            return .failure(FirefoxLoginReader.ImportError(type: operationType, underlyingError: error))
         }
     }
 

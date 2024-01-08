@@ -279,9 +279,6 @@ final class LocalBookmarkStore: BookmarkStore {
                     // will return the children of the root folder, as the root folder is an implementation detail of the bookmarks store.
                     let rootFolder = self.bookmarksRoot(in: context)
                     let orphanedEntities = BookmarkUtils.fetchOrphanedEntities(context)
-                    if !orphanedEntities.isEmpty {
-                        self.reportOrphanedBookmarksIfNeeded()
-                    }
                     results = (rootFolder?.childrenArray ?? []) + orphanedEntities
                 case .favorites:
                     results = self.favoritesRoot(in: context)?.favoritesArray ?? []
@@ -297,15 +294,6 @@ final class LocalBookmarkStore: BookmarkStore {
             } catch let error {
                 completion(nil, error)
             }
-        }
-    }
-
-    private func reportOrphanedBookmarksIfNeeded() {
-        Task { @MainActor in
-            guard let syncService = NSApp.delegateTyped.syncService, syncService.authState == .inactive else {
-                return
-            }
-            Pixel.fire(.debug(event: .orphanedBookmarksPresent))
         }
     }
 
@@ -717,8 +705,8 @@ final class LocalBookmarkStore: BookmarkStore {
     /// 2. **Safari:** Create a root level "Imported Favorites" folder to store bookmarks from the bookmarks bar, and all other bookmarks go at the root level.
     /// 3. **Chrome:** Put all bookmarks at the root level, except for Other Bookmarks which go in a root level "Other Bookmarks" folder.
     /// 4. **Firefox:** Put all bookmarks at the root level, except for Other Bookmarks which go in a root level "Other Bookmarks" folder.
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
-        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
+        var total = BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
 
         do {
             let context = makeContext()
@@ -759,7 +747,7 @@ final class LocalBookmarkStore: BookmarkStore {
     private func createEntitiesFromBookmarks(allFolders: [BookmarkEntity],
                                              bookmarks: ImportedBookmarks,
                                              importSourceName: String,
-                                             in context: NSManagedObjectContext) -> BookmarkImportResult {
+                                             in context: NSManagedObjectContext) -> BookmarksImportSummary {
 
         guard let root = bookmarksRoot(in: context) else {
             return .init(successful: 0,
@@ -767,7 +755,7 @@ final class LocalBookmarkStore: BookmarkStore {
                          failed: bookmarks.numberOfBookmarks)
         }
 
-        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+        var total = BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
 
         var parent = root
         var makeFavorties = true
@@ -803,8 +791,8 @@ final class LocalBookmarkStore: BookmarkStore {
     private func recursivelyCreateEntities(from bookmarks: [ImportedBookmarks.BookmarkOrFolder],
                                            parent: BookmarkEntity,
                                            markBookmarksAsFavorite: Bool? = false,
-                                           in context: NSManagedObjectContext) -> BookmarkImportResult {
-        var total = BookmarkImportResult(successful: 0, duplicates: 0, failed: 0)
+                                           in context: NSManagedObjectContext) -> BookmarksImportSummary {
+        var total = BookmarksImportSummary(successful: 0, duplicates: 0, failed: 0)
 
         let favoritesFolders = BookmarkUtils.fetchFavoritesFolders(for: favoritesDisplayMode, in: context)
 

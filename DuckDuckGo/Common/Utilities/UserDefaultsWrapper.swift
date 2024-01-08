@@ -41,6 +41,8 @@ public struct UserDefaultsWrapper<T> {
         case configStoragePrivacyConfigurationEtag = "config.storage.privacyconfiguration.etag"
         case configFBConfigEtag = "config.storage.fbconfig.etag"
 
+        case configLastInstalled = "config.last.installed"
+
         case fireproofDomains = "com.duckduckgo.fireproofing.allowedDomains"
         case areDomainsMigratedToETLDPlus1 = "com.duckduckgo.are-domains-migrated-to-etldplus1"
         case unprotectedDomains = "com.duckduckgo.contentblocker.unprotectedDomains"
@@ -176,6 +178,7 @@ public struct UserDefaultsWrapper<T> {
         case syncIsEligibleForFaviconsFetcherOnboarding = "sync.is-eligible-for-favicons-fetcher-onboarding"
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
+        case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
     }
 
     enum RemovedKeys: String, CaseIterable {

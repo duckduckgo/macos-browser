@@ -414,7 +414,7 @@ final class TabPermissionsTests: XCTestCase {
         eDidCancel = expectation(description: "didCancel external app should be called")
 
         // shouldn‘t open external app when restoring session from interaction state
-        let tab = Tab(content: .url(externalUrl, source: .stateRestoration), webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
+        let tab = Tab(content: .url(externalUrl, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, workspace: workspace, privacyFeatures: privacyFeaturesMock, extensionsBuilder: extensionsBuilder, shouldLoadInBackground: true)
 
         var c = tab.permissions.$authorizationQuery.sink { query in
             guard let query else { return }

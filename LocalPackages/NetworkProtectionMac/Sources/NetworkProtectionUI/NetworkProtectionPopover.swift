@@ -17,6 +17,7 @@
 //
 
 import AppKit
+import Combine
 import Foundation
 import SwiftUI
 import NetworkProtection
@@ -43,6 +44,7 @@ public final class NetworkProtectionPopover: NSPopover {
 
     public typealias MenuItem = NetworkProtectionStatusView.Model.MenuItem
 
+    private let debugInformationPublisher = CurrentValueSubject<Bool, Never>(false)
     private let statusReporter: NetworkProtectionStatusReporter
 
     public required init(controller: TunnelController,
@@ -57,7 +59,11 @@ public final class NetworkProtectionPopover: NSPopover {
         self.animates = false
         self.behavior = .semitransient
 
-        setupContentController(controller: controller, onboardingStatusPublisher: onboardingStatusPublisher, statusReporter: statusReporter, menuItems: menuItems)
+        setupContentController(controller: controller,
+                               onboardingStatusPublisher: onboardingStatusPublisher,
+                               statusReporter: statusReporter,
+                               debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
+                               menuItems: menuItems)
     }
 
     required init?(coder: NSCoder) {
@@ -67,11 +73,13 @@ public final class NetworkProtectionPopover: NSPopover {
     private func setupContentController(controller: TunnelController,
                                         onboardingStatusPublisher: OnboardingStatusPublisher,
                                         statusReporter: NetworkProtectionStatusReporter,
+                                        debugInformationPublisher: AnyPublisher<Bool, Never>,
                                         menuItems: @escaping () -> [MenuItem]) {
 
         let model = NetworkProtectionStatusView.Model(controller: controller,
                                                       onboardingStatusPublisher: onboardingStatusPublisher,
                                                       statusReporter: statusReporter,
+                                                      debugInformationPublisher: debugInformationPublisher,
                                                       menuItems: menuItems)
 
         let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in
@@ -92,5 +100,11 @@ public final class NetworkProtectionPopover: NSPopover {
 
         statusReporter.forceRefresh()
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+    }
+
+    // MARK: - Debug Information
+
+    func setShowsDebugInformation(_ showsDebugInformation: Bool) {
+        debugInformationPublisher.send(showsDebugInformation)
     }
 }

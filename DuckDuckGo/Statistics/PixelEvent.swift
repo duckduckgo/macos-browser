@@ -101,10 +101,15 @@ extension Pixel {
 
         case dailyOsVersionCounter
 
-        case dataImportFailed(any DataImportError)
+        case dataImportFailed(source: DataImport.Source, sourceVersion: String?, error: any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
+
+        case autofillLoginsSaveLoginModalExcludeSiteConfirmed
+        case autofillLoginsSettingsResetExcludedDisplayed
+        case autofillLoginsSettingsResetExcludedConfirmed
+        case autofillLoginsSettingsResetExcludedDismissed
 
         case bitwardenPasswordAutofilled
         case bitwardenPasswordSaved
@@ -196,6 +201,9 @@ extension Pixel {
         case dataBrokerProtectionWaitlistCardUITapped
         case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
         case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
+
+        // DataBrokerProtection Other
+        case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
         // 28-day Home Button
         case homeButtonHidden
@@ -310,7 +318,6 @@ extension Pixel {
             case missingParent
             case bookmarksSaveFailed
             case bookmarksSaveFailedOnImport
-            case orphanedBookmarksPresent
 
             case bookmarksCouldNotLoadDatabase
             case bookmarksCouldNotPrepareDatabase
@@ -374,16 +381,25 @@ extension Pixel.Event {
         case .dailyOsVersionCounter:
             return "m_mac_daily-os-version-counter"
 
-        case .dataImportFailed(let error) where error.action == .favicons:
-            return "m_mac_favicon-import-failed_\(error.source)"
-        case .dataImportFailed(let error):
-            return "m_mac_data-import-failed_\(error.action)_\(error.source)"
+        case .dataImportFailed(source: let source, sourceVersion: _, error: let error) where error.action == .favicons:
+            return "m_mac_favicon-import-failed_\(source)"
+        case .dataImportFailed(source: let source, sourceVersion: _, error: let error):
+            return "m_mac_data-import-failed_\(error.action)_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
+
+        case .autofillLoginsSaveLoginModalExcludeSiteConfirmed:
+            return "m_mac_autofill_logins_save_login_exclude_site_confirmed"
+        case .autofillLoginsSettingsResetExcludedDisplayed:
+            return "m_mac_autofill_settings_reset_excluded_displayed"
+        case .autofillLoginsSettingsResetExcludedConfirmed:
+            return "m_mac_autofill_settings_reset_excluded_confirmed"
+        case .autofillLoginsSettingsResetExcludedDismissed:
+            return "m_mac_autofill_settings_reset_excluded_dismissed"
 
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"
@@ -539,6 +555,8 @@ extension Pixel.Event {
             return "m_mac_dbp_imp_terms"
         case .dataBrokerProtectionWaitlistTermsAndConditionsAccepted:
             return "m_mac_dbp_ev_terms_accepted"
+        case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
+            return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
 
             // 28-day Home Button
         case .homeButtonHidden:
@@ -753,7 +771,6 @@ extension Pixel.Event.Debug {
         case .missingParent: return "bookmark_missing_parent"
         case .bookmarksSaveFailed: return "bookmarks_save_failed"
         case .bookmarksSaveFailedOnImport: return "bookmarks_save_failed_on_import"
-        case .orphanedBookmarksPresent: return "bookmarks_orphans_present"
 
         case .bookmarksCouldNotLoadDatabase: return "bookmarks_could_not_load_database"
         case .bookmarksCouldNotPrepareDatabase: return "bookmarks_could_not_prepare_database"

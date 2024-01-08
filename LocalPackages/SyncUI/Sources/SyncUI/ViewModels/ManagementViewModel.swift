@@ -20,6 +20,11 @@ import Foundation
 
 public protocol ManagementViewModel: ObservableObject {
 
+    var isDataSyncingAvailable: Bool { get }
+    var isConnectingDevicesAvailable: Bool { get }
+    var isAccountCreationAvailable: Bool { get }
+    var isAccountRecoveryAvailable: Bool { get }
+
     var isSyncEnabled: Bool { get }
     var isCreatingAccount: Bool { get }
     var shouldShowErrorMessage: Bool { get set }
@@ -50,8 +55,9 @@ public protocol ManagementViewModel: ObservableObject {
 }
 
 public enum SyncErrorType {
-    case unableToSync
-    case unableToGetDevices
+    case unableToSyncToServer
+    case unableToSyncToOtherDevice
+    case unableToMergeTwoAccounts
     case unableToUpdateDeviceName
     case unableToTurnSyncOff
     case unableToDeleteData
@@ -65,10 +71,12 @@ public enum SyncErrorType {
 
     var description: String {
         switch self {
-        case .unableToSync:
-            return UserText.unableToSyncDescription
-        case .unableToGetDevices:
-            return UserText.unableToGetDevicesDescription
+        case .unableToSyncToServer:
+            return UserText.unableToSyncToServerDescription
+        case .unableToSyncToOtherDevice:
+            return UserText.unableToSyncWithAnotherDeviceDescription
+        case .unableToMergeTwoAccounts:
+            return UserText.unableToMergeTwoAccountsDescription
         case .unableToUpdateDeviceName:
             return UserText.unableToUpdateDeviceNameDescription
         case .unableToTurnSyncOff:

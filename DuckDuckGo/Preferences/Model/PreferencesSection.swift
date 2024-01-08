@@ -19,12 +19,16 @@
 import Foundation
 import SwiftUI
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
 
     @MainActor
-    static func defaultSections(includingDuckPlayer: Bool, includingVPN: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
 #if SUBSCRIPTION
             var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
@@ -34,10 +38,16 @@ struct PreferencesSection: Hashable, Identifiable {
                     panes.insert(.sync, at: generalIndex + 1)
                 }
             }
+
+            if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
+                if let subscriptionIndex = panes.firstIndex(of: .subscription) {
+                    panes.remove(at: subscriptionIndex)
+                }
+            }
 #else
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
 
-            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
+            if includingSync {
                 panes.insert(.sync, at: 1)
             }
 #endif
@@ -92,6 +102,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         self.init(rawValue: path)
     }
 
+    @MainActor
     var displayName: String {
         switch self {
         case .general:
@@ -99,7 +110,9 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
         case .sync:
             let isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
             let isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
-            if isSyncBookmarksPaused || isSyncCredentialsPaused {
+            let syncService = NSApp.delegateTyped.syncService
+            let isDataSyncingDisabled = syncService?.featureFlags.contains(.dataSyncing) == false && syncService?.authState == .active
+            if isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
                 return UserText.sync + " ⚠️"
             }
             return UserText.sync
