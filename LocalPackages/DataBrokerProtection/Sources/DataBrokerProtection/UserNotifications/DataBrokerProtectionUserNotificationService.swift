@@ -184,11 +184,11 @@ private enum UserNotification {
         case .firstScanComplete:
             return "Scan complete!"
         case .firstProfileRemoved:
-            return "Success! A record of your info was removed!"
+            return "A record of your info was removed!"
         case .allInfoRemoved:
             return "All pending info removals complete!"
         case .twoWeeksCheckIn:
-            return "We're making progress on your info removals"
+            return "We're making progress!"
         }
     }
 
