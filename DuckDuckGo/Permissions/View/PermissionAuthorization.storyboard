@@ -154,7 +154,7 @@ Gw
                                             <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="QNh-Lc-wpe">
                                                 <rect key="frame" x="0.0" y="26" width="288" height="5"/>
                                             </box>
-                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="A53-A7-zYD">
+                                            <button translatesAutoresizingMaskIntoConstraints="NO" id="A53-A7-zYD" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="217" height="16"/>
                                                 <buttonCell key="cell" type="recessed" title="Learn more about location services" bezelStyle="recessed" alignment="left" imageScaling="proportionallyDown" inset="2" id="eMd-Hi-dvY">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -213,7 +213,6 @@ Gw
                         <outlet property="domainNameLabel" destination="Qnx-0b-4zc" id="NxM-TF-b10"/>
                         <outlet property="learnMoreBottomConstraint" destination="jON-5j-XdC" id="5go-VL-qbA"/>
                         <outlet property="learnMoreStackView" destination="ar6-d0-ukR" id="9iC-DA-5VW"/>
-                        <outlet property="stackView" destination="DDy-au-YqK" id="HMT-wY-ByF"/>
                     </connections>
                 </viewController>
                 <customObject id="Pct-h6-WSE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
