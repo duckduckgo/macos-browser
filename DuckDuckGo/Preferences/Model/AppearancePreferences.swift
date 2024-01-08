@@ -243,7 +243,7 @@ final class AppearancePreferences: ObservableObject {
 
     @Published var homeButtonPosition: HomeButtonPosition {
         didSet {
-            persistor.homeButtonPosition = homeButtonPosition            
+            persistor.homeButtonPosition = homeButtonPosition
         }
     }
 
