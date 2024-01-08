@@ -29,6 +29,10 @@ extension Pixel.Event {
         case .debug(event: let debugEvent, error: let error):
             var params = error?.pixelParameters ?? [:]
 
+            if let debugParams = debugEvent.parameters {
+                params.merge(debugParams) { (current, _) in current }
+            }
+
             if case let .assertionFailure(message, file, line) = debugEvent {
                 params[PixelKit.Parameters.assertionMessage] = message
                 params[PixelKit.Parameters.assertionFile] = String(file)
@@ -162,6 +166,122 @@ extension Pixel.Event {
              .homeButtonLeft,
              .homeButtonRight,
              .homeButtonHidden:
+            return nil
+        }
+    }
+
+}
+
+extension Pixel.Event.Debug {
+
+    var parameters: [String: String]? {
+        switch self {
+        case .loginItemUpdateError(let loginItemBundleID, let action, let buildType):
+            return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType]
+        case .pixelKitEvent,
+                .assertionFailure,
+                .dbMakeDatabaseError,
+                .dbContainerInitializationError,
+                .dbInitializationError,
+                .dbSaveExcludedHTTPSDomainsError,
+                .dbSaveBloomFilterError,
+                .configurationFetchError,
+                .trackerDataParseFailed,
+                .trackerDataReloadFailed,
+                .trackerDataCouldNotBeLoaded,
+                .privacyConfigurationParseFailed,
+                .privacyConfigurationReloadFailed,
+                .privacyConfigurationCouldNotBeLoaded,
+                .fileStoreWriteFailed,
+                .fileMoveToDownloadsFailed,
+                .fileGetDownloadLocationFailed,
+                .suggestionsFetchFailed,
+                .appOpenURLFailed,
+                .appStateRestorationFailed,
+                .contentBlockingErrorReportingIssue,
+                .contentBlockingCompilationFailed,
+                .contentBlockingCompilationTime,
+                .secureVaultInitError,
+                .secureVaultError,
+                .feedbackReportingFailed,
+                .blankNavigationOnBurnFailed,
+                .historyRemoveFailed,
+                .historyReloadFailed,
+                .historyCleanEntriesFailed,
+                .historyCleanVisitsFailed,
+                .historySaveFailed,
+                .historyInsertVisitFailed,
+                .historyRemoveVisitsFailed,
+                .emailAutofillKeychainError,
+                .bookmarksStoreRootFolderMigrationFailed,
+                .bookmarksStoreFavoritesFolderMigrationFailed,
+                .adAttributionCompilationFailedForAttributedRulesList,
+                .adAttributionGlobalAttributedRulesDoNotExist,
+                .adAttributionDetectionHeuristicsDidNotMatchDomain,
+                .adAttributionLogicUnexpectedStateOnRulesCompiled,
+                .adAttributionLogicUnexpectedStateOnInheritedAttribution,
+                .adAttributionLogicUnexpectedStateOnRulesCompilationFailed,
+                .adAttributionDetectionInvalidDomainInParameter,
+                .adAttributionLogicRequestingAttributionTimedOut,
+                .adAttributionLogicWrongVendorOnSuccessfulCompilation,
+                .adAttributionLogicWrongVendorOnFailedCompilation,
+                .webKitDidTerminate,
+                .removedInvalidBookmarkManagedObjects,
+                .bitwardenNotResponding,
+                .bitwardenRespondedCannotDecrypt,
+                .bitwardenRespondedCannotDecryptUnique,
+                .bitwardenHandshakeFailed,
+                .bitwardenDecryptionOfSharedKeyFailed,
+                .bitwardenStoringOfTheSharedKeyFailed,
+                .bitwardenCredentialRetrievalFailed,
+                .bitwardenCredentialCreationFailed,
+                .bitwardenCredentialUpdateFailed,
+                .bitwardenRespondedWithError,
+                .bitwardenNoActiveVault,
+                .bitwardenParsingFailed,
+                .bitwardenStatusParsingFailed,
+                .bitwardenHmacComparisonFailed,
+                .bitwardenDecryptionFailed,
+                .bitwardenSendingOfMessageFailed,
+                .bitwardenSharedKeyInjectionFailed,
+                .updaterAborted,
+                .userSelectedToSkipUpdate,
+                .userSelectedToInstallUpdate,
+                .userSelectedToDismissUpdate,
+                .faviconDecryptionFailedUnique,
+                .downloadListItemDecryptionFailedUnique,
+                .historyEntryDecryptionFailedUnique,
+                .permissionDecryptionFailedUnique,
+                .missingParent,
+                .bookmarksSaveFailed,
+                .bookmarksSaveFailedOnImport,
+                .bookmarksCouldNotLoadDatabase,
+                .bookmarksCouldNotPrepareDatabase,
+                .bookmarksMigrationAlreadyPerformed,
+                .bookmarksMigrationFailed,
+                .bookmarksMigrationCouldNotPrepareDatabase,
+                .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration,
+                .bookmarksMigrationCouldNotRemoveOldStore,
+                .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders,
+                .syncSentUnauthenticatedRequest,
+                .syncMetadataCouldNotLoadDatabase,
+                .syncBookmarksProviderInitializationFailed,
+                .syncBookmarksFailed,
+                .syncCredentialsProviderInitializationFailed,
+                .syncCredentialsFailed,
+                .syncSettingsFailed,
+                .syncSettingsMetadataUpdateFailed,
+                .bookmarksCleanupFailed,
+                .bookmarksCleanupAttemptedWhileSyncWasEnabled,
+                .favoritesCleanupFailed,
+                .bookmarksFaviconsFetcherStateStoreInitializationFailed,
+                .bookmarksFaviconsFetcherFailed,
+                .credentialsDatabaseCleanupFailed,
+                .credentialsCleanupAttemptedWhileSyncWasEnabled,
+                .invalidPayload,
+                .burnerTabMisplaced,
+                .networkProtectionRemoteMessageFetchingFailed,
+                .networkProtectionRemoteMessageStorageFailed:
             return nil
         }
     }

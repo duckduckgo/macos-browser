@@ -54,8 +54,14 @@ final class LoginItemsManager {
             do {
                 try action(item)()
             } catch let error as NSError {
-                Pixel.fire(.debug(event: .loginItemUpdateError, error: error))
-                logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
+                let event = Pixel.Event.Debug.loginItemUpdateError(
+                    loginItemBundleID: item.agentBundleID,
+                    action: whatAreWeDoing,
+                    buildType: AppVersion.buildType
+                )
+
+                DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)    
+                // logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
             }
         }
     }
