@@ -23,7 +23,7 @@ import Foundation
 class ChromiumFaviconsReaderTests: XCTestCase {
 
     func testReadingFavicons() {
-        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: resourceURL(), source: .chrome)
+        let faviconsReader = ChromiumFaviconsReader(chromiumDataDirectoryURL: resourceURL())
         let favicons = faviconsReader.readFavicons()
 
         guard case let .success(favicons) = favicons else {

@@ -30,7 +30,7 @@ let package = Package(
         .library(name: "XPCHelper", targets: ["XPCHelper"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "98.0.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "0c73655b7faf329d8fa2d1b24d43e9144cf8dfab"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

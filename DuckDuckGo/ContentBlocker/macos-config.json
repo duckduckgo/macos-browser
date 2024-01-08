@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1703003631137,
+    "version": 1703694473333,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -63,6 +63,9 @@
         "ampLinks": {
             "exceptions": [
                 {
+                    "domain": "asana.com"
+                },
+                {
                     "domain": "freecodecamp.org"
                 },
                 {
@@ -110,7 +113,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "5bfae22c5e0cb13c0a25ce80531827ff"
+            "hash": "369b8aac2cb358e0df3a828c1e3b9a29"
         },
         "androidBrowserConfig": {
             "exceptions": [],
@@ -124,6 +127,9 @@
                 },
                 {
                     "domain": "bild.de"
+                },
+                {
+                    "domain": "breitbart.com"
                 },
                 {
                     "domain": "derstandard.de"
@@ -267,7 +273,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "a1060783f1bf56f5cc661b994c9c9e56"
+            "hash": "2c63be0009057e4511dc6f6726251a47"
         },
         "autofill": {
             "exceptions": [
@@ -956,6 +962,9 @@
                     "domain": "ads.google.com"
                 },
                 {
+                    "domain": "soranews24.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -968,7 +977,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "71ad0f38f9ce2bbacae5ff7db05511ec"
+            "hash": "e37447d42ee8194f185e35e40f577f41"
         },
         "cookie": {
             "settings": {
@@ -1008,6 +1017,9 @@
                     "domain": "optout.networkadvertising.org"
                 },
                 {
+                    "domain": "news.ti.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -1021,7 +1033,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "e41dbd0af3841636937030d91bc305b1"
+            "hash": "37a27966915571085613911b47e6e2eb"
         },
         "customUserAgent": {
             "settings": {
@@ -1055,7 +1067,7 @@
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 3
+                                "percent": 10
                             }
                         ]
                     }
@@ -1063,7 +1075,7 @@
             },
             "exceptions": [],
             "minSupportedVersion": "1.68.0",
-            "hash": "784ab72b62adf8b5c07f656f167a28d2"
+            "hash": "04f130fe1e3e088c7859ef6aa4a64e5c"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -1801,6 +1813,18 @@
                         ]
                     },
                     {
+                        "domain": "beverfood.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": ".adsbygoogle",
+                                "type": "override"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "bild.de",
                         "rules": [
                             {
@@ -2502,6 +2526,32 @@
                             {
                                 "selector": ".connatix-player",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".ad-container",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".bottom-right-sticky-container",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".video-container",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".top-ad-recirc",
+                                "type": "modify-style",
+                                "values": [
+                                    {
+                                        "property": "height",
+                                        "value": "auto"
+                                    },
+                                    {
+                                        "property": "min-height",
+                                        "value": "auto"
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -2870,11 +2920,14 @@
                         ]
                     },
                     {
-                        "domain": "orange.fr",
+                        "domain": "oceanofcompressed.xyz",
                         "rules": [
                             {
-                                "selector": ".tag-rm",
-                                "type": "hide-empty"
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": "#sticky-ads",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -2887,6 +2940,15 @@
                             },
                             {
                                 "selector": ".lrec",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "orange.fr",
+                        "rules": [
+                            {
+                                "selector": ".tag-rm",
                                 "type": "hide-empty"
                             }
                         ]
@@ -3202,6 +3264,14 @@
                         ]
                     },
                     {
+                        "domain": "soranews24.com",
+                        "rules": [
+                            {
+                                "type": "disable-default"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "spanishdict.com",
                         "rules": [
                             {
@@ -3316,6 +3386,15 @@
                             {
                                 "selector": "[class*='responsive__NativeAd']",
                                 "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "thewindowsclub.com",
+                        "rules": [
+                            {
+                                "selector": ".adtester-container",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -3702,7 +3781,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "8551081ffe228a4bef49deba3fe37b19"
+            "hash": "815cda75f82d989dd56864bc43f76574"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -3917,6 +3996,9 @@
                     "domain": "hyatt.com"
                 },
                 {
+                    "domain": "proton.me"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -3963,7 +4045,7 @@
                 }
             ],
             "state": "enabled",
-            "hash": "82ebfddf791575ada285a49b7fdc71ca"
+            "hash": "37e16df501e3e68416a13f991b4e4147"
         },
         "fingerprintingScreenSize": {
             "settings": {
@@ -4092,6 +4174,9 @@
                     "domain": "chime.com"
                 },
                 {
+                    "domain": "tirerack.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -4113,7 +4198,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "57800fe9cefcdf8ae18bfcbd0b0fb7a4"
+            "hash": "1a1373bcf16647d63220659fce650a83"
         },
         "harmfulApis": {
             "settings": {
@@ -4393,6 +4478,11 @@
             "state": "disabled",
             "hash": "dede7e70939822f5ecb9eb5fae577fa3"
         },
+        "privacyProtectionsPopup": {
+            "state": "disabled",
+            "exceptions": [],
+            "hash": "c292bb627849854515cebbded288ef5a"
+        },
         "referrer": {
             "exceptions": [
                 {
@@ -4488,9 +4578,23 @@
             "hash": "5e792dd491428702bc0104240fbce0ce"
         },
         "sync": {
+            "state": "internal",
+            "features": {
+                "level0ShowSync": {
+                    "state": "enabled"
+                },
+                "level1AllowDataSyncing": {
+                    "state": "enabled"
+                },
+                "level2AllowSetupFlows": {
+                    "state": "enabled"
+                },
+                "level3AllowCreateAccount": {
+                    "state": "enabled"
+                }
+            },
             "exceptions": [],
-            "state": "disabled",
-            "hash": "728493ef7a1488e4781656d3f9db84aa"
+            "hash": "4e4382e6a69f7cc99222fd924168e80f"
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -4754,6 +4858,12 @@
                                     "wxii12.com",
                                     "wyff4.com"
                                 ]
+                            },
+                            {
+                                "rule": "z-na.amazon-adsystem.com/widgets/onejs",
+                                "domains": [
+                                    "oceanofcompressed.xyz"
+                                ]
                             }
                         ]
                     },
@@ -5005,6 +5115,12 @@
                             },
                             {
                                 "rule": "challenges.cloudflare.com",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -6098,7 +6214,13 @@
                             {
                                 "rule": "api.hubspot.com/livechat-public/v1/message/public",
                                 "domains": [
-                                    "pippintitle.com"
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "js.hubspot.com/web-interactives-embed.js",
+                                "domains": [
+                                    "<all>"
                                 ]
                             },
                             {
@@ -6145,7 +6267,7 @@
                             {
                                 "rule": "cmp.inmobi.com",
                                 "domains": [
-                                    "express.co.uk"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -6403,6 +6525,16 @@
                                 "rule": "survey.medallia.com/",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "media.net": {
+                        "rules": [
+                            {
+                                "rule": "contextual.media.net/dmedianet.js",
+                                "domains": [
+                                    "oceanofcompressed.xyz"
                                 ]
                             }
                         ]
@@ -6865,7 +6997,8 @@
                             {
                                 "rule": "secure.quantserve.com/quant.js",
                                 "domains": [
-                                    "aternos.org"
+                                    "aternos.org",
+                                    "oceanofcompressed.xyz"
                                 ]
                             }
                         ]
@@ -7550,7 +7683,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "b6996e16fe1785f6d75cd6302da1f48e"
+            "hash": "aef10e6a36c19d0d87312466ee852936"
         },
         "trackingCookies1p": {
             "settings": {

@@ -63,41 +63,33 @@ struct SyncWithAnotherDeviceView: View {
 
     fileprivate func pickerView() -> some View {
         return HStack(spacing: 0) {
-            HStack {
-                Image("QR-Icon")
-                Text(UserText.syncWithAnotherDeviceShowCodeButton)
-            }
-            .onTapGesture {
-                selectedSegment = 0
-            }
-            .frame(width: 172, height: 28)
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(selectedSegment == 0 ? Color("BlackWhite10") : .clear, lineWidth: 1)
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(selectedSegment == 0 ? Color("PickerViewSelected") : Color("BlackWhite1"))
-                }
-            )
-            HStack {
-                Image("Keyboard-16D")
-                Text(UserText.syncWithAnotherDeviceEnterCodeButton)
-            }
-            .onTapGesture {
-                selectedSegment = 1
-            }
-            .frame(width: 172, height: 28)
-            .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(selectedSegment == 1 ? Color("BlackWhite10") : .clear, lineWidth: 1)
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(selectedSegment == 1 ? Color("PickerViewSelected")  : Color("BlackWhite1"))
-                }
-            )
+            pickerOptionView(imageName: "QR-Icon", title: UserText.syncWithAnotherDeviceShowCodeButton, tag: 0)
+            pickerOptionView(imageName: "Keyboard-16D", title: UserText.syncWithAnotherDeviceEnterCodeButton, tag: 1)
         }
         .frame(width: 348, height: 32)
         .roundedBorder()
+    }
+
+    @ViewBuilder
+    fileprivate func pickerOptionView(imageName: String, title: String, tag: Int) -> some View {
+        Button {
+            selectedSegment = tag
+        } label: {
+            HStack {
+                Image(imageName)
+                Text(title)
+            }
+            .frame(width: 172, height: 28)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(selectedSegment == tag ? Color("BlackWhite10") : .clear, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(selectedSegment == tag ? Color("PickerViewSelected") : Color("BlackWhite1"))
+                }
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     fileprivate func scanQRCodeView() -> some View {
