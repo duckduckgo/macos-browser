@@ -34,6 +34,7 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     private var previewTimer: Timer?
+    private var hideTimer: Timer?
     private var lastHideTime: Date?
 
     private var isHiding = false
@@ -64,6 +65,9 @@ final class TabPreviewWindowController: NSWindowController {
             self.layout(topLeftPoint: parentWindow.convertPoint(toScreen: topLeftPointInWindow))
         }
 
+        // Invalidate hide timer if it exists
+        hideTimer?.invalidate()
+
         guard let childWindows = parentWindow.childWindows,
               let tabPreviewWindow = self.window else {
             os_log("TabPreviewWindowController: Showing tab preview window failed", type: .error)
@@ -89,27 +93,33 @@ final class TabPreviewWindowController: NSWindowController {
 
     }
 
-    func hide(allowQuickRedisplay: Bool) {
-        func removePreview() -> Bool {
-            guard let window = window, window.isVisible else {
-                return false
+    func hide(allowQuickRedisplay: Bool = false, withDelay delay: Bool = false) {
+        func removePreview(allowQuickRedisplay: Bool) {
+            guard let window = window else {
+                return
             }
             guard let parentWindow = window.parent else {
                 os_log("TabPreviewWindowController: Tab preview window not available", type: .error)
-                return false
+                return
             }
 
             parentWindow.removeChildWindow(window)
             (window).orderOut(nil)
 
-            return true
-        }
-        previewTimer?.invalidate()
-
-        // Hide the preview
-        if removePreview() {
             // Record the hide time
             lastHideTime = allowQuickRedisplay ? Date() : nil
+        }
+
+        previewTimer?.invalidate()
+
+        if delay {
+            // Set up a new timer to hide the preview after 0.25 seconds
+            hideTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: false) { [weak self] _ in
+                removePreview(allowQuickRedisplay: allowQuickRedisplay)
+            }
+        } else {
+            // Hide the preview immediately
+            removePreview(allowQuickRedisplay: allowQuickRedisplay)
         }
     }
 

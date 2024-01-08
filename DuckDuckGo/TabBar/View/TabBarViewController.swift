@@ -989,7 +989,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
                 showTabPreview(for: tabBarViewItem)
             }
         } else {
-            tabPreviewWindowController.hide(allowQuickRedisplay: true)
+            tabPreviewWindowController.hide(allowQuickRedisplay: true, withDelay: true)
         }
     }
 
