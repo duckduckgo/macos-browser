@@ -96,10 +96,14 @@ final class TabPreviewWindowController: NSWindowController {
     func hide(allowQuickRedisplay: Bool = false, withDelay delay: Bool = false) {
         func removePreview(allowQuickRedisplay: Bool) {
             guard let window = window else {
+                lastHideTime = nil
                 return
             }
             guard let parentWindow = window.parent else {
                 os_log("TabPreviewWindowController: Tab preview window not available", type: .error)
+                if !allowQuickRedisplay {
+                    lastHideTime = nil
+                }
                 return
             }
 
@@ -113,8 +117,9 @@ final class TabPreviewWindowController: NSWindowController {
         previewTimer?.invalidate()
 
         if delay {
-            // Set up a new timer to hide the preview after 0.25 seconds
-            hideTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: false) { [weak self] _ in
+            // Set up a new timer to hide the preview after 0.05 seconds
+            // It makes the transition from one preview to another more fluent
+            hideTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: false) { _ in
                 removePreview(allowQuickRedisplay: allowQuickRedisplay)
             }
         } else {
