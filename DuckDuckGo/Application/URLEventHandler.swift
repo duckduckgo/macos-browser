@@ -152,6 +152,8 @@ final class URLEventHandler {
     private static func handleDataBrokerProtectionURL(_ url: URL) {
         switch url {
         case DataBrokerProtectionNotificationCommand.showDashboard.url:
+            NotificationCenter.default.post(name: DataBrokerProtectionNotifications.shouldReloadUI, object: nil)
+
             WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
         default:
             return
