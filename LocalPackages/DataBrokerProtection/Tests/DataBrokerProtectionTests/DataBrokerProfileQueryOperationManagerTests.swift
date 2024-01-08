@@ -44,6 +44,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -65,6 +66,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id for broker")
@@ -85,6 +87,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertEqual(mockDatabase.eventsAdded.first?.type, .scanStarted)
@@ -105,6 +108,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .noMatchFound }))
@@ -128,6 +132,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasUpdateRemoveDateCalled)
@@ -153,6 +158,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
@@ -176,6 +182,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasUpdateRemoveDateCalled)
@@ -199,6 +206,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.wasSaveOptOutOperationCalled)
@@ -221,6 +229,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
@@ -245,6 +254,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutConfirmed }))
@@ -270,6 +280,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
@@ -298,6 +309,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -321,6 +333,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -344,6 +357,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Scan should fail when brokerProfileQueryData has no id profile query")
@@ -367,6 +381,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasDatabaseCalled)
@@ -390,6 +405,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertFalse(mockDatabase.wasDatabaseCalled)
@@ -413,6 +429,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutStarted }))
@@ -435,6 +452,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTAssertTrue(mockDatabase.eventsAdded.contains(where: { $0.type == .optOutRequested }))
@@ -458,6 +476,7 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
                 database: mockDatabase,
                 notificationCenter: .default,
                 pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: MockUserNotification(),
                 shouldRunNextStep: { true }
             )
             XCTFail("Should throw!")
@@ -746,4 +765,13 @@ extension ExtractedProfile {
         ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date)
     }
 }
+
+final class MockUserNotification: DataBrokerProtectionUserNotificationService {
+    func requestNotificationPermission() { }
+    func sendFirstScanCompletedNotification() { }
+    func sendFirstRemovedNotificationIfPossible() { }
+    func sendAllInfoRemovedNotificationIfPossible() { }
+    func scheduleCheckInNotificationIfPossible() { }
+}
+
 // swiftlint:enable type_body_length
