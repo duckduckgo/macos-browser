@@ -131,49 +131,49 @@ final class TabPreviewExtension {
     //TODO: Pass hosting view directly
     //TODO: What to do after restoration?
     func generateNativePreview(from view: NSView) {
-//        guard let hostingView = view.subviews.last?.subviews.first else {
-//            return
-//        }
-//
-//        let originalSize = hostingView.bounds.size
-//        let targetWidth = CGFloat(TabPreviewWindowController.Size.width.rawValue)
-//        let targetHeight = originalSize.height * (targetWidth / originalSize.width) // Preserving aspect ratio
-//
-//        guard let bitmapRep = NSBitmapImageRep(
-//            bitmapDataPlanes: nil,
-//            pixelsWide: Int(originalSize.width),
-//            pixelsHigh: Int(originalSize.height),
-//            bitsPerSample: 8,
-//            samplesPerPixel: 4,
-//            hasAlpha: true,
-//            isPlanar: false,
-//            colorSpaceName: NSColorSpaceName.deviceRGB,
-//            bytesPerRow: 0,
-//            bitsPerPixel: 0) else {
-//            return
-//        }
-//
-//        NSGraphicsContext.saveGraphicsState()
-//        let context = NSGraphicsContext(bitmapImageRep: bitmapRep)
-//        NSGraphicsContext.current = context
-//
-//        if let cgContext = context?.cgContext {
-//            cgContext.translateBy(x: 0, y: originalSize.height)
-//            cgContext.scaleBy(x: 1.0, y: -1.0)
-//            hostingView.layer?.render(in: cgContext)
-//        }
-//
-//        NSGraphicsContext.restoreGraphicsState()
-//
-//        let originalImage = NSImage(size: originalSize)
-//        originalImage.addRepresentation(bitmapRep)
-//
-//        // Resize the image to the target width while preserving the aspect ratio
-//        let resizedImage = NSImage(size: NSSize(width: targetWidth, height: targetHeight))
-//        resizedImage.lockFocus()
-//        originalImage.draw(in: NSRect(x: 0, y: 0, width: targetWidth, height: targetHeight), from: NSRect.zero, operation: .copy, fraction: 1.0)
-//        resizedImage.unlockFocus()
-//        nativePreview = resizedImage
+        guard let hostingView = view.subviews.last?.subviews.first else {
+            return
+        }
+
+        let originalSize = hostingView.bounds.size
+        let targetWidth = CGFloat(TabPreviewWindowController.Size.width.rawValue)
+        let targetHeight = originalSize.height * (targetWidth / originalSize.width) // Preserving aspect ratio
+
+        guard let bitmapRep = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: Int(originalSize.width),
+            pixelsHigh: Int(originalSize.height),
+            bitsPerSample: 8,
+            samplesPerPixel: 4,
+            hasAlpha: true,
+            isPlanar: false,
+            colorSpaceName: NSColorSpaceName.deviceRGB,
+            bytesPerRow: 0,
+            bitsPerPixel: 0) else {
+            return
+        }
+
+        NSGraphicsContext.saveGraphicsState()
+        let context = NSGraphicsContext(bitmapImageRep: bitmapRep)
+        NSGraphicsContext.current = context
+
+        if let cgContext = context?.cgContext {
+            cgContext.translateBy(x: 0, y: originalSize.height)
+            cgContext.scaleBy(x: 1.0, y: -1.0)
+            hostingView.layer?.render(in: cgContext)
+        }
+
+        NSGraphicsContext.restoreGraphicsState()
+
+        let originalImage = NSImage(size: originalSize)
+        originalImage.addRepresentation(bitmapRep)
+
+        // Resize the image to the target width while preserving the aspect ratio
+        let resizedImage = NSImage(size: NSSize(width: targetWidth, height: targetHeight))
+        resizedImage.lockFocus()
+        originalImage.draw(in: NSRect(x: 0, y: 0, width: targetWidth, height: targetHeight), from: NSRect.zero, operation: .copy, fraction: 1.0)
+        resizedImage.unlockFocus()
+        nativePreview = resizedImage
     }
 
 }

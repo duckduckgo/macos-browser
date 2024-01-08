@@ -99,8 +99,8 @@ final class TabPreviewWindowController: NSWindowController {
                 lastHideTime = nil
                 return
             }
+
             guard let parentWindow = window.parent else {
-                os_log("TabPreviewWindowController: Tab preview window not available", type: .error)
                 if !allowQuickRedisplay {
                     lastHideTime = nil
                 }
@@ -130,7 +130,6 @@ final class TabPreviewWindowController: NSWindowController {
 
     private func layout(topLeftPoint: NSPoint) {
         guard let window = window else {
-            os_log("TabBarCollectionView: Tab preview window not available", type: .error)
             return
         }
 
