@@ -19,6 +19,10 @@
 import Foundation
 import SwiftUI
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
@@ -32,6 +36,12 @@ struct PreferencesSection: Hashable, Identifiable {
             if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 if let generalIndex = panes.firstIndex(of: .general) {
                     panes.insert(.sync, at: generalIndex + 1)
+                }
+            }
+
+            if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
+                if let subscriptionIndex = panes.firstIndex(of: .subscription) {
+                    panes.remove(at: subscriptionIndex)
                 }
             }
 #else

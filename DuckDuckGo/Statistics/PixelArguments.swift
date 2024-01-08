@@ -117,7 +117,7 @@ extension DataImportAction: CustomStringConvertible {
     var description: String {
         switch self {
         case .bookmarks: return "bookmarks"
-        case .logins: return "logins"
+        case .passwords: return "logins"
         case .favicons: return "favicons"
         case .generic: return "generic"
         }
@@ -129,7 +129,10 @@ extension DataImport.Source: CustomStringConvertible {
         switch self {
         case .brave: return "source-brave"
         case .chrome: return "source-chrome"
+        case .chromium: return "source-chromium"
+        case .coccoc: return "source-coccoc"
         case .csv: return "source-csv"
+        case .bitwarden: return "source-bitwarden"
         case .lastPass: return "source-lastpass"
         case .onePassword7: return "source-1password"
         case .onePassword8: return "source-1password-8"
@@ -138,6 +141,11 @@ extension DataImport.Source: CustomStringConvertible {
         case .safari: return "source-safari"
         case .safariTechnologyPreview: return "source-safari-technology-preview"
         case .bookmarksHTML: return "source-bookmarks-html"
+        case .opera: return "source-opera"
+        case .operaGX: return "source-operagx"
+        case .tor: return "source-tor"
+        case .vivaldi: return "source-vivaldi"
+        case .yandex: return "source-yandex"
         }
     }
 }

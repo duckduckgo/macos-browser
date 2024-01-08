@@ -55,8 +55,9 @@ public protocol ManagementViewModel: ObservableObject {
 }
 
 public enum SyncErrorType {
-    case unableToSync
-    case unableToGetDevices
+    case unableToSyncToServer
+    case unableToSyncToOtherDevice
+    case unableToMergeTwoAccounts
     case unableToUpdateDeviceName
     case unableToTurnSyncOff
     case unableToDeleteData
@@ -70,10 +71,12 @@ public enum SyncErrorType {
 
     var description: String {
         switch self {
-        case .unableToSync:
-            return UserText.unableToSyncDescription
-        case .unableToGetDevices:
-            return UserText.unableToGetDevicesDescription
+        case .unableToSyncToServer:
+            return UserText.unableToSyncToServerDescription
+        case .unableToSyncToOtherDevice:
+            return UserText.unableToSyncWithAnotherDeviceDescription
+        case .unableToMergeTwoAccounts:
+            return UserText.unableToMergeTwoAccountsDescription
         case .unableToUpdateDeviceName:
             return UserText.unableToUpdateDeviceNameDescription
         case .unableToTurnSyncOff:

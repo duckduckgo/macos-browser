@@ -101,10 +101,15 @@ extension Pixel {
 
         case dailyOsVersionCounter
 
-        case dataImportFailed(any DataImportError)
+        case dataImportFailed(source: DataImport.Source, sourceVersion: String?, error: any DataImportError)
 
         case formAutofilled(kind: FormAutofillKind)
         case autofillItemSaved(kind: FormAutofillKind)
+
+        case autofillLoginsSaveLoginModalExcludeSiteConfirmed
+        case autofillLoginsSettingsResetExcludedDisplayed
+        case autofillLoginsSettingsResetExcludedConfirmed
+        case autofillLoginsSettingsResetExcludedDismissed
 
         case bitwardenPasswordAutofilled
         case bitwardenPasswordSaved
@@ -348,7 +353,7 @@ extension Pixel {
             case networkProtectionRemoteMessageFetchingFailed
             case networkProtectionRemoteMessageStorageFailed
 
-            case loginItemUpdateError
+            case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
         }
 
     }
@@ -376,16 +381,25 @@ extension Pixel.Event {
         case .dailyOsVersionCounter:
             return "m_mac_daily-os-version-counter"
 
-        case .dataImportFailed(let error) where error.action == .favicons:
-            return "m_mac_favicon-import-failed_\(error.source)"
-        case .dataImportFailed(let error):
-            return "m_mac_data-import-failed_\(error.action)_\(error.source)"
+        case .dataImportFailed(source: let source, sourceVersion: _, error: let error) where error.action == .favicons:
+            return "m_mac_favicon-import-failed_\(source)"
+        case .dataImportFailed(source: let source, sourceVersion: _, error: let error):
+            return "m_mac_data-import-failed_\(error.action)_\(source)"
 
         case .formAutofilled(kind: let kind):
             return "m_mac_autofill_\(kind)"
 
         case .autofillItemSaved(kind: let kind):
             return "m_mac_save_\(kind)"
+
+        case .autofillLoginsSaveLoginModalExcludeSiteConfirmed:
+            return "m_mac_autofill_logins_save_login_exclude_site_confirmed"
+        case .autofillLoginsSettingsResetExcludedDisplayed:
+            return "m_mac_autofill_settings_reset_excluded_displayed"
+        case .autofillLoginsSettingsResetExcludedConfirmed:
+            return "m_mac_autofill_settings_reset_excluded_confirmed"
+        case .autofillLoginsSettingsResetExcludedDismissed:
+            return "m_mac_autofill_settings_reset_excluded_dismissed"
 
         case .bitwardenPasswordAutofilled:
             return "m_mac_bitwarden_autofill_password"

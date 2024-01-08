@@ -243,6 +243,16 @@ public enum DataBrokerProtectionPixels {
     case disableLoginItem
     case resetLoginItem
 
+    // DataBrokerProtection User Notifications
+    case dataBrokerProtectionNotificationSentFirstScanComplete
+    case dataBrokerProtectionNotificationOpenedFirstScanComplete
+    case dataBrokerProtectionNotificationSentFirstRemoval
+    case dataBrokerProtectionNotificationOpenedFirstRemoval
+    case dataBrokerProtectionNotificationScheduled2WeeksCheckIn
+    case dataBrokerProtectionNotificationOpened2WeeksCheckIn
+    case dataBrokerProtectionNotificationSentAllRecordsRemoved
+    case dataBrokerProtectionNotificationOpenedAllRecordsRemoved
+
     // Scan/Search pixels
     case scanSuccess(dataBroker: String, matchesFound: Int, duration: Double, tries: Int)
     case scanFailed(dataBroker: String, duration: Double, tries: Int)
@@ -253,32 +263,32 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
     public var name: String {
         switch self {
-        case .parentChildMatches: return "dbp_macos_parent-child-broker-matches"
+        case .parentChildMatches: return "m_mac_dbp_macos_parent-child-broker-matches"
             // SLO and SLI Pixels: https://app.asana.com/0/1203581873609357/1205337273100857/f
             // Stage Pixels
-        case .optOutStart: return "dbp_macos_optout_stage_start"
-        case .optOutEmailGenerate: return "dbp_macos_optout_stage_email-generate"
-        case .optOutCaptchaParse: return "dbp_macos_optout_stage_captcha-parse"
-        case .optOutCaptchaSend: return "dbp_macos_optout_stage_captcha-send"
-        case .optOutCaptchaSolve: return "dbp_macos_optout_stage_captcha-solve"
-        case .optOutSubmit: return "dbp_macos_optout_stage_submit"
-        case .optOutEmailReceive: return "dbp_macos_optout_stage_email-receive"
-        case .optOutEmailConfirm: return "dbp_macos_optout_stage_email-confirm"
-        case .optOutValidate: return "dbp_macos_optout_stage_validate"
-        case .optOutFinish: return "dbp_macos_optout_stage_finish"
+        case .optOutStart: return "m_mac_dbp_macos_optout_stage_start"
+        case .optOutEmailGenerate: return "m_mac_dbp_macos_optout_stage_email-generate"
+        case .optOutCaptchaParse: return "m_mac_dbp_macos_optout_stage_captcha-parse"
+        case .optOutCaptchaSend: return "m_mac_dbp_macos_optout_stage_captcha-send"
+        case .optOutCaptchaSolve: return "m_mac_dbp_macos_optout_stage_captcha-solve"
+        case .optOutSubmit: return "m_mac_dbp_macos_optout_stage_submit"
+        case .optOutEmailReceive: return "m_mac_dbp_macos_optout_stage_email-receive"
+        case .optOutEmailConfirm: return "m_mac_dbp_macos_optout_stage_email-confirm"
+        case .optOutValidate: return "m_mac_dbp_macos_optout_stage_validate"
+        case .optOutFinish: return "m_mac_dbp_macos_optout_stage_finish"
 
             // Process Pixels
-        case .optOutSubmitSuccess: return "dbp_macos_optout_process_submit-success"
-        case .optOutSuccess: return "dbp_macos_optout_process_success"
-        case .optOutFailure: return "dbp_macos_optout_process_failure"
+        case .optOutSubmitSuccess: return "m_mac_dbp_macos_optout_process_submit-success"
+        case .optOutSuccess: return "m_mac_dbp_macos_optout_process_success"
+        case .optOutFailure: return "m_mac_dbp_macos_optout_process_failure"
 
             // Scan/Search pixels: https://app.asana.com/0/1203581873609357/1205337273100855/f
-        case .scanSuccess: return "dbp_macos_search_stage_main_status_success"
-        case .scanFailed: return "dbp_macos_search_stage_main_status_failure"
-        case .scanError: return "dbp_macos_search_stage_main_status_error"
+        case .scanSuccess: return "m_mac_dbp_macos_search_stage_main_status_success"
+        case .scanFailed: return "m_mac_dbp_macos_search_stage_main_status_failure"
+        case .scanError: return "m_mac_dbp_macos_search_stage_main_status_error"
 
             // Debug Pixels
-        case .error: return "data_broker_error"
+        case .error: return "m_mac_data_broker_error"
 
         case .backgroundAgentStarted: return "m_mac_dbp_background-agent_started"
         case .backgroundAgentStartedStoppingDueToAnotherInstanceRunning: return "m_mac_dbp_background-agent_started_stopping-due-to-another-instance-running"
@@ -302,6 +312,24 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
         case .restartLoginItem: return "m_mac_dbp_login-item_restart"
         case .disableLoginItem: return "m_mac_dbp_login-item_disable"
         case .resetLoginItem: return "m_mac_dbp_login-item_reset"
+
+        // User Notifications
+        case .dataBrokerProtectionNotificationSentFirstScanComplete:
+            return "m_mac_dbp_notification_sent_first_scan_complete"
+        case .dataBrokerProtectionNotificationOpenedFirstScanComplete:
+            return "m_mac_dbp_notification_opened_first_scan_complete"
+        case .dataBrokerProtectionNotificationSentFirstRemoval:
+            return "m_mac_dbp_notification_sent_first_removal"
+        case .dataBrokerProtectionNotificationOpenedFirstRemoval:
+            return "m_mac_dbp_notification_opened_first_removal"
+        case .dataBrokerProtectionNotificationScheduled2WeeksCheckIn:
+            return "m_mac_dbp_notification_scheduled_2_weeks_check_in"
+        case .dataBrokerProtectionNotificationOpened2WeeksCheckIn:
+            return "m_mac_dbp_notification_opened_2_weeks_check_in"
+        case .dataBrokerProtectionNotificationSentAllRecordsRemoved:
+            return "m_mac_dbp_notification_sent_all_records_removed"
+        case .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
+            return "m_mac_dbp_notification_opened_all_records_removed"
         }
     }
 
@@ -356,7 +384,15 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
                 .enableLoginItem,
                 .restartLoginItem,
                 .disableLoginItem,
-                .resetLoginItem:
+                .resetLoginItem,
+                .dataBrokerProtectionNotificationSentFirstScanComplete,
+                .dataBrokerProtectionNotificationOpenedFirstScanComplete,
+                .dataBrokerProtectionNotificationSentFirstRemoval,
+                .dataBrokerProtectionNotificationOpenedFirstRemoval,
+                .dataBrokerProtectionNotificationScheduled2WeeksCheckIn,
+                .dataBrokerProtectionNotificationOpened2WeeksCheckIn,
+                .dataBrokerProtectionNotificationSentAllRecordsRemoved,
+                .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
             return [:]
         case .ipcServerRegister,
                 .ipcServerStartScheduler,
@@ -381,6 +417,7 @@ extension DataBrokerProtectionPixels: PixelKitEvent {
 
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
+    // swiftlint:disable:next function_body_length
     public init() {
         super.init { event, _, _, _ in
             switch event {
@@ -422,7 +459,16 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
-                    .scanError:
+                    .scanError,
+                    .dataBrokerProtectionNotificationSentFirstScanComplete,
+                    .dataBrokerProtectionNotificationOpenedFirstScanComplete,
+                    .dataBrokerProtectionNotificationSentFirstRemoval,
+                    .dataBrokerProtectionNotificationOpenedFirstRemoval,
+                    .dataBrokerProtectionNotificationScheduled2WeeksCheckIn,
+                    .dataBrokerProtectionNotificationOpened2WeeksCheckIn,
+                    .dataBrokerProtectionNotificationSentAllRecordsRemoved,
+                    .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
+
                 PixelKit.fire(event)
             }
         }

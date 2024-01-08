@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Foundation
 import PixelKit
 
 extension Pixel.Event {
@@ -26,8 +27,11 @@ extension Pixel.Event {
             return event.parameters
 
         case .debug(event: let debugEvent, error: let error):
-
             var params = error?.pixelParameters ?? [:]
+
+            if let debugParams = debugEvent.parameters {
+                params.merge(debugParams) { (current, _) in current }
+            }
 
             if case let .assertionFailure(message, file, line) = debugEvent {
                 params[PixelKit.Parameters.assertionMessage] = message
@@ -37,8 +41,13 @@ extension Pixel.Event {
 
             return params
 
-        case .dataImportFailed(let error):
-            return error.pixelParameters
+        case .dataImportFailed(source: _, sourceVersion: let version, error: let error):
+            var params = error.pixelParameters
+
+            if let version {
+                params[PixelKit.Parameters.sourceBrowserVersion] = version
+            }
+            return params
 
         case .launchInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
@@ -93,6 +102,10 @@ extension Pixel.Event {
              .serp,
              .formAutofilled,
              .autofillItemSaved,
+             .autofillLoginsSaveLoginModalExcludeSiteConfirmed,
+             .autofillLoginsSettingsResetExcludedDisplayed,
+             .autofillLoginsSettingsResetExcludedConfirmed,
+             .autofillLoginsSettingsResetExcludedDismissed,
              .bitwardenPasswordAutofilled,
              .bitwardenPasswordSaved,
              .ampBlockingRulesCompilationFailed,
@@ -153,6 +166,122 @@ extension Pixel.Event {
              .homeButtonLeft,
              .homeButtonRight,
              .homeButtonHidden:
+            return nil
+        }
+    }
+
+}
+
+extension Pixel.Event.Debug {
+
+    var parameters: [String: String]? {
+        switch self {
+        case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
+            return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
+        case .pixelKitEvent,
+                .assertionFailure,
+                .dbMakeDatabaseError,
+                .dbContainerInitializationError,
+                .dbInitializationError,
+                .dbSaveExcludedHTTPSDomainsError,
+                .dbSaveBloomFilterError,
+                .configurationFetchError,
+                .trackerDataParseFailed,
+                .trackerDataReloadFailed,
+                .trackerDataCouldNotBeLoaded,
+                .privacyConfigurationParseFailed,
+                .privacyConfigurationReloadFailed,
+                .privacyConfigurationCouldNotBeLoaded,
+                .fileStoreWriteFailed,
+                .fileMoveToDownloadsFailed,
+                .fileGetDownloadLocationFailed,
+                .suggestionsFetchFailed,
+                .appOpenURLFailed,
+                .appStateRestorationFailed,
+                .contentBlockingErrorReportingIssue,
+                .contentBlockingCompilationFailed,
+                .contentBlockingCompilationTime,
+                .secureVaultInitError,
+                .secureVaultError,
+                .feedbackReportingFailed,
+                .blankNavigationOnBurnFailed,
+                .historyRemoveFailed,
+                .historyReloadFailed,
+                .historyCleanEntriesFailed,
+                .historyCleanVisitsFailed,
+                .historySaveFailed,
+                .historyInsertVisitFailed,
+                .historyRemoveVisitsFailed,
+                .emailAutofillKeychainError,
+                .bookmarksStoreRootFolderMigrationFailed,
+                .bookmarksStoreFavoritesFolderMigrationFailed,
+                .adAttributionCompilationFailedForAttributedRulesList,
+                .adAttributionGlobalAttributedRulesDoNotExist,
+                .adAttributionDetectionHeuristicsDidNotMatchDomain,
+                .adAttributionLogicUnexpectedStateOnRulesCompiled,
+                .adAttributionLogicUnexpectedStateOnInheritedAttribution,
+                .adAttributionLogicUnexpectedStateOnRulesCompilationFailed,
+                .adAttributionDetectionInvalidDomainInParameter,
+                .adAttributionLogicRequestingAttributionTimedOut,
+                .adAttributionLogicWrongVendorOnSuccessfulCompilation,
+                .adAttributionLogicWrongVendorOnFailedCompilation,
+                .webKitDidTerminate,
+                .removedInvalidBookmarkManagedObjects,
+                .bitwardenNotResponding,
+                .bitwardenRespondedCannotDecrypt,
+                .bitwardenRespondedCannotDecryptUnique,
+                .bitwardenHandshakeFailed,
+                .bitwardenDecryptionOfSharedKeyFailed,
+                .bitwardenStoringOfTheSharedKeyFailed,
+                .bitwardenCredentialRetrievalFailed,
+                .bitwardenCredentialCreationFailed,
+                .bitwardenCredentialUpdateFailed,
+                .bitwardenRespondedWithError,
+                .bitwardenNoActiveVault,
+                .bitwardenParsingFailed,
+                .bitwardenStatusParsingFailed,
+                .bitwardenHmacComparisonFailed,
+                .bitwardenDecryptionFailed,
+                .bitwardenSendingOfMessageFailed,
+                .bitwardenSharedKeyInjectionFailed,
+                .updaterAborted,
+                .userSelectedToSkipUpdate,
+                .userSelectedToInstallUpdate,
+                .userSelectedToDismissUpdate,
+                .faviconDecryptionFailedUnique,
+                .downloadListItemDecryptionFailedUnique,
+                .historyEntryDecryptionFailedUnique,
+                .permissionDecryptionFailedUnique,
+                .missingParent,
+                .bookmarksSaveFailed,
+                .bookmarksSaveFailedOnImport,
+                .bookmarksCouldNotLoadDatabase,
+                .bookmarksCouldNotPrepareDatabase,
+                .bookmarksMigrationAlreadyPerformed,
+                .bookmarksMigrationFailed,
+                .bookmarksMigrationCouldNotPrepareDatabase,
+                .bookmarksMigrationCouldNotPrepareDatabaseOnFailedMigration,
+                .bookmarksMigrationCouldNotRemoveOldStore,
+                .bookmarksMigrationCouldNotPrepareMultipleFavoriteFolders,
+                .syncSentUnauthenticatedRequest,
+                .syncMetadataCouldNotLoadDatabase,
+                .syncBookmarksProviderInitializationFailed,
+                .syncBookmarksFailed,
+                .syncCredentialsProviderInitializationFailed,
+                .syncCredentialsFailed,
+                .syncSettingsFailed,
+                .syncSettingsMetadataUpdateFailed,
+                .bookmarksCleanupFailed,
+                .bookmarksCleanupAttemptedWhileSyncWasEnabled,
+                .favoritesCleanupFailed,
+                .bookmarksFaviconsFetcherStateStoreInitializationFailed,
+                .bookmarksFaviconsFetcherFailed,
+                .credentialsDatabaseCleanupFailed,
+                .credentialsCleanupAttemptedWhileSyncWasEnabled,
+                .invalidPayload,
+                .burnerTabMisplaced,
+                .networkProtectionRemoteMessageFetchingFailed,
+                .networkProtectionRemoteMessageStorageFailed:
             return nil
         }
     }

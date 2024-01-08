@@ -70,7 +70,7 @@ extension EventMapping where Event == NetworkProtectionError {
                 .wireGuardDnsResolution,
                 .wireGuardSetNetworkSettings,
                 .startWireGuardBackend,
-                // Needs Privacy triage for macOS Geoswitching pixels
+                .failedToRetrieveAuthToken,
                 .failedToFetchLocationList,
                 .failedToParseLocationListResponse:
             domainEvent = .networkProtectionUnhandledError(function: #function, line: #line, error: event)
