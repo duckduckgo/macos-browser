@@ -176,8 +176,8 @@ extension Pixel.Event.Debug {
 
     var parameters: [String: String]? {
         switch self {
-        case .loginItemUpdateError(let loginItemBundleID, let action, let buildType):
-            return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType]
+        case .loginItemUpdateError(let loginItemBundleID, let action, let buildType, let osVersion):
+            return ["loginItemBundleID": loginItemBundleID, "action": action, "buildType": buildType, "macosVersion": osVersion]
         case .pixelKitEvent,
                 .assertionFailure,
                 .dbMakeDatabaseError,

@@ -21,7 +21,7 @@ import Common
 
 extension AppVersion {
 
-    static var buildType: String {
+    var buildType: String {
 #if APPSTORE
         return "appstore"
 #else

@@ -159,7 +159,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     }
 
     private func collectDeviceInfoMetadata() -> VPNMetadata.DeviceInfo {
-        let buildFlavor = AppVersion.buildType
+        let buildFlavor = AppVersion.shared.buildType
         let osVersion = AppVersion.shared.osVersion
         let lowPowerModeEnabled: Bool
 

@@ -57,7 +57,8 @@ final class LoginItemsManager {
                 let event = Pixel.Event.Debug.loginItemUpdateError(
                     loginItemBundleID: item.agentBundleID,
                     action: whatAreWeDoing,
-                    buildType: AppVersion.buildType
+                    buildType: AppVersion.shared.buildType,
+                    osVersion: AppVersion.shared.osVersion
                 )
 
                 DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
