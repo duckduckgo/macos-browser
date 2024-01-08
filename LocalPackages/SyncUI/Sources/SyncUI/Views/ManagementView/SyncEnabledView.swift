@@ -57,7 +57,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 .font(Const.Fonts.preferencePaneSectionHeader)
                 .padding(.horizontal, 16)
             Toggle(isOn: $model.isFaviconsFetchingEnabled) {
-                HStack(alignment: .center) {
+                HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(UserText.fetchFaviconsOptionTitle)
                         Text(UserText.fetchFaviconsOptionCaption)
@@ -74,7 +74,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
             .roundedBorder()
             .frame(width: 513, alignment: .topLeading)
             Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                HStack(alignment: .center) {
+                HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(UserText.shareFavoritesOptionTitle)
                         Text(UserText.shareFavoritesOptionCaption)
