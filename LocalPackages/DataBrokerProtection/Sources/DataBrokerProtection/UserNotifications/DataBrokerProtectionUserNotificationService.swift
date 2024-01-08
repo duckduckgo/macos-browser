@@ -41,7 +41,7 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
     private let userNotificationCenter: UNUserNotificationCenter
-    private let areNotificationsEnabled = false
+    private let areNotificationsEnabled = true
 
     public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 userDefaults: UserDefaults = .standard,
