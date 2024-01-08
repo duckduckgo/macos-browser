@@ -125,7 +125,7 @@ final class URLEventHandler {
 #endif
     }
 
-#if NETWORK_PROTECTION || DBP
+#if NETWORK_PROTECTION
 
     /// Handles NetP URLs
     ///
