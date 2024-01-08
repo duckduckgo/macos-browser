@@ -41,6 +41,7 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
     private let userNotificationCenter: UNUserNotificationCenter
+    private let areNotificationsEnabled = false
 
     public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 userDefaults: UserDefaults = .standard,
@@ -55,6 +56,8 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     }
 
     public func requestNotificationPermission() {
+        guard areNotificationsEnabled else { return }
+
         userNotificationCenter.requestAuthorization(options: [.alert]) { _, _ in }
     }
 
@@ -94,11 +97,15 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     }
 
     public func sendFirstScanCompletedNotification() {
+        guard areNotificationsEnabled else { return }
+
         sendNotification(.firstScanComplete)
         pixelHandler.fire(.dataBrokerProtectionNotificationSentFirstScanComplete)
     }
 
     public func sendFirstRemovedNotificationIfPossible() {
+        guard areNotificationsEnabled else { return }
+
         if userDefaults[.didSendFirstRemovedNotification] != true {
             sendNotification(.firstProfileRemoved)
             userDefaults[.didSendFirstRemovedNotification]  = true
@@ -108,6 +115,8 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     }
 
     public func sendAllInfoRemovedNotificationIfPossible() {
+        guard areNotificationsEnabled else { return }
+
         if userDefaults[.didSendAllInfoRemovedNotification] != true {
             sendNotification(.allInfoRemoved)
             userDefaults[.didSendAllInfoRemovedNotification]  = true
@@ -117,6 +126,8 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     }
 
     public func scheduleCheckInNotificationIfPossible() {
+        guard areNotificationsEnabled else { return }
+
         if userDefaults[.didSendCheckedInNotification] != true {
             sendNotification(.twoWeeksCheckIn, afterDays: 14)
             userDefaults[.didSendCheckedInNotification]  = true
