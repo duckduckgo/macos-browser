@@ -254,7 +254,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
         )
 
         let presentableMessages = messaging.presentableRemoteMessages()
-        // XCTAssertEqual(presentableMessages, [])
+        XCTAssertEqual(presentableMessages, [])
     }
 
     func testWhenStoredMessagesExist_AndSomeMessagesRequireNetPUsage_ThenPresentableMessagesDoNotIncludeInvalidMessages() {
