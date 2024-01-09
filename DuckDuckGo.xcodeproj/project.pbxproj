@@ -7141,6 +7141,8 @@
 		AAB549DD25DAB8E90058460B /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				B69A14F12B4D6FE800B9417D /* AddBookmarkFolderPopoverViewModel.swift */,
+				B69A14F52B4D701F00B9417D /* AddBookmarkPopoverViewModel.swift */,
 				AAB549DE25DAB8F80058460B /* BookmarkViewModel.swift */,
 				B6F9BDD72B45B7D900677B33 /* AddBookmarkModalViewModel.swift */,
 				B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */,
@@ -7241,8 +7243,6 @@
 		AAC5E4C225D6A6C7007F5990 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				B69A14F12B4D6FE800B9417D /* AddBookmarkFolderPopoverViewModel.swift */,
-				B69A14F52B4D701F00B9417D /* AddBookmarkPopoverViewModel.swift */,
 				4B9292D82667124B00AD2C21 /* BookmarkListTreeControllerDataSource.swift */,
 				4B92929926670D2A00AD2C21 /* BookmarkManagedObject.swift */,
 				4B92929326670D2A00AD2C21 /* BookmarkNode.swift */,

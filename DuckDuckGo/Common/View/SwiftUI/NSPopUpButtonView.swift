@@ -122,7 +122,6 @@ struct NSPopUpButtonView<SelectionValue: Equatable>: NSViewRepresentable {
                 assertionFailure()
                 return
             }
-
             // swiftlint:disable:next force_cast
             parent.selection = selectedItem.representedObject as! SelectionValue
         }
