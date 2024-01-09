@@ -108,6 +108,14 @@ final class PrivacyDashboardViewController: NSViewController {
         webView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0).isActive = true
         webView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
         webView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+
+#if DEBUG
+        if #available(macOS 13.3, *) {
+            webView.isInspectable = true
+        } else {
+            // Fallback on earlier versions
+        }
+#endif
     }
 
     public func isPendingUpdates() -> Bool {
