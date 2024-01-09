@@ -22,7 +22,6 @@ final class TabPreviewViewController: NSViewController {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var urlTextField: NSTextField!
-    @IBOutlet weak var faviconImageView: NSImageView!
     @IBOutlet weak var screenshotImageView: NSImageView!
     @IBOutlet weak var screenshotImageViewHeightConstraint: NSLayoutConstraint!
 
@@ -52,7 +51,6 @@ extension TabPreviewViewController {
         } else {
             urlTextField.stringValue = tabViewModel.addressBarString
         }
-        faviconImageView.image = tabViewModel.favicon
 
         if !isSelected, let preview = tabViewModel.tab.tabPreview {
             screenshotImageView.image = tabViewModel.tab.tabPreview
