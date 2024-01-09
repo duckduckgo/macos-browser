@@ -41,10 +41,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
-    private var bookmarkPopover: BookmarkPopover?
-    private func bookmarkPopoverCreatingIfNeeded() -> BookmarkPopover {
+    private var bookmarkPopover: AddBookmarkPopover?
+    private func bookmarkPopoverCreatingIfNeeded() -> AddBookmarkPopover {
         return bookmarkPopover ?? {
-            let popover = BookmarkPopover()
+            let popover = AddBookmarkPopover()
             popover.delegate = self
             self.bookmarkPopover = popover
             return popover
