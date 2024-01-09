@@ -196,6 +196,7 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        bookmarkButton.sendAction(on: .leftMouseDown)
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
     }
