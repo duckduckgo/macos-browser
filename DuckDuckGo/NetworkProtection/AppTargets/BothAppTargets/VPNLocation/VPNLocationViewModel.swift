@@ -77,7 +77,9 @@ final class VPNLocationViewModel: ObservableObject {
 
     @MainActor
     private func reloadList() async {
-        guard let list = try? await locationListRepository.fetchLocationList() else { return }
+        guard let list = try? await locationListRepository.fetchLocationList().sorted(by: { lhs, rhs in
+            lhs.country.localizedLocationFromCountryCode < rhs.country.localizedLocationFromCountryCode
+        }) else { return }
         let isNearestSelected = selectedLocation == .nearest
         var isCurrentItemFirstItem = true
 
@@ -184,6 +186,12 @@ extension VPNLocationViewModel {
             locationListRepository: locationListRepository,
             settings: VPNSettings(defaults: .netP)
         )
+    }
+}
+
+private extension String {
+    var localizedLocationFromCountryCode: String {
+        Locale.current.localizedString(forRegionCode: self) ?? ""
     }
 }
 
