@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -9,7 +9,7 @@
         <!--Bookmarks-->
         <scene sceneID="q4A-kX-Gcw">
             <objects>
-                <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <splitViewController title="Bookmarks" storyboardIdentifier="BookmarkManagementSplitViewController" id="cTg-Rr-Tjp" customClass="BookmarkManagementSplitViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
                         <splitViewItem holdingPriority="255" behavior="contentList" id="Gzb-7F-4E7"/>
                         <splitViewItem id="Z59-qq-Yho"/>
@@ -39,12 +39,12 @@
         <!--Bookmark Management Sidebar View Controller-->
         <scene sceneID="kSB-yp-ZWy">
             <objects>
-                <viewController id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="cOb-MX-4XZ" customClass="BookmarkManagementSidebarViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="oQD-6b-AhT">
                         <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eJ4-cO-2QO" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="eJ4-cO-2QO" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="258" height="500"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -58,7 +58,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="234" height="410"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="28" viewBased="YES" indentationPerLevel="13" outlineTableColumn="Eur-dh-ZOY" id="dHL-py-g9k" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="234" height="410"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
@@ -145,12 +145,12 @@
         <!--Bookmark Management Detail View Controller-->
         <scene sceneID="6Fs-Ad-ECj">
             <objects>
-                <viewController id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="nlv-9S-Ioa" customClass="BookmarkManagementDetailViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="0G1-O6-fPI">
                         <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="pWh-Hk-YzZ" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="pWh-Hk-YzZ" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="676" height="629"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -210,7 +210,7 @@
                                 </connections>
                             </scrollView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I9P-t9-o4Y">
-                                <rect key="frame" x="226" y="187" width="224" height="218"/>
+                                <rect key="frame" x="226" y="186" width="224" height="218"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="mrh-3F-46f">
                                         <rect key="frame" x="48" y="122" width="128" height="96"/>
@@ -266,7 +266,7 @@
                                     <constraint firstItem="LTY-g7-MLc" firstAttribute="top" secondItem="mrh-3F-46f" secondAttribute="bottom" constant="8" id="xB2-zS-Uxz"/>
                                 </constraints>
                             </customView>
-                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nQu-I8-OqK" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="194" y="573" width="110" height="24"/>
                                 <buttonCell key="cell" type="square" title="  New Folder" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="leading" alignment="center" inset="2" id="luj-VO-HpO">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -292,7 +292,7 @@
                                     <action selector="presentAddFolderModal:" target="nlv-9S-Ioa" id="Dv0-j9-4ha"/>
                                 </connections>
                             </button>
-                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                            <button imageHugsTitle="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="96h-Ck-yux" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="48" y="573" width="130" height="24"/>
                                 <buttonCell key="cell" type="square" title="  New Bookmark" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="leading" alignment="center" inset="2" id="hNH-Va-fKg">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -323,16 +323,16 @@
                             <constraint firstItem="96h-Ck-yux" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="48" id="0ct-US-dZ7"/>
                             <constraint firstAttribute="trailing" secondItem="mTh-HU-7C9" secondAttribute="trailing" constant="48" id="72i-pd-gJ1"/>
                             <constraint firstItem="fLo-NU-bGv" firstAttribute="top" secondItem="96h-Ck-yux" secondAttribute="bottom" constant="24" id="9cg-ih-8W3"/>
+                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="centerY" secondItem="0G1-O6-fPI" secondAttribute="centerY" constant="20" id="NBU-fT-Sje"/>
                             <constraint firstItem="mTh-HU-7C9" firstAttribute="top" secondItem="fLo-NU-bGv" secondAttribute="bottom" id="Nof-ez-kWz"/>
                             <constraint firstItem="pWh-Hk-YzZ" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" id="Qru-FU-YrV"/>
                             <constraint firstAttribute="bottom" secondItem="pWh-Hk-YzZ" secondAttribute="bottom" id="STg-lN-c04"/>
-                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="centerY" secondItem="b59-XH-JSp" secondAttribute="centerY" id="TR5-oX-CiT"/>
                             <constraint firstAttribute="bottom" secondItem="mTh-HU-7C9" secondAttribute="bottom" id="ZSL-bc-yTD"/>
                             <constraint firstItem="pWh-Hk-YzZ" firstAttribute="top" secondItem="0G1-O6-fPI" secondAttribute="top" id="aGZ-X7-K6H"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="nQu-I8-OqK" secondAttribute="trailing" constant="20" id="eYV-TZ-5bu"/>
                             <constraint firstAttribute="trailing" secondItem="fLo-NU-bGv" secondAttribute="trailing" constant="58" id="ep6-4T-swC"/>
-                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="centerX" secondItem="b59-XH-JSp" secondAttribute="centerX" id="gnY-O5-3SB"/>
                             <constraint firstItem="nQu-I8-OqK" firstAttribute="leading" secondItem="96h-Ck-yux" secondAttribute="trailing" constant="16" id="hKM-YS-17O"/>
+                            <constraint firstItem="I9P-t9-o4Y" firstAttribute="centerX" secondItem="0G1-O6-fPI" secondAttribute="centerX" id="mg6-0n-RIE"/>
                             <constraint firstAttribute="trailing" secondItem="pWh-Hk-YzZ" secondAttribute="trailing" id="qXD-FT-b4Y"/>
                             <constraint firstItem="nQu-I8-OqK" firstAttribute="centerY" secondItem="96h-Ck-yux" secondAttribute="centerY" id="qi0-9n-sUF"/>
                             <constraint firstItem="fLo-NU-bGv" firstAttribute="leading" secondItem="0G1-O6-fPI" secondAttribute="leading" constant="58" id="rWx-rp-2nh"/>
@@ -363,7 +363,7 @@
         <!--Bookmark Add Popover View Controller-->
         <scene sceneID="3pH-Ju-wLu">
             <objects>
-                <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkAddPopoverViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkPopoverViewController" id="vCQ-b9-yaB" customClass="BookmarkAddPopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="2fn-ed-4g2">
                         <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -425,7 +425,7 @@
                                 </popUpButtonCell>
                                 <accessibility identifier="bookmark.add.folder.dropdown"/>
                             </popUpButton>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="PHK-0Q-PGv" userLabel="Separator View" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="19" y="94" width="262" height="1"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="1" id="pce-i3-i0O"/>
@@ -512,7 +512,7 @@ DQ
         <!--Add Bookmark Modal View Controller-->
         <scene sceneID="D4i-le-BSY">
             <objects>
-                <viewController storyboardIdentifier="AddBookmarkModalViewController" id="iFE-Lt-gjz" customClass="AddBookmarkModalViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddBookmarkModalViewController" id="iFE-Lt-gjz" customClass="AddBookmarkModalViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="LEv-d8-u9h">
                         <rect key="frame" x="0.0" y="0.0" width="437" height="164"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -624,7 +624,7 @@ Gw
         <!--Add Folder Modal View Controller-->
         <scene sceneID="Ggh-5g-8vh">
             <objects>
-                <viewController storyboardIdentifier="AddFolderModalViewController" id="6vl-fZ-16D" customClass="AddFolderModalViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddFolderModalViewController" id="6vl-fZ-16D" customClass="AddFolderModalViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="zwT-eh-oPu">
                         <rect key="frame" x="0.0" y="0.0" width="450" height="131"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -711,7 +711,7 @@ Gw
         <!--Bookmark List View Controller-->
         <scene sceneID="zFa-lt-gPi">
             <objects>
-                <viewController storyboardIdentifier="BookmarkListViewController" id="Scx-gG-IP9" customClass="BookmarkListViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkListViewController" id="Scx-gG-IP9" customClass="BookmarkListViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" autoresizesSubviews="NO" id="xb9-2G-g28">
                         <rect key="frame" x="0.0" y="0.0" width="420" height="453"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -739,7 +739,7 @@ Gw
                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0If-Lj-8IG">
                                 <rect key="frame" x="303" y="417" width="97" height="28"/>
                                 <subviews>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="qBa-rT-8sF" userLabel="New Bookmark Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddBookmark" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="KBc-mO-g1J">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -765,7 +765,7 @@ Gw
                                             <action selector="newBookmarkButtonClicked:" target="Scx-gG-IP9" id="65N-1I-jOo"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="xMD-lr-ArK" userLabel="New Folder Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="32" y="0.0" width="28" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="AddFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="EkA-sE-QuN">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -798,7 +798,7 @@ Gw
                                             <constraint firstAttribute="height" constant="18" id="rtz-NW-cwa"/>
                                         </constraints>
                                     </box>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="pTk-xE-OqR" userLabel="Show Management UI Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="81" y="0.0" width="16" height="28"/>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Expand" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="jdG-cU-IZR">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -843,7 +843,7 @@ Gw
                                     <rect key="frame" x="0.0" y="0.0" width="420" height="408"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_DBP" customModuleProvider="target">
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" usesAutomaticRowHeights="YES" viewBased="YES" indentationPerLevel="13" outlineTableColumn="UgF-sw-0QC" id="66p-cd-DbA" customClass="BookmarksOutlineView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="408" height="408"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="17" height="0.0"/>
@@ -981,7 +981,7 @@ Gw
         <!--Bookmark Add Folder Popover View Controller-->
         <scene sceneID="3YF-3W-2Ph">
             <objects>
-                <viewController storyboardIdentifier="BookmarkAddFolderPopoverViewController" id="pTx-lh-HJH" customClass="BookmarkAddFolderPopoverViewController" customModule="DuckDuckGo_DBP" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BookmarkAddFolderPopoverViewController" id="pTx-lh-HJH" customClass="BookmarkAddFolderPopoverViewController" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="rpa-zP-EkD">
                         <rect key="frame" x="0.0" y="0.0" width="300" height="224"/>
                         <autoresizingMask key="autoresizingMask"/>
