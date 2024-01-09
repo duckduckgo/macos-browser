@@ -30,11 +30,9 @@ struct VPNLocationPreferenceItem: View {
             HStack(spacing: 10) {
                 switch model.icon {
                 case .defaultIcon:
-                    Image(systemName: "location.fill")
-                        .resizable()
-                        .frame(width: 18, height: 18)
+                    Image("Location-16-Solid")
                 case .emoji(let string):
-                    Text(string).font(.system(size: 20))
+                    Text(string).font(.system(size: 16))
                 }
 
                 VStack(alignment: .leading) {

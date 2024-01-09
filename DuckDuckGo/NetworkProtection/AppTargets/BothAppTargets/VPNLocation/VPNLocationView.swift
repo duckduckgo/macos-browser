@@ -78,10 +78,9 @@ struct VPNLocationView: View {
                     await model.onNearestItemSelection()
                 }
             }, label: {
-                Image(systemName: "location.fill")
-                    .resizable()
-                    .frame(width: 18, height: 18)
                 VStack(alignment: .leading, spacing: 4) {
+                Image("Location-16-Solid")
+                    .padding(4)
                     Text(UserText.vpnLocationNearestAvailable)
                         .foregroundColor(.primary)
                     Text(UserText.vpnLocationNearestAvailableSubtitle)
@@ -170,7 +169,9 @@ private struct CountryItem: View {
             isSelected: itemModel.isSelected,
             action: action,
             label: {
-                Text(itemModel.emoji).background(Color.clear)
+                Text(itemModel.emoji)
+                    .font(.system(size: 16))
+                    .padding(4)
                 labels
                 if itemModel.shouldShowPicker {
                     Spacer()
