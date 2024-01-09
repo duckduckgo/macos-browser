@@ -38,6 +38,7 @@ struct VPNMetadata: Encodable {
         let osVersion: String
         let buildFlavor: String
         let lowPowerModeEnabled: Bool
+        let cpuArchitecture: String
     }
 
     struct NetworkInfo: Encodable {
@@ -169,7 +170,31 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             lowPowerModeEnabled = false
         }
 
-        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled)
+        let architecture = getMachineArchitecture()
+
+        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled, cpuArchitecture: architecture)
+    }
+
+    private func getMachineArchitecture() -> String {
+        #if arch(arm)
+            return "arm"
+        #elseif arch(arm64)
+            return "arm64"
+        #elseif arch(i386)
+            return "i386"
+        #elseif arch(powerpc64)
+            return "powerpc64"
+        #elseif arch(powerpc64le)
+            return "powerpc64le"
+        #elseif arch(s390x)
+            return "s390x"
+        #elseif arch(wasm32)
+            return "wasm32"
+        #elseif arch(x86_64)
+            return "x86_64"
+        #else
+            return "unknown"
+        #endif
     }
 
     func collectNetworkInformation() async -> VPNMetadata.NetworkInfo {
