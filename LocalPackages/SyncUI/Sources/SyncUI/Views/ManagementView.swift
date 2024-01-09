@@ -43,11 +43,7 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
                         .foregroundColor(Color("LinkBlueColor"))
                         .frame(width: 16)
                         .background(Circle().foregroundColor(Color(.white)))
-                    VStack(alignment: .leading, spacing: 4){
-                        Text(UserText.syncRollOutBannerTitle)
-                            .font(.system(size: 12, weight: .semibold))
-                        Text(UserText.syncRollOutBannerDescription)
-                    }
+                    Text(UserText.syncRollOutBannerDescription)
                 }
                 .frame(width: 493)
                 .padding()
