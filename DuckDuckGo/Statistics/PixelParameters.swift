@@ -284,7 +284,9 @@ extension Pixel.Event.Debug {
                 .invalidPayload,
                 .burnerTabMisplaced,
                 .networkProtectionRemoteMessageFetchingFailed,
-                .networkProtectionRemoteMessageStorageFailed:
+                .networkProtectionRemoteMessageStorageFailed,
+                .dataBrokerProtectionRemoteMessageFetchingFailed,
+                .dataBrokerProtectionRemoteMessageStorageFailed:
             return nil
         }
     }
