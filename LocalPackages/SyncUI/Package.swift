@@ -19,6 +19,7 @@ let package = Package(
         .target(
             name: "SyncUI",
             dependencies: [
+                .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
             swiftSettings: [

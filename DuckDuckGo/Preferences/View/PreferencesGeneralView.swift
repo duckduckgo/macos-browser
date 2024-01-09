@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import AppKit
 import Combine
+import PreferencesViews
+import SwiftUI
 import SwiftUIExtensions
 
 extension Preferences {
@@ -32,11 +33,11 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
 
                 // TITLE
-                TextMenuTitle(text: UserText.general)
+                TextMenuTitle(UserText.general)
 
                 // SECTION 1: Default Browser
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.defaultBrowser)
+                    TextMenuItemHeader(UserText.defaultBrowser)
 
                     HStack {
                         if defaultBrowserModel.isDefault {
@@ -54,19 +55,19 @@ extension Preferences {
 
                 // SECTION 2: On Startup
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.onStartup)
+                    TextMenuItemHeader(UserText.onStartup)
                     Picker(selection: $startupModel.restorePreviousSession, content: {
                         Text(UserText.showHomePage).tag(false)
                         Text(UserText.reopenAllWindowsFromLastSession).tag(true)
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: Const.pickerHorizontalOffset)
+                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                 }
 
                 // SECTION 3: Home Page
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.homePage)
-                    TextMenuItemCaption(text: UserText.homePageDescription)
+                    TextMenuItemHeader(UserText.homePage)
+                    TextMenuItemCaption(UserText.homePageDescription)
                     Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
                         Text(UserText.newTab).tag(false)
                         VStack(alignment: .leading) {
@@ -76,14 +77,14 @@ extension Preferences {
                                     showingCustomHomePageSheet.toggle()
                                 }.disabled(!startupModel.launchToCustomHomePage)
                             }
-                            TextMenuItemCaption(text: startupModel.friendlyURL)
+                            TextMenuItemCaption(startupModel.friendlyURL)
                                 .padding(.top, 0)
                                 .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
 
                         }.tag(true)
                     }
                     .pickerStyle(.radioGroup)
-                    .offset(x: Const.pickerHorizontalOffset)
+                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                     .padding(.bottom, 0)
                     HStack {
                         Picker(UserText.mainMenuHomeButton, selection: $startupModel.homeButtonPosition) {
@@ -113,8 +114,7 @@ struct CustomHomePageSheet: View {
 
     var body: some View {
         VStack(alignment: .center) {
-            Text(UserText.setHomePage)
-                .font(Preferences.Const.Fonts.preferencePaneTitle)
+            TextMenuTitle(UserText.setHomePage)
                 .padding(.vertical, 10)
 
             Group {

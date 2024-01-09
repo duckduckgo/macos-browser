@@ -17,7 +17,7 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
+import PreferencesViews
 
 struct SyncWarningMessage: View {
     let title: String
