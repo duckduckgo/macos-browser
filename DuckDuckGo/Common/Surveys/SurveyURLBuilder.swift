@@ -96,7 +96,8 @@ final class SurveyURLBuilder {
     }
 
     private func queryItem(parameter: SurveyURLParameters, value: String) -> URLQueryItem {
-        let sanitizedValue = value.addingPercentEncoding(withAllowedCharacters: .alphanumerics)
+        let urlAllowed: CharacterSet = .alphanumerics.union(.init(charactersIn: "-._~"))
+        let sanitizedValue = value.addingPercentEncoding(withAllowedCharacters: urlAllowed)
         return URLQueryItem(name: parameter.rawValue, value: sanitizedValue)
     }
 
