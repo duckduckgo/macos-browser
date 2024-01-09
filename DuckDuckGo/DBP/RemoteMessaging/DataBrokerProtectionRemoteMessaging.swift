@@ -55,7 +55,7 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
         messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.dataBrokerProtectionMessagesRequest(),
         messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.dataBrokerProtection(),
         waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "dbp", keychainAppGroup: Bundle.main.appGroup(bundle: .dbp)),
-        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
         dataBrokerProtectionVisibility: DataBrokerProtectionFeatureVisibility = DefaultDataBrokerProtectionFeatureVisibility(),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
@@ -130,12 +130,12 @@ final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemo
             }
 
             // Next, check if the message requires access to DBP but it's not visible:
-            if message.requiresDataBrokerProtectionAccess, !dataBrokerProtectionVisibility.isFeatureVisible() { // TODO
+            if message.requiresDataBrokerProtectionAccess, !dataBrokerProtectionVisibility.isFeatureVisible() {
                 return false
             }
 
             // Finally, check if the message requires DBP usage, and check if the user has used it at all:
-            if message.requiresDataBrokerProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil { // TODO
+            if message.requiresDataBrokerProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
                 return false
             }
 
