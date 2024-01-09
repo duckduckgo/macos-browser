@@ -138,6 +138,7 @@ extension DBPHomeViewController: DataBrokerProtectionInviteDialogsViewModelDeleg
 
 public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
+    // swiftlint:disable:next function_body_length
     public init() {
         super.init { event, _, _, _ in
             switch event {
@@ -180,7 +181,15 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
                     .resetLoginItem,
                     .scanSuccess,
                     .scanFailed,
-                    .scanError:
+                    .scanError,
+                    .dataBrokerProtectionNotificationSentFirstScanComplete,
+                    .dataBrokerProtectionNotificationOpenedFirstScanComplete,
+                    .dataBrokerProtectionNotificationSentFirstRemoval,
+                    .dataBrokerProtectionNotificationOpenedFirstRemoval,
+                    .dataBrokerProtectionNotificationScheduled2WeeksCheckIn,
+                    .dataBrokerProtectionNotificationOpened2WeeksCheckIn,
+                    .dataBrokerProtectionNotificationSentAllRecordsRemoved,
+                    .dataBrokerProtectionNotificationOpenedAllRecordsRemoved:
                 Pixel.fire(.pixelKitEvent(event))
             }
         }

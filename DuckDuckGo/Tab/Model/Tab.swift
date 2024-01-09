@@ -59,7 +59,8 @@ protocol NewWindowPolicyDecisionMaker {
         case dataBrokerProtection
 
         enum URLSource: Equatable {
-            case stateRestoration
+            case pendingStateRestoration
+            case loadedByStateRestoration
             case userEntered(String)
             case historyEntry
             case bookmark
@@ -86,9 +87,9 @@ protocol NewWindowPolicyDecisionMaker {
                 switch self {
                 case .userEntered:
                     .custom(.userEnteredUrl)
-                case .stateRestoration:
+                case .pendingStateRestoration:
                     .sessionRestoration
-                case .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
+                case .loadedByStateRestoration, .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
                     .custom(.tabContentUpdate)
                 case .reload:
                     .reload
@@ -97,9 +98,9 @@ protocol NewWindowPolicyDecisionMaker {
 
             var cachePolicy: URLRequest.CachePolicy {
                 switch self {
-                case .stateRestoration, .historyEntry:
+                case .pendingStateRestoration, .historyEntry:
                     .returnCacheDataElseLoad
-                case .reload:
+                case .reload, .loadedByStateRestoration:
                     .reloadIgnoringCacheData
                 case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
                     .useProtocolCachePolicy

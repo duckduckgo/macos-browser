@@ -92,8 +92,8 @@ extension NavigationProtectionTabExtension: NavigationResponder {
         }
         guard !Task.isCancelled else { return .cancel }
 
-        if let url = await linkProtection.requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.url, destinationURL: request.url!) {
-            request.url = url
+        if let newRequest = await linkProtection.requestTrackingLinkRewrite(initiatingURL: navigationAction.sourceFrame.url, destinationRequest: request) {
+            request = newRequest
         }
         guard !Task.isCancelled else { return .cancel }
 
@@ -140,11 +140,11 @@ extension LinkProtection {
 
     @MainActor
     public func requestTrackingLinkRewrite(initiatingURL: URL?,
-                                           destinationURL: URL) async -> URL? {
+                                           destinationRequest: URLRequest) async -> URLRequest? {
         await withCheckedContinuation { continuation in
             let didRewriteLink = {
-                requestTrackingLinkRewrite(initiatingURL: initiatingURL, destinationURL: destinationURL, onStartExtracting: {}, onFinishExtracting: {}) { url in
-                    continuation.resume(returning: url) // <---
+                requestTrackingLinkRewrite(initiatingURL: initiatingURL, destinationRequest: destinationRequest, onStartExtracting: {}, onFinishExtracting: {}) { newRequest in
+                    continuation.resume(returning: newRequest) // <---
                 } policyDecisionHandler: { allowNavigationAction in
                     if allowNavigationAction {
                         continuation.resume(returning: nil)

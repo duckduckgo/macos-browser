@@ -18,18 +18,21 @@
 #if DBP && SUBSCRIPTION
 
 import Foundation
-import Account
+import Subscription
 import DataBrokerProtection
 
 final class DataBrokerProtectionSubscriptionEventHandler {
 
-    private let accountManager: Account.AccountManaging
+    private let accountManager: Subscription.AccountManaging
     private let authRepository: AuthenticationRepository
+    private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(accountManager: Account.AccountManaging = Account.AccountManager(),
-         authRepository: AuthenticationRepository = KeychainAuthenticationData()) {
+    init(accountManager: Subscription.AccountManaging = AccountManager(),
+         authRepository: AuthenticationRepository = KeychainAuthenticationData(),
+         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.accountManager = accountManager
         self.authRepository = authRepository
+        self.featureDisabler = featureDisabler
     }
 
     func registerForSubscriptionAccountManagerEvents() {
@@ -38,7 +41,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignIn() {
-        guard let token = accountManager.token else {
+        guard let token = accountManager.accessToken else {
             Pixel.fire(.dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn)
             assertionFailure("[DBP Subscription] AccountManager signed in but token could not be retrieved")
             return
@@ -48,7 +51,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignOut() {
-        // Going to be defined here: https://app.asana.com/0/1204006570077678/1206206961074916/f
+        featureDisabler.disableAndDelete()
     }
 }
 

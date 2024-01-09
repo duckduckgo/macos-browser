@@ -41,7 +41,6 @@ class ChromiumLoginReaderTests: XCTestCase {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.v32.databaseDirectoryURL,
             source: .chrome,
-            processName: "Chrome",
             decryptionKey: ChromiumLoginStore.v32.decryptionKey
         )
 
@@ -70,7 +69,6 @@ class ChromiumLoginReaderTests: XCTestCase {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
             source: .chrome,
-            processName: "Chrome",
             decryptionKey: ChromiumLoginStore.legacy.decryptionKey
         )
 
@@ -90,7 +88,6 @@ class ChromiumLoginReaderTests: XCTestCase {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
             source: .chrome,
-            processName: "Chrome",
             decryptionKeyPrompt: mockPrompt
         )
 
@@ -109,7 +106,6 @@ class ChromiumLoginReaderTests: XCTestCase {
         let reader = ChromiumLoginReader(
             chromiumDataDirectoryURL: ChromiumLoginStore.legacy.databaseDirectoryURL,
             source: .chrome,
-            processName: "Chrome",
             decryptionKeyPrompt: mockPrompt
         )
 

@@ -35,9 +35,10 @@ final class SafariFaviconsReader {
         }
 
         var action: DataImportAction { .favicons }
-        var source: DataImport.Source { .safari }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .other }
     }
 
     fileprivate final class SafariFaviconRecord: FetchableRecord {

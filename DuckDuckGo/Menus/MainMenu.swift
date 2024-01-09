@@ -30,7 +30,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Subscription
+import SubscriptionUI
 #endif
 
 // swiftlint:disable:next type_body_length
@@ -519,14 +519,14 @@ import Subscription
     }
 
     private func updateShortcutMenuItems() {
-        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
-        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
-        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
+        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
+        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem.isHidden = false
-            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
         } else {
             toggleNetworkProtectionShortcutMenuItem.isHidden = true
         }

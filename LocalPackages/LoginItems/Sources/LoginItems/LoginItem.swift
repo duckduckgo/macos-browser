@@ -25,7 +25,7 @@ import ServiceManagement
 ///
 public struct LoginItem: Equatable, Hashable {
 
-    let agentBundleID: String
+    public let agentBundleID: String
     private let launchInformation: LoginItemLaunchInformation
     private let defaults: UserDefaults
     private let log: OSLog

@@ -159,7 +159,7 @@ extension AppDelegate {
     }
 
     @objc func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportViewController.show()
+        DataImportView.show()
     }
 
     @objc func openExportLogins(_ sender: Any?) {
@@ -380,7 +380,9 @@ extension MainViewController {
     }
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
+#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+#endif
     }
 
     // MARK: - History
