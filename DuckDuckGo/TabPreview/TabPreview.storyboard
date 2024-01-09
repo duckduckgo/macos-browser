@@ -39,7 +39,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="280" height="58"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <visualEffectView blendingMode="behindWindow" material="sheet" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="Sph-39-HMA">
+                            <visualEffectView blendingMode="behindWindow" material="sidebar" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="Sph-39-HMA">
                                 <rect key="frame" x="0.0" y="0.0" width="280" height="58"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="58" id="0H2-N3-xyB"/>
