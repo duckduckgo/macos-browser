@@ -16,142 +16,6 @@
 //  limitations under the License.
 //
 
-import Cocoa
-import Combine
-
-@MainActor
-final class AddBookmarkPopoverViewModel: ObservableObject {
-
-    private let bookmarkManager: BookmarkManager
-
-    @Published private(set) var bookmark: Bookmark
-
-    @Published private(set) var folders: [FolderViewModel] = [] {
-        didSet {
-            print("didSet", folders.map { $0.title + " - " + $0.id })
-        }
-    }
-
-    @Published var selectedFolder: BookmarkFolder? {
-        didSet {
-            if oldValue?.id != selectedFolder?.id {
-                bookmarkManager.add(bookmark: bookmark, to: selectedFolder) { [weak self] _ in
-                    self?.reloadBookmark()
-                }
-            }
-        }
-    }
-
-    @Published var addFolderViewModel: AddBookmarkFolderPopoverViewModel?
-
-    private var bookmarkListCancellable: AnyCancellable?
-
-    init(bookmark: Bookmark,
-         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-        self.bookmarkManager = bookmarkManager
-        self.bookmark = bookmark
-        self.bookmarkTitle = bookmark.title
-
-        bookmarkListCancellable = bookmarkManager.listPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] list in
-                self?.folders = .init(list)
-                self?.reloadBookmark()
-            }
-    }
-
-    private func reloadBookmark() {
-        bookmark = bookmarkManager.getBookmark(for: bookmark.url.url ?? .empty) ?? bookmark
-        resetSelectedFolder()
-    }
-
-    private func resetSelectedFolder() {
-        selectedFolder = folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
-    }
-
-    func removeButtonAction(dismiss: () -> Void) {
-        bookmarkManager.remove(bookmark: bookmark)
-        dismiss()
-    }
-
-    func doneButtonAction(dismiss: () -> Void) {
-        dismiss()
-    }
-
-    func favoritesButtonAction() {
-        bookmark.isFavorite.toggle()
-
-        bookmarkManager.update(bookmark: bookmark)
-    }
-
-    func addFolderButtonAction() {
-        addFolderViewModel = .init(bookmark: bookmark, bookmarkManager: bookmarkManager) { [bookmark, bookmarkManager, weak self] newFolder in
-            if let newFolder {
-                bookmarkManager.move(objectUUIDs: [bookmark.id],
-                                     toIndex: 1,
-                                     withinParentFolder: .parent(uuid: newFolder.id),
-                                     completion: { [weak self] _ in
-                    self?.reloadBookmark()
-                })
-            }
-            self?.resetAddFolderState()
-        }
-    }
-
-    private func resetAddFolderState() {
-        addFolderViewModel = nil
-    }
-
-    @Published var bookmarkTitle: String {
-        didSet {
-            bookmark.title = bookmarkTitle
-
-            bookmarkManager.update(bookmark: bookmark)
-        }
-    }
-
-}
-
-struct FolderViewModel: Identifiable, Equatable {
-
-    let entity: BookmarkFolder
-    let level: Int
-
-    var id: BookmarkFolder.ID {
-        entity.id
-    }
-
-    var title: String {
-        BookmarkViewModel(entity: entity).menuTitle
-    }
-
-}
-
-extension [FolderViewModel] {
-
-    init(_ list: BookmarkList?) {
-        guard let topLevelEntities = list?.topLevelEntities else {
-            assertionFailure("Tried to refresh bookmark folder picker, but couldn't get bookmark list")
-            self = []
-            return
-        }
-        self.init(entities: topLevelEntities, level: 0)
-    }
-
-    private init(entities: [BaseBookmarkEntity], level: Int) {
-        self = []
-        for entity in entities {
-            guard let folder = entity as? BookmarkFolder else { continue }
-            let item = FolderViewModel(entity: folder, level: level)
-            self.append(item)
-
-            let childModels = Self(entities: folder.children, level: level + 1)
-            self.append(contentsOf: childModels)
-        }
-    }
-
-}
-
 import SwiftUI
 import SwiftUIExtensions
 
@@ -206,12 +70,12 @@ struct AddBookmarkPopoverView: View {
             Button {
                 model.favoritesButtonAction()
             } label: {
-                HStack { // TODO: align
+                HStack(spacing: 8) {
                     if model.bookmark.isFavorite {
-                        Image(.favorite)
+                        Image(.favoriteFilled)
                         Text(UserText.removeFromFavorites)
                     } else {
-                        Image(.favoriteFilled)
+                        Image(.favorite)
                         Text(UserText.addToFavorites)
                     }
                 }
@@ -228,7 +92,6 @@ struct AddBookmarkPopoverView: View {
                 } label: {
                     Text("Remove", comment: "Remove bookmark button title")
                 }
-                .keyboardShortcut(.defaultAction)
                 .accessibilityIdentifier("bookmark.add.remove.button")
 
                 Button {
@@ -236,7 +99,7 @@ struct AddBookmarkPopoverView: View {
                 } label: {
                     Text(UserText.done)
                 }
-                .keyboardShortcut(.cancelAction)
+                .keyboardShortcut(.defaultAction)
                 .accessibilityIdentifier("bookmark.add.done.button")
             }
 
@@ -245,28 +108,6 @@ struct AddBookmarkPopoverView: View {
         .padding(EdgeInsets(top: 19, leading: 19, bottom: 19, trailing: 19))
         .frame(width: 300, height: 229)
         .background(Color(.popoverBackground))
-    }
-
-}
-
-struct BookmarkFolderPicker: View {
-
-    let folders: [FolderViewModel]
-    @Binding var selectedFolder: BookmarkFolder?
-
-    var body: some View {
-
-        NSPopUpButtonView(selection: $selectedFolder, viewCreator: NSPopUpButton.init) {
-
-            PopupButtonItem(icon: .folder, title: UserText.bookmarks)
-
-            PopupButtonItem.separator()
-
-            for folder in folders {
-                PopupButtonItem(icon: .folder, title: folder.title, indentation: folder.level, selectionValue: folder.entity)
-            }
-        }
-
     }
 
 }

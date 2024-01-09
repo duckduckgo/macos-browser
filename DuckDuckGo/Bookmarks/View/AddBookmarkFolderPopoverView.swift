@@ -16,57 +16,6 @@
 //  limitations under the License.
 //
 
-import AppKit
-
-final class AddBookmarkFolderPopoverViewModel: ObservableObject {
-
-    private let bookmarkManager: BookmarkManager
-
-    let folders: [FolderViewModel]
-    @Published var parent: BookmarkFolder?
-
-    @Published var folderName: String = ""
-
-    @Published private(set) var isDisabled = false
-
-    private let completionHandler: (BookmarkFolder?) -> Void
-
-    init(bookmark: Bookmark? = nil,
-         folderName: String = "",
-         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         completionHandler: @escaping (BookmarkFolder?) -> Void = {_ in }) {
-
-        self.folders = .init(bookmarkManager.list)
-        self.bookmarkManager = bookmarkManager
-        self.folderName = folderName
-        self.completionHandler = completionHandler
-        self.parent = bookmark.flatMap { bookmark in
-            folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
-        }
-    }
-
-    func cancel() {
-        completionHandler(nil)
-    }
-
-    func addFolder() {
-        guard !folderName.isEmpty else {
-            assertionFailure("folderName is empty, button should be disabled")
-            return
-        }
-
-        isDisabled = true
-        bookmarkManager.makeFolder(for: folderName, parent: parent) { [completionHandler] result in
-            completionHandler(result)
-        }
-    }
-
-    var isAddFolderButtonDisabled: Bool {
-        folderName.isEmpty
-    }
-
-}
-
 import SwiftUI
 
 struct AddBookmarkFolderPopoverView: ModalView {
@@ -83,6 +32,7 @@ struct AddBookmarkFolderPopoverView: ModalView {
 
                 BookmarkFolderPicker(folders: model.folders, selectedFolder: $model.parent)
                 .accessibilityIdentifier("bookmark.folder.folder.dropdown")
+                .disabled(model.isDisabled)
             }
 
             VStack(alignment: .leading, spacing: 7) {
@@ -104,8 +54,8 @@ struct AddBookmarkFolderPopoverView: ModalView {
                 }) {
                     Text(UserText.cancel)
                 }
-                .keyboardShortcut(.cancelAction)
                 .accessibilityIdentifier("bookmark.add.cancel.button")
+                .disabled(model.isDisabled)
 
                 Button(action: {
                     model.addFolder()
@@ -114,7 +64,7 @@ struct AddBookmarkFolderPopoverView: ModalView {
                 }
                 .keyboardShortcut(.defaultAction)
                 .accessibilityIdentifier("bookmark.add.add.folder.button")
-                .disabled(model.isAddFolderButtonDisabled)
+                .disabled(model.isAddFolderButtonDisabled || model.isDisabled)
             }
         }
         .font(.system(size: 13))
@@ -124,8 +74,23 @@ struct AddBookmarkFolderPopoverView: ModalView {
     }
 }
 
-//#Preview {
-//    AddBookmarkFolderPopoverView(model: AddBookmarkFolderPopoverViewModel {
-//        print("Cancel")
-//    })
-//}
+#Preview {
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
+        BookmarkFolder(id: "1", title: "Folder 1", children: [
+            BookmarkFolder(id: "2", title: "Nested Folder", children: [
+            ])
+        ]),
+        BookmarkFolder(id: "3", title: "Another Folder", children: [
+            BookmarkFolder(id: "4", title: "Nested Folder", children: [
+                BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
+                ])
+            ])
+        ])
+    ]))
+    bkman.loadBookmarks()
+    customAssertionFailure = { _, _, _ in }
+
+    return AddBookmarkFolderPopoverView(model: AddBookmarkFolderPopoverViewModel(bookmarkManager: bkman) {
+        print("CompletionHandler:", $0?.title ?? "<nil>")
+    })
+}

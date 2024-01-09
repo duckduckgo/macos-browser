@@ -4330,7 +4330,7 @@
       }
     },
     "Name:" : {
-      "comment" : "New bookmark folder dialog folder name field heading\nAdd Folder popover: folder name text field title"
+      "comment" : "Add Folder popover: folder name text field title\nNew bookmark folder dialog folder name field heading"
     },
     "navigate.back" : {
       "comment" : "Context menu item",
