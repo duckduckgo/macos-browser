@@ -37,11 +37,13 @@ extension TabPreviewViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupGradients()
+        titleTextField.maximumNumberOfLines = 3
+        titleTextField.cell?.truncatesLastVisibleLine = true
     }
 
     func display(tabViewModel: TabViewModel, isSelected: Bool) {
         titleTextField.stringValue = tabViewModel.title
+        titleTextField.lineBreakMode = isSelected ? .byWordWrapping : .byTruncatingTail
 
         // Search queries can match valid URL formats, so prevent creating a URL object from the address bar string if on a search page.
         if !(tabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false),
@@ -59,15 +61,6 @@ extension TabPreviewViewController {
             screenshotImageView.image = nil
             screenshotImageViewHeightConstraint.constant = 0
         }
-    }
-
-    private func setupGradients() {
-        titleTextField.wantsLayer = true
-        titleTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
-                                trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
-        urlTextField.wantsLayer = true
-        urlTextField.gradient(width: TextFieldMaskGradientSize.width.rawValue,
-                              trailingPadding: TextFieldMaskGradientSize.trailingSpace.rawValue)
     }
 
     private func getHeight(for image: NSImage?) -> CGFloat {

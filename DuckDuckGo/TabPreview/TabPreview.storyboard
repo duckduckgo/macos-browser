@@ -42,7 +42,7 @@
                             <visualEffectView blendingMode="behindWindow" material="sidebar" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="Sph-39-HMA">
                                 <rect key="frame" x="0.0" y="0.0" width="280" height="58"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="58" id="0H2-N3-xyB"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="58" id="0H2-N3-xyB"/>
                                 </constraints>
                             </visualEffectView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lWf-Z2-vYW">
@@ -50,7 +50,7 @@
                                 <constraints>
                                     <constraint firstAttribute="width" constant="256" id="tMT-xB-AW4"/>
                                 </constraints>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="cca-xA-oAB">
+                                <textFieldCell key="cell" title="Label" id="cca-xA-oAB">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" name="TabPreviewTintColor"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -58,7 +58,7 @@
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jLi-sz-Wfx">
                                 <rect key="frame" x="14" y="13" width="260" height="15"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="9YQ-IO-IWw">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="9YQ-IO-IWw">
                                     <font key="font" metaFont="cellTitle"/>
                                     <color key="textColor" name="TabPreviewSecondaryTintColor"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -73,6 +73,7 @@
                             </imageView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="lWf-Z2-vYW" firstAttribute="top" secondItem="Sph-39-HMA" secondAttribute="top" constant="10" id="0iQ-Wt-3Wi"/>
                             <constraint firstAttribute="trailing" secondItem="K3E-VN-I4d" secondAttribute="trailing" id="GhA-NJ-WTR"/>
                             <constraint firstItem="jLi-sz-Wfx" firstAttribute="top" secondItem="lWf-Z2-vYW" secondAttribute="bottom" constant="4" id="JaN-qy-ftV"/>
                             <constraint firstItem="K3E-VN-I4d" firstAttribute="top" secondItem="Sph-39-HMA" secondAttribute="bottom" id="Rgr-fZ-FqT"/>
@@ -83,6 +84,7 @@
                             <constraint firstItem="K3E-VN-I4d" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" id="Xyt-z8-yFB"/>
                             <constraint firstItem="lWf-Z2-vYW" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" constant="16" id="byj-C9-Ptu"/>
                             <constraint firstItem="Sph-39-HMA" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" id="d2F-1I-J5H"/>
+                            <constraint firstItem="jLi-sz-Wfx" firstAttribute="bottom" secondItem="Sph-39-HMA" secondAttribute="bottom" constant="-13" id="gQz-qO-zMP"/>
                             <constraint firstItem="jLi-sz-Wfx" firstAttribute="leading" secondItem="bqc-XW-5Ht" secondAttribute="leading" constant="16" id="kUH-YF-EYh"/>
                             <constraint firstAttribute="trailing" secondItem="jLi-sz-Wfx" secondAttribute="trailing" constant="8" id="ulB-9g-zeK"/>
                             <constraint firstAttribute="trailing" secondItem="lWf-Z2-vYW" secondAttribute="trailing" constant="8" id="vRu-jU-Vtz"/>
