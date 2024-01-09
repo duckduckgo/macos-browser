@@ -28,6 +28,8 @@ final class TabPreviewExtension {
         var url: URL
         var scrollPosition: CGFloat
         var image: NSImage
+        var webviewBoundsSize: NSSize
+        var afterLoadPreview: Bool
     }
 
     private var previewData: PreviewData?
@@ -43,7 +45,6 @@ final class TabPreviewExtension {
             return nil
         }
     }
-
 
     private var cancellables = Set<AnyCancellable>()
     private weak var webView: WKWebView?
@@ -62,52 +63,52 @@ final class TabPreviewExtension {
     }
 
     // MARK: - Webviews
-
+    
     @MainActor
     func generatePreview() async {
+        await generatePreview(afterLoad: false)
+    }
+
+    @MainActor
+    func generatePreview(afterLoad: Bool = false) async {
         dispatchPrecondition(condition: .onQueue(.main))
 
-        guard let webView else {
-            return
-        }
-
-        guard let url = webView.url else { return }
-
-        guard let tabContent, tabContent.isUrl else {
-            //TODO: Generate preview from SwiftUI views
+        guard let webView, let tabContent, let url = tabContent.url else {
+            // Previews of native views are generated in generateNativePreview()
             return
         }
 
         // Avoid unnecessary generations
-        let scrollPosition = try? await getScrollPosition()
-        if let previewData, previewData.url == url, previewData.scrollPosition == scrollPosition {
-            // Preview is already generated
+        let scrollPosition = try? await getScrollPosition(webView: webView)
+        if let previewData,
+           let scrollPosition,
+           !previewData.afterLoadPreview,
+           previewData.webviewBoundsSize == webView.bounds.size,
+           previewData.url == url,
+           previewData.scrollPosition == scrollPosition {
+            os_log("Skipping preview rendering, it is already generated. url: \(url) scrollPosition \(scrollPosition)", log: .tabPreviews)
             return
         }
 
         let configuration = WKSnapshotConfiguration.makeConfiguration()
         webView.takeSnapshot(with: configuration) { [weak self] image, _ in
             guard let image = image else {
-                os_log("TabPreviewExtension: failed to create a snapshot of webView", type: .error)
+                os_log("TabPreviewExtension: failed to create a snapshot of webView", log: .tabPreviews, type: .error)
                 return
             }
             self?.generatePreviewAfterLoad = false
-            self?.previewData = PreviewData(url: url, scrollPosition: 0, image: image)
+            self?.previewData = PreviewData(url: url,
+                                            scrollPosition: scrollPosition ?? -1,
+                                            image: image,
+                                            webviewBoundsSize: webView.bounds.size,
+                                            afterLoadPreview: afterLoad)
 
-            //TODO: remove
-            os_log("!preview generated \(webView.url)", type: .info)
+            os_log("Preview rendered: \(url) ", log: .tabPreviews)
         }
-
-
     }
 
     @MainActor
-    private func getScrollPosition() async throws -> CGFloat? {
-        guard let webView else {
-            assertionFailure("WebView is missing")
-            return nil
-        }
-
+    private func getScrollPosition(webView: WKWebView) async throws -> CGFloat? {
         do {
             let result = try await webView.evaluateJavaScript("window.scrollY")
             if let scrollPosition = result as? CGFloat {
@@ -134,6 +135,8 @@ final class TabPreviewExtension {
         guard let hostingView = view.subviews.last?.subviews.first else {
             return
         }
+
+        //TODO: Avoid unnecessary generations
 
         let originalSize = hostingView.bounds.size
         let targetWidth = CGFloat(TabPreviewWindowController.Size.width.rawValue)
@@ -221,7 +224,7 @@ extension TabPreviewExtension: NavigationResponder {
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
         if generatePreviewAfterLoad {
             Task {
-                await generatePreview()
+                await generatePreview(afterLoad: true)
             }
         }
     }
@@ -231,7 +234,7 @@ extension TabPreviewExtension: NavigationResponder {
 protocol TabPreviewExtensionProtocol: AnyObject, NavigationResponder {
 
     var preview: NSImage? { get }
-//    var nativePreview: NSImage? { set get }
+
     func generatePreview() async
     func generateNativePreview(from view: NSView)
 
