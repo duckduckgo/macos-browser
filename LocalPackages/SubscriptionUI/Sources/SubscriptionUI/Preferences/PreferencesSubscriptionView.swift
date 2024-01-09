@@ -31,7 +31,7 @@ public struct PreferencesSubscriptionView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-            TextMenuTitle(text: UserText.preferencesTitle)
+            TextMenuTitle(UserText.preferencesTitle)
                 .sheet(isPresented: $showingSheet) {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
@@ -69,8 +69,8 @@ public struct PreferencesSubscriptionView: View {
                         Image("subscription-active-icon", bundle: .module)
                             .padding(4)
                     } content: {
-                        TextMenuItemHeader(text: UserText.preferencesSubscriptionActiveHeader)
-                        TextMenuItemCaption(text: model.subscriptionDetails ?? "")
+                        TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
+                        TextMenuItemCaption(model.subscriptionDetails ?? "")
                     } buttons: {
                         Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
 
@@ -95,8 +95,8 @@ public struct PreferencesSubscriptionView: View {
                             .background(Color.black.opacity(0.06))
                             .cornerRadius(4)
                     } content: {
-                        TextMenuItemHeader(text: UserText.preferencesSubscriptionInactiveHeader)
-                        TextMenuItemCaption(text: UserText.preferencesSubscriptionInactiveCaption)
+                        TextMenuItemHeader(UserText.preferencesSubscriptionInactiveHeader)
+                        TextMenuItemCaption(UserText.preferencesSubscriptionInactiveCaption)
                     } buttons: {
                         Button(UserText.learnMoreButton) { model.learnMoreAction() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
@@ -139,9 +139,9 @@ public struct PreferencesSubscriptionView: View {
             .roundedBorder()
 
             PreferencePaneSection {
-                TextMenuItemHeader(text: UserText.preferencesSubscriptionFooterTitle)
+                TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)
                 HStack(alignment: .top, spacing: 6) {
-                    TextMenuItemCaption(text: UserText.preferencesSubscriptionFooterCaption)
+                    TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
                     Button(UserText.viewFaqsButton) { model.openFAQ() }
                 }
             }
