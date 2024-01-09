@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -226,53 +227,5 @@ public struct SectionView: View {
         .padding(.vertical, 7)
         .disabled(!enabled)
         .opacity(enabled ? 1.0 : 0.6)
-    }
-}
-
-enum Const {
-
-    static let pickerHorizontalOffset: CGFloat = {
-        if #available(macOS 12.0, *) {
-            return -8
-        } else {
-            return 0
-        }
-    }()
-
-    enum Fonts {
-        static let popUpButton: NSFont = .preferredFont(forTextStyle: .title1, options: [:])
-        static let sideBarItem: Font = .body
-        static let preferencePaneTitle: Font = .title2.weight(.semibold)
-        static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
-        static let preferencePaneDisclaimer: Font = .subheadline
-    }
-}
-
-struct TextMenuTitle: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(Const.Fonts.preferencePaneTitle)
-    }
-}
-
-struct TextMenuItemHeader: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(Const.Fonts.preferencePaneSectionHeader)
-    }
-}
-
-struct TextMenuItemCaption: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .fixMultilineScrollableText()
-            .foregroundColor(Color("GreyTextColor"))
     }
 }
