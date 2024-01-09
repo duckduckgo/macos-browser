@@ -25,11 +25,14 @@ final class DataBrokerProtectionSubscriptionEventHandler {
 
     private let accountManager: Subscription.AccountManaging
     private let authRepository: AuthenticationRepository
+    private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
-    init(accountManager: Subscription.AccountManaging = Subscription.AccountManager(),
-         authRepository: AuthenticationRepository = KeychainAuthenticationData()) {
+    init(accountManager: Subscription.AccountManaging = AccountManager(),
+         authRepository: AuthenticationRepository = KeychainAuthenticationData(),
+         featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
         self.accountManager = accountManager
         self.authRepository = authRepository
+        self.featureDisabler = featureDisabler
     }
 
     func registerForSubscriptionAccountManagerEvents() {
@@ -48,7 +51,7 @@ final class DataBrokerProtectionSubscriptionEventHandler {
     }
 
     @objc private func handleAccountDidSignOut() {
-        // Going to be defined here: https://app.asana.com/0/1204006570077678/1206206961074916/f
+        featureDisabler.disableAndDelete()
     }
 }
 

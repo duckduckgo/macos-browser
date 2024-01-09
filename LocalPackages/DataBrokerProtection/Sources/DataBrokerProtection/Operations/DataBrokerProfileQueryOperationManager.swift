@@ -35,6 +35,7 @@ protocol OperationsManager {
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                       showWebView: Bool,
+                      userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws
 }
 
@@ -45,6 +46,7 @@ extension OperationsManager {
                       notificationCenter: NotificationCenter,
                       runner: WebOperationRunner,
                       pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+                      userNotificationService: DataBrokerProtectionUserNotificationService,
                       shouldRunNextStep: @escaping () -> Bool) async throws {
 
         try await runOperation(operationData: operationData,
@@ -54,6 +56,7 @@ extension OperationsManager {
                                runner: runner,
                                pixelHandler: pixelHandler,
                                showWebView: false,
+                               userNotificationService: userNotificationService,
                                shouldRunNextStep: shouldRunNextStep)
     }
 }
@@ -67,6 +70,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                runner: WebOperationRunner,
                                pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                showWebView: Bool = false,
+                               userNotificationService: DataBrokerProtectionUserNotificationService,
                                shouldRunNextStep: @escaping () -> Bool) async throws {
 
         if operationData as? ScanOperationData != nil {
@@ -76,6 +80,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                        notificationCenter: notificationCenter,
                                        pixelHandler: pixelHandler,
                                        showWebView: showWebView,
+                                       userNotificationService: userNotificationService,
                                        shouldRunNextStep: shouldRunNextStep)
         } else if let optOutOperationData = operationData as? OptOutOperationData {
             try await runOptOutOperation(for: optOutOperationData.extractedProfile,
@@ -85,17 +90,19 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                          notificationCenter: notificationCenter,
                                          pixelHandler: pixelHandler,
                                          showWebView: showWebView,
+                                         userNotificationService: userNotificationService,
                                          shouldRunNextStep: shouldRunNextStep)
         }
     }
 
-    // swiftlint:disable:next function_body_length
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     internal func runScanOperation(on runner: WebOperationRunner,
                                    brokerProfileQueryData: BrokerProfileQueryData,
                                    database: DataBrokerProtectionRepository,
                                    notificationCenter: NotificationCenter,
                                    pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                    showWebView: Bool = false,
+                                   userNotificationService: DataBrokerProtectionUserNotificationService,
                                    shouldRunNextStep: @escaping () -> Bool) async throws {
         os_log("Running scan operation: %{public}@", log: .dataBrokerProtection, String(describing: brokerProfileQueryData.dataBroker.name))
 
@@ -174,12 +181,13 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             }
 
             if !removedProfiles.isEmpty {
+                var shouldSendProfileRemovedNotification = false
                 for removedProfile in removedProfiles {
                     if let extractedProfileId = removedProfile.id {
                         let event = HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutConfirmed)
                         database.add(event)
                         database.updateRemovedDate(Date(), on: extractedProfileId)
-
+                        shouldSendProfileRemovedNotification = true
                         try updateOperationDataDates(
                             origin: .scan,
                             brokerId: brokerId,
@@ -191,7 +199,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
                         os_log("Profile removed from optOutsData: %@", log: .dataBrokerProtection, String(describing: removedProfile))
 
-                        // Add a comment explaining this piece of code
                         if let attempt = database.fetchAttemptInformation(for: extractedProfileId), let attemptUUID = UUID(uuidString: attempt.attemptId) {
                             let now = Date()
                             let calculateDurationSinceLastStage = now.timeIntervalSince(attempt.lastStageDate) * 1000
@@ -200,6 +207,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                             pixelHandler.fire(.optOutSuccess(dataBroker: attempt.dataBroker, attemptId: attemptUUID, duration: calculateDurationSinceStart))
                         }
                     }
+                }
+                if shouldSendProfileRemovedNotification {
+                    sendProfileRemovedNotificationIfNecessary(userNotificationService: userNotificationService,
+                                                              database: database)
                 }
             } else {
                 try updateOperationDataDates(
@@ -224,6 +235,20 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
             throw error
         }
     }
+
+    private func sendProfileRemovedNotificationIfNecessary(userNotificationService: DataBrokerProtectionUserNotificationService, database: DataBrokerProtectionRepository) {
+        let savedExtractedProfiles = database.fetchAllBrokerProfileQueryData().flatMap { $0.extractedProfiles }
+        if savedExtractedProfiles.count == 1 {
+            userNotificationService.sendAllInfoRemovedNotificationIfPossible()
+        } else {
+            if savedExtractedProfiles.allSatisfy({ $0.removedDate != nil }) {
+                userNotificationService.sendAllInfoRemovedNotificationIfPossible()
+            } else {
+                userNotificationService.sendFirstRemovedNotificationIfPossible()
+            }
+        }
+    }
+
     // swiftlint:disable:next function_body_length
     internal func runOptOutOperation(for extractedProfile: ExtractedProfile,
                                      on runner: WebOperationRunner,
@@ -232,6 +257,7 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
                                      notificationCenter: NotificationCenter,
                                      pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                                      showWebView: Bool = false,
+                                     userNotificationService: DataBrokerProtectionUserNotificationService,
                                      shouldRunNextStep: @escaping () -> Bool) async throws {
         guard let brokerId = brokerProfileQueryData.dataBroker.id, let profileQueryId = brokerProfileQueryData.profileQuery.id, let extractedProfileId = extractedProfile.id else {
             // Maybe send pixel?

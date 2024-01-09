@@ -353,7 +353,7 @@ extension Pixel {
             case networkProtectionRemoteMessageFetchingFailed
             case networkProtectionRemoteMessageStorageFailed
 
-            case loginItemUpdateError
+            case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
         }
 
     }

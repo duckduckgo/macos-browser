@@ -100,7 +100,7 @@ enum UserText {
     static let syncWithAnotherDeviceShowCodeButton = NSLocalizedString("preferences.sync.sync-with-another-device.show-code-button", value: "Show Code", comment: "Sync with another device dialog show code button")
     static let syncWithAnotherDeviceEnterCodeButton = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-button", value: "Enter Code", comment: "Sync with another device dialog enter code button")
     static let syncWithAnotherDeviceShowQRCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.show-qr-code-explanation", value: "Scan this QR code to connect.", comment: "Sync with another device dialog show qr code explanation")
-    static let syncWithAnotherDeviceEnterCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-explanation", value: "Enter the text code in the field below to connect.", comment: "Sync with another device dialog enter code explanation")
+    static let syncWithAnotherDeviceEnterCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.enter-code-explanation", value: "Paste the code here to sync.", comment: "Sync with another device dialog enter code explanation")
     static let syncWithAnotherDeviceShowCodeExplanation = NSLocalizedString("preferences.sync.sync-with-another-device.show-code-explanation", value: "Share this code to connect with a desktop machine.", comment: "Sync with another device dialog show code explanation")
     static let syncWithAnotherDeviceViewQRCode = NSLocalizedString("preferences.sync.sync-with-another-device.view-qr-code-link", value: "View QR Code", comment: "Sync with another device dialog view qr code link")
     static let syncWithAnotherDeviceViewTextCode = NSLocalizedString("preferences.sync.sync-with-another-device.view-text-code-link", value: "View Text Code", comment: "Sync with another device dialog view text code link")
@@ -134,9 +134,9 @@ enum UserText {
     // Sync enabled options
     static let optionsSectionTitle = NSLocalizedString("prefrences.sync.options-section-title", value: "Options", comment: "Title for options settings")
     static let shareFavoritesOptionTitle = NSLocalizedString("prefrences.sync.share-favorite-option-title", value: "Unify Favorites Across Devices", comment: "Title for share favorite option")
-    static let shareFavoritesOptionCaption = NSLocalizedString("prefrences.sync.share-favorite-option-caption", value: "Use the same favorite bookmarks on the new tab. Leave off to keep mobile and desktop favorites separate.", comment: "Caption for share favorite option")
-    static let fetchFaviconsOptionTitle = NSLocalizedString("prefrences.sync.fetch-favicons-option-title", value: "Fetch Bookmark Icons", comment: "Title for fetch favicons option")
-    static let fetchFaviconsOptionCaption = NSLocalizedString("prefrences.sync.fetch-favicons-option-caption", value: "Automatically download icons for synced bookmarks.", comment: "Caption for fetch favicons option")
+    static let shareFavoritesOptionCaption = NSLocalizedString("prefrences.sync.share-favorite-option-caption", value: "Use the same favorite bookmarks on all your devices. Leave off to keep mobile and desktop favorites separate.", comment: "Caption for share favorite option")
+    static let fetchFaviconsOptionTitle = NSLocalizedString("prefrences.sync.fetch-favicons-option-title", value: "Auto-Download Icons", comment: "Title for fetch favicons option")
+    static let fetchFaviconsOptionCaption = NSLocalizedString("prefrences.sync.fetch-favicons-option-caption", value: "Automatically download icons for synced bookmarks. Icon downloads are exposed to your network.", comment: "Caption for fetch favicons option")
 
     // sync enabled errors
     static let syncLimitExceededTitle = NSLocalizedString("prefrences.sync.limit-exceeded-title", value: "Sync Paused", comment: "Title for sync limits exceeded warning")

@@ -35,30 +35,26 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Sync Enabled
-        PreferencePaneSection(verticalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 8) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
-                .frame(width: 513, alignment: .topLeading)
         }
 
         // Synced Devices
-        PreferencePaneSection(verticalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 8) {
             Text(UserText.syncedDevices)
                 .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
-                .frame(width: 513, alignment: .topLeading)
         }
 
         // Options
-        PreferencePaneSection(verticalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 8) {
             Text(UserText.optionsSectionTitle)
                 .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
             Toggle(isOn: $model.isFaviconsFetchingEnabled) {
                 HStack {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(UserText.fetchFaviconsOptionTitle)
                         Text(UserText.fetchFaviconsOptionCaption)
                             .font(Const.Fonts.preferencePaneCaption)
@@ -66,17 +62,13 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                             .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.leading)
                     }
-                    Spacer(minLength: 30)
+                    Spacer()
                 }
             }
-            .padding(.horizontal, 16)
-            .toggleStyle(.switch)
-            .padding(.vertical, 12)
-            .roundedBorder()
-            .frame(width: 513, alignment: .topLeading)
+            .frame(alignment: .topLeading)
             Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
                 HStack {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(UserText.shareFavoritesOptionTitle)
                         Text(UserText.shareFavoritesOptionCaption)
                             .font(Const.Fonts.preferencePaneCaption)
@@ -84,40 +76,31 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                             .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.leading)
                     }
-                    Spacer(minLength: 30)
+                    Spacer()
                 }
             }
-            .padding(.horizontal, 16)
-            .toggleStyle(.switch)
-            .padding(.vertical, 12)
-            .roundedBorder()
-            .frame(width: 513, alignment: .topLeading)
+            .frame(alignment: .topLeading)
         }
 
         // Recovery
-        PreferencePaneSection(verticalPadding: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(UserText.recovery)
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-                HStack(alignment: .top, spacing: 12) {
-                    Text(UserText.recoveryInstructions)
-                        .fixMultilineScrollableText()
-                    Spacer()
-                    Button(UserText.saveRecoveryPDF) {
-                        model.saveRecoveryPDF()
-                    }
+        PreferencePaneSection(verticalPadding: 8) {
+            Text(UserText.recovery)
+                .font(Const.Fonts.preferencePaneSectionHeader)
+            HStack(alignment: .top, spacing: 12) {
+                Text(UserText.recoveryInstructions)
+                    .fixMultilineScrollableText()
+                Spacer()
+                Button(UserText.saveRecoveryPDF) {
+                    model.saveRecoveryPDF()
                 }
             }
-            .padding(.horizontal, 16)
-            .frame(width: 513, alignment: .topLeading)
         }
 
-        // Turn Off and Delate Data
-        PreferencePaneSection(verticalPadding: 12) {
+        // Turn Off and Delete Data
+        PreferencePaneSection(verticalPadding: 8) {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
-            .padding(16)
         }
     }
 
