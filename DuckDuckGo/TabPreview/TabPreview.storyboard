@@ -46,18 +46,18 @@
                                 </constraints>
                             </visualEffectView>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lWf-Z2-vYW">
-                                <rect key="frame" x="14" y="31" width="260" height="17"/>
+                                <rect key="frame" x="14" y="32" width="260" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="256" id="tMT-xB-AW4"/>
                                 </constraints>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="cca-xA-oAB">
-                                    <font key="font" metaFont="system" size="14"/>
+                                    <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" name="TabPreviewTintColor"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jLi-sz-Wfx">
-                                <rect key="frame" x="36" y="12" width="238" height="15"/>
+                                <rect key="frame" x="36" y="13" width="238" height="15"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="9YQ-IO-IWw">
                                     <font key="font" metaFont="cellTitle"/>
                                     <color key="textColor" name="TabPreviewSecondaryTintColor"/>
@@ -65,7 +65,7 @@
                                 </textFieldCell>
                             </textField>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BBd-BB-c2m" userLabel="Favicon Image View">
-                                <rect key="frame" x="16" y="11" width="16" height="16"/>
+                                <rect key="frame" x="16" y="12" width="16" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="16" id="26h-yC-vdl"/>
                                     <constraint firstAttribute="height" constant="16" id="wW1-R8-h1C"/>
