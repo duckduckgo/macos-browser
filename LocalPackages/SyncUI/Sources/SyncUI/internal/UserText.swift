@@ -61,6 +61,7 @@ enum UserText {
 
     // Sync Title
     static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
+    static let syncRollOutBannerDescription = NSLocalizedString("preferences.sync.rollout-banner.description", value: "Sync & Backup is rolling out gradually and may not be available yet within DuckDuckGo on your other devices.", comment: "Description of rollout banner")
 
     static let turnOff = NSLocalizedString("preferences.sync.turn-off", value: "Turn Off", comment: "Turn off sync confirmation dialog button title")
     static let turnOffSync = NSLocalizedString("preferences.sync.turn-off.ellipsis", value: "Turn off Sync...", comment: "Disable sync button caption")
