@@ -35,7 +35,7 @@ struct VPNLocationPreferenceItem: View {
                     Text(string).font(.system(size: 16))
                 }
 
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(model.title)
                         .font(.system(size: 13))
                         .foregroundColor(.primary)

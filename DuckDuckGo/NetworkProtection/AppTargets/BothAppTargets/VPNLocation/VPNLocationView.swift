@@ -28,11 +28,11 @@ struct VPNLocationView: View {
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 16) {
                     Text(UserText.vpnLocationListTitle)
                         .font(.system(size: 17, weight: .bold))
                         .foregroundColor(.primary)
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 20) {
                         nearestSection
                         countriesSection
                     }
@@ -61,7 +61,7 @@ struct VPNLocationView: View {
 
     @ViewBuilder
     private var nearestSection: some View {
-        PreferencePaneSection(verticalPadding: 12) {
+        PreferencePaneSection(verticalPadding: 0) {
             Text(UserText.vpnLocationRecommendedSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
@@ -78,10 +78,11 @@ struct VPNLocationView: View {
                     await model.onNearestItemSelection()
                 }
             }, label: {
-                VStack(alignment: .leading, spacing: 4) {
                 Image("Location-16-Solid")
                     .padding(4)
+                VStack(alignment: .leading, spacing: 2) {
                     Text(UserText.vpnLocationNearestAvailable)
+                        .font(.system(size: 13))
                         .foregroundColor(.primary)
                     Text(UserText.vpnLocationNearestAvailableSubtitle)
                         .font(.system(size: 11))
@@ -89,9 +90,6 @@ struct VPNLocationView: View {
                 }
             }
         )
-        .frame(idealWidth: .infinity, maxWidth: .infinity, maxHeight: 52)
-        .padding(10)
-        .background(Color("BlackWhite1"))
         .roundedBorder()
     }
 
@@ -99,10 +97,10 @@ struct VPNLocationView: View {
     private var countriesSection: some View {
         switch model.state {
         case .loading:
-            EmptyView()
-                .listRowBackground(Color.clear)
+            ProgressView()
+                .padding()
         case .loaded(let countryItems):
-            PreferencePaneSection(verticalPadding: 12) {
+            PreferencePaneSection(verticalPadding: 0) {
                 Text(UserText.vpnLocationCustomSectionTitle)
                     .font(.system(size: 15))
                     .foregroundColor(.primary)
@@ -113,11 +111,6 @@ struct VPNLocationView: View {
 
     private func countriesList(countries: [VPNCountryItemModel]) -> some View {
         VStack(spacing: 0) {
-            if countries.isEmpty {
-                ProgressView()
-                    .padding()
-            }
-
             ForEach(countries) { country in
                 if !country.isFirstItem {
                     Rectangle()
@@ -180,23 +173,19 @@ private struct CountryItem: View {
             }
         )
         .frame(idealWidth: .infinity, maxWidth: .infinity)
-        .if(itemModel.shouldShowPicker) {
-            $0.padding(10)
-        }
-        .if(!itemModel.shouldShowPicker) {
-            $0.padding(18)
-        }
         .background(Color("BlackWhite1"))
     }
 
     @ViewBuilder
     private var labels: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 2) {
             Text(itemModel.title)
+                .font(.system(size: 13))
                 .foregroundColor(.primary)
                 .background(Color.clear)
             if let subtitle = itemModel.subtitle {
                 Text(subtitle)
+                    .font(.system(size: 11))
                     .foregroundColor(.secondary)
                     .background(Color.clear)
             }
@@ -215,6 +204,7 @@ private struct CountryItem: View {
                     .tag(cityItem)
             }
         }
+        .foregroundColor(.accentColor)
         .pickerStyle(.menu)
         .frame(width: 90)
         .background(Color.clear)
@@ -227,17 +217,20 @@ private struct ChecklistItem<Content>: View where Content: View {
     @ViewBuilder let label: () -> Content
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            Image(systemName: "checkmark")
-                .foregroundColor(Color.accentColor)
-                .if(!isSelected) {
-                    $0.hidden()
-                }
-            label()
+        HStack(alignment: .center, spacing: 10) {
+            HStack {
+                Image(systemName: "checkmark")
+                    .foregroundColor(.accentColor)
+                    .if(!isSelected) {
+                        $0.hidden()
+                    }
+                label()
+            }
+            .padding(10)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .frame(height: 52)
         .contentShape(Rectangle())
-        .background(Color.clear)
         .onTapGesture {
             action()
         }
@@ -249,19 +242,24 @@ private struct VPNLocationViewButtons: View {
     let onCancel: () -> Void
 
     var body: some View {
-        HStack {
-            Spacer()
-            button(text: UserText.vpnLocationCancelButtonTitle, action: onCancel)
-                .keyboardShortcut(.cancelAction)
-                .buttonStyle(DismissActionButtonStyle())
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(Color("BlackWhite10"))
+                .frame(height: 1)
+            HStack {
+                Spacer()
+                button(text: UserText.vpnLocationCancelButtonTitle, action: onCancel)
+                    .keyboardShortcut(.cancelAction)
+                    .buttonStyle(DismissActionButtonStyle())
 
-            button(text: UserText.vpnLocationSubmitButtonTitle, action: onDone)
-                .keyboardShortcut(.defaultAction)
-                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                button(text: UserText.vpnLocationSubmitButtonTitle, action: onDone)
+                    .keyboardShortcut(.defaultAction)
+                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            }
+            .padding(.vertical, 16)
+            .padding(.horizontal, 20)
+            .background(Color("BlackWhite1"))
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 20)
-        .background(Color.secondary.opacity(0.18))
     }
 
     @ViewBuilder
