@@ -107,7 +107,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
 
         let messages = [mockMessage(id: "123")]
 
-        request.result = .success(messages as [AnyObject])
+        request.result = .success(messages)
         waitlistStorage.store(waitlistToken: "token")
         waitlistStorage.store(waitlistTimestamp: 123)
         waitlistStorage.store(inviteCode: "ABCD1234")
@@ -310,7 +310,7 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
 
 private final class MockNetworkProtectionRemoteMessagingRequest: HomePageRemoteMessagingRequest {
 
-    var result: Result<[AnyObject], Error>!
+    var result: Result<[NetworkProtectionRemoteMessage], Error>!
     var didFetchMessages: Bool = false
 
     func fetchHomePageRemoteMessages<T>(completion: @escaping (Result<[T], Error>) -> Void) where T: Decodable {
