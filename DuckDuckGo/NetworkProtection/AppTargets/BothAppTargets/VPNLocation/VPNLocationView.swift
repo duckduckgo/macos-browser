@@ -26,73 +26,78 @@ struct VPNLocationView: View {
     @Binding var isPresented: Bool
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(UserText.vpnLocationListTitle)
-                .font(.system(size: 17, weight: .bold))
-                .foregroundColor(.primary)
-            VStack(alignment: .leading, spacing: 16) {
-                nearest(isSelected: model.isNearestSelected)
-                countries()
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading) {
+                    Text(UserText.vpnLocationListTitle)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.primary)
+                    VStack(alignment: .leading, spacing: 16) {
+                        nearestSection
+                        countriesSection
+                    }
+                    .padding(0)
+                }
+                .padding(.horizontal, 56)
+                .padding(.top, 32)
+                .padding(.bottom, 20)
             }
-            .padding(0)
-        }
-        .padding(.horizontal, 56)
-        .padding(.top, 32)
-        .padding(.bottom, 20)
-        .frame(minWidth: 624, maxWidth: .infinity, minHeight: 514, maxHeight: 514, alignment: .top)
-        Spacer()
-        Group {
             VPNLocationViewButtons(
                 onDone: {
                     model.onSubmit()
                     isPresented = false
                 }, onCancel: {
                     isPresented = false
-                })
-            .navigationTitle(UserText.vpnFeedbackFormTitle)
+                }
+            )
             .onAppear {
                 Task {
                     await model.onViewAppeared()
                 }
             }
         }
-        .background(Color.secondary.opacity(0.1))
+        .frame(minWidth: 624, maxWidth: .infinity, minHeight: 514, maxHeight: 514, alignment: .top)
     }
 
     @ViewBuilder
-    private func nearest(isSelected: Bool) -> some View {
+    private var nearestSection: some View {
         PreferencePaneSection(verticalPadding: 12) {
             Text(UserText.vpnLocationRecommendedSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
-            ChecklistItem(
-                isSelected: isSelected,
-                action: {
-                    Task {
-                        await model.onNearestItemSelection()
-                    }
-                }, label: {
-                    Image(systemName: "location.fill")
-                        .resizable()
-                        .frame(width: 18, height: 18)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(UserText.vpnLocationNearestAvailable)
-                            .foregroundColor(.primary)
-                        Text(UserText.vpnLocationNearestAvailableSubtitle)
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-                }
-            )
-            .frame(idealWidth: .infinity, maxWidth: .infinity)
-            .padding(10)
-            .background(Color("BlackWhite1"))
-            .roundedBorder()
+            nearestItem
         }
     }
 
     @ViewBuilder
-    private func countries() -> some View {
+    private var nearestItem: some View {
+        ChecklistItem(
+            isSelected: model.isNearestSelected,
+            action: {
+                Task {
+                    await model.onNearestItemSelection()
+                }
+            }, label: {
+                Image(systemName: "location.fill")
+                    .resizable()
+                    .frame(width: 18, height: 18)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(UserText.vpnLocationNearestAvailable)
+                        .foregroundColor(.primary)
+                    Text(UserText.vpnLocationNearestAvailableSubtitle)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+            }
+        )
+        .frame(idealWidth: .infinity, maxWidth: .infinity, maxHeight: 52)
+        .padding(10)
+        .background(Color("BlackWhite1"))
+        .roundedBorder()
+    }
+
+    @ViewBuilder
+    private var countriesSection: some View {
         switch model.state {
         case .loading:
             EmptyView()
@@ -102,25 +107,42 @@ struct VPNLocationView: View {
                 Text(UserText.vpnLocationCustomSectionTitle)
                     .font(.system(size: 15))
                     .foregroundColor(.primary)
-                LazyVStack(alignment: .leading) {
-                    ForEach(countryItems) { item in
-                        CountryItem(
-                            itemModel: item,
-                            action: {
-                                Task {
-                                    await model.onCountryItemSelection(id: item.id)
-                                }
-                            }, cityPickerAction: { selection in
-                                Task {
-                                    await model.onCountryItemSelection(id: item.id, cityId: selection)
-                                }
-                            })
-                        .padding(10)
-                    }
-                }
-                .roundedBorder()
+                countriesList(countries: countryItems)
             }
         }
+    }
+
+    private func countriesList(countries: [VPNCountryItemModel]) -> some View {
+        VStack(spacing: 0) {
+            if countries.isEmpty {
+                ProgressView()
+                    .padding()
+            }
+
+            ForEach(countries) { country in
+                if !country.isFirstItem {
+                    Rectangle()
+                        .fill(Color("BlackWhite10"))
+                        .frame(height: 1)
+                        .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
+                }
+
+                CountryItem(
+                    itemModel: country,
+                    action: {
+                        Task {
+                            await model.onCountryItemSelection(id: country.id)
+                        }
+                    },
+                    cityPickerAction: { selection in
+                        Task {
+                            await model.onCountryItemSelection(id: country.id, cityId: selection)
+                        }
+                    }
+                )
+            }
+        }
+        .roundedBorder()
     }
 }
 
@@ -148,31 +170,53 @@ private struct CountryItem: View {
             isSelected: itemModel.isSelected,
             action: action,
             label: {
-                Text(itemModel.emoji)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(itemModel.title)
-                        .foregroundColor(.primary)
-                    if let subtitle = itemModel.subtitle {
-                        Text(subtitle)
-                            .foregroundColor(.secondary)
-                    }
-                }
+                Text(itemModel.emoji).background(Color.clear)
+                labels
                 if itemModel.shouldShowPicker {
                     Spacer()
-                    Picker("", selection: selectedCityItemBinding) {
-                        Text(itemModel.nearestCityPickerItem.name)
-                            .tag(itemModel.nearestCityPickerItem)
-                        Divider()
-                        ForEach(itemModel.cityPickerItems) { cityItem in
-                            Text(cityItem.name)
-                                .tag(cityItem)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .frame(width: 90)
+                    picker
                 }
             }
         )
+        .frame(idealWidth: .infinity, maxWidth: .infinity)
+        .if(itemModel.shouldShowPicker) {
+            $0.padding(10)
+        }
+        .if(!itemModel.shouldShowPicker) {
+            $0.padding(18)
+        }
+        .background(Color("BlackWhite1"))
+    }
+
+    @ViewBuilder
+    private var labels: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(itemModel.title)
+                .foregroundColor(.primary)
+                .background(Color.clear)
+            if let subtitle = itemModel.subtitle {
+                Text(subtitle)
+                    .foregroundColor(.secondary)
+                    .background(Color.clear)
+            }
+        }
+        .background(Color.clear)
+    }
+
+    @ViewBuilder
+    private var picker: some View {
+        Picker("", selection: selectedCityItemBinding) {
+            Text(itemModel.nearestCityPickerItem.name)
+                .tag(itemModel.nearestCityPickerItem)
+            Divider()
+            ForEach(itemModel.cityPickerItems) { cityItem in
+                Text(cityItem.name)
+                    .tag(cityItem)
+            }
+        }
+        .pickerStyle(.menu)
+        .frame(width: 90)
+        .background(Color.clear)
     }
 }
 
@@ -182,7 +226,7 @@ private struct ChecklistItem<Content>: View where Content: View {
     @ViewBuilder let label: () -> Content
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: 12) {
             Image(systemName: "checkmark")
                 .foregroundColor(Color.accentColor)
                 .if(!isSelected) {
@@ -192,7 +236,7 @@ private struct ChecklistItem<Content>: View where Content: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .contentShape(Rectangle())
-        .background(Color("BlackWhite1"))
+        .background(Color.clear)
         .onTapGesture {
             action()
         }
@@ -216,6 +260,7 @@ private struct VPNLocationViewButtons: View {
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 20)
+        .background(Color.secondary.opacity(0.18))
     }
 
     @ViewBuilder

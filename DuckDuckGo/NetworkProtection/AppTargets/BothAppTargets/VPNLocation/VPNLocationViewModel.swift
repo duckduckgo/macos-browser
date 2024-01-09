@@ -79,6 +79,7 @@ final class VPNLocationViewModel: ObservableObject {
     private func reloadList() async {
         guard let list = try? await locationListRepository.fetchLocationList() else { return }
         let isNearestSelected = selectedLocation == .nearest
+        var isCurrentItemFirstItem = true
 
         let countryItems = list.map { currentLocation in
             let isCountrySelected: Bool
@@ -99,12 +100,15 @@ final class VPNLocationViewModel: ObservableObject {
                 }
                 selectedCityItem = .nearest
             }
+            let isFirstItem = isCurrentItemFirstItem
+            isCurrentItemFirstItem = false
 
             return VPNCountryItemModel(
                 netPLocation: currentLocation,
                 isSelected: isCountrySelected,
                 cityPickerItems: cityPickerItems,
-                selectedCityItem: selectedCityItem
+                selectedCityItem: selectedCityItem,
+                isFirstItem: isFirstItem
             )
         }
         self.isNearestSelected = isNearestSelected
@@ -131,8 +135,9 @@ struct VPNCountryItemModel: Identifiable {
     let cityPickerItems: [VPNCityItemModel]
     let selectedCityItem: VPNCityItemModel
     let shouldShowPicker: Bool
+    let isFirstItem: Bool
 
-    fileprivate init(netPLocation: NetworkProtectionLocation, isSelected: Bool, cityPickerItems: [VPNCityItemModel], selectedCityItem: VPNCityItemModel) {
+    fileprivate init(netPLocation: NetworkProtectionLocation, isSelected: Bool, cityPickerItems: [VPNCityItemModel], selectedCityItem: VPNCityItemModel, isFirstItem: Bool = false) {
         self.labelsModel = .init(country: netPLocation.country)
         self.isSelected = isSelected
         self.id = netPLocation.country
@@ -141,6 +146,7 @@ struct VPNCountryItemModel: Identifiable {
         self.cityPickerItems = cityPickerItems
         self.shouldShowPicker = hasMultipleCities
         self.selectedCityItem = selectedCityItem
+        self.isFirstItem = isFirstItem
     }
 }
 
