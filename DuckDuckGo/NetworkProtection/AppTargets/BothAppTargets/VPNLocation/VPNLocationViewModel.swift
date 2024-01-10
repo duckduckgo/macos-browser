@@ -51,9 +51,12 @@ final class VPNLocationViewModel: ObservableObject {
     init(locationListRepository: NetworkProtectionLocationListRepository, settings: VPNSettings) {
         self.locationListRepository = locationListRepository
         self.settings = settings
-        state = .loading
         selectedLocation = settings.selectedLocation
         self.isNearestSelected = selectedLocation == .nearest
+        state = .loading
+        Task {
+            await reloadList()
+        }
     }
 
     func onViewAppeared() async {

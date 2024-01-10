@@ -22,7 +22,7 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct VPNLocationView: View {
-    @StateObject var model = VPNLocationViewModel()
+    @StateObject var model: VPNLocationViewModel
     @Binding var isPresented: Bool
 
     var body: some View {
@@ -36,6 +36,7 @@ struct VPNLocationView: View {
                         nearestSection
                         countriesSection
                     }
+                    .animation(.default, value: model.state.isLoading)
                     .padding(0)
                 }
                 .padding(.horizontal, 56)
@@ -95,15 +96,14 @@ struct VPNLocationView: View {
 
     @ViewBuilder
     private var countriesSection: some View {
-        switch model.state {
-        case .loading:
-            ProgressView()
-                .padding()
-        case .loaded(let countryItems):
-            PreferencePaneSection(verticalPadding: 0) {
-                Text(UserText.vpnLocationCustomSectionTitle)
-                    .font(.system(size: 15))
-                    .foregroundColor(.primary)
+        PreferencePaneSection(verticalPadding: 0) {
+            Text(UserText.vpnLocationCustomSectionTitle)
+                .font(.system(size: 15))
+                .foregroundColor(.primary)
+            switch model.state {
+            case .loading:
+                EmptyView()
+            case .loaded(let countryItems):
                 countriesList(countries: countryItems)
             }
         }

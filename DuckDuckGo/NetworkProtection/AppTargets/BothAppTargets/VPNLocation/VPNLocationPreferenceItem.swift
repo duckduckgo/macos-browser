@@ -22,7 +22,7 @@ import Foundation
 import SwiftUI
 
 struct VPNLocationPreferenceItem: View {
-    let model: VPNLocationPreferenceItemModel
+    @ObservedObject var model: VPNLocationPreferenceItemModel
     @State private var isShowingLocationSheet: Bool = false
 
     var body: some View {
@@ -50,7 +50,7 @@ struct VPNLocationPreferenceItem: View {
                     isShowingLocationSheet = true
                 }
                 .sheet(isPresented: $isShowingLocationSheet) {
-                    VPNLocationView(isPresented: $isShowingLocationSheet)
+                    VPNLocationView(model: model.locationsViewModel, isPresented: $isShowingLocationSheet)
                 }
             }
         }
