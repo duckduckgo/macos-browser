@@ -48,6 +48,7 @@ public final class NetworkProtectionPopover: NSPopover {
     private let debugInformationPublisher = CurrentValueSubject<Bool, Never>(false)
     private let statusReporter: NetworkProtectionStatusReporter
     private let model: NetworkProtectionStatusView.Model
+    private var appLifecycleCancellable: AnyCancellable?
 
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
@@ -68,6 +69,7 @@ public final class NetworkProtectionPopover: NSPopover {
         self.animates = false
         self.behavior = .semitransient
 
+        subscribeToAppLifecycleEvents()
         setupContentController()
     }
 
@@ -88,7 +90,16 @@ public final class NetworkProtectionPopover: NSPopover {
         controller.view.frame = CGRect(origin: .zero, size: controller.view.intrinsicContentSize)
     }
 
-    // MARK: - Forcing Status Refresh
+    // MARK: - Status Refresh
+
+    private func subscribeToAppLifecycleEvents() {
+        appLifecycleCancellable = NotificationCenter
+            .default
+            .publisher(for: NSApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                self?.model.refreshLoginItemStatus()
+        }
+    }
 
     override public func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
         statusReporter.forceRefresh()
