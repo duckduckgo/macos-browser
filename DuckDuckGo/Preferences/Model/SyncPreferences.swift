@@ -25,6 +25,7 @@ import SyncUI
 import SwiftUI
 import PDFKit
 import Navigation
+import PixelKit
 
 extension SyncDevice {
     init(_ account: SyncAccount) {
@@ -627,3 +628,5 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
 }
+
+extension SyncError: ErrorWithPixelParameters {}

@@ -2141,9 +2141,6 @@
 		56D145F229E6F06D00E3488A /* MockBookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */; };
 		56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
 		56D6A3D729DB2BAB0055215A /* ContinueSetUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */; };
-		56DB49B62B4DAAD300F4F27E /* SyncPixelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DB49B52B4DAAD300F4F27E /* SyncPixelParameters.swift */; };
-		56DB49B72B4DAAD300F4F27E /* SyncPixelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DB49B52B4DAAD300F4F27E /* SyncPixelParameters.swift */; };
-		56DB49B82B4DAAD300F4F27E /* SyncPixelParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DB49B52B4DAAD300F4F27E /* SyncPixelParameters.swift */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
@@ -3658,7 +3655,6 @@
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
 		56D145F029E6F06D00E3488A /* MockBookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockBookmarkManager.swift; sourceTree = "<group>"; };
 		56D6A3D529DB2BAB0055215A /* ContinueSetUpView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContinueSetUpView.swift; sourceTree = "<group>"; };
-		56DB49B52B4DAAD300F4F27E /* SyncPixelParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncPixelParameters.swift; sourceTree = "<group>"; };
 		7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
@@ -7830,7 +7826,6 @@
 				B6DA44012616B28300DD1EC2 /* PixelDataStore.swift */,
 				B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */,
 				B6DA44062616B30600DD1EC2 /* PixelDataModel.xcdatamodeld */,
-				56DB49B52B4DAAD300F4F27E /* SyncPixelParameters.swift */,
 			);
 			path = Statistics;
 			sourceTree = "<group>";
@@ -9401,7 +9396,6 @@
 				3706FEC3293F6F0600E42796 /* BWCommunicator.swift in Sources */,
 				3706FAFA293F65D500E42796 /* CleanThisHistoryMenuItem.swift in Sources */,
 				1DA6D0FE2A1FF9A100540406 /* HTTPCookie.swift in Sources */,
-				56DB49B72B4DAAD300F4F27E /* SyncPixelParameters.swift in Sources */,
 				3706FAFC293F65D500E42796 /* DownloadListItem.swift in Sources */,
 				3706FAFD293F65D500E42796 /* DownloadsPopover.swift in Sources */,
 				3706FAFE293F65D500E42796 /* SpacerNode.swift in Sources */,
@@ -10903,7 +10897,6 @@
 				4B957B322AC7AE700062CA31 /* EmailManagerRequestDelegate.swift in Sources */,
 				4B957B332AC7AE700062CA31 /* ApplicationVersionReader.swift in Sources */,
 				4B957B342AC7AE700062CA31 /* BookmarksBarViewController.swift in Sources */,
-				56DB49B82B4DAAD300F4F27E /* SyncPixelParameters.swift in Sources */,
 				4B957B352AC7AE700062CA31 /* PreferencesAutofillView.swift in Sources */,
 				4B957B362AC7AE700062CA31 /* BurnerHomePageView.swift in Sources */,
 				4B957B372AC7AE700062CA31 /* UserText+PasswordManager.swift in Sources */,
@@ -11405,7 +11398,6 @@
 				4BBF0915282DD40100EE1418 /* TemporaryFileHandler.swift in Sources */,
 				B602E8162A1E2570006D261F /* URL+NetworkProtection.swift in Sources */,
 				CB6BCDF927C6BEFF00CC76DC /* PrivacyFeatures.swift in Sources */,
-				56DB49B62B4DAAD300F4F27E /* SyncPixelParameters.swift in Sources */,
 				378F44EB29B4C73E00899924 /* ViewExtension.swift in Sources */,
 				B6DB3CF926A00E2D00D459B7 /* AVCaptureDevice+SwizzledAuthState.swift in Sources */,
 				1E0C72062ABC63BD00802009 /* SubscriptionPagesUserScript.swift in Sources */,
