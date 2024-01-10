@@ -75,8 +75,7 @@ final class FeedbackViewController: NSViewController {
     }
 
     private let feedbackSender = FeedbackSender()
-    private let websiteBreakageSender = WebsiteBreakageSender()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setContentViewHeight(Constants.defaultContentHeight, animated: false)

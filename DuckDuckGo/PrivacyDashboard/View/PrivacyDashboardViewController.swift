@@ -21,6 +21,7 @@ import WebKit
 import Combine
 import BrowserServicesKit
 import PrivacyDashboard
+import Common
 
 protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
 
@@ -49,7 +50,17 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
     public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
-    private let websiteBreakageReporter = WebsiteBreakageReporter()
+    
+    private let websiteBreakageReporter: WebsiteBreakageReporter = {
+        WebsiteBreakageReporter(pixelHandler: { parameters in
+            Pixel.fire(
+                .brokenSiteReport,
+                withAdditionalParameters: parameters,
+                allowedQueryReservedCharacters: CharacterSet(charactersIn: ",")
+            )
+        }, keyValueStoring: UserDefaults.standard)
+    }()
+    
     private let permissionHandler = PrivacyDashboardPermissionHandler()
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
@@ -57,9 +68,9 @@ final class PrivacyDashboardViewController: NSViewController {
 
         preferredMaxHeight = height
     }
-
     var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
-
+    private weak var tabViewModel: TabViewModel?
+    
     required init?(coder: NSCoder, initMode: Mode) {
         self.initMode = initMode
         super.init(coder: coder)
@@ -69,22 +80,21 @@ final class PrivacyDashboardViewController: NSViewController {
         self.initMode = .privacyDashboard
         super.init(coder: coder)
     }
-
+    
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
-
+        self.tabViewModel = tabViewModel
         privacyDashboardController.updatePrivacyInfo(tabViewModel.tab.privacyInfo)
         rulesUpdateObserver.updateTabViewModel(tabViewModel, onPendingUpdates: { [weak self] in
             self?.sendPendingUpdates()
         })
-        websiteBreakageReporter.updateTabViewModel(tabViewModel)
         permissionHandler.updateTabViewModel(tabViewModel) { [weak self] allowedPermissions in
             self?.privacyDashboardController.allowedPermissions = allowedPermissions
         }
     }
 
     public override func viewDidLoad() {
+        
         super.viewDidLoad()
-
         initWebView()
         privacyDashboardController.setup(for: webView, reportBrokenSiteOnly: initMode == .reportBrokenSite ? true : false)
         privacyDashboardController.privacyDashboardNavigationDelegate = self
@@ -95,11 +105,9 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private func initWebView() {
         let configuration = WKWebViewConfiguration()
-
 #if DEBUG
         configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
 #endif
-
         let webView = PrivacyDashboardWebView(frame: .zero, configuration: configuration)
         self.webView = webView
         view.addAndLayout(webView)
@@ -223,11 +231,61 @@ extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
 
 extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelegate {
 
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didRequestSubmitBrokenSiteReportWithCategory category: String, description: String) {
-        websiteBreakageReporter.reportBreakage(category: category, description: description, reportFlow: .dashboard)
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, 
+                                    didRequestSubmitBrokenSiteReportWithCategory category: String,
+                                    description: String) {
+        do {
+            let websiteBreakage = try makeWebsiteBreakage(category: category, description: description)
+            try websiteBreakageReporter.report(breakage: websiteBreakage)
+        } catch {
+            os_log("Failed to generate or send the website breakage report: \(error.localizedDescription)", type: .error)
+        }
     }
 
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, reportBrokenSiteDidChangeProtectionSwitch protectionState: PrivacyDashboard.ProtectionState) {
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, 
+                                    reportBrokenSiteDidChangeProtectionSwitch protectionState: PrivacyDashboard.ProtectionState) {
+        
         privacyDashboardProtectionSwitchChangeHandler(state: protectionState)
+    }
+}
+
+// MARK: - Breakage
+
+extension PrivacyDashboardViewController {
+    
+    enum WebsiteBreakageError: Error {
+        case FailedToFetchTheCurrentURL
+    }
+    
+    private func makeWebsiteBreakage(category: String, description: String) throws -> WebsiteBreakage {
+        
+        // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
+        guard let currentTab = tabViewModel?.tab,
+            let currentURL = currentTab.content.url?.trimmingQueryItemsAndFragment() else {
+            throw WebsiteBreakageError.FailedToFetchTheCurrentURL
+        }
+        let blockedTrackerDomains = currentTab.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
+        let installedSurrogates = currentTab.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
+        let ampURL = currentTab.linkProtection.lastAMPURLString ?? ""
+        let urlParametersRemoved = currentTab.linkProtection.urlParametersRemoved
+
+        // current domain's protection status
+        let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
+        let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
+                
+        let websiteBreakage = WebsiteBreakage(siteUrl: currentURL,
+                                              category: category.lowercased(),
+                                              description: description,
+                                              osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+                                              upgradedHttps: currentTab.privacyInfo?.connectionUpgradedTo != nil,
+                                              tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
+                                              blockedTrackerDomains: blockedTrackerDomains,
+                                              installedSurrogates: installedSurrogates,
+                                              isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                              ampURL: ampURL,
+                                              urlParametersRemoved: urlParametersRemoved,
+                                              protectionsState: protectionsState,
+                                              reportFlow: source)
+        return websiteBreakage
     }
 }
