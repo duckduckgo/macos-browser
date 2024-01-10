@@ -49,22 +49,22 @@ final class CriticalPathsTests: XCTestCase {
 
         // Create Account
         let sheetsQuery = settingsWindow.sheets
-        settingsWindow.staticTexts["Sync and Back Up This Device"].click()
-        sheetsQuery.buttons["Turn on Sync & Backup"].click()
+        settingsWindow/*@START_MENU_TOKEN@*/.buttons["Sync and Back Up This Device"]/*[[".groups",".scrollViews.buttons[\"Sync and Back Up This Device\"]",".buttons[\"Sync and Back Up This Device\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
+        sheetsQuery.buttons["Turn On Sync & Backup"].click()
         sheetsQuery.buttons["Next"].click()
         sheetsQuery.buttons["Done"].click()
         let syncEnabledElement = settingsWindow.staticTexts["Sync Enabled"]
         XCTAssertTrue(syncEnabledElement.exists, "Sync Enabled text is not visible")
 
         // Clean Up
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
         settingsWindow.swipeUp()
-        settingsWindow.buttons["Turn Off and Delete Server Data"].click()
+        settingsWindow/*@START_MENU_TOKEN@*/.buttons["Turn Off and Delete Server Data…"]/*[[".groups",".scrollViews.buttons[\"Turn Off and Delete Server Data…\"]",".buttons[\"Turn Off and Delete Server Data…\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
         sheetsQuery.buttons["Delete Data"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
         XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
+        debugMenuBarItem.click()
+        internaluserstateMenuItem.click()
     }
 
     func testCanRecoverSyncAccount() throws {
@@ -77,8 +77,8 @@ final class CriticalPathsTests: XCTestCase {
 
         // Create Account
         let sheetsQuery = settingsWindow.sheets
-        settingsWindow.staticTexts["Sync and Back Up This Device"].click()
-        sheetsQuery.buttons["Turn on Sync & Backup"].click()
+        settingsWindow.buttons["Sync and Back Up This Device"].click()
+        sheetsQuery.buttons["Turn On Sync & Backup"].click()
         sheetsQuery.buttons["Copy Code"].click()
         sheetsQuery.buttons["Next"].click()
         sheetsQuery.buttons["Done"].click()
@@ -86,25 +86,25 @@ final class CriticalPathsTests: XCTestCase {
         XCTAssertTrue(syncEnabledElement.exists, "Sync Enabled text is not visible")
 
         // Log out
-        settingsWindow.buttons["Turn off Sync..."].click()
+        settingsWindow.buttons["Turn Off Sync…"].click()
         sheetsQuery.buttons["Turn Off"].click()
 
         // Recover Account
-        settingsWindow.staticTexts["Recover Synced Data"].click()
+        settingsWindow.buttons["Recover Synced Data"].click()
         sheetsQuery.buttons["Get Started"].click()
         sheetsQuery.buttons["Paste"].click()
         sheetsQuery.buttons["Done"].click()
         XCTAssertTrue(syncEnabledElement.exists, "Sync Enabled text is not visible")
 
         // Clean Up
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
         settingsWindow.swipeUp()
-        settingsWindow.buttons["Turn Off and Delete Server Data"].click()
+        settingsWindow.buttons["Turn Off and Delete Server Data…"].click()
         sheetsQuery.buttons["Delete Data"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
         XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
+        debugMenuBarItem.click()
+        internaluserstateMenuItem.click()
     }
 
     func testCanRemoveData() {
@@ -117,8 +117,8 @@ final class CriticalPathsTests: XCTestCase {
 
         // Create Account
         let sheetsQuery = settingsWindow.sheets
-        settingsWindow.staticTexts["Sync and Back Up This Device"].click()
-        sheetsQuery.buttons["Turn on Sync & Backup"].click()
+        settingsWindow.buttons["Sync and Back Up This Device"].click()
+        sheetsQuery.buttons["Turn On Sync & Backup"].click()
         sheetsQuery.buttons["Copy Code"].click()
         sheetsQuery.buttons["Next"].click()
         sheetsQuery.buttons["Done"].click()
@@ -127,19 +127,19 @@ final class CriticalPathsTests: XCTestCase {
 
         // Delete Data
         settingsWindow.swipeUp()
-        settingsWindow.buttons["Turn Off and Delete Server Data"].click()
+        settingsWindow.buttons["Turn Off and Delete Server Data…"].click()
         sheetsQuery.buttons["Delete Data"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
         XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
 
         // Log In and check error
-        settingsWindow.staticTexts["Sync with Another Device"].click()
+        settingsWindow.buttons["Sync With Another Device"].click()
         let settingsSheetsQuery = settingsWindow.sheets
-        settingsSheetsQuery.staticTexts["Enter Code"].click()
+        settingsSheetsQuery.buttons["Enter Code"].click()
         settingsSheetsQuery.buttons["Paste"].click()
         let alertSheet = sheetsQuery.sheets["alert"]
-        alertSheet.staticTexts["Sync Error"].click()
+        alertSheet.staticTexts["Sync & Backup Error"].click()
         XCTAssertTrue(alertSheet.exists, "Sync Error text is not visible")
 
         // Clean Up
@@ -167,16 +167,18 @@ final class CriticalPathsTests: XCTestCase {
         logIn()
 
         // Clean Up
+        logOut()
         debugMenuBarItem.click()
         internaluserstateMenuItem.click()
-        logOut()
     }
 
     func testCanSyncData() {
-        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
-            XCTFail("CODE not set")
-            return
-        }
+//        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
+//            XCTFail("CODE not set")
+//            return
+//        }
+
+        let code = "eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNWQ5ODE3ZDYtMGE2Mi00MWM2LTk2NmUtZDZmMTk2YTJhYTdjIiwicHJpbWFyeV9rZXkiOiJlTU4rQWt6R0Yzc1hFZ1FhY1lucHZ5TEMrd2UwWVJ2OGF5Z05xT1k2aDNBPSJ9fQ=="
 
         // Add Bookmarks and Favorite
         addBookmarksAndFavorites()
@@ -212,7 +214,7 @@ final class CriticalPathsTests: XCTestCase {
 
         // Toggle Unified Favorite
         let settingsWindow = app.windows["Settings"]
-        settingsWindow.scrollViews.containing(.staticText, identifier: "Sync & Backup").children(matching: .switch).element(boundBy: 1).click()
+        settingsWindow/*@START_MENU_TOKEN@*/.checkBoxes["Unify Favorites Across Devices"]/*[[".groups",".scrollViews.checkBoxes[\"Unify Favorites Across Devices\"]",".checkBoxes[\"Unify Favorites Across Devices\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
 
         // Check Bookmarks
         chekBookmarks()
@@ -231,9 +233,9 @@ final class CriticalPathsTests: XCTestCase {
     private func logIn() {
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
-        settingsWindow.staticTexts["Sync with Another Device"].click()
+        settingsWindow.buttons["Sync With Another Device"].click()
         let settingsSheetsQuery = settingsWindow.sheets
-        settingsSheetsQuery.staticTexts["Enter Code"].click()
+        settingsSheetsQuery.buttons["Enter Code"].click()
         settingsSheetsQuery.buttons["Paste"].click()
         settingsSheetsQuery.buttons["Next"].click()
         settingsSheetsQuery.buttons["Done"].click()
@@ -244,7 +246,7 @@ final class CriticalPathsTests: XCTestCase {
     private func logOut() {
         let settingsWindow = app.windows["Settings"]
         let settingsSheetsQuery = settingsWindow.sheets
-        settingsWindow.buttons["Turn off Sync..."].click()
+        settingsWindow.buttons["Turn Off Sync…"].click()
         settingsSheetsQuery.buttons["Turn Off"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
