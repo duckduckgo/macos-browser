@@ -50,7 +50,9 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            if let onboardingStepViewModel = model.onboardingStepViewModel {
+            if model.loginItemNeedsApproval {
+                
+            } else if let onboardingStepViewModel = model.onboardingStepViewModel {
                 OnboardingStepView(model: onboardingStepViewModel)
                     .padding(.horizontal, 5)
                     .padding(.top, 5)

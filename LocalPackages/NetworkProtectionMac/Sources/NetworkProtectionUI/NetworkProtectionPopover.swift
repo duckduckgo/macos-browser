@@ -21,6 +21,7 @@ import Combine
 import Foundation
 import SwiftUI
 import NetworkProtection
+import LoginItems
 
 @available(iOS, introduced: 10.15, deprecated: 12.0, message: "Use Apple's DismissAction")
 public struct DismissAction: EnvironmentKey {
@@ -50,7 +51,8 @@ public final class NetworkProtectionPopover: NSPopover {
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
-                         menuItems: @escaping () -> [MenuItem]) {
+                         menuItems: @escaping () -> [MenuItem],
+                         agentLoginItem: LoginItem?) {
 
         self.statusReporter = statusReporter
 
@@ -63,7 +65,8 @@ public final class NetworkProtectionPopover: NSPopover {
                                onboardingStatusPublisher: onboardingStatusPublisher,
                                statusReporter: statusReporter,
                                debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
-                               menuItems: menuItems)
+                               menuItems: menuItems,
+                               agentLoginItem: agentLoginItem)
     }
 
     required init?(coder: NSCoder) {
@@ -74,13 +77,15 @@ public final class NetworkProtectionPopover: NSPopover {
                                         onboardingStatusPublisher: OnboardingStatusPublisher,
                                         statusReporter: NetworkProtectionStatusReporter,
                                         debugInformationPublisher: AnyPublisher<Bool, Never>,
-                                        menuItems: @escaping () -> [MenuItem]) {
+                                        menuItems: @escaping () -> [MenuItem],
+                                        agentLoginItem: LoginItem?) {
 
         let model = NetworkProtectionStatusView.Model(controller: controller,
                                                       onboardingStatusPublisher: onboardingStatusPublisher,
                                                       statusReporter: statusReporter,
                                                       debugInformationPublisher: debugInformationPublisher,
-                                                      menuItems: menuItems)
+                                                      menuItems: menuItems,
+                                                      agentLoginItem: agentLoginItem)
 
         let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in
             self?.close()

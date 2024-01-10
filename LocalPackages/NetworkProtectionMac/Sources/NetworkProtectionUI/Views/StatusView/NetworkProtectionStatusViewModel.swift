@@ -20,6 +20,7 @@ import SwiftUI
 import Combine
 import NetworkExtension
 import NetworkProtection
+import LoginItems
 
 /// This view can be shown from any location where we want the user to be able to interact with NetP.
 /// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
@@ -58,6 +59,10 @@ extension NetworkProtectionStatusView {
             onboardingStatus != .completed
         }
 
+        var loginItemNeedsApproval: Bool {
+            agentLoginItem?.status == .requiresApproval
+        }
+
         /// The NetP onboarding status publisher
         ///
         private let onboardingStatusPublisher: OnboardingStatusPublisher
@@ -74,6 +79,8 @@ extension NetworkProtectionStatusView {
         ///
         @Published
         var showDebugInformation: Bool
+
+        public let agentLoginItem: LoginItem?
 
         // MARK: - Extra Menu Items
 
@@ -101,6 +108,7 @@ extension NetworkProtectionStatusView {
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
                     menuItems: @escaping () -> [MenuItem],
+                    agentLoginItem: LoginItem?,
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
@@ -108,6 +116,7 @@ extension NetworkProtectionStatusView {
             self.statusReporter = statusReporter
             self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
+            self.agentLoginItem = agentLoginItem
             self.runLoopMode = runLoopMode
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,

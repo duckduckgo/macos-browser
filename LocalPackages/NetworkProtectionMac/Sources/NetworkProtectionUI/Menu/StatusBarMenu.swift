@@ -21,6 +21,7 @@ import Foundation
 import Combine
 import SwiftUI
 import NetworkProtection
+import LoginItems
 
 /// Abstraction of the the Network Protection status bar menu with a simple interface.
 ///
@@ -52,7 +53,8 @@ public final class StatusBarMenu: NSObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
-                menuItems: @escaping () -> [MenuItem]) {
+                menuItems: @escaping () -> [MenuItem],
+                agentLoginItem: LoginItem?) {
 
         self.model = model
         let statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -62,7 +64,8 @@ public final class StatusBarMenu: NSObject {
         popover = NetworkProtectionPopover(controller: controller,
                                            onboardingStatusPublisher: onboardingStatusPublisher,
                                            statusReporter: statusReporter,
-                                           menuItems: menuItems)
+                                           menuItems: menuItems,
+                                           agentLoginItem: agentLoginItem)
         popover.behavior = .transient
 
         super.init()

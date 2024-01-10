@@ -70,6 +70,10 @@ public enum OnboardingStep: String, Equatable {
     ///
     case userNeedsToAllowExtension
 
+    /// The user needs to allow the VPN agent to run
+    ///
+    case userNeedsToAllowVPNAgent
+
     /// The user needs to allow the VPN Configuration creation
     ///
     case userNeedsToAllowVPNConfiguration

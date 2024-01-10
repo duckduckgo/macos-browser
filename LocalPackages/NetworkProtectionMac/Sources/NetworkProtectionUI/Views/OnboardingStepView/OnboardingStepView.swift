@@ -67,12 +67,38 @@ struct OnboardingStepView: View {
 
     // MARK: - Model
 
-    private let model: Model
+    private let icon: NetworkProtectionAsset
+    private let title: String
+    private let description: [Model.StyledTextFragment]
+    private let actionTitle: String
+    private let action: () -> Void
+    private let actionScreenshot: NetworkProtectionAsset?
 
     // MARK: - Initializers
 
     public init(model: Model) {
-        self.model = model
+        self.init(
+            icon: model.icon,
+            title: model.title,
+            description: model.description,
+            actionTitle: model.actionTitle,
+            action: model.action,
+            actionScreenshot: model.actionScreenshot
+        )
+    }
+
+    public init(icon: NetworkProtectionAsset,
+                title: String,
+                description: [Model.StyledTextFragment],
+                actionTitle: String,
+                action: @escaping () -> Void,
+                actionScreenshot: NetworkProtectionAsset?) {
+        self.icon = icon
+        self.title = title
+        self.description = description
+        self.actionTitle = actionTitle
+        self.action = action
+        self.actionScreenshot = actionScreenshot
     }
 
     // MARK: - View
@@ -80,15 +106,15 @@ struct OnboardingStepView: View {
     public var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 12) {
-                Image(model.icon)
+                Image(icon)
 
                 HStack {
                     VStack(alignment: .leading, spacing: 5) {
-                        Text(model.title)
+                        Text(title)
                             .applyStepTitleAttributes()
                             .multilineText()
 
-                        model.description.reduce(Text("")) { previous, fragment in
+                        description.reduce(Text("")) { previous, fragment in
                             var newText = Text(fragment.text)
 
                             if fragment.isEmphasized {
@@ -100,7 +126,7 @@ struct OnboardingStepView: View {
                         .applyStepDescriptionAttributes()
                         .multilineText()
 
-                        Button(model.actionTitle, action: model.action)
+                        Button(actionTitle, action: action)
                             .applyStepButtonAttributes(colorScheme: colorScheme)
                             .padding(.top, 3)
                     }
@@ -111,7 +137,7 @@ struct OnboardingStepView: View {
             .padding(.vertical, 16)
             .padding(.horizontal, 10)
 
-            if let actionScreenshot = model.actionScreenshot {
+            if let actionScreenshot = self.actionScreenshot {
                 Image(actionScreenshot)
             }
         }

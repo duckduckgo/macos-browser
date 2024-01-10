@@ -18,6 +18,7 @@
 
 import Combine
 import Foundation
+import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
@@ -64,7 +65,8 @@ final class NetworkProtectionNavBarPopoverManager {
 
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
-                                                   statusReporter: statusReporter) {
+                                                   statusReporter: statusReporter,
+                                                   menuItems: {
                 let menuItems = [
                     NetworkProtectionStatusView.Model.MenuItem(
                         name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
@@ -80,7 +82,7 @@ final class NetworkProtectionNavBarPopoverManager {
                 ]
 
                 return menuItems
-            }
+            }, agentLoginItem: LoginItem.vpnMenu)
             popover.delegate = delegate
 
             networkProtectionPopover = popover
