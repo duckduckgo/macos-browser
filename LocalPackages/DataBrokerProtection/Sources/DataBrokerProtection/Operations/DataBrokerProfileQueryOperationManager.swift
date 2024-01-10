@@ -239,7 +239,10 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
     private func sendProfileRemovedNotificationIfNecessary(userNotificationService: DataBrokerProtectionUserNotificationService, database: DataBrokerProtectionRepository) {
         let savedExtractedProfiles = database.fetchAllBrokerProfileQueryData().flatMap { $0.extractedProfiles }
 
-        guard savedExtractedProfiles.count > 0 else { return }
+        guard savedExtractedProfiles.count > 0 else {
+            assertionFailure("If no extracted profiles are saved, removed profiles should always be empty")
+            return
+        }
 
         if savedExtractedProfiles.count == 1 {
             userNotificationService.sendAllInfoRemovedNotificationIfPossible()
