@@ -367,14 +367,16 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func updateDeviceName(_ name: String) {
         Task { @MainActor in
+            self.devices = []
+            syncService.scheduler.cancelSyncAndSuspendSyncQueue()
             do {
-                self.devices = []
                 let devices = try await syncService.updateDeviceName(name)
                 managementDialogModel.endFlow()
                 mapDevices(devices)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToUpdateDeviceName, description: error.localizedDescription)
             }
+            syncService.scheduler.resumeSyncQueue()
         }
     }
 
