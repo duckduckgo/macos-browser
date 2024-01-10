@@ -19,14 +19,15 @@
 import XCTest
 @testable import Networking
 @testable import DuckDuckGo_Privacy_Browser
+import PrivacyDashboard
 
 class WebsiteBreakageReportTests: XCTestCase {
 
     func testCommonSetOfFields() throws {
         let breakage = WebsiteBreakage(
+            siteUrl: URL(string: "https://example.test/")!,
             category: "contentIsMissing",
             description: nil,
-            siteUrlString: "https://example.test/",
             osVersion: "12.3.0",
             upgradedHttps: true,
             tdsETag: "abc123",
@@ -64,9 +65,9 @@ class WebsiteBreakageReportTests: XCTestCase {
 
     func testThatNativeAppSpecificFieldsAreReported() throws {
         let breakage = WebsiteBreakage(
+            siteUrl: URL(string: "http://unsafe.example.test/path/to/thing.html")!,
             category: "videoOrImagesDidntLoad",
             description: nil,
-            siteUrlString: "http://unsafe.example.test/path/to/thing.html",
             osVersion: "12",
             upgradedHttps: false,
             tdsETag: "abc123",
@@ -81,7 +82,6 @@ class WebsiteBreakageReportTests: XCTestCase {
             ampURL: "https://example.test",
             urlParametersRemoved: false,
             protectionsState: true,
-            manufacturer: "IBM",
             reportFlow: .appMenu
         )
 
@@ -101,7 +101,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         XCTAssertEqual(queryItems[valueFor: "blockedTrackers"], "bad.tracker.test,tracking.test")
         XCTAssertEqual(queryItems[valueFor: "surrogates"], "surrogate.domain.test")
         XCTAssertEqual(queryItems[valueFor: "protectionsState"], "true")
-        XCTAssertEqual(queryItems[valueFor: "manufacturer"], "IBM")
+        XCTAssertEqual(queryItems[valueFor: "manufacturer"], "Apple")
         XCTAssertEqual(queryItems[valueFor: "os"], "12")
         XCTAssertEqual(queryItems[valueFor: "gpc"], "true")
     }
@@ -112,7 +112,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
                                                      queryParameters: params,
-                                                     allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters)
+                                                     allowedQueryReservedCharacters: PrivacyDashboardViewController.allowedQueryReservedCharacters)
         return configuration.request
     }
 }

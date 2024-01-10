@@ -50,17 +50,17 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
     public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
-    
+    static let allowedQueryReservedCharacters = CharacterSet(charactersIn: ",")
     private let websiteBreakageReporter: WebsiteBreakageReporter = {
         WebsiteBreakageReporter(pixelHandler: { parameters in
             Pixel.fire(
                 .brokenSiteReport,
                 withAdditionalParameters: parameters,
-                allowedQueryReservedCharacters: CharacterSet(charactersIn: ",")
+                allowedQueryReservedCharacters: PrivacyDashboardViewController.allowedQueryReservedCharacters
             )
         }, keyValueStoring: UserDefaults.standard)
     }()
-    
+
     private let permissionHandler = PrivacyDashboardPermissionHandler()
     private var preferredMaxHeight: CGFloat = Constants.initialContentHeight
     func setPreferredMaxHeight(_ height: CGFloat) {
@@ -70,7 +70,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
     var sizeDelegate: PrivacyDashboardViewControllerSizeDelegate?
     private weak var tabViewModel: TabViewModel?
-    
+
     required init?(coder: NSCoder, initMode: Mode) {
         self.initMode = initMode
         super.init(coder: coder)
@@ -80,7 +80,7 @@ final class PrivacyDashboardViewController: NSViewController {
         self.initMode = .privacyDashboard
         super.init(coder: coder)
     }
-    
+
     public func updateTabViewModel(_ tabViewModel: TabViewModel) {
         self.tabViewModel = tabViewModel
         privacyDashboardController.updatePrivacyInfo(tabViewModel.tab.privacyInfo)
@@ -93,7 +93,7 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     public override func viewDidLoad() {
-        
+
         super.viewDidLoad()
         initWebView()
         privacyDashboardController.setup(for: webView, reportBrokenSiteOnly: initMode == .reportBrokenSite ? true : false)
@@ -231,7 +231,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
 
 extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelegate {
 
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, 
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController,
                                     didRequestSubmitBrokenSiteReportWithCategory category: String,
                                     description: String) {
         do {
@@ -242,9 +242,9 @@ extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelega
         }
     }
 
-    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, 
+    func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController,
                                     reportBrokenSiteDidChangeProtectionSwitch protectionState: PrivacyDashboard.ProtectionState) {
-        
+
         privacyDashboardProtectionSwitchChangeHandler(state: protectionState)
     }
 }
@@ -252,17 +252,17 @@ extension PrivacyDashboardViewController: PrivacyDashboardReportBrokenSiteDelega
 // MARK: - Breakage
 
 extension PrivacyDashboardViewController {
-    
+
     enum WebsiteBreakageError: Error {
-        case FailedToFetchTheCurrentURL
+        case failedToFetchTheCurrentURL
     }
-    
+
     private func makeWebsiteBreakage(category: String, description: String) throws -> WebsiteBreakage {
-        
+
         // ⚠️ To limit privacy risk, site URL is trimmed to not include query and fragment
         guard let currentTab = tabViewModel?.tab,
             let currentURL = currentTab.content.url?.trimmingQueryItemsAndFragment() else {
-            throw WebsiteBreakageError.FailedToFetchTheCurrentURL
+            throw WebsiteBreakageError.failedToFetchTheCurrentURL
         }
         let blockedTrackerDomains = currentTab.privacyInfo?.trackerInfo.trackersBlocked.compactMap { $0.domain } ?? []
         let installedSurrogates = currentTab.privacyInfo?.trackerInfo.installedSurrogates.map {$0} ?? []
@@ -272,7 +272,7 @@ extension PrivacyDashboardViewController {
         // current domain's protection status
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
-                
+
         let websiteBreakage = WebsiteBreakage(siteUrl: currentURL,
                                               category: category.lowercased(),
                                               description: description,

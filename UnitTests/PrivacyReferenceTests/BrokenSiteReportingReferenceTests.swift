@@ -19,6 +19,7 @@
 import XCTest
 import os.log
 import BrowserServicesKit
+import PrivacyDashboard
 
 @testable import Networking
 @testable import DuckDuckGo_Privacy_Browser
@@ -36,7 +37,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
         params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
                                                      queryParameters: params,
-                                                     allowedQueryReservedCharacters: WebsiteBreakageSender.allowedQueryReservedCharacters)
+                                                     allowedQueryReservedCharacters: PrivacyDashboardViewController.allowedQueryReservedCharacters)
         return configuration.request
     }
 
@@ -52,9 +53,9 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
             os_log("Testing [%s]", type: .info, test.name)
 
-            let breakage = WebsiteBreakage(category: "test",
-                                           description: nil,
-                                           siteUrlString: test.siteURL,
+            let breakage = WebsiteBreakage(siteUrl: test.siteURL,
+                                           category: "test",
+                                           description: "description",
                                            osVersion: test.os ?? "",
                                            upgradedHttps: test.wasUpgraded,
                                            tdsETag: test.blocklistVersion,
@@ -64,7 +65,6 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            ampURL: "",
                                            urlParametersRemoved: false,
                                            protectionsState: test.protectionsEnabled,
-                                           manufacturer: test.manufacturer ?? "",
                                            reportFlow: .appMenu)
 
             let request = makeURLRequest(with: breakage.requestParameters)
@@ -115,7 +115,7 @@ private struct ReportURL: Codable {
 
 private struct Test: Codable {
     let name: String
-    let siteURL: String
+    let siteURL: URL
     let wasUpgraded: Bool
     let category: String
     let blockedTrackers, surrogates: [String]
