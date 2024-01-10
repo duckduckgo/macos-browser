@@ -473,8 +473,7 @@ extension HomePage.Models {
 
             switch actionType {
             case .openDataBrokerProtection:
-                break
-                // NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: nil)
+                break // Not used currently
             case .openSurveyURL, .openURL:
                 if let surveyURL = remoteMessage.presentableSurveyURL() {
                     let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
@@ -597,7 +596,7 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
-            case .dataBrokerProtectionRemoteMessage(let message):
+            case .dataBrokerProtectionRemoteMessage:
                 return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
                 return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!

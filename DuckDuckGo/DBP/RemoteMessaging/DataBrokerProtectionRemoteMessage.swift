@@ -57,19 +57,15 @@ struct DataBrokerProtectionRemoteMessage: Codable, Equatable, Hashable {
             return nil
         }
 
-        if let actionURL = action.actionURL {
-            let surveyURLBuilder = SurveyURLBuilder(
-                statisticsStore: statisticsStore,
-                operatingSystemVersion: operatingSystemVersion,
-                appVersion: appVersion,
-                hardwareModel: hardwareModel,
-                daysSinceActivation: activationDateStore.daysSinceActivation(),
-                daysSinceLastActive: activationDateStore.daysSinceLastActive()
-            )
+        let surveyURLBuilder = SurveyURLBuilder(
+            statisticsStore: statisticsStore,
+            operatingSystemVersion: operatingSystemVersion,
+            appVersion: appVersion,
+            hardwareModel: hardwareModel,
+            daysSinceActivation: activationDateStore.daysSinceActivation(),
+            daysSinceLastActive: activationDateStore.daysSinceLastActive()
+        )
 
-            return surveyURLBuilder.buildSurveyURL(from: actionURL)
-        } else {
-            return nil
-        }
+        return surveyURLBuilder.buildSurveyURL(from: surveyURL)
     }
 }
