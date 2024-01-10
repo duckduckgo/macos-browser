@@ -57,11 +57,12 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
 
     public func requestNotificationPermission() {
         guard areNotificationsEnabled else { return }
-
-        userNotificationCenter.requestAuthorization(options: [.alert]) { _, _ in }
+        requestNotificationPermissionIfNecessary()
     }
 
     private func sendNotification(_ notification: UserNotification, afterDays days: Int? = nil) {
+        requestNotificationPermissionIfNecessary()
+
         let notificationContent = UNMutableNotificationContent()
         notificationContent.title = notification.title
         notificationContent.body = notification.message
@@ -92,6 +93,14 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
                 } else {
                     os_log("Notification sent", log: .dataBrokerProtection)
                 }
+            }
+        }
+    }
+
+    private func requestNotificationPermissionIfNecessary() {
+        userNotificationCenter.getNotificationSettings { [weak self] settings in
+            if settings.authorizationStatus == .notDetermined {
+                self?.userNotificationCenter.requestAuthorization(options: [.alert]) { _, _ in }
             }
         }
     }
