@@ -90,7 +90,12 @@ final class BookmarkHTMLReader {
         while cursor != nil {
             let itemType: XMLNode.BookmarkItemType?
             if importSource?.supportsSafariBookmarksHTMLFormat == true {
-                itemType = findNextItemInSafariFormat(&cursor)
+                let initialCursor = cursor
+                itemType = findNextItemInSafariFormat(&cursor) ?? {
+                    // fallback to non-safari format
+                    cursor = initialCursor
+                    return findNextItem(&cursor)
+                }()
             } else {
                 itemType = findNextItem(&cursor)
             }
