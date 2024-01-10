@@ -92,7 +92,6 @@ final class DefaultHomePageRemoteMessagingRequest: HomePageRemoteMessagingReques
                     let decoded = try decoder.decode([T].self, from: responseData)
                     completion(Result.success(decoded))
                 } catch {
-                    print("DEBUG: Error \(error), request \(self.endpointURL)")
                     completion(.failure(HomePageRemoteMessagingRequestError.failedToDecodeMessages))
                 }
             } else {
