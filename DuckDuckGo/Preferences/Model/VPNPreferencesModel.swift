@@ -84,12 +84,20 @@ final class VPNPreferencesModel: ObservableObject {
         shouldShowLocationItem = featureFlagger.isFeatureOn(.vpnGeoswitching)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
+        subscribeToShowInMenuBarSettingChanges()
         subscribeToLocationSettingChanges()
     }
 
     func subscribeToOnboardingStatusChanges(defaults: UserDefaults) {
         defaults.networkProtectionOnboardingStatusPublisher
             .assign(to: \.onboardingStatus, onWeaklyHeld: self)
+            .store(in: &cancellables)
+    }
+
+    func subscribeToShowInMenuBarSettingChanges() {
+        settings.showInMenuBarPublisher
+            .removeDuplicates()
+            .assign(to: \.showInMenuBar, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 
