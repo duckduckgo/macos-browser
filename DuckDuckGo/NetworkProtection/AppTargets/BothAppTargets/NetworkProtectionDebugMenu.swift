@@ -501,7 +501,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @objc func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
-        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
         DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
     }
 
@@ -518,7 +518,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func overrideNetworkProtectionActivationDate(to date: Date?) {
-        let store = DefaultWaitlistActivationDateStore()
+        let store = DefaultWaitlistActivationDateStore(source: .netP)
 
         if let date {
             store.updateActivationDate(date)

@@ -241,7 +241,7 @@ extension Tab.TabContent {
     func loadedFromCache() -> Self {
         switch self {
         case .url(let url, credential: let credential, source: _):
-            .url(url, credential: credential, source: .stateRestoration)
+            .url(url, credential: credential, source: .pendingStateRestoration)
         case .homePage, .preferences, .bookmarks, .onboarding, .none, .dataBrokerProtection:
             self
         }
@@ -249,10 +249,11 @@ extension Tab.TabContent {
 
     func forceReload() -> Self {
         switch self {
-        case .url(let url, credential: let credential, source: _):
-            .url(url, credential: credential, source: .reload)
+        case .url(let url, credential: let credential, source: let source):
+            let newSource: URLSource = source == .pendingStateRestoration ? .loadedByStateRestoration : .reload
+            return .url(url, credential: credential, source: newSource)
         case .homePage, .preferences, .bookmarks, .onboarding, .none, .dataBrokerProtection:
-            self
+            return self
         }
     }
 

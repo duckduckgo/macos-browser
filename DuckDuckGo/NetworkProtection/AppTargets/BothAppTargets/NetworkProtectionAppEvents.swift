@@ -115,7 +115,7 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionNumber
+        let currentVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         defer {
             versionStore.lastVersionRun = currentVersion
