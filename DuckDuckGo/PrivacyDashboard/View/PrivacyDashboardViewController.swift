@@ -278,6 +278,7 @@ extension PrivacyDashboardViewController {
                                               category: category.lowercased(),
                                               description: description,
                                               osVersion: "\(ProcessInfo.processInfo.operatingSystemVersion)",
+                                              manufacturer: "Apple",
                                               upgradedHttps: currentTab.privacyInfo?.connectionUpgradedTo != nil,
                                               tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                               blockedTrackerDomains: blockedTrackerDomains,
