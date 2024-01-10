@@ -80,49 +80,46 @@ final class VPNLocationViewModel: ObservableObject {
 
     @MainActor
     private func reloadList() async {
-        guard let list = try? await locationListRepository.fetchLocationList().sorted(by: { lhs, rhs in
-            lhs.country.localizedLocationFromCountryCode < rhs.country.localizedLocationFromCountryCode
-        }) else { return }
+        guard let locations = try? await locationListRepository.fetchLocationList().sortedByName() else { return }
         let isNearestSelected = selectedLocation == .nearest
-        var isCurrentItemFirstItem = true
+        self.isNearestSelected = isNearestSelected
+        var countryItems = [VPNCountryItemModel]()
 
-        let countryItems = list.map { currentLocation in
+        for i in 0..<locations.count {
+            let currentLocation = locations[i]
             let isCountrySelected: Bool
-            var cityPickerItems: [CityItem]
-            let selectedCityItem: CityItem
+            var cityPickerItems: [VPNCityItemModel]
+            let selectedCityItem: VPNCityItemModel
 
             switch selectedLocation {
             case .location(let location):
                 isCountrySelected = location.country == currentLocation.country
                 cityPickerItems = currentLocation.cities.map { currentCity in
-                    return CityItem(cityName: currentCity.name)
+                    return VPNCityItemModel(cityName: currentCity.name)
                 }
-                selectedCityItem = location.city.flatMap(CityItem.init(cityName:)) ?? .nearest
+                selectedCityItem = location.city.flatMap(VPNCityItemModel.init(cityName:)) ?? .nearest
             case .nearest:
                 isCountrySelected = false
                 cityPickerItems = currentLocation.cities.map { currentCity in
-                    CityItem(cityName: currentCity.name)
+                    VPNCityItemModel(cityName: currentCity.name)
                 }
                 selectedCityItem = .nearest
             }
-            let isFirstItem = isCurrentItemFirstItem
-            isCurrentItemFirstItem = false
+            let isFirstItem = i == 0
 
-            return VPNCountryItemModel(
-                netPLocation: currentLocation,
-                isSelected: isCountrySelected,
-                cityPickerItems: cityPickerItems,
-                selectedCityItem: selectedCityItem,
-                isFirstItem: isFirstItem
+            countryItems.append(
+                VPNCountryItemModel(
+                    netPLocation: currentLocation,
+                    isSelected: isCountrySelected,
+                    cityPickerItems: cityPickerItems,
+                    selectedCityItem: selectedCityItem,
+                    isFirstItem: isFirstItem
+                )
             )
         }
-        self.isNearestSelected = isNearestSelected
         state = .loaded(countryItems: countryItems)
     }
 }
-
-private typealias CountryItem = VPNCountryItemModel
-private typealias CityItem = VPNCityItemModel
 
 struct VPNCountryItemModel: Identifiable {
     private let labelsModel: NetworkProtectionVPNCountryLabelsModel
@@ -189,6 +186,14 @@ extension VPNLocationViewModel {
             locationListRepository: locationListRepository,
             settings: VPNSettings(defaults: .netP)
         )
+    }
+}
+
+private extension Array where Element == NetworkProtectionLocation {
+    func sortedByName() -> Self {
+        sorted(by: { lhs, rhs in
+            lhs.country.localizedLocationFromCountryCode < rhs.country.localizedLocationFromCountryCode
+        })
     }
 }
 
