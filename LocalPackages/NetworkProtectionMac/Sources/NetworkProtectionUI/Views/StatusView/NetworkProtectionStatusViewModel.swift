@@ -57,7 +57,7 @@ extension NetworkProtectionStatusView {
         private(set) var onboardingStatus: OnboardingStatus = .completed
 
         var tunnelControllerViewDisabled: Bool {
-            onboardingStatus != .completed
+            onboardingStatus != .completed || loginItemNeedsApproval
         }
 
         @MainActor
