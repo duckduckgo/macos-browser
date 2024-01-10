@@ -162,10 +162,8 @@ extension Pixel.Event {
              .dataBrokerProtectionWaitlistCardUITapped,
              .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
              .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
+
              .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn,
-             .homeButtonLeft,
-             .homeButtonRight,
-             .homeButtonHidden,
              .dataBrokerProtectionRemoteMessageOpened,
              .dataBrokerProtectionRemoteMessageDisplayed,
              .dataBrokerProtectionRemoteMessageDismissed:

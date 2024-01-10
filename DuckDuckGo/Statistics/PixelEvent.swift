@@ -208,11 +208,6 @@ extension Pixel {
         // DataBrokerProtection Other
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
 
-        // 28-day Home Button
-        case homeButtonHidden
-        case homeButtonLeft
-        case homeButtonRight
-
         case dailyPixel(Event, isFirst: Bool)
 
         enum Debug {
@@ -562,21 +557,12 @@ extension Pixel.Event {
             return "m_mac_dbp_ev_terms_accepted"
         case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
             return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
-
         case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
             return "m_mac_dbp_remote_message_displayed_\(messageID)"
         case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
             return "m_mac_dbp_remote_message_dismissed_\(messageID)"
         case .dataBrokerProtectionRemoteMessageOpened(let messageID):
             return "m_mac_dbp_remote_message_opened_\(messageID)"
-
-            // 28-day Home Button
-        case .homeButtonHidden:
-            return "m_mac_home_button_hidden"
-        case .homeButtonLeft:
-            return "m_mac_home_button_left"
-        case .homeButtonRight:
-            return "m_mac_home_button_right"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
