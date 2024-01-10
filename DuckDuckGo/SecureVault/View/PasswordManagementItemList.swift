@@ -72,6 +72,14 @@ struct PasswordManagementItemListView: View {
                         }
                 }
             }
+
+            Spacer(minLength: 0)
+
+            Divider()
+
+            PasswordManagementAddButton()
+                .padding()
+
         }
     }
 
@@ -388,6 +396,59 @@ struct PasswordManagementSortButton: View {
             return "✓ \(string)"
         } else {
             return "    \(string)"
+        }
+    }
+
+}
+
+private struct PasswordManagementAddButton: View {
+
+    @EnvironmentObject var model: PasswordManagementItemListModel
+
+    var body: some View {
+
+        ZStack {
+            // Setting Menu label to empty string and overlaying with this as Menu will not allow the image + text to be centered
+            HStack(spacing: 4) {
+                Image("Add")
+                Text(UserText.pmAddItem)
+            }
+
+            Menu {
+                createMenuItem(imageName: "LoginGlyph", text: UserText.pmNewLogin, category: .logins)
+                createMenuItem(imageName: "IdentityGlyph", text: UserText.pmNewIdentity, category: .identities)
+                createMenuItem(imageName: "CreditCardGlyph", text: UserText.pmNewCard, category: .cards)
+           } label: {
+                Text("")
+            }
+            .modifier(HideMenuIndicatorModifier())
+        }
+
+    }
+
+    private func createMenuItem(imageName: String, text: String, category: SecureVaultSorting.Category) -> some View {
+
+        Button {
+            model.onAddItemClickedFor(category)
+        } label: {
+            HStack {
+                Image(imageName)
+                Text(text)
+            }
+        }
+
+    }
+
+}
+
+private struct HideMenuIndicatorModifier: ViewModifier {
+
+    func body(content: Content) -> some View {
+        if #available(macOS 12, *) {
+            content
+                .menuIndicator(.hidden)
+        } else {
+            content
         }
     }
 
