@@ -48,7 +48,6 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
-    @IBOutlet var addVaultItemButton: NSButton!
     @IBOutlet var moreButton: NSButton!
     @IBOutlet var searchField: NSTextField!
     @IBOutlet var divider: NSView!
@@ -165,15 +164,12 @@ final class PasswordManagementViewController: NSViewController {
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
         emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
 
-        addVaultItemButton.toolTip = UserText.addItemTooltip
         moreButton.toolTip = UserText.moreOptionsTooltip
 
-        addVaultItemButton.sendAction(on: .leftMouseDown)
         moreButton.sendAction(on: .leftMouseDown)
 
         exportLoginItem.title = UserText.exportLogins
         unlockYourAutofillInfo.setAccessibilityIdentifier("Unlock Autofill")
-        addVaultItemButton.setAccessibilityIdentifier("add item")
 
         NotificationCenter.default.publisher(for: .deviceBecameLocked)
             .receive(on: DispatchQueue.main)
@@ -210,7 +206,6 @@ final class PasswordManagementViewController: NSViewController {
     private func displayLockScreen() {
         lockScreen.isHidden = false
         searchField.isEnabled = false
-        addVaultItemButton.isEnabled = false
 
         view.window?.makeFirstResponder(nil)
     }
@@ -218,7 +213,6 @@ final class PasswordManagementViewController: NSViewController {
     private func hideLockScreen() {
         lockScreen.isHidden = true
         searchField.isEnabled = true
-        addVaultItemButton.isEnabled = true
     }
 
     override func viewWillAppear() {
@@ -262,13 +256,6 @@ final class PasswordManagementViewController: NSViewController {
         authenticator.authenticateUser(reason: .unlockLogins) { authenticationResult in
             self.toggleLockScreen(hidden: authenticationResult.authenticated)
         }
-    }
-
-    @IBAction func onNewClicked(_ sender: NSButton) {
-        let menu = createNewSecureVaultItemMenu()
-        let location = NSPoint(x: sender.frame.origin.x, y: sender.frame.origin.y - (sender.frame.height / 2) + 6)
-
-        menu.popUp(positioning: nil, at: location, in: sender.superview)
     }
 
     @IBAction func moreButtonAction(_ sender: NSButton) {
@@ -785,25 +772,6 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     // swiftlint:enable function_body_length
-
-    private func createNewSecureVaultItemMenu() -> NSMenu {
-        let menu = NSMenu()
-
-        func createMenuItem(title: String, action: Selector, imageName: String) -> NSMenuItem {
-            let item = NSMenuItem(title: title, action: action, target: self, keyEquivalent: "")
-            item.image = NSImage(named: imageName)
-
-            return item
-        }
-
-        menu.items = [
-            createMenuItem(title: UserText.pmNewLogin, action: #selector(createNewLogin), imageName: "LoginGlyph"),
-            createMenuItem(title: UserText.pmNewIdentity, action: #selector(createNewIdentity), imageName: "IdentityGlyph"),
-            createMenuItem(title: UserText.pmNewCard, action: #selector(createNewCreditCard), imageName: "CreditCardGlyph"),
-        ]
-
-        return menu
-    }
 
     private func updateFilter() {
         let text = searchField.stringValue.trimmingWhitespace()
