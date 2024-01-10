@@ -35,36 +35,24 @@ public struct EnterRecoveryCodeView: View {
             SyncUIViews.TextDetailMultiline(text: UserText.enterRecoveryCodeDialogSubtitle)
             VStack(spacing: 16) {
                 Text(UserText.enterRecoveryCodeDialogAction1)
-                HStack(spacing: 10) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(.clear)
-                        Text(recoveryCodeModel.recoveryCode)
-                            .font(
-                                Font.custom("SF Mono", size: 13)
-                                    .weight(.medium)
-                            )
-                            .kerning(2)
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(3)
-                            .padding(.horizontal)
-                    }
-                    .frame(width: 290, height: 32)
-                    Button {
-                        recoveryCodeModel.paste()
-                        model.delegate?.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: true)
-                    } label: {
+                    .foregroundColor(.secondary)
+                    .padding(8)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                Button {
+                    recoveryCodeModel.paste()
+                    model.delegate?.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: true)
+                } label: {
+                    HStack {
                         Image("Paste")
-                            .frame(width: 32, height: 32)
+                        Text(UserText.paste)
                     }
                 }
-                .frame(width: 348)
+                .buttonStyle(CopyPasteButtonStyle(verticalPadding: 6.0))
+                .keyboardShortcut(KeyEquivalent("v"), modifiers: .command)
             }
             .padding()
             .roundedBorder()
-            .padding()
+            .padding(4)
             HStack {
                 line()
                 Text(UserText.enterRecoveryCodeDialogAction2)
