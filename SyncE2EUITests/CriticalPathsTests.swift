@@ -173,12 +173,10 @@ final class CriticalPathsTests: XCTestCase {
     }
 
     func testCanSyncData() {
-//        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
-//            XCTFail("CODE not set")
-//            return
-//        }
-
-        let code = "eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNWQ5ODE3ZDYtMGE2Mi00MWM2LTk2NmUtZDZmMTk2YTJhYTdjIiwicHJpbWFyeV9rZXkiOiJlTU4rQWt6R0Yzc1hFZ1FhY1lucHZ5TEMrd2UwWVJ2OGF5Z05xT1k2aDNBPSJ9fQ=="
+        guard let code = ProcessInfo.processInfo.environment["CODE"] else {
+            XCTFail("CODE not set")
+            return
+        }
 
         // Add Bookmarks and Favorite
         addBookmarksAndFavorites()
