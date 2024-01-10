@@ -47,7 +47,7 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
                 }
                 .frame(width: 493)
                 .padding()
-                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("OnboardingSkipButtonBaseColor")))
+                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("InfoBannerColour")))
                 .padding(.bottom, 10)
 
                 Text(UserText.sync)
