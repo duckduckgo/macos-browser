@@ -31,7 +31,9 @@ protocol PrivacyDashboardViewControllerSizeDelegate: AnyObject {
 final class PrivacyDashboardViewController: NSViewController {
 
     struct Constants {
-        static let initialContentHeight: CGFloat = 489
+        static let initialContentHeight: CGFloat = 489.0
+        static let reportBrokenSiteInitialContentHeight = 587.0 + 28.0
+        static let initialContentWidth: CGFloat = 360.0
     }
 
     /// Type of web page displayed
@@ -41,7 +43,6 @@ final class PrivacyDashboardViewController: NSViewController {
     }
 
     private var webView: WKWebView!
-    let width: CGFloat = 360.0
     private let initMode: Mode
 
     var source: WebsiteBreakage.Source {
@@ -219,7 +220,7 @@ extension PrivacyDashboardViewController: PrivacyDashboardControllerDelegate {
 extension PrivacyDashboardViewController: PrivacyDashboardNavigationDelegate {
 
     func privacyDashboardController(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController, didSetHeight height: Int) {
-        sizeDelegate?.privacyDashboardViewControllerDidChange(size: NSSize(width: width, height: CGFloat(height)))
+        sizeDelegate?.privacyDashboardViewControllerDidChange(size: NSSize(width: Constants.initialContentWidth, height: CGFloat(height)))
     }
 
     func privacyDashboardControllerDidTapClose(_ privacyDashboardController: PrivacyDashboard.PrivacyDashboardController) {
