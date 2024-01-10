@@ -17,8 +17,93 @@
 //
 
 import Cocoa
+import Combine
 
 final class MainView: NSView {
+    let tabBarContainerView = NSView()
+    let navigationBarContainerView = NSView()
+    let webContainerView = NSView()
+    let findInPageContainerView = NSView().hidden()
+    let bookmarksBarContainerView = NSView()
+    let fireContainerView = NSView()
+    let divider = ColorView(frame: .zero, backgroundColor: .separatorColor)
+
+    private(set) var navigationBarTopConstraint: NSLayoutConstraint!
+    private(set) var addressBarHeightConstraint: NSLayoutConstraint!
+    private(set) var bookmarksBarHeightConstraint: NSLayoutConstraint!
+
+    @Published var isMouseAboveWebView: Bool = false
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+
+        for subview in [
+            tabBarContainerView,
+            divider,
+            bookmarksBarContainerView,
+            navigationBarContainerView,
+            webContainerView,
+            findInPageContainerView,
+            fireContainerView,
+        ] {
+            subview.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(subview)
+        }
+
+        addConstraints()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func addConstraints() {
+        bookmarksBarHeightConstraint = bookmarksBarContainerView.heightAnchor.constraint(equalToConstant: 34)
+
+        navigationBarTopConstraint = navigationBarContainerView.topAnchor.constraint(equalTo: topAnchor, constant: 38)
+        addressBarHeightConstraint = navigationBarContainerView.heightAnchor.constraint(equalToConstant: 42)
+
+        NSLayoutConstraint.activate([
+            tabBarContainerView.topAnchor.constraint(equalTo: topAnchor),
+            tabBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            tabBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            tabBarContainerView.heightAnchor.constraint(equalToConstant: 38),
+
+            divider.topAnchor.constraint(equalTo: navigationBarContainerView.bottomAnchor),
+            divider.leadingAnchor.constraint(equalTo: leadingAnchor),
+            divider.trailingAnchor.constraint(equalTo: trailingAnchor),
+            divider.heightAnchor.constraint(equalToConstant: 1),
+
+            bookmarksBarContainerView.topAnchor.constraint(equalTo: divider.bottomAnchor),
+            bookmarksBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            bookmarksBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            bookmarksBarHeightConstraint,
+
+            navigationBarTopConstraint,
+            navigationBarContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            navigationBarContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            addressBarHeightConstraint,
+
+            webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor),
+            webContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            webContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            webContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            webContainerView.widthAnchor.constraint(greaterThanOrEqualToConstant: 512),
+            webContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 178),
+
+            findInPageContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor, constant: -4),
+            findInPageContainerView.topAnchor.constraint(equalTo: navigationBarContainerView.bottomAnchor, constant: -4).priority(900),
+            findInPageContainerView.centerXAnchor.constraint(equalTo: navigationBarContainerView.centerXAnchor),
+            findInPageContainerView.widthAnchor.constraint(equalToConstant: 400),
+            findInPageContainerView.heightAnchor.constraint(equalToConstant: 40),
+
+            fireContainerView.topAnchor.constraint(equalTo: topAnchor),
+            fireContainerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            fireContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            fireContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+        ])
+    }
+
     private typealias CFWebServicesCopyProviderInfoType = @convention(c) (CFString, UnsafeRawPointer?) -> NSDictionary?
 
     // PDF Plugin context menu
@@ -47,7 +132,7 @@ final class MainView: NSView {
         }
     }
 
-    // MARK: NSDraggingDestination
+    // MARK: - NSDraggingDestination
 
     override func draggingEntered(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
         return (nextResponder as? NSDraggingDestination)?.draggingEntered?(draggingInfo) ?? .none
@@ -60,5 +145,51 @@ final class MainView: NSView {
     override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
         return (nextResponder as? NSDraggingDestination)?.performDragOperation?(draggingInfo) ?? false
     }
+
+    // MARK: - Mouse Tracking
+
+    func setMouseAboveWebViewTrackingAreaEnabled(_ isEnabled: Bool) {
+        if isEnabled {
+            let trackingArea = makeMouseAboveViewTrackingArea()
+            addTrackingArea(trackingArea)
+            mouseAboveWebViewTrackingArea = trackingArea
+        } else if let mouseAboveWebViewTrackingArea {
+            removeTrackingArea(mouseAboveWebViewTrackingArea)
+            self.mouseAboveWebViewTrackingArea = nil
+            isMouseAboveWebView = false
+        }
+    }
+
+    override func updateTrackingAreas() {
+        if let mouseAboveWebViewTrackingArea {
+            removeTrackingArea(mouseAboveWebViewTrackingArea)
+            isMouseAboveWebView = false
+            let trackingArea = makeMouseAboveViewTrackingArea()
+            self.mouseAboveWebViewTrackingArea = trackingArea
+            addTrackingArea(trackingArea)
+        }
+        super.updateTrackingAreas()
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        if let mouseAboveWebViewTrackingArea, event.trackingArea == mouseAboveWebViewTrackingArea {
+            isMouseAboveWebView = true
+        }
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        if let mouseAboveWebViewTrackingArea, event.trackingArea == mouseAboveWebViewTrackingArea {
+            isMouseAboveWebView = false
+        }
+    }
+
+    private func makeMouseAboveViewTrackingArea() -> NSTrackingArea {
+        var bounds = bounds
+        bounds.size.height -= webContainerView.bounds.maxY
+        bounds.origin.y += webContainerView.bounds.maxY
+        return NSTrackingArea(rect: bounds, options: [.activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
+    }
+
+    private var mouseAboveWebViewTrackingArea: NSTrackingArea?
 
 }
