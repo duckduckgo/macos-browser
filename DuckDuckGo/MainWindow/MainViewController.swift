@@ -26,18 +26,7 @@ import NetworkProtection
 #endif
 
 final class MainViewController: NSViewController {
-
-    private let tabBarContainerView = NSView()
-    private let navigationBarContainerView = NSView()
-    private let webContainerView = NSView()
-    private let findInPageContainerView = NSView().hidden()
-    private let bookmarksBarContainerView = NSView()
-    private let fireContainerView = NSView()
-    private var navigationBarTopConstraint: NSLayoutConstraint!
-    private var addressBarHeightConstraint: NSLayoutConstraint!
-    private var bookmarksBarHeightConstraint: NSLayoutConstraint!
-
-    private let divider = ColorView(frame: .zero, backgroundColor: .separatorColor)
+    private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
 
     let tabBarViewController: TabBarViewController
     let navigationBarViewController: NavigationBarViewController
@@ -49,6 +38,7 @@ final class MainViewController: NSViewController {
     let tabCollectionViewModel: TabCollectionViewModel
     let isBurner: Bool
 
+    private var addressBarBookmarkIconVisibilityCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
@@ -86,91 +76,31 @@ final class MainViewController: NSViewController {
     }
 
     override func loadView() {
-        view = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
+        view = mainView
 
-        for subview in [
-            tabBarContainerView,
-            divider,
-            bookmarksBarContainerView,
-            navigationBarContainerView,
-            webContainerView,
-            findInPageContainerView,
-            fireContainerView,
-        ] {
-            subview.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(subview)
-        }
-
-        addConstraints()
-
-        addAndLayoutChild(tabBarViewController, into: tabBarContainerView)
-        addAndLayoutChild(bookmarksBarViewController, into: bookmarksBarContainerView)
-        addAndLayoutChild(navigationBarViewController, into: navigationBarContainerView)
-        addAndLayoutChild(browserTabViewController, into: webContainerView)
-        addAndLayoutChild(findInPageViewController, into: findInPageContainerView)
-        addAndLayoutChild(fireViewController, into: fireContainerView)
-    }
-
-    private func addConstraints() {
-        bookmarksBarHeightConstraint = bookmarksBarContainerView.heightAnchor.constraint(equalToConstant: 34)
-
-        navigationBarTopConstraint = navigationBarContainerView.topAnchor.constraint(equalTo: view.topAnchor, constant: 38)
-        addressBarHeightConstraint = navigationBarContainerView.heightAnchor.constraint(equalToConstant: 42)
-
-        NSLayoutConstraint.activate([
-            tabBarContainerView.topAnchor.constraint(equalTo: view.topAnchor),
-            tabBarContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tabBarContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tabBarContainerView.heightAnchor.constraint(equalToConstant: 38),
-
-            divider.topAnchor.constraint(equalTo: navigationBarContainerView.bottomAnchor),
-            divider.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 1),
-
-            bookmarksBarContainerView.topAnchor.constraint(equalTo: divider.bottomAnchor),
-            bookmarksBarContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            bookmarksBarContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            bookmarksBarHeightConstraint,
-
-            navigationBarTopConstraint,
-            navigationBarContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            navigationBarContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            addressBarHeightConstraint,
-
-            webContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor),
-            webContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            webContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webContainerView.widthAnchor.constraint(greaterThanOrEqualToConstant: 512),
-            webContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 178),
-
-            findInPageContainerView.topAnchor.constraint(equalTo: bookmarksBarContainerView.bottomAnchor, constant: -4),
-            findInPageContainerView.topAnchor.constraint(equalTo: navigationBarContainerView.bottomAnchor, constant: -4).priority(900),
-            findInPageContainerView.centerXAnchor.constraint(equalTo: navigationBarContainerView.centerXAnchor),
-            findInPageContainerView.widthAnchor.constraint(equalToConstant: 400),
-            findInPageContainerView.heightAnchor.constraint(equalToConstant: 40),
-
-            fireContainerView.topAnchor.constraint(equalTo: view.topAnchor),
-            fireContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            fireContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            fireContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ])
+        addAndLayoutChild(tabBarViewController, into: mainView.tabBarContainerView)
+        addAndLayoutChild(bookmarksBarViewController, into: mainView.bookmarksBarContainerView)
+        addAndLayoutChild(navigationBarViewController, into: mainView.navigationBarContainerView)
+        addAndLayoutChild(browserTabViewController, into: mainView.webContainerView)
+        addAndLayoutChild(findInPageViewController, into: mainView.findInPageContainerView)
+        addAndLayoutChild(fireViewController, into: mainView.fireContainerView)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         listenToKeyDownEvents()
+        subscribeToMouseTrackingArea()
         subscribeToSelectedTabViewModel()
         subscribeToAppSettingsNotifications()
-        findInPageContainerView.applyDropShadow()
+        mainView.findInPageContainerView.applyDropShadow()
 
         view.registerForDraggedTypes([.URL, .fileURL])
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
+        mainView.setMouseAboveWebViewTrackingAreaEnabled(true)
         registerForBookmarkBarPromptNotifications()
     }
 
@@ -187,6 +117,7 @@ final class MainViewController: NSViewController {
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
+        mainView.setMouseAboveWebViewTrackingAreaEnabled(false)
         if let bookmarkBarPromptObserver {
             NotificationCenter.default.removeObserver(bookmarkBarPromptObserver)
         }
@@ -195,13 +126,13 @@ final class MainViewController: NSViewController {
     override func viewWillAppear() {
         if isInPopUpWindow {
             tabBarViewController.view.isHidden = true
-            tabBarContainerView.isHidden = true
-            navigationBarTopConstraint.constant = 0.0
-            addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+            mainView.tabBarContainerView.isHidden = true
+            mainView.navigationBarTopConstraint.constant = 0.0
+            mainView.addressBarHeightConstraint.constant = mainView.tabBarContainerView.frame.height
             updateBookmarksBarViewVisibility(visible: false)
         } else {
-            navigationBarContainerView.wantsLayer = true
-            navigationBarContainerView.layer?.masksToBounds = false
+            mainView.navigationBarContainerView.wantsLayer = true
+            mainView.navigationBarContainerView.layer?.masksToBounds = false
 
             resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
 
@@ -213,7 +144,7 @@ final class MainViewController: NSViewController {
     }
 
     override func viewDidLayout() {
-        findInPageContainerView.applyDropShadow()
+        mainView.findInPageContainerView.applyDropShadow()
     }
 
     func windowDidBecomeMain() {
@@ -279,7 +210,7 @@ final class MainViewController: NSViewController {
     }
 
     func toggleBookmarksBarVisibility() {
-        updateBookmarksBarViewVisibility(visible: !(bookmarksBarHeightConstraint.constant > 0))
+        updateBookmarksBarViewVisibility(visible: !(mainView.bookmarksBarHeightConstraint.constant > 0))
     }
 
     // Can be updated via keyboard shortcut so needs to be internal visibility
@@ -290,15 +221,17 @@ final class MainViewController: NSViewController {
             if bookmarksBarViewController.parent == nil {
                 addChild(bookmarksBarViewController)
 
-                bookmarksBarViewController.view.frame = bookmarksBarContainerView.bounds
-                bookmarksBarContainerView.addSubview(bookmarksBarViewController.view)
+                bookmarksBarViewController.view.frame = mainView.bookmarksBarContainerView.bounds
+                mainView.bookmarksBarContainerView.addSubview(bookmarksBarViewController.view)
             }
         } else {
             bookmarksBarViewController.removeFromParent()
             bookmarksBarViewController.view.removeFromSuperview()
         }
 
-        bookmarksBarHeightConstraint?.constant = showBookmarksBar ? 34 : 0
+        mainView.bookmarksBarHeightConstraint?.constant = showBookmarksBar ? 34 : 0
+        mainView.layoutSubtreeIfNeeded()
+        mainView.updateTrackingAreas()
 
         updateDividerColor()
     }
@@ -307,8 +240,16 @@ final class MainViewController: NSViewController {
         NSAppearance.withAppAppearance {
             let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
             let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .addressBarSolidSeparatorColor
-            divider.backgroundColor = backgroundColor
+            mainView.divider.backgroundColor = backgroundColor
         }
+    }
+
+    private func subscribeToMouseTrackingArea() {
+        addressBarBookmarkIconVisibilityCancellable = mainView.$isMouseAboveWebView
+            .sink { [weak self] isMouseAboveWebView in
+                self?.navigationBarViewController.addressBarViewController?
+                    .addressBarButtonsViewController?.isMouseOverNavigationBar = isMouseAboveWebView
+            }
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -350,7 +291,7 @@ final class MainViewController: NSViewController {
 
             let nonHomePageHeight: CGFloat = isInPopUpWindow ? 42 : 48
 
-            let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
+            let height = animated ? mainView.addressBarHeightConstraint.animator() : mainView.addressBarHeightConstraint
             height?.constant = homePage ? 52 : nonHomePageHeight
 
             updateDividerColor()
@@ -409,7 +350,7 @@ final class MainViewController: NSViewController {
             return
         }
 
-        findInPageContainerView.isHidden = !model.isVisible
+        mainView.findInPageContainerView.isHidden = !model.isVisible
         findInPageViewController.model = model
         if model.isVisible {
             findInPageViewController.makeMeFirstResponder()
@@ -546,7 +487,7 @@ extension MainViewController {
         switch Int(event.keyCode) {
         case kVK_Escape:
             var isHandled = false
-            if !findInPageContainerView.isHidden {
+            if !mainView.findInPageContainerView.isHidden {
                 findInPageViewController.findInPageDone(self)
                 isHandled = true
             }
@@ -580,7 +521,7 @@ extension MainViewController {
 
     func otherMouseUp(with event: NSEvent) -> NSEvent? {
         guard event.window === self.view.window,
-              self.webContainerView.isMouseLocationInsideBounds(event.locationInWindow)
+              mainView.webContainerView.isMouseLocationInsideBounds(event.locationInWindow)
         else { return event }
 
         if event.buttonNumber == 3,
@@ -596,7 +537,6 @@ extension MainViewController {
         return event
 
     }
-
 }
 
 #if DEBUG
