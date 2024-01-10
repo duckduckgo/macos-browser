@@ -46,8 +46,6 @@ extension OnboardingStepView {
             switch step {
             case .userNeedsToAllowExtension:
                 return .appleVaultIcon
-            case .userNeedsToAllowVPNAgent:
-                return .appleVPNIcon
             case .userNeedsToAllowVPNConfiguration:
                 return .appleVPNIcon
             }
@@ -57,8 +55,6 @@ extension OnboardingStepView {
             switch step {
             case .userNeedsToAllowExtension:
                 return UserText.networkProtectionOnboardingInstallExtensionTitle
-            case .userNeedsToAllowVPNAgent:
-                return "Title"
             case .userNeedsToAllowVPNConfiguration:
                 return UserText.networkProtectionOnboardingAllowVPNTitle
             }
@@ -71,10 +67,6 @@ extension OnboardingStepView {
                     .init(text: UserText.networkProtectionOnboardingAllowExtensionDescPrefix),
                     .init(text: UserText.networkProtectionOnboardingAllowExtensionDescAllow, isEmphasized: true),
                     .init(text: UserText.networkProtectionOnboardingAllowExtensionDescSuffix),
-                ]
-            case .userNeedsToAllowVPNAgent:
-                return [
-                    .init(text: "Description"),
                 ]
             case .userNeedsToAllowVPNConfiguration:
                 return [
@@ -89,8 +81,6 @@ extension OnboardingStepView {
             switch step {
             case .userNeedsToAllowExtension:
                 return UserText.networkProtectionOnboardingAllowExtensionAction
-            case .userNeedsToAllowVPNAgent:
-                return "Allow VPN Agent"
             case .userNeedsToAllowVPNConfiguration:
                 return UserText.networkProtectionOnboardingAllowVPNAction
             }
@@ -104,8 +94,6 @@ extension OnboardingStepView {
                 } else {
                     return .allowSysexScreenshotBigSur
                 }
-            case .userNeedsToAllowVPNAgent:
-                return nil
             case .userNeedsToAllowVPNConfiguration:
                 return nil
             }

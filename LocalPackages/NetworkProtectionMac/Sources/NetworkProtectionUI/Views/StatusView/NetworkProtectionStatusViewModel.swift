@@ -21,6 +21,7 @@ import Combine
 import NetworkExtension
 import NetworkProtection
 import LoginItems
+import ServiceManagement
 
 /// This view can be shown from any location where we want the user to be able to interact with NetP.
 /// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
@@ -59,9 +60,9 @@ extension NetworkProtectionStatusView {
             onboardingStatus != .completed
         }
 
-        var loginItemNeedsApproval: Bool {
-            agentLoginItem?.status == .requiresApproval
-        }
+        @MainActor
+        @Published
+        var loginItemNeedsApproval = false
 
         /// The NetP onboarding status publisher
         ///
@@ -135,6 +136,7 @@ extension NetworkProtectionStatusView {
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
             subscribeToDebugInformationChanges()
+            refreshLoginItemStatus()
 
             onboardingStatusPublisher
                 .receive(on: DispatchQueue.main)
@@ -142,6 +144,23 @@ extension NetworkProtectionStatusView {
                 self?.onboardingStatus = status
             }
             .store(in: &cancellables)
+        }
+
+        func refreshLoginItemStatus() {
+            self.loginItemNeedsApproval = agentLoginItem?.status == .requiresApproval
+        }
+
+        func openLoginItemSettings() {
+            if #available(macOS 13.0, *) {
+                SMAppService.openSystemSettingsLoginItems()
+            } else {
+                guard let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") else {
+                    assertionFailure("Can't initialize login items URL")
+                    return
+                }
+
+                NSWorkspace.shared.open(loginItemsURL)
+            }
         }
 
         private func subscribeToStatusChanges() {

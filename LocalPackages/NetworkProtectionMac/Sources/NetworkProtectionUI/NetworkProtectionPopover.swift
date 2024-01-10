@@ -47,6 +47,7 @@ public final class NetworkProtectionPopover: NSPopover {
 
     private let debugInformationPublisher = CurrentValueSubject<Bool, Never>(false)
     private let statusReporter: NetworkProtectionStatusReporter
+    private let model: NetworkProtectionStatusView.Model
 
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
@@ -55,39 +56,27 @@ public final class NetworkProtectionPopover: NSPopover {
                          agentLoginItem: LoginItem?) {
 
         self.statusReporter = statusReporter
+        self.model = NetworkProtectionStatusView.Model(controller: controller,
+                                                      onboardingStatusPublisher: onboardingStatusPublisher,
+                                                      statusReporter: statusReporter,
+                                                      debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
+                                                      menuItems: menuItems,
+                                                      agentLoginItem: agentLoginItem)
 
         super.init()
 
         self.animates = false
         self.behavior = .semitransient
 
-        setupContentController(controller: controller,
-                               onboardingStatusPublisher: onboardingStatusPublisher,
-                               statusReporter: statusReporter,
-                               debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
-                               menuItems: menuItems,
-                               agentLoginItem: agentLoginItem)
+        setupContentController()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupContentController(controller: TunnelController,
-                                        onboardingStatusPublisher: OnboardingStatusPublisher,
-                                        statusReporter: NetworkProtectionStatusReporter,
-                                        debugInformationPublisher: AnyPublisher<Bool, Never>,
-                                        menuItems: @escaping () -> [MenuItem],
-                                        agentLoginItem: LoginItem?) {
-
-        let model = NetworkProtectionStatusView.Model(controller: controller,
-                                                      onboardingStatusPublisher: onboardingStatusPublisher,
-                                                      statusReporter: statusReporter,
-                                                      debugInformationPublisher: debugInformationPublisher,
-                                                      menuItems: menuItems,
-                                                      agentLoginItem: agentLoginItem)
-
-        let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in
+    private func setupContentController() {
+        let view = NetworkProtectionStatusView(model: self.model).environment(\.dismiss, { [weak self] in
             self?.close()
         }).fixedSize()
 
@@ -102,8 +91,8 @@ public final class NetworkProtectionPopover: NSPopover {
     // MARK: - Forcing Status Refresh
 
     override public func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
-
         statusReporter.forceRefresh()
+        model.refreshLoginItemStatus()
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
     }
 

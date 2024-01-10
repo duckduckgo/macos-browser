@@ -51,7 +51,18 @@ public struct NetworkProtectionStatusView: View {
     public var body: some View {
         VStack(spacing: 0) {
             if model.loginItemNeedsApproval {
-                
+                OnboardingStepView(
+                    icon: .appleVPNIcon,
+                    title: "Allow VPN Agent",
+                    description: [.init(text: "Open System Settings to Login Items. Scroll and allow DuckDuckGo VPN to run in the background.")],
+                    actionTitle: "Open System Settings...",
+                    action: {
+                        model.openLoginItemSettings()
+                    },
+                    actionScreenshot: nil
+                )
+                    .padding(.horizontal, 5)
+                    .padding(.top, 5)
             } else if let onboardingStepViewModel = model.onboardingStepViewModel {
                 OnboardingStepView(model: onboardingStepViewModel)
                     .padding(.horizontal, 5)
