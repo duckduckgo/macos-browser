@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -27,11 +28,11 @@ extension Preferences {
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 // TITLE
-                TextMenuTitle(text: UserText.downloads)
+                TextMenuTitle(UserText.downloads)
 
                 // SECTION 1: Location
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.downloadsLocation)
+                    TextMenuItemHeader(UserText.downloadsLocation)
                     HStack {
                         NSPathControlView(url: model.selectedDownloadLocation)
 #if !APPSTORE
@@ -41,7 +42,7 @@ extension Preferences {
 #endif
                     }
                     .disabled(model.alwaysRequestDownloadLocation)
-                    ToggleMenuItem(title: UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
+                    ToggleMenuItem(UserText.downloadsAlwaysAsk, isOn: $model.alwaysRequestDownloadLocation)
                 }
             }
         }

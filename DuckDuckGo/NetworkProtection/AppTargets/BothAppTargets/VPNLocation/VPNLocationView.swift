@@ -18,6 +18,7 @@
 
 #if NETWORK_PROTECTION
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 

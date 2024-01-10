@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import SwiftUI
+import SwiftUIExtensions
 
 final class FeedbackViewController: NSViewController {
 

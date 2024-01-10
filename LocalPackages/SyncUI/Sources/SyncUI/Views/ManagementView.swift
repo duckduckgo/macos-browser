@@ -38,6 +38,18 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top, spacing: 16) {
+                    Image("Info")
+                        .foregroundColor(Color("LinkBlueColor"))
+                        .frame(width: 16)
+                        .background(Circle().foregroundColor(Color(.white)))
+                    Text(UserText.syncRollOutBannerDescription)
+                }
+                .frame(width: 493)
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("OnboardingSkipButtonBaseColor")))
+                .padding(.bottom, 10)
+
                 Text(UserText.sync)
                     .font(.system(size: 17))
                     .bold()
