@@ -689,8 +689,9 @@ final class PasswordManagementViewController: NSViewController {
     var passwordManagerSelectionCancellable: AnyCancellable?
 
     // swiftlint:disable function_body_length
+    // swiftlint:disable:next cyclomatic_complexity
     private func createListView() {
-        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator) { [weak self] previousValue, newValue in
+        let listModel = PasswordManagementItemListModel(passwordManagerCoordinator: self.passwordManagerCoordinator, onItemSelected: { [weak self] previousValue, newValue in
             guard let newValue = newValue,
                   let id = newValue.secureVaultID,
                   let window = self?.view.window else {
@@ -748,7 +749,18 @@ final class PasswordManagementViewController: NSViewController {
             } else {
                 loadNewItemWithID()
             }
-        }
+        }, onAddItemSelected: { [weak self] category in
+            switch category {
+            case .logins:
+                self?.createNewLogin()
+            case .identities:
+                self?.createNewIdentity()
+            case .cards:
+                self?.createNewCreditCard()
+            default:
+                break
+            }
+        })
 
         self.listModel = listModel
         self.listView = NSHostingView(rootView: PasswordManagementItemListView().environmentObject(listModel))
