@@ -29,6 +29,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             category: "contentIsMissing",
             description: nil,
             osVersion: "12.3.0",
+            manufacturer: "Apple",
             upgradedHttps: true,
             tdsETag: "abc123",
             blockedTrackerDomains: [
@@ -69,6 +70,7 @@ class WebsiteBreakageReportTests: XCTestCase {
             category: "videoOrImagesDidntLoad",
             description: nil,
             osVersion: "12",
+            manufacturer: "Apple",
             upgradedHttps: false,
             tdsETag: "abc123",
             blockedTrackerDomains: [
@@ -112,7 +114,7 @@ class WebsiteBreakageReportTests: XCTestCase {
         params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
                                                      queryParameters: params,
-                                                     allowedQueryReservedCharacters: PrivacyDashboardViewController.allowedQueryReservedCharacters)
+                                                     allowedQueryReservedCharacters: WebsiteBreakage.allowedQueryReservedCharacters)
         return configuration.request
     }
 }

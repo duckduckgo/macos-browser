@@ -37,7 +37,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
         params["test"] = "1"
         let configuration = APIRequest.Configuration(url: URL.pixelUrl(forPixelNamed: Pixel.Event.brokenSiteReport.name),
                                                      queryParameters: params,
-                                                     allowedQueryReservedCharacters: PrivacyDashboardViewController.allowedQueryReservedCharacters)
+                                                     allowedQueryReservedCharacters: WebsiteBreakage.allowedQueryReservedCharacters)
         return configuration.request
     }
 
@@ -57,6 +57,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            category: "test",
                                            description: "description",
                                            osVersion: test.os ?? "",
+                                           manufacturer: "Apple",
                                            upgradedHttps: test.wasUpgraded,
                                            tdsETag: test.blocklistVersion,
                                            blockedTrackerDomains: test.blockedTrackers,
