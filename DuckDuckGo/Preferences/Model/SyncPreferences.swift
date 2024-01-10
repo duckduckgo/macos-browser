@@ -522,7 +522,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             .generate(recoveryCode)
 
         Task { @MainActor in
-            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "DuckDuckGo Recovery Code.pdf")
+            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "Sync Data Recovery - DuckDuckGo.pdf")
             let response = await panel.begin()
 
             guard response == .OK,
