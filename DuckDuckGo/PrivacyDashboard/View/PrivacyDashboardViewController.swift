@@ -51,7 +51,7 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
     public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
-    
+
     private let websiteBreakageReporter: WebsiteBreakageReporter = {
         WebsiteBreakageReporter(pixelHandler: { parameters in
             Pixel.fire(
