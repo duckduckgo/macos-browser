@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessage.swift
+//  DataBrokerProtectionRemoteMessage.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,9 +19,9 @@
 import Foundation
 import Common
 
-struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
+struct DataBrokerRemoteMessageAction: Codable, Equatable, Hashable {
     enum Action: String, Codable {
-        case openNetworkProtection
+        case openDataBrokerProtection
         case openSurveyURL
         case openURL
     }
@@ -31,20 +31,20 @@ struct NetworkProtectionRemoteMessageAction: Codable, Equatable, Hashable {
     let actionURL: String?
 }
 
-struct NetworkProtectionRemoteMessage: Codable, Equatable, Identifiable, Hashable {
+struct DataBrokerProtectionRemoteMessage: Codable, Equatable, Hashable {
 
     let id: String
     let cardTitle: String
     let cardDescription: String
-    /// If this is set, the message won't be displayed if NetP hasn't been used, even if the usage and access booleans are false
-    let daysSinceNetworkProtectionEnabled: Int?
-    let requiresNetworkProtectionUsage: Bool
-    let requiresNetworkProtectionAccess: Bool
-    let action: NetworkProtectionRemoteMessageAction
+    /// If this is set, the message won't be displayed if DBP hasn't been used, even if the usage and access booleans are false
+    let daysSinceDataBrokerProtectionEnabled: Int?
+    let requiresDataBrokerProtectionUsage: Bool
+    let requiresDataBrokerProtectionAccess: Bool
+    let action: DataBrokerRemoteMessageAction
 
     func presentableSurveyURL(
         statisticsStore: StatisticsStore = LocalStatisticsStore(),
-        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
+        activationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
         operatingSystemVersion: String = ProcessInfo.processInfo.operatingSystemVersion.description,
         appVersion: String = AppVersion.shared.versionNumber,
         hardwareModel: String? = HardwareModel.model

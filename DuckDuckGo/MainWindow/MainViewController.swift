@@ -230,6 +230,7 @@ final class MainViewController: NSViewController {
 
 #if DBP
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
+        refreshDataBrokerProtectionMessages()
 #endif
     }
 
@@ -257,6 +258,14 @@ final class MainViewController: NSViewController {
 
     func refreshNetworkProtectionMessages() {
         networkProtectionMessaging.fetchRemoteMessages()
+    }
+#endif
+
+#if DBP
+    private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
+
+    func refreshDataBrokerProtectionMessages() {
+        dataBrokerProtectionMessaging.fetchRemoteMessages()
     }
 #endif
 

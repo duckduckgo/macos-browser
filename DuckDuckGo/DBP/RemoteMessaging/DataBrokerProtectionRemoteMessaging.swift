@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessaging.swift
+//  DataBrokerProtectionRemoteMessaging.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,27 +19,27 @@
 import Foundation
 import Networking
 
-#if NETWORK_PROTECTION
+#if DBP
 
-protocol NetworkProtectionRemoteMessaging {
+protocol DataBrokerProtectionRemoteMessaging {
 
     func fetchRemoteMessages(completion: (() -> Void)?)
-    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage]
-    func dismiss(message: NetworkProtectionRemoteMessage)
+    func presentableRemoteMessages() -> [DataBrokerProtectionRemoteMessage]
+    func dismiss(message: DataBrokerProtectionRemoteMessage)
 
 }
 
-final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging {
+final class DefaultDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging {
 
     enum Constants {
-        static let lastRefreshDateKey = "network-protection.remote-messaging.last-refresh-date"
+        static let lastRefreshDateKey = "data-broker-protection.remote-messaging.last-refresh-date"
     }
 
     private let messageRequest: HomePageRemoteMessagingRequest
     private let messageStorage: HomePageRemoteMessagingStorage
     private let waitlistStorage: WaitlistStorage
     private let waitlistActivationDateStore: WaitlistActivationDateStore
-    private let networkProtectionVisibility: NetworkProtectionFeatureVisibility
+    private let dataBrokerProtectionVisibility: DataBrokerProtectionFeatureVisibility
     private let minimumRefreshInterval: TimeInterval
     private let userDefaults: UserDefaults
 
@@ -52,11 +52,11 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
     }
 
     init(
-        messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.networkProtectionMessagesRequest(),
-        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.networkProtection(),
-        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "networkprotection", keychainAppGroup: Bundle.main.appGroup(bundle: .netP)),
-        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP),
-        networkProtectionVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility(),
+        messageRequest: HomePageRemoteMessagingRequest = DefaultHomePageRemoteMessagingRequest.dataBrokerProtectionMessagesRequest(),
+        messageStorage: HomePageRemoteMessagingStorage = DefaultHomePageRemoteMessagingStorage.dataBrokerProtection(),
+        waitlistStorage: WaitlistStorage = WaitlistKeychainStore(waitlistIdentifier: "dbp", keychainAppGroup: Bundle.main.appGroup(bundle: .dbp)),
+        waitlistActivationDateStore: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp),
+        dataBrokerProtectionVisibility: DataBrokerProtectionFeatureVisibility = DefaultDataBrokerProtectionFeatureVisibility(),
         minimumRefreshInterval: TimeInterval,
         userDefaults: UserDefaults = .standard
     ) {
@@ -64,13 +64,12 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         self.messageStorage = messageStorage
         self.waitlistStorage = waitlistStorage
         self.waitlistActivationDateStore = waitlistActivationDateStore
-        self.networkProtectionVisibility = networkProtectionVisibility
+        self.dataBrokerProtectionVisibility = dataBrokerProtectionVisibility
         self.minimumRefreshInterval = minimumRefreshInterval
         self.userDefaults = userDefaults
     }
 
     func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
-
         if let lastRefreshDate = lastRefreshDate(), lastRefreshDate.addingTimeInterval(minimumRefreshInterval) > Date() {
             fetchCompletion?()
             return
@@ -84,7 +83,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
             guard let self else { return }
 
             // Cast the generic parameter to a concrete type:
-            let result: Result<[NetworkProtectionRemoteMessage], Error> = result
+            let result: Result<[DataBrokerProtectionRemoteMessage], Error> = result
 
             switch result {
             case .success(let messages):
@@ -92,7 +91,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                     try self.messageStorage.store(messages: messages)
                     self.updateLastRefreshDate() // Update last refresh date on success, otherwise let the app try again next time
                 } catch {
-                    Pixel.fire(.debug(event: .networkProtectionRemoteMessageStorageFailed, error: error))
+                    Pixel.fire(.debug(event: .dataBrokerProtectionRemoteMessageStorageFailed, error: error))
                 }
             case .failure(let error):
                 // Ignore 403 errors, those happen when a file can't be found on S3
@@ -101,19 +100,17 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                     return
                 }
 
-                Pixel.fire(.debug(event: .networkProtectionRemoteMessageFetchingFailed, error: error))
+                Pixel.fire(.debug(event: .dataBrokerProtectionRemoteMessageFetchingFailed, error: error))
             }
         }
-
     }
 
-    /// Uses the "days since Network Protection activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
-    func presentableRemoteMessages() -> [NetworkProtectionRemoteMessage] {
+    /// Uses the "days since DBP activated" count combined with the set of dismissed messages to determine which messages should be displayed to the user.
+    func presentableRemoteMessages() -> [DataBrokerProtectionRemoteMessage] {
         let dismissedMessageIDs = messageStorage.dismissedMessageIDs()
-        let possibleMessages: [NetworkProtectionRemoteMessage] = messageStorage.storedMessages()
+        let possibleMessages: [DataBrokerProtectionRemoteMessage] = messageStorage.storedMessages()
 
-        // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user
-        // has used Network Protection for.
+        // Only show messages that haven't been dismissed, and check whether they have a requirement on how long the user has used DBP for.
         let filteredMessages = possibleMessages.filter { message in
 
             // Don't show messages that have already been dismissed. If you need to show the same message to a user again,
@@ -122,8 +119,8 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                 return false
             }
 
-            // First, check messages that require a number of days of NetP usage
-            if let requiredDaysSinceActivation = message.daysSinceNetworkProtectionEnabled,
+            // First, check messages that require a number of days of DBP usage
+            if let requiredDaysSinceActivation = message.daysSinceDataBrokerProtectionEnabled,
                let daysSinceActivation = waitlistActivationDateStore.daysSinceActivation() {
                 if requiredDaysSinceActivation <= daysSinceActivation {
                     return true
@@ -132,13 +129,13 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
                 }
             }
 
-            // Next, check if the message requires access to NetP but it's not visible:
-            if message.requiresNetworkProtectionAccess, !networkProtectionVisibility.isNetworkProtectionVisible() {
+            // Next, check if the message requires access to DBP but it's not visible:
+            if message.requiresDataBrokerProtectionAccess, !dataBrokerProtectionVisibility.isFeatureVisible() {
                 return false
             }
 
-            // Finally, check if the message requires NetP usage, and check if the user has used it at all:
-            if message.requiresNetworkProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
+            // Finally, check if the message requires DBP usage, and check if the user has used it at all:
+            if message.requiresDataBrokerProtectionUsage, waitlistActivationDateStore.daysSinceActivation() == nil {
                 return false
             }
 
@@ -149,7 +146,7 @@ final class DefaultNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMess
         return filteredMessages
     }
 
-    func dismiss(message: NetworkProtectionRemoteMessage) {
+    func dismiss(message: DataBrokerProtectionRemoteMessage) {
         messageStorage.dismissRemoteMessage(with: message.id)
     }
 

@@ -201,6 +201,9 @@ extension Pixel {
         case dataBrokerProtectionWaitlistCardUITapped
         case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
         case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
+        case dataBrokerProtectionRemoteMessageDisplayed(messageID: String)
+        case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
+        case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
         // DataBrokerProtection Other
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
@@ -347,6 +350,8 @@ extension Pixel {
 
             case networkProtectionRemoteMessageFetchingFailed
             case networkProtectionRemoteMessageStorageFailed
+            case dataBrokerProtectionRemoteMessageFetchingFailed
+            case dataBrokerProtectionRemoteMessageStorageFailed
 
             case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
         }
@@ -552,6 +557,12 @@ extension Pixel.Event {
             return "m_mac_dbp_ev_terms_accepted"
         case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
             return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
+        case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
+            return "m_mac_dbp_remote_message_displayed_\(messageID)"
+        case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
+            return "m_mac_dbp_remote_message_dismissed_\(messageID)"
+        case .dataBrokerProtectionRemoteMessageOpened(let messageID):
+            return "m_mac_dbp_remote_message_opened_\(messageID)"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
@@ -794,6 +805,9 @@ extension Pixel.Event.Debug {
 
         case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
         case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
+
+        case .dataBrokerProtectionRemoteMessageFetchingFailed: return "dbp_remote_message_fetching_failed"
+        case .dataBrokerProtectionRemoteMessageStorageFailed: return "dbp_remote_message_storage_failed"
 
         case .loginItemUpdateError: return "login-item_update-error"
         }
