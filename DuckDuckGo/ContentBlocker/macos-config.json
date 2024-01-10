@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1703694473333,
+    "version": 1704822595347,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -2019,6 +2019,13 @@
                         "domain": "dallasnews.com",
                         "rules": [
                             {
+                                "type": "disable-default"
+                            },
+                            {
+                                "selector": "[class^='dmnc_features-ads']",
+                                "type": "hide-empty"
+                            },
+                            {
                                 "selector": ".adhesiveAdWrapper",
                                 "type": "hide-empty"
                             },
@@ -3781,7 +3788,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "815cda75f82d989dd56864bc43f76574"
+            "hash": "f3ff26830138646b3a2959db25c9a6db"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4110,6 +4117,9 @@
                     "domain": "litebluesso.usps.gov"
                 },
                 {
+                    "domain": "tattoogenius.art"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -4123,7 +4133,7 @@
                 }
             ],
             "state": "disabled",
-            "hash": "146684a51a3efc615f8c5951689cb675"
+            "hash": "f858697949c90842c450daee64a1dc30"
         },
         "googleRejected": {
             "exceptions": [
@@ -5050,6 +5060,12 @@
                                 "domains": [
                                     "asics.com"
                                 ]
+                            },
+                            {
+                                "rule": "edge1.certona.net/cd/6490677b/mightyape/scripts/resonance.js",
+                                "domains": [
+                                    "mightyape.co.nz"
+                                ]
                             }
                         ]
                     },
@@ -5936,6 +5952,9 @@
                                     "daotranslate.com",
                                     "drakescans.com",
                                     "duden.de",
+                                    "freetubetv.net",
+                                    "hscprojects.com",
+                                    "kits4beats.com",
                                     "magicgameworld.com",
                                     "rocketnews24.com",
                                     "youmath.it",
@@ -5974,7 +5993,8 @@
                                 "rule": "googletagmanager.com/gtag/js",
                                 "domains": [
                                     "abril.com.br",
-                                    "cosmicbook.news"
+                                    "cosmicbook.news",
+                                    "tradersync.com"
                                 ]
                             }
                         ]
@@ -6956,6 +6976,16 @@
                             }
                         ]
                     },
+                    "pub.network": {
+                        "rules": [
+                            {
+                                "rule": "a.pub.network/newser-com/cls.css",
+                                "domains": [
+                                    "newser.com"
+                                ]
+                            }
+                        ]
+                    },
                     "pubmatic.com": {
                         "rules": [
                             {
@@ -7618,6 +7648,12 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "lptag.customermessaging.bupa.com.au",
+                                "domains": [
+                                    "<all>"
+                                ]
                             }
                         ]
                     },
@@ -7683,7 +7719,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "aef10e6a36c19d0d87312466ee852936"
+            "hash": "b9b0e988f8777a231e6cb1eed92b077c"
         },
         "trackingCookies1p": {
             "settings": {
