@@ -41,7 +41,7 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
     private let userNotificationCenter: UNUserNotificationCenter
-    private let areNotificationsEnabled = false
+    private let areNotificationsEnabled = true
 
     public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 userDefaults: UserDefaults = .standard,
@@ -184,11 +184,11 @@ private enum UserNotification {
         case .firstScanComplete:
             return "Scan complete!"
         case .firstProfileRemoved:
-            return "Success! A record of your info was removed!"
+            return "A record of your info was removed!"
         case .allInfoRemoved:
-            return "All pending info removals complete!"
+            return "Personal info removed!"
         case .twoWeeksCheckIn:
-            return "We're making progress on your info removals"
+            return "We're making progress!"
         }
     }
 
