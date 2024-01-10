@@ -51,13 +51,13 @@ final class PrivacyDashboardViewController: NSViewController {
 
     private let privacyDashboardController =  PrivacyDashboardController(privacyInfo: nil)
     public let rulesUpdateObserver = ContentBlockingRulesUpdateObserver()
-    static let allowedQueryReservedCharacters = CharacterSet(charactersIn: ",")
+    
     private let websiteBreakageReporter: WebsiteBreakageReporter = {
         WebsiteBreakageReporter(pixelHandler: { parameters in
             Pixel.fire(
                 .brokenSiteReport,
                 withAdditionalParameters: parameters,
-                allowedQueryReservedCharacters: PrivacyDashboardViewController.allowedQueryReservedCharacters
+                allowedQueryReservedCharacters: WebsiteBreakage.allowedQueryReservedCharacters
             )
         }, keyValueStoring: UserDefaults.standard)
     }()
