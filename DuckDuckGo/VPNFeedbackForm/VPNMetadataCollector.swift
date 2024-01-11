@@ -152,7 +152,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     // MARK: - Metadata Collection
 
     private func collectAppInfoMetadata() -> VPNMetadata.AppInfo {
-        let appVersion = AppVersion.shared.versionNumber
+        let appVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
 
