@@ -412,10 +412,7 @@ private struct PasswordManagementAddButton: View {
         case .allItems:
             ZStack {
                 // Setting Menu label to empty string and overlaying with this as Menu will not allow the image + text to be centered
-                HStack(spacing: 4) {
-                    Image("Add")
-                    Text(UserText.pmAddItem)
-                }
+                Text(UserText.pmAddItem)
 
                 Menu {
                     createMenuItem(imageName: "LoginGlyph", text: UserText.pmNewLogin, category: .logins)
@@ -427,9 +424,14 @@ private struct PasswordManagementAddButton: View {
                 .modifier(HideMenuIndicatorModifier())
             }
             .padding(.vertical, -4)
-        case .logins, .cards, .identities:
-            createButton(category: model.sortDescriptor.category)
+        case .logins:
+            createButton(text: UserText.pmAddLogin, category: model.sortDescriptor.category)
+        case .identities:
+            createButton(text: UserText.pmAddIdentity, category: model.sortDescriptor.category)
+        case .cards:
+            createButton(text: UserText.pmAddCard, category: model.sortDescriptor.category)
         }
+
     }
 
     private func createMenuItem(imageName: String, text: String, category: SecureVaultSorting.Category) -> some View {
@@ -445,17 +447,14 @@ private struct PasswordManagementAddButton: View {
 
     }
 
-    private func createButton(category: SecureVaultSorting.Category) -> some View {
+    private func createButton(text: String, category: SecureVaultSorting.Category) -> some View {
 
         Button {
             model.onAddItemClickedFor(category)
         } label: {
-            HStack(spacing: 4) {
-                Image("Add")
-                Text(UserText.pmAddItem)
-            }
-            .frame(maxWidth: .infinity)
-            .offset(y: 1)
+            Text(text)
+                .frame(maxWidth: .infinity)
+                .offset(y: 1)
         }
         .padding(.vertical, -4)
 
