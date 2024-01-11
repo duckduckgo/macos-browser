@@ -622,11 +622,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     private func firePixelIfNeeded(event: Pixel.Event) {
         if case let .debug(_, debugError as SyncError) = event {
             if !debugError.isServerError {
-                Pixel.fire(event)
+                Pixel.fire(event, withAdditionalParameters: debugError.errorParameters)
             }
         }
     }
 
 }
-
-extension SyncError: ErrorWithPixelParameters {}
