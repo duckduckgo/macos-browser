@@ -117,6 +117,56 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         XCTAssertEqual(model.emptyState, .logins)
     }
 
+    func testWhenGettingSelectedItem_AndViewModelHasNoMatchingDomains_ThenFirstItemSelected() {
+        let account1 = makeAccount(id: 1, domain: "adomain.com")
+        let account2 = makeAccount(id: 2, domain: "anotherdomain.com")
+        let account3 = makeAccount(id: 3, domain: "otherdomain.com")
+        let accounts = [account1, account2, account3]
+
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+
+        model.update(items: accounts)
+        model.selectLoginWithDomainOrFirst(domain: "dummy.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[0]))
+    }
+
+    func testWhenGettingSelectedItem_AndViewModelHasMatchingDomain_ThenMatchingDomainSelected() {
+        let account1 = makeAccount(id: 1, domain: "adomain.com")
+        let account2 = makeAccount(id: 2, domain: "example.com")
+        let account3 = makeAccount(id: 3, domain: "otherdomain.com")
+        let accounts = [account1, account2, account3]
+
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+
+        model.update(items: accounts)
+        model.selectLoginWithDomainOrFirst(domain: "example.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[1]))
+    }
+
+    func testWhenGettingSelectedItem_AndViewModelHasMatchingSubdomains_ThenMatchingSubdomainSelected() {
+        let account1 = makeAccount(id: 1, domain: "example.com")
+        let account2 = makeAccount(id: 2, domain: "sub.example.com")
+        let account3 = makeAccount(id: 3, domain: "www.example.com")
+        let accounts = [account1, account2, account3]
+
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+
+        model.update(items: accounts)
+        model.selectLoginWithDomainOrFirst(domain: "sub.example.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[1]))
+
+        model.selectLoginWithDomainOrFirst(domain: "example.com")
+
+        XCTAssertNotNil(model.selected)
+        XCTAssertEqual(model.selected?.id, String(describing: accounts[0]))
+    }
+
     func makeAccount(id: Int64, title: String? = nil, username: String = "username", domain: String = "domain") -> SecureVaultItem {
         let account = SecureVaultModels.WebsiteAccount(id: String(id),
                                                 title: title,
