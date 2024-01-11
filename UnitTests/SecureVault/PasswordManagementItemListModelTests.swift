@@ -123,7 +123,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let account3 = makeAccount(id: 3, domain: "otherdomain.com")
         let accounts = [account1, account2, account3]
 
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.selectLoginWithDomainOrFirst(domain: "dummy.com")
@@ -138,7 +138,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let account3 = makeAccount(id: 3, domain: "otherdomain.com")
         let accounts = [account1, account2, account3]
 
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.selectLoginWithDomainOrFirst(domain: "example.com")
@@ -153,7 +153,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let account3 = makeAccount(id: 3, domain: "www.example.com")
         let accounts = [account1, account2, account3]
 
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.selectLoginWithDomainOrFirst(domain: "sub.example.com")
