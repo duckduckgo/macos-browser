@@ -128,7 +128,6 @@ extension AppDelegate {
 
         let window = NSWindow(contentViewController: privacyDashboardViewController)
         window.styleMask.remove(.resizable)
-        window.styleMask.remove(.titled)
         window.setFrame(NSRect(x: 0, y: 0, width: PrivacyDashboardViewController.Constants.initialContentWidth,
                                height: PrivacyDashboardViewController.Constants.reportBrokenSiteInitialContentHeight),
                         display: true)
