@@ -246,9 +246,8 @@ final class HomePageViewController: NSViewController {
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
-        let addEditFavoriteViewController = AddEditFavoriteViewController.create(bookmark: bookmark)
-
-        self.beginSheet(addEditFavoriteViewController)
+        AddBookmarkModalView(model: AddBookmarkModalViewModel(originalBookmark: bookmark, isFavorite: true))
+            .show(in: self.view.window)
     }
 
     private var burningDataCancellable: AnyCancellable?
