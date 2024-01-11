@@ -408,24 +408,28 @@ private struct PasswordManagementAddButton: View {
 
     var body: some View {
 
-        ZStack {
-            // Setting Menu label to empty string and overlaying with this as Menu will not allow the image + text to be centered
-            HStack(spacing: 4) {
-                Image("Add")
-                Text(UserText.pmAddItem)
-            }
+        switch model.sortDescriptor.category {
+        case .allItems:
+            ZStack {
+                // Setting Menu label to empty string and overlaying with this as Menu will not allow the image + text to be centered
+                HStack(spacing: 4) {
+                    Image("Add")
+                    Text(UserText.pmAddItem)
+                }
 
-            Menu {
-                createMenuItem(imageName: "LoginGlyph", text: UserText.pmNewLogin, category: .logins)
-                createMenuItem(imageName: "IdentityGlyph", text: UserText.pmNewIdentity, category: .identities)
-                createMenuItem(imageName: "CreditCardGlyph", text: UserText.pmNewCard, category: .cards)
-           } label: {
-                Text("")
+                Menu {
+                    createMenuItem(imageName: "LoginGlyph", text: UserText.pmNewLogin, category: .logins)
+                    createMenuItem(imageName: "IdentityGlyph", text: UserText.pmNewIdentity, category: .identities)
+                    createMenuItem(imageName: "CreditCardGlyph", text: UserText.pmNewCard, category: .cards)
+               } label: {
+                    Text("")
+                }
+                .modifier(HideMenuIndicatorModifier())
             }
-            .modifier(HideMenuIndicatorModifier())
+            .padding(.vertical, -4)
+        case .logins, .cards, .identities:
+            createButton(category: model.sortDescriptor.category)
         }
-        .padding(.vertical, -4)
-
     }
 
     private func createMenuItem(imageName: String, text: String, category: SecureVaultSorting.Category) -> some View {
@@ -441,6 +445,21 @@ private struct PasswordManagementAddButton: View {
 
     }
 
+    private func createButton(category: SecureVaultSorting.Category) -> some View {
+
+        Button {
+            model.onAddItemClickedFor(category)
+        } label: {
+            HStack(spacing: 4) {
+                Image("Add")
+                Text(UserText.pmAddItem)
+            }
+            .frame(maxWidth: .infinity)
+            .offset(y: 1)
+        }
+        .padding(.vertical, -4)
+
+    }
 }
 
 private struct HideMenuIndicatorModifier: ViewModifier {
