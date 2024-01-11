@@ -72,19 +72,22 @@ struct ImportedBookmarks: Codable, Equatable {
     }
 
     struct TopLevelFolders: Codable, Equatable {
-        let bookmarkBar: BookmarkOrFolder
-        let otherBookmarks: BookmarkOrFolder
+        let bookmarkBar: BookmarkOrFolder?
+        let otherBookmarks: BookmarkOrFolder?
+        let syncedBookmarks: BookmarkOrFolder?
 
         enum CodingKeys: String, CodingKey {
             case bookmarkBar = "bookmark_bar"
             case otherBookmarks = "other"
+            case syncedBookmarks = "synced"
         }
     }
 
     let topLevelFolders: TopLevelFolders
 
     var numberOfBookmarks: Int {
-        topLevelFolders.bookmarkBar.numberOfBookmarks + topLevelFolders.otherBookmarks.numberOfBookmarks
+        [topLevelFolders.bookmarkBar, topLevelFolders.otherBookmarks, topLevelFolders.syncedBookmarks]
+            .reduce(0) { $0 + ($1?.numberOfBookmarks ?? 0) }
     }
 
     enum CodingKeys: String, CodingKey {

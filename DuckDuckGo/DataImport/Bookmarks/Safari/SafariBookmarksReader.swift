@@ -116,7 +116,7 @@ final class SafariBookmarksReader {
         let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: otherBookmarks)
         let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: "folder", urlString: nil, children: [])
 
-        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder)
+        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder, syncedBookmarks: nil)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolder)
 
         return importedBookmarks

@@ -766,7 +766,7 @@ final class LocalBookmarkStore: BookmarkStore {
                                                context: context)
         }
 
-        if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar.children {
+        if let bookmarksBar = bookmarks.topLevelFolders.bookmarkBar?.children {
             let result = recursivelyCreateEntities(from: bookmarksBar,
                                                    parent: parent,
                                                    markBookmarksAsFavorite: makeFavorties,
@@ -775,9 +775,19 @@ final class LocalBookmarkStore: BookmarkStore {
             total += result
         }
 
-        if let otherBookmarks = bookmarks.topLevelFolders.otherBookmarks.children {
-            let result = recursivelyCreateEntities(from: otherBookmarks,
-                                                   parent: parent,
+        for folder in [bookmarks.topLevelFolders.otherBookmarks, bookmarks.topLevelFolders.syncedBookmarks] {
+            guard let folder, let children = folder.children else { continue }
+
+            var folderParent = parent
+            // keep the original imported folder if bookmarks bar is not empty
+            // import to import root otherwise
+            if !parent.childrenArray.isEmpty, !folder.name.isEmpty {
+                folderParent = BookmarkEntity.makeFolder(title: folder.name,
+                                                         parent: parent,
+                                                         context: context)
+            }
+            let result = recursivelyCreateEntities(from: children,
+                                                   parent: folderParent,
                                                    markBookmarksAsFavorite: false,
                                                    in: context)
 

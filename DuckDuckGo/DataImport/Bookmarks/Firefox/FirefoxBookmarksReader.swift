@@ -176,7 +176,7 @@ final class FirefoxBookmarksReader {
                                                                children: toolbarBookmarksAndFolders + menuBookmarksAndFolders)
 
         let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: unfiledBookmarksAndFolders)
-        let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder)
+        let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder, syncedBookmarks: nil)
 
         return ImportedBookmarks(topLevelFolders: folders)
     }
