@@ -166,9 +166,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func presentAddBookmarkModal(_ sender: Any) {
-        let addBookmarkViewController = AddBookmarkModalViewController.create()
-        addBookmarkViewController.delegate = self
-        beginSheet(addBookmarkViewController)
+        AddBookmarkModalView(model: AddBookmarkModalViewModel(parent: selectionState.folder))
+            .show(in: view.window)
     }
 
     @IBAction func presentAddFolderModal(_ sender: Any) {
@@ -265,24 +264,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
 // MARK: - Modal Delegates
 
-extension BookmarkManagementDetailViewController: AddBookmarkModalViewControllerDelegate, AddFolderModalViewControllerDelegate {
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
-        guard !bookmarkManager.isUrlBookmarked(url: url) else {
-            return
-        }
-
-        if case let .folder(selectedFolder) = selectionState {
-            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false, index: nil, parent: selectedFolder)
-        } else {
-            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
-        }
-    }
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
-        bookmarkManager.update(bookmark: bookmark)
-        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
-    }
+extension BookmarkManagementDetailViewController: AddFolderModalViewControllerDelegate {
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         if case let .folder(selectedFolder) = selectionState {
