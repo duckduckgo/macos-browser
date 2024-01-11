@@ -39,6 +39,7 @@ struct VPNMetadata: Encodable {
         let buildFlavor: String
         let lowPowerModeEnabled: Bool
         let cpuArchitecture: String
+        let isAdminUser: String
     }
 
     struct NetworkInfo: Encodable {
@@ -171,8 +172,15 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         }
 
         let architecture = getMachineArchitecture()
+        let isAdminUser = isAdminUser()
 
-        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled, cpuArchitecture: architecture)
+        return .init(
+            osVersion: osVersion,
+            buildFlavor: buildFlavor,
+            lowPowerModeEnabled: lowPowerModeEnabled,
+            cpuArchitecture: architecture,
+            isAdminUser: isAdminUser
+        )
     }
 
     private func getMachineArchitecture() -> String {
@@ -270,6 +278,61 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             selectedServer: settings.selectedServer.stringValue ?? "automatic",
             selectedEnvironment: settings.selectedEnvironment.rawValue
         )
+    }
+
+}
+
+// MARK: - Admin User
+
+private enum AdminQueryError: Error {
+    case queryExecutionFailed
+    case queriedWithoutResult
+}
+
+extension VPNMetadataCollector {
+
+    private func getUser() throws -> CSIdentity? {
+        let query = CSIdentityQueryCreateForCurrentUser(kCFAllocatorDefault).takeRetainedValue()
+        let flags = CSIdentityQueryFlags()
+
+        guard CSIdentityQueryExecute(query, flags, nil) else {
+            throw AdminQueryError.queryExecutionFailed
+        }
+
+        let users = CSIdentityQueryCopyResults(query).takeRetainedValue() as? [CSIdentity]
+        return users?.first
+    }
+
+    private func getAdminGroup() throws -> CSIdentity {
+        let privilegeGroup = "admin" as CFString
+        let authority = CSGetDefaultIdentityAuthority().takeRetainedValue()
+        let query = CSIdentityQueryCreateForName(kCFAllocatorDefault,
+                                                 privilegeGroup,
+                                                 kCSIdentityQueryStringEquals,
+                                                 kCSIdentityClassGroup,
+                                                 authority).takeRetainedValue()
+        let flags = CSIdentityQueryFlags()
+
+        guard CSIdentityQueryExecute(query, flags, nil) else { throw AdminQueryError.queryExecutionFailed }
+        let groups = CSIdentityQueryCopyResults(query).takeRetainedValue() as? [CSIdentity]
+
+        guard let adminGroup = groups?.first else {
+            throw AdminQueryError.queriedWithoutResult
+        }
+
+        return adminGroup
+    }
+
+    fileprivate func isAdminUser() -> String {
+        do {
+            let user = try self.getUser()
+            let group = try self.getAdminGroup()
+
+            let isAdmin = CSIdentityIsMemberOfGroup(user, group)
+            return String(describing: isAdmin)
+        } catch {
+            return "error checking status: \(error.localizedDescription)"
+        }
     }
 
 }
