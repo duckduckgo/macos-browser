@@ -110,6 +110,17 @@ extension Bundle {
         return appGroup
     }
 
+    var isInApplicationsDirectory: Bool {
+        let directoryPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
+
+        guard let applicationsPath = directoryPaths.first else {
+            return true
+        }
+
+        let path = self.bundlePath
+        return path.hasPrefix(applicationsPath)
+    }
+
 }
 
 enum BundleGroup {

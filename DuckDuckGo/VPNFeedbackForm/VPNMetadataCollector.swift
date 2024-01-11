@@ -32,6 +32,8 @@ struct VPNMetadata: Encodable {
         let appVersion: String
         let lastVersionRun: String
         let isInternalUser: Bool
+        let isAdminUser: String
+        let isInApplicationsDirectory: Bool
     }
 
     struct DeviceInfo: Encodable {
@@ -39,7 +41,6 @@ struct VPNMetadata: Encodable {
         let buildFlavor: String
         let lowPowerModeEnabled: Bool
         let cpuArchitecture: String
-        let isAdminUser: String
     }
 
     struct NetworkInfo: Encodable {
@@ -156,8 +157,16 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let appVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
+        let isAdminUser = isAdminUser()
+        let isInApplicationsDirectory = Bundle.main.isInApplicationsDirectory
 
-        return .init(appVersion: appVersion, lastVersionRun: versionStore.lastVersionRun ?? "Unknown", isInternalUser: isInternalUser)
+        return .init(
+            appVersion: appVersion,
+            lastVersionRun: versionStore.lastVersionRun ?? "Unknown",
+            isInternalUser: isInternalUser,
+            isAdminUser: isAdminUser,
+            isInApplicationsDirectory: isInApplicationsDirectory
+        )
     }
 
     private func collectDeviceInfoMetadata() -> VPNMetadata.DeviceInfo {
@@ -172,15 +181,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         }
 
         let architecture = getMachineArchitecture()
-        let isAdminUser = isAdminUser()
 
-        return .init(
-            osVersion: osVersion,
-            buildFlavor: buildFlavor,
-            lowPowerModeEnabled: lowPowerModeEnabled,
-            cpuArchitecture: architecture,
-            isAdminUser: isAdminUser
-        )
+        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled, cpuArchitecture: architecture)
     }
 
     private func getMachineArchitecture() -> String {
