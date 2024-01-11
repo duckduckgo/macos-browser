@@ -139,6 +139,7 @@ struct PasswordManagementItemListCategoryView: View {
                 PasswordManagementSortButton(imageName: "SortDescending")
             }
         }
+        .padding(.vertical, -4)
 
     }
 }
@@ -423,6 +424,7 @@ private struct PasswordManagementAddButton: View {
             }
             .modifier(HideMenuIndicatorModifier())
         }
+        .padding(.vertical, -4)
 
     }
 

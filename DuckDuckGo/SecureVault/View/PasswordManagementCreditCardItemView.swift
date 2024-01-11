@@ -47,6 +47,7 @@ struct PasswordManagementCreditCardItemView: View {
                 VStack(alignment: .leading, spacing: 0) {
 
                     HeaderView()
+                        .padding(.top, 16)
                         .padding(.bottom, model.isInEditMode ? 20 : 30)
 
                     EditableCreditCardField(textFieldValue: $model.cardNumber, title: UserText.pmCardNumber)
@@ -94,10 +95,12 @@ struct PasswordManagementCreditCardItemView: View {
                     Spacer(minLength: 0)
 
                     Buttons()
+                        .padding(.top, model.isInEditMode ? 12 : 10)
+                        .padding(.bottom, model.isInEditMode ? 12 : 3)
 
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding()
+                .padding(.horizontal)
 
             }
             .padding(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 10))
