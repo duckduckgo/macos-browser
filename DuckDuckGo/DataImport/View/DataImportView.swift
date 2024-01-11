@@ -166,8 +166,8 @@ struct DataImportView: View {
                     model.initiateImport(fileURL: url)
                 }
 
-            case .summary(let dataTypes):
-                DataImportSummaryView(model, dataTypes: dataTypes)
+            case .summary(let dataTypes, let isFileImport):
+                DataImportSummaryView(model, dataTypes: dataTypes, isFileImport: isFileImport)
 
             case .feedback:
                 DataImportSummaryView(model)

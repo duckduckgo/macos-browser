@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1704822595347,
+    "version": 1704906276365,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -255,6 +255,9 @@
                     "domain": "youtube.com"
                 },
                 {
+                    "domain": "forbes.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -269,11 +272,12 @@
             ],
             "settings": {
                 "disabledCMPs": [
-                    "generic-cosmetic"
+                    "generic-cosmetic",
+                    "EZoic"
                 ]
             },
             "state": "enabled",
-            "hash": "2c63be0009057e4511dc6f6726251a47"
+            "hash": "7718a046d4f157b8fff1abe7d384c793"
         },
         "autofill": {
             "exceptions": [
@@ -1664,6 +1668,7 @@
                     "- publicidade -",
                     "reklama",
                     "skip ad",
+                    "skip advertisement",
                     "sponsored news",
                     "continue reading the main story",
                     "this advertisement has not loaded yet, but your article continues below.",
@@ -3788,7 +3793,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "f3ff26830138646b3a2959db25c9a6db"
+            "hash": "72cec10e1f8cca83c98696388d7981d6"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4897,16 +4902,6 @@
                             }
                         ]
                     },
-                    "analytics-egain.com": {
-                        "rules": [
-                            {
-                                "rule": "analytics.analytics-egain.com/onetag/",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
                     "appboycdn.com": {
                         "rules": [
                             {
@@ -5277,16 +5272,6 @@
                             }
                         ]
                     },
-                    "crisp.chat": {
-                        "rules": [
-                            {
-                                "rule": "crisp.chat",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
                     "criteo.com": {
                         "rules": [
                             {
@@ -5438,6 +5423,7 @@
                                 "domains": [
                                     "ah.nl",
                                     "nytimes.com",
+                                    "realmadrid.com",
                                     "rocketnews24.com",
                                     "uwbadgers.com",
                                     "wunderground.com",
@@ -5542,16 +5528,6 @@
                                     "espn.com.mx",
                                     "espn.in",
                                     "espnfc.com"
-                                ]
-                            }
-                        ]
-                    },
-                    "egain.cloud": {
-                        "rules": [
-                            {
-                                "rule": "egain.cloud/",
-                                "domains": [
-                                    "<all>"
                                 ]
                             }
                         ]
@@ -5674,16 +5650,6 @@
                                 "rule": "target-opus.map.fastly.net/",
                                 "domains": [
                                     "target.com"
-                                ]
-                            }
-                        ]
-                    },
-                    "five9.com": {
-                        "rules": [
-                            {
-                                "rule": "app.five9.com",
-                                "domains": [
-                                    "<all>"
                                 ]
                             }
                         ]
@@ -5919,15 +5885,10 @@
                                     "games.washingtonpost.com",
                                     "metro.co.uk",
                                     "nfl.com",
+                                    "pandora.com",
                                     "paper-io.com",
                                     "rawstory.com",
                                     "usatoday.com"
-                                ]
-                            },
-                            {
-                                "rule": "storage.googleapis.com/code.snapengage.com/",
-                                "domains": [
-                                    "<all>"
                                 ]
                             }
                         ]
@@ -5994,6 +5955,7 @@
                                 "domains": [
                                     "abril.com.br",
                                     "cosmicbook.news",
+                                    "thesimsresource.com",
                                     "tradersync.com"
                                 ]
                             }
@@ -6157,16 +6119,6 @@
                             }
                         ]
                     },
-                    "gorgias.chat": {
-                        "rules": [
-                            {
-                                "rule": "gorgias.chat",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
                     "greylabeldelivery.com": {
                         "rules": [
                             {
@@ -6179,16 +6131,6 @@
                                 "rule": "tags.focus.de.greylabeldelivery.com/focus-web/prod/utag.js",
                                 "domains": [
                                     "focus.de"
-                                ]
-                            }
-                        ]
-                    },
-                    "groovehq.com": {
-                        "rules": [
-                            {
-                                "rule": "widget.cluster.groovehq.com/_next/static/chunks/",
-                                "domains": [
-                                    "<all>"
                                 ]
                             }
                         ]
@@ -6231,12 +6173,6 @@
                     },
                     "hubspot.com": {
                         "rules": [
-                            {
-                                "rule": "api.hubspot.com/livechat-public/v1/message/public",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            },
                             {
                                 "rule": "js.hubspot.com/web-interactives-embed.js",
                                 "domains": [
@@ -6472,42 +6408,12 @@
                             }
                         ]
                     },
-                    "livechatinc.com": {
-                        "rules": [
-                            {
-                                "rule": "livechatinc.com",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
-                    "liveperson.net": {
-                        "rules": [
-                            {
-                                "rule": "liveperson.net",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
                     "loggly.com": {
                         "rules": [
                             {
                                 "rule": "cloudfront.loggly.com/js/loggly.tracker-2.1.min.js",
                                 "domains": [
                                     "rte.ie"
-                                ]
-                            }
-                        ]
-                    },
-                    "lpsnmedia.net": {
-                        "rules": [
-                            {
-                                "rule": "lpsnmedia.net",
-                                "domains": [
-                                    "<all>"
                                 ]
                             }
                         ]
@@ -6659,16 +6565,6 @@
                             }
                         ]
                     },
-                    "nuance.com": {
-                        "rules": [
-                            {
-                                "rule": "nuance.com",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
                     "omappapi.com": {
                         "rules": [
                             {
@@ -6748,7 +6644,8 @@
                                 "domains": [
                                     "abc.net.au",
                                     "emol.com",
-                                    "oufc.co.uk"
+                                    "oufc.co.uk",
+                                    "theposh.com"
                                 ]
                             }
                         ]
@@ -7621,58 +7518,6 @@
                             }
                         ]
                     },
-                    "zopim.com": {
-                        "rules": [
-                            {
-                                "rule": "zopim.com",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
-                    "citi.com": {
-                        "rules": [
-                            {
-                                "rule": "lp-03.chat.online.citi.com",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
-                    "bupa.com.au": {
-                        "rules": [
-                            {
-                                "rule": "lp-07.customermessaging.bupa.com.au",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            },
-                            {
-                                "rule": "lptag.customermessaging.bupa.com.au",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
-                    "optus.com.au": {
-                        "rules": [
-                            {
-                                "rule": "lp-07.messaging.optus.com.au",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            },
-                            {
-                                "rule": "lptag.messaging.optus.com.au",
-                                "domains": [
-                                    "<all>"
-                                ]
-                            }
-                        ]
-                    },
                     "canadapost-postescanada.ca": {
                         "rules": [
                             {
@@ -7719,7 +7564,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "b9b0e988f8777a231e6cb1eed92b077c"
+            "hash": "cc8e9d6fcf1d2a85ef58c0c751be6304"
         },
         "trackingCookies1p": {
             "settings": {
@@ -7769,6 +7614,9 @@
         "trackingParameters": {
             "exceptions": [
                 {
+                    "domain": "axs.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -7812,7 +7660,7 @@
             },
             "state": "enabled",
             "minSupportedVersion": "0.22.3",
-            "hash": "ff472ac5bb4d6ba43121fd13ba433dc0"
+            "hash": "9a0282376084874f0245c421d6943841"
         },
         "userAgentRotation": {
             "settings": {

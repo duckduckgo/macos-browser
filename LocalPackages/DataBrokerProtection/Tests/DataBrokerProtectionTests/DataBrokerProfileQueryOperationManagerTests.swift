@@ -26,10 +26,164 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
     let sut = DataBrokerProfileQueryOperationManager()
     let mockWebOperationRunner = MockWebOperationRunner()
     let mockDatabase = MockDatabase()
+    let mockUserNotification = MockUserNotification()
 
     override func tearDown() {
         mockWebOperationRunner.clear()
+        mockUserNotification.reset()
     }
+
+    // MARK: - Notification tests
+
+    func testWhenOnlyOneProfileIsFoundAndRemoved_thenAllInfoRemovedNotificationIsSent() async {
+        do {
+            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+
+            let brokerId: Int64 = 1
+            let profileQueryId: Int64 = 1
+            let extractedProfileId: Int64 = 1
+            let currentPreferredRunDate = Date()
+
+            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
+
+            let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
+            let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+
+            let extractedProfileSaved = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
+
+            let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved)]
+
+            let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker,
+                                                                profileQuery: mockProfileQuery,
+                                                                scanOperationData: mockScanOperation,
+            optOutOperationsData: optOutData)
+            mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
+
+            mockWebOperationRunner.scanResults = []
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: extractedProfileSaved)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: mockUserNotification,
+                shouldRunNextStep: { true }
+            )
+            XCTAssertTrue(mockUserNotification.allInfoRemovedWasSent)
+            XCTAssertFalse(mockUserNotification.firstRemovedNotificationWasSent)
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testWhenManyProfilesAreFoundAndOnlyOneRemoved_thenFirstRemovedNotificationIsSent() async {
+        do {
+
+            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+
+            let brokerId: Int64 = 1
+            let profileQueryId: Int64 = 1
+            let extractedProfileId: Int64 = 1
+            let currentPreferredRunDate = Date()
+
+            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
+
+            let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
+            let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+
+            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
+            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz")
+
+            let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
+                              OptOutOperationData.mock(with: extractedProfileSaved2)]
+
+            let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker,
+                                                                profileQuery: mockProfileQuery,
+                                                                scanOperationData: mockScanOperation,
+            optOutOperationsData: optOutData)
+            mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
+
+            mockWebOperationRunner.scanResults = [extractedProfileSaved1]
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: extractedProfileSaved1),
+                                           OptOutOperationData.mock(with: extractedProfileSaved2)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: mockUserNotification,
+                shouldRunNextStep: { true }
+            )
+            XCTAssertFalse(mockUserNotification.allInfoRemovedWasSent)
+            XCTAssertTrue(mockUserNotification.firstRemovedNotificationWasSent)
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
+    func testWhenNoProfilesAreRemoved_thenNoNotificationsAreSent() async {
+        do {
+
+            let config = DataBrokerScheduleConfig(retryError: 1000, confirmOptOutScan: 1000, maintenanceScan: 1000)
+
+            let brokerId: Int64 = 1
+            let profileQueryId: Int64 = 1
+            let extractedProfileId: Int64 = 1
+            let currentPreferredRunDate = Date()
+
+            let mockDataBroker = DataBroker(name: "databroker", steps: [Step](), version: "1.0", schedulingConfig: config)
+            let mockProfileQuery = ProfileQuery(id: profileQueryId, firstName: "a", lastName: "b", city: "c", state: "d", birthYear: 1222)
+
+            let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
+            let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
+
+            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
+            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz")
+
+            let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
+                              OptOutOperationData.mock(with: extractedProfileSaved2)]
+
+            let mockBrokerProfileQuery = BrokerProfileQueryData(dataBroker: mockDataBroker,
+                                                                profileQuery: mockProfileQuery,
+                                                                scanOperationData: mockScanOperation,
+            optOutOperationsData: optOutData)
+            mockDatabase.brokerProfileQueryDataToReturn = [mockBrokerProfileQuery]
+
+            mockWebOperationRunner.scanResults = [extractedProfileSaved1, extractedProfileSaved2]
+            _ = try await sut.runScanOperation(
+                on: mockWebOperationRunner,
+                brokerProfileQueryData: .init(
+                    dataBroker: .mock,
+                    profileQuery: .mock,
+                    scanOperationData: .mock,
+                    optOutOperationsData: [OptOutOperationData.mock(with: extractedProfileSaved1),
+                                           OptOutOperationData.mock(with: extractedProfileSaved2)]
+                ),
+                database: mockDatabase,
+                notificationCenter: .default,
+                pixelHandler: MockDataBrokerProtectionPixelsHandler(),
+                userNotificationService: mockUserNotification,
+                shouldRunNextStep: { true }
+            )
+            XCTAssertFalse(mockUserNotification.allInfoRemovedWasSent)
+            XCTAssertFalse(mockUserNotification.firstRemovedNotificationWasSent)
+        } catch {
+            XCTFail("Should not throw")
+        }
+    }
+
     // MARK: - Run scan operation tests
 
     func testWhenProfileQueryIdIsNil_thenRunScanOperationThrows() async {
@@ -767,11 +921,40 @@ extension ExtractedProfile {
 }
 
 final class MockUserNotification: DataBrokerProtectionUserNotificationService {
-    func requestNotificationPermission() { }
-    func sendFirstScanCompletedNotification() { }
-    func sendFirstRemovedNotificationIfPossible() { }
-    func sendAllInfoRemovedNotificationIfPossible() { }
-    func scheduleCheckInNotificationIfPossible() { }
+
+    var requestPermissionWasAsked = false
+    var firstScanNotificationWasSent = false
+    var firstRemovedNotificationWasSent = false
+    var checkInNotificationWasScheduled = false
+    var allInfoRemovedWasSent = false
+
+    func requestNotificationPermission() {
+        requestPermissionWasAsked = true
+    }
+
+    func sendFirstScanCompletedNotification() {
+        firstScanNotificationWasSent = true
+    }
+
+    func sendFirstRemovedNotificationIfPossible() {
+        firstRemovedNotificationWasSent = true
+    }
+
+    func sendAllInfoRemovedNotificationIfPossible() {
+        allInfoRemovedWasSent = true
+    }
+
+    func scheduleCheckInNotificationIfPossible() {
+        checkInNotificationWasScheduled = true
+    }
+
+    func reset() {
+        requestPermissionWasAsked = false
+        firstScanNotificationWasSent = false
+        firstRemovedNotificationWasSent = false
+        checkInNotificationWasScheduled = false
+        allInfoRemovedWasSent = false
+    }
 }
 
 // swiftlint:enable type_body_length
