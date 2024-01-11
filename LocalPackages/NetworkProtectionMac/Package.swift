@@ -32,7 +32,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.0.0"),
         .package(path: "../XPCHelper"),
-        .package(path: "../SwiftUIExtensions")
+        .package(path: "../SwiftUIExtensions"),
+        .package(path: "../LoginItems")
     ],
     targets: [
         // MARK: - NetworkProtectionIPC
@@ -55,7 +56,8 @@ let package = Package(
             name: "NetworkProtectionUI",
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
-                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+                .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions"),
+                .product(name: "LoginItems", package: "LoginItems"),
             ],
             resources: [
                 .copy("Resources/Assets.xcassets")
@@ -69,7 +71,8 @@ let package = Package(
             name: "NetworkProtectionUITests",
             dependencies: [
                 "NetworkProtectionUI",
-                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit")
+                .product(name: "NetworkProtectionTestUtils", package: "BrowserServicesKit"),
+                .product(name: "LoginItems", package: "LoginItems")
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         )
