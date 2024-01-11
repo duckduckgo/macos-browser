@@ -66,8 +66,8 @@ final class NetworkProtectionDebugUtilities {
         settings.resetToDefaults()
 
         NetworkProtectionWaitlist().waitlistStorage.deleteWaitlistState()
-        DefaultWaitlistActivationDateStore().removeDates()
-        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultWaitlistActivationDateStore(source: .netP).removeDates()
+        DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
 
         UserDefaults().removeObject(forKey: UserDefaultsWrapper<Bool>.Key.networkProtectionTermsAndConditionsAccepted.rawValue)
         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)

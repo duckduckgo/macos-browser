@@ -17,7 +17,7 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
+import PreferencesViews
 
 struct SyncWarningMessage: View {
     let title: String
@@ -45,7 +45,6 @@ struct SyncWarningMessage: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
         }
         .frame(width: 512, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
