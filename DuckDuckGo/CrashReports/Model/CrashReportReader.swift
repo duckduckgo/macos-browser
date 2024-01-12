@@ -21,23 +21,32 @@ import Foundation
 final class CrashReportReader {
 
     static let displayName = Bundle.main.displayName
+    static let vpnExtensionDisplayName = "com.duckduckgo.macos.vpn.network-extension"
 
     func getCrashReports(since lastCheckDate: Date) -> [CrashReport] {
-        let allPaths: [URL]
+        var allPaths: [URL]
+
         do {
-            allPaths = try FileManager.default.contentsOfDirectory(at: FileManager.diagnosticReports,
-                                                                   includingPropertiesForKeys: nil,
-                                                                   options: [])
+            allPaths = try FileManager.default.contentsOfDirectory(at: FileManager.userDiagnosticReports, includingPropertiesForKeys: nil)
         } catch {
             assertionFailure("CrashReportReader: Can't read content of diagnostic reports \(error.localizedDescription)")
             return []
         }
 
-        return allPaths
-            .filter({ isCrashReportPath($0) &&
-                        belongsToThisApp($0) &&
-                        isFile(at: $0, newerThan: lastCheckDate) })
-            .compactMap(crashReport(from:))
+#if NETP_SYSTEM_EXTENSION
+        do {
+            let systemPaths = try FileManager.default.contentsOfDirectory(at: FileManager.systemDiagnosticReports, includingPropertiesForKeys: nil)
+            allPaths.append(contentsOf: systemPaths)
+        } catch {
+            assertionFailure("Failed to read system crash reports: \(error)")
+        }
+#endif
+
+        let filteredPaths = allPaths.filter({
+            isCrashReportPath($0) && belongsToThisApp($0) && isFile(at: $0, newerThan: lastCheckDate)
+        })
+
+        return filteredPaths.compactMap(crashReport(from:))
     }
 
     private func isCrashReportPath(_ path: URL) -> Bool {
@@ -46,7 +55,10 @@ final class CrashReportReader {
     }
 
     private func belongsToThisApp(_ path: URL) -> Bool {
-        return path.lastPathComponent.hasPrefix(Self.displayName ?? "DuckDuckGo")
+        let hasAppPrefix = path.lastPathComponent.hasPrefix(Self.displayName ?? "DuckDuckGo")
+        let hasVPNPrefix = path.lastPathComponent.hasPrefix(Self.vpnExtensionDisplayName)
+
+        return hasAppPrefix || hasVPNPrefix
     }
 
     private func isFile(at path: URL, newerThan lastCheckDate: Date) -> Bool {
@@ -70,10 +82,14 @@ final class CrashReportReader {
 
 fileprivate extension FileManager {
 
-    static let diagnosticReports: URL = {
+    static let userDiagnosticReports: URL = {
         let homeDirectoryURL = FileManager.default.homeDirectoryForCurrentUser
         return homeDirectoryURL
             .appendingPathComponent("Library/Logs/DiagnosticReports")
+    }()
+
+    static let systemDiagnosticReports: URL = {
+        return URL(fileURLWithPath: "/Library/Logs/DiagnosticReports")
     }()
 
     func fileCreationDate(url: URL) -> Date? {

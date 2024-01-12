@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionRemoteMessagingStorageTests.swift
+//  HomePageRemoteMessagingStorageTests.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,9 +19,10 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-final class NetworkProtectionRemoteMessagingStorageTests: XCTestCase {
+final class HomePageRemoteMessagingStorageTests: XCTestCase {
 
-    private let temporaryFileURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json", isDirectory: false)
+    private let temporaryFileURL: URL = FileManager.default.temporaryDirectory
+    private let temporaryFileName: String = UUID().uuidString + ".json"
     private var defaults: UserDefaults!
     private let testGroupName = "remote-messaging-storage"
 
@@ -36,23 +37,34 @@ final class NetworkProtectionRemoteMessagingStorageTests: XCTestCase {
     }
 
     func testWhenStoringMessages_ThenMessagesCanBeReadFromDisk() throws {
-        let storage = DefaultNetworkProtectionRemoteMessagingStorage(userDefaults: defaults, messagesURL: temporaryFileURL)
+        let storage = DefaultHomePageRemoteMessagingStorage(
+            userDefaults: defaults,
+            messagesDirectoryURL: temporaryFileURL,
+            messagesFileName: temporaryFileName,
+            dismissedMessageIdentifiersKey: "dismissed-messages-key"
+        )
+
         let message = mockMessage(id: "123")
         try storage.store(messages: [message])
-        let storedMessages = storage.storedMessages()
+        let storedMessages: [NetworkProtectionRemoteMessage] = storage.storedMessages()
 
         XCTAssertEqual(storedMessages, [message])
     }
 
     func testWhenStoringMessages_ThenOldMessagesAreOverwritten() throws {
-        let storage = DefaultNetworkProtectionRemoteMessagingStorage(userDefaults: defaults, messagesURL: temporaryFileURL)
+        let storage = DefaultHomePageRemoteMessagingStorage(
+            userDefaults: defaults,
+            messagesDirectoryURL: temporaryFileURL,
+            messagesFileName: temporaryFileName,
+            dismissedMessageIdentifiersKey: "dismissed-messages-key"
+        )
 
         let message1 = mockMessage(id: "123")
         let message2 = mockMessage(id: "456")
 
         try storage.store(messages: [message1])
         try storage.store(messages: [message2])
-        let storedMessages = storage.storedMessages()
+        let storedMessages: [NetworkProtectionRemoteMessage] = storage.storedMessages()
 
         XCTAssertEqual(storedMessages, [message2])
     }

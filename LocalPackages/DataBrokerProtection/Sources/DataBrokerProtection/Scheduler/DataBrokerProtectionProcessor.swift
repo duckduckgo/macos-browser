@@ -31,12 +31,14 @@ final class DataBrokerProtectionProcessor {
     private let notificationCenter: NotificationCenter
     private let operationQueue: OperationQueue
     private var pixelHandler: EventMapping<DataBrokerProtectionPixels>
+    private let userNotificationService: DataBrokerProtectionUserNotificationService
 
     init(database: DataBrokerProtectionRepository,
          config: SchedulerConfig,
          operationRunnerProvider: OperationRunnerProvider,
          notificationCenter: NotificationCenter = NotificationCenter.default,
-         pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
+         pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         userNotificationService: DataBrokerProtectionUserNotificationService) {
 
         self.database = database
         self.config = config
@@ -45,6 +47,7 @@ final class DataBrokerProtectionProcessor {
         self.operationQueue = OperationQueue()
         self.pixelHandler = pixelHandler
         self.operationQueue.maxConcurrentOperationCount = config.concurrentOperationsDifferentBrokers
+        self.userNotificationService = userNotificationService
     }
 
     // MARK: - Public functions
@@ -119,7 +122,7 @@ final class DataBrokerProtectionProcessor {
             operationQueue.addOperation(collection)
         }
 
-        operationQueue.addBarrierBlock {
+        operationQueue.addBarrierBlock { [weak self] in
             completion()
         }
     }
@@ -145,6 +148,7 @@ final class DataBrokerProtectionProcessor {
                                                                 notificationCenter: notificationCenter,
                                                                 runner: operationRunnerProvider.getOperationRunner(),
                                                                 pixelHandler: pixelHandler,
+                                                                userNotificationService: userNotificationService,
                                                                 showWebView: showWebView)
                 collections.append(collection)
 

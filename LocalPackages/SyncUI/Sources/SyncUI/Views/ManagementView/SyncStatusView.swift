@@ -34,10 +34,6 @@ struct SyncStatusView<ViewModel>: View where ViewModel: ManagementViewModel {
                 }
             }
             .roundedBorder()
-            Text("Bookmarks and Saved Logins are currently in sync across your devices.")
-                .font(Font.system(size: 11))
-                .foregroundColor(Color("BlackWhite60"))
-                .padding(.horizontal)
         }
     }
 }

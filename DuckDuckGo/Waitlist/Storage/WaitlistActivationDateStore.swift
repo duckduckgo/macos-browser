@@ -18,6 +18,25 @@
 
 import Foundation
 
+enum WaitlistActivationDateStoreSource {
+    case netP
+    case dbp
+
+    var activationDateKey: String {
+        switch self {
+        case .netP: return "com.duckduckgo.network-protection.activation-date"
+        case .dbp: return "com.duckduckgo.dbp.activation-date"
+        }
+    }
+
+    var lastActiveDateKey: String {
+        switch self {
+        case .netP: return "com.duckduckgo.network-protection.last-active-date"
+        case .dbp: return "com.duckduckgo.dbp.last-active-date"
+        }
+    }
+}
+
 protocol WaitlistActivationDateStore {
 
     func daysSinceActivation() -> Int?
@@ -27,19 +46,21 @@ protocol WaitlistActivationDateStore {
 
 struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
 
-    private enum Constants {
-        static let networkProtectionActivationDateKey = "com.duckduckgo.network-protection.activation-date"
-        static let networkProtectionLastActiveDateKey = "com.duckduckgo.network-protection.last-active-date"
-    }
-
+    private let source: WaitlistActivationDateStoreSource
     private let userDefaults: UserDefaults
 
-    init(userDefaults: UserDefaults = .netP) {
-        self.userDefaults = userDefaults
+    init(source: WaitlistActivationDateStoreSource) {
+        self.source = source
+        switch source {
+        case.netP:
+            self.userDefaults = .netP
+        case .dbp:
+            self.userDefaults = .dbp
+        }
     }
 
     func setActivationDateIfNecessary() {
-        if userDefaults.double(forKey: Constants.networkProtectionActivationDateKey) != 0 {
+        if userDefaults.double(forKey: source.activationDateKey) != 0 {
             return
         }
 
@@ -47,7 +68,7 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
     }
 
     func daysSinceActivation() -> Int? {
-        let timestamp = userDefaults.double(forKey: Constants.networkProtectionActivationDateKey)
+        let timestamp = userDefaults.double(forKey: source.activationDateKey)
 
         if timestamp == 0 {
             return nil
@@ -58,11 +79,11 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
     }
 
     func updateLastActiveDate() {
-        userDefaults.set(Date(), forKey: Constants.networkProtectionLastActiveDateKey)
+        userDefaults.set(Date(), forKey: source.lastActiveDateKey)
     }
 
     func daysSinceLastActive() -> Int? {
-        let timestamp = userDefaults.double(forKey: Constants.networkProtectionLastActiveDateKey)
+        let timestamp = userDefaults.double(forKey: source.lastActiveDateKey)
 
         if timestamp == 0 {
             return nil
@@ -75,14 +96,14 @@ struct DefaultWaitlistActivationDateStore: WaitlistActivationDateStore {
     // MARK: - Resetting
 
     func removeDates() {
-        userDefaults.removeObject(forKey: Constants.networkProtectionActivationDateKey)
-        userDefaults.removeObject(forKey: Constants.networkProtectionLastActiveDateKey)
+        userDefaults.removeObject(forKey: source.activationDateKey)
+        userDefaults.removeObject(forKey: source.lastActiveDateKey)
     }
 
     // MARK: - Updating
 
     func updateActivationDate(_ date: Date) {
-        userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: Constants.networkProtectionActivationDateKey)
+        userDefaults.set(date.timeIntervalSinceReferenceDate, forKey: source.activationDateKey)
     }
 
     private func daysSince(date storedDate: Date) -> Int? {

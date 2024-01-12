@@ -41,9 +41,12 @@ extension HomePage.Models {
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION && DBP
         let networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging
-        let appGroupUserDefaults: UserDefaults
+        let networkProtectionUserDefaults: UserDefaults
+
+        let dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging
+        let dataBrokerProtectionUserDefaults: UserDefaults
 #endif
 
         var isDay0SurveyEnabled: Bool {
@@ -135,7 +138,7 @@ extension HomePage.Models {
 
         @Published var visibleFeaturesMatrix: [[FeatureType]] = [[]]
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION && DBP
         init(defaultBrowserProvider: DefaultBrowserProvider,
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
@@ -143,7 +146,9 @@ extension HomePage.Models {
              privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              networkProtectionRemoteMessaging: NetworkProtectionRemoteMessaging,
-             appGroupUserDefaults: UserDefaults,
+             dataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging,
+             networkProtectionUserDefaults: UserDefaults,
+             dataBrokerProtectionUserDefaults: UserDefaults,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
             self.defaultBrowserProvider = defaultBrowserProvider
             self.dataImportProvider = dataImportProvider
@@ -152,9 +157,13 @@ extension HomePage.Models {
             self.privacyPreferences = privacyPreferences
             self.duckPlayerPreferences = duckPlayerPreferences
             self.networkProtectionRemoteMessaging = networkProtectionRemoteMessaging
-            self.appGroupUserDefaults = appGroupUserDefaults
+            self.dataBrokerProtectionRemoteMessaging = dataBrokerProtectionRemoteMessaging
+            self.networkProtectionUserDefaults = networkProtectionUserDefaults
+            self.dataBrokerProtectionUserDefaults = dataBrokerProtectionUserDefaults
             self.privacyConfigurationManager = privacyConfigurationManager
+
             refreshFeaturesMatrix()
+
             NotificationCenter.default.addObserver(self, selector: #selector(newTabOpenNotification(_:)), name: HomePage.Models.newHomePageTabOpen, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(windowDidBecomeKey(_:)), name: NSWindow.didBecomeKeyNotification, object: nil)
         }
@@ -179,6 +188,7 @@ extension HomePage.Models {
         }
 #endif
 
+        // swiftlint:disable:next cyclomatic_complexity
         @MainActor func performAction(for featureType: FeatureType) {
             switch featureType {
             case .defaultBrowser:
@@ -202,6 +212,8 @@ extension HomePage.Models {
             case .surveyDay7:
                 visitSurvey(day: .day7)
             case .networkProtectionRemoteMessage(let message):
+                handle(remoteMessage: message)
+            case .dataBrokerProtectionRemoteMessage(let message):
                 handle(remoteMessage: message)
             case .dataBrokerProtectionWaitlistInvited:
 #if DBP
@@ -229,18 +241,32 @@ extension HomePage.Models {
                 networkProtectionRemoteMessaging.dismiss(message: message)
                 Pixel.fire(.networkProtectionRemoteMessageDismissed(messageID: message.id))
 #endif
+            case .dataBrokerProtectionRemoteMessage(let message):
+#if DBP
+                dataBrokerProtectionRemoteMessaging.dismiss(message: message)
+                Pixel.fire(.dataBrokerProtectionRemoteMessageDismissed(messageID: message.id))
+#endif
             case .dataBrokerProtectionWaitlistInvited:
                 shouldShowDBPWaitlistInvitedCardUI = false
             }
             refreshFeaturesMatrix()
         }
 
-        // swiftlint:disable:next cyclomatic_complexity
+        // swiftlint:disable:next cyclomatic_complexity function_body_length
         func refreshFeaturesMatrix() {
             var features: [FeatureType] = []
 #if DBP
             if shouldDBPWaitlistCardBeVisible {
                 features.append(.dataBrokerProtectionWaitlistInvited)
+            }
+
+            for message in dataBrokerProtectionRemoteMessaging.presentableRemoteMessages() {
+                features.append(.dataBrokerProtectionRemoteMessage(message))
+                DailyPixel.fire(
+                    pixel: .dataBrokerProtectionRemoteMessageDisplayed(messageID: message.id),
+                    frequency: .dailyOnly,
+                    includeAppVersionParameter: true
+                )
             }
 #endif
 
@@ -281,10 +307,8 @@ extension HomePage.Models {
                     if shouldSurveyDay7BeVisible {
                         features.append(feature)
                     }
-                case .networkProtectionRemoteMessage:
-                    break // Do nothing, NetP remote messages get appended first
-                case .dataBrokerProtectionWaitlistInvited:
-                    break // Do nothing. The feature is being set for everyone invited in the waitlist
+                case .networkProtectionRemoteMessage, .dataBrokerProtectionRemoteMessage, .dataBrokerProtectionWaitlistInvited:
+                    break // Do nothing, these messages get appended first
                 }
             }
             featuresMatrix = features.chunked(into: itemsPerRow)
@@ -437,6 +461,32 @@ extension HomePage.Models {
             }
 #endif
         }
+
+        @MainActor private func handle(remoteMessage: DataBrokerProtectionRemoteMessage) {
+#if DBP
+            guard let actionType = remoteMessage.action.actionType else {
+                Pixel.fire(.dataBrokerProtectionRemoteMessageDismissed(messageID: remoteMessage.id))
+                dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                refreshFeaturesMatrix()
+                return
+            }
+
+            switch actionType {
+            case .openDataBrokerProtection:
+                break // Not used currently
+            case .openSurveyURL, .openURL:
+                if let surveyURL = remoteMessage.presentableSurveyURL() {
+                    let tab = Tab(content: .url(surveyURL, source: .ui), shouldLoadInBackground: true)
+                    tabCollectionViewModel.append(tab: tab)
+                    Pixel.fire(.dataBrokerProtectionRemoteMessageOpened(messageID: remoteMessage.id))
+
+                    // Dismiss the message after the user opens the URL, even if they just close the tab immediately afterwards.
+                    dataBrokerProtectionRemoteMessaging.dismiss(message: remoteMessage)
+                    refreshFeaturesMatrix()
+                }
+            }
+#endif
+        }
     }
 
     // MARK: Feature Type
@@ -456,6 +506,7 @@ extension HomePage.Models {
         case surveyDay0
         case surveyDay7
         case networkProtectionRemoteMessage(NetworkProtectionRemoteMessage)
+        case dataBrokerProtectionRemoteMessage(DataBrokerProtectionRemoteMessage)
         case dataBrokerProtectionWaitlistInvited
 
         var title: String {
@@ -473,6 +524,8 @@ extension HomePage.Models {
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7CardTitle
             case .networkProtectionRemoteMessage(let message):
+                return message.cardTitle
+            case .dataBrokerProtectionRemoteMessage(let message):
                 return message.cardTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Personal Information Removal"
@@ -495,6 +548,8 @@ extension HomePage.Models {
                 return UserText.newTabSetUpSurveyDay7Summary
             case .networkProtectionRemoteMessage(let message):
                 return message.cardDescription
+            case .dataBrokerProtectionRemoteMessage(let message):
+                return message.cardDescription
             case .dataBrokerProtectionWaitlistInvited:
                 return "You're invited to try Personal Information Removal beta!"
             }
@@ -515,6 +570,8 @@ extension HomePage.Models {
             case .surveyDay7:
                 return UserText.newTabSetUpSurveyDay7Action
             case .networkProtectionRemoteMessage(let message):
+                return message.action.actionTitle
+            case .dataBrokerProtectionRemoteMessage(let message):
                 return message.action.actionTitle
             case .dataBrokerProtectionWaitlistInvited:
                 return "Get Started"
@@ -539,6 +596,8 @@ extension HomePage.Models {
                 return NSImage(named: "Survey-128")!.resized(to: iconSize)!
             case .networkProtectionRemoteMessage:
                 return NSImage(named: "VPN-Ended")!.resized(to: iconSize)!
+            case .dataBrokerProtectionRemoteMessage:
+                return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             case .dataBrokerProtectionWaitlistInvited:
                 return NSImage(named: "DBP-Information-Remover")!.resized(to: iconSize)!
             }
