@@ -193,6 +193,9 @@
     "Address" : {
 
     },
+    "Address:" : {
+      "comment" : "Add Bookmark dialog bookmark url field heading"
+    },
     "address.bar.search.suffix" : {
       "comment" : "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo",
       "extractionState" : "extracted_with_value",
@@ -1242,6 +1245,18 @@
     "Bookmark import failed." : {
       "comment" : "Data import summary message of failed bookmarks import."
     },
+    "bookmark.dialog.add" : {
+      "comment" : "Button to confim a bookmark creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add"
+          }
+        }
+      }
+    },
     "bookmark.page" : {
       "comment" : "Context menu item",
       "extractionState" : "extracted_with_value",
@@ -1298,6 +1313,18 @@
     },
     "Bookmarks…" : {
       "comment" : "Main Menu File-Export item"
+    },
+    "bookmarks.add.dialog.title" : {
+      "comment" : "Bookmark creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Bookmark"
+          }
+        }
+      }
     },
     "bookmarks.bar.context-menu.copy" : {
       "comment" : "Copy menu item for the bookmarks bar context menu",
@@ -8380,6 +8407,9 @@
     },
     "The version of the browser you are trying to import from" : {
       "comment" : "Data import failure Report dialog description of a report field providing version of a browser user is trying to import data from"
+    },
+    "Title:" : {
+      "comment" : "Add Bookmark dialog bookmark title field heading"
     },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",

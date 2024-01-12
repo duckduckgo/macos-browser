@@ -85,7 +85,7 @@ final class DuckDuckGoNotificationsAppDelegate: NSObject, NSApplicationDelegate 
         distributedNotificationCenter.publisher(for: .showConnectedNotification)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
-                let serverLocation = notification.userInfo?[NetworkProtectionNotification.UserInfoKey.connectedServerLocation] as? String
+                let serverLocation = notification.object as? String
                 self?.showConnectedNotification(serverLocation: serverLocation)
             }.store(in: &cancellables)
 
