@@ -30,7 +30,7 @@ final class TabPreviewWindowController: NSWindowController {
     }
 
     enum Delay: Double {
-        case standard = 1.5
+        case standard = 1
     }
 
     private var previewTimer: Timer?
