@@ -127,8 +127,7 @@ final class NetworkProtectionAppEvents {
             return
         }
 
-        // For debug builds we always want to restart the VPN and VPN menu app to ensure
-        // the latest is loaded
+        // We want to restart the VPN menu app to make sure it's always on the latest.
         restartNetworkProtectionMenu(using: loginItemsManager)
     }
 
