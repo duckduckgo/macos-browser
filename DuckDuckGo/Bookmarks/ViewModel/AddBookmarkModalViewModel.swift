@@ -54,7 +54,7 @@ struct AddBookmarkModalViewModel {
         }
 
         var result: Bookmark?
-        if var bookmark = originalBookmark {
+        if var bookmark = originalBookmark ?? bookmarkManager.getBookmark(for: url) {
 
             if url.absoluteString != bookmark.url {
                 bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
