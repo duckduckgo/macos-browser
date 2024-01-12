@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1704906276365,
+    "version": 1705003169921,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -136,6 +136,9 @@
                 },
                 {
                     "domain": "duden.de"
+                },
+                {
+                    "domain": "eleconomista.es"
                 },
                 {
                     "domain": "ksta.de"
@@ -277,7 +280,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "7718a046d4f157b8fff1abe7d384c793"
+            "hash": "8749a4d02730a39a663091b7ce31ee1a"
         },
         "autofill": {
             "exceptions": [
@@ -1053,12 +1056,16 @@
                     {
                         "domain": "facebook.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1641"
+                    },
+                    {
+                        "domain": "sas.dk",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1347"
                     }
                 ]
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "6ed03febdd780fd845cc1f7d6ce74ecf"
+            "hash": "ba77bfe2a8c42227b0d05dc501e29704"
         },
         "dbp": {
             "state": "enabled",
@@ -1987,6 +1994,19 @@
                         ]
                     },
                     {
+                        "domain": "corriere.it",
+                        "rules": [
+                            {
+                                "selector": "[id^='rcsad_']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": ".bck-adv",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "cyclingtips.com",
                         "rules": [
                             {
@@ -2401,51 +2421,55 @@
                         "domain": "google.com",
                         "rules": [
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19026802']))",
+                                "selector": "div:has(> iframe[src*='prid=19026802'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19015398']))",
+                                "selector": "div:has(> iframe[src*='prid=19015398'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19026796']))",
+                                "selector": "div:has(> iframe[src*='prid=19026796'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19018053']))",
+                                "selector": "div:has(> iframe[src*='prid=19018053'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19018054']))",
+                                "selector": "div:has(> iframe[src*='prid=19018054'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19016403']))",
+                                "selector": "div:has(> iframe[src*='prid=19016403'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19015972']))",
+                                "selector": "div:has(> iframe[src*='prid=19015972'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19016223']))",
+                                "selector": "div:has(> iframe[src*='prid=19016223'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19015952']))",
+                                "selector": "div:has(> iframe[src*='prid=19015952'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19030391']))",
+                                "selector": "div:has(> iframe[src*='prid=19030391'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19030389']))",
+                                "selector": "div:has(> iframe[src*='prid=19030389'])",
                                 "type": "hide"
                             },
                             {
-                                "selector": ":is(div:has(> iframe[src*='prid=19030167']))",
+                                "selector": "div:has(> iframe[src*='prid=19030167'])",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": "div:has(> iframe[src*='prid=19031496'])",
                                 "type": "hide"
                             }
                         ]
@@ -3736,6 +3760,15 @@
                         ]
                     },
                     {
+                        "domain": "xatakamovil.com",
+                        "rules": [
+                            {
+                                "selector": "#stories_container",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "xfinity.com",
                         "rules": [
                             {
@@ -3793,7 +3826,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "72cec10e1f8cca83c98696388d7981d6"
+            "hash": "b8a0df9f0fa4271bd331c66835dbfd68"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4841,6 +4874,7 @@
                                 "rule": "c.amazon-adsystem.com/aax2/apstag.js",
                                 "domains": [
                                     "4029tv.com",
+                                    "applesfera.com",
                                     "cnn.com",
                                     "corriere.it",
                                     "eurogamer.net",
@@ -5393,6 +5427,7 @@
                                 "rule": "securepubads.g.doubleclick.net/gampad/ads",
                                 "domains": [
                                     "ah.nl",
+                                    "applesfera.com",
                                     "rocketnews24.com"
                                 ]
                             },
@@ -5422,6 +5457,7 @@
                                 "rule": "securepubads.g.doubleclick.net/tag/js/gpt.js",
                                 "domains": [
                                     "ah.nl",
+                                    "applesfera.com",
                                     "nytimes.com",
                                     "realmadrid.com",
                                     "rocketnews24.com",
@@ -5444,6 +5480,12 @@
                                     "rocketnews24.com",
                                     "weather.com",
                                     "wunderground.com"
+                                ]
+                            },
+                            {
+                                "rule": "securepubads.g.doubleclick.net/pagead/managed/js/gpt",
+                                "domains": [
+                                    "applesfera.com"
                                 ]
                             },
                             {
@@ -6501,6 +6543,16 @@
                                 "rule": "monetate.net",
                                 "domains": [
                                     "kleen-ritecorp.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "mrf.io": {
+                        "rules": [
+                            {
+                                "rule": "mrf.io",
+                                "domains": [
+                                    "diariodesevilla.es"
                                 ]
                             }
                         ]
@@ -7564,7 +7616,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "cc8e9d6fcf1d2a85ef58c0c751be6304"
+            "hash": "ff0c1c263625ef2b3e404f7cdac379df"
         },
         "trackingCookies1p": {
             "settings": {
