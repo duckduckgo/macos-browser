@@ -1,0 +1,70 @@
+{
+  "name": "publicreports.com",
+  "version": "0.1.1",
+  "parent": "verecor.com",
+  "addedDatetime": 1703052000000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "ae0104a2-a75c-4d97-bada-dda4f21dd446",
+          "url": "https://publicreports.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
+          "ageRange": [
+            "18-30",
+            "31-40",
+            "41-50",
+            "51-60",
+            "61-70",
+            "71-80",
+            "81+"
+          ]
+        },
+        {
+          "actionType": "extract",
+          "id": "388c55e3-fa12-4376-9a02-01190b8a30fd",
+          "selector": ".card",
+          "profile": {
+            "name": {
+              "selector": ".card-title",
+              "beforeText": " ~"
+            },
+            "alternativeNamesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Known as:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "age": {
+              "beforeText": "years old",
+              "selector": ".card-title",
+              "afterText": " ~"
+            },
+            "addressCityStateList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Has lived in:']]/dd/ul[@class='list-inline m-0']/li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//div[@class='card-body']/dl[dt[text()='Related to:']]/dd/ul[@class='list-inline m-0']/li",
+              "beforeText": ",",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": "a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}
