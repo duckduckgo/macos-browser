@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1705003169921,
+    "version": 1705078221022,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -950,6 +950,11 @@
             "state": "enabled",
             "hash": "f1b7de266435cd2e414f50deb2c9234a"
         },
+        "clientBrandHint": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "contentBlocking": {
             "state": "enabled",
             "exceptions": [
@@ -1864,6 +1869,10 @@
                     {
                         "domain": "bleacherreport.com",
                         "rules": [
+                            {
+                                "selector": ".br-ad-renderer",
+                                "type": "hide-empty"
+                            },
                             {
                                 "selector": ".br-ad-wrapper",
                                 "type": "closest-empty"
@@ -3826,7 +3835,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "b8a0df9f0fa4271bd331c66835dbfd68"
+            "hash": "405e753a74140923880f1bc6b1a30261"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -5485,7 +5494,8 @@
                             {
                                 "rule": "securepubads.g.doubleclick.net/pagead/managed/js/gpt",
                                 "domains": [
-                                    "applesfera.com"
+                                    "applesfera.com",
+                                    "triblive.com"
                                 ]
                             },
                             {
@@ -6130,6 +6140,7 @@
                                     "thecw46.com",
                                     "thecwtc.com",
                                     "thenationaldesk.com",
+                                    "triblive.com",
                                     "turnto10.com",
                                     "univisionseattle.com",
                                     "upnorthlive.com",
@@ -7616,7 +7627,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "ff0c1c263625ef2b3e404f7cdac379df"
+            "hash": "103d48713e9ec9b7e0fe23a1a8af6dd4"
         },
         "trackingCookies1p": {
             "settings": {
