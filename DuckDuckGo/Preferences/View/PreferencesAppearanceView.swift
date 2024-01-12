@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import Bookmarks
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
-import Bookmarks
 
 extension Preferences {
 
@@ -88,37 +89,37 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
 
                 // TITLE
-                TextMenuTitle(text: UserText.appearance)
+                TextMenuTitle(UserText.appearance)
 
                 // SECTION 1: Theme
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.theme)
+                    TextMenuItemHeader(UserText.theme)
                     ThemePicker()
                         .environmentObject(model)
                 }
 
                 // SECTION 2: Address Bar
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.addressBar)
-                    ToggleMenuItem(title: UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    ToggleMenuItem(title: UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
+                    TextMenuItemHeader(UserText.addressBar)
+                    ToggleMenuItem(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
+                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
 
                 // SECTION 3: New Tab Page
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.newTabBottomPopoverTitle)
+                    TextMenuItemHeader(UserText.newTabBottomPopoverTitle)
                     if model.isContinueSetUpAvailable {
-                        ToggleMenuItem(title: UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
+                        ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
                     }
-                    ToggleMenuItem(title: UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible)
-                    ToggleMenuItem(title: UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
+                    ToggleMenuItem(UserText.newTabFavoriteSectionTitle, isOn: $model.isFavoriteVisible)
+                    ToggleMenuItem(UserText.newTabRecentActivitySectionTitle, isOn: $model.isRecentActivityVisible)
                 }
 
                 // SECTION 4: Bookmarks Bar
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: "Bookmarks Bar")
+                    TextMenuItemHeader("Bookmarks Bar")
                     HStack {
-                        ToggleMenuItem(title: UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
+                        ToggleMenuItem(UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
                         NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
                             let button = NSPopUpButton()
                             button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -137,8 +138,7 @@ extension Preferences {
 
                 // SECTION 5: Zoom Setting
                 PreferencePaneSection {
-                    Text(UserText.zoomSettingTitle)
-                        .font(Const.Fonts.preferencePaneSectionHeader)
+                    TextMenuItemHeader(UserText.zoomSettingTitle)
                     HStack {
                         Text(UserText.zoomPickerTitle)
                         NSPopUpButtonView(selection: $model.defaultPageZoom) {

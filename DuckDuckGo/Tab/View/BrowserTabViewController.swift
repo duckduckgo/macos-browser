@@ -115,6 +115,10 @@ final class BrowserTabViewController: NSViewController {
 
 #if DBP
         NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onDBPFeatureDisabled),
+                                               name: .dbpWasDisabled,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
                                                selector: #selector(onCloseDataBrokerProtection),
                                                name: .dbpDidClose,
                                                object: nil)
@@ -165,6 +169,11 @@ final class BrowserTabViewController: NSViewController {
     }
 
 #if DBP
+    @objc
+    private func onDBPFeatureDisabled(_ notification: Notification) {
+        tabCollectionViewModel.removeAll(with: .dataBrokerProtection)
+    }
+
     @objc
     private func onCloseDataBrokerProtection(_ notification: Notification) {
         guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,

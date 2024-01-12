@@ -59,6 +59,16 @@ final public class DataBrokerProtectionViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        NotificationCenter.default.addObserver(forName: DataBrokerProtectionNotifications.shouldReloadUI,
+                                               object: nil,
+                                               queue: .main) { [weak self] _ in
+            self?.webView?.reload()
+        }
+    }
+
     override public func loadView() {
         guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 

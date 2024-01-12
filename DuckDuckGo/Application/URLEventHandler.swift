@@ -23,6 +23,10 @@ import Foundation
 import NetworkProtection
 #endif
 
+#if DBP
+import DataBrokerProtection
+#endif
+
 @MainActor
 final class URLEventHandler {
 
@@ -100,9 +104,19 @@ final class URLEventHandler {
 
     private static func openURL(_ url: URL) {
 #if NETWORK_PROTECTION
-        if url.scheme == "networkprotection" {
+        if url.scheme?.isNetworkProtectionScheme == true {
             handleNetworkProtectionURL(url)
-        } else {
+        }
+#endif
+
+#if DBP
+        if url.scheme?.isDataBrokerProtectionScheme == true {
+            handleDataBrokerProtectionURL(url)
+        }
+#endif
+
+#if NETWORK_PROTECTION || DBP
+        if url.scheme?.isNetworkProtectionScheme == false && url.scheme?.isDataBrokerProtectionScheme == false {
             WaitlistModalDismisser.dismissWaitlistModalViewControllerIfNecessary(url)
             WindowControllersManager.shared.show(url: url, source: .appOpenUrl, newTab: true)
         }
@@ -132,4 +146,33 @@ final class URLEventHandler {
 
 #endif
 
+#if DBP
+    /// Handles DBP URLs
+    ///
+    private static func handleDataBrokerProtectionURL(_ url: URL) {
+        switch url {
+        case DataBrokerProtectionNotificationCommand.showDashboard.url:
+            NotificationCenter.default.post(name: DataBrokerProtectionNotifications.shouldReloadUI, object: nil)
+
+            WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+        default:
+            return
+        }
+    }
+
+#endif
+
+}
+
+private extension String {
+    static let dataBrokerProtectionScheme = "databrokerprotection"
+    static let networkProtectionScheme = "networkprotection"
+
+    var isDataBrokerProtectionScheme: Bool {
+        return self == String.dataBrokerProtectionScheme
+    }
+
+    var isNetworkProtectionScheme: Bool {
+        return self == String.networkProtectionScheme
+    }
 }
