@@ -7,18 +7,24 @@ let package = Package(
     name: "SwiftUIExtensions",
     platforms: [ .macOS("11.4") ],
     products: [
-        .library(
-            name: "SwiftUIExtensions",
-            targets: ["SwiftUIExtensions"]
-        ),
+        .library(name: "SwiftUIExtensions", targets: ["SwiftUIExtensions"]),
+        .library(name: "PreferencesViews", targets: ["PreferencesViews"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "100.0.3"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.1.0"),
     ],
     targets: [
         .target(
             name: "SwiftUIExtensions",
             dependencies: [],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
+        .target(
+            name: "PreferencesViews",
+            dependencies: ["SwiftUIExtensions"],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],

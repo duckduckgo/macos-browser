@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -28,13 +29,13 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
 
                 // TITLE
-                TextMenuTitle(text: UserText.privacy)
+                TextMenuTitle(UserText.privacy)
 
                 // SECTION 1: Web Tracking Protection Section
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.webTrackingProtectionSettingsTitle)
+                    TextMenuItemHeader(UserText.webTrackingProtectionSettingsTitle)
                     VStack(alignment: .leading, spacing: 6) {
-                        TextMenuItemCaption(text: UserText.webTrackingProtectionExplenation)
+                        TextMenuItemCaption(UserText.webTrackingProtectionExplenation)
                         TextButton(UserText.learnMore) {
                             model.openURL(.webTrackingProtection)
                         }
@@ -43,10 +44,10 @@ extension Preferences {
 
                 // SECTION 2: Cookie Consent Pop-ups
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.autoconsentSettingsTitle)
-                    ToggleMenuItem(title: UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
+                    TextMenuItemHeader(UserText.autoconsentSettingsTitle)
+                    ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
                     VStack(alignment: .leading, spacing: 6) {
-                        TextMenuItemCaption(text: UserText.autoconsentExplanation)
+                        TextMenuItemCaption(UserText.autoconsentExplanation)
                         TextButton(UserText.learnMore) {
                             model.openURL(.cookieConsentPopUpManagement)
                         }
@@ -55,10 +56,10 @@ extension Preferences {
 
                 // SECTION 3: Fireproof Site
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.fireproofSites)
-                    ToggleMenuItem(title: UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
+                    TextMenuItemHeader(UserText.fireproofSites)
+                    ToggleMenuItem(UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
                     VStack(alignment: .leading, spacing: 6) {
-                        TextMenuItemCaption(text: UserText.fireproofExplanation)
+                        TextMenuItemCaption(UserText.fireproofExplanation)
                         TextButton(UserText.learnMore) {
                             model.openURL(.theFireButton)
                         }
@@ -70,10 +71,10 @@ extension Preferences {
 
                 // SECTION 4: Global privacy control
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.gpcSettingsTitle)
-                    ToggleMenuItem(title: UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
+                    TextMenuItemHeader(UserText.gpcSettingsTitle)
+                    ToggleMenuItem(UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
                     VStack(alignment: .leading, spacing: 6) {
-                        TextMenuItemCaption(text: UserText.gpcExplanation)
+                        TextMenuItemCaption(UserText.gpcExplanation)
                         TextButton(UserText.learnMore) {
                             model.openURL(.gpcLearnMore)
                         }

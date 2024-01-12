@@ -18,6 +18,7 @@
 
 #if NETWORK_PROTECTION
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -31,11 +32,11 @@ extension Preferences {
 
                 // TITLE
 
-                TextMenuTitle(text: UserText.vpn)
+                TextMenuTitle(UserText.vpn)
 
                 if model.shouldShowLocationItem {
                     PreferencePaneSection {
-                        TextMenuItemHeader(text: UserText.vpnLocationTitle)
+                        TextMenuItemHeader(UserText.vpnLocationTitle)
                         VPNLocationPreferenceItem(model: model.locationItem)
                     }
                 }
@@ -43,21 +44,23 @@ extension Preferences {
                 // SECTION: Manage VPN
 
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.vpnGeneralTitle)
+                    TextMenuItemHeader(UserText.vpnGeneralTitle)
 
                     SpacedCheckbox {
-                        ToggleMenuItem(title: UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
+                        ToggleMenuItem(UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
                     }
 
                     SpacedCheckbox {
-                        ToggleMenuItem(title: UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
+                        ToggleMenuItem(UserText.vpnShowInMenuBarSettingTitle, isOn: $model.showInMenuBar)
                     }
 
                     SpacedCheckbox {
-                        ToggleMenuItemWithDescription(title: UserText.vpnExcludeLocalNetworksSettingTitle,
-                                                      description: UserText.vpnExcludeLocalNetworksSettingDescription,
-                                                      isOn: $model.excludeLocalNetworks,
-                                                      spacing: 12)
+                        ToggleMenuItemWithDescription(
+                            UserText.vpnExcludeLocalNetworksSettingTitle,
+                            UserText.vpnExcludeLocalNetworksSettingDescription,
+                            isOn: $model.excludeLocalNetworks,
+                            spacing: 12
+                        )
                     }
 
                     VStack(alignment: .leading) {
@@ -90,9 +93,9 @@ extension Preferences {
                 // SECTION: VPN Notifications
 
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.vpnNotificationsSettingsTitle)
+                    TextMenuItemHeader(UserText.vpnNotificationsSettingsTitle)
 
-                    ToggleMenuItem(title: "VPN connection drops or status changes", isOn: $model.notifyStatusChanges)
+                    ToggleMenuItem("VPN connection drops or status changes", isOn: $model.notifyStatusChanges)
                 }
 
                 // SECTION: Uninstall
