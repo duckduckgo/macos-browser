@@ -45,13 +45,16 @@ extension TabPreviewViewController {
         titleTextField.stringValue = tabViewModel.title
         titleTextField.lineBreakMode = isSelected ? .byWordWrapping : .byTruncatingTail
 
-        // Search queries can match valid URL formats, so prevent creating a URL object from the address bar string if on a search page.
-        if !(tabViewModel.tab.content.url?.isDuckDuckGoSearch ?? false),
-           let url = URL(trimmedAddressBarString: tabViewModel.addressBarString),
-           let punycodeDecoded = url.punycodeDecodedString {
-            urlTextField.stringValue = punycodeDecoded
-        } else {
-            urlTextField.stringValue = tabViewModel.addressBarString
+        switch tabViewModel.tab.content {
+        case .url(let url, credential: _, source: _):
+            urlTextField.stringValue = url.toString(decodePunycode: true,
+                                                    dropScheme: true,
+                                                    needsWWW: false,
+                                                    dropTrailingSlash: true)
+        case .bookmarks, .dataBrokerProtection, .homePage, .onboarding, .preferences:
+            urlTextField.stringValue = "DuckDuckGo Browser"
+        default:
+            urlTextField.stringValue = ""
         }
 
         if !isSelected, let preview = tabViewModel.tab.tabPreview {

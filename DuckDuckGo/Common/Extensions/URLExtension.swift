@@ -215,7 +215,7 @@ extension URL {
         toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
     }
 
-    private func toString(decodePunycode: Bool,
+    func toString(decodePunycode: Bool,
                           dropScheme: Bool,
                           needsWWW: Bool? = nil,
                           dropTrailingSlash: Bool) -> String {
