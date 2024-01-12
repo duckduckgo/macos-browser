@@ -30,6 +30,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let webUIViewModel: DBPUIViewModel
 
     private let openURLHandler: (URL?) -> Void
+    private var reloadObserver: NSObjectProtocol?
 
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
@@ -62,7 +63,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        NotificationCenter.default.addObserver(forName: DataBrokerProtectionNotifications.shouldReloadUI,
+        reloadObserver = NotificationCenter.default.addObserver(forName: DataBrokerProtectionNotifications.shouldReloadUI,
                                                object: nil,
                                                queue: .main) { [weak self] _ in
             self?.webView?.reload()
@@ -85,7 +86,9 @@ final public class DataBrokerProtectionViewController: NSViewController {
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        if let reloadObserver {
+            NotificationCenter.default.removeObserver(reloadObserver)
+        }
     }
 }
 
