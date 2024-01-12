@@ -27,7 +27,8 @@ protocol VPNFeedbackSender {
 struct DefaultVPNFeedbackSender: VPNFeedbackSender {
 
     func send(metadata: VPNMetadata, category: VPNFeedbackCategory, userText: String) async throws {
-        let encodedUserText = userText.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? userText
+        let urlAllowed: CharacterSet = .alphanumerics.union(.init(charactersIn: "-._~"))
+        let encodedUserText = userText.addingPercentEncoding(withAllowedCharacters: urlAllowed) ?? userText
         let pixelEvent = Pixel.Event.vpnBreakageReport(category: category.rawValue, description: encodedUserText, metadata: metadata.toBase64())
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in

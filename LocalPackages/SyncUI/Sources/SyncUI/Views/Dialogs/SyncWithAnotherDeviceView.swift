@@ -106,27 +106,10 @@ struct SyncWithAnotherDeviceView: View {
     }
 
     fileprivate func enterCodeView() -> some View {
-        return Group {
+        Group {
             Text(UserText.syncWithAnotherDeviceEnterCodeExplanation)
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color("BookmarkRepresentingColor4"), lineWidth: 5)
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(.clear)
-                    Text(recoveryCodeModel.recoveryCode)
-                        .font(
-                            Font.custom("SF Mono", size: 13)
-                                .weight(.medium)
-                        )
-                        .kerning(2)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(3)
-                        .padding(.horizontal)
-                }
-                .frame(
-                    width: 348,
-                    height: recoveryCodeModel.recoveryCode.isEmpty ? 32 : 120
-                )
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             Button {
                 recoveryCodeModel.paste()
                 model.delegate?.recoveryCodePasted(recoveryCodeModel.recoveryCode, fromRecoveryScreen: false)
@@ -137,11 +120,12 @@ struct SyncWithAnotherDeviceView: View {
                 }
             }
             .buttonStyle(CopyPasteButtonStyle(verticalPadding: 8.0))
+            .keyboardShortcut(KeyEquivalent("v"), modifiers: .command)
         }
     }
 
     fileprivate func showTextCodeView() -> some View {
-        return Group {
+        Group {
             VStack(spacing: 20) {
                 Text(UserText.syncWithAnotherDeviceShowCodeExplanation)
                 Text(code)

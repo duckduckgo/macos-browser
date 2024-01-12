@@ -20,6 +20,7 @@ import Foundation
 import Combine
 import Sparkle
 import BrowserServicesKit
+import SwiftUIExtensions
 
 #if SPARKLE
 
