@@ -83,6 +83,10 @@ final public class DataBrokerProtectionViewController: NSViewController {
         }
 
     }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 }
 
 extension DataBrokerProtectionViewController: WKUIDelegate {
