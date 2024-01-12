@@ -68,7 +68,7 @@ enum UserText {
 
     // Sync Enabled View
     // Turn off sync dialog
-    static let turnOffSyncConfirmTitle = NSLocalizedString("preferences.sync.turn-off.confirm.title", value: "Turn Off Sync?", comment: "Turn off sync confirmation dialog title")
+    static let turnOffSyncConfirmTitle = NSLocalizedString("preferences.sync.turn-off.confirm.title", value: "Turn off sync?", comment: "Turn off sync confirmation dialog title")
     static let turnOffSyncConfirmMessage = NSLocalizedString("preferences.sync.turn-off.confirm.message", value: "This device will no longer be able to access your synced data.", comment: "Turn off sync confirmation dialog message")
     // Delete server data
     static let turnOffAndDeleteServerData = NSLocalizedString("preferences.sync.turn-off-and-delete-data", value: "Turn Off and Delete Server Data…", comment: "Disable and delete data sync button caption")
@@ -81,7 +81,7 @@ enum UserText {
     static let removeDeviceButton = NSLocalizedString("preferences.sync.remove-device", value: "Remove...", comment: "Button to remove a device")
 
     // Remove device dialog
-    static let removeDeviceConfirmTitle = NSLocalizedString("preferences.sync.remove-device-title", value: "Remove Device?", comment: "Title on remove a device confirmation")
+    static let removeDeviceConfirmTitle = NSLocalizedString("preferences.sync.remove-device-title", value: "Remove device?", comment: "Title on remove a device confirmation")
     static let removeDeviceConfirmButton = NSLocalizedString("preferences.sync.remove-device-button", value: "Remove Device", comment: "Button to on remove a device confirmation")
     static func removeDeviceConfirmMessage(_ deviceName: String) -> String {
         let localized = NSLocalizedString("preferences.sync.remove-device-message",
@@ -128,7 +128,7 @@ enum UserText {
     static let deviceDetailsPrompt = NSLocalizedString("prefrences.sync.device-details.prompt", value: "Device name", comment: "The text entry prompt")
 
     // Delete Account Dialog
-    static let deleteAccountTitle = NSLocalizedString("prefrences.sync.delete-account.title", value: "Delete Server Data?", comment: "Title for delete account")
+    static let deleteAccountTitle = NSLocalizedString("prefrences.sync.delete-account.title", value: "Delete server data?", comment: "Title for delete account")
     static let deleteAccountMessage = NSLocalizedString("prefrences.sync.delete-account.message", value: "These devices will be disconnected and your synced data will be deleted from the server.", comment: "Message for delete account")
     static let deleteAccountButton = NSLocalizedString("prefrences.sync.delete-account.button", value: "Delete Data", comment: "Label for delete account button")
 
