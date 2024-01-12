@@ -14,6 +14,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="140"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
+                            <box boxType="custom" borderType="none" cornerRadius="4" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="b80-GE-9ca">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="160"/>
+                                <view key="contentView" id="rpW-0t-1gZ">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="160"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <color key="fillColor" name="PopoverBackgroundColor"/>
+                            </box>
                             <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="16" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalHuggingPriority="752" verticalHuggingPriority="752" horizontalCompressionResistancePriority="249" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DDy-au-YqK">
                                 <rect key="frame" x="16" y="12" width="288" height="108"/>
                                 <subviews>
@@ -194,8 +202,12 @@ Gw
                             </stackView>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="b80-GE-9ca" secondAttribute="trailing" id="0l6-Pj-8cU"/>
+                            <constraint firstAttribute="bottom" secondItem="b80-GE-9ca" secondAttribute="bottom" id="Bre-Xj-PgA"/>
+                            <constraint firstItem="b80-GE-9ca" firstAttribute="leading" secondItem="6Y6-ej-1GX" secondAttribute="leading" id="EEV-yq-iYQ"/>
                             <constraint firstAttribute="bottom" secondItem="FDy-Cn-myW" secondAttribute="bottom" constant="16" id="JHg-ZD-huo"/>
                             <constraint firstItem="DDy-au-YqK" firstAttribute="top" secondItem="6Y6-ej-1GX" secondAttribute="top" constant="20" id="Skm-gh-V3K"/>
+                            <constraint firstItem="b80-GE-9ca" firstAttribute="top" secondItem="6Y6-ej-1GX" secondAttribute="top" constant="-20" id="bru-fW-hU0"/>
                             <constraint firstAttribute="trailing" secondItem="DDy-au-YqK" secondAttribute="trailing" constant="16" id="isC-Zf-Hmg"/>
                             <constraint firstAttribute="bottom" secondItem="ar6-d0-ukR" secondAttribute="bottom" constant="12" id="jON-5j-XdC"/>
                             <constraint firstItem="DDy-au-YqK" firstAttribute="leading" secondItem="6Y6-ej-1GX" secondAttribute="leading" constant="16" id="onV-OP-Sdk"/>
@@ -255,6 +267,9 @@ Gw
     <resources>
         <namedColor name="AccentColor">
             <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="PopoverBackgroundColor">
+            <color red="0.94900000095367432" green="0.94099998474121094" blue="0.94099998474121094" alpha="0.89999997615814209" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
