@@ -110,6 +110,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         )
     }()
 
+    private lazy var vpnAppEventsHandler = {
+        VPNAppEventsHandler(tunnelController: tunnelController)
+    }()
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
@@ -194,6 +198,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 onComplete(error == nil, error)
             }
         }
+
+        vpnAppEventsHandler.appDidFinishLaunching()
 
         let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
         let launchedOnStartup = launchInformation.wasLaunchedByStartup
