@@ -39,7 +39,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     weak var delegate: BookmarkListViewControllerDelegate?
-    var currentTabWebsite: AddBookmarkModalViewController.WebsiteInfo?
+    var currentTabWebsite: WebsiteInfo?
 
     @IBOutlet var outlineView: NSOutlineView!
     @IBOutlet var contextMenu: NSMenu!
@@ -134,12 +134,10 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {
-        let newBookmarkViewController = AddBookmarkModalViewController.create()
-        newBookmarkViewController.currentTabWebsite = currentTabWebsite
-        newBookmarkViewController.delegate = self
-
         delegate?.popover(shouldPreventClosure: true)
-        beginSheetFromMainWindow(newBookmarkViewController)
+        AddBookmarkModalView(model: AddBookmarkModalViewModel(currentTabWebsite: currentTabWebsite) { [weak delegate] _ in
+            delegate?.popover(shouldPreventClosure: false)
+        }).show(in: parent?.view.window)
     }
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
@@ -254,22 +252,7 @@ final class BookmarkListViewController: NSViewController {
 
 // MARK: - Modal Delegates
 
-extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, AddFolderModalViewControllerDelegate {
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
-        if !bookmarkManager.isUrlBookmarked(url: url) {
-            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
-        }
-    }
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
-        bookmarkManager.update(bookmark: bookmark)
-        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
-    }
-
-    func addBookmarkViewControllerWillClose() {
-        delegate?.popover(shouldPreventClosure: false)
-    }
+extension BookmarkListViewController: AddFolderModalViewControllerDelegate {
 
     func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
         bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })

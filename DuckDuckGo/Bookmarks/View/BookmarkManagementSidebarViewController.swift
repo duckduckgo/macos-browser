@@ -33,11 +33,12 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         case folder(BookmarkFolder)
         case favorites
 
+        var folder: BookmarkFolder? {
+            if case .folder(let folder) = self { folder } else { nil }
+        }
+
         var selectedFolderUUID: String? {
-            switch self {
-            case .folder(let folder): return folder.id
-            default: return nil
-            }
+            folder?.id
         }
     }
 
