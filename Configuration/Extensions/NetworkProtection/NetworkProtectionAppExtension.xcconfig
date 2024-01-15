@@ -51,3 +51,24 @@ SKIP_INSTALL = YES
 SWIFT_EMIT_LOC_STRINGS = YES
 
 LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks @executable_path/../../../../Frameworks
+
+// Distributed Notifications:
+
+AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.mobile.ios.vpn.agent
+AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
+AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
+AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
+AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
+
+SYSEX_BUNDLE_ID_BASE[sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
+SYSEX_BUNDLE_ID_BASE[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
+SYSEX_BUNDLE_ID_BASE[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
+SYSEX_BUNDLE_ID_BASE[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
+SYSEX_BUNDLE_ID_BASE[config=Release][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
+
+DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE = $(SYSEX_BUNDLE_ID_BASE)
+
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=CI][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).ci
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Review][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).review
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Debug][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).debug
+DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Release][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE)
