@@ -24,6 +24,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var isUserAuthenticated: Bool = false
     @Published var hasEntitlements: Bool = false
     @Published var subscriptionDetails: String?
+
+    private var subscriptionPlatform: String?
+
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
     private let accountManager: AccountManager
@@ -69,9 +72,27 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         actionHandler.openURL(.purchaseSubscription)
     }
 
+    enum ChangePlanOrBillingAction {
+        case presentSheet(ManageSubscriptionSheet)
+        case navigateToManageSubscription(()->Void)
+    }
+
     @MainActor
-    func changePlanOrBillingAction() {
-        actionHandler.changePlanOrBilling()
+    func changePlanOrBillingAction() -> ChangePlanOrBillingAction {
+        return .presentSheet(.google)
+
+        switch subscriptionPlatform {
+        case "apple": 
+            return .presentSheet(.apple)
+        case "google":
+            return .presentSheet(.google)
+        case "stripe":
+            return .navigateToManageSubscription { [weak self] in
+                self?.actionHandler.changePlanOrBilling()
+            }
+        default:
+            return .navigateToManageSubscription { }
+        }
     }
 
     @MainActor
@@ -116,6 +137,8 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 }
 
                 updateDescription(for: response.expiresOrRenewsAt)
+
+                subscriptionPlatform = response.platform
             }
 
             self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
@@ -148,5 +171,13 @@ public final class PreferencesSubscriptionActionHandlers {
         self.openVPN = openVPN
         self.openPersonalInformationRemoval = openPersonalInformationRemoval
         self.openIdentityTheftRestoration = openIdentityTheftRestoration
+    }
+}
+
+enum ManageSubscriptionSheet: Identifiable {
+    case apple, google
+
+    var id: Self {
+        return self
     }
 }
