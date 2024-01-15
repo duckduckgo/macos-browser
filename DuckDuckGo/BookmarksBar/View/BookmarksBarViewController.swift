@@ -237,10 +237,8 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
             bookmark.isFavorite = true
             bookmarkManager.update(bookmark: bookmark)
         case .edit:
-            let addBookmarkViewController = AddBookmarkModalViewController.create()
-            addBookmarkViewController.delegate = self
-            addBookmarkViewController.edit(bookmark: bookmark)
-            beginSheet(addBookmarkViewController)
+            AddBookmarkModalView(model: AddBookmarkModalViewModel(originalBookmark: bookmark))
+                .show(in: view.window)
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .copyURL:
@@ -260,10 +258,8 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
             menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
         case .edit:
-            let addFolderViewController = AddFolderModalViewController.create()
-            addFolderViewController.delegate = self
-            addFolderViewController.edit(folder: folder)
-            beginSheet(addFolderViewController)
+            AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
+                .show(in: view.window)
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .deleteEntity:
@@ -289,29 +285,6 @@ extension BookmarksBarViewController: NSMenuDelegate {
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
         BookmarksBarMenuFactory.addToMenu(menu)
-    }
-
-}
-
-// MARK: - Editing
-
-extension BookmarksBarViewController: AddBookmarkModalViewControllerDelegate, AddFolderModalViewControllerDelegate {
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        assertionFailure("Cannot add new folders to the bookmarks bar via the modal")
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        bookmarkManager.update(folder: folder)
-    }
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
-        assertionFailure("Cannot add new bookmarks to the bookmarks bar via the modal")
-    }
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
-        bookmarkManager.update(bookmark: bookmark)
-        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
     }
 
 }

@@ -30,6 +30,7 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let webUIViewModel: DBPUIViewModel
 
     private let openURLHandler: (URL?) -> Void
+    private var reloadObserver: NSObjectProtocol?
 
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
@@ -59,6 +60,16 @@ final public class DataBrokerProtectionViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        reloadObserver = NotificationCenter.default.addObserver(forName: DataBrokerProtectionNotifications.shouldReloadUI,
+                                               object: nil,
+                                               queue: .main) { [weak self] _ in
+            self?.webView?.reload()
+        }
+    }
+
     override public func loadView() {
         guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
@@ -72,6 +83,12 @@ final public class DataBrokerProtectionViewController: NSViewController {
             assertionFailure("Selected URL is not valid \(webUISettings.selectedURL)")
         }
 
+    }
+
+    deinit {
+        if let reloadObserver {
+            NotificationCenter.default.removeObserver(reloadObserver)
+        }
     }
 }
 

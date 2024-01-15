@@ -122,7 +122,7 @@ final class DataBrokerProtectionProcessor {
             operationQueue.addOperation(collection)
         }
 
-        operationQueue.addBarrierBlock { [weak self] in
+        operationQueue.addBarrierBlock {
             completion()
         }
     }
