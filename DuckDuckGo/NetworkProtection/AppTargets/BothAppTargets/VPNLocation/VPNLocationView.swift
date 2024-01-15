@@ -82,6 +82,7 @@ struct VPNLocationView: View {
             }, label: {
                 Image("Location-16-Solid")
                     .padding(4)
+                    .foregroundColor(Color("BlackWhite100").opacity(0.9))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(UserText.vpnLocationNearestAvailable)
                         .font(.system(size: 13))

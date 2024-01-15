@@ -31,6 +31,7 @@ struct VPNLocationPreferenceItem: View {
                 switch model.icon {
                 case .defaultIcon:
                     Image("Location-16-Solid")
+                        .foregroundColor(Color("BlackWhite100").opacity(0.9))
                 case .emoji(let string):
                     Text(string).font(.system(size: 16))
                 }
