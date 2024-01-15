@@ -111,11 +111,11 @@ protocol NewWindowPolicyDecisionMaker {
 
         static func contentFromURL(_ url: URL?, source: URLSource) -> TabContent {
             switch url {
-            case URL.newtab, URL.Invalid.aboutNewtab:
+            case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
                 return .newtab
             case URL.welcome, URL.Invalid.aboutWelcome:
                 return .onboarding
-            case URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings:
+            case URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings, URL.Invalid.duckConfig, URL.Invalid.duckPreferences:
                 return .anySettingsPane
             case URL.bookmarks, URL.Invalid.aboutBookmarks:
                 return .bookmarks
@@ -190,7 +190,7 @@ protocol NewWindowPolicyDecisionMaker {
         }
         var userEditableUrl: URL? {
             switch self {
-            case .url(let url, credential: _, source: _) where !(url.isDuckPlayer || url.isDuckPlayerScheme):
+            case .url(let url, credential: _, source: _) where !(url.isDuckPlayer || url.isDuckURLScheme):
                 return url
             default:
                 return nil
@@ -1026,7 +1026,7 @@ protocol NewWindowPolicyDecisionMaker {
             return
         }
 
-        if url.isDuckPlayer || url.isDuckPlayerScheme {
+        if url.isDuckPlayer {
             favicon = .duckPlayer
             return
         }

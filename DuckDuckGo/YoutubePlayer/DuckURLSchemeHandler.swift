@@ -1,5 +1,5 @@
 //
-//  DuckPlayerSchemeHandler.swift
+//  DuckURLSchemeHandler.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,11 +19,26 @@
 import Foundation
 import WebKit
 
-final class DuckPlayerSchemeHandler: NSObject, WKURLSchemeHandler {
+final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
 
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let requestURL = webView.url ?? urlSchemeTask.request.url else {
             assertionFailure("No URL for Private Player scheme handler")
+            return
+        }
+
+        guard requestURL.isDuckPlayer else {
+            let data = "<html><body /></html>".utf8data
+
+            let response = URLResponse(url: requestURL,
+                                       mimeType: "text/html",
+                                       expectedContentLength: data.count,
+                                       textEncodingName: nil)
+
+            urlSchemeTask.didReceive(response)
+            urlSchemeTask.didReceive(data)
+            urlSchemeTask.didFinish()
+
             return
         }
 
@@ -34,7 +49,7 @@ final class DuckPlayerSchemeHandler: NSObject, WKURLSchemeHandler {
             let newRequest = youtubeHandler.makeDuckPlayerRequest(from: URLRequest(url: requestURL))
             webView.loadSimulatedRequest(newRequest, responseHTML: html)
         } else {
-            guard let data = html.data(using: .utf8) else { return }
+            let data = html.utf8data
 
             let response = URLResponse(url: requestURL,
                                        mimeType: "text/html",
