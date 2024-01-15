@@ -1,5 +1,5 @@
 //
-//  AddBookmarkModalView.swift
+//  AddBookmarkFolderModalView.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -16,12 +16,11 @@
 //  limitations under the License.
 //
 
-import AppKit
 import SwiftUI
 
-struct AddBookmarkModalView: ModalView {
+struct AddBookmarkFolderModalView: ModalView {
 
-    @State private(set) var model: AddBookmarkModalViewModel
+    @State var model: AddBookmarkFolderModalViewModel = .init()
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -30,22 +29,13 @@ struct AddBookmarkModalView: ModalView {
                 .fontWeight(.semibold)
 
             HStack(spacing: 16) {
-                VStack(alignment: .leading) {
-                    Text("Title:", comment: "Add Bookmark dialog bookmark title field heading")
-                        .frame(height: 22)
-                    Text("Address:", comment: "Add Bookmark dialog bookmark url field heading")
-                        .frame(height: 22)
-                }
+                Text("Name:", comment: "New bookmark folder dialog folder name field heading")
+                    .frame(height: 22)
 
-                VStack {
-                    TextField("", text: $model.bookmarkTitle)
-                        .accessibilityIdentifier("Title Text Field")
-                        .textFieldStyle(.roundedBorder)
-                    TextField("", text: $model.bookmarkAddress)
-                        .accessibilityIdentifier("URL Text Field")
-                        .textFieldStyle(.roundedBorder)
-                        .disableAutocorrection(true)
-                }
+                TextField("", text: $model.folderName)
+                    .accessibilityIdentifier("Title Text Field")
+                    .textFieldStyle(.roundedBorder)
+                    .disableAutocorrection(true)
             }
             .padding(.bottom, 4)
 
@@ -58,7 +48,7 @@ struct AddBookmarkModalView: ModalView {
                 .keyboardShortcut(.cancelAction)
 
                 Button(model.addButtonTitle) {
-                    model.addOrSave(dismiss: dismiss.callAsFunction)
+                    model.addFolder(dismiss: dismiss.callAsFunction)
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(model.isAddButtonDisabled)
@@ -67,11 +57,11 @@ struct AddBookmarkModalView: ModalView {
         }
         .font(.system(size: 13))
         .padding()
-        .frame(width: 437, height: 164)
+        .frame(width: 450, height: 131)
     }
 
 }
 
 #Preview {
-    AddBookmarkModalView(model: AddBookmarkModalViewModel())
+    AddBookmarkFolderModalView()
 }

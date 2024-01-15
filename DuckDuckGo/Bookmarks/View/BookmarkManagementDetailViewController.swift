@@ -125,7 +125,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportView.show()
+        DataImportView().show()
     }
 
     @IBAction func handleDoubleClick(_ sender: NSTableView) {
@@ -171,9 +171,8 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @IBAction func presentAddFolderModal(_ sender: Any) {
-        let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.delegate = self
-        beginSheet(addFolderViewController)
+        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(parent: selectionState.folder))
+            .show(in: view.window)
     }
 
     @IBAction func delete(_ sender: AnyObject) {
@@ -260,24 +259,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }
         return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
     }()
-}
-
-// MARK: - Modal Delegates
-
-extension BookmarkManagementDetailViewController: AddFolderModalViewControllerDelegate {
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        if case let .folder(selectedFolder) = selectionState {
-            bookmarkManager.makeFolder(for: name, parent: selectedFolder, completion: { _ in })
-        } else {
-            bookmarkManager.makeFolder(for: name, parent: nil, completion: { _ in })
-        }
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        bookmarkManager.update(folder: folder)
-    }
-
 }
 
 // MARK: - NSTableView
@@ -592,10 +573,8 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
             return
         }
 
-        let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.delegate = self
-        addFolderViewController.edit(folder: folder)
-        beginSheet(addFolderViewController)
+        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
+            .show(in: view.window)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {

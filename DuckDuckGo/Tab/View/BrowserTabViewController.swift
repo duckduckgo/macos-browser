@@ -943,7 +943,7 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        DataImportView.show(completion: completion)
+        DataImportView().show(completion: completion)
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {
