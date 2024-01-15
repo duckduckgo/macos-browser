@@ -157,9 +157,6 @@
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
     },
-    "Add Folder" : {
-
-    },
     "Add to Favorites" : {
 
     },
@@ -1247,9 +1244,6 @@
           }
         }
       }
-    },
-    "Bookmark Added" : {
-
     },
     "Bookmark import failed:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) failed to import."
@@ -3233,12 +3227,6 @@
         }
       }
     },
-    "Folder Picker" : {
-
-    },
-    "Folder:" : {
-
-    },
     "folder.dialog.add" : {
       "comment" : "Button to confim a bookmark folder creation",
       "extractionState" : "extracted_with_value",
@@ -4193,9 +4181,6 @@
     },
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails."
-    },
-    "Location:" : {
-
     },
     "looking.for.bitwarden" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -8008,9 +7993,6 @@
           }
         }
       }
-    },
-    "Remove" : {
-
     },
     "remove-favorite" : {
       "comment" : "Remove Favorite button",
