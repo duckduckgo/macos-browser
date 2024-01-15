@@ -19,28 +19,8 @@
 import AppKit
 import SwiftUI
 
-extension DataImportView {
-
-    @MainActor
-    static func show(completion: (() -> Void)? = nil) {
-        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
-
-        if !window.isKeyWindow {
-            window.makeKeyAndOrderFront(nil)
-        }
-
-        let sheetWindow = SheetHostingWindow(rootView: DataImportView())
-
-        window.beginSheet(sheetWindow, completionHandler: completion.map { completion in { _ in
-                completion()
-            }
-        })
-    }
-
-}
-
 @MainActor
-struct DataImportView: View {
+struct DataImportView: ModalView {
 
     @Environment(\.dismiss) private var dismiss
 

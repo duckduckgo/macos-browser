@@ -151,8 +151,14 @@
     "Actual Size" : {
       "comment" : "Main Menu View item"
     },
+    "Add" : {
+      "comment" : "Button to confim a bookmark creation"
+    },
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
+    },
+    "Add to Favorites" : {
+
     },
     "add.favorite" : {
       "comment" : "Button for adding a favorite bookmark",
@@ -1305,6 +1311,9 @@
         }
       }
     },
+    "Bookmarks" : {
+
+    },
     "Bookmarks Import Complete:" : {
       "comment" : "Bookmarks Data Import result summary headline"
     },
@@ -1612,6 +1621,9 @@
           }
         }
       }
+    },
+    "Cancel" : {
+
     },
     "cannot.open.file.alert.header" : {
       "comment" : "Header of the alert dialog informing user it is not possible to open the file",
@@ -2272,6 +2284,9 @@
       }
     },
     "Display progress" : {
+
+    },
+    "Done" : {
 
     },
     "dont.quit" : {
@@ -3208,6 +3223,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Fireproof Sites"
+          }
+        }
+      }
+    },
+    "folder.dialog.add" : {
+      "comment" : "Button to confim a bookmark folder creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add"
           }
         }
       }
@@ -4293,6 +4320,9 @@
         }
       }
     },
+    "Name:" : {
+      "comment" : "New bookmark folder dialog folder name field heading"
+    },
     "navigate.back" : {
       "comment" : "Context menu item",
       "extractionState" : "extracted_with_value",
@@ -5192,6 +5222,9 @@
           }
         }
       }
+    },
+    "New Folder" : {
+      "comment" : "Title for New bookmark folder dialog"
     },
     "New Tab" : {
       "comment" : "Main Menu File item"
