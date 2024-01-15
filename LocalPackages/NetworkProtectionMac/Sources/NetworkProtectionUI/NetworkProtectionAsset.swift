@@ -28,6 +28,7 @@ public enum NetworkProtectionAsset: String, CaseIterable {
     // Apple Icons
     case appleVaultIcon = "apple-vault-icon"
     case appleVPNIcon = "apple-vpn-icon"
+    case appleSystemSettingsIcon = "apple-system-settings-icon"
 
     // App Specific
     case appVPNOnIcon = "app-vpn-on"

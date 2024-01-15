@@ -52,10 +52,14 @@ public struct NetworkProtectionStatusView: View {
         VStack(spacing: 0) {
             if model.loginItemNeedsApproval {
                 OnboardingStepView(
-                    icon: .appleVPNIcon,
-                    title: "Allow VPN Agent",
-                    description: [.init(text: "Open System Settings to Login Items. Scroll and allow DuckDuckGo VPN to run in the background.")],
-                    actionTitle: "Open System Settings...",
+                    icon: .appleSystemSettingsIcon,
+                    title: "Change System Setting To Reconnect",
+                    description: [
+                        .init(text: "Open "),
+                        .init(text: "System Settings", isEmphasized: true),
+                        .init(text: " and allow DuckDuckGo VPN to run in the background."),
+                    ],
+                    actionTitle: "Open System Settings…",
                     action: {
                         model.openLoginItemSettings()
                     },
