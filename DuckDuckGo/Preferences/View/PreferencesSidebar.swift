@@ -16,7 +16,9 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
+import SwiftUIExtensions
 
 extension Preferences {
 
@@ -29,7 +31,7 @@ extension Preferences {
             Button(action: action) {
                 HStack(spacing: 6) {
                     Image(pane.preferenceIconName).frame(width: 16, height: 16)
-                    Text(pane.displayName).font(Const.Fonts.sideBarItem)
+                    Text(pane.displayName).font(PreferencesViews.Const.Fonts.sideBarItem)
                 }
             }
             .buttonStyle(SidebarItemButtonStyle(isSelected: isSelected))
@@ -42,7 +44,7 @@ extension Preferences {
         var body: some View {
             NSPopUpButtonView(selection: $model.selectedTabIndex, viewCreator: {
                 let button = NSPopUpButton()
-                button.font = Const.Fonts.popUpButton
+                button.font = PreferencesViews.Const.Fonts.popUpButton
                 button.setButtonType(.momentaryLight)
                 button.isBordered = false
 

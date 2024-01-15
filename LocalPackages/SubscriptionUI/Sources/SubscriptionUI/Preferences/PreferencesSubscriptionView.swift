@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -31,7 +32,7 @@ public struct PreferencesSubscriptionView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
 
-            TextMenuTitle(text: UserText.preferencesTitle)
+            TextMenuTitle(UserText.preferencesTitle)
                 .sheet(isPresented: $showingSheet) {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
@@ -69,8 +70,8 @@ public struct PreferencesSubscriptionView: View {
                         Image("subscription-active-icon", bundle: .module)
                             .padding(4)
                     } content: {
-                        TextMenuItemHeader(text: UserText.preferencesSubscriptionActiveHeader)
-                        TextMenuItemCaption(text: model.subscriptionDetails ?? "")
+                        TextMenuItemHeader(UserText.preferencesSubscriptionActiveHeader)
+                        TextMenuItemCaption(model.subscriptionDetails ?? "")
                     } buttons: {
                         Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
 
@@ -95,8 +96,8 @@ public struct PreferencesSubscriptionView: View {
                             .background(Color.black.opacity(0.06))
                             .cornerRadius(4)
                     } content: {
-                        TextMenuItemHeader(text: UserText.preferencesSubscriptionInactiveHeader)
-                        TextMenuItemCaption(text: UserText.preferencesSubscriptionInactiveCaption)
+                        TextMenuItemHeader(UserText.preferencesSubscriptionInactiveHeader)
+                        TextMenuItemCaption(UserText.preferencesSubscriptionInactiveCaption)
                     } buttons: {
                         Button(UserText.learnMoreButton) { model.learnMoreAction() }
                             .buttonStyle(DefaultActionButtonStyle(enabled: true))
@@ -139,9 +140,9 @@ public struct PreferencesSubscriptionView: View {
             .roundedBorder()
 
             PreferencePaneSection {
-                TextMenuItemHeader(text: UserText.preferencesSubscriptionFooterTitle)
+                TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)
                 HStack(alignment: .top, spacing: 6) {
-                    TextMenuItemCaption(text: UserText.preferencesSubscriptionFooterCaption)
+                    TextMenuItemCaption(UserText.preferencesSubscriptionFooterCaption)
                     Button(UserText.viewFaqsButton) { model.openFAQ() }
                 }
             }
@@ -226,53 +227,5 @@ public struct SectionView: View {
         .padding(.vertical, 7)
         .disabled(!enabled)
         .opacity(enabled ? 1.0 : 0.6)
-    }
-}
-
-enum Const {
-
-    static let pickerHorizontalOffset: CGFloat = {
-        if #available(macOS 12.0, *) {
-            return -8
-        } else {
-            return 0
-        }
-    }()
-
-    enum Fonts {
-        static let popUpButton: NSFont = .preferredFont(forTextStyle: .title1, options: [:])
-        static let sideBarItem: Font = .body
-        static let preferencePaneTitle: Font = .title2.weight(.semibold)
-        static let preferencePaneSectionHeader: Font = .title3.weight(.semibold)
-        static let preferencePaneDisclaimer: Font = .subheadline
-    }
-}
-
-struct TextMenuTitle: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(Const.Fonts.preferencePaneTitle)
-    }
-}
-
-struct TextMenuItemHeader: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(Const.Fonts.preferencePaneSectionHeader)
-    }
-}
-
-struct TextMenuItemCaption: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .fixMultilineScrollableText()
-            .foregroundColor(Color("GreyTextColor"))
     }
 }

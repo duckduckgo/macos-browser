@@ -24,6 +24,14 @@ final class UserText {
 
     static let networkProtectionConnectionSuccessNotificationTitle = NSLocalizedString("network.protection.success.notification.title", value: "Network Protection is On", comment: "The title of the notification shown when Network Protection connects successfully")
     static let networkProtectionConnectionSuccessNotificationSubtitle = NSLocalizedString("network.protection.success.notification.subtitle", value: "Your location and online activity are protected.", comment: "The subtitle of the notification shown when Network Protection reconnects successfully")
+    static func networkProtectionConnectionSuccessNotificationSubtitle(serverLocation: String) -> String {
+        let localized = NSLocalizedString(
+            "network.protection.success.notification.subtitle.including.serverLocation",
+            value: "Routing device traffic through %@.",
+            comment: "The body of the notification shown when Network Protection connects successfully with the city + state/country as formatted parameter"
+        )
+        return String(format: localized, serverLocation)
+    }
 
     static let networkProtectionConnectionInterruptedNotificationTitle = NSLocalizedString("network.protection.interrupted.notification.title", value: "Network Protection was interrupted", comment: "The title of the notification shown when Network Protection's connection is interrupted")
     static let networkProtectionConnectionInterruptedNotificationSubtitle = NSLocalizedString("network.protection.interrupted.notification.subtitle", value: "Attempting to reconnect now...", comment: "The subtitle of the notification shown when Network Protection's connection is interrupted")

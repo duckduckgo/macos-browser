@@ -156,7 +156,9 @@ final class AddressBarButtonsViewController: NSViewController {
     }
     var isMouseOverNavigationBar = false {
         didSet {
-            updateBookmarkButtonVisibility()
+            if isMouseOverNavigationBar != oldValue {
+                updateBookmarkButtonVisibility()
+            }
         }
     }
 

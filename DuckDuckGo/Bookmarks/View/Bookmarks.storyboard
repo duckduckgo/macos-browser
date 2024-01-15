@@ -210,7 +210,7 @@
                                 </connections>
                             </scrollView>
                             <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I9P-t9-o4Y">
-                                <rect key="frame" x="256" y="192" width="224" height="218"/>
+                                <rect key="frame" x="256" y="214" width="224" height="218"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="mrh-3F-46f">
                                         <rect key="frame" x="48" y="122" width="128" height="96"/>

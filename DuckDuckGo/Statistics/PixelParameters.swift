@@ -163,9 +163,9 @@ extension Pixel.Event {
              .dataBrokerProtectionWaitlistTermsAndConditionsDisplayed,
              .dataBrokerProtectionWaitlistTermsAndConditionsAccepted,
              .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn,
-             .homeButtonLeft,
-             .homeButtonRight,
-             .homeButtonHidden:
+             .dataBrokerProtectionRemoteMessageOpened,
+             .dataBrokerProtectionRemoteMessageDisplayed,
+             .dataBrokerProtectionRemoteMessageDismissed:
             return nil
         }
     }
@@ -281,7 +281,9 @@ extension Pixel.Event.Debug {
                 .invalidPayload,
                 .burnerTabMisplaced,
                 .networkProtectionRemoteMessageFetchingFailed,
-                .networkProtectionRemoteMessageStorageFailed:
+                .networkProtectionRemoteMessageStorageFailed,
+                .dataBrokerProtectionRemoteMessageFetchingFailed,
+                .dataBrokerProtectionRemoteMessageStorageFailed:
             return nil
         }
     }
