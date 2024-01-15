@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1705078221022,
+    "version": 1705334213687,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -261,6 +261,9 @@
                     "domain": "forbes.com"
                 },
                 {
+                    "domain": "tuc.org.uk"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -280,7 +283,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "8749a4d02730a39a663091b7ce31ee1a"
+            "hash": "0e798c688c53c17c989fa3a41b8c9f65"
         },
         "autofill": {
             "exceptions": [
@@ -4635,7 +4638,7 @@
             "hash": "5e792dd491428702bc0104240fbce0ce"
         },
         "sync": {
-            "state": "internal",
+            "state": "enabled",
             "features": {
                 "level0ShowSync": {
                     "state": "enabled"
@@ -4651,7 +4654,8 @@
                 }
             },
             "exceptions": [],
-            "hash": "4e4382e6a69f7cc99222fd924168e80f"
+            "minSupportedVersion": "1.70.0",
+            "hash": "0a35f748d63fc61a777ea5e712728fa3"
         },
         "trackerAllowlist": {
             "state": "enabled",
@@ -4882,39 +4886,9 @@
                             {
                                 "rule": "c.amazon-adsystem.com/aax2/apstag.js",
                                 "domains": [
-                                    "4029tv.com",
                                     "applesfera.com",
-                                    "cnn.com",
-                                    "corriere.it",
-                                    "eurogamer.net",
-                                    "foxweather.com",
-                                    "kcci.com",
-                                    "kcra.com",
-                                    "ketv.com",
-                                    "kmbc.com",
-                                    "koat.com",
-                                    "koco.com",
-                                    "ksbw.com",
-                                    "mynbc5.com",
-                                    "seattletimes.com",
                                     "thesurfersview.com",
-                                    "wapt.com",
-                                    "wbaltv.com",
-                                    "wcvb.com",
-                                    "wdsu.com",
-                                    "wesh.com",
-                                    "wgal.com",
-                                    "wildrivers.lostcoastoutpost.com",
-                                    "wisn.com",
-                                    "wlky.com",
-                                    "wlwt.com",
-                                    "wmtw.com",
-                                    "wmur.com",
-                                    "wpbf.com",
-                                    "wtae.com",
-                                    "wvtm13.com",
-                                    "wxii12.com",
-                                    "wyff4.com"
+                                    "wildrivers.lostcoastoutpost.com"
                                 ]
                             },
                             {
@@ -5782,12 +5756,6 @@
                     "gemius.pl": {
                         "rules": [
                             {
-                                "rule": "gapl.hit.gemius.pl/gplayer.js",
-                                "domains": [
-                                    "tvp.pl"
-                                ]
-                            },
-                            {
                                 "rule": "pro.hit.gemius.pl/gstream.js",
                                 "domains": [
                                     "tvp.pl"
@@ -6210,16 +6178,6 @@
                                 "rule": "cdn.heapanalytics.com",
                                 "domains": [
                                     "mejuri.com"
-                                ]
-                            }
-                        ]
-                    },
-                    "htlbid.com": {
-                        "rules": [
-                            {
-                                "rule": "htlbid.com/v3/dangerousminds.net/htlbid.js",
-                                "domains": [
-                                    "dangerousminds.net"
                                 ]
                             }
                         ]
@@ -7326,17 +7284,27 @@
                     "trustpilot.com": {
                         "rules": [
                             {
+                                "rule": "widget.trustpilot.com/trustboxes/",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "widget.trustpilot.com/trustbox-data/",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
                                 "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js",
                                 "domains": [
-                                    "azurestandard.com",
-                                    "domesticandgeneral.com",
-                                    "www.hotpoint.co.uk"
+                                    "<all>"
                                 ]
                             },
                             {
                                 "rule": "widget.trustpilot.com/bootstrap/v5/tp.widget.sync.bootstrap.min.js",
                                 "domains": [
-                                    "www.hotpoint.co.uk"
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -7627,7 +7595,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "103d48713e9ec9b7e0fe23a1a8af6dd4"
+            "hash": "64bacd744ef069efd7206f48c684a102"
         },
         "trackingCookies1p": {
             "settings": {
