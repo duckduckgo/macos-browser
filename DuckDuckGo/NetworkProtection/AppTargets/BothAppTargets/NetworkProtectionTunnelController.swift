@@ -134,7 +134,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
-        self.networkExtensionBundleID = networkExtensionBundleID
+        self.networkExtensionBundleID = "com.duckduckgo.mobile.ios.vpn.agent.debug.network-protection-extension" // networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
         self.settings = settings
         self.tokenStore = tokenStore
