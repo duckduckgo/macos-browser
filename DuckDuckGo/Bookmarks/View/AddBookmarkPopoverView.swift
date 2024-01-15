@@ -112,6 +112,7 @@ struct AddBookmarkPopoverView: View {
 
 }
 
+#if DEBUG
 #Preview { {
     let bkm = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "1")
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
@@ -133,3 +134,4 @@ struct AddBookmarkPopoverView: View {
 
     return AddBookmarkPopoverView(model: AddBookmarkPopoverViewModel(bookmark: bkm, bookmarkManager: bkman))
 }() }
+#endif

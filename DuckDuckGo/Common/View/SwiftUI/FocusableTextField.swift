@@ -20,6 +20,7 @@ import SwiftUI
 
 extension TextField {
 
+#if !APPSTORE
     @available(macOS, obsoleted: 12.0, message: "This needs to be removed as it‘s no longer necessary.")
     @ViewBuilder
     func focusedOnAppear() -> some View {
@@ -29,6 +30,13 @@ extension TextField {
             self
         }
     }
+#else
+    @ViewBuilder
+    @inlinable
+    func focusedOnAppear() -> some View {
+        self
+    }
+#endif
 
 }
 

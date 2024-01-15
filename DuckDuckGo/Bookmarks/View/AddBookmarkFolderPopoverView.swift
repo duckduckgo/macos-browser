@@ -74,6 +74,7 @@ struct AddBookmarkFolderPopoverView: ModalView {
     }
 }
 
+#if DEBUG
 #Preview {
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
         BookmarkFolder(id: "1", title: "Folder 1", children: [
@@ -94,3 +95,4 @@ struct AddBookmarkFolderPopoverView: ModalView {
         print("CompletionHandler:", $0?.title ?? "<nil>")
     })
 }
+#endif
