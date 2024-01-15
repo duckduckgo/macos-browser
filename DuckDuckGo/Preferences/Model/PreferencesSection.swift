@@ -97,9 +97,16 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     }
 
     init?(url: URL) {
-        // manually extract path because URLs such as "about:preferences" can't figure out their host or path
-        let path = url.absoluteString.dropping(prefix: URL.preferences.absoluteString + "/")
-        self.init(rawValue: path)
+        // manually extract path because URLs such as "about:settings" can't figure out their host or path
+        for urlPrefix in [URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings] {
+            let prefix = urlPrefix.absoluteString
+            guard url.absoluteString.hasPrefix(prefix) else { continue }
+
+            let path = url.absoluteString.dropping(prefix: prefix + "/")
+            self.init(rawValue: path)
+            return
+        }
+        return nil
     }
 
     @MainActor

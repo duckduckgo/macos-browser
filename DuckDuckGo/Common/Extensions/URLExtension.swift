@@ -122,28 +122,34 @@ extension URL {
         return url
     }
 
-    static var blankPage: URL {
-        return URL(string: "about:blank")!
+    static let blankPage = URL(string: "about:blank")!
+
+    static let newtab = URL(string: "about:/newtab")!
+
+    static let welcome = URL(string: "about:/welcome")!
+
+    static let settings = URL(string: "about:/settings")!
+
+    static let bookmarks = URL(string: "about:/bookmarks")!
+
+    static let dataBrokerProtection = URL(string: "about:/dbp")!
+
+    static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
+        return settings.appendingPathComponent(pane.rawValue)
     }
 
-    static var homePage: URL {
-        return URL(string: "about:home")!
-    }
+    enum Invalid {
+        static let aboutNewtab = URL(string: "about:newtab")!
+        static let aboutWelcome = URL(string: "about:welcome")!
+        static let aboutHome = URL(string: "about:home")!
 
-    static var welcome: URL {
-        return URL(string: "about:welcome")!
-    }
+        static let aboutSettings = URL(string: "about:settings")!
+        static let aboutPreferences = URL(string: "about:preferences")!
+        static let aboutConfig = URL(string: "about:config")!
 
-    static var preferences: URL {
-        return URL(string: "about:preferences")!
-    }
+        static let aboutBookmarks = URL(string: "about:bookmarks")!
 
-    static var dataBrokerProtection: URL {
-        return URL(string: "about:dbp")!
-    }
-
-    static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
-        return Self.preferences.appendingPathComponent(pane.rawValue)
+        static let aboutDBP = URL(string: "about:dbp")!
     }
 
     var isHypertextURL: Bool {

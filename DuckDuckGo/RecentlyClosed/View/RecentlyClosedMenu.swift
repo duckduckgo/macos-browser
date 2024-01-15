@@ -67,10 +67,10 @@ private extension NSMenuItem {
         case .dataBrokerProtection:
             image = TabViewModel.Favicon.dataBrokerProtection
             title = UserText.tabDataBrokerProtectionTitle
-        case .homePage:
+        case .newtab:
             image = TabViewModel.Favicon.home
             title = UserText.tabHomeTitle
-        case .preferences:
+        case .settings:
             image = TabViewModel.Favicon.preferences
             title = UserText.tabPreferencesTitle
         case .bookmarks:
