@@ -124,7 +124,7 @@ public final class StatusBarMenu: NSObject {
         menu.items = model.contextMenuItems
 
         menu.popUp(positioning: nil,
-                   at: .zero,
+                   at: NSPoint(x: 0, y: statusItem.statusBar!.thickness),
                    in: statusItem.button)
     }
 
