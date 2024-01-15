@@ -168,7 +168,7 @@ Gw
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
-                                                <color key="contentTintColor" name="AccentColor"/>
+                                                <color key="contentTintColor" name="LinkBlueColor"/>
                                                 <connections>
                                                     <action selector="learnMoreAction:" target="1ds-EH-Sa3" id="knP-8H-vyN"/>
                                                 </connections>
@@ -265,8 +265,8 @@ Gw
         </scene>
     </scenes>
     <resources>
-        <namedColor name="AccentColor">
-            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="LinkBlueColor">
+            <color red="0.22352941176470589" green="0.41176470588235292" blue="0.93333333333333335" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="PopoverBackgroundColor">
             <color red="0.94900000095367432" green="0.94099998474121094" blue="0.94099998474121094" alpha="0.89999997615814209" colorSpace="custom" customColorSpace="sRGB"/>
