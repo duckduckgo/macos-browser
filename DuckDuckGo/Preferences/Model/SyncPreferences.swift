@@ -211,7 +211,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
                 UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
             } catch {
-                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToDeleteData, description: error.localizedDescription)
+                managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToTurnSyncOff, description: error.localizedDescription)
             }
         }
     }
@@ -367,14 +367,16 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func updateDeviceName(_ name: String) {
         Task { @MainActor in
+            self.devices = []
+            syncService.scheduler.cancelSyncAndSuspendSyncQueue()
             do {
-                self.devices = []
                 let devices = try await syncService.updateDeviceName(name)
                 managementDialogModel.endFlow()
                 mapDevices(devices)
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToUpdateDeviceName, description: error.localizedDescription)
             }
+            syncService.scheduler.resumeSyncQueue()
         }
     }
 
@@ -520,7 +522,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             .generate(recoveryCode)
 
         Task { @MainActor in
-            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "DuckDuckGo Recovery Code.pdf")
+            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "Sync Data Recovery - DuckDuckGo.pdf")
             let response = await panel.begin()
 
             guard response == .OK,

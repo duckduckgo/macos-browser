@@ -88,7 +88,7 @@ private extension String {
     }
 }
 
-extension UserDefaults {
+private extension UserDefaults {
     enum Key: String {
         case customURLValue
         case urlType

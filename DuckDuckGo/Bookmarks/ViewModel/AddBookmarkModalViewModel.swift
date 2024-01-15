@@ -24,6 +24,7 @@ struct AddBookmarkModalViewModel {
 
     let title: String
     let addButtonTitle: String
+    var isFavorite: Bool
 
     private let originalBookmark: Bookmark?
     private let parent: BookmarkFolder?
@@ -53,30 +54,38 @@ struct AddBookmarkModalViewModel {
         }
 
         var result: Bookmark?
-        if let bookmark = originalBookmark {
-            bookmark.title = bookmarkTitle
+        if var bookmark = originalBookmark ?? bookmarkManager.getBookmark(for: url) {
 
-            bookmarkManager.update(bookmark: bookmark)
-            _ = bookmarkManager.updateUrl(of: bookmark, to: url)
+            if url.absoluteString != bookmark.url {
+                bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
+            }
+            if bookmark.title != bookmarkTitle || bookmark.isFavorite != isFavorite {
+                bookmark.title = bookmarkTitle
+                bookmark.isFavorite = isFavorite
+                bookmarkManager.update(bookmark: bookmark)
+            }
+
             result = bookmark
 
         } else if !bookmarkManager.isUrlBookmarked(url: url) {
-            result = bookmarkManager.makeBookmark(for: url, title: bookmarkTitle, isFavorite: false, index: nil, parent: parent)
+            result = bookmarkManager.makeBookmark(for: url, title: bookmarkTitle, isFavorite: isFavorite, index: nil, parent: parent)
         }
 
         completionHandler(result)
         dismiss()
     }
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+    init(isFavorite: Bool = false,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
          currentTabWebsite website: WebsiteInfo? = nil,
          parent: BookmarkFolder? = nil,
          completionHandler: @escaping (Bookmark?) -> Void = { _ in }) {
 
         self.bookmarkManager = bookmarkManager
 
-        title = UserText.newBookmark
-        addButtonTitle = UserText.bookmarkDialogAdd
+        self.isFavorite = isFavorite
+        self.title = isFavorite ? UserText.addFavorite : UserText.newBookmark
+        self.addButtonTitle = UserText.bookmarkDialogAdd
 
         if let website,
            !LocalBookmarkManager.shared.isUrlBookmarked(url: website.url) {
@@ -90,19 +99,26 @@ struct AddBookmarkModalViewModel {
     }
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
-         originalBookmark: Bookmark,
+         originalBookmark: Bookmark?,
+         isFavorite: Bool = false,
          completionHandler: @escaping (Bookmark?) -> Void = { _ in }) {
 
         self.bookmarkManager = bookmarkManager
 
-        title = UserText.updateBookmark
-        addButtonTitle = UserText.save
+        self.isFavorite = isFavorite
+        if originalBookmark != nil {
+            self.title = isFavorite ? UserText.editFavorite : UserText.updateBookmark
+            self.addButtonTitle = UserText.save
+        } else {
+            self.title = isFavorite ? UserText.addFavorite : UserText.newBookmark
+            self.addButtonTitle = UserText.bookmarkDialogAdd
+        }
 
         self.parent = nil
         self.originalBookmark = originalBookmark
 
-        bookmarkTitle = originalBookmark.title
-        bookmarkAddress = originalBookmark.url
+        bookmarkTitle = originalBookmark?.title ?? ""
+        bookmarkAddress = originalBookmark?.url ?? ""
 
         self.completionHandler = completionHandler
     }

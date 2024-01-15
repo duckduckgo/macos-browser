@@ -57,11 +57,8 @@ struct AddBookmarkModalView: ModalView {
                 }
                 .keyboardShortcut(.cancelAction)
 
-                Button {
+                Button(model.addButtonTitle) {
                     model.addOrSave(dismiss: dismiss.callAsFunction)
-                } label: {
-                    Text("Add", comment: "Button to confim a bookmark creation")
-
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(model.isAddButtonDisabled)
