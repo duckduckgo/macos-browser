@@ -164,7 +164,7 @@ Gw
                                             </box>
                                             <button translatesAutoresizingMaskIntoConstraints="NO" id="A53-A7-zYD" customClass="LinkButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="217" height="16"/>
-                                                <buttonCell key="cell" type="recessed" title="Learn more about location services" bezelStyle="recessed" alignment="left" imageScaling="proportionallyDown" inset="2" id="eMd-Hi-dvY">
+                                                <buttonCell key="cell" type="square" title="Learn more about location services" bezelStyle="shadowlessSquare" alignment="left" imageScaling="proportionallyDown" inset="2" id="eMd-Hi-dvY">
                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                     <font key="font" metaFont="system"/>
                                                 </buttonCell>
