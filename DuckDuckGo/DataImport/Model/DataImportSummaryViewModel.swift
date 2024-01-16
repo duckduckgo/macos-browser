@@ -35,7 +35,7 @@ struct DataImportSummaryViewModel {
     let summaryKind: SummaryKind
     let results: [DataTypeImportResult]
 
-    init(source: Source, results: [DataTypeImportResult], dataTypes: Set<DataType>? = nil) {
+    init(source: Source, isFileImport: Bool = false, results: [DataTypeImportResult], dataTypes: Set<DataType>? = nil) {
         let dataTypes = dataTypes ?? Set(results.map(\.dataType))
         assert(!dataTypes.isEmpty)
 
@@ -48,7 +48,6 @@ struct DataImportSummaryViewModel {
         } else {
             let dataType = dataTypes.first ?? .bookmarks
 
-            let isFileImport = source.initialScreen.isFileImport || results.filter({ $0.dataType == dataType }).count > 1 /* is file import retry */
             self.summaryKind = isFileImport ? .fileImportComplete(dataType) : .importComplete(dataType)
         }
 

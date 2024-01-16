@@ -178,6 +178,10 @@ extension Pixel {
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
         case networkProtectionEnabledOnSearch
+        case networkProtectionGeoswitchingOpened
+        case networkProtectionGeoswitchingSetNearest
+        case networkProtectionGeoswitchingSetCustom
+        case networkProtectionGeoswitchingNoLocations
 
         // Sync
         case syncSignupDirect
@@ -566,6 +570,14 @@ extension Pixel.Event {
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
+        case .networkProtectionGeoswitchingOpened:
+            return "m_mac_netp_imp_geoswitching_c"
+        case .networkProtectionGeoswitchingSetNearest:
+            return "m_mac_netp_ev_geoswitching_set_nearest"
+        case .networkProtectionGeoswitchingSetCustom:
+            return "m_mac_netp_ev_geoswitching_set_custom"
+        case .networkProtectionGeoswitchingNoLocations:
+            return "m_mac_netp_ev_geoswitching_no_locations"
         }
     }
 }
