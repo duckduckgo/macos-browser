@@ -31,6 +31,7 @@ final class FirefoxBookmarksReader {
         static let toolbar = "toolbar_____"
         static let tags = "tags________"
         static let unfiled = "unfiled_____"
+        static let mobile = "mobile______"
     }
 
     struct ImportError: DataImportError {
@@ -119,7 +120,7 @@ final class FirefoxBookmarksReader {
         return importedBookmarks
     }
 
-    fileprivate class DatabaseBookmarks {
+    fileprivate struct DatabaseBookmarks {
         let topLevelFolders: [FolderRow]
         let foldersByParent: [Int: [FolderRow]]
         let bookmarksByFolder: [Int: [BookmarkRow]]
@@ -165,18 +166,24 @@ final class FirefoxBookmarksReader {
         let menu = databaseBookmarks.topLevelFolders.first(where: { $0.guid == BookmarkGUID.menu })
         let toolbar = databaseBookmarks.topLevelFolders.first(where: { $0.guid == BookmarkGUID.toolbar })
         let unfiled = databaseBookmarks.topLevelFolders.first(where: { $0.guid == BookmarkGUID.unfiled })
+        let mobile = databaseBookmarks.topLevelFolders.first(where: { $0.guid == BookmarkGUID.mobile })
+        let filteredGUIDs = Set([BookmarkGUID.menu, BookmarkGUID.toolbar, BookmarkGUID.unfiled, BookmarkGUID.mobile, BookmarkGUID.tags])
+        let otherFolders = databaseBookmarks.topLevelFolders.filter { !filteredGUIDs.contains($0.guid) }
 
         let menuBookmarksAndFolders = children(parentID: menu?.id, bookmarks: databaseBookmarks)
         let toolbarBookmarksAndFolders = children(parentID: toolbar?.id, bookmarks: databaseBookmarks)
+        let syncedBookmarksAndFolders = children(parentID: mobile?.id, bookmarks: databaseBookmarks)
         let unfiledBookmarksAndFolders = children(parentID: unfiled?.id, bookmarks: databaseBookmarks)
+            + otherFolders.flatMap { children(parentID: $0.id, bookmarks: databaseBookmarks) }
 
         let toolbarFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar",
-                                                               type: "folder",
+                                                               type: .folder,
                                                                urlString: nil,
                                                                children: toolbarBookmarksAndFolders + menuBookmarksAndFolders)
 
-        let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: unfiledBookmarksAndFolders)
-        let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder, syncedBookmarks: nil)
+        let unfiledFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.otherBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: unfiledBookmarksAndFolders)
+        let syncedFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.mobileBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: syncedBookmarksAndFolders)
+        let folders = ImportedBookmarks.TopLevelFolders(bookmarkBar: toolbarFolder, otherBookmarks: unfiledFolder, syncedBookmarks: syncedFolder)
 
         return ImportedBookmarks(topLevelFolders: folders)
     }
@@ -258,11 +265,11 @@ extension ImportedBookmarks.BookmarkOrFolder {
 
     fileprivate static func from(folderRow: FirefoxBookmarksReader.FolderRow,
                                  children: [ImportedBookmarks.BookmarkOrFolder]) -> ImportedBookmarks.BookmarkOrFolder {
-        return ImportedBookmarks.BookmarkOrFolder(name: folderRow.title, type: "folder", urlString: nil, children: children)
+        return ImportedBookmarks.BookmarkOrFolder(name: folderRow.title, type: .folder, urlString: nil, children: children)
     }
 
     fileprivate static func from(bookmarkRow: FirefoxBookmarksReader.BookmarkRow) -> ImportedBookmarks.BookmarkOrFolder {
-        return ImportedBookmarks.BookmarkOrFolder(name: bookmarkRow.title ?? "", type: "bookmark", urlString: bookmarkRow.url, children: nil)
+        return ImportedBookmarks.BookmarkOrFolder(name: bookmarkRow.title ?? "", type: .bookmark, urlString: bookmarkRow.url, children: nil)
     }
 
 }
