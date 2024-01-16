@@ -68,15 +68,20 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
                                                  primaryPassword: primaryPassword)
 
         // Part 2: Take the decrypted ASN1 data, parse it, and extract the key.
-        operationType = .key3readerStage2
-        let decryptedASNData = try ASN1Parser.parse(data: decryptedData)
-        let extractedASNData = try extractKey3DecryptedASNData(from: decryptedASNData)
+        do {
+            operationType = .key3readerStage2
+            let decryptedASNData = try ASN1Parser.parse(data: decryptedData)
+            let extractedASNData = try extractKey3DecryptedASNData(from: decryptedASNData)
 
-        operationType = .key3readerStage3
-        let keyContainerASNData = try ASN1Parser.parse(data: extractedASNData)
-        let key = try extractKey3Key(from: keyContainerASNData)
+            operationType = .key3readerStage3
+            let keyContainerASNData = try ASN1Parser.parse(data: extractedASNData)
+            let key = try extractKey3Key(from: keyContainerASNData)
 
-        return key
+            return key
+
+        } catch let error as ASN1Parser.ParserError {
+            throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: error)
+        }
     }
 
     func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data> {

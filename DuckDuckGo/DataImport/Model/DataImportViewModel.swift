@@ -292,6 +292,9 @@ struct DataImportViewModel {
 
             // firefox passwords db is master-password protected: request password
             case let error as FirefoxLoginReader.ImportError where error.type == .requiresPrimaryPassword:
+                if error.underlyingError != nil {
+                    Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: error))
+                }
 
                 log("primary password required")
                 // stay on the same screen but request password synchronously
