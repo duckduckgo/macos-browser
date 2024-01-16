@@ -41,7 +41,7 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let userDefaults: UserDefaults
     private let userNotificationCenter: UNUserNotificationCenter
-    private let areNotificationsEnabled = false
+    private let areNotificationsEnabled = true
 
     public init(pixelHandler: EventMapping<DataBrokerProtectionPixels>,
                 userDefaults: UserDefaults = .standard,
@@ -57,11 +57,12 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
 
     public func requestNotificationPermission() {
         guard areNotificationsEnabled else { return }
-
-        userNotificationCenter.requestAuthorization(options: [.alert]) { _, _ in }
+        requestNotificationPermissionIfNecessary()
     }
 
     private func sendNotification(_ notification: UserNotification, afterDays days: Int? = nil) {
+        requestNotificationPermissionIfNecessary()
+
         let notificationContent = UNMutableNotificationContent()
         notificationContent.title = notification.title
         notificationContent.body = notification.message
@@ -92,6 +93,14 @@ public class DefaultDataBrokerProtectionUserNotificationService: NSObject, DataB
                 } else {
                     os_log("Notification sent", log: .dataBrokerProtection)
                 }
+            }
+        }
+    }
+
+    private func requestNotificationPermissionIfNecessary() {
+        userNotificationCenter.getNotificationSettings { [weak self] settings in
+            if settings.authorizationStatus == .notDetermined {
+                self?.userNotificationCenter.requestAuthorization(options: [.alert]) { _, _ in }
             }
         }
     }
@@ -184,11 +193,11 @@ private enum UserNotification {
         case .firstScanComplete:
             return "Scan complete!"
         case .firstProfileRemoved:
-            return "Success! A record of your info was removed!"
+            return "A record of your info was removed!"
         case .allInfoRemoved:
-            return "All pending info removals complete!"
+            return "Personal info removed!"
         case .twoWeeksCheckIn:
-            return "We're making progress on your info removals"
+            return "We're making progress!"
         }
     }
 

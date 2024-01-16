@@ -308,19 +308,24 @@ final class NetworkProtectionRemoteMessagingTests: XCTestCase {
 
 // MARK: - Mocks
 
-private final class MockNetworkProtectionRemoteMessagingRequest: NetworkProtectionRemoteMessagingRequest {
+private final class MockNetworkProtectionRemoteMessagingRequest: HomePageRemoteMessagingRequest {
 
     var result: Result<[NetworkProtectionRemoteMessage], Error>!
     var didFetchMessages: Bool = false
 
-    func fetchNetworkProtectionRemoteMessages(completion: @escaping (Result<[NetworkProtectionRemoteMessage], Error>) -> Void) {
+    func fetchHomePageRemoteMessages<T>(completion: @escaping (Result<[T], Error>) -> Void) where T: Decodable {
         didFetchMessages = true
-        completion(result)
+
+        if let castResult = self.result as? Result<[T], Error> {
+            completion(castResult)
+        } else {
+            fatalError("Could not cast result to expected type")
+        }
     }
 
 }
 
-private final class MockNetworkProtectionRemoteMessagingStorage: NetworkProtectionRemoteMessagingStorage {
+private final class MockNetworkProtectionRemoteMessagingStorage: HomePageRemoteMessagingStorage {
 
     var _storedMessages: [NetworkProtectionRemoteMessage] = []
     var _storedDismissedMessageIDs: [String] = []
@@ -331,6 +336,18 @@ private final class MockNetworkProtectionRemoteMessagingStorage: NetworkProtecti
 
     func storedMessages() -> [NetworkProtectionRemoteMessage] {
         _storedMessages
+    }
+
+    func store<Message: Codable>(messages: [Message]) throws {
+        if let messages = messages as? [NetworkProtectionRemoteMessage] {
+            self._storedMessages = messages
+        } else {
+            fatalError("Failed to cast messages")
+        }
+    }
+
+    func storedMessages<Message: Codable>() -> [Message] {
+        return _storedMessages as! [Message]
     }
 
     func dismissRemoteMessage(with id: String) {

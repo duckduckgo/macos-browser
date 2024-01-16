@@ -44,7 +44,6 @@ final class NavigationBarViewController: NSViewController {
         static let homeButtonSeparatorHeight: CGFloat = 20
     }
 
-    @IBOutlet weak var mouseOverView: MouseOverView!
     @IBOutlet weak var goBackButton: NSButton!
     @IBOutlet weak var goForwardButton: NSButton!
     @IBOutlet weak var refreshOrStopButton: NSButton!
@@ -170,8 +169,6 @@ final class NavigationBarViewController: NSViewController {
         view.layer?.masksToBounds = false
         addressBarContainer.wantsLayer = true
         addressBarContainer.layer?.masksToBounds = false
-
-        mouseOverView.delegate = self
 
         setupNavigationButtonMenus()
         subscribeToSelectedTabViewModel()
@@ -863,14 +860,6 @@ final class NavigationBarViewController: NSViewController {
     }
 }
 
-extension NavigationBarViewController: MouseOverViewDelegate {
-
-    func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        addressBarViewController?.addressBarButtonsViewController?.isMouseOverNavigationBar = isMouseOver
-    }
-
-}
-
 extension NavigationBarViewController: NSMenuDelegate {
 
     public func menuNeedsUpdate(_ menu: NSMenu) {
@@ -1003,7 +992,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     }
 
     func optionsButtonMenuRequestedBookmarkImportInterface(_ menu: NSMenu) {
-        DataImportView.show()
+        DataImportView().show()
     }
 
     func optionsButtonMenuRequestedBookmarkExportInterface(_ menu: NSMenu) {

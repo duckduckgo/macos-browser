@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -64,7 +65,7 @@ extension Preferences {
             VStack(alignment: .leading, spacing: 0) {
 
                 // TITLE
-                TextMenuTitle(text: UserText.autofill)
+                TextMenuTitle(UserText.autofill)
 
                 // Autofill Content  Button
                 PreferencePaneSection {
@@ -85,14 +86,14 @@ extension Preferences {
 #if !APPSTORE
                 // SECTION 1: Password Manager
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.autofillPasswordManager)
+                    TextMenuItemHeader(UserText.autofillPasswordManager)
                     VStack(alignment: .leading, spacing: 6) {
                         Picker(selection: passwordManagerBinding, content: {
                             Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
                             Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
                         }, label: {})
                         .pickerStyle(.radioGroup)
-                        .offset(x: Const.pickerHorizontalOffset)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                         if model.passwordManager == .bitwarden && !model.isBitwardenSetupFlowPresented {
                             bitwardenStatusView(for: bitwardenManager.status)
                         }
@@ -109,21 +110,21 @@ extension Preferences {
 
                 // SECTION 2: Ask to Save:
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.autofillAskToSave)
+                    TextMenuItemHeader(UserText.autofillAskToSave)
                     VStack(alignment: .leading, spacing: 6) {
-                        ToggleMenuItem(title: UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
-                        ToggleMenuItem(title: UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
-                        ToggleMenuItem(title: UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
+                        ToggleMenuItem(UserText.autofillUsernamesAndPasswords, isOn: $model.askToSaveUsernamesAndPasswords)
+                        ToggleMenuItem(UserText.autofillAddresses, isOn: $model.askToSaveAddresses)
+                        ToggleMenuItem(UserText.autofillPaymentMethods, isOn: $model.askToSavePaymentMethods)
                     }
-                    TextMenuItemCaption(text: UserText.autofillAskToSaveExplanation)
+                    TextMenuItemCaption(UserText.autofillAskToSaveExplanation)
                 }
 
                 // SECTION 3: Reset excluded (aka never prompt to save) sites:
                 // This is only displayed if the user has never prompt sites saved & not using Bitwarden
                 if model.hasNeverPromptWebsites && model.passwordManager == .duckduckgo {
                     PreferencePaneSection {
-                        TextMenuItemHeader(text: UserText.autofillExcludedSites)
-                        TextMenuItemCaption(text: UserText.autofillExcludedSitesExplanation)
+                        TextMenuItemHeader(UserText.autofillExcludedSites)
+                        TextMenuItemCaption(UserText.autofillExcludedSitesExplanation)
                             .padding(.top, -8)
                         Button(UserText.autofillExcludedSitesReset) {
                             showingResetNeverPromptSitesSheet.toggle()
@@ -139,7 +140,7 @@ extension Preferences {
                 // SECTION 4: Auto-Lock:
 
                 PreferencePaneSection {
-                    TextMenuItemHeader(text: UserText.autofillAutoLock)
+                    TextMenuItemHeader(UserText.autofillAutoLock)
                     Picker(selection: isAutoLockEnabledBinding, content: {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
@@ -164,8 +165,8 @@ extension Preferences {
                         Text(UserText.autofillNeverLock).tag(false)
                     }, label: {})
                     .pickerStyle(.radioGroup)
-                    .offset(x: Const.pickerHorizontalOffset)
-                    TextMenuItemCaption(text: UserText.autofillNeverLockWarning)
+                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                    TextMenuItemCaption(UserText.autofillNeverLockWarning)
                 }
             }
         }
@@ -316,8 +317,7 @@ struct ResetNeverPromptSitesSheet: View {
 
     var body: some View {
         VStack(alignment: .center) {
-            Text(UserText.autofillExcludedSitesResetActionTitle)
-                .font(Preferences.Const.Fonts.preferencePaneTitle)
+            TextMenuTitle(UserText.autofillExcludedSitesResetActionTitle)
                 .padding(.top, 10)
 
             Text(UserText.autofillExcludedSitesResetActionMessage)

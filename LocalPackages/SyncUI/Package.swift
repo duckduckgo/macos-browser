@@ -13,12 +13,13 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "7522aa923521c26b6503db8754829e33c450bc68"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.1.2"),
     ],
     targets: [
         .target(
             name: "SyncUI",
             dependencies: [
+                .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
             swiftSettings: [

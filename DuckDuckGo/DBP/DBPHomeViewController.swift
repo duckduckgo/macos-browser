@@ -80,6 +80,11 @@ final class DBPHomeViewController: NSViewController {
         if !dataBrokerProtectionManager.shouldAskForInviteCode() {
             attachDataBrokerContainerView()
         }
+
+        if dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
+            let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+            dbpDateStore.updateLastActiveDate()
+        }
     }
 
     private func attachDataBrokerContainerView() {

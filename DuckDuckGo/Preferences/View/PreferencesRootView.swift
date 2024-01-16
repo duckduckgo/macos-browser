@@ -17,6 +17,7 @@
 //
 
 import Common
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
@@ -26,14 +27,14 @@ import Subscription
 import SubscriptionUI
 #endif
 
-fileprivate extension Preferences.Const {
-    static let sidebarWidth: CGFloat = 256
-    static let paneContentWidth: CGFloat = 524
-    static let panePaddingHorizontal: CGFloat = 48
-    static let panePaddingVertical: CGFloat = 40
-}
+enum Preferences {
 
-extension Preferences {
+    enum Const {
+        static let sidebarWidth: CGFloat = 256
+        static let paneContentWidth: CGFloat = 524
+        static let panePaddingHorizontal: CGFloat = 48
+        static let panePaddingVertical: CGFloat = 40
+    }
 
     struct RootView: View {
 
