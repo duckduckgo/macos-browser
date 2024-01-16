@@ -30,11 +30,17 @@ public enum EmailError: Error, Equatable, Codable {
 }
 
 protocol EmailServiceProtocol {
-    func getEmail() async throws -> String
+    func getEmail(dataBrokerName: String?) async throws -> String
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
                              pollingIntervalInSeconds: Int,
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL
+}
+
+extension EmailServiceProtocol {
+    func getEmail() async throws -> String {
+        try await getEmail(dataBrokerName: nil)
+    }
 }
 
 struct EmailService: EmailServiceProtocol {
@@ -51,8 +57,14 @@ struct EmailService: EmailServiceProtocol {
         self.redeemUseCase = redeemUseCase
     }
 
-    func getEmail() async throws -> String {
-        guard let url = URL(string: Constants.baseUrl + "/generate") else {
+    func getEmail(dataBrokerName: String? = nil) async throws -> String {
+        var urlString = Constants.baseUrl + "/generate"
+
+        if let dataBrokerValue = dataBrokerName {
+            urlString += "?databroker=\(dataBrokerValue)"
+        }
+
+        guard let url = URL(string: urlString) else {
             throw EmailError.cantGenerateURL
         }
 
