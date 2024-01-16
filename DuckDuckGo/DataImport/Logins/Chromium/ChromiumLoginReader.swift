@@ -281,11 +281,11 @@ private struct ChromiumCredential: Identifiable {
 
 extension ChromiumCredential: FetchableRecord {
 
-    init(row: Row) {
-        url = row["signon_realm"]
-        username = row["username_value"]
-        encryptedPassword = row["password_value"]
-        passwordModifiedAt = row["date_password_modified"]
+    init(row: Row) throws {
+        url = try row["signon_realm"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 0) }()
+        username = try row["username_value"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 1) }()
+        encryptedPassword = try row["password_value"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 2) }()
+        passwordModifiedAt = try row["date_password_modified"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 3) }()
     }
 
 }
