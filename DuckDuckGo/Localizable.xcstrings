@@ -6471,7 +6471,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Hide Network Protection"
+            "value" : "Hide VPN Shortcut"
           }
         }
       }
@@ -6531,7 +6531,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show Network Protection"
+            "value" : "Show VPN Shortcut"
           }
         }
       }
