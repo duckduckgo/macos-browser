@@ -285,7 +285,7 @@ extension ChromiumCredential: FetchableRecord {
         url = try row["signon_realm"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 0) }()
         username = try row["username_value"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 1) }()
         encryptedPassword = try row["password_value"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 2) }()
-        passwordModifiedAt = try row["date_password_modified"] ?? { throw FetchableRecordError<ChromiumCredential>(column: 3) }()
+        passwordModifiedAt = row["date_password_modified"]
     }
 
 }
