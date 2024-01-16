@@ -123,8 +123,14 @@ public final class StatusBarMenu: NSObject {
         menu.delegate = self
         menu.items = model.contextMenuItems
 
+        // I'm not sure why +8 is needed, but that seems to be the right positioning to make this work well
+        // across all systems.  I'm seeing an issue where the menu looks right for me but not for others testing
+        // this, and this seems to fix it:
+        // Ref:
+        let yPosition = statusItem.statusBar!.thickness + 8
+
         menu.popUp(positioning: nil,
-                   at: NSPoint(x: 0, y: statusItem.statusBar!.thickness),
+                   at: NSPoint(x: 0, y: yPosition),
                    in: statusItem.button)
     }
 
