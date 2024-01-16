@@ -156,7 +156,7 @@ final class FirefoxBookmarksReader {
         init(row: Row) throws {
             id = try row["id"] ?? { throw FetchableRecordError<BookmarkRow>(column: 0) }()
             self.title = row["title"]
-            url = try row["parent"] ?? { throw FetchableRecordError<BookmarkRow>(column: 2) }()
+            url = try row["url"] ?? { throw FetchableRecordError<BookmarkRow>(column: 2) }()
             parent = try row["parent"] ?? { throw FetchableRecordError<BookmarkRow>(column: 3) }()
         }
     }
