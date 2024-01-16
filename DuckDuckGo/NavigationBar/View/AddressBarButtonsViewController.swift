@@ -978,6 +978,22 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
+    func popoverShouldClose(_ popover: NSPopover) -> Bool {
+        switch popover {
+        case bookmarkPopover:
+            // fix popover reopening on next bookmarkButtonAction (on macOS 11)
+            DispatchQueue.main.async { [weak self] in
+                if let bookmarkPopover = self?.bookmarkPopover, bookmarkPopover.isShown {
+                    bookmarkPopover.close()
+                }
+            }
+            return false
+
+        default:
+            return true
+        }
+    }
+
     func popoverWillClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
         case bookmarkPopover:
@@ -995,6 +1011,7 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
                 NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
             }
             updateBookmarkButtonVisibility()
+            self.bookmarkPopover = nil
 
         case privacyDashboardPopover:
             privacyEntryPointButton.state = .off

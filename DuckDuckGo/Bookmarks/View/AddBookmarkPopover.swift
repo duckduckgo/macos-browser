@@ -36,7 +36,7 @@ final class AddBookmarkPopover: NSPopover {
               let window = addressBar.window else { return .infinite }
         var frame = window.convertToScreen(addressBar.convert(addressBar.bounds, to: nil))
 
-        frame = frame.insetBy(dx: -36, dy: -window.frame.size.height)
+        frame = frame.insetBy(dx: -42, dy: -window.frame.size.height)
 
         return frame
     }
@@ -53,16 +53,20 @@ final class AddBookmarkPopover: NSPopover {
     }
 
     private func setupBookmarkAddController() {
-        guard let bookmark else {
-            contentViewController = NSViewController()
-            return
-        }
-        contentViewController = NSHostingController(rootView: AddBookmarkPopoverView(model: AddBookmarkPopoverViewModel(bookmark: bookmark)))
+        guard let bookmark else { return }
+        contentViewController = NSHostingController(rootView: AddBookmarkPopoverView(model: AddBookmarkPopoverViewModel(bookmark: bookmark))
+            .legacyOnDismiss { [weak self] in
+                self?.performClose(nil)
+            })
     }
 
     override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
         self.addressBar = positioningView.superview
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
+    }
+
+    override func performClose(_ sender: Any?) {
+        self.close()
     }
 
     func popoverWillClose() {

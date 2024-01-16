@@ -36,7 +36,7 @@ struct AddBookmarkFolderPopoverView: ModalView {
             }
 
             VStack(alignment: .leading, spacing: 7) {
-                Text("Name:", comment: "Add Folder popover: folder name text field title")
+                Text(UserText.newFolderDialogFolderNameTitle)
 
                 TextField("", text: $model.folderName)
                     .focusedOnAppear()

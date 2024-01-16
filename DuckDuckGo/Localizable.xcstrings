@@ -163,6 +163,18 @@
     "Add to Favorites" : {
 
     },
+    "add.bookmark.name" : {
+      "comment" : "New bookmark folder dialog folder name field heading",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
+          }
+        }
+      }
+    },
     "add.favorite" : {
       "comment" : "Button for adding a favorite bookmark",
       "extractionState" : "extracted_with_value",
@@ -171,6 +183,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Add Favorite"
+          }
+        }
+      }
+    },
+    "add.folder.name" : {
+      "comment" : "Add Folder popover: folder name text field title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
           }
         }
       }
@@ -4328,9 +4352,6 @@
           }
         }
       }
-    },
-    "Name:" : {
-      "comment" : "New bookmark folder dialog folder name field heading\nAdd Folder popover: folder name text field title"
     },
     "navigate.back" : {
       "comment" : "Context menu item",
