@@ -61,7 +61,7 @@ struct EmailService: EmailServiceProtocol {
         var urlString = Constants.baseUrl + "/generate"
 
         if let dataBrokerValue = dataBrokerName {
-            urlString += "?databroker=\(dataBrokerValue)"
+            urlString += "?dataBroker=\(dataBrokerValue)"
         }
 
         guard let url = URL(string: urlString) else {
