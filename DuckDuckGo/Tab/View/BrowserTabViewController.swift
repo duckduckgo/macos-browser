@@ -407,7 +407,11 @@ final class BrowserTabViewController: NSViewController {
     private var setFirstResponderAfterAdding = false
 
     private func setFirstResponderIfNeeded() {
-        guard webView?.url != nil else {
+        guard let webView else {
+            setFirstResponderAfterAdding = true
+            return
+        }
+        guard webView.url != nil else {
             return
         }
 
