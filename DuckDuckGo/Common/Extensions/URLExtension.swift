@@ -423,11 +423,9 @@ extension URL {
             quarantineProperties[kLSQuarantineDataURLKey as String] = sourceURL
             quarantineProperties[kLSQuarantineOriginURLKey as String] = referrerURL
 
-            if quarantineProperties[kLSQuarantineTypeKey as String] == nil {
-                quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
-                    ? kLSQuarantineTypeWebDownload
-                    : kLSQuarantineTypeOtherDownload
-            }
+            quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
+                ? kLSQuarantineTypeWebDownload
+                : kLSQuarantineTypeOtherDownload
 
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
