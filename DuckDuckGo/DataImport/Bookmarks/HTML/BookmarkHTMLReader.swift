@@ -109,7 +109,7 @@ final class BookmarkHTMLReader {
             bookmarkBar = firstFolder
         }
 
-        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: "other", children: other)
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: UserText.otherBookmarksImportedFolderTitle, children: other)
         let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks, syncedBookmarks: nil))
         let result = HTMLImportedBookmarks(source: importSource, bookmarks: allBookmarks)
 
