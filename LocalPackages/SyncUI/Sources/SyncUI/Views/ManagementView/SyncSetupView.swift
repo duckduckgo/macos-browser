@@ -28,6 +28,7 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 syncUnavailableView()
                 syncWithAnotherDeviceView()
                 SyncUIViews.TextDetailSecondary(text: UserText.beginSyncFooter)
+                    .frame(height: 28)
                     .padding(.bottom, 24)
                     .padding(.horizontal, 110)
                     .font(.system(size: 11))
