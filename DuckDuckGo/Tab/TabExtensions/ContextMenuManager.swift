@@ -144,12 +144,12 @@ extension ContextMenuManager {
         if isWebViewSupportedScheme {
             // insert Add Link to Bookmarks
             menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: currentIndex)
-            menu.replaceItem(at: currentIndex + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+            menu.replaceItem(at: currentIndex + 1, with: self.copyLinkOrEmailAddressMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
             currentIndex += 2
         } else if isEmailAddress {
             let emailAddresses = linkURL.flatMap(URL.init(string:))?.emailAddresses ?? []
             let title = emailAddresses.count == 1 ? UserText.copyEmailAddress : UserText.copyEmailAddresses
-            menu.replaceItem(at: currentIndex, with: self.copyLinkMenuItem(withTitle: title, from: openLinkInNewWindowItem))
+            menu.replaceItem(at: currentIndex, with: self.copyLinkOrEmailAddressMenuItem(withTitle: title, from: openLinkInNewWindowItem))
             currentIndex += 1
         }
 
@@ -260,7 +260,7 @@ private extension ContextMenuManager {
                      withIdentifierIn: [.downloadLinkedFile, .downloadMedia])
     }
 
-    func copyLinkMenuItem(withTitle title: String, from openLinkItem: NSMenuItem) -> NSMenuItem {
+    func copyLinkOrEmailAddressMenuItem(withTitle title: String, from openLinkItem: NSMenuItem) -> NSMenuItem {
         makeMenuItem(withTitle: title, action: #selector(copyLinkOrEmailAddress), from: openLinkItem, with: .openLinkInNewWindow)
     }
 
