@@ -37,7 +37,6 @@ struct VPNLocationView: View {
                         nearestSection
                         countriesSection
                     }
-                    .animation(.default, value: model.state.isLoading)
                     .padding(0)
                 }
                 .padding(.horizontal, 56)
@@ -104,11 +103,20 @@ struct VPNLocationView: View {
                 .foregroundColor(.primary)
             switch model.state {
             case .loading:
-                EmptyView()
+                listLoadingView
             case .loaded(let countryItems):
                 countriesList(countries: countryItems)
             }
         }
+    }
+
+    private var listLoadingView: some View {
+        ZStack(alignment: .center) {
+            ProgressView()
+        }
+        .frame(height: 270)
+        .frame(idealWidth: .infinity, maxWidth: .infinity)
+        .roundedBorder()
     }
 
     private func countriesList(countries: [VPNCountryItemModel]) -> some View {
