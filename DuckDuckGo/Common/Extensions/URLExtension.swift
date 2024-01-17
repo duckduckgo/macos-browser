@@ -154,11 +154,11 @@ extension URL {
     // MARK: ATB
 
     static var devMode: String {
-        #if DEBUG
+#if DEBUG
         return "?test=1"
-        #else
+#else
         return ""
-        #endif
+#endif
     }
 
     static let atb = "\(Self.duckDuckGo)atb.js\(devMode)"
@@ -230,8 +230,8 @@ extension URL {
 
             switch (needsWWW, host.hasPrefix(HostPrefix.www.separated())) {
             case (.some(true), true),
-                 (.some(false), false),
-                 (.none, _):
+                (.some(false), false),
+                (.none, _):
                 break
             case (.some(false), true):
                 host = host.dropping(prefix: HostPrefix.www.separated())
@@ -271,7 +271,7 @@ extension URL {
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
                              needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww,
+                             && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
 
@@ -290,6 +290,14 @@ extension URL {
         guard !filename.isEmpty else { return nil }
 
         return filename
+    }
+
+    var emailAddresses: [String] {
+        guard navigationalScheme == .mailto, let path = URLComponents(url: self, resolvingAgainstBaseURL: false)?.path else {
+            return []
+        }
+
+        return path.components(separatedBy: .init(charactersIn: ", ")).filter { !$0.isEmpty }
     }
 
     // MARK: - Validity

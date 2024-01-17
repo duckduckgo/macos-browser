@@ -36,11 +36,14 @@ final class ContextMenuManager: NSObject {
     private var linkURL: String?
 
     private var isEmailAddress: Bool {
-        linkURL?.url?.navigationalScheme == .mailto
+        guard let linkURL, let url = URL(string: linkURL) else {
+            return false
+        }
+        return url.navigationalScheme == .mailto
     }
 
     private var isWebViewSupportedScheme: Bool {
-        guard let scheme = linkURL?.url?.scheme else {
+        guard let linkURL, let scheme = URL(string: linkURL)?.scheme else {
             return false
         }
         return WKWebView.handlesURLScheme(scheme)
@@ -144,7 +147,9 @@ extension ContextMenuManager {
             menu.replaceItem(at: currentIndex + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
             currentIndex += 2
         } else if isEmailAddress {
-            menu.replaceItem(at: currentIndex, with: self.copyLinkMenuItem(withTitle: UserText.copyEmailAddress, from: openLinkInNewWindowItem))
+            let emailAddresses = linkURL.flatMap(URL.init(string:))?.emailAddresses ?? []
+            let title = emailAddresses.count == 1 ? UserText.copyEmailAddress : UserText.copyEmailAddresses
+            menu.replaceItem(at: currentIndex, with: self.copyLinkMenuItem(withTitle: title, from: openLinkInNewWindowItem))
             currentIndex += 1
         }
 
@@ -449,8 +454,9 @@ private extension ContextMenuManager {
             guard let url = navigationAction?.request.url else { return .cancel }
 
             if isEmailAddress {
-                if let email = url.nakedString, !email.isEmpty {
-                    NSPasteboard.general.copy(email)
+                let emailAddresses = url.emailAddresses
+                if !emailAddresses.isEmpty {
+                    NSPasteboard.general.copy(emailAddresses.joined(separator: ", "))
                 }
             } else {
                 NSPasteboard.general.copy(url)
