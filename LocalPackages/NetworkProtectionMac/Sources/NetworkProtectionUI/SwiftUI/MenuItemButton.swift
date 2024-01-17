@@ -20,7 +20,9 @@ import Foundation
 import SwiftUI
 
 struct MenuItemButton: View {
+    private let iconName: NetworkProtectionAsset?
     private let title: String
+    private let detailTitle: String?
     private let textColor: Color
     private let action: () async -> Void
 
@@ -29,8 +31,10 @@ struct MenuItemButton: View {
     @State private var isHovered = false
     @State private var animatingTap = false
 
-    init(_ title: String, textColor: Color, action: @escaping () async -> Void) {
+    init(iconName: NetworkProtectionAsset? = nil, _ title: String, detailTitle: String? = nil, textColor: Color, action: @escaping () async -> Void) {
+        self.iconName = iconName
         self.title = title
+        self.detailTitle = detailTitle
         self.textColor = textColor
         self.action = action
     }
@@ -40,9 +44,17 @@ struct MenuItemButton: View {
             buttonTapped()
         }) {
             HStack {
+                if let iconName {
+                    Image(iconName)
+                        .foregroundColor(isHovered ? .white : textColor)
+                }
                 Text(title)
                     .foregroundColor(isHovered ? .white : textColor)
                 Spacer()
+                if let detailTitle {
+                    Text(detailTitle)
+                        .foregroundColor(isHovered ? .white : .secondary)
+                }
             }.padding([.top, .bottom], 3)
                 .padding([.leading, .trailing], 9)
         }

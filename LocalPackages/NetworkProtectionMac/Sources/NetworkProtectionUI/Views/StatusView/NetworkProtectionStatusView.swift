@@ -21,7 +21,7 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
-fileprivate extension View {
+extension View {
     func applyMenuAttributes() -> some View {
         opacity(0.9)
             .font(.system(size: 13, weight: .regular, design: .default))
