@@ -148,7 +148,7 @@ extension ContextMenuManager {
             currentIndex += 2
         } else if isEmailAddress {
             let emailAddresses = linkURL.flatMap(URL.init(string:))?.emailAddresses ?? []
-            let title = emailAddresses.count == 1 ? UserText.copyEmailAddress : UserText.copyEmailAddresses
+            let title = emailAddresses.count > 1 ? UserText.copyEmailAddresses : UserText.copyEmailAddress
             menu.replaceItem(at: currentIndex, with: self.copyLinkOrEmailAddressMenuItem(withTitle: title, from: openLinkInNewWindowItem))
             currentIndex += 1
         }

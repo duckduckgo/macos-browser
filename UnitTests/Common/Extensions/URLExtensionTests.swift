@@ -117,22 +117,23 @@ final class URLExtensionTests: XCTestCase {
         XCTAssertNil(notURL)
     }
 
-    func testThatEmailAddressesExtractsCommaSeparatedAddressesFromMailtoURL() {
-        XCTAssertEqual(
-            URL(string: "mailto:dax@duck.com,donald@duck.com,example@duck.com")?.emailAddresses,
-            ["dax@duck.com", "donald@duck.com", "example@duck.com"]
-        )
+    func testThatEmailAddressesExtractsCommaSeparatedAddressesFromMailtoURL() throws {
+        let url1 = try XCTUnwrap(URL(string: "mailto:dax@duck.com,donald@duck.com,example@duck.com"))
+        XCTAssertEqual(url1.emailAddresses, ["dax@duck.com", "donald@duck.com", "example@duck.com"])
 
-        XCTAssertEqual(
-            URL(string: "mailto:  dax@duck.com,    donald@duck.com,  example@duck.com ")?.emailAddresses,
-            ["dax@duck.com", "donald@duck.com", "example@duck.com"]
-        )
+        if let url2 = URL(string: "mailto:  dax@duck.com,    donald@duck.com,  example@duck.com ") {
+            XCTAssertEqual(url2.emailAddresses, ["dax@duck.com", "donald@duck.com", "example@duck.com"])
+        }
     }
 
-    func testThatEmailAddressesExtractsInvalidEmailAddresses() {
+    func testThatEmailAddressesExtractsInvalidEmailAddresses() throws {
         // parity with Safari which also doesn't validate email addresses
-        XCTAssertEqual(URL(string: "mailto:dax@duck.com,donald,example")?.emailAddresses, ["dax@duck.com", "donald", "example"])
-        XCTAssertEqual(URL(string: "mailto:dax@duck.com, ,,, ,, donald")?.emailAddresses, ["dax@duck.com", "donald"])
+        let url1 = try XCTUnwrap(URL(string: "mailto:dax@duck.com,donald,example"))
+        XCTAssertEqual(url1.emailAddresses, ["dax@duck.com", "donald", "example"])
+
+        if let url2 = URL(string: "mailto:dax@duck.com, ,,, ,, donald") {
+            XCTAssertEqual(url2.emailAddresses, ["dax@duck.com", "donald"])
+        }
     }
 
 }
