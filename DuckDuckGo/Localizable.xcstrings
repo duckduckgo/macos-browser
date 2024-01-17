@@ -157,8 +157,23 @@
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
     },
+    "Add Folder" : {
+      "comment" : "Add Folder popover: Create folder button"
+    },
     "Add to Favorites" : {
 
+    },
+    "add.bookmark.name" : {
+      "comment" : "New bookmark folder dialog folder name field heading",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
+          }
+        }
+      }
     },
     "add.favorite" : {
       "comment" : "Button for adding a favorite bookmark",
@@ -168,6 +183,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Add Favorite"
+          }
+        }
+      }
+    },
+    "add.folder.name" : {
+      "comment" : "Add Folder popover: folder name text field title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
           }
         }
       }
@@ -348,6 +375,9 @@
     },
     "also applies here." : {
 
+    },
+    "Always Show" : {
+      "comment" : "Preference for always showing the bookmarks bar"
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
@@ -1245,6 +1275,9 @@
         }
       }
     },
+    "Bookmark Added" : {
+      "comment" : "Bookmark Added popover title"
+    },
     "Bookmark import failed:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) failed to import."
     },
@@ -1450,19 +1483,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Always Show"
-          }
-        }
-      }
-    },
-    "bookmarks.bar.show.never" : {
-      "comment" : "Preference for never showing the bookmarks bar on new tab",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Never Show"
+            "value" : "Always show"
           }
         }
       }
@@ -1474,7 +1495,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Only Show on New Tab"
+            "value" : "Only show on New Tab"
           }
         }
       }
@@ -3315,7 +3336,7 @@
       "comment" : "Main Menu Help"
     },
     "Hide" : {
-      "comment" : "Main Menu > View > Home Button > None item"
+      "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item"
     },
     "Hide DuckDuckGo" : {
       "comment" : "Main Menu DuckDuckGo item"
@@ -4182,6 +4203,9 @@
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails."
     },
+    "Location:" : {
+      "comment" : "Add Folder popover: parent folder picker title"
+    },
     "looking.for.bitwarden" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -4319,9 +4343,6 @@
           }
         }
       }
-    },
-    "Name:" : {
-      "comment" : "New bookmark folder dialog folder name field heading"
     },
     "navigate.back" : {
       "comment" : "Context menu item",
@@ -5211,6 +5232,9 @@
         }
       }
     },
+    "Never Show" : {
+      "comment" : "Preference for never showing the bookmarks bar on new tab"
+    },
     "never.for.this.site" : {
       "comment" : "Never ask to save login credentials for this site button",
       "extractionState" : "extracted_with_value",
@@ -5804,6 +5828,9 @@
           }
         }
       }
+    },
+    "Only Show on New Tab" : {
+      "comment" : "Preference for only showing the bookmarks bar on new tab"
     },
     "open" : {
       "comment" : "Open button",
@@ -6471,7 +6498,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Hide Network Protection"
+            "value" : "Hide VPN Shortcut"
           }
         }
       }
@@ -6531,7 +6558,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show Network Protection"
+            "value" : "Show VPN Shortcut"
           }
         }
       }
@@ -7890,7 +7917,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Reopen All Windows from Last Session"
+            "value" : "Reopen all windows from last session"
           }
         }
       }
@@ -7994,6 +8021,9 @@
         }
       }
     },
+    "Remove" : {
+      "comment" : "Remove bookmark button title"
+    },
     "remove-favorite" : {
       "comment" : "Remove Favorite button",
       "extractionState" : "extracted_with_value",
@@ -8017,6 +8047,9 @@
           }
         }
       }
+    },
+    "Reopen All Windows from Last Session" : {
+      "comment" : "Main Menu History item"
     },
     "reopen.last.closed.tab" : {
       "extractionState" : "extracted_with_value",
@@ -8232,6 +8265,9 @@
       "comment" : "Main Menu View item"
     },
     "Show left of the back button" : {
+      "comment" : "Preferences > Home Button > left position item"
+    },
+    "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item"
     },
     "Show Next Tab" : {
@@ -8247,6 +8283,9 @@
       "comment" : "Main Menu View-Developer item"
     },
     "Show right of the reload button" : {
+      "comment" : "Preferences > Home Button > right position item"
+    },
+    "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item"
     },
     "Show Spelling and Grammar" : {
