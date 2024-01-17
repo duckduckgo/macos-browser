@@ -32,6 +32,7 @@ extension AppLaunchCommand {
         case .shareFeedback: return "shareFeedback"
         case .showStatus: return "showStatus"
         case .showSettings: return "showSettings"
+        case .showVPNLocations: return "showVPNLocations"
         case .enableOnDemand: return "enableOnDemand"
         }
     }
@@ -88,6 +89,8 @@ extension AppLaunchCommand {
             return "networkprotection://show-status"
         case .showSettings:
             return "networkprotection://show-settings"
+        case .showVPNLocations:
+            return "networkprotection://show-settings/locations"
         default:
             return nil
         }
