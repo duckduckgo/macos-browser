@@ -100,8 +100,8 @@ extension Preferences {
         private func makeSubscriptionView() -> some View {
             let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
                 WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-            }, changePlanOrBilling: {
-                self.changePlanOrBilling()
+            }, changePlanOrBilling: { environment in
+                self.changePlanOrBilling(for: environment)
             }, openVPN: {
                 NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
             }, openPersonalInformationRemoval: {
@@ -122,8 +122,8 @@ extension Preferences {
             return SubscriptionUI.PreferencesSubscriptionView(model: model)
         }
 
-        private func changePlanOrBilling() {
-            switch SubscriptionPurchaseEnvironment.current {
+        private func changePlanOrBilling(for environment: SubscriptionPurchaseEnvironment.Environment) {
+            switch environment {
             case .appStore:
                 NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
             case .stripe:

@@ -25,7 +25,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     @Published var hasEntitlements: Bool = false
     @Published var subscriptionDetails: String?
 
-    private var subscriptionPlatform: String?
+    private var subscriptionPlatform: SubscriptionService.GetSubscriptionDetailsResponse.Platform?
 
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
@@ -79,22 +79,21 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func changePlanOrBillingAction() async -> ChangePlanOrBillingAction {
-        let navigateToManageSubscription: ChangePlanOrBillingAction = .navigateToManageSubscription { [weak self] in
-            self?.actionHandler.changePlanOrBilling()
-        }
-
-
         switch subscriptionPlatform {
-        case "apple":
+        case .apple:
             if await canOpenAppStoreSubscriptionSettings() {
-                return navigateToManageSubscription
+                return .navigateToManageSubscription { [weak self] in
+                    self?.actionHandler.changePlanOrBilling(.appStore)
+                }
             } else {
                 return .presentSheet(.apple)
             }
-        case "google":
+        case .google:
             return .presentSheet(.google)
-        case "stripe":
-            return navigateToManageSubscription
+        case .web:
+            return .navigateToManageSubscription { [weak self] in
+                self?.actionHandler.changePlanOrBilling(.stripe)
+            }
         default:
             return .navigateToManageSubscription { }
         }
@@ -180,12 +179,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
 public final class PreferencesSubscriptionActionHandlers {
     var openURL: (URL) -> Void
-    var changePlanOrBilling: () -> Void
+    var changePlanOrBilling: (SubscriptionPurchaseEnvironment.Environment) -> Void
     var openVPN: () -> Void
     var openPersonalInformationRemoval: () -> Void
     var openIdentityTheftRestoration: () -> Void
 
-    public init(openURL: @escaping (URL) -> Void, changePlanOrBilling: @escaping () -> Void, openVPN: @escaping () -> Void, openPersonalInformationRemoval: @escaping () -> Void, openIdentityTheftRestoration: @escaping () -> Void) {
+    public init(openURL: @escaping (URL) -> Void, changePlanOrBilling: @escaping (SubscriptionPurchaseEnvironment.Environment) -> Void, openVPN: @escaping () -> Void, openPersonalInformationRemoval: @escaping () -> Void, openIdentityTheftRestoration: @escaping () -> Void) {
         self.openURL = openURL
         self.changePlanOrBilling = changePlanOrBilling
         self.openVPN = openVPN
