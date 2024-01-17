@@ -232,6 +232,19 @@ extension WindowControllersManager {
 
         parentWindowController.window?.beginSheet(feedbackFormWindow)
     }
+
+    func showLocationPickerSheet() {
+        let locationsViewController = VPNLocationsHostingViewController()
+        let locationsWindowController = locationsViewController.wrappedInWindowController()
+
+        guard let locationsFormWindow = locationsWindowController.window,
+              let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else {
+            assertionFailure("Failed to present native VPN feedback form")
+            return
+        }
+
+        parentWindowController.window?.beginSheet(locationsFormWindow)
+    }
 #endif
 
 }
