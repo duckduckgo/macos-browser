@@ -23,11 +23,14 @@ struct ImportedBookmarks: Codable, Equatable {
     struct BookmarkOrFolder: Codable, Equatable {
         let name: String
 
-        enum EntityType: String, Codable {
-            case bookmark
-            case folder
+        struct EntityType: RawRepresentable, Codable, Equatable {
+            let rawValue: String
+
+            static let bookmark = EntityType(rawValue: "bookmark")
+            static let folder = EntityType(rawValue: "folder")
+            static let url = EntityType(rawValue: "url")
         }
-        let type: EntityType
+        let type: EntityType?
         let urlString: String?
         var isDDGFavorite: Bool = false
 

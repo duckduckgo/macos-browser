@@ -21,7 +21,7 @@
 import Foundation
 import NetworkProtection
 
-struct VPNLocationPreferenceItemModel {
+final class VPNLocationPreferenceItemModel: ObservableObject {
     enum LocationIcon {
         case defaultIcon
         case emoji(String)
@@ -30,6 +30,9 @@ struct VPNLocationPreferenceItemModel {
     let title: String
     let subtitle: String?
     let icon: LocationIcon
+
+    // This is preloaded so the user doesn't have to wait for the list to load on presentation
+    let locationsViewModel = VPNLocationViewModel()
 
     init(selectedLocation: VPNSettings.SelectedLocation) {
         switch selectedLocation {

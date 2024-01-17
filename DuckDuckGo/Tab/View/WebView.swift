@@ -176,6 +176,9 @@ final class WebView: WKWebView {
     // MARK: - NSDraggingDestination
 
     override func draggingUpdated(_ draggingInfo: NSDraggingInfo) -> NSDragOperation {
+        if draggingInfo.draggingSource is WebView {
+            return super.draggingUpdated(draggingInfo)
+        }
         if NSApp.isCommandPressed || NSApp.isOptionPressed {
             return superview?.draggingUpdated(draggingInfo) ?? .none
         }
@@ -190,6 +193,9 @@ final class WebView: WKWebView {
     }
 
     override func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
+        if draggingInfo.draggingSource is WebView {
+            return super.performDragOperation(draggingInfo)
+        }
         if NSApp.isCommandPressed || NSApp.isOptionPressed || super.draggingUpdated(draggingInfo) == .none {
             return superview?.performDragOperation(draggingInfo) ?? false
         }

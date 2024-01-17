@@ -781,7 +781,7 @@ final class LocalBookmarkStore: BookmarkStore {
             var folderParent = parent
             // keep the original imported folder if bookmarks bar is not empty
             // import to import root otherwise
-            if !parent.childrenArray.isEmpty, !folder.name.isEmpty {
+            if !parent.childrenArray.isEmpty, !folder.name.isEmpty, !children.isEmpty {
                 folderParent = BookmarkEntity.makeFolder(title: folder.name,
                                                          parent: parent,
                                                          context: context)

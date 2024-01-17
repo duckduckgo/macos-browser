@@ -46,6 +46,9 @@ struct UserText {
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
     static let clear = NSLocalizedString("clear", value: "Clear", comment: "Clear button")
     static let `continue` = NSLocalizedString("`continue`", value: "Continue", comment: "Continue button")
+    static let bookmarkDialogAdd = NSLocalizedString("bookmark.dialog.add", value: "Add", comment: "Button to confim a bookmark creation")
+    static let newFolderDialogAdd = NSLocalizedString("folder.dialog.add", value: "Add", comment: "Button to confim a bookmark folder creation")
+
     static func openIn(value: String) -> String {
         let localized = NSLocalizedString("open.in",
                                           value: "Open in %@",
@@ -431,6 +434,7 @@ struct UserText {
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let favorites = NSLocalizedString("favorites", value: "Favorites", comment: "Title text for the Favorites menu item")
+    static let newBookmark = NSLocalizedString("bookmarks.add.dialog.title", value: "New Bookmark", comment: "Bookmark creation dialog title")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
     static let addToFavorites = NSLocalizedString("add.to.favorites", value: "Add to Favorites", comment: "Button for adding bookmarks to favorites")
     static let addFavorite = NSLocalizedString("add.favorite", value: "Add Favorite", comment: "Button for adding a favorite bookmark")
@@ -457,6 +461,8 @@ struct UserText {
     static let newFolder = NSLocalizedString("folder.optionsMenu.newFolder", value: "New Folder", comment: "Option for creating a new folder")
     static let renameFolder = NSLocalizedString("folder.optionsMenu.renameFolder", value: "Rename Folder", comment: "Option for renaming a folder")
     static let deleteFolder = NSLocalizedString("folder.optionsMenu.deleteFolder", value: "Delete Folder", comment: "Option for deleting a folder")
+    static let newFolderDialogFolderNameTitle = NSLocalizedString("add.folder.name", value: "Name:", comment: "Add Folder popover: folder name text field title")
+    static let newBookmarkDialogBookmarkNameTitle = NSLocalizedString("add.bookmark.name", value: "Name:", comment: "New bookmark folder dialog folder name field heading")
 
     static let updateBookmark = NSLocalizedString("bookmark.update", value: "Update Bookmark", comment: "Option for updating a bookmark")
 
@@ -827,8 +833,8 @@ struct UserText {
     static let showDownloadsShortcut = NSLocalizedString("pinning.show-downloads-shortcut", value: "Show Downloads Shortcut", comment: "Menu item for showing the downloads shortcut")
     static let hideDownloadsShortcut = NSLocalizedString("pinning.hide-downloads-shortcut", value: "Hide Downloads Shortcut", comment: "Menu item for hiding the downloads shortcut")
 
-    static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show Network Protection", comment: "Menu item for showing the NetP shortcut")
-    static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide Network Protection", comment: "Menu item for hiding the NetP shortcut")
+    static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show VPN Shortcut", comment: "Menu item for showing the NetP shortcut")
+    static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide VPN Shortcut", comment: "Menu item for hiding the NetP shortcut")
 
     static let showHomeShortcut = NSLocalizedString("pinning.show-home-shortcut", value: "Show Home Button", comment: "Menu item for showing the Home shortcut")
     static let hideHomeShortcut = NSLocalizedString("pinning.hide-home-shortcut", value: "Hide Home Button", comment: "Menu item for hiding the Home shortcut")
