@@ -36,7 +36,7 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("DataBrokerProtectionFeatureVisibility.swift", .source),
     .init("DataBrokerProtectionFeatureDisabler.swift", .source),
     .init("DataBrokerProtectionAppEvents.swift", .source),
-    .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
+    .init("DuckDuckGo Personal Information Removal.app", .unknown),
     .init("DataBrokerProtectionSubscriptionEventHandler.swift", .source)
 ]
 
@@ -63,8 +63,8 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
         .init("BWEncryptionTests.swift", .source),
         .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source),
         .init("NetworkProtectionRemoteMessageTests.swift", .source),
-        .init("NetworkProtectionRemoteMessagingStorageTests.swift", .source),
-        .init("network-protection-messages.json", .resource)
+        .init("network-protection-messages.json", .resource),
+        .init("dbp-messages.json", .resource),
     ],
 
     "Integration Tests": []

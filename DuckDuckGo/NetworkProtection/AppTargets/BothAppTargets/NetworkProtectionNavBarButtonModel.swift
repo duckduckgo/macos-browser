@@ -100,7 +100,7 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         isHavingConnectivityIssues = networkProtectionStatusReporter.connectivityIssuesObserver.recentValue
         buttonImage = .image(for: iconPublisher.icon)
 
-        self.waitlistActivationDateStore = DefaultWaitlistActivationDateStore()
+        self.waitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .netP)
         super.init()
 
         setupSubscriptions()
@@ -219,19 +219,15 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         }
 
         guard !isPinned,
-              !popoverManager.isShown else {
+              !popoverManager.isShown,
+              !isHavingConnectivityIssues else {
+
+            pinNetworkProtectionToNavBarIfNeverPinnedBefore()
             showButton = true
             return
         }
 
-        Task {
-            guard !isHavingConnectivityIssues else {
-                showButton = true
-                return
-            }
-
-            showButton = false
-        }
+        showButton = false
     }
 
     // MARK: - Pinning
@@ -245,10 +241,8 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
     /// if the user hasn't toggled it manually before.
     /// 
     private func pinNetworkProtectionToNavBarIfNeverPinnedBefore() {
-        assert(showButton)
-
-        guard !pinningManager.wasManuallyToggled(.networkProtection),
-              !pinningManager.isPinned(.networkProtection) else {
+        guard !pinningManager.isPinned(.networkProtection),
+              !pinningManager.wasManuallyToggled(.networkProtection) else {
             return
         }
 
