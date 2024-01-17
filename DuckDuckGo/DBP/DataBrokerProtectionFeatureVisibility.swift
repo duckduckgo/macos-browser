@@ -51,6 +51,10 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
             regionCode = Locale.current.regionCode
         }
 
+        if isInternalUser {
+            regionCode = "US"
+        }
+
         #if DEBUG // Always assume US for debug builds
         regionCode = "US"
         #endif
