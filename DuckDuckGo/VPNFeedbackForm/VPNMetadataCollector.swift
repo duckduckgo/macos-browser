@@ -65,10 +65,7 @@ struct VPNMetadata: Encodable {
 
     struct LoginItemState: Encodable {
         let vpnMenuState: String
-
-#if NETP_SYSTEM_EXTENSION
         let notificationsAgentState: String
-#endif
     }
 
     let appInfo: AppInfo
@@ -228,7 +225,7 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let notificationsAgentState = String(describing: LoginItem.notificationsAgent.status)
         return .init(vpnMenuState: vpnMenuState, notificationsAgentState: notificationsAgentState)
 #else
-        return .init(vpnMenuState: vpnMenuState)
+        return .init(vpnMenuState: vpnMenuState, notificationsAgentState: "not-required")
 #endif
     }
 

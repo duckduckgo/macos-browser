@@ -108,10 +108,7 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             selectedEnvironment: "production"
         )
 
-        let loginItemState = VPNMetadata.LoginItemState(
-            vpnMenuState: "enabled",
-            notificationsAgentState: "enabled"
-        )
+        let loginItemState = VPNMetadata.LoginItemState(vpnMenuState: "enabled", notificationsAgentState: "enabled")
 
         return VPNMetadata(
             appInfo: appInfo,
