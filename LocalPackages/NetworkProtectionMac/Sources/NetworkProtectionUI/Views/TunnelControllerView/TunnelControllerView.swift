@@ -198,6 +198,7 @@ public struct TunnelControllerView: View {
                 detailTitle: model.serverLocation,
                 textColor: Color(.defaultText)) {
                     model.showLocationSettings()
+                    dismiss()
             }.applyMenuAttributes()
 
             connectionStatusRow(icon: .ipAddressIcon,
