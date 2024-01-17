@@ -78,21 +78,41 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }
 
     @MainActor
-    func changePlanOrBillingAction() -> ChangePlanOrBillingAction {
-        return .presentSheet(.google)
+    func changePlanOrBillingAction() async -> ChangePlanOrBillingAction {
+        let navigateToManageSubscription: ChangePlanOrBillingAction = .navigateToManageSubscription { [weak self] in
+            self?.actionHandler.changePlanOrBilling()
+        }
+
 
         switch subscriptionPlatform {
-        case "apple": 
-            return .presentSheet(.apple)
+        case "apple":
+            if await canOpenAppStoreSubscriptionSettings() {
+                return navigateToManageSubscription
+            } else {
+                return .presentSheet(.apple)
+            }
         case "google":
             return .presentSheet(.google)
         case "stripe":
-            return .navigateToManageSubscription { [weak self] in
-                self?.actionHandler.changePlanOrBilling()
-            }
+            return navigateToManageSubscription
         default:
             return .navigateToManageSubscription { }
         }
+    }
+
+    private func canOpenAppStoreSubscriptionSettings() async -> Bool {
+        if #available(macOS 12.0, *) {
+            guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return false }
+
+            switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            case .success(let response):
+                return response.externalID == AccountManager().externalID
+            case .failure:
+                return false
+            }
+        }
+
+        return false
     }
 
     @MainActor

@@ -92,11 +92,13 @@ public struct PreferencesSubscriptionView: View {
 
                         Menu {
                             Button(UserText.changePlanOrBillingButton, action: {
-                                switch model.changePlanOrBillingAction() {
-                                case .presentSheet(let sheet):
-                                    manageSubscriptionSheet = sheet
-                                case .navigateToManageSubscription(let navigationAction):
-                                    navigationAction()
+                                Task {
+                                    switch await model.changePlanOrBillingAction() {
+                                    case .presentSheet(let sheet):
+                                        manageSubscriptionSheet = sheet
+                                    case .navigateToManageSubscription(let navigationAction):
+                                        navigationAction()
+                                    }
                                 }
                             })
                             Button(UserText.removeFromThisDeviceButton, action: {
