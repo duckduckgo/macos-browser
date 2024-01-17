@@ -81,7 +81,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     func changePlanOrBillingAction() async -> ChangePlanOrBillingAction {
         switch subscriptionPlatform {
         case .apple:
-            if await canOpenAppStoreSubscriptionSettings() {
+            if await confirmIfSignedInToSameAccount() {
                 return .navigateToManageSubscription { [weak self] in
                     self?.actionHandler.changePlanOrBilling(.appStore)
                 }
@@ -90,7 +90,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             }
         case .google:
             return .presentSheet(.google)
-        case .web:
+        case .stripe:
             return .navigateToManageSubscription { [weak self] in
                 self?.actionHandler.changePlanOrBilling(.stripe)
             }
@@ -99,7 +99,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
         }
     }
 
-    private func canOpenAppStoreSubscriptionSettings() async -> Bool {
+    private func confirmIfSignedInToSameAccount() async -> Bool {
         if #available(macOS 12.0, *) {
             guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return false }
 

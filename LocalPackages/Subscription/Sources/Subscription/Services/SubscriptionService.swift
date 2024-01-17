@@ -54,7 +54,7 @@ public struct SubscriptionService: APIService {
         }
 
         public enum Platform: String, Codable {
-            case apple, google, web
+            case apple, google, stripe
             case unknown
 
             public init(from decoder: Decoder) throws {
