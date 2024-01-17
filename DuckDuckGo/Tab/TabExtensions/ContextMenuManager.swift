@@ -39,12 +39,11 @@ final class ContextMenuManager: NSObject {
         linkURL?.url?.navigationalScheme == .mailto
     }
 
-    private var isNonSupportedScheme: Bool {
-        guard let linkURL else { return false }
-        if let scheme = URL(string: linkURL)?.scheme {
-            return !WKWebView.handlesURLScheme(scheme)
+    private var isWebViewSupportedScheme: Bool {
+        guard let scheme = linkURL?.url?.scheme else {
+            return false
         }
-        return false
+        return WKWebView.handlesURLScheme(scheme)
     }
 
     fileprivate weak var webView: WKWebView?
@@ -101,16 +100,14 @@ extension ContextMenuManager {
 
         if isEmailAddress {
             menu.removeItem(at: index)
-        } else if isNonSupportedScheme {
-            // leave "open link" item for non-supported scheme
-        } else {
+        } else if isWebViewSupportedScheme {
             menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
                                                                             makeBurner: isCurrentWindowBurner))
         }
     }
 
     private func handleOpenLinkInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner || isNonSupportedScheme {
+        if isCurrentWindowBurner || !isWebViewSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewWindowMenuItem(from: item))
@@ -118,7 +115,7 @@ extension ContextMenuManager {
     }
 
     private func handleOpenFrameInNewWindowItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isCurrentWindowBurner || isNonSupportedScheme {
+        if isCurrentWindowBurner || !isWebViewSupportedScheme {
             menu.removeItem(at: index)
         } else {
             menu.replaceItem(at: index, with: self.openFrameInNewWindowMenuItem(from: item))
@@ -126,10 +123,10 @@ extension ContextMenuManager {
     }
 
     private func handleDownloadLinkedFileItem(_ item: NSMenuItem, at index: Int, in menu: NSMenu) {
-        if isNonSupportedScheme {
-            menu.removeItem(at: index)
-        } else {
+        if isWebViewSupportedScheme {
             menu.replaceItem(at: index, with: self.downloadMenuItem(from: item))
+        } else {
+            menu.removeItem(at: index)
         }
     }
 
@@ -140,8 +137,9 @@ extension ContextMenuManager {
         }
 
         var currentIndex = index
-        // insert Add Link to Bookmarks
-        if !isNonSupportedScheme {
+
+        if isWebViewSupportedScheme {
+            // insert Add Link to Bookmarks
             menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: currentIndex)
             menu.replaceItem(at: currentIndex + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
             currentIndex += 2
