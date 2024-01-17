@@ -172,13 +172,13 @@ final class MainView: NSView {
     }
 
     override func mouseEntered(with event: NSEvent) {
-        if let mouseAboveWebViewTrackingArea, event.trackingArea == mouseAboveWebViewTrackingArea {
+        if event.type == .mouseEntered, let mouseAboveWebViewTrackingArea, event.trackingArea == mouseAboveWebViewTrackingArea {
             isMouseAboveWebView = true
         }
     }
 
     override func mouseExited(with event: NSEvent) {
-        if let mouseAboveWebViewTrackingArea, event.trackingArea == mouseAboveWebViewTrackingArea {
+        if event.type == .mouseExited, let mouseAboveWebViewTrackingArea, event.trackingArea == mouseAboveWebViewTrackingArea {
             isMouseAboveWebView = false
         }
     }

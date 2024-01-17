@@ -157,8 +157,23 @@
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
     },
+    "Add Folder" : {
+      "comment" : "Add Folder popover: Create folder button"
+    },
     "Add to Favorites" : {
 
+    },
+    "add.bookmark.name" : {
+      "comment" : "New bookmark folder dialog folder name field heading",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
+          }
+        }
+      }
     },
     "add.favorite" : {
       "comment" : "Button for adding a favorite bookmark",
@@ -168,6 +183,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Add Favorite"
+          }
+        }
+      }
+    },
+    "add.folder.name" : {
+      "comment" : "Add Folder popover: folder name text field title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
           }
         }
       }
@@ -1244,6 +1271,9 @@
           }
         }
       }
+    },
+    "Bookmark Added" : {
+      "comment" : "Bookmark Added popover title"
     },
     "Bookmark import failed:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) failed to import."
@@ -4206,6 +4236,9 @@
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails."
     },
+    "Location:" : {
+      "comment" : "Add Folder popover: parent folder picker title"
+    },
     "looking.for.bitwarden" : {
       "comment" : "Setup of the integration with Bitwarden app",
       "extractionState" : "extracted_with_value",
@@ -4343,9 +4376,6 @@
           }
         }
       }
-    },
-    "Name:" : {
-      "comment" : "New bookmark folder dialog folder name field heading"
     },
     "navigate.back" : {
       "comment" : "Context menu item",
@@ -8017,6 +8047,9 @@
           }
         }
       }
+    },
+    "Remove" : {
+      "comment" : "Remove bookmark button title"
     },
     "remove-favorite" : {
       "comment" : "Remove Favorite button",
