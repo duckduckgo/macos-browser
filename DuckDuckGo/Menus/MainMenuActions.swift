@@ -956,6 +956,9 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.openExportLogins(_:)):
             return areTherePasswords
 
+        case #selector(AppDelegate.openReportBrokenSite(_:)):
+            return WindowControllersManager.shared.selectedTab?.canReload ?? false
+
         default:
             return true
         }

@@ -541,7 +541,6 @@ final class FeedbackSubMenu: NSMenu {
 
     init(targetting target: AnyObject, tabCollectionViewModel: TabCollectionViewModel) {
         super.init(title: UserText.sendFeedback)
-
         updateMenuItems(with: tabCollectionViewModel, targetting: target)
     }
 
@@ -552,11 +551,15 @@ final class FeedbackSubMenu: NSMenu {
     private func updateMenuItems(with tabCollectionViewModel: TabCollectionViewModel, targetting target: AnyObject) {
         removeAllItems()
 
-        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite, action: #selector(AppDelegate.openReportBrokenSite(_:)), keyEquivalent: "")
+        let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
+                                              action: #selector(AppDelegate.openReportBrokenSite(_:)),
+                                              keyEquivalent: "")
             .withImage(NSImage(named: "Exclamation"))
         addItem(reportBrokenSiteItem)
 
-        let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback, action: #selector(AppDelegate.openFeedback(_:)), keyEquivalent: "")
+        let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback,
+                                             action: #selector(AppDelegate.openFeedback(_:)),
+                                             keyEquivalent: "")
             .withImage(NSImage(named: "Feedback"))
         addItem(browserFeedbackItem)
     }
