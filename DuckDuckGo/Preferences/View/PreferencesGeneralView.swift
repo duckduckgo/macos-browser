@@ -89,7 +89,7 @@ extension Preferences {
                     HStack {
                         Picker(UserText.mainMenuHomeButton, selection: $startupModel.homeButtonPosition) {
                             ForEach(HomeButtonPosition.allCases, id: \.self) { position in
-                                Text(UserText.mainMenuHomeButton(for: position)).tag(position)
+                                Text(UserText.homeButtonMode(for: position)).tag(position)
                             }
                         }.scaledToFit()
                         .onChange(of: startupModel.homeButtonPosition) { _ in

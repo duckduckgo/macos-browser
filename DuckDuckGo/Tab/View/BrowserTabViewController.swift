@@ -407,7 +407,11 @@ final class BrowserTabViewController: NSViewController {
     private var setFirstResponderAfterAdding = false
 
     private func setFirstResponderIfNeeded() {
-        guard webView?.url != nil else {
+        guard let webView else {
+            setFirstResponderAfterAdding = true
+            return
+        }
+        guard webView.url != nil else {
             return
         }
 
@@ -943,7 +947,7 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        DataImportView.show(completion: completion)
+        DataImportView().show(completion: completion)
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {

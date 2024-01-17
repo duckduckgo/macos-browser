@@ -41,10 +41,10 @@ final class AddressBarButtonsViewController: NSViewController {
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
-    private var bookmarkPopover: BookmarkPopover?
-    private func bookmarkPopoverCreatingIfNeeded() -> BookmarkPopover {
+    private var bookmarkPopover: AddBookmarkPopover?
+    private func bookmarkPopoverCreatingIfNeeded() -> AddBookmarkPopover {
         return bookmarkPopover ?? {
-            let popover = BookmarkPopover()
+            let popover = AddBookmarkPopover()
             popover.delegate = self
             self.bookmarkPopover = popover
             return popover
@@ -205,6 +205,7 @@ final class AddressBarButtonsViewController: NSViewController {
         subscribeToEffectiveAppearance()
         subscribeToIsMouseOverAnimationVisible()
         updateBookmarkButtonVisibility()
+        bookmarkButton.sendAction(on: .leftMouseDown)
 
         privacyEntryPointButton.toolTip = UserText.privacyDashboardTooltip
     }
@@ -348,13 +349,13 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func openPrivacyDashboard() {
-        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else { return }
-        // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
-        guard let privacyDashboardViewController = privacyDashboardPopover.viewController else {
+        
+        guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+        let privacyDashboardViewController = privacyDashboardPopover.viewController, // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
+        privacyDashboardViewController.isPendingUpdates() == false else {
             return
         }
-        if privacyDashboardViewController.isPendingUpdates() { return }
-
+        
         guard !privacyDashboardPopover.isShown else {
             privacyDashboardPopover.close()
             _privacyDashboardPopover = nil
@@ -365,6 +366,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
         let positioningViewInWindow = privacyDashboardPositioningView.convert(privacyDashboardPositioningView.bounds, to: view.window?.contentView)
         privacyDashboardPopover.setPreferredMaxHeight(positioningViewInWindow.origin.y)
+        privacyDashboardPopover.delegate = self
         privacyDashboardPopover.show(positionedBelow: privacyDashboardPositioningView)
 
         privacyEntryPointButton.state = .on
@@ -987,9 +989,25 @@ extension AddressBarButtonsViewController: PermissionContextMenuDelegate {
 
 extension AddressBarButtonsViewController: NSPopoverDelegate {
 
+    func popoverShouldClose(_ popover: NSPopover) -> Bool {
+        switch popover {
+        case bookmarkPopover:
+            // fix popover reopening on next bookmarkButtonAction (on macOS 11)
+            DispatchQueue.main.async { [weak self] in
+                if let bookmarkPopover = self?.bookmarkPopover, bookmarkPopover.isShown {
+                    bookmarkPopover.close()
+                }
+            }
+            return false
+
+        default:
+            return true
+        }
+    }
+
     func popoverWillClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
-        case is BookmarkPopover:
+        case bookmarkPopover:
             bookmarkPopover?.popoverWillClose()
 
         default:
@@ -999,13 +1017,13 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
         switch notification.object as? NSPopover {
-        case is BookmarkPopover:
+        case bookmarkPopover:
             if bookmarkPopover?.isNew == true {
                 NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
             }
             updateBookmarkButtonVisibility()
 
-        case is PrivacyDashboardPopover:
+        case privacyDashboardPopover:
             privacyEntryPointButton.state = .off
             _privacyDashboardPopover = nil
 

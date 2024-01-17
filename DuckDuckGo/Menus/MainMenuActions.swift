@@ -183,7 +183,7 @@ extension AppDelegate {
     }
 
     @objc func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportView.show()
+        DataImportView().show()
     }
 
     @objc func openExportLogins(_ sender: Any?) {
