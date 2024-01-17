@@ -34,6 +34,11 @@ final class ContextMenuManager: NSObject {
     private var originalItems: [WKMenuItemIdentifier: NSMenuItem]?
     private var selectedText: String?
     private var linkURL: String?
+
+    private var isEmailAddress: Bool {
+        linkURL?.url?.navigationalScheme == .mailto
+    }
+
     private var isNonSupportedScheme: Bool {
         guard let linkURL else { return false }
         if let scheme = URL(string: linkURL)?.scheme {
@@ -41,6 +46,7 @@ final class ContextMenuManager: NSObject {
         }
         return false
     }
+
     fileprivate weak var webView: WKWebView?
 
     @MainActor
@@ -93,7 +99,9 @@ extension ContextMenuManager {
             return
         }
 
-        if isNonSupportedScheme {
+        if isEmailAddress {
+            menu.removeItem(at: index)
+        } else if isNonSupportedScheme {
             // leave "open link" item for non-supported scheme
         } else {
             menu.replaceItem(at: index, with: self.openLinkInNewTabMenuItem(from: openLinkInNewWindowItem,
@@ -130,16 +138,22 @@ extension ContextMenuManager {
             assertionFailure("WKMenuItemIdentifierOpenLinkInNewWindow item not found")
             return
         }
+
+        var currentIndex = index
         // insert Add Link to Bookmarks
         if !isNonSupportedScheme {
-            menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: index)
-            menu.replaceItem(at: index + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+            menu.insertItem(self.addLinkToBookmarksMenuItem(from: openLinkInNewWindowItem), at: currentIndex)
+            menu.replaceItem(at: currentIndex + 1, with: self.copyLinkMenuItem(withTitle: copyLinkItem.title, from: openLinkInNewWindowItem))
+            currentIndex += 2
+        } else if isEmailAddress {
+            menu.replaceItem(at: currentIndex, with: self.copyLinkMenuItem(withTitle: UserText.copyEmailAddress, from: openLinkInNewWindowItem))
+            currentIndex += 1
         }
 
         // insert Separator and Copy (selection) items
         if selectedText?.isEmpty == false {
-            menu.insertItem(.separator(), at: index + 2)
-            menu.insertItem(self.copySelectionMenuItem(), at: index + 3)
+            menu.insertItem(.separator(), at: currentIndex)
+            menu.insertItem(self.copySelectionMenuItem(), at: currentIndex + 1)
         }
     }
 
@@ -244,7 +258,7 @@ private extension ContextMenuManager {
     }
 
     func copyLinkMenuItem(withTitle title: String, from openLinkItem: NSMenuItem) -> NSMenuItem {
-        makeMenuItem(withTitle: title, action: #selector(copyLink), from: openLinkItem, with: .openLinkInNewWindow)
+        makeMenuItem(withTitle: title, action: #selector(copyLinkOrEmailAddress), from: openLinkItem, with: .openLinkInNewWindow)
     }
 
     func copySelectionMenuItem() -> NSMenuItem {
@@ -421,7 +435,7 @@ private extension ContextMenuManager {
         NSApp.sendAction(action, to: originalItem.target, from: originalItem)
     }
 
-    func copyLink(_ sender: NSMenuItem) {
+    func copyLinkOrEmailAddress(_ sender: NSMenuItem) {
         guard let originalItem = sender.representedObject as? NSMenuItem,
               let identifier = originalItem.identifier.map(WKMenuItemIdentifier.init),
               identifier == .openLinkInNewWindow,
@@ -431,10 +445,18 @@ private extension ContextMenuManager {
             return
         }
 
+        let isEmailAddress = self.isEmailAddress
+
         onNewWindow = { navigationAction in
             guard let url = navigationAction?.request.url else { return .cancel }
 
-            NSPasteboard.general.copy(url)
+            if isEmailAddress {
+                if let email = url.nakedString, !email.isEmpty {
+                    NSPasteboard.general.copy(email)
+                }
+            } else {
+                NSPasteboard.general.copy(url)
+            }
 
             return .cancel
         }

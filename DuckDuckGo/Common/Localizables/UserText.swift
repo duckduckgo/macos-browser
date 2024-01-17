@@ -235,6 +235,7 @@ struct UserText {
     static let openImageInNewBurnerTab = NSLocalizedString("open.image.in.new.burner.tab", value: "Open Image in New Fire Tab", comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
+    static let copyEmailAddress = NSLocalizedString("copy.email.address", value: "Copy Email Address", comment: "Context menu item")
     static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As…", comment: "Context menu item")
     static let addLinkToBookmarks = NSLocalizedString("add.link.to.bookmarks", value: "Add Link to Bookmarks", comment: "Context menu item")
     static let bookmarkPage = NSLocalizedString("bookmark.page", value: "Bookmark Page", comment: "Context menu item")
