@@ -31,7 +31,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     private let featureDisabler: DataBrokerProtectionFeatureDisabling
 
     /// Temporary code to use while we have both redeem flow for diary study users. Should be removed later
-    static var bypassWaitlist = false
+    static var bypassWaitlist = true
 
     init(privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
          featureDisabler: DataBrokerProtectionFeatureDisabling = DataBrokerProtectionFeatureDisabler()) {
@@ -44,6 +44,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     var isUserLocaleAllowed: Bool {
+        return true
         var regionCode: String?
         if #available(macOS 13, *) {
             regionCode = Locale.current.region?.identifier
@@ -59,6 +60,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     }
 
     private var isInternalUser: Bool {
+        return true
         NSApp.delegateTyped.internalUserDecider.isInternalUser
     }
 
@@ -93,6 +95,7 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
     /// we should set isWaitlistEnabled to false and isWaitlistBetaActive to true.
     /// To remove it from everyone, isWaitlistBetaActive should be set to false
     func isFeatureVisible() -> Bool {
+        return true
         // only US locale should be available
         guard isUserLocaleAllowed else { return false }
 
