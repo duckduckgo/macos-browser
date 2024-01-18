@@ -29,7 +29,7 @@ struct AddBookmarkFolderModalView: ModalView {
                 .fontWeight(.semibold)
 
             HStack(spacing: 16) {
-                Text("Name:", comment: "New bookmark folder dialog folder name field heading")
+                Text(UserText.newBookmarkDialogBookmarkNameTitle)
                     .frame(height: 22)
 
                 TextField("", text: $model.folderName)

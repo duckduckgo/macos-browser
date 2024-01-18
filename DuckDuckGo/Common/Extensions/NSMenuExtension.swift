@@ -18,11 +18,23 @@
 
 import AppKit
 
+typealias MenuBuilder = ArrayBuilder<NSMenuItem>
+
 extension NSMenu {
 
     convenience init(title: String = "", items: [NSMenuItem]) {
         self.init(title: title)
         self.items = items
+    }
+
+    convenience init(title string: String = "", @MenuBuilder items: () -> [NSMenuItem]) {
+        self.init(title: string, items: items())
+    }
+
+    @discardableResult
+    func buildItems(@MenuBuilder items: () -> [NSMenuItem]) -> NSMenu {
+        self.items = items()
+        return self
     }
 
     func indexOfItem(withIdentifier id: String) -> Int? {

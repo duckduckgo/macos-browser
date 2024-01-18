@@ -139,11 +139,11 @@ final class FirefoxBookmarksReader {
         let parent: Int
         let guid: String
 
-        init(row: Row) {
-            id = row["id"]
-            title = row["title"]
-            parent = row["parent"]
-            guid = row["guid"]
+        init(row: Row) throws {
+            id = try row["id"] ?? { throw FetchableRecordError<FolderRow>(column: 0) }()
+            title = try row["title"] ?? { throw FetchableRecordError<FolderRow>(column: 1) }()
+            parent = try row["parent"] ?? { throw FetchableRecordError<FolderRow>(column: 2) }()
+            guid = try row["guid"] ?? { throw FetchableRecordError<FolderRow>(column: 3) }()
         }
     }
 
@@ -153,11 +153,11 @@ final class FirefoxBookmarksReader {
         let url: String
         let parent: Int
 
-        init(row: Row) {
-            id = row["id"]
-            title = row["title"]
-            url = row["url"]
-            parent = row["parent"]
+        init(row: Row) throws {
+            id = try row["id"] ?? { throw FetchableRecordError<BookmarkRow>(column: 0) }()
+            self.title = row["title"]
+            url = try row["url"] ?? { throw FetchableRecordError<BookmarkRow>(column: 2) }()
+            parent = try row["parent"] ?? { throw FetchableRecordError<BookmarkRow>(column: 3) }()
         }
     }
 
