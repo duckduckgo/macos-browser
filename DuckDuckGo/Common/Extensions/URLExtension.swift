@@ -230,8 +230,8 @@ extension URL {
 
             switch (needsWWW, host.hasPrefix(HostPrefix.www.separated())) {
             case (.some(true), true),
-                (.some(false), false),
-                (.none, _):
+                 (.some(false), false),
+                 (.none, _):
                 break
             case (.some(false), true):
                 host = host.dropping(prefix: HostPrefix.www.separated())
@@ -270,8 +270,7 @@ extension URL {
 
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
-                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                             && hasInputWww,
+                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
 
