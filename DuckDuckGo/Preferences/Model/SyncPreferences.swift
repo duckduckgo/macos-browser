@@ -241,18 +241,6 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
                 }
             }
             .store(in: &cancellables)
-        apperancePreferences.$favoritesDisplayMode
-            .map(\.isDisplayUnified)
-            .sink { [weak self] isUnifiedFavoritesEnabled in
-                guard let self else {
-                    return
-                }
-                if self.isUnifiedFavoritesEnabled != isUnifiedFavoritesEnabled {
-                    self.shouldRequestSyncOnFavoritesOptionChange = false
-                    self.isUnifiedFavoritesEnabled = isUnifiedFavoritesEnabled
-                }
-            }
-            .store(in: &cancellables)
 
         apperancePreferences.$favoritesDisplayMode
             .map(\.isDisplayUnified)
