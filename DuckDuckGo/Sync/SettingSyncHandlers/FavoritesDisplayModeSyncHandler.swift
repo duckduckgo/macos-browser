@@ -23,6 +23,9 @@ import SyncDataProviders
 
 final class FavoritesDisplayModeSyncHandler: FavoritesDisplayModeSyncHandlerBase {
 
+    // Used to ignore updates coming from this instance.
+    private var lastValueFromSync: FavoritesDisplayMode?
+
     override func getValue() throws -> String? {
         preferences.favoritesDisplayMode.description
     }
@@ -30,13 +33,24 @@ final class FavoritesDisplayModeSyncHandler: FavoritesDisplayModeSyncHandlerBase
     override func setValue(_ value: String?, shouldDetectOverride: Bool) throws {
         if let value, let displayMode = FavoritesDisplayMode(value) {
             DispatchQueue.main.async {
+                self.lastValueFromSync = displayMode
                 self.preferences.favoritesDisplayMode = displayMode
             }
         }
     }
 
     override var valueDidChangePublisher: AnyPublisher<Void, Never> {
-        preferences.$favoritesDisplayMode.dropFirst().asVoid().eraseToAnyPublisher()
+        preferences.$favoritesDisplayMode
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .filter( { [weak self] in
+                guard let self else { return false }
+                let lastValueFromSync = self.lastValueFromSync
+                self.lastValueFromSync = nil
+                return $0 != lastValueFromSync
+            })
+            .asVoid()
+            .eraseToAnyPublisher()
     }
 
     init(_ preferences: AppearancePreferences = .shared) {
