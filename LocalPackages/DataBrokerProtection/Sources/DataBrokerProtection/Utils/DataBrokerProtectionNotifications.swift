@@ -18,7 +18,8 @@
 
 import Foundation
 
-internal struct DataBrokerProtectionNotifications {
+public struct DataBrokerProtectionNotifications {
     public static let didFinishScan = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishScan")
     public static let didFinishOptOut = NSNotification.Name(rawValue: "com.duckduckgo.dbp.didFinishOptOut")
+    public static let shouldReloadUI = NSNotification.Name(rawValue: "com.duckduckgo.dbp.shouldReloadUI")
 }

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import Common
 import CryptoKit
@@ -60,8 +61,8 @@ final class SafariFaviconsReader {
             return components.string
         }
 
-        init(row: Row) {
-            host = row["host"]
+        init(row: Row) throws {
+            host = try row["host"] ?? { throw FetchableRecordError<SafariFaviconRecord>(column: 0) }()
         }
     }
 

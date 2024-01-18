@@ -370,8 +370,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func updateDeviceName(_ name: String) {
         Task { @MainActor in
+            self.devices = []
+            syncService.scheduler.cancelSyncAndSuspendSyncQueue()
             do {
-                self.devices = []
                 let devices = try await syncService.updateDeviceName(name)
                 managementDialogModel.endFlow()
                 mapDevices(devices)
@@ -379,6 +380,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableToUpdateDeviceName, description: error.localizedDescription)
                 firePixelIfNeeded(event: .debug(event: .syncUpdateDeviceError, error: error))
             }
+            syncService.scheduler.resumeSyncQueue()
         }
     }
 
@@ -528,7 +530,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             .generate(recoveryCode)
 
         Task { @MainActor in
-            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "DuckDuckGo Recovery Code.pdf")
+            let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "Sync Data Recovery - DuckDuckGo.pdf")
             let response = await panel.begin()
 
             guard response == .OK,

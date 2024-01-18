@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -31,8 +32,7 @@ extension Preferences {
 
         var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                Text(UserText.aboutDuckDuckGo)
-                    .font(Const.Fonts.preferencePaneTitle)
+                TextMenuTitle(UserText.aboutDuckDuckGo)
 
                 if !SupportedOSChecker.isCurrentOSReceivingUpdates {
                     UnsupportedDeviceInfoBox(wide: true)

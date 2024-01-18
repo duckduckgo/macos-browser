@@ -89,8 +89,16 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
         false
     }
 
+    func stateFor(featureKey: BrowserServicesKit.PrivacyFeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> BrowserServicesKit.PrivacyConfigurationFeatureState {
+        .disabled(.disabledInConfig)
+    }
+
     func isSubfeatureEnabled(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
         false
+    }
+
+    func stateFor(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> BrowserServicesKit.PrivacyConfigurationFeatureState {
+        .disabled(.disabledInConfig)
     }
 
     func exceptionsList(forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> [String] {
