@@ -45,12 +45,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             updateDescription(for: cachedDate)
         }
 
-        signInObserver = NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
-            self.updateUserAuthenticatedState(true)
+        signInObserver = NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { [weak self] _ in
+            self?.updateUserAuthenticatedState(true)
         }
 
-        signOutObserver = NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { _ in
-            self.updateUserAuthenticatedState(false)
+        signOutObserver = NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { [weak self] _ in
+            self?.updateUserAuthenticatedState(false)
         }
     }
 
