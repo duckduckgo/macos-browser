@@ -30,6 +30,9 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var actionHandler: PreferencesSubscriptionActionHandlers
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
+    private var signInObserver: Any?
+    private var signOutObserver: Any?
+
     public init(accountManager: AccountManager = AccountManager(), actionHandler: PreferencesSubscriptionActionHandlers, sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
         self.actionHandler = actionHandler
@@ -42,12 +45,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
             updateDescription(for: cachedDate)
         }
 
-        NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
+        signInObserver = NotificationCenter.default.addObserver(forName: .accountDidSignIn, object: nil, queue: .main) { _ in
             self.updateUserAuthenticatedState(true)
         }
 
-        NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { _ in
+        signOutObserver = NotificationCenter.default.addObserver(forName: .accountDidSignOut, object: nil, queue: .main) { _ in
             self.updateUserAuthenticatedState(false)
+        }
+    }
+
+    deinit {
+        if let signInObserver {
+            NotificationCenter.default.removeObserver(signInObserver)
+        }
+
+        if let signOutObserver {
+            NotificationCenter.default.removeObserver(signOutObserver)
         }
     }
 
