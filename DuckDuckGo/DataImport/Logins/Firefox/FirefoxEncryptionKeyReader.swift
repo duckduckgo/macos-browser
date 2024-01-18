@@ -122,9 +122,9 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         let globalSalt: Data
         let item2: Data
 
-        init(row: Row) {
-            globalSalt = row["item1"]
-            item2 = row["item2"]
+        init(row: Row) throws {
+            globalSalt = try row["item1"] ?? { throw FetchableRecordError<MetadataRow>(column: 0) }()
+            item2 = try row["item2"] ?? { throw FetchableRecordError<MetadataRow>(column: 1) }()
         }
     }
 
@@ -366,9 +366,9 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         let a11: Data
         let a102: Data
 
-        init(row: Row) {
-            a11 = row["a11"]
-            a102 = row["a102"]
+        init(row: Row) throws {
+            a11 = try row["a11"] ?? { throw FetchableRecordError<NssPrivateRow>(column: 0) }()
+            a102 = try row["a102"] ?? { throw FetchableRecordError<NssPrivateRow>(column: 1) }()
         }
     }
 
