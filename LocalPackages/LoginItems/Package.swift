@@ -13,7 +13,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "d094ee462eacc3d513eaf22cbd87c87b42a1234b"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "e89b4b48dd8dc9879cd6013d2efb5fe4658d6735"),
     ],
     targets: [
         .target(
