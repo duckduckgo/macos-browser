@@ -505,7 +505,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         defer {
             endEditing()
         }
-        guard var bookmark = fetchEntity(at: row) as? Bookmark, bookmark.id == editingBookmarkIndex?.uuid else {
+        guard var bookmark = fetchEntity(at: row) as? Bookmark, bookmark.id == uuid else {
             return
         }
 
