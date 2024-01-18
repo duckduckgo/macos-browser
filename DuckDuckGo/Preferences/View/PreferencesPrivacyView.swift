@@ -26,15 +26,12 @@ extension Preferences {
         @ObservedObject var model: PrivacyPreferencesModel
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-                TextMenuTitle(UserText.privacy)
+            PreferencePane(UserText.privacy) {
 
                 // SECTION 1: Web Tracking Protection Section
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.webTrackingProtectionSettingsTitle)
-                    VStack(alignment: .leading, spacing: 6) {
+                PreferencePaneSection(UserText.webTrackingProtectionSettingsTitle) {
+
+                    VStack(alignment: .leading, spacing: 0) {
                         TextMenuItemCaption(UserText.webTrackingProtectionExplenation)
                         TextButton(UserText.learnMore) {
                             model.openURL(.webTrackingProtection)
@@ -43,10 +40,10 @@ extension Preferences {
                 }
 
                 // SECTION 2: Cookie Consent Pop-ups
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.autoconsentSettingsTitle)
+                PreferencePaneSection(UserText.autoconsentSettingsTitle) {
+
                     ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 0) {
                         TextMenuItemCaption(UserText.autoconsentExplanation)
                         TextButton(UserText.learnMore) {
                             model.openURL(.cookieConsentPopUpManagement)
@@ -55,25 +52,30 @@ extension Preferences {
                 }
 
                 // SECTION 3: Fireproof Site
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.fireproofSites)
-                    ToggleMenuItem(UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
-                    VStack(alignment: .leading, spacing: 6) {
-                        TextMenuItemCaption(UserText.fireproofExplanation)
-                        TextButton(UserText.learnMore) {
-                            model.openURL(.theFireButton)
+                PreferencePaneSection(UserText.fireproofSites) {
+
+                    PreferencePaneSubSection {
+                        ToggleMenuItem(UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
+                        VStack(alignment: .leading, spacing: 0) {
+                            TextMenuItemCaption(UserText.fireproofExplanation)
+                            TextButton(UserText.learnMore) {
+                                model.openURL(.theFireButton)
+                            }
                         }
                     }
-                    Button(UserText.manageFireproofSites) {
-                        model.presentManageFireproofSitesDialog()
+
+                    PreferencePaneSection {
+                        Button(UserText.manageFireproofSites) {
+                            model.presentManageFireproofSitesDialog()
+                        }
                     }
                 }
 
                 // SECTION 4: Global privacy control
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.gpcSettingsTitle)
+                PreferencePaneSection(UserText.gpcSettingsTitle) {
+
                     ToggleMenuItem(UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 0) {
                         TextMenuItemCaption(UserText.gpcExplanation)
                         TextButton(UserText.learnMore) {
                             model.openURL(.gpcLearnMore)
