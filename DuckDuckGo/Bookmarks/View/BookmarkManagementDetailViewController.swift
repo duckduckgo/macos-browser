@@ -82,8 +82,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let nib = NSNib(nibNamed: "BookmarkTableCellView", bundle: Bundle.main)
-        tableView.register(nib, forIdentifier: Constants.bookmarkCellIdentifier)
         tableView.setDraggingSourceOperationMask([.move], forLocal: true)
         tableView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                            FolderPasteboardWriter.folderUTIInternalType])
@@ -289,27 +287,27 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         guard let entity = fetchEntity(at: row) else { return nil }
 
-        if let cell = tableView.makeView(withIdentifier: Constants.bookmarkCellIdentifier, owner: nil) as? BookmarkTableCellView {
-            cell.delegate = self
+        let cell = tableView.makeView(withIdentifier: Constants.bookmarkCellIdentifier, owner: nil) as? BookmarkTableCellView
+            ?? BookmarkTableCellView(identifier: Constants.bookmarkCellIdentifier)
 
-            if let bookmark = entity as? Bookmark {
-                cell.update(from: bookmark)
-                cell.editing = bookmark.id == editingBookmarkIndex?.uuid
+        cell.delegate = self
 
-                if bookmark.favicon(.small) == nil {
-                    faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
-                }
-            } else if let folder = entity as? BookmarkFolder {
-                cell.update(from: folder)
-                cell.editing = folder.id == editingBookmarkIndex?.uuid
-            } else {
-                assertionFailure("Failed to cast bookmark")
+        if let bookmark = entity as? Bookmark {
+            cell.update(from: bookmark)
+            cell.editing = bookmark.id == editingBookmarkIndex?.uuid
+
+            if bookmark.favicon(.small) == nil {
+                faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
             }
-            cell.isSelected = tableView.selectedRowIndexes.contains(row)
-            return cell
+        } else if let folder = entity as? BookmarkFolder {
+            cell.update(from: folder)
+            cell.editing = folder.id == editingBookmarkIndex?.uuid
+        } else {
+            assertionFailure("Failed to cast bookmark")
         }
+        cell.isSelected = tableView.selectedRowIndexes.contains(row)
 
-        return nil
+        return cell
     }
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
