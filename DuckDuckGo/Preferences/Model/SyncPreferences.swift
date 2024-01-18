@@ -621,10 +621,14 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         recoverDevice(recoveryCode: code, fromRecoveryScreen: fromRecoveryScreen)
     }
 
+
     private func firePixelIfNeeded(event: Pixel.Event) {
-        if case let .debug(_, debugError as SyncError) = event {
-            if !debugError.isServerError {
-                Pixel.fire(event, withAdditionalParameters: debugError.errorParameters)
+        if case let .debug(_, debugError) = event {
+            if debugError == nil {
+                Pixel.fire(event)
+            }
+            if let syncError = debugError as? SyncError, !syncError.isServerError {
+                Pixel.fire(event, withAdditionalParameters: syncError.errorParameters)
             }
         }
     }
