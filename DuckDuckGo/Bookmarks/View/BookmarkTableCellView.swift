@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 
 @objc protocol BookmarkTableCellViewDelegate: AnyObject {
@@ -34,6 +35,9 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
     private lazy var bookmarkURLLabel = NSTextField(string: "URL")
     private lazy var favoriteButton = NSButton(title: "", image: .favoriteFilledBorder, target: self, action: #selector(favoriteButtonClicked))
     private lazy var accessoryImageView = NSImageView(image: .forward)
+
+    private var favoriteButtonBottomConstraint: NSLayoutConstraint!
+    private var favoriteButtonTrailingConstraint: NSLayoutConstraint!
 
     private lazy var containerView = NSView()
     private lazy var shadowView = NSBox()
@@ -139,6 +143,15 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         shadowView.cornerRadius = 4
         shadowView.fillColor = .tableCellEditingColor
         shadowView.translatesAutoresizingMaskIntoConstraints = false
+        shadowView.wantsLayer = true
+        shadowView.layer?.backgroundColor = NSColor.tableCellEditingColor.cgColor
+        shadowView.layer?.cornerRadius = 6
+
+        let shadow = NSShadow()
+        shadow.shadowOffset = NSSize(width: 0, height: -1)
+        shadow.shadowColor = NSColor.black.withAlphaComponent(0.2)
+        shadow.shadowBlurRadius = 2.0
+        shadowView.shadow = shadow
 
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(faviconImageView)
@@ -208,15 +221,18 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         containerView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor).isActive = true
 
         bookmarkURLLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
-        trailingAnchor.constraint(equalTo: favoriteButton.trailingAnchor, constant: 8).isActive = true
+        favoriteButtonTrailingConstraint = trailingAnchor.constraint(equalTo: favoriteButton.trailingAnchor, constant: 3)
+        favoriteButtonTrailingConstraint.isActive = true
+
         menuButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 8).isActive = true
         faviconImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 6).isActive = true
         favoriteButton.topAnchor.constraint(equalTo: bookmarkURLLabel.bottomAnchor).isActive = true
+
         accessoryImageView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: faviconImageView.trailingAnchor, constant: 8).isActive = true
-        trailingAnchor.constraint(equalTo: accessoryImageView.trailingAnchor).isActive = true
+        trailingAnchor.constraint(equalTo: accessoryImageView.trailingAnchor, constant: 3).isActive = true
         faviconImageView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
-        trailingAnchor.constraint(equalTo: menuButton.trailingAnchor).isActive = true
+        trailingAnchor.constraint(equalTo: menuButton.trailingAnchor, constant: 2).isActive = true
         bookmarkURLLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
         trailingAnchor.constraint(equalTo: bookmarkURLLabel.trailingAnchor, constant: 16).isActive = true
         menuButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor).isActive = true
@@ -236,11 +252,11 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         shadowViewBottomConstraint = bottomAnchor.constraint(equalTo: shadowView.bottomAnchor, constant: 3)
         shadowViewBottomConstraint.isActive = true
 
-        titleLabelBottomConstraint = bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5)
+        titleLabelBottomConstraint = bottomAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8)
         titleLabelBottomConstraint.priority = .init(rawValue: 250)
         titleLabelBottomConstraint.isActive = true
 
-        let favoriteButtonBottomConstraint = bottomAnchor.constraint(equalTo: favoriteButton.bottomAnchor, constant: 8)
+        favoriteButtonBottomConstraint = bottomAnchor.constraint(equalTo: favoriteButton.bottomAnchor, constant: 8)
         favoriteButtonBottomConstraint.priority = .init(rawValue: 750)
         favoriteButtonBottomConstraint.isActive = true
 
@@ -331,6 +347,8 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         shadowViewTopConstraint.constant = 10
         shadowViewBottomConstraint.constant = 10
         titleLabelTopConstraint.constant = 12
+        favoriteButtonTrailingConstraint.constant = 11
+        favoriteButtonBottomConstraint.constant = 18
         shadowView.isHidden = false
         faviconImageView.isHidden = true
 
@@ -352,9 +370,11 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         titleLabel.isEditable = false
         bookmarkURLLabel.isEditable = false
 
-        titleLabelTopConstraint.constant = 6
+        titleLabelTopConstraint.constant = 5
         shadowViewTopConstraint.constant = 3
         shadowViewBottomConstraint.constant = 3
+        favoriteButtonTrailingConstraint.constant = 3
+        favoriteButtonBottomConstraint.constant = 8
         shadowView.isHidden = true
         faviconImageView.isHidden = false
 
@@ -507,7 +527,9 @@ extension BookmarkTableCellView {
         }
 
         func bookmarkTableCellView(_ cellView: BookmarkTableCellView, updatedBookmarkWithUUID uuid: String, newTitle: String, newUrl: String) {
-            cell.editing = false
+            if cell.editing {
+                cell.editing = false
+            }
         }
     }
 }
