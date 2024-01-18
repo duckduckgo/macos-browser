@@ -169,6 +169,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
         titleLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        titleLabel.delegate = self
 
         bookmarkURLLabel.focusRingType = .none
         bookmarkURLLabel.isEditable = false
@@ -182,6 +183,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         bookmarkURLLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         bookmarkURLLabel.setContentHuggingPriority(.required, for: .vertical)
         bookmarkURLLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        bookmarkURLLabel.delegate = self
 
         accessoryImageView.translatesAutoresizingMaskIntoConstraints = false
         accessoryImageView.widthAnchor.constraint(equalToConstant: 22).isActive = true
@@ -298,6 +300,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
 
         accessoryImageView.image = bookmark.isFavorite ? .favorite : nil
         favoriteButton.image = bookmark.isFavorite ? .favoriteFilledBorder : .favorite
+        titleLabel.stringValue = bookmark.title
         primaryTitleLabelValue = bookmark.title
         tertiaryTitleLabelValue = bookmark.url
         bookmarkURLLabel.stringValue = bookmark.url
@@ -359,8 +362,7 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         favoriteButton.isHidden = true
         titleLabelBottomConstraint.priority = .required
 
-        if let editedBookmark = self.entity as? Bookmark,
-           titleLabel.stringValue != editedBookmark.title || bookmarkURLLabel.stringValue != editedBookmark.url {
+        if let editedBookmark = self.entity as? Bookmark {
             delegate?.bookmarkTableCellView(self,
                                             updatedBookmarkWithUUID: editedBookmark.id,
                                             newTitle: titleLabel.stringValue,
@@ -441,6 +443,26 @@ final class BookmarkTableCellView: NSTableCellView, NibLoadable {
         titleString.append(urlString)
 
         return titleString
+    }
+
+}
+
+extension BookmarkTableCellView: NSTextFieldDelegate {
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        switch commandSelector {
+        case #selector(cancelOperation) where self.editing:
+            self.resetAppearanceFromBookmark()
+            self.editing = false
+            return true
+
+        case #selector(insertNewline) where self.editing:
+            self.editing = false
+            return true
+
+        default: break
+        }
+        return false
     }
 
 }

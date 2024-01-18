@@ -187,9 +187,9 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     private func endEditing() {
         if let editingIndex = editingBookmarkIndex?.index {
+            self.editingBookmarkIndex = nil
             animateEditingState(forRowAt: editingIndex, editing: false)
         }
-        self.editingBookmarkIndex = nil
     }
 
     private func updateEditingState(forRowAt index: Int) {
@@ -502,16 +502,20 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
 
     func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: String, newTitle: String, newUrl: String) {
         let row = tableView.row(for: cell)
-
-        guard let bookmark = fetchEntity(at: row) as? Bookmark, bookmark.id == editingBookmarkIndex?.uuid else {
+        defer {
+            endEditing()
+        }
+        guard var bookmark = fetchEntity(at: row) as? Bookmark, bookmark.id == editingBookmarkIndex?.uuid else {
             return
         }
 
-        bookmark.title = newTitle.isEmpty ? bookmark.title : newTitle
-        bookmarkManager.update(bookmark: bookmark)
-
-        if let newURL = newUrl.url, newURL.absoluteString != bookmark.url {
-            _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
+        if let url = newUrl.url, url.absoluteString != bookmark.url {
+            bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
+        }
+        let bookmarkTitle = newTitle.isEmpty ? bookmark.title : newTitle
+        if bookmark.title != bookmarkTitle {
+            bookmark.title = bookmarkTitle
+            bookmarkManager.update(bookmark: bookmark)
         }
     }
 
