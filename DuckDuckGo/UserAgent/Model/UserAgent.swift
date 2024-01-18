@@ -28,6 +28,9 @@ extension UserAgent {
     static let fallbackWebKitVersion = "605.1.15"
     static let fallbackWebViewDefault = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
 
+    static let defaultPolicyConfigKey = "defaultPolicy"
+    static let brandPolicy = "brand"
+
     // MARK: - Loaded versions
 
     static let safariVersion: String = {
@@ -45,6 +48,8 @@ extension UserAgent {
         }
         return version
     }()
+
+    static let ddgVersion: String = safariVersion.appending(" Ddg/\(safariVersion)")
 
     // MARK: - User Agents
 
@@ -85,7 +90,11 @@ extension UserAgent {
             return userAgent
         }
 
-        return Self.default
+        if isBrandPolicy(forConfig: privacyConfig) {
+            return Self.default.appending(ddgVersion)
+        } else {
+            return Self.default
+        }
     }
 
     // MARK: - Remote user agent configuration
@@ -102,6 +111,12 @@ extension UserAgent {
         return domains.contains(where: { domain in
             url?.isPart(ofDomain: domain) ?? false
         })
+    }
+
+    private static func isBrandPolicy(forConfig config: PrivacyConfiguration) -> Bool {
+        let uaSettings = config.settings(for: .customUserAgent)
+        guard let policy = uaSettings[defaultPolicyConfigKey] as? String else { return false }
+        return policy == brandPolicy
     }
 
 }
