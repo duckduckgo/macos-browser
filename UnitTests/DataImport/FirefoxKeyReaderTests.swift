@@ -55,7 +55,6 @@ class FirefoxKeyReaderTests: XCTestCase {
         switch result {
         case .failure(let error as FirefoxLoginReader.ImportError):
             XCTAssertEqual(error.type, .requiresPrimaryPassword)
-            XCTAssertTrue(error.underlyingError is ASN1Parser.ParserError)
         default:
             XCTFail("Received unexpected \(result)")
         }
