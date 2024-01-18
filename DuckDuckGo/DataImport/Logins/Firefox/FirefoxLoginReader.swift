@@ -162,10 +162,10 @@ final class FirefoxLoginReader {
         var lastError: Error?
         for login in loginsToImport {
             do {
-                currentOperationType = .decryptUsername
-                let decryptedUsername = try decrypt(credential: login.encryptedUsername, key: key)
                 currentOperationType = .decryptPassword
                 let decryptedPassword = try decrypt(credential: login.encryptedPassword, key: key)
+                currentOperationType = .decryptUsername
+                let decryptedUsername = try decrypt(credential: login.encryptedUsername, key: key)
 
                 credentials.append(ImportedLoginCredential(url: login.hostname, username: decryptedUsername, password: decryptedPassword, notes: nil))
             } catch {
@@ -197,6 +197,27 @@ final class FirefoxLoginReader {
         return try String(data: decryptedData, encoding: .utf8) ?? { throw LoginReaderFileLineError() }()
     }
 
+}
+
+extension Data {
+    init?(hexString: String) {
+        var hexString = hexString.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexString = hexString.replacingOccurrences(of: " ", with: "")
+
+        var data = Data(capacity: hexString.count / 2)
+
+        var index = hexString.startIndex
+        while index < hexString.endIndex {
+            let nextIndex = hexString.index(index, offsetBy: 2)
+            guard let byte = UInt8(hexString[index..<nextIndex], radix: 16) else {
+                return nil
+            }
+            data.append(byte)
+            index = nextIndex
+        }
+
+        self = data
+    }
 }
 
 /// Represents the logins.json file found in the Firefox profile directory

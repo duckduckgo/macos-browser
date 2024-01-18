@@ -32,6 +32,12 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
     typealias KeyReaderFileLineError = FileLineError<FirefoxEncryptionKeyReader>
 
+    private enum Constants {
+        static let passwordCheckStr = "password-check"
+        static let passwordCheckLength = 16
+        static let key3length = 24
+    }
+
     init() {
     }
 
@@ -56,6 +62,26 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         guard asnData.count > 4 else { throw KeyReaderFileLineError() }
         asnData = asnData[4...] // Drop the first 4 bytes, they aren't required for decryption and can be ignored
 
+        // decrypted password-check should match "password-check"
+        if let passwordCheck = result[Constants.passwordCheckStr] {
+            guard passwordCheck.count > Constants.passwordCheckLength else { throw KeyReaderFileLineError() }
+            let entrySaltLength = Int(passwordCheck[1])
+            guard entrySaltLength > 0 else { throw KeyReaderFileLineError() }
+            guard passwordCheck.count >= Constants.passwordCheckLength + 3 + entrySaltLength else { throw KeyReaderFileLineError() }
+            let entrySalt = passwordCheck[3..<(entrySaltLength + 3)]
+            let passwordCheckCiphertext = passwordCheck[(passwordCheck.count - Constants.passwordCheckLength)...]
+
+            do {
+                let decryptedCiphertext = try tripleDesDecrypt(ciphertext: passwordCheckCiphertext,
+                                                               globalSalt: globalSalt,
+                                                               entrySalt: entrySalt,
+                                                               primaryPassword: primaryPassword)
+                guard decryptedCiphertext.utf8String() == Constants.passwordCheckStr else { throw KeyReaderFileLineError() }
+            } catch {
+                throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: error)
+            }
+        }
+
         // Part 1: Take the data from the database and decrypt it.
 
         let decodedASNData = try ASN1Parser.parse(data: asnData)
@@ -68,20 +94,15 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
                                                  primaryPassword: primaryPassword)
 
         // Part 2: Take the decrypted ASN1 data, parse it, and extract the key.
-        do {
-            operationType = .key3readerStage2
-            let decryptedASNData = try ASN1Parser.parse(data: decryptedData)
-            let extractedASNData = try extractKey3DecryptedASNData(from: decryptedASNData)
+        operationType = .key3readerStage2
+        let decryptedASNData = try ASN1Parser.parse(data: decryptedData)
+        let extractedASNData = try extractKey3DecryptedASNData(from: decryptedASNData)
 
-            operationType = .key3readerStage3
-            let keyContainerASNData = try ASN1Parser.parse(data: extractedASNData)
-            let key = try extractKey3Key(from: keyContainerASNData)
+        operationType = .key3readerStage3
+        let keyContainerASNData = try ASN1Parser.parse(data: extractedASNData)
+        var key = try extractKey3Key(from: keyContainerASNData)
 
-            return key
-
-        } catch let error as ASN1Parser.ParserError {
-            throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: error)
-        }
+        return key
     }
 
     func getEncryptionKey(key4DatabaseURL: URL, primaryPassword: String) -> DataImportResult<Data> {
@@ -165,11 +186,12 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         var lineError = KeyReaderFileLineError.nextLine()
         guard case let .sequence(outerSequence) = node, lineError.next(),
               let integer = outerSequence[safe: 3], lineError.next(),
-              case let .integer(data: data) = integer else {
+              case let .integer(data: data) = integer, lineError.next(),
+              data.count >= Constants.key3length else {
             throw lineError
         }
 
-        return data
+        return data.dropFirst(data.count - Constants.key3length)
     }
 
     /// HP = SHA1( global-salt | PrimaryPassword )
@@ -184,7 +206,8 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
     private func tripleDesDecrypt(ciphertext: Data, globalSalt: Data, entrySalt: Data, primaryPassword: String) throws -> Data {
         let primaryPasswordData = primaryPassword.utf8data
         var pes = Data(count: 20)
-        pes.replaceSubrange(0..<min(entrySalt.count, pes.count), with: entrySalt[0..<min(entrySalt.count, pes.count)])
+        let len = min(entrySalt.count, pes.count)
+        pes.replaceSubrange(0..<len, with: entrySalt[entrySalt.startIndex..<entrySalt.index(entrySalt.startIndex, offsetBy: len)])
 
         let hp = SHA.from(data: globalSalt + primaryPasswordData)
         let chp = SHA.from(data: hp + entrySalt)
@@ -193,7 +216,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         let k2 = calculateHMAC(key: chp, message: (tk + entrySalt))
         let k = k1 + k2
 
-        let key = k.prefix(24)
+        let key = k.prefix(Constants.key3length)
         let iv = k.suffix(8)
 
         return try Cryptography.decrypt3DES(data: ciphertext, key: key, iv: iv)
@@ -334,7 +357,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
         let passwordCheckString = String(data: decryptedCiphertext, encoding: .utf8)
 
-        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
+        guard passwordCheckString == Constants.passwordCheckStr else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
 
         guard let nssPrivateRow = try NssPrivateRow.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else { throw KeyReaderFileLineError() }
 
@@ -355,7 +378,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
         let passwordCheckString = String(data: decryptedItem2, encoding: .utf8)
 
         // The password check is technically "password-check\x02\x02", it's converted to UTF-8 and checked here for simplicity
-        guard passwordCheckString == "password-check" else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
+        guard passwordCheckString == Constants.passwordCheckStr else { throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil) }
 
         guard let nssPrivateRow = try NssPrivateRow.fetchOne(database, sql: "SELECT a11, a102 FROM nssPrivate;") else { throw KeyReaderFileLineError() }
 
