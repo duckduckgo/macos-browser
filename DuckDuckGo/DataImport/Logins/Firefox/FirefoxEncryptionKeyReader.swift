@@ -78,7 +78,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
                                                                primaryPassword: primaryPassword)
                 guard decryptedCiphertext.utf8String() == Constants.passwordCheckStr else { throw KeyReaderFileLineError() }
             } catch {
-                throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: error)
+                throw FirefoxLoginReader.ImportError(type: .requiresPrimaryPassword, underlyingError: nil)
             }
         }
 
@@ -100,7 +100,7 @@ final class FirefoxEncryptionKeyReader: FirefoxEncryptionKeyReading {
 
         operationType = .key3readerStage3
         let keyContainerASNData = try ASN1Parser.parse(data: extractedASNData)
-        var key = try extractKey3Key(from: keyContainerASNData)
+        let key = try extractKey3Key(from: keyContainerASNData)
 
         return key
     }
