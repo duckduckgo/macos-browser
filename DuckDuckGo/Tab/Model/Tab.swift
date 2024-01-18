@@ -1100,7 +1100,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
         webViewDidReceiveRedirectPublisher.send()
     }
-    
+
     @MainActor
     func didCommit(_ navigation: Navigation) {
         webViewDidCommitNavigationPublisher.send()
