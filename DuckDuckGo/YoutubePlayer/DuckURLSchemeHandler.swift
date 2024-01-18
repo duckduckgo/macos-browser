@@ -28,6 +28,7 @@ final class DuckURLSchemeHandler: NSObject, WKURLSchemeHandler {
         }
 
         guard requestURL.isDuckPlayer else {
+            // return empty page for native UI pages navigations (like the Home page or Settings) if the request is not for the Duck Player
             let data = "<html><body /></html>".utf8data
 
             let response = URLResponse(url: requestURL,
