@@ -51,18 +51,67 @@ public final class TunnelControllerIPCClient {
     /// The delegate.
     ///
     public weak var clientDelegate: IPCClientInterface?
+    private let xpcDelegate: TunnelControllerXPCClientDelegate?
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
+        self.xpcDelegate = TunnelControllerXPCClientDelegate(
+            clientDelegate: self.clientDelegate,
+            serverInfoObserver: self.serverInfoObserver,
+            connectionErrorObserver: self.connectionErrorObserver,
+            connectionStatusObserver: self.connectionStatusObserver
+        )
 
         xpc = XPCClient(
             machServiceName: machServiceName,
             clientInterface: clientInterface,
             serverInterface: serverInterface)
 
-        xpc.delegate = self
+        xpc.delegate = xpcDelegate
     }
+}
+
+private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
+
+    weak var clientDelegate: IPCClientInterface?
+    weak var serverInfoObserver: ConnectionServerInfoObserverThroughIPC?
+    weak var connectionErrorObserver: ConnectionErrorObserverThroughIPC?
+    weak var connectionStatusObserver: ConnectionStatusObserverThroughIPC?
+
+    init(clientDelegate: IPCClientInterface?,
+         serverInfoObserver: ConnectionServerInfoObserverThroughIPC?,
+         connectionErrorObserver: ConnectionErrorObserverThroughIPC?,
+         connectionStatusObserver: ConnectionStatusObserverThroughIPC?) {
+        self.clientDelegate = clientDelegate
+        self.serverInfoObserver = serverInfoObserver
+        self.connectionErrorObserver = connectionErrorObserver
+        self.connectionStatusObserver = connectionStatusObserver
+    }
+
+    func errorChanged(error: String?) {
+        connectionErrorObserver?.publish(error)
+        clientDelegate?.errorChanged(error)
+    }
+
+    func serverInfoChanged(payload: Data) {
+        guard let serverInfo = try? JSONDecoder().decode(NetworkProtectionStatusServerInfo.self, from: payload) else {
+            return
+        }
+
+        serverInfoObserver?.publish(serverInfo)
+        clientDelegate?.serverInfoChanged(serverInfo)
+    }
+
+    func statusChanged(payload: Data) {
+        guard let status = try? JSONDecoder().decode(ConnectionStatus.self, from: payload) else {
+            return
+        }
+
+        connectionStatusObserver?.publish(status)
+        clientDelegate?.statusChanged(status)
+    }
+
 }
 
 // MARK: - Outgoing communication to the server
@@ -115,33 +164,5 @@ extension TunnelControllerIPCClient: IPCServerInterface {
                 continuation.resume(throwing: error)
             })
         }
-    }
-}
-
-// MARK: - Incoming communication from the server
-
-extension TunnelControllerIPCClient: XPCClientInterface {
-
-    func errorChanged(error: String?) {
-        connectionErrorObserver.publish(error)
-        clientDelegate?.errorChanged(error)
-    }
-
-    func serverInfoChanged(payload: Data) {
-        guard let serverInfo = try? JSONDecoder().decode(NetworkProtectionStatusServerInfo.self, from: payload) else {
-            return
-        }
-
-        serverInfoObserver.publish(serverInfo)
-        clientDelegate?.serverInfoChanged(serverInfo)
-    }
-
-    func statusChanged(payload: Data) {
-        guard let status = try? JSONDecoder().decode(ConnectionStatus.self, from: payload) else {
-            return
-        }
-
-        connectionStatusObserver.publish(status)
-        clientDelegate?.statusChanged(status)
     }
 }
