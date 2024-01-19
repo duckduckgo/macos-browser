@@ -63,15 +63,10 @@ public final class XPCClient<ClientInterface: NSObjectProtocol, ServerInterface:
     public weak var delegate: ClientInterface? {
         didSet {
             Task { @XPCConnectionActor in
-                delegateProxy.delegate = delegate
+                connection.exportedObject = XPCDelegateProxy(delegate: delegate)
             }
         }
     }
-
-    // This is a convenience proxy that can be used to keep the delegate truly weak.
-    // This object will be used as the XPC connection's exportedObject (which is retained).
-    // If a method is invoked on this proxy and the delegate is gone, it will fail silently.
-    private var delegateProxy = XPCDelegateProxy(delegate: nil)
 
     // MARK: - Initialization
 
