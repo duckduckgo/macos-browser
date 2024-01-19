@@ -3816,6 +3816,9 @@
 		987799FF29999B64005D8EB6 /* Bookmark 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Bookmark 3.xcdatamodel"; sourceTree = "<group>"; };
 		98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkMigrationTests.swift; sourceTree = "<group>"; };
 		98EB5D0F27516A4800681FE6 /* AppPrivacyConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationTests.swift; sourceTree = "<group>"; };
+		9D76125F2B5B04E10087129D /* NetworkProtectionAppExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionAppExtension.entitlements; sourceTree = "<group>"; };
+		9D7612602B5B04E50087129D /* NetworkProtectionSystemExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkProtectionSystemExtension.entitlements; sourceTree = "<group>"; };
+		9D7612612B5B04EF0087129D /* DuckDuckGoVPNAppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPNAppStore.entitlements; sourceTree = "<group>"; };
 		9D8FA00B2AC5BDCE005DD0D0 /* LoginItem+DataBrokerProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginItem+DataBrokerProtection.swift"; sourceTree = "<group>"; };
 		9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginItem+NetworkProtection.swift"; sourceTree = "<group>"; };
 		9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginItemsManager.swift; sourceTree = "<group>"; };
@@ -5124,6 +5127,7 @@
 		4B25375C2A11BE7500610219 /* NetworkProtectionSystemExtension */ = {
 			isa = PBXGroup;
 			children = (
+				9D7612602B5B04E50087129D /* NetworkProtectionSystemExtension.entitlements */,
 				4B25376E2A11BF8B00610219 /* Info.plist */,
 				4B25376F2A11BF8B00610219 /* main.swift */,
 				7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */,
@@ -5364,6 +5368,7 @@
 		4B5F14F72A148B230060320F /* NetworkProtectionAppExtension */ = {
 			isa = PBXGroup;
 			children = (
+				9D76125F2B5B04E10087129D /* NetworkProtectionAppExtension.entitlements */,
 				4B5F14F82A148B230060320F /* Info.plist */,
 			);
 			path = NetworkProtectionAppExtension;
@@ -6494,6 +6499,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				9D7612612B5B04EF0087129D /* DuckDuckGoVPNAppStore.entitlements */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -12279,6 +12285,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12286,6 +12293,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12293,6 +12301,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12300,6 +12309,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37DD516C296EAEDC00837F27 /* DuckDuckGoAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12412,6 +12422,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12433,6 +12444,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12440,6 +12453,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12447,6 +12462,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12454,6 +12471,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D604F2A0B293C00BCD287 /* NetworkProtectionSystemExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionSystemExtension/NetworkProtectionSystemExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12461,6 +12480,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12468,6 +12488,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12475,6 +12496,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12482,6 +12504,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0C2AD11D1E0042E5CE /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12489,6 +12512,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12496,6 +12521,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12503,6 +12530,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12510,6 +12539,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7BA7CC0B2AD11D1E0042E5CE /* DuckDuckGoVPNAppStore.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPNAppStore.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12517,6 +12548,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12524,6 +12556,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12531,6 +12564,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12538,6 +12572,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4BEC182A11B3EA001D9AC5 /* DuckDuckGoNotifications.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12545,6 +12580,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12552,6 +12589,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12559,6 +12598,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12566,6 +12607,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B4D60502A0B293C00BCD287 /* NetworkProtectionAppExtension.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetworkProtectionAppExtension/NetworkProtectionAppExtension.entitlements;
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12573,6 +12616,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12580,6 +12624,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12587,6 +12632,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12594,6 +12640,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B957C432AC7AF190062CA31 /* DuckDuckGoPrivacyPro.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12650,6 +12697,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12657,6 +12705,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12664,6 +12713,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12671,6 +12721,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E52AE2D8AF004FE6DF /* DuckDuckGoDBPAgent.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12678,6 +12729,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12685,6 +12737,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = CI;
 		};
@@ -12692,6 +12745,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12699,6 +12753,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7B6EC5E42AE2D8AF004FE6DF /* DuckDuckGoDBPAgentAppStore.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};
@@ -12720,6 +12775,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Debug;
 		};
@@ -12727,6 +12783,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Release;
 		};
@@ -12755,6 +12812,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58CD295ECA75002C0CC0 /* DuckDuckGo.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = NO;
 			};
 			name = Review;
 		};

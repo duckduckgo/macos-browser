@@ -12,6 +12,8 @@
 	<array>
 		<string>$(NETP_APP_GROUP)</string>
 	</array>
+	<key>com.apple.security.get-task-allow</key>
+	<true/>
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(NETP_APP_GROUP)</string>
