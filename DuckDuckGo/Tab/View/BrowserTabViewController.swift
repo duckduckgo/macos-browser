@@ -575,7 +575,7 @@ final class BrowserTabViewController: NSViewController {
     var bookmarksViewController: BookmarkManagementSplitViewController?
     private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
         return bookmarksViewController ?? {
-            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            let bookmarksViewController = BookmarkManagementSplitViewController()
             bookmarksViewController.delegate = self
             self.bookmarksViewController = bookmarksViewController
             return bookmarksViewController

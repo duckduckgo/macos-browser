@@ -624,6 +624,7 @@ struct UserText {
 
     static let importLoginsPasswords = NSLocalizedString("import.logins.passwords", value: "Passwords", comment: "Title text for the Passwords import option")
 
+    static let importBookmarksButtonTitle = NSLocalizedString("bookmarks.import.button.title", value: "Import", comment: "Button text to open bookmark import dialog")
     static let initiateImport = NSLocalizedString("import.data.initiate", value: "Import", comment: "Button text for importing data")
     static let skipBookmarksImport = NSLocalizedString("import.data.skip.bookmarks", value: "Skip bookmarks", comment: "Button text to skip bookmarks manual import")
     static let skipPasswordsImport = NSLocalizedString("import.data.skip.passwords", value: "Skip passwords", comment: "Button text to skip bookmarks manual import")
@@ -854,10 +855,6 @@ struct UserText {
     static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show VPN Shortcut", comment: "Menu item for showing the NetP shortcut")
     static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide VPN Shortcut", comment: "Menu item for hiding the NetP shortcut")
 
-    static let showHomeShortcut = NSLocalizedString("pinning.show-home-shortcut", value: "Show Home Button", comment: "Menu item for showing the Home shortcut")
-    static let hideHomeShortcut = NSLocalizedString("pinning.hide-home-shortcut", value: "Hide Home Button", comment: "Menu item for hiding the Home shortcut")
-    static let showHomeButtonSettings = NSLocalizedString("settings.hide-home-shortcut", value: "Show Home Button in Toolbar", comment: "Settings Optionm to set Home Button visibility")
-    
     // MARK: - Tooltips
 
     static let autofillShortcutTooltip = NSLocalizedString("tooltip.autofill.shortcut", value: "Autofill", comment: "Tooltip for the autofill shortcut")

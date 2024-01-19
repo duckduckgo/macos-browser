@@ -21,34 +21,41 @@ import Combine
 
 final class BookmarkManagementSplitViewController: NSSplitViewController {
 
-    private enum Constants {
-        static let storyboardName = "Bookmarks"
-        static let identifier = "BookmarkManagementSplitViewController"
-    }
-
-    static func create() -> BookmarkManagementSplitViewController {
-        let storyboard = NSStoryboard(name: Constants.storyboardName, bundle: nil)
-        return storyboard.instantiateController(identifier: Constants.identifier)
-    }
-
-    // swiftlint:disable force_cast
-    var sidebarViewController: BookmarkManagementSidebarViewController {
-        return splitViewItems[0].viewController as! BookmarkManagementSidebarViewController
-    }
-
-    var detailViewController: BookmarkManagementDetailViewController {
-        return splitViewItems[1].viewController as! BookmarkManagementDetailViewController
-    }
-    // swiftlint:enable force_cast
-
     weak var delegate: BrowserTabSelectionDelegate?
+
+    lazy var sidebarViewController: BookmarkManagementSidebarViewController = BookmarkManagementSidebarViewController()
+    lazy var detailViewController: BookmarkManagementDetailViewController = BookmarkManagementDetailViewController()
+
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(type(of: self)): Bad initializer")
+    }
+
+    override func loadView() {
+        title = UserText.bookmarks
+
+        splitView.dividerStyle = .thin
+        splitView.isVertical = true
+        splitView.setValue(NSColor.divider, forKey: #keyPath(NSSplitView.dividerColor))
+
+        let sidebarViewItem = NSSplitViewItem(contentListWithViewController: sidebarViewController)
+        sidebarViewItem.holdingPriority = .init(rawValue: 255)
+        addSplitViewItem(sidebarViewItem)
+
+        let detailViewItem = NSSplitViewItem(viewController: detailViewController)
+        addSplitViewItem(detailViewItem)
+
+        view = splitView
+    }
 
     private var selectedTabCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        splitView.setValue(NSColor(named: "DividerColor"), forKey: "dividerColor")
         sidebarViewController.delegate = self
         detailViewController.delegate = self
         sidebarViewController.tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
