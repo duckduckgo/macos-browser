@@ -651,7 +651,6 @@
 		3706FCD9293F65D500E42796 /* trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439732754D55100B241FA /* trackers-1.json */; };
 		3706FCDA293F65D500E42796 /* dark-trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439762754D55100B241FA /* dark-trackers-1.json */; };
 		3706FCDB293F65D500E42796 /* Feedback.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA3863C427A1E28F00749AB5 /* Feedback.storyboard */; };
-		3706FCDD293F65D500E42796 /* BookmarkTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B92928A26670D1700AD2C21 /* BookmarkTableCellView.xib */; };
 		3706FCDE293F65D500E42796 /* HomePageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */; };
 		3706FCDF293F65D500E42796 /* shield-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E627E8809D00036718 /* shield-mouse-over.json */; };
 		3706FCE0293F65D500E42796 /* BookmarkOutlineViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B92928826670D1600AD2C21 /* BookmarkOutlineViewCell.xib */; };
@@ -1231,7 +1230,6 @@
 		4B92928D26670D1700AD2C21 /* BookmarkOutlineViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */; };
 		4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B92928826670D1600AD2C21 /* BookmarkOutlineViewCell.xib */; };
 		4B92928F26670D1700AD2C21 /* BookmarkTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92928926670D1700AD2C21 /* BookmarkTableCellView.swift */; };
-		4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B92928A26670D1700AD2C21 /* BookmarkTableCellView.xib */; };
 		4B92929B26670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92929126670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift */; };
 		4B92929C26670D2A00AD2C21 /* PasteboardFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92929226670D2A00AD2C21 /* PasteboardFolder.swift */; };
 		4B92929D26670D2A00AD2C21 /* BookmarkNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B92929326670D2A00AD2C21 /* BookmarkNode.swift */; };
@@ -1949,7 +1947,6 @@
 		4B957C122AC7AE700062CA31 /* trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439732754D55100B241FA /* trackers-1.json */; };
 		4B957C132AC7AE700062CA31 /* dark-trackers-1.json in Resources */ = {isa = PBXBuildFile; fileRef = AA3439762754D55100B241FA /* dark-trackers-1.json */; };
 		4B957C142AC7AE700062CA31 /* Feedback.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA3863C427A1E28F00749AB5 /* Feedback.storyboard */; };
-		4B957C162AC7AE700062CA31 /* BookmarkTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B92928A26670D1700AD2C21 /* BookmarkTableCellView.xib */; };
 		4B957C172AC7AE700062CA31 /* HomePageAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85AC7AD827BD625000FFB69B /* HomePageAssets.xcassets */; };
 		4B957C182AC7AE700062CA31 /* shield-mouse-over.json in Resources */ = {isa = PBXBuildFile; fileRef = AA7EB6E627E8809D00036718 /* shield-mouse-over.json */; };
 		4B957C192AC7AE700062CA31 /* BookmarkOutlineViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B92928826670D1600AD2C21 /* BookmarkOutlineViewCell.xib */; };
@@ -3530,7 +3527,6 @@
 		4B92928726670D1600AD2C21 /* BookmarkOutlineViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewCell.swift; sourceTree = "<group>"; };
 		4B92928826670D1600AD2C21 /* BookmarkOutlineViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarkOutlineViewCell.xib; sourceTree = "<group>"; };
 		4B92928926670D1700AD2C21 /* BookmarkTableCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTableCellView.swift; sourceTree = "<group>"; };
-		4B92928A26670D1700AD2C21 /* BookmarkTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BookmarkTableCellView.xib; sourceTree = "<group>"; };
 		4B92929126670D2A00AD2C21 /* BookmarkOutlineViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkOutlineViewDataSource.swift; sourceTree = "<group>"; };
 		4B92929226670D2A00AD2C21 /* PasteboardFolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardFolder.swift; sourceTree = "<group>"; };
 		4B92929326670D2A00AD2C21 /* BookmarkNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkNode.swift; sourceTree = "<group>"; };
@@ -7259,7 +7255,6 @@
 				4B92928826670D1600AD2C21 /* BookmarkOutlineViewCell.xib */,
 				4B92928526670D1600AD2C21 /* BookmarksOutlineView.swift */,
 				4B92928926670D1700AD2C21 /* BookmarkTableCellView.swift */,
-				4B92928A26670D1700AD2C21 /* BookmarkTableCellView.xib */,
 				4B92928626670D1600AD2C21 /* OutlineSeparatorViewCell.swift */,
 				AAC5E4C625D6A6E8007F5990 /* Bookmarks.storyboard */,
 				4B0511B3262CAA5A00F6079C /* RoundedSelectionRowView.swift */,
@@ -8748,7 +8743,6 @@
 				3706FCDA293F65D500E42796 /* dark-trackers-1.json in Resources */,
 				3706FCDB293F65D500E42796 /* Feedback.storyboard in Resources */,
 				B658BAB72B0F848D00D1F2C7 /* Localizable.xcstrings in Resources */,
-				3706FCDD293F65D500E42796 /* BookmarkTableCellView.xib in Resources */,
 				3706FCDE293F65D500E42796 /* HomePageAssets.xcassets in Resources */,
 				3706FCDF293F65D500E42796 /* shield-mouse-over.json in Resources */,
 				3706FCE0293F65D500E42796 /* BookmarkOutlineViewCell.xib in Resources */,
@@ -8879,7 +8873,6 @@
 				4B957C132AC7AE700062CA31 /* dark-trackers-1.json in Resources */,
 				4B957C142AC7AE700062CA31 /* Feedback.storyboard in Resources */,
 				B658BAB92B0F849100D1F2C7 /* Localizable.xcstrings in Resources */,
-				4B957C162AC7AE700062CA31 /* BookmarkTableCellView.xib in Resources */,
 				4B957C172AC7AE700062CA31 /* HomePageAssets.xcassets in Resources */,
 				4B957C182AC7AE700062CA31 /* shield-mouse-over.json in Resources */,
 				4B957C192AC7AE700062CA31 /* BookmarkOutlineViewCell.xib in Resources */,
@@ -8979,7 +8972,6 @@
 				AA34397C2754D55100B241FA /* dark-trackers-1.json in Resources */,
 				AA3863C527A1E28F00749AB5 /* Feedback.storyboard in Resources */,
 				B658BAB62B0F845D00D1F2C7 /* Localizable.xcstrings in Resources */,
-				4B92929026670D1700AD2C21 /* BookmarkTableCellView.xib in Resources */,
 				85AC7AD927BD625000FFB69B /* HomePageAssets.xcassets in Resources */,
 				AA7EB6E727E8809D00036718 /* shield-mouse-over.json in Resources */,
 				4B92928E26670D1700AD2C21 /* BookmarkOutlineViewCell.xib in Resources */,

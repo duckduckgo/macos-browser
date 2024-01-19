@@ -29,7 +29,7 @@ public struct StandardButtonStyle: ButtonStyle {
         let labelColor = Color("PWMButtonLabel")
 
         configuration.label
-            .font(.custom("SFProText-Regular", size: 13))
+            .font(.system(size: 13))
             .padding(.top, 2.5)
             .padding(.bottom, 3)
             .padding(.horizontal, 7.5)
@@ -56,7 +56,7 @@ public struct DefaultActionButtonStyle: ButtonStyle {
 
         configuration.label
             .lineLimit(1)
-            .font(.custom("SFProText-Regular", size: 13))
+            .font(.system(size: 13))
             .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
             .padding(.top, 2.5)
             .padding(.bottom, 3)
@@ -80,7 +80,7 @@ public struct DismissActionButtonStyle: ButtonStyle {
 
         configuration.label
             .lineLimit(1)
-            .font(.custom("SFProText-Regular", size: 13))
+            .font(.system(size: 13))
             .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
             .padding(.top, 2.5)
             .padding(.bottom, 3)
@@ -115,7 +115,7 @@ public struct DestructiveActionButtonStyle: ButtonStyle {
 
         configuration.label
             .lineLimit(1)
-            .font(.custom("SFProText-Regular", size: 13))
+            .font(.system(size: 13))
             .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
             .padding(.top, 2.5)
             .padding(.bottom, 3)
