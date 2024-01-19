@@ -260,7 +260,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         Task { @MainActor in
             let actionHandlers = SubscriptionAccessActionHandlers(
                 restorePurchases: {
-                    SubscriptionPagesUseSubscriptionFeature.startRestoreSubscriptionFlow {
+                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow {
                         message.webView?.reload()
                     }
                 },
@@ -342,7 +342,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
 
 extension SubscriptionPagesUseSubscriptionFeature {
 
-    static func startRestoreSubscriptionFlow(onSuccessHandler: @escaping () -> Void = {}) {
+    static func startAppStoreRestoreFlow(onSuccessHandler: @escaping () -> Void = {}) {
         if #available(macOS 12.0, *) {
             Task { @MainActor in
                 let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController

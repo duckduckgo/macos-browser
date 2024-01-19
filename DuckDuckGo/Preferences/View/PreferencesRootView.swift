@@ -104,12 +104,9 @@ enum Preferences {
                 WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
             }
 
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                SubscriptionPagesUseSubscriptionFeature.startRestoreSubscriptionFlow()
-            }, openURLHandler: openURL,
-                                                                      goToSyncPreferences: {
-                self.model.selectPane(.sync)
-            })
+            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
+                                                                      openURLHandler: openURL,
+                                                                      goToSyncPreferences: { self.model.selectPane(.sync) })
 
             let model = PreferencesSubscriptionModel(openURLHandler: openURL,
                                                      sheetActionHandler: sheetActionHandler)
