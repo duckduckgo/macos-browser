@@ -154,11 +154,11 @@ extension URL {
     // MARK: ATB
 
     static var devMode: String {
-        #if DEBUG
+#if DEBUG
         return "?test=1"
-        #else
+#else
         return ""
-        #endif
+#endif
     }
 
     static let atb = "\(Self.duckDuckGo)atb.js\(devMode)"
@@ -270,8 +270,7 @@ extension URL {
 
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
-                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww,
+                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
 
@@ -290,6 +289,14 @@ extension URL {
         guard !filename.isEmpty else { return nil }
 
         return filename
+    }
+
+    var emailAddresses: [String] {
+        guard navigationalScheme == .mailto, let path = URLComponents(url: self, resolvingAgainstBaseURL: false)?.path else {
+            return []
+        }
+
+        return path.components(separatedBy: .init(charactersIn: ", ")).filter { !$0.isEmpty }
     }
 
     // MARK: - Validity
@@ -423,11 +430,9 @@ extension URL {
             quarantineProperties[kLSQuarantineDataURLKey as String] = sourceURL
             quarantineProperties[kLSQuarantineOriginURLKey as String] = referrerURL
 
-            if quarantineProperties[kLSQuarantineTypeKey as String] == nil {
-                quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
-                    ? kLSQuarantineTypeWebDownload
-                    : kLSQuarantineTypeOtherDownload
-            }
+            quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
+                ? kLSQuarantineTypeWebDownload
+                : kLSQuarantineTypeOtherDownload
 
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
