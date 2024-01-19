@@ -99,43 +99,22 @@ enum Preferences {
 
 #if SUBSCRIPTION
         private func makeSubscriptionView() -> some View {
-            let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
+
+            let openURL: (URL) -> Void = { url in
                 WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-            }, changePlanOrBilling: {
-                self.changePlanOrBilling()
-            }, openVPN: {
-                NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
-            }, openPersonalInformationRemoval: {
-                NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
-            }, openIdentityTheftRestoration: {
-                NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
-            })
+            }
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 self.restorePurchases()
-            }, openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-            }, goToSyncPreferences: {
+            }, openURLHandler: openURL,
+                                                                      goToSyncPreferences: {
                 self.model.selectPane(.sync)
             })
 
-            let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
+            let model = PreferencesSubscriptionModel(openURLHandler: openURL,
+                                                     sheetActionHandler: sheetActionHandler)
+
             return SubscriptionUI.PreferencesSubscriptionView(model: model)
-        }
-
-        private func changePlanOrBilling() {
-            switch SubscriptionPurchaseEnvironment.current {
-            case .appStore:
-                NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
-            case .stripe:
-                Task {
-                    guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
-                          case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
-                    guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
-
-                    WindowControllersManager.shared.show(url: customerPortalURL, source: .ui, newTab: true)
-                }
-            }
         }
 
         private func restorePurchases() {

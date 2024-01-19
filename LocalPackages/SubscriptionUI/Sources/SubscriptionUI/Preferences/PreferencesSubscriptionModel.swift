@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Subscription
 
 public final class PreferencesSubscriptionModel: ObservableObject {
@@ -27,12 +27,12 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
     private let accountManager: AccountManager
-    private var actionHandler: PreferencesSubscriptionActionHandlers
+    private let openURLHandler: (URL) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
 
-    public init(accountManager: AccountManager = AccountManager(), actionHandler: PreferencesSubscriptionActionHandlers, sheetActionHandler: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManager = AccountManager(), openURLHandler: @escaping (URL) -> Void, sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
-        self.actionHandler = actionHandler
+        self.openURLHandler = openURLHandler
         self.sheetActionHandler = sheetActionHandler
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
@@ -66,12 +66,23 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func learnMoreAction() {
-        actionHandler.openURL(.purchaseSubscription)
+        openURLHandler(.purchaseSubscription)
     }
 
     @MainActor
     func changePlanOrBillingAction() {
-        actionHandler.changePlanOrBilling()
+        switch SubscriptionPurchaseEnvironment.current {
+        case .appStore:
+            NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
+        case .stripe:
+            Task {
+                guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
+                      case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
+
+                openURLHandler(customerPortalURL)
+            }
+        }
     }
 
     @MainActor
@@ -81,22 +92,22 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        actionHandler.openVPN()
+        NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        actionHandler.openPersonalInformationRemoval()
+        NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
     }
 
     @MainActor
     func openIdentityTheftRestoration() {
-        actionHandler.openIdentityTheftRestoration()
+        NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
     }
 
     @MainActor
     func openFAQ() {
-        actionHandler.openURL(.subscriptionFAQ)
+        openURLHandler(.subscriptionFAQ)
     }
 
     @MainActor
@@ -133,20 +144,4 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
         return dateFormatter
     }()
-}
-
-public final class PreferencesSubscriptionActionHandlers {
-    var openURL: (URL) -> Void
-    var changePlanOrBilling: () -> Void
-    var openVPN: () -> Void
-    var openPersonalInformationRemoval: () -> Void
-    var openIdentityTheftRestoration: () -> Void
-
-    public init(openURL: @escaping (URL) -> Void, changePlanOrBilling: @escaping () -> Void, openVPN: @escaping () -> Void, openPersonalInformationRemoval: @escaping () -> Void, openIdentityTheftRestoration: @escaping () -> Void) {
-        self.openURL = openURL
-        self.changePlanOrBilling = changePlanOrBilling
-        self.openVPN = openVPN
-        self.openPersonalInformationRemoval = openPersonalInformationRemoval
-        self.openIdentityTheftRestoration = openIdentityTheftRestoration
-    }
 }
