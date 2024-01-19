@@ -28,16 +28,8 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("DuckDuckGo VPN.app", .unknown),
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionSubscriptionEventHandler.swift", .source),
-    .init("DBPHomeViewController.swift", .source),
-    .init("DataBrokerProtectionManager.swift", .source),
-    .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
-    .init("LoginItem+DataBrokerProtection.swift", .source),
-    .init("DataBrokerProtectionDebugMenu.swift", .source),
-    .init("DataBrokerProtectionFeatureVisibility.swift", .source),
-    .init("DataBrokerProtectionFeatureDisabler.swift", .source),
-    .init("DataBrokerProtectionAppEvents.swift", .source),
+    .init("DataBrokerProtectionSubscriptionEventHandler.swift", .source),
     .init("DuckDuckGo Personal Information Removal.app", .unknown),
-    .init("DataBrokerProtectionSubscriptionEventHandler.swift", .source)
 ]
 
 /**
@@ -55,6 +47,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo Privacy Browser App Store": [
         .init("DuckDuckGo VPN App Store.app", .unknown),
+        .init("DuckDuckGo Personal Information Removal2.app", .unknown),
     ],
 
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
