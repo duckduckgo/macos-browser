@@ -37,12 +37,6 @@ protocol EmailServiceProtocol {
                              shouldRunNextStep: @escaping () -> Bool) async throws -> URL
 }
 
-extension EmailServiceProtocol {
-    func getEmail() async throws -> String {
-        try await getEmail(dataBrokerName: nil)
-    }
-}
-
 struct EmailService: EmailServiceProtocol {
     private struct Constants {
         static let baseUrl = "https://dbp.duckduckgo.com/dbp/em/v0"
