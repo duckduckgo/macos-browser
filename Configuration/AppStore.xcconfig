@@ -79,7 +79,7 @@ DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DBP_BACKGROUND_AGENT_BUN
 DBP_BACKGROUND_AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID).debug
 DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID).review
 
-DBP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.dbp
+DBP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.appstore.dbp
 DBP_APP_GROUP[config=CI][sdk=*] = $(DBP_BASE_APP_GROUP).debug
 DBP_APP_GROUP[config=Review][sdk=*] = $(DBP_BASE_APP_GROUP).review
 DBP_APP_GROUP[config=Debug][sdk=*] = $(DBP_BASE_APP_GROUP).debug
