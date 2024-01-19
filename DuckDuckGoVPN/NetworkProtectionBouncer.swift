@@ -30,9 +30,6 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp() {
-        let waitlistStore = WaitlistKeychainStore(waitlistIdentifier: Self.identifier, keychainAppGroup: Self.keychainAppGroup)
-
-
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil)
 
         guard keychainStore.isFeatureActivated else {
