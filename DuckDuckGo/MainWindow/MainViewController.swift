@@ -134,7 +134,7 @@ final class MainViewController: NSViewController {
             mainView.navigationBarContainerView.wantsLayer = true
             mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
+            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab, animated: false)
 
             let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
@@ -238,7 +238,7 @@ final class MainViewController: NSViewController {
 
     private func updateDividerColor() {
         NSAppearance.withAppAppearance {
-            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
             let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .addressBarSolidSeparatorColor
             mainView.divider.backgroundColor = backgroundColor
         }
@@ -303,7 +303,7 @@ final class MainViewController: NSViewController {
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
             guard let self = self else { return }
-            self.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self.lastTabContent != .homePage)
+            self.resizeNavigationBarForHomePage(content == .newtab, animated: content == .newtab && self.lastTabContent != .newtab)
             self.updateBookmarksBar(content)
             self.lastTabContent = content
             self.adjustFirstResponderOnContentChange(content: content)
@@ -410,13 +410,13 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homePage:
+        case .newtab:
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .onboarding:
             self.view.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
-        case .preferences:
+        case .settings:
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
         case .bookmarks:
             browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()

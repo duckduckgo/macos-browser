@@ -23,13 +23,13 @@ import os.log
 final class DuckPlayerURLExtensionTests: XCTestCase {
 
     func testIsDuckPlayerScheme() {
-        XCTAssertTrue("duck:player/abcdef12345".url!.isDuckPlayerScheme)
-        XCTAssertTrue("duck://player/abcdef12345".url!.isDuckPlayerScheme)
-        XCTAssertTrue("duck://player/abcdef".url!.isDuckPlayerScheme)
-        XCTAssertTrue("duck://player/12345".url!.isDuckPlayerScheme)
-        XCTAssertFalse("http://duckplayer/abcdef12345".url!.isDuckPlayerScheme)
-        XCTAssertFalse("https://www.youtube.com/watch?v=abcdef12345".url!.isDuckPlayerScheme)
-        XCTAssertFalse("https://www.youtube-nocookie.com/embed/abcdef12345".url!.isDuckPlayerScheme)
+        XCTAssertTrue("duck:player/abcdef12345".url!.isDuckURLScheme)
+        XCTAssertTrue("duck://player/abcdef12345".url!.isDuckURLScheme)
+        XCTAssertTrue("duck://player/abcdef".url!.isDuckURLScheme)
+        XCTAssertTrue("duck://player/12345".url!.isDuckURLScheme)
+        XCTAssertFalse("http://duckplayer/abcdef12345".url!.isDuckURLScheme)
+        XCTAssertFalse("https://www.youtube.com/watch?v=abcdef12345".url!.isDuckURLScheme)
+        XCTAssertFalse("https://www.youtube-nocookie.com/embed/abcdef12345".url!.isDuckURLScheme)
     }
 
     func testIsDuckPlayer() {

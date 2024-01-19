@@ -33,7 +33,7 @@ extension URL {
     }
 
     static func duckPlayer(_ videoID: String, timestamp: String? = nil) -> URL {
-        let url = "\(DuckPlayer.duckPlayerScheme)://player/\(videoID)".url!
+        let url = "\(NavigationalScheme.duck.rawValue)://player/\(videoID)".url!
         return url.addingTimestamp(timestamp)
     }
 
@@ -47,8 +47,8 @@ extension URL {
         return url.addingTimestamp(timestamp)
     }
 
-    var isDuckPlayerScheme: Bool {
-        scheme == DuckPlayer.duckPlayerScheme
+    var isDuckURLScheme: Bool {
+        navigationalScheme == .duck
     }
 
     /**
@@ -61,7 +61,7 @@ extension URL {
         if DuckPlayer.usesSimulatedRequests {
             return host == DuckPlayer.duckPlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
         } else {
-            return isDuckPlayerScheme && host == DuckPlayer.duckPlayerHost
+            return isDuckURLScheme && host == DuckPlayer.duckPlayerHost
         }
     }
 
@@ -103,7 +103,7 @@ extension URL {
 
     /// Attempts extracting video ID and timestamp from the URL. Works with all types of YouTube URLs.
     var youtubeVideoParams: (videoID: String, timestamp: String?)? {
-        if isDuckPlayerScheme {
+        if isDuckURLScheme {
             guard let components = URLComponents(string: absoluteString) else {
                 return nil
             }

@@ -205,7 +205,7 @@ final class BrowserTabViewController: NSViewController {
             self.previouslySelectedTab = nil
         }
 
-        openNewTab(with: .preferences(pane: .subscription))
+        openNewTab(with: .settings(pane: .subscription))
     }
 #endif
 
@@ -491,7 +491,7 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
-        case let .preferences(pane):
+        case let .settings(pane):
             removeAllTabContent()
             let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
@@ -512,7 +512,7 @@ final class BrowserTabViewController: NSViewController {
                 changeWebView(tabViewModel: tabViewModel)
             }
 
-        case .homePage:
+        case .newtab:
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
@@ -938,8 +938,8 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
             return
         }
 
-        if case .preferences = selectedTab.content {
-            selectedTab.setContent(.preferences(pane: identifier))
+        if case .settings = selectedTab.content {
+            selectedTab.setContent(.settings(pane: identifier))
         }
     }
 

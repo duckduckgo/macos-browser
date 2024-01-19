@@ -47,7 +47,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
     }
 
     func testWhenResetTabSelectionIfNeededCalledThenPreferencesTabIsSelected() throws {
-        let tabs: [Tab.TabContent] = [.anyPreferencePane, .bookmarks]
+        let tabs: [Tab.TabContent] = [.anySettingsPane, .bookmarks]
         let model = PreferencesSidebarModel(tabSwitcherTabs: tabs)
         model.selectedTabIndex = 1
 
@@ -81,7 +81,7 @@ final class PreferencesSidebarModelTests: XCTestCase {
 
     func testWhenSelectedTabIndexIsChangedThenSelectedPaneIsNotAffected() throws {
         let sections: [PreferencesSection] = [.init(id: .regularPreferencePanes, panes: [.general, .appearance, .downloads, .autofill])]
-        let tabs: [Tab.TabContent] = [.anyPreferencePane, .bookmarks]
+        let tabs: [Tab.TabContent] = [.anySettingsPane, .bookmarks]
         let model = PreferencesSidebarModel(loadSections: sections, tabSwitcherTabs: tabs)
 
         var selectedPaneUpdates = [PreferencePaneIdentifier]()
