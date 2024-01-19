@@ -66,7 +66,12 @@ final class NetworkProtectionAppEvents {
                 return
             }
 
-            restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
+            guard featureVisibility.isUserWithVPNFullyEnabled else {
+                loginItemsManager.disableVPNLoginItems()
+                return
+            }
+
+            loginItemsManager.restartVPNLoginItems()
             refreshNetworkProtectionServers()
         }
     }
@@ -112,27 +117,6 @@ final class NetworkProtectionAppEvents {
         } catch {
             print(String(describing: error))
         }
-    }
-
-    private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionAndBuildNumber
-        let versionStore = NetworkProtectionLastVersionRunStore()
-        defer {
-            versionStore.lastVersionRun = currentVersion
-        }
-
-        // should‘ve been run at least once with NetP enabled
-        guard let lastVersionRun = versionStore.lastVersionRun else {
-            os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
-            return
-        }
-
-        // We want to restart the VPN menu app to make sure it's always on the latest.
-        restartNetworkProtectionMenu(using: loginItemsManager)
-    }
-
-    private func restartNetworkProtectionMenu(using loginItemsManager: LoginItemsManager) {
-        loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.

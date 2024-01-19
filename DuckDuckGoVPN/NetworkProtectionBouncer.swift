@@ -30,11 +30,21 @@ final class NetworkProtectionBouncer {
     /// current app.
     ///
     func requireAuthTokenOrKillApp() {
+        let waitlistStore = WaitlistKeychainStore(waitlistIdentifier: Self.identifier, keychainAppGroup: Self.keychainAppGroup)
+
+
         let keychainStore = NetworkProtectionKeychainTokenStore(keychainType: .default, errorEvents: nil)
 
         guard keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
-            exit(EXIT_FAILURE)
+
+            // It's extremely important to return EXIT_SUCCESS here as any other value will cause
+            // the system to relaunch our login item.
+            //
+            // See "If the service corresponds to a LoginItem bundle" at the following URL
+            // https://developer.apple.com/documentation/servicemanagement/smappservice/register()
+            //
+            exit(EXIT_SUCCESS)
         }
     }
 }

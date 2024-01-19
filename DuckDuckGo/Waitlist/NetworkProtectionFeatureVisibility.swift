@@ -26,6 +26,8 @@ import NetworkProtection
 import NetworkProtectionUI
 
 protocol NetworkProtectionFeatureVisibility {
+    var isUserWithVPNFullyEnabled: Bool { get }
+
     func isNetworkProtectionVisible() -> Bool
     func disableForAllUsers()
     func disableForWaitlistUsers()
@@ -78,6 +80,12 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     var onboardStatusPublisher: AnyPublisher<OnboardingStatus, Never> {
         defaults.networkProtectionOnboardingStatusPublisher
+    }
+
+    /// This can be used to know if the user has NetP fully set up and ready for use
+    ///
+    var isUserWithVPNFullyEnabled: Bool {
+        isEasterEggUser || isEnabledWaitlistUser
     }
 
     /// Easter egg users can be identified by them being internal users and having an auth token (NetP being activated).

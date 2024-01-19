@@ -36,6 +36,14 @@ extension LoginItemsManager {
 #endif
         return items
     }
+
+    func disableVPNLoginItems() {
+        disableLoginItems(LoginItemsManager.networkProtectionLoginItems)
+    }
+
+    func restartVPNLoginItems() {
+        restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
+    }
 }
 
 #endif
