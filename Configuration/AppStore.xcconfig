@@ -49,6 +49,12 @@ AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
 
 AGENT_PRODUCT_NAME = DuckDuckGo VPN App Store
 
+SYSEX_BUNDLE_ID[sdk=*] = com.duckduckgo.mobile.ios.vpn.agent
+SYSEX_BUNDLE_ID[config=Debug][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.debug.network-protection-extension
+SYSEX_BUNDLE_ID[config=CI][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.debug.network-protection-extension
+SYSEX_BUNDLE_ID[config=Review][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.review.network-protection-extension
+SYSEX_BUNDLE_ID[config=Release][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.network-protection-extension
+
 // Distributed Notifications Prefix
 
 SYSEX_BUNDLE_ID_BASE[sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
