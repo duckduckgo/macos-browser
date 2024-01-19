@@ -105,7 +105,7 @@ enum Preferences {
             }
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                self.restorePurchases()
+                SubscriptionPagesUseSubscriptionFeature.startRestoreSubscriptionFlow()
             }, openURLHandler: openURL,
                                                                       goToSyncPreferences: {
                 self.model.selectPane(.sync)
@@ -115,35 +115,6 @@ enum Preferences {
                                                      sheetActionHandler: sheetActionHandler)
 
             return SubscriptionUI.PreferencesSubscriptionView(model: model)
-        }
-
-        private func restorePurchases() {
-            if #available(macOS 12.0, *) {
-                Task {
-                    let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                    let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
-
-                    defer { mainViewController?.dismiss(progressViewController) }
-
-                    mainViewController?.presentAsSheet(progressViewController)
-
-                    guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
-
-                    switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                    case .success:
-                        break
-                    case .failure(let error):
-                        switch error {
-                        case .missingAccountOrTransactions:
-                            WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
-                        case .subscriptionExpired:
-                            WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
-                        default:
-                            WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
-                        }
-                    }
-                }
-            }
         }
 #endif
     }
