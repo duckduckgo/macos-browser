@@ -29,11 +29,11 @@ public protocol IPCClientInterface: AnyObject {
 
 /// This is the XPC interface with parameters that can be packed properly
 @objc
-protocol XPCClientInterface {
+protocol XPCClientInterface: NSObjectProtocol {
     func schedulerStatusChanged(_ payload: Data)
 }
 
-public final class DataBrokerProtectionIPCClient {
+public final class DataBrokerProtectionIPCClient: NSObject {
 
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
 
@@ -61,6 +61,8 @@ public final class DataBrokerProtectionIPCClient {
             machServiceName: machServiceName,
             clientInterface: clientInterface,
             serverInterface: serverInterface)
+
+        super.init()
 
         xpc.delegate = self
     }

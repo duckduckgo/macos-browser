@@ -17,6 +17,7 @@
 //
 
 import Foundation
+@_implementationOnly import XPCDelegateProxy
 
 /// This actor is meant to support synchronized access to the XPC connection
 ///
@@ -29,7 +30,7 @@ private struct XPCConnectionActor {
 
 /// An XPC client
 ///
-public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObject> {
+public final class XPCClient<ClientInterface: NSObjectProtocol, ServerInterface: AnyObject> {
 
     public enum ConnectionError: Error {
         case noRemoteObjectProxy
@@ -62,7 +63,7 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
     public weak var delegate: ClientInterface? {
         didSet {
             Task { @XPCConnectionActor in
-                connection.exportedObject = delegate
+                connection.exportedObject = XPCDelegateProxy(delegate: delegate)
             }
         }
     }
@@ -87,7 +88,7 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
     private func makeConnection() -> NSXPCConnection {
         let connection = NSXPCConnection(machServiceName: machServiceName)
         connection.exportedInterface = clientInterface
-        connection.exportedObject = delegate
+        connection.exportedObject = XPCDelegateProxy(delegate: delegate)
         connection.remoteObjectInterface = serverInterface
 
         let closeConnection = { [weak self] in
@@ -96,6 +97,7 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
             }
 
             Task { @XPCConnectionActor in
+                self.internalConnection?.invalidate()
                 self.internalConnection = nil
             }
         }
