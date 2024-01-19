@@ -112,8 +112,27 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     private func setupAndSave(_ tunnelManager: NETunnelProviderManager) async throws {
         await setup(tunnelManager)
         try await tunnelManager.saveToPreferences()
+        logConfig(from: tunnelManager)
         try await tunnelManager.loadFromPreferences()
         try await tunnelManager.saveToPreferences()
+    }
+
+    private func logConfig(from tunnelManager: NETunnelProviderManager) {
+#if !APPSTORE
+        guard let protocolConfiguration = tunnelManager.protocolConfiguration else {
+            return
+        }
+
+        let configurationDescriptionString = String(describing: tunnelManager)
+            .replacingOccurrences(of: "    ", with: "  ")
+
+        let protocolConfigurationString = String(describing: protocolConfiguration)
+            .replacingOccurrences(of: "    ", with: "")
+            .dropping(prefix: "\n")
+
+        os_log("CONFIGURATION OVERVIEW: %{public}@", type: .error, configurationDescriptionString)
+        os_log("FULL PROTOCOL CONFIGURATION: %{public}@", type: .error, protocolConfigurationString)
+#endif
     }
 
     // MARK: - Initialization
