@@ -44,6 +44,8 @@
 	<array>
 		<string>com.duckduckgo.mobile.ios.vpn.agent.debug</string>
 		<string>com.duckduckgo.mobile.ios.DBP.backgroundAgent.debug</string>
+		<string>com.duckduckgo.mobile.ios.DBP.backgroundAgent</string>
+		<string>com.duckduckgo.mobile.ios.DBP.backgroundAgent.review</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
