@@ -30,13 +30,13 @@ public protocol IPCClientInterface: AnyObject {
 
 /// This is the XPC interface with parameters that can be packed properly
 @objc
-protocol XPCClientInterface {
+protocol XPCClientInterface: NSObjectProtocol {
     func errorChanged(error: String?)
     func serverInfoChanged(payload: Data)
     func statusChanged(payload: Data)
 }
 
-public final class TunnelControllerIPCClient {
+public final class TunnelControllerIPCClient: NSObject {
 
     // MARK: - XPC Communication
 
@@ -50,49 +50,26 @@ public final class TunnelControllerIPCClient {
 
     /// The delegate.
     ///
-    public weak var clientDelegate: IPCClientInterface? {
-        didSet {
-            xpcDelegate.clientDelegate = self.clientDelegate
-        }
-    }
-
-    private let xpcDelegate: TunnelControllerXPCClientDelegate
+    public weak var clientDelegate: IPCClientInterface?
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
-        self.xpcDelegate = TunnelControllerXPCClientDelegate(
-            clientDelegate: self.clientDelegate,
-            serverInfoObserver: self.serverInfoObserver,
-            connectionErrorObserver: self.connectionErrorObserver,
-            connectionStatusObserver: self.connectionStatusObserver
-        )
 
         xpc = XPCClient(
             machServiceName: machServiceName,
             clientInterface: clientInterface,
             serverInterface: serverInterface)
 
-        xpc.delegate = xpcDelegate
+        super.init()
+
+        xpc.delegate = self
     }
 }
 
-private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
+// MARK: - Incoming communication from the server
 
-    weak var clientDelegate: IPCClientInterface?
-    let serverInfoObserver: ConnectionServerInfoObserverThroughIPC
-    let connectionErrorObserver: ConnectionErrorObserverThroughIPC
-    let connectionStatusObserver: ConnectionStatusObserverThroughIPC
-
-    init(clientDelegate: IPCClientInterface?,
-         serverInfoObserver: ConnectionServerInfoObserverThroughIPC,
-         connectionErrorObserver: ConnectionErrorObserverThroughIPC,
-         connectionStatusObserver: ConnectionStatusObserverThroughIPC) {
-        self.clientDelegate = clientDelegate
-        self.serverInfoObserver = serverInfoObserver
-        self.connectionErrorObserver = connectionErrorObserver
-        self.connectionStatusObserver = connectionStatusObserver
-    }
+extension TunnelControllerIPCClient: XPCClientInterface {
 
     func errorChanged(error: String?) {
         connectionErrorObserver.publish(error)
@@ -116,7 +93,6 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
         connectionStatusObserver.publish(status)
         clientDelegate?.statusChanged(status)
     }
-
 }
 
 // MARK: - Outgoing communication to the server
