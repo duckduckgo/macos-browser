@@ -398,37 +398,48 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
             return true
         } else if let pasteboardItems = draggingInfo.draggingPasteboard.pasteboardItems {
-            var currentIndexPathItem = newIndexPath.item
+            // First, check if the user is dragging a bulk set of bookmarks to the bar, and move them all at once.
+            // Otherwise, read whatever entities were dragged to the bar and create a bookmarks out of them.
 
-            for item in pasteboardItems {
-                if let bookmarkEntityUUID = item.bookmarkEntityUUID {
-                    bookmarkManager.move(objectUUIDs: [bookmarkEntityUUID], toIndex: currentIndexPathItem, withinParentFolder: .root) { error in
-                        if error != nil {
-                            self.delegate?.bookmarksBarViewModelReloadedData()
-                        }
+            let mappedBookmarkEntityUUIDs = pasteboardItems.compactMap(\.bookmarkEntityUUID)
+            if mappedBookmarkEntityUUIDs.count == pasteboardItems.count {
+                bookmarkManager.move(objectUUIDs: mappedBookmarkEntityUUIDs, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
+                    if error != nil {
+                        self.delegate?.bookmarksBarViewModelReloadedData()
                     }
-                } else if let webViewItem = item.draggedWebViewValues() {
-                    let title = webViewItem.title ?? tabCollectionViewModel.title(forTabWithURL: webViewItem.url) ?? webViewItem.url.absoluteString
-                    self.bookmarkManager.makeBookmark(for: webViewItem.url, title: title, isFavorite: false, index: currentIndexPathItem, parent: nil)
-                } else if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
-                    let title: String
-
-                    if let tabTitle = tabCollectionViewModel.title(forTabWithURL: draggedURL) {
-                        title = tabTitle
-                    } else {
-                        title = draggedURL.absoluteString
-                    }
-
-                    self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: currentIndexPathItem, parent: nil)
                 }
-
-                currentIndexPathItem += 1
+            } else {
+                createBookmarks(from: pasteboardItems, at: newIndexPath.item)
             }
 
             return true
         }
 
         return false
+    }
+
+    @MainActor
+    private func createBookmarks(from pasteboardItems: [NSPasteboardItem], at index: Int) {
+        var currentIndex = index
+
+        for item in pasteboardItems {
+            if let webViewItem = item.draggedWebViewValues() {
+                let title = webViewItem.title ?? tabCollectionViewModel.title(forTabWithURL: webViewItem.url) ?? webViewItem.url.absoluteString
+                self.bookmarkManager.makeBookmark(for: webViewItem.url, title: title, isFavorite: false, index: currentIndex, parent: nil)
+            } else if let draggedString = item.string(forType: .string), let draggedURL = URL(string: draggedString) {
+                let title: String
+
+                if let tabTitle = tabCollectionViewModel.title(forTabWithURL: draggedURL) {
+                    title = tabTitle
+                } else {
+                    title = draggedURL.absoluteString
+                }
+
+                self.bookmarkManager.makeBookmark(for: draggedURL, title: title, isFavorite: false, index: currentIndex, parent: nil)
+            }
+
+            currentIndex += 1
+        }
     }
 
     // MARK: - Drag & Drop
