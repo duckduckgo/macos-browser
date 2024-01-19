@@ -398,17 +398,26 @@ extension BookmarksBarViewModel: NSCollectionViewDelegate, NSCollectionViewDataS
 
             return true
         } else if let pasteboardItems = draggingInfo.draggingPasteboard.pasteboardItems {
-            // First, check if the user is dragging a bulk set of bookmarks to the bar, and move them all at once.
-            // Otherwise, read whatever entities were dragged to the bar and create a bookmarks out of them.
+            var bookmarksBarUUIDs: [String] = []
+            var otherItems: [NSPasteboardItem] = []
 
-            let mappedBookmarkEntityUUIDs = pasteboardItems.compactMap(\.bookmarkEntityUUID)
-            if mappedBookmarkEntityUUIDs.count == pasteboardItems.count {
-                bookmarkManager.move(objectUUIDs: mappedBookmarkEntityUUIDs, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
+            pasteboardItems.forEach { item in
+                if let bookmarkEntityUUID = item.bookmarkEntityUUID {
+                    bookmarksBarUUIDs.append(bookmarkEntityUUID)
+                } else {
+                    otherItems.append(item)
+                }
+            }
+
+            if !bookmarksBarUUIDs.isEmpty {
+                bookmarkManager.move(objectUUIDs: bookmarksBarUUIDs, toIndex: newIndexPath.item, withinParentFolder: .root) { error in
                     if error != nil {
                         self.delegate?.bookmarksBarViewModelReloadedData()
                     }
                 }
-            } else {
+            }
+
+            if !otherItems.isEmpty {
                 createBookmarks(from: pasteboardItems, at: newIndexPath.item)
             }
 
