@@ -99,10 +99,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     init?(url: URL) {
         // manually extract path because URLs such as "about:settings" can't figure out their host or path
         for urlPrefix in [URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings, URL.Invalid.duckConfig, URL.Invalid.duckPreferences] {
-            let prefix = urlPrefix.absoluteString
+            let prefix = urlPrefix.absoluteString + "/"
             guard url.absoluteString.hasPrefix(prefix) else { continue }
 
-            let path = url.absoluteString.dropping(prefix: prefix + "/")
+            let path = url.absoluteString.dropping(prefix: prefix)
             self.init(rawValue: path)
             return
         }
