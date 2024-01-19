@@ -121,7 +121,7 @@ enum Preferences {
             if #available(macOS 12.0, *) {
                 Task {
                     let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                    let progressViewController = ProgressViewController(title: "Restoring subscription...")
+                    let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
 
                     defer { mainViewController?.dismiss(progressViewController) }
 
