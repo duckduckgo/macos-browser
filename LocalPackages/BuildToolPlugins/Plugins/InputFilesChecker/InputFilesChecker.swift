@@ -47,7 +47,7 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo Privacy Browser App Store": [
         .init("DuckDuckGo VPN App Store.app", .unknown),
-        .init("DuckDuckGo Personal Information Removal2.app", .unknown),
+        .init("DuckDuckGo Personal Information Removal App Store.app", .unknown),
     ],
 
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,

@@ -72,7 +72,7 @@ DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Release][sdk=*] = $(DISTRIBUTED_NOTIFICA
 
 // DBP
 
-DBP_BACKGROUND_AGENT_PRODUCT_NAME = DuckDuckGo Personal Information Removal2
+DBP_BACKGROUND_AGENT_PRODUCT_NAME = DuckDuckGo Personal Information Removal App Store
 
 DBP_BACKGROUND_AGENT_BUNDLE_ID[sdk=*] = com.duckduckgo.mobile.ios.DBP.backgroundAgent
 DBP_BACKGROUND_AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID).debug

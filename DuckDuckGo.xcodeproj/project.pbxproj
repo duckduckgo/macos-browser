@@ -132,7 +132,7 @@
 		317295D52AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 317295D12AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift */; };
 		3184AC6D288F29D800C35E4B /* BadgeNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6C288F29D800C35E4B /* BadgeNotificationAnimationModel.swift */; };
 		3184AC6F288F2A1100C35E4B /* CookieNotificationAnimationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3184AC6E288F2A1100C35E4B /* CookieNotificationAnimationModel.swift */; };
-		3185638D2B5AF57400074D87 /* DuckDuckGo Personal Information Removal2.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal2.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3185638D2B5AF57400074D87 /* DuckDuckGo Personal Information Removal App Store.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		31A3A4E32B0C115F0021063C /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 31A3A4E22B0C115F0021063C /* DataBrokerProtection */; };
 		31B4AF532901A4F20013585E /* NSEventExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31B4AF522901A4F20013585E /* NSEventExtension.swift */; };
 		31BF18CF2B5AF7750046F5AD /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 31BF18CE2B5AF7750046F5AD /* Networking */; };
@@ -3236,7 +3236,7 @@
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
-				3185638D2B5AF57400074D87 /* DuckDuckGo Personal Information Removal2.app in CopyFiles */,
+				3185638D2B5AF57400074D87 /* DuckDuckGo Personal Information Removal App Store.app in CopyFiles */,
 				4BF97AE02B43C8FE00EB4240 /* DuckDuckGo VPN App Store.app in CopyFiles */,
 				4BF97ADF2B43C8F200EB4240 /* DuckDuckGo Notifications.app in CopyFiles */,
 			);
@@ -3904,7 +3904,7 @@
 		9D9AE8682AA76CDC0026E7DC /* LoginItem+NetworkProtection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoginItem+NetworkProtection.swift"; sourceTree = "<group>"; };
 		9D9AE86A2AA76CF90026E7DC /* LoginItemsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginItemsManager.swift; sourceTree = "<group>"; };
 		9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Personal Information Removal.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Personal Information Removal2.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo Personal Information Removal App Store.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D9AE9142AAA3B450026E7DC /* Info-AppStore.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-AppStore.plist"; sourceTree = "<group>"; };
 		9D9AE9152AAA3B450026E7DC /* DuckDuckGoDBPBackgroundAgentAppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckDuckGoDBPBackgroundAgentAppDelegate.swift; sourceTree = "<group>"; };
 		9D9AE9162AAA3B450026E7DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -6633,7 +6633,7 @@
 				4B2D06392A11CFBB00DE1F49 /* DuckDuckGo VPN.app */,
 				4B2D06692A13318400DE1F49 /* DuckDuckGo VPN App Store.app */,
 				9D9AE8D12AAA39A70026E7DC /* DuckDuckGo Personal Information Removal.app */,
-				9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal2.app */,
+				9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */,
 				4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */,
 				565E46DD2B2725DC0013AC2A /* SyncE2EUITests.xctest */,
 				376113D42B29CD5B00E794BB /* SyncE2EUITests App Store.xctest */,
@@ -8570,6 +8570,7 @@
 				9D9AE8D72AAA39D30026E7DC /* Sources */,
 				9D9AE8E72AAA39D30026E7DC /* Frameworks */,
 				9D9AE8EA2AAA39D30026E7DC /* Resources */,
+				3144CDF02B5AFC9C00AF1908 /* Copy Swift Package resources */,
 			);
 			buildRules = (
 			);
@@ -8583,7 +8584,7 @@
 				31BF18CE2B5AF7750046F5AD /* Networking */,
 			);
 			productName = DuckDuckGoAgent;
-			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal2.app */;
+			productReference = 9D9AE8F22AAA39D30026E7DC /* DuckDuckGo Personal Information Removal App Store.app */;
 			productType = "com.apple.product-type.application";
 		};
 		AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */ = {
@@ -9109,6 +9110,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3144CDF02B5AFC9C00AF1908 /* Copy Swift Package resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Swift Package resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# We had issues where the Swift Package resources were not being added to the Agent Apps,\n# so we're manually coping them here.\n# It seems to be a known issue: https://forums.swift.org/t/swift-packages-resource-bundle-not-present-in-xcarchive-when-framework-using-said-package-is-archived/50084/2\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/ContentScopeScripts_ContentScopeScripts.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\ncp -RL \"${BUILT_PRODUCTS_DIR}\"/DataBrokerProtection_DataBrokerProtection.bundle \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+		};
 		3705272528992C8A000C06A2 /* Check Embedded Config URLs */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;

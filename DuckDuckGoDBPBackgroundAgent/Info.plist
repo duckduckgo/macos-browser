@@ -4,7 +4,9 @@
 <dict>
 	<key>DBP_APP_GROUP</key>
 	<string>$(DBP_APP_GROUP)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Tomato</string>
 	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.productivity</string>
+	<string>public.app-category.utilities</string>
 </dict>
 </plist>
