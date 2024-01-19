@@ -50,17 +50,51 @@ public final class TunnelControllerIPCClient: NSObject {
 
     /// The delegate.
     ///
-    public weak var clientDelegate: IPCClientInterface?
+    public weak var clientDelegate: IPCClientInterface? {
+        didSet {
+            xpcDelegate.clientDelegate = self.clientDelegate
+        }
+    }
+
+    private let xpcDelegate: TunnelControllerXPCClientDelegate
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
+        self.xpcDelegate = TunnelControllerXPCClientDelegate(
+            clientDelegate: self.clientDelegate,
+            serverInfoObserver: self.serverInfoObserver,
+            connectionErrorObserver: self.connectionErrorObserver,
+            connectionStatusObserver: self.connectionStatusObserver
+        )
 
         xpc = XPCClient(
             machServiceName: machServiceName,
             clientInterface: clientInterface,
             serverInterface: serverInterface)
 
+<<<<<<< HEAD
+        xpc.delegate = xpcDelegate
+    }
+}
+
+private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
+
+    weak var clientDelegate: IPCClientInterface?
+    let serverInfoObserver: ConnectionServerInfoObserverThroughIPC
+    let connectionErrorObserver: ConnectionErrorObserverThroughIPC
+    let connectionStatusObserver: ConnectionStatusObserverThroughIPC
+
+    init(clientDelegate: IPCClientInterface?,
+         serverInfoObserver: ConnectionServerInfoObserverThroughIPC,
+         connectionErrorObserver: ConnectionErrorObserverThroughIPC,
+         connectionStatusObserver: ConnectionStatusObserverThroughIPC) {
+        self.clientDelegate = clientDelegate
+        self.serverInfoObserver = serverInfoObserver
+        self.connectionErrorObserver = connectionErrorObserver
+        self.connectionStatusObserver = connectionStatusObserver
+    }
+=======
         super.init()
 
         xpc.delegate = self
@@ -70,6 +104,7 @@ public final class TunnelControllerIPCClient: NSObject {
 // MARK: - Incoming communication from the server
 
 extension TunnelControllerIPCClient: XPCClientInterface {
+>>>>>>> 475a09282 (Fix IPC memory leak (DBP support) (#2092))
 
     func errorChanged(error: String?) {
         connectionErrorObserver.publish(error)
@@ -93,6 +128,10 @@ extension TunnelControllerIPCClient: XPCClientInterface {
         connectionStatusObserver.publish(status)
         clientDelegate?.statusChanged(status)
     }
+<<<<<<< HEAD
+
+=======
+>>>>>>> 475a09282 (Fix IPC memory leak (DBP support) (#2092))
 }
 
 // MARK: - Outgoing communication to the server
