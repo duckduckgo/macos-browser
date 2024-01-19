@@ -41,7 +41,7 @@ NETP_APP_GROUP[config=Debug][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
 NETP_APP_GROUP[config=Release][sdk=macos*] = $(NETP_BASE_APP_GROUP)
 
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] =
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
 PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
 PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-protection-extension
 PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-protection-extension
