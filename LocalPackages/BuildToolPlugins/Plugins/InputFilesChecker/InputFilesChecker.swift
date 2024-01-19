@@ -29,7 +29,6 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("PFMoveApplication.m", .source),
     .init("NetworkProtectionSubscriptionEventHandler.swift", .source),
     .init("DataBrokerProtectionSubscriptionEventHandler.swift", .source),
-    .init("DuckDuckGo Personal Information Removal.app", .unknown),
 ]
 
 /**
@@ -47,7 +46,6 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo Privacy Browser App Store": [
         .init("DuckDuckGo VPN App Store.app", .unknown),
-        .init("DuckDuckGo Personal Information Removal App Store.app", .unknown),
     ],
 
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,

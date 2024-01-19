@@ -4,8 +4,6 @@
 <dict>
 	<key>DBP_APP_GROUP</key>
 	<string>$(DBP_APP_GROUP)</string>
-	<key>CFBundleDisplayName</key>
-	<string>App Store Tomato</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 </dict>
