@@ -52,7 +52,7 @@ final class TabCollectionViewModelTests: XCTestCase {
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection())
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs[0].content, .homePage)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs[0].content, .newtab)
     }
 
     // MARK: - Select
@@ -125,38 +125,38 @@ final class TabCollectionViewModelTests: XCTestCase {
 
     func testWhenPreferencesTabIsPresentThenSelectDisplayableTabIfPresentSelectsPreferencesTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .anyPreferencePane))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .anySettingsPane))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(0))
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anySettingsPane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
     }
 
     func testWhenPreferencesTabIsPresentThenOpeningPreferencesWithDifferentPaneUpdatesPaneOnExistingTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences(pane: .appearance)))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .settings(pane: .appearance)))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.preferences(pane: .privacy)))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.settings(pane: .privacy)))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
-        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .preferences(pane: .privacy))
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .settings(pane: .privacy))
     }
 
     func testWhenPreferencesTabIsPresentThenOpeningPreferencesWithAnyPaneDoesNotUpdatePaneOnExistingTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences(pane: .appearance)))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .settings(pane: .appearance)))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anySettingsPane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
-        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .preferences(pane: .appearance))
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .settings(pane: .appearance))
     }
 
     func testWhenBookmarksTabIsPresentThenSelectDisplayableTabIfPresentSelectsBookmarksTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(0))
 
         XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
@@ -165,8 +165,8 @@ final class TabCollectionViewModelTests: XCTestCase {
 
     func testSelectDisplayableTabDoesNotChangeSelectionIfDisplayableTabIsNotPresent() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(2))
 
         XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
@@ -176,10 +176,10 @@ final class TabCollectionViewModelTests: XCTestCase {
     func testSelectDisplayableTabDoesNotChangeSelectionIfDisplayableTabTypeDoesNotMatch() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(2))
 
-        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
+        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.anySettingsPane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 2))
     }
 
@@ -439,6 +439,6 @@ fileprivate extension TabCollectionViewModel {
 extension Tab {
     @MainActor
     convenience init(parentTab: Tab) {
-        self.init(content: .url(.blankPage), parentTab: parentTab)
+        self.init(content: .url(.blankPage, source: .link), parentTab: parentTab)
     }
 }

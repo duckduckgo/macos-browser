@@ -17,13 +17,15 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
+import PreferencesViews
 
 struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
+        // Errors
         VStack(alignment: .leading, spacing: 16) {
+            syncUnavailableView()
             if model.isSyncBookmarksPaused {
                 syncPaused(for: .bookmarks)
             }
@@ -31,77 +33,52 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 syncPaused(for: .credentials)
             }
         }
-        .padding(.top, 20)
 
-        PreferencePaneSection(vericalPadding: 12) {
+        // Sync Enabled
+        PreferencePaneSection(verticalPadding: 8) {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
-                .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
-            Text(UserText.syncedDevices)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
+        // Synced Devices
+        PreferencePaneSection(verticalPadding: 8) {
+            TextMenuItemHeader(UserText.syncedDevices)
+
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
-                .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
-            Text(UserText.syncNewDevice)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
-            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.recoveryCode ?? "")
-                .environmentObject(model)
+        // Options
+        PreferencePaneSection(verticalPadding: 8) {
+            TextMenuItemHeader(UserText.optionsSectionTitle)
+
+            ToggleMenuItem(UserText.fetchFaviconsOptionTitle, isOn: $model.isFaviconsFetchingEnabled)
+            TextMenuItemCaption(UserText.fetchFaviconsOptionCaption)
+                .padding(.bottom, 8)
+
+            ToggleMenuItem(UserText.shareFavoritesOptionTitle, isOn: $model.isUnifiedFavoritesEnabled)
+            TextMenuItemCaption(UserText.shareFavoritesOptionCaption)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
-            Text(UserText.optionsSectionTitle)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
-            Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                HStack {
-                    IconOnBackground(image: NSImage(imageLiteralResourceName: "SyncAllDevices"))
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(UserText.shareFavoritesOptionTitle)
-                            .font(Const.Fonts.preferencePaneOptionTitle)
-                        Text(UserText.shareFavoritesOptionCaption)
-                            .font(Const.Fonts.preferencePaneCaption)
-                            .foregroundColor(Color("BlackWhite60"))
-                    }
-                    Spacer(minLength: 30)
+        // Recovery
+        PreferencePaneSection(verticalPadding: 8) {
+            TextMenuItemHeader(UserText.recovery)
+
+            HStack(alignment: .top, spacing: 12) {
+                Text(UserText.recoveryInstructions)
+                    .fixMultilineScrollableText()
+                Spacer()
+                Button(UserText.saveRecoveryPDF) {
+                    model.saveRecoveryPDF()
                 }
             }
-            .padding(.horizontal, 16)
-            .toggleStyle(.switch)
-            .padding(.vertical, 12)
-            .roundedBorder()
-            .frame(width: 513, alignment: .topLeading)
         }
 
-        PreferencePaneSection(vericalPadding: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(UserText.recovery)
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-                HStack(alignment: .top, spacing: 12) {
-                    Text(UserText.recoveryInstructions)
-                        .fixMultilineScrollableText()
-                    Spacer()
-                    Button(UserText.saveRecoveryPDF) {
-                        model.saveRecoveryPDF()
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .frame(width: 513, alignment: .topLeading)
-        }
-
-        PreferencePaneSection(vericalPadding: 12) {
+        // Turn Off and Delete Data
+        PreferencePaneSection(verticalPadding: 8) {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
-            .padding(16)
         }
     }
 
@@ -123,28 +100,23 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
                 return UserText.credentialsLimitExceededAction
             }
         }
-        PreferencePaneSection(vericalPadding: 16) {
-            HStack(alignment: .top, spacing: 8) {
-                Text("⚠️")
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(UserText.syncLimitExceededTitle)
-                        .bold()
-                    Text(description)
-                    Button(actionTitle) {
-                        switch itemType {
-                        case .bookmarks:
-                            model.manageBookmarks()
-                        case .credentials:
-                            model.manageLogins()
-                        }
-                    }
-                    .padding(.top, 8)
-                }
+        SyncWarningMessage(title: UserText.syncLimitExceededTitle, message: description, buttonTitle: actionTitle) {
+            switch itemType {
+            case .bookmarks:
+                model.manageBookmarks()
+            case .credentials:
+                model.manageLogins()
             }
-            .padding(.horizontal, 16)
         }
-        .frame(width: 512, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
+    }
+
+    @ViewBuilder
+    fileprivate func syncUnavailableView() -> some View {
+        if model.isDataSyncingAvailable {
+            EmptyView()
+        } else {
+            SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+        }
     }
 
     enum LimitedItemType {

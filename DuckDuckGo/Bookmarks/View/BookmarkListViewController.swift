@@ -39,7 +39,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     weak var delegate: BookmarkListViewControllerDelegate?
-    var currentTabWebsite: AddBookmarkModalViewController.WebsiteInfo?
+    var currentTabWebsite: WebsiteInfo?
 
     @IBOutlet var outlineView: NSOutlineView!
     @IBOutlet var contextMenu: NSMenu!
@@ -64,7 +64,16 @@ final class BookmarkListViewController: NSViewController {
     }()
 
     private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .bookmarksAndFolders, treeController: treeController)
+        BookmarkOutlineViewDataSource(
+            contentMode: .bookmarksAndFolders,
+            treeController: treeController,
+            presentFaviconsFetcherOnboarding: { [weak self] in
+                guard let self, let window = self.view.window else {
+                    return
+                }
+                self.faviconsFetcherOnboarding?.presentOnboardingIfNeeded(in: window)
+            }
+        )
     }()
 
     private var selectedNodes: [BookmarkNode] {
@@ -73,6 +82,14 @@ final class BookmarkListViewController: NSViewController {
         }
         return [BookmarkNode]()
     }
+
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -117,20 +134,18 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @IBAction func newBookmarkButtonClicked(_ sender: AnyObject) {
-        let newBookmarkViewController = AddBookmarkModalViewController.create()
-        newBookmarkViewController.currentTabWebsite = currentTabWebsite
-        newBookmarkViewController.delegate = self
-
         delegate?.popover(shouldPreventClosure: true)
-        beginSheetFromMainWindow(newBookmarkViewController)
+        AddBookmarkModalView(model: AddBookmarkModalViewModel(currentTabWebsite: currentTabWebsite) { [weak delegate] _ in
+            delegate?.popover(shouldPreventClosure: false)
+        }).show(in: parent?.view.window)
     }
 
     @IBAction func newFolderButtonClicked(_ sender: AnyObject) {
-        let newFolderViewController = AddFolderModalViewController.create()
-        newFolderViewController.delegate = self
-
         delegate?.popover(shouldPreventClosure: true)
-        beginSheetFromMainWindow(newFolderViewController)
+        AddBookmarkFolderModalView()
+            .show(in: parent?.view.window) { [weak delegate] in
+                delegate?.popover(shouldPreventClosure: false)
+            }
     }
 
     @IBAction func openManagementInterface(_ sender: NSButton) {
@@ -156,7 +171,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @IBAction func onImportClicked(_ sender: NSButton) {
-        DataImportViewController.show()
+        DataImportView().show()
     }
 
     // MARK: NSOutlineView Configuration
@@ -235,38 +250,6 @@ final class BookmarkListViewController: NSViewController {
     }
 }
 
-// MARK: - Modal Delegates
-
-extension BookmarkListViewController: AddBookmarkModalViewControllerDelegate, AddFolderModalViewControllerDelegate {
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, addedBookmarkWithTitle title: String, url: URL) {
-        if !bookmarkManager.isUrlBookmarked(url: url) {
-            bookmarkManager.makeBookmark(for: url, title: title, isFavorite: false)
-        }
-    }
-
-    func addBookmarkViewController(_ viewController: AddBookmarkModalViewController, saved bookmark: Bookmark, newURL: URL) {
-        bookmarkManager.update(bookmark: bookmark)
-        _ = bookmarkManager.updateUrl(of: bookmark, to: newURL)
-    }
-
-    func addBookmarkViewControllerWillClose() {
-        delegate?.popover(shouldPreventClosure: false)
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        bookmarkManager.makeFolder(for: name, parent: nil)
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        bookmarkManager.update(folder: folder)
-    }
-
-    func addFolderViewControllerWillClose() {
-        delegate?.popover(shouldPreventClosure: false)
-    }
-}
-
 // MARK: - Menu Item Selectors
 
 extension BookmarkListViewController: NSMenuDelegate {
@@ -313,7 +296,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        WindowControllersManager.shared.show(url: bookmark.urlObject, newTab: true)
+        WindowControllersManager.shared.show(url: bookmark.urlObject, source: .bookmark, newTab: true)
     }
 
     func openBookmarkInNewWindow(_ sender: NSMenuItem) {
@@ -324,7 +307,7 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
         guard let urlObject = bookmark.urlObject else {
             return
         }
-        WindowsManager.openNewWindow(with: urlObject, isBurner: false)
+        WindowsManager.openNewWindow(with: urlObject, source: .bookmark, isBurner: false)
     }
 
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
@@ -383,10 +366,10 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
 
         delegate?.popover(shouldPreventClosure: true)
 
-        let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.edit(folder: folder)
-        addFolderViewController.delegate = self
-        beginSheetFromMainWindow(addFolderViewController)
+        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
+            .show(in: parent?.view.window) { [weak delegate] in
+                delegate?.popover(shouldPreventClosure: false)
+            }
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
@@ -405,7 +388,7 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             return
         }
 
-        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
+        let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0, source: .bookmark), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
         tabCollection.append(tabs: tabs)
     }
 

@@ -29,7 +29,13 @@ final class HomePageViewController: NSViewController {
     private let fireViewModel: FireViewModel
     private let onboardingViewModel: OnboardingViewModel
 
-    private weak var host: NSView?
+    private(set) lazy var faviconsFetcherOnboarding: FaviconsFetcherOnboarding? = {
+        guard let syncService = NSApp.delegateTyped.syncService, let syncBookmarksAdapter = NSApp.delegateTyped.syncDataProviders?.bookmarksAdapter else {
+            assertionFailure("SyncService and/or SyncBookmarksAdapter is nil")
+            return nil
+        }
+        return .init(syncService: syncService, syncBookmarksAdapter: syncBookmarksAdapter)
+    }()
 
     var favoritesModel: HomePage.Models.FavoritesModel!
     var defaultBrowserModel: HomePage.Models.DefaultBrowserModel!
@@ -45,12 +51,11 @@ final class HomePageViewController: NSViewController {
         fatalError("HomePageViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder,
-          tabCollectionViewModel: TabCollectionViewModel,
-          bookmarkManager: BookmarkManager,
-          historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
-          fireViewModel: FireViewModel? = nil,
-          onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
+    init(tabCollectionViewModel: TabCollectionViewModel,
+         bookmarkManager: BookmarkManager,
+         historyCoordinating: HistoryCoordinating = HistoryCoordinator.shared,
+         fireViewModel: FireViewModel? = nil,
+         onboardingViewModel: OnboardingViewModel = OnboardingViewModel()) {
 
         self.tabCollectionViewModel = tabCollectionViewModel
         self.bookmarkManager = bookmarkManager
@@ -58,14 +63,10 @@ final class HomePageViewController: NSViewController {
         self.fireViewModel = fireViewModel ?? FireCoordinator.fireViewModel
         self.onboardingViewModel = onboardingViewModel
 
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        refreshModelsOnAppBecomingActive()
-
+    override func loadView() {
         favoritesModel = createFavoritesModel()
         defaultBrowserModel = createDefaultBrowserModel()
         recentlyVisitedModel = createRecentlyVisitedModel()
@@ -85,11 +86,11 @@ final class HomePageViewController: NSViewController {
                 self?.view.makeMeFirstResponder()
             }
 
-        let host = NSHostingView(rootView: rootView)
-        host.frame = view.frame
-        view.addSubview(host)
-        self.host = host
+        self.view = NSHostingView(rootView: rootView)
+    }
 
+    override func viewDidLoad() {
+        refreshModelsOnAppBecomingActive()
         subscribeToBookmarks()
         subscribeToBurningData()
     }
@@ -107,11 +108,6 @@ final class HomePageViewController: NSViewController {
     override func viewDidAppear() {
         super.viewDidAppear()
         refreshModels()
-    }
-
-    override func viewDidLayout() {
-        super.viewDidLayout()
-        host?.frame = self.view.frame
     }
 
     override func viewWillDisappear() {
@@ -144,13 +140,16 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION && DBP
         let vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
-            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging()
+            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
+            dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: .netP,
+            dataBrokerProtectionUserDefaults: .dbp
         )
 #else
         let vm = HomePage.Models.ContinueSetUpModel(
@@ -161,7 +160,6 @@ final class HomePageViewController: NSViewController {
         )
 #endif
 
-        vm.delegate = self
         return vm
     }
 
@@ -193,6 +191,8 @@ final class HomePageViewController: NSViewController {
             self?.showAddEditController(for: bookmark)
         }, moveFavorite: { [weak self] (bookmark, index) in
             self?.bookmarkManager.moveFavorites(with: [bookmark.id], toIndex: index) { _ in }
+        }, onFaviconMissing: { [weak self] in
+            self?.faviconsFetcherOnboarding?.presentOnboardingIfNeeded()
         })
     }
 
@@ -228,50 +228,26 @@ final class HomePageViewController: NSViewController {
 
     private func openUrl(_ url: URL, target: HomePage.Models.FavoritesModel.OpenTarget? = nil) {
         if target == .newWindow || NSApplication.shared.isCommandPressed && NSApplication.shared.isOptionPressed {
-            WindowsManager.openNewWindow(with: url, isBurner: tabCollectionViewModel.isBurner)
+            WindowsManager.openNewWindow(with: url, source: .bookmark, isBurner: tabCollectionViewModel.isBurner)
             return
         }
 
         if target == .newTab || NSApplication.shared.isCommandPressed && NSApplication.shared.isShiftPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: true)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: true)
             return
         }
 
         if NSApplication.shared.isCommandPressed {
-            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url), selected: false)
+            tabCollectionViewModel.appendNewTab(with: .contentFromURL(url, source: .bookmark), selected: false)
             return
         }
 
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url))
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(.contentFromURL(url, source: .bookmark))
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
-        // swiftlint:disable force_cast
-        let windowController = NSStoryboard.homePage.instantiateController(withIdentifier: "AddEditFavoriteWindowController") as! NSWindowController
-        // swiftlint:enable force_cast
-
-        guard let window = windowController.window as? AddEditFavoriteWindow else {
-            assertionFailure("HomePageViewController: Failed to present AddEditFavoriteWindowController")
-            return
-        }
-
-        guard let screen = window.screen else {
-            assertionFailure("HomePageViewController: No screen")
-            return
-        }
-
-        if let bookmark = bookmark {
-            window.addEditFavoriteViewController.edit(bookmark: bookmark)
-        }
-
-        let windowFrame = NSRect(x: screen.frame.origin.x + screen.frame.size.width / 2.0 - AddEditFavoriteWindow.Size.width / 2.0,
-                                 y: screen.frame.origin.y + screen.frame.size.height / 2.0 - AddEditFavoriteWindow.Size.height / 2.0,
-                                 width: AddEditFavoriteWindow.Size.width,
-                                 height: AddEditFavoriteWindow.Size.height)
-
-        view.window?.addChildWindow(window, ordered: .above)
-        window.setFrame(windowFrame, display: true)
-        window.makeKey()
+        AddBookmarkModalView(model: AddBookmarkModalViewModel(originalBookmark: bookmark, isFavorite: true))
+            .show(in: self.view.window)
     }
 
     private var burningDataCancellable: AnyCancellable?
@@ -293,11 +269,5 @@ final class HomePageViewController: NSViewController {
                 self?.refreshModels()
             }
     }
-
-}
-
-fileprivate extension NSStoryboard {
-
-    static let homePage = NSStoryboard(name: "HomePage", bundle: .main)
 
 }

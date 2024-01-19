@@ -42,7 +42,7 @@ final class DataBrokerProtectionInMemoryCacheTests: XCTestCase {
 
     func testCacheDoesNotStoreEmptyNames() throws {
         let cache = InMemoryDataCache()
-        var result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "", middle: "Jacob", last: "JingleHeimerSchmidt", suffix: nil))
+        let result = cache.addNameToCurrentUserProfile(DBPUIUserProfileName(first: "", middle: "Jacob", last: "JingleHeimerSchmidt", suffix: nil))
 
         XCTAssertFalse(result, "Result of adding empty name should be `false`")
     }
@@ -68,7 +68,7 @@ final class DataBrokerProtectionInMemoryCacheTests: XCTestCase {
 
     func testCacheDoesNotStoreEmptyAddresses() throws {
         let cache = InMemoryDataCache()
-        var result = cache.addAddressToCurrentUserProfile(DBPUIUserProfileAddress(street: "123 any street", city: "", state: "TX", zipCode: "12345"))
+        let result = cache.addAddressToCurrentUserProfile(DBPUIUserProfileAddress(street: "123 any street", city: "", state: "TX", zipCode: "12345"))
 
         XCTAssertFalse(result, "Result of adding empty address should be `false`")
     }

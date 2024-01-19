@@ -770,7 +770,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(with: .displayNative(.mobile), in: context)
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = true
             bookmarkStore.update(bookmark: bookmark)
@@ -792,7 +792,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(folders: [nonNativeFolder])
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = true
             bookmarkStore.update(bookmark: bookmark)
@@ -813,7 +813,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(with: bookmarkStore.favoritesDisplayMode, in: context)
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = false
             bookmarkStore.update(bookmark: bookmark)
@@ -894,7 +894,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(folders: [nonNativeFolder])
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = true
             bookmarkStore.update(bookmark: bookmark)
@@ -917,7 +917,7 @@ final class LocalBookmarkStoreTests: XCTestCase {
             bookmarkMO.addToFavorites(folders: [nonNativeFolder])
             try! context.save()
 
-            var bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
+            let bookmark = Bookmark.from(managedObject: bookmarkMO, favoritesDisplayMode: bookmarkStore.favoritesDisplayMode) as! Bookmark
 
             bookmark.isFavorite = false
             bookmarkStore.update(bookmark: bookmark)
@@ -933,11 +933,11 @@ final class LocalBookmarkStoreTests: XCTestCase {
         let context = container.viewContext
         let bookmarkStore = LocalBookmarkStore(context: context)
 
-        let bookmark = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: "bookmark", urlString: "https://duckduckgo.com", children: nil)
-        let bookmarkBar = ImportedBookmarks.BookmarkOrFolder(name: "Bookmark Bar", type: "folder", urlString: nil, children: [bookmark])
-        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "Other Bookmarks", type: "folder", urlString: nil, children: [])
+        let bookmark = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: .bookmark, urlString: "https://duckduckgo.com", children: nil)
+        let bookmarkBar = ImportedBookmarks.BookmarkOrFolder(name: "Bookmark Bar", type: .folder, urlString: nil, children: [bookmark])
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "Other Bookmarks", type: .folder, urlString: nil, children: [])
 
-        let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks)
+        let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks, syncedBookmarks: nil)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolders)
 
         let result = bookmarkStore.importBookmarks(importedBookmarks, source: .thirdPartyBrowser(.safari))
@@ -1090,14 +1090,14 @@ final class LocalBookmarkStoreTests: XCTestCase {
     }
 
     private func createMockImportedBookmarks() -> ImportedBookmarks {
-        let bookmark1 = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: "bookmark", urlString: "https://duckduckgo.com", children: nil)
-        let bookmark2 = ImportedBookmarks.BookmarkOrFolder(name: "Duck", type: "bookmark", urlString: "https://duck.com", children: nil)
-        let folder1 = ImportedBookmarks.BookmarkOrFolder(name: "Folder", type: "folder", urlString: nil, children: [bookmark2])
+        let bookmark1 = ImportedBookmarks.BookmarkOrFolder(name: "DuckDuckGo", type: .bookmark, urlString: "https://duckduckgo.com", children: nil)
+        let bookmark2 = ImportedBookmarks.BookmarkOrFolder(name: "Duck", type: .bookmark, urlString: "https://duck.com", children: nil)
+        let folder1 = ImportedBookmarks.BookmarkOrFolder(name: "Folder", type: .folder, urlString: nil, children: [bookmark2])
 
-        let bookmarkBar = ImportedBookmarks.BookmarkOrFolder(name: "Bookmark Bar", type: "folder", urlString: nil, children: [bookmark1, folder1])
-        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "Other Bookmarks", type: "folder", urlString: nil, children: [])
+        let bookmarkBar = ImportedBookmarks.BookmarkOrFolder(name: "Bookmark Bar", type: .folder, urlString: nil, children: [bookmark1, folder1])
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder(name: "Other Bookmarks", type: .folder, urlString: nil, children: [])
 
-        let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks)
+        let topLevelFolders = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks, syncedBookmarks: nil)
 
         return ImportedBookmarks(topLevelFolders: topLevelFolders)
     }

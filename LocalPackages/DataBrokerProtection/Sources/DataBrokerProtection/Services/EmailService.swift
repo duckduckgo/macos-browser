@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionEmailService.swift
+//  EmailService.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -30,7 +30,7 @@ public enum EmailError: Error, Equatable, Codable {
 }
 
 protocol EmailServiceProtocol {
-    func getEmail() async throws -> String
+    func getEmail(dataBrokerName: String?) async throws -> String
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
                              pollingIntervalInSeconds: Int,
@@ -51,8 +51,14 @@ struct EmailService: EmailServiceProtocol {
         self.redeemUseCase = redeemUseCase
     }
 
-    func getEmail() async throws -> String {
-        guard let url = URL(string: Constants.baseUrl + "/generate") else {
+    func getEmail(dataBrokerName: String? = nil) async throws -> String {
+        var urlString = Constants.baseUrl + "/generate"
+
+        if let dataBrokerValue = dataBrokerName {
+            urlString += "?dataBroker=\(dataBrokerValue)"
+        }
+
+        guard let url = URL(string: urlString) else {
             throw EmailError.cantGenerateURL
         }
 

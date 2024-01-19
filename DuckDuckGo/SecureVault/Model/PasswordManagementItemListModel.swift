@@ -247,6 +247,7 @@ final class PasswordManagementItemListModel: ObservableObject {
                 return
             }
 
+            clearSelection()
             updateFilteredData()
 
             // Select first item if no previous selection was provided
@@ -323,11 +324,19 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         let websiteAccounts = items
             .compactMap { $0.websiteAccount }
-        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
 
-        // If the best match does not include the TLD, just pick the first item in the list
-        if let match = bestMatch.first,
-           tld.eTLDplus1(domain) == tld.eTLDplus1(match.domain) {
+        let matchingAccounts = websiteAccounts.filter { account in
+            return urlMatcher.isMatchingForAutofill(
+                currentSite: domain,
+                savedSite: account.domain ?? "",
+                tld: tld
+            )
+        }
+
+        let bestMatch = matchingAccounts.sortedForDomain(domain, tld: tld, removeDuplicates: true)
+
+        // If there are no matches for autofill, just pick the first item in the list
+        if let match = bestMatch.first {
 
             for section in displayedItems {
                 if let account = section.items.first(where: {
@@ -437,7 +446,7 @@ final class PasswordManagementItemListModel: ObservableObject {
 
         var sections = [PasswordManagementListSection]()
 
-        if !accounts.isEmpty { sections.append(PasswordManagementListSection(title: "Logins", items: accounts)) }
+        if !accounts.isEmpty { sections.append(PasswordManagementListSection(title: "Passwords", items: accounts)) }
         if !cards.isEmpty { sections.append(PasswordManagementListSection(title: "Credit Cards", items: cards)) }
         if !identities.isEmpty { sections.append(PasswordManagementListSection(title: "Identities", items: identities)) }
         if !notes.isEmpty { sections.append(PasswordManagementListSection(title: "Notes", items: notes)) }

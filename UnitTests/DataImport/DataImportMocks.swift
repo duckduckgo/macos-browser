@@ -20,13 +20,12 @@ import Foundation
 @testable import DuckDuckGo_Privacy_Browser
 
 final class MockLoginImporter: LoginImporter {
+    var importedLogins: DataImportSummary?
 
-    var importedLogins: DataImport.Summary?
+func importLogins(_ logins: [DuckDuckGo_Privacy_Browser.ImportedLoginCredential], progressCallback: @escaping (Int) throws -> Void) throws -> DataImport.DataTypeSummary {
+        let summary = DataImport.DataTypeSummary(successful: logins.count, duplicate: 0, failed: 0)
 
-    func importLogins(_ logins: [ImportedLoginCredential]) throws -> DataImport.CompletedLoginsResult {
-        let summary = DataImport.CompletedLoginsResult(successfulImports: logins.map(\.username), duplicateImports: [], failedImports: [])
-
-        self.importedLogins = .init(bookmarksResult: nil, loginsResult: .completed(summary))
+        self.importedLogins = [.passwords: .success(summary)]
         return summary
     }
 
@@ -36,10 +35,10 @@ struct BookmarkImportErrorMock: Error {}
 
 struct MockBookmarkImporter: BookmarkImporter {
 
-    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarkImportResult {
+    func importBookmarks(_ bookmarks: ImportedBookmarks, source: BookmarkImportSource) -> BookmarksImportSummary {
         return importBookmarks(bookmarks, source)
     }
 
-    var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarkImportResult
+    var importBookmarks: (ImportedBookmarks, BookmarkImportSource) -> BookmarksImportSummary
 
 }

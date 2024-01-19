@@ -38,6 +38,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
     secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
@@ -65,8 +69,6 @@ on:
         required: true
       NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64:
         required: true
-      SSH_PRIVATE_KEY_FIND_IN_PAGE:
-        required: true
       APPLE_API_KEY_BASE64:
         required: true
       APPLE_API_KEY_ID:
@@ -89,7 +91,7 @@ jobs:
 
     name: Export Notarized App
 
-    runs-on: macos-13
+    runs-on: macos-13-xlarge
 
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
@@ -101,15 +103,11 @@ jobs:
 
     steps:
 
-    - name: Register SSH keys for submodules access
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FIND_IN_PAGE }}
-
     - name: Check out the code
       uses: actions/checkout@v3
       with:
         submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles
@@ -161,13 +159,13 @@ jobs:
         echo "app-name=${{ env.app-name }}" >> $GITHUB_OUTPUT
 
     - name: Upload app artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
         path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}.zip
 
     - name: Upload dSYMs artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
         path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
@@ -211,7 +209,7 @@ jobs:
     steps:
 
     - name: Fetch app bundle
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.app
         path: ${{ github.workspace }}/dmg
@@ -240,7 +238,7 @@ jobs:
             "dmg"
 
     - name: Upload DMG artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
         path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg

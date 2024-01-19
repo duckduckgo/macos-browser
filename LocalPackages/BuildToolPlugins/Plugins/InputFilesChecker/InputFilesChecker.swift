@@ -1,5 +1,5 @@
 //
-//  TargetSourcesChecker.swift
+//  InputFilesChecker.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -32,7 +32,21 @@ let nonSandboxedExtraInputFiles: Set<InputFile> = [
     .init("NetworkProtectionAppEvents.swift", .source),
     .init("NetworkProtectionIPCTunnelController.swift", .source),
     .init("NetworkProtectionNavBarPopoverManager.swift", .source),
-    .init("KeychainType+ClientDefault.swift", .source)
+    .init("NetworkProtectionSubscriptionEventHandler.swift", .source),
+    .init("KeychainType+ClientDefault.swift", .source),
+    .init("DBPHomeViewController.swift", .source),
+    .init("DataBrokerProtectionManager.swift", .source),
+    .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
+    .init("LoginItem+DataBrokerProtection.swift", .source),
+    .init("DataBrokerProtectionDebugMenu.swift", .source),
+    .init("DataBrokerProtectionFeatureVisibility.swift", .source),
+    .init("DataBrokerProtectionFeatureDisabler.swift", .source),
+    .init("DataBrokerProtectionAppEvents.swift", .source),
+    .init("VPNMetadataCollector.swift", .source),
+    .init("VPNFeedbackCategory.swift", .source),
+    .init("VPNFeedbackSender.swift", .source),
+    .init("DuckDuckGo Personal Information Removal.app", .unknown),
+    .init("DataBrokerProtectionSubscriptionEventHandler.swift", .source)
 ]
 
 /**
@@ -50,26 +64,14 @@ let extraInputFiles: [TargetName: Set<InputFile>] = [
 
     "DuckDuckGo Privacy Browser App Store": [],
 
-    "DuckDuckGo DBP": nonSandboxedExtraInputFiles.union([
-        .init("DBPHomeViewController.swift", .source),
-        .init("DataBrokerProtectionManager.swift", .source),
-        .init("DataBrokerProtectionLoginItemScheduler.swift", .source),
-        .init("LoginItem+DataBrokerProtection.swift", .source),
-        .init("DataBrokerProtectionDebugMenu.swift", .source),
-        .init("DataBrokerProtectionFeatureVisibility.swift", .source),
-        .init("DataBrokerProtectionFeatureDisabler.swift", .source),
-        .init("DataBrokerProtectionAppEvents.swift", .source),
-        .init("DuckDuckGoDBPBackgroundAgent.app", .unknown),
-    ]),
-
     "DuckDuckGo Privacy Pro": nonSandboxedExtraInputFiles,
 
     "Unit Tests": [
         .init("BWEncryptionTests.swift", .source),
         .init("WKWebViewPrivateMethodsAvailabilityTests.swift", .source),
         .init("NetworkProtectionRemoteMessageTests.swift", .source),
-        .init("NetworkProtectionRemoteMessagingStorageTests.swift", .source),
-        .init("network-protection-messages.json", .resource)
+        .init("network-protection-messages.json", .resource),
+        .init("dbp-messages.json", .resource),
     ],
 
     "Integration Tests": []
@@ -110,8 +112,6 @@ struct TargetSourcesChecker: BuildToolPlugin, XcodeBuildToolPlugin {
         context.xcodeProject.targets.forEach { target in
             switch target.product?.kind {
             case .application where target.displayName.starts(with: "DuckDuckGo Privacy Browser"):
-                appTargets.append(target)
-            case .application where target.displayName == "DuckDuckGo DBP": // To be removed after the DBP target is deleted
                 appTargets.append(target)
             case .application where target.displayName == "DuckDuckGo Privacy Pro": // To be removed after the target is deleted
                 appTargets.append(target)

@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionPixel.swift
+//  NetworkProtectionPixelEvent.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -25,6 +25,19 @@ import NetworkProtection
 enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     case networkProtectionActiveUser
+    case networkProtectionNewUser
+
+    case networkProtectionStartFailed
+
+    case networkProtectionEnableAttemptConnecting
+    case networkProtectionEnableAttemptSuccess
+    case networkProtectionEnableAttemptFailure
+
+    case networkProtectionTunnelFailureDetected
+    case networkProtectionTunnelFailureRecovered
+
+    case networkProtectionLatency(quality: NetworkProtectionLatencyMonitor.ConnectionQuality)
+    case networkProtectionLatencyError
 
     case networkProtectionTunnelConfigurationNoServerRegistrationInfo
     case networkProtectionTunnelConfigurationCouldNotSelectClosestServer
@@ -41,6 +54,8 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionClientInvalidInviteCode
     case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
     case networkProtectionClientFailedToParseRedeemResponse(error: Error)
+    case networkProtectionClientFailedToFetchLocations(error: Error?)
+    case networkProtectionClientFailedToParseLocationsResponse(error: Error?)
     case networkProtectionClientInvalidAuthToken
 
     case networkProtectionServerListStoreFailedToEncodeServerList
@@ -54,7 +69,7 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionKeychainDeleteError(status: Int32)
 
     case networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
-    case networkProtectionWireguardErrorInvalidState
+    case networkProtectionWireguardErrorInvalidState(reason: String)
     case networkProtectionWireguardErrorFailedDNSResolution
     case networkProtectionWireguardErrorCannotSetNetworkSettings(error: Error)
     case networkProtectionWireguardErrorCannotStartWireguardBackend(code: Int32)
@@ -63,17 +78,45 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
     case networkProtectionRekeyCompleted
 
-    case networkProtectionLatency(ms: Int, server: String, networkType: NetworkConnectionType)
-
-    case networkProtectionSystemExtensionUnknownActivationResult
+    case networkProtectionSystemExtensionActivationFailure
 
     case networkProtectionUnhandledError(function: String, line: Int, error: Error)
 
+    /// Name of the pixel event
+    /// - Unique pixels must end with `_u`
+    /// - Daily pixels will automatically have `_d` or `_c` appended to their names
     var name: String {
         switch self {
 
         case .networkProtectionActiveUser:
             return "m_mac_netp_daily_active"
+
+        case .networkProtectionNewUser:
+            return "m_mac_netp_daily_active_u"
+
+        case .networkProtectionStartFailed:
+            return "m_mac_netp_start_failed"
+
+        case .networkProtectionEnableAttemptConnecting:
+            return "m_mac_netp_ev_enable_attempt"
+
+        case .networkProtectionEnableAttemptSuccess:
+            return "m_mac_netp_ev_enable_attempt_success"
+
+        case .networkProtectionEnableAttemptFailure:
+            return "m_mac_netp_ev_enable_attempt_failure"
+
+        case .networkProtectionTunnelFailureDetected:
+            return "m_mac_netp_ev_tunnel_failure"
+
+        case .networkProtectionTunnelFailureRecovered:
+            return "m_mac_netp_ev_tunnel_failure_recovered"
+
+        case .networkProtectionLatency(let quality):
+            return "m_mac_netp_ev_\(quality.rawValue)_latency"
+
+        case .networkProtectionLatencyError:
+            return "m_mac_netp_ev_latency_error"
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo:
             return "m_mac_netp_tunnel_config_error_no_server_registration_info"
@@ -116,6 +159,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
         case .networkProtectionClientFailedToParseRedeemResponse:
             return "m_mac_netp_backend_api_error_parsing_redeem_response_failed"
+
+        case .networkProtectionClientFailedToFetchLocations:
+            return "m_mac_netp_backend_api_error_failed_to_fetch_location_list"
+
+        case .networkProtectionClientFailedToParseLocationsResponse:
+            return "m_mac_netp_backend_api_error_parsing_location_list_response_failed"
 
         case .networkProtectionClientInvalidAuthToken:
             return "m_mac_netp_backend_api_error_invalid_auth_token"
@@ -165,11 +214,8 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionRekeyCompleted:
             return "m_mac_netp_rekey_completed"
 
-        case .networkProtectionLatency:
-            return "m_mac_netp_latency"
-
-        case .networkProtectionSystemExtensionUnknownActivationResult:
-            return "m_mac_netp_system_extension_unknown_activation_result"
+        case .networkProtectionSystemExtensionActivationFailure:
+            return "m_mac_netp_system_extension_activation_failure"
 
         case .networkProtectionUnhandledError:
             return "m_mac_netp_unhandled_error"
@@ -213,18 +259,17 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionClientFailedToRedeemInviteCode(error: let error):
             return error?.pixelParameters
 
+        case .networkProtectionClientFailedToFetchLocations(error: let error):
+            return error?.pixelParameters
+
+        case .networkProtectionClientFailedToParseLocationsResponse(error: let error):
+            return error?.pixelParameters
+
         case .networkProtectionUnhandledError(let function, let line, let error):
             var parameters = error.pixelParameters
             parameters[PixelKit.Parameters.function] = function
             parameters[PixelKit.Parameters.line] = String(line)
             return parameters
-
-        case .networkProtectionLatency(ms: let latency, server: let server, networkType: let networkType):
-            return [
-                PixelKit.Parameters.latency: String(latency),
-                PixelKit.Parameters.server: server,
-                PixelKit.Parameters.networkType: networkType.description
-            ]
 
         case .networkProtectionWireguardErrorCannotSetNetworkSettings(error: let error):
             return error.pixelParameters
@@ -232,6 +277,11 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionWireguardErrorCannotStartWireguardBackend(code: let code):
             return [
                 PixelKit.Parameters.errorCode: String(code)
+            ]
+
+        case .networkProtectionWireguardErrorInvalidState(reason: let reason):
+            return [
+                PixelKit.Parameters.reason: reason
             ]
 
         case .networkProtectionTunnelConfigurationNoServerRegistrationInfo,
@@ -251,10 +301,18 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
              .networkProtectionNoAuthTokenFoundError,
              .networkProtectionRekeyCompleted,
              .networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor,
-             .networkProtectionWireguardErrorInvalidState,
              .networkProtectionWireguardErrorFailedDNSResolution,
-             .networkProtectionSystemExtensionUnknownActivationResult,
-             .networkProtectionActiveUser:
+             .networkProtectionSystemExtensionActivationFailure,
+             .networkProtectionActiveUser,
+             .networkProtectionNewUser,
+             .networkProtectionEnableAttemptConnecting,
+             .networkProtectionEnableAttemptSuccess,
+             .networkProtectionEnableAttemptFailure,
+             .networkProtectionTunnelFailureDetected,
+             .networkProtectionTunnelFailureRecovered,
+             .networkProtectionLatency,
+             .networkProtectionLatencyError,
+             .networkProtectionStartFailed:
 
             return nil
         }

@@ -41,12 +41,15 @@ final class SafariBookmarksReader {
             case readPlist
 
             case getTopLevelEntries
+            case getChildren
+            case entryNotDict
         }
 
         var action: DataImportAction { .bookmarks }
-        var source: DataImport.Source { .safari }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .dataCorrupted }
     }
 
     private let safariBookmarksFileURL: URL
@@ -71,17 +74,30 @@ final class SafariBookmarksReader {
         }
     }
 
+    func validateFileReadAccess() -> DataImportResult<Void> {
+        if !FileManager.default.isReadableFile(atPath: safariBookmarksFileURL.path) {
+            do {
+                try _=Data(contentsOf: safariBookmarksFileURL)
+            } catch {
+                return .failure(ImportError(type: .readPlist, underlyingError: error))
+            }
+        }
+        return .success( () )
+    }
+
     private func reallyReadBookmarks() throws -> ImportedBookmarks {
         currentOperationType = .readPlist
         let plistData = try readPropertyList()
 
-        guard let topLevelEntries = plistData[Constants.bookmarkChildrenKey] as? [[String: AnyObject]] else { throw ImportError(type: .getTopLevelEntries, underlyingError: nil) }
+        guard let children = plistData[Constants.bookmarkChildrenKey] else { throw ImportError(type: .getChildren, underlyingError: nil) }
+        guard let topLevelEntries = children as? [Any] else { throw ImportError(type: .getTopLevelEntries, underlyingError: nil) }
 
         var bookmarksBar: ImportedBookmarks.BookmarkOrFolder?
         var otherBookmarks: [ImportedBookmarks.BookmarkOrFolder] = []
 
-        for entry in topLevelEntries
-            where ((entry[Constants.typeKey] as? String) == Constants.listType) || ((entry[Constants.typeKey] as? String) == Constants.leafType) {
+        for entry in topLevelEntries {
+            guard let entry = entry as? [String: AnyObject] else { throw ImportError(type: .entryNotDict, underlyingError: nil) }
+            guard (entry[Constants.typeKey] as? String) == Constants.listType || (entry[Constants.typeKey] as? String) == Constants.leafType else { continue }
 
             if let title = entry[Constants.titleKey] as? String, title == Constants.readingListKey {
                 continue
@@ -97,10 +113,10 @@ final class SafariBookmarksReader {
 
         }
 
-        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: otherBookmarks)
-        let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: "folder", urlString: nil, children: [])
+        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.otherBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: otherBookmarks)
+        let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: .folder, urlString: nil, children: [])
 
-        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder)
+        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder, syncedBookmarks: nil)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolder)
 
         return importedBookmarks
@@ -119,11 +135,11 @@ final class SafariBookmarksReader {
             assert(entry[Constants.typeKey] as? String == Constants.listType)
 
             let children = children.compactMap { bookmarkOrFolder(from: $0) }
-            return ImportedBookmarks.BookmarkOrFolder(name: title, type: "folder", urlString: nil, children: children)
+            return ImportedBookmarks.BookmarkOrFolder(name: title, type: .folder, urlString: nil, children: children)
         } else if let url = entry[Constants.urlStringKey] as? String {
             assert(entry[Constants.typeKey] as? String == Constants.leafType)
 
-            return ImportedBookmarks.BookmarkOrFolder(name: title, type: "bookmark", urlString: url, children: nil)
+            return ImportedBookmarks.BookmarkOrFolder(name: title, type: .bookmark, urlString: url, children: nil)
         }
 
         return nil

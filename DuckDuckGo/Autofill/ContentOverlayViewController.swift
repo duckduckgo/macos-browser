@@ -106,7 +106,7 @@ public final class ContentOverlayViewController: NSViewController, EmailManagerR
 
     public override func viewWillDisappear() {
         // We should never see this but it's better than a flash of old content
-        webView.load(URLRequest(url: URL(string: "about:blank")!))
+        webView.load(URLRequest(url: .blankPage))
     }
 
     public func messageMouseMove(x: CGFloat, y: CGFloat) {
@@ -302,7 +302,7 @@ extension ContentOverlayViewController: SecureVaultManagerDelegate {
     }
 
     public func secureVaultManager(_: SecureVaultManager, didRequestAuthenticationWithCompletionHandler handler: @escaping (Bool) -> Void) {
-        DeviceAuthenticator.shared.authenticateUser(reason: .autofill) { authenticationResult in
+        DeviceAuthenticator.shared.authenticateUser(reason: .autofillCreditCards) { authenticationResult in
             handler(authenticationResult.authenticated)
         }
     }

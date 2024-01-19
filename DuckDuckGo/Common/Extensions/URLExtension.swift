@@ -22,6 +22,8 @@ import BrowserServicesKit
 
 extension URL.NavigationalScheme {
 
+    static let duck = URL.NavigationalScheme(rawValue: "duck")
+
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
     }
@@ -36,10 +38,18 @@ extension URL {
      * Returns a URL pointing to `${HOME}/Library`, regardless of whether the app is sandboxed or not.
      */
     static var nonSandboxLibraryDirectoryURL: URL {
-        guard NSApp.isSandboxed else {
-            return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+        if NSApp.isSandboxed {
+            return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         }
-        return FileManager.default.homeDirectoryForCurrentUser.deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        return FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+    }
+
+    static var nonSandboxHomeDirectory: URL {
+        if NSApp.isSandboxed {
+            return FileManager.default.homeDirectoryForCurrentUser
+                .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        }
+        return FileManager.default.homeDirectoryForCurrentUser
     }
 
     /**
@@ -75,7 +85,16 @@ extension URL {
             return nil
         }
 
-        return Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+        var url = Self.duckDuckGo.appendingParameter(name: DuckDuckGoParameters.search.rawValue, value: trimmedQuery)
+
+        // Add experimental atb parameter to SERP queries for internal users to display Privacy Reminder
+        // https://app.asana.com/0/1199230911884351/1205979030848528/f
+        if case .normal = NSApp.runType,
+           NSApp.delegateTyped.featureFlagger.isFeatureOn(.appendAtbToSerpQueries),
+           let atbWithVariant = LocalStatisticsStore().atbWithVariant {
+            url = url.appendingParameter(name: URL.DuckDuckGoParameters.ATB.atb, value: atbWithVariant + "-wb")
+        }
+        return url
     }
 
     static func makeURL(from addressBarString: String) -> URL? {
@@ -105,30 +124,34 @@ extension URL {
         return url
     }
 
-    static var blankPage: URL {
-        return URL(string: "about:blank")!
+    static let blankPage = URL(string: "about:blank")!
+
+    static let newtab = URL(string: "duck://newtab")!
+    static let welcome = URL(string: "duck://welcome")!
+    static let settings = URL(string: "duck://settings")!
+    static let bookmarks = URL(string: "duck://bookmarks")!
+
+    static let dataBrokerProtection = URL(string: "duck://dbp")!
+
+    static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
+        return settings.appendingPathComponent(pane.rawValue)
     }
 
-    static var homePage: URL {
-        return URL(string: "about:home")!
-    }
+    enum Invalid {
+        static let aboutNewtab = URL(string: "about:newtab")!
+        static let duckHome = URL(string: "duck://home")!
 
-    static var welcome: URL {
-        return URL(string: "about:welcome")!
-    }
+        static let aboutWelcome = URL(string: "about:welcome")!
 
-    static var preferences: URL {
-        return URL(string: "about:preferences")!
-    }
+        static let aboutHome = URL(string: "about:home")!
 
-#if DBP
-    static var dataBrokerProtection: URL {
-        return URL(string: "about:dbp")!
-    }
-#endif
+        static let aboutSettings = URL(string: "about:settings")!
+        static let aboutPreferences = URL(string: "about:preferences")!
+        static let duckPreferences = URL(string: "duck://preferences")!
+        static let aboutConfig = URL(string: "about:config")!
+        static let duckConfig = URL(string: "duck://config")!
 
-    static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
-        return Self.preferences.appendingPathComponent(pane.rawValue)
+        static let aboutBookmarks = URL(string: "about:bookmarks")!
     }
 
     var isHypertextURL: Bool {
@@ -139,11 +162,11 @@ extension URL {
     // MARK: ATB
 
     static var devMode: String {
-        #if DEBUG
+#if DEBUG
         return "?test=1"
-        #else
+#else
         return ""
-        #endif
+#endif
     }
 
     static let atb = "\(Self.duckDuckGo)atb.js\(devMode)"
@@ -255,8 +278,7 @@ extension URL {
 
         return self.toString(decodePunycode: decodePunycode,
                              dropScheme: input.isEmpty || !(hasInputScheme && !hasInputHost),
-                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty
-                                && hasInputWww,
+                             needsWWW: !input.dropping(prefix: self.separatedScheme ?? "").isEmpty && hasInputWww,
                              dropTrailingSlash: !input.hasSuffix("/"))
     }
 
@@ -275,6 +297,14 @@ extension URL {
         guard !filename.isEmpty else { return nil }
 
         return filename
+    }
+
+    var emailAddresses: [String] {
+        guard navigationalScheme == .mailto, let path = URLComponents(url: self, resolvingAgainstBaseURL: false)?.path else {
+            return []
+        }
+
+        return path.components(separatedBy: .init(charactersIn: ", ")).filter { !$0.isEmpty }
     }
 
     // MARK: - Validity
@@ -380,7 +410,7 @@ extension URL {
     func sanitizedForQuarantine() -> URL? {
         guard !self.isFileURL,
               !["data", "blob"].contains(self.scheme),
-              var components = URLComponents.init(url: self, resolvingAgainstBaseURL: false)
+              var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
         else {
             return nil
         }
@@ -408,11 +438,9 @@ extension URL {
             quarantineProperties[kLSQuarantineDataURLKey as String] = sourceURL
             quarantineProperties[kLSQuarantineOriginURLKey as String] = referrerURL
 
-            if quarantineProperties[kLSQuarantineTypeKey as String] == nil {
-                quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
-                    ? kLSQuarantineTypeWebDownload
-                    : kLSQuarantineTypeOtherDownload
-            }
+            quarantineProperties[kLSQuarantineTypeKey as String] = ["http", "https"].contains(sourceURL?.scheme)
+                ? kLSQuarantineTypeWebDownload
+                : kLSQuarantineTypeOtherDownload
 
             try (self as NSURL).setResourceValue(quarantineProperties, forKey: .quarantinePropertiesKey)
         }
@@ -422,4 +450,26 @@ extension URL {
     // MARK: - System Settings
 
     static var fullDiskAccess = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
+
+    // MARK: - Blob URLs
+
+    var isBlobURL: Bool {
+        guard let scheme = self.scheme?.lowercased() else { return false }
+
+        if scheme == "blob" || scheme.hasPrefix("blob:") {
+            return true
+        }
+
+        return false
+    }
+
+    func stripUnsupportedCredentials() -> String {
+        if self.absoluteString.firstIndex(of: "@") != nil {
+            let authPattern = "([^:]+):\\/\\/[^\\/]*@"
+            let strippedURL = self.absoluteString.replacingOccurrences(of: authPattern, with: "$1://", options: .regularExpression)
+            let uuid = UUID().uuidString.lowercased()
+            return "\(strippedURL)\(uuid)"
+        }
+        return self.absoluteString
+    }
 }

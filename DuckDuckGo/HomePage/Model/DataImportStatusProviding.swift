@@ -1,5 +1,5 @@
 //
-//  DataImportProvider.swift
+//  DataImportStatusProviding.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -47,8 +47,10 @@ final class BookmarksAndPasswordsImportStatusProvider: DataImportStatusProviding
         }
         return successfulImportHappened!
     }
+
+    @MainActor
     func showImportWindow(completion: (() -> Void)?) {
-        DataImportViewController.show(completion: completion)
+        DataImportView().show(completion: completion)
     }
 
     // It only cover the case in which the user has imported bookmar AFTER already having some bookmarks

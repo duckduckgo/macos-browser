@@ -30,7 +30,7 @@ import NetworkProtection
 #endif
 
 #if SUBSCRIPTION
-import Subscription
+import SubscriptionUI
 #endif
 
 // swiftlint:disable:next type_body_length
@@ -383,6 +383,7 @@ import Subscription
         updateBookmarksBarMenuItem()
         updateShortcutMenuItems()
         updateLoggingMenuItems()
+        updateInternalUserItem()
         updateRemoteConfigurationInfo()
     }
 
@@ -518,14 +519,14 @@ import Subscription
     }
 
     private func updateShortcutMenuItems() {
-        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .autofill)
-        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .bookmarks)
-        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .downloads)
+        toggleAutofillShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .autofill)
+        toggleBookmarksShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .bookmarks)
+        toggleDownloadsShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .downloads)
 
 #if NETWORK_PROTECTION
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {
             toggleNetworkProtectionShortcutMenuItem.isHidden = false
-            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.toggleShortcutInterfaceTitle(for: .networkProtection)
+            toggleNetworkProtectionShortcutMenuItem.title = LocalPinningManager.shared.shortcutTitle(for: .networkProtection)
         } else {
             toggleNetworkProtectionShortcutMenuItem.isHidden = true
         }
@@ -533,6 +534,8 @@ import Subscription
     }
 
     // MARK: - Debug
+
+    let internalUserItem = NSMenuItem(title: "Set Internal User State", action: #selector(MainViewController.internalUserState))
 
     // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
@@ -570,7 +573,7 @@ import Subscription
             NSMenuItem(title: "User Scripts") {
                 NSMenuItem(title: "Remove user scripts from selected tab", action: #selector(MainViewController.removeUserScripts))
             }
-            NSMenuItem(title: "Sync")
+            NSMenuItem(title: "Sync & Backup")
                 .submenu(SyncDebugMenu())
 
 #if DBP
@@ -593,6 +596,7 @@ import Subscription
 
             NSMenuItem(title: "Logging").submenu(setupLoggingMenu())
         }
+        debugMenu.addItem(internalUserItem)
         debugMenu.autoenablesItems = false
         return debugMenu
     }
@@ -623,6 +627,10 @@ import Subscription
         return menu
     }
 
+    private func updateInternalUserItem() {
+        internalUserItem.title = NSApp.delegateTyped.internalUserDecider.isInternalUser ? "Remove Internal User State" : "Set Internal User State"
+    }
+
     private func updateLoggingMenuItems() {
         guard let loggingMenu else { return }
 
@@ -635,8 +643,14 @@ import Subscription
     }
 
     private func updateRemoteConfigurationInfo() {
-        let dateString = DateFormatter.localizedString(from: ConfigurationManager.shared.lastUpdateTime, dateStyle: .short, timeStyle: .medium)
-        configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        var dateString: String
+        if let date = ConfigurationManager.shared.lastConfigurationInstallDate {
+            dateString = DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .medium)
+            configurationDateAndTimeMenuItem.title = "Last Update Time: \(dateString)"
+        } else {
+            dateString = "Last Update Time: -"
+        }
+        configurationDateAndTimeMenuItem.title = dateString
         customConfigurationUrlMenuItem.title = "Configuration URL:  \(AppConfigurationURLProvider().url(for: .privacyConfiguration).absoluteString)"
     }
 

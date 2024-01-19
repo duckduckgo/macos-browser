@@ -28,7 +28,7 @@ final class AddressBarViewController: NSViewController {
     @IBOutlet var activeBackgroundView: NSView!
     @IBOutlet var activeOuterBorderView: NSView!
     @IBOutlet var activeBackgroundViewWithSuggestions: NSView!
-    @IBOutlet var progressIndicator: ProgressView!
+    @IBOutlet var progressIndicator: LoadingProgressView!
     @IBOutlet var passiveTextFieldMinXConstraint: NSLayoutConstraint!
     @IBOutlet var activeTextFieldMinXConstraint: NSLayoutConstraint!
     private static let defaultActiveTextFieldMinX: CGFloat = 40
@@ -82,7 +82,7 @@ final class AddressBarViewController: NSViewController {
     init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel, isBurner: Bool) {
         self.tabCollectionViewModel = tabCollectionViewModel
         self.suggestionContainerViewModel = SuggestionContainerViewModel(
-            isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage,
+            isHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab,
             isBurner: isBurner,
             suggestionContainer: SuggestionContainer())
         self.isBurner = isBurner
@@ -218,7 +218,7 @@ final class AddressBarViewController: NSViewController {
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
-            .map { $0 == .homePage }
+            .map { $0 == .newtab }
             .assign(to: \.isHomePage, onWeaklyHeld: self)
             .store(in: &tabViewModelCancellables)
     }

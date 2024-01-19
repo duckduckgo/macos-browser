@@ -139,7 +139,7 @@ public final class InMemoryDataCache {
 
 extension InMemoryDataCache: DBPUICommunicationDelegate {
     func saveProfile() async -> Bool {
-        await delegate?.flushCache(profile: profile)
+        _ = await delegate?.flushCache(profile: profile)
 
         return true
     }

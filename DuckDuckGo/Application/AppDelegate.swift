@@ -19,6 +19,7 @@
 import Cocoa
 import Combine
 import Common
+import CoreData
 import BrowserServicesKit
 import Persistence
 import Configuration
@@ -31,6 +32,10 @@ import UserNotifications
 
 #if NETWORK_PROTECTION
 import NetworkProtection
+#endif
+
+#if SUBSCRIPTION
+import Subscription
 #endif
 
 @MainActor
@@ -67,10 +72,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     private(set) var syncDataProviders: SyncDataProviders!
     private(set) var syncService: DDGSyncing?
-    private var syncStateCancellable: AnyCancellable?
-    private var bookmarksSyncErrorCancellable: AnyCancellable?
+    private var isSyncInProgressCancellable: AnyCancellable?
+    private var syncFeatureFlagsCancellable: AnyCancellable?
+    private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
+
+#if NETWORK_PROTECTION && SUBSCRIPTION
+    private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
+#endif
+
+#if DBP && SUBSCRIPTION
+    private let dataBrokerProtectionSubscriptionEventHandler = DataBrokerProtectionSubscriptionEventHandler()
+#endif
 
     private var didFinishLaunching = false
 
@@ -112,6 +126,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 Thread.sleep(forTimeInterval: 1)
                 fatalError("Could not load DB: \(error.localizedDescription)")
             }
+
+            let preMigrationErrorHandling = EventMapping<BookmarkFormFactorFavoritesMigration.MigrationErrors> { _, error, _, _ in
+                if let error = error {
+                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase, error: error))
+                } else {
+                    Pixel.fire(.debug(event: .bookmarksCouldNotLoadDatabase))
+                }
+
+                Thread.sleep(forTimeInterval: 1)
+                fatalError("Could not create Bookmarks database stack: \(error?.localizedDescription ?? "err")")
+            }
+
+            BookmarkDatabase.shared.preFormFactorSpecificFavoritesFolderOrder = BookmarkFormFactorFavoritesMigration
+                .getFavoritesOrderFromPreV4Model(
+                    dbContainerLocation: BookmarkDatabase.defaultDBLocation,
+                    dbFileURL: BookmarkDatabase.defaultDBFileURL,
+                    errorEvents: preMigrationErrorHandling
+                )
 
             BookmarkDatabase.shared.db.loadStore { context, error in
                 guard let context = context else {
@@ -160,6 +192,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appIconChanger = AppIconChanger(internalUserDecider: internalUserDecider)
     }
 
+    // swiftlint:disable:next function_body_length
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard NSApp.runType.requiresEnvironment else { return }
         defer {
@@ -218,13 +251,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         UserDefaultsWrapper<Any>.clearRemovedKeys()
 
+#if NETWORK_PROTECTION && SUBSCRIPTION
+        networkProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+#endif
+
 #if NETWORK_PROTECTION
         NetworkProtectionAppEvents().applicationDidFinishLaunching()
         UNUserNotificationCenter.current().delegate = self
 #endif
 
+#if DBP && SUBSCRIPTION
+        dataBrokerProtectionSubscriptionEventHandler.registerForSubscriptionAccountManagerEvents()
+#endif
+
 #if DBP
         DataBrokerProtectionAppEvents().applicationDidFinishLaunching()
+#endif
+
+#if SUBSCRIPTION
+        Task {
+    #if STRIPE
+            SubscriptionPurchaseEnvironment.current = .stripe
+    #else
+            SubscriptionPurchaseEnvironment.current = .appStore
+    #endif
+            await AccountManager().checkSubscriptionState()
+        }
 #endif
     }
 
@@ -320,10 +372,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         let environment = defaultEnvironment
 #endif
         let syncDataProviders = SyncDataProviders(bookmarksDatabase: BookmarkDatabase.shared.db)
-        if bookmarksManager.didMigrateToFormFactorSpecificFavorites {
-            syncDataProviders.bookmarksAdapter.shouldResetBookmarksSyncTimestamp = true
-        }
-        let syncService = DDGSync(dataProvidersSource: syncDataProviders, errorEvents: SyncErrorHandler(), log: OSLog.sync, environment: environment)
+        let syncService = DDGSync(
+            dataProvidersSource: syncDataProviders,
+            errorEvents: SyncErrorHandler(),
+            privacyConfigurationManager: ContentBlocking.shared.privacyConfigurationManager,
+            log: OSLog.sync,
+            environment: environment
+        )
         syncService.initializeIfNeeded()
         syncDataProviders.setUpDatabaseCleaners(syncService: syncService)
 
@@ -336,6 +391,71 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
         self.syncDataProviders = syncDataProviders
         self.syncService = syncService
+
+        isSyncInProgressCancellable = syncService.isSyncInProgressPublisher
+            .filter { $0 }
+            .asVoid()
+            .sink { [weak syncService] in
+                Pixel.fire(.syncDaily, limitTo: .dailyFirst)
+                syncService?.syncDailyStats.sendStatsIfNeeded(handler: { params in
+                    Pixel.fire(.syncSuccessRateDaily, withAdditionalParameters: params)
+                })
+            }
+
+        subscribeSyncQueueToScreenLockedNotifications()
+        subscribeToSyncFeatureFlags(syncService)
+    }
+
+    @UserDefaultsWrapper(key: .syncDidShowSyncPausedByFeatureFlagAlert, defaultValue: false)
+    private var syncDidShowSyncPausedByFeatureFlagAlert: Bool
+
+    private func subscribeToSyncFeatureFlags(_ syncService: DDGSync) {
+        syncFeatureFlagsCancellable = syncService.featureFlagsPublisher
+            .dropFirst()
+            .map { $0.contains(.dataSyncing) }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self, weak syncService] isDataSyncingAvailable in
+                if isDataSyncingAvailable {
+                    self?.syncDidShowSyncPausedByFeatureFlagAlert = false
+                } else if syncService?.authState == .active, self?.syncDidShowSyncPausedByFeatureFlagAlert == false {
+                    let isSyncUIVisible = syncService?.featureFlags.contains(.userInterface) == true
+                    let alert = NSAlert.dataSyncingDisabledByFeatureFlag(showLearnMore: isSyncUIVisible)
+                    let response = alert.runModal()
+                    self?.syncDidShowSyncPausedByFeatureFlagAlert = true
+
+                    switch response {
+                    case .alertSecondButtonReturn:
+                        alert.window.sheetParent?.endSheet(alert.window)
+                        WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .sync)
+                    default:
+                        break
+                    }
+                }
+            }
+    }
+
+    private func subscribeSyncQueueToScreenLockedNotifications() {
+        let screenIsLockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsLocked"))
+            .map { _ in true }
+        let screenIsUnlockedPublisher = DistributedNotificationCenter.default
+            .publisher(for: .init(rawValue: "com.apple.screenIsUnlocked"))
+            .map { _ in false }
+
+        screenLockedCancellable = Publishers.Merge(screenIsLockedPublisher, screenIsUnlockedPublisher)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLocked in
+                guard let syncService = self?.syncService, syncService.authState != .inactive else {
+                    return
+                }
+                if isLocked {
+                    os_log(.debug, log: .sync, "Screen is locked")
+                    syncService.scheduler.cancelSyncAndSuspendSyncQueue()
+                } else {
+                    os_log(.debug, log: .sync, "Screen is unlocked")
+                    syncService.scheduler.resumeSyncQueue()
+                }
+            }
     }
 
     private func subscribeToEmailProtectionStatusNotifications() {
@@ -410,7 +530,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
 #if DBP
             if response.notification.request.identifier == DataBrokerProtectionWaitlist.notificationIdentifier {
-                DataBrokerProtectionAppEvents().handleNotification()
+                DataBrokerProtectionAppEvents().handleWaitlistInvitedNotification(source: .localPush)
             }
 #endif
         }

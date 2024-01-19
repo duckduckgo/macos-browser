@@ -40,7 +40,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        window = WindowsManager.openNewWindow(with: .none)!
+        window = WindowsManager.openNewWindow(with: Tab(content: .none))
     }
 
     override func tearDown() {
@@ -73,40 +73,10 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         let cookieConsentManaged = try await cookieConsentManagedPromise.value
         XCTAssertTrue(cookieConsentManaged)
-    }
-
-    @MainActor
-    func testWhenAutoconsentDisabled_promptIsDisplayed() async throws {
-        // reset the feature setting
-        PrivacySecurityPreferences.shared.autoconsentEnabled = nil
-        let url = URL(string: "http://privacy-test-pages.site/features/autoconsent/")!
-
-        let tab = self.tabViewModel.tab
-
-        _=await tab.setUrl(url, userEntered: nil)?.result
-
-        // expect cookieConsent request to be published
-        let cookieConsentPromptRequestPromise = tab.cookieConsentPromptRequestPublisher
-            .compactMap { $0 != nil ? true : nil }
-            .timeout(5)
-            .first()
-            .promise()
-
-        let cookieConsentPromptRequestPublished = try await cookieConsentPromptRequestPromise.value
-        XCTAssertTrue(cookieConsentPromptRequestPublished)
-        XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-
-        // expect cookieConsent popover to be hidden when opening a new tab
-        mainViewController.browserTabViewController.openNewTab(with: .none)
-        XCTAssertFalse(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
-
-        // switch back: popover should be reopen
-        mainViewController.tabCollectionViewModel.select(at: .unpinned(0))
-        XCTAssertTrue(mainViewController.view.window!.childWindows?.first?.contentViewController is CookieConsentUserPermissionViewController)
     }
 
     @MainActor
@@ -130,7 +100,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=await tab.setUrl(url, userEntered: nil)?.result
+        _=await tab.setUrl(url, source: .link)?.result
 
         do {
             let cookieConsentManaged = try await cookieConsentManagedPromise.value
@@ -182,7 +152,7 @@ class AutoconsentIntegrationTests: XCTestCase {
             .promise()
 
         os_log("starting navigation to http://privacy-test-pages.site/features/autoconsent/banner.html")
-        let navigation = tab.setUrl(url, userEntered: nil)
+        let navigation = tab.setUrl(url, source: .link)
 
         navigation?.appendResponder(navigationResponse: { response in
             os_log("navigationResponse: %s", "\(String(describing: response))")

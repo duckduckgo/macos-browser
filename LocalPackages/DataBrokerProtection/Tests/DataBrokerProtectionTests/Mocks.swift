@@ -31,7 +31,8 @@ extension BrokerProfileQueryData {
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
                      scanHistoryEvents: [HistoryEvent] = [HistoryEvent](),
-                     mirrorSites: [MirrorSite] = [MirrorSite]()) -> BrokerProfileQueryData {
+                     mirrorSites: [MirrorSite] = [MirrorSite](),
+                     deprecated: Bool = false) -> BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: dataBrokerName,
@@ -40,7 +41,7 @@ extension BrokerProfileQueryData {
                 schedulingConfig: DataBrokerScheduleConfig.mock,
                 mirrorSites: mirrorSites
             ),
-            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50),
+            profileQuery: ProfileQuery(firstName: "John", lastName: "Doe", city: "Miami", state: "FL", birthYear: 50, deprecated: deprecated),
             scanOperationData: ScanOperationData(brokerId: 1,
                                                  profileQueryId: 1,
                                                  preferredRunDate: preferredRunDate,
@@ -57,12 +58,18 @@ extension DataBrokerScheduleConfig {
     }
 }
 
+final class InternalUserDeciderStoreMock: InternalUserStoring {
+    var isInternalUser: Bool = false
+}
+
 final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
     var currentConfig: Data = Data()
 
     var updatesPublisher: AnyPublisher<Void, Never> = .init(Just(()))
 
     var privacyConfig: BrowserServicesKit.PrivacyConfiguration = PrivacyConfigurationMock()
+
+    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider(store: InternalUserDeciderStoreMock())
 
     func reload(etag: String?, data: Data?) -> PrivacyConfigurationManager.ReloadResult {
         .downloaded
@@ -82,8 +89,16 @@ final class PrivacyConfigurationMock: PrivacyConfiguration {
         false
     }
 
+    func stateFor(featureKey: BrowserServicesKit.PrivacyFeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> BrowserServicesKit.PrivacyConfigurationFeatureState {
+        .disabled(.disabledInConfig)
+    }
+
     func isSubfeatureEnabled(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider) -> Bool {
         false
+    }
+
+    func stateFor(_ subfeature: any PrivacySubfeature, versionProvider: BrowserServicesKit.AppVersionProvider, randomizer: (Range<Double>) -> Double) -> BrowserServicesKit.PrivacyConfigurationFeatureState {
+        .disabled(.disabledInConfig)
     }
 
     func exceptionsList(forFeature featureKey: BrowserServicesKit.PrivacyFeature) -> [String] {
@@ -217,7 +232,7 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail() async throws -> String {
+    func getEmail(dataBrokerName: String?) async throws -> String {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }

@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionIPCNotificationsPresenter.swift
+//  NetworkProtectionAgentNotificationsPresenter.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -33,8 +33,7 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
     // MARK: - Presenting user notifications
 
     func showConnectedNotification(serverLocation: String?) {
-        let userInfo = serverLocation.flatMap { [NetworkProtectionNotification.UserInfoKey.connectedServerLocation: $0] as [AnyHashable: Any] }
-        notificationCenter.post(.showConnectedNotification, userInfo: userInfo)
+        notificationCenter.post(.showConnectedNotification, object: serverLocation)
     }
 
     func showReconnectingNotification() {

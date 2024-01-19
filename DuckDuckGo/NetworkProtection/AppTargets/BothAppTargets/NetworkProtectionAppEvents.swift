@@ -115,7 +115,7 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionNumber
+        let currentVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         defer {
             versionStore.lastVersionRun = currentVersion
@@ -127,27 +127,12 @@ final class NetworkProtectionAppEvents {
             return
         }
 
-        if lastVersionRun != currentVersion {
-            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
-            restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
-        }
+        // We want to restart the VPN menu app to make sure it's always on the latest.
+        restartNetworkProtectionMenu(using: loginItemsManager)
     }
 
-    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
-
+    private func restartNetworkProtectionMenu(using loginItemsManager: LoginItemsManager) {
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
-
-        Task {
-            let machServiceName = Bundle.main.vpnMenuAgentBundleId
-            let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
-            let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-
-            // Restart NetP SysEx on app update
-            if controller.isConnected {
-                await controller.stop()
-                await controller.start()
-            }
-        }
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
@@ -169,7 +154,7 @@ final class NetworkProtectionAppEvents {
     // MARK: - Legacy Login Item and Extension
 
     private func removeLegacyLoginItemAndVPNConfiguration() async {
-        LoginItem(bundleId: legacyAgentBundleID).forceStop()
+        LoginItem(bundleId: legacyAgentBundleID, defaults: .netP).forceStop()
 
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
         let tunnel = tunnels?.first {
@@ -180,7 +165,7 @@ final class NetworkProtectionAppEvents {
             return
         }
 
-        UserDefaults.shared.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
+        UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 
         try? await tunnel.removeFromPreferences()
     }

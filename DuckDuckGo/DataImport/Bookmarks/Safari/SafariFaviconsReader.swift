@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import Common
 import CryptoKit
@@ -35,9 +36,10 @@ final class SafariFaviconsReader {
         }
 
         var action: DataImportAction { .favicons }
-        var source: DataImport.Source { .safari }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .other }
     }
 
     fileprivate final class SafariFaviconRecord: FetchableRecord {
@@ -59,8 +61,8 @@ final class SafariFaviconsReader {
             return components.string
         }
 
-        init(row: Row) {
-            host = row["host"]
+        init(row: Row) throws {
+            host = try row["host"] ?? { throw FetchableRecordError<SafariFaviconRecord>(column: 0) }()
         }
     }
 

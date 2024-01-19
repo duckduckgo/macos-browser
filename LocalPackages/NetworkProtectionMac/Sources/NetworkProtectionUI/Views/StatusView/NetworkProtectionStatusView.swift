@@ -65,6 +65,10 @@ public struct NetworkProtectionStatusView: View {
             TunnelControllerView(model: model.tunnelControllerViewModel)
                 .disabled(model.tunnelControllerViewDisabled)
 
+            if model.showDebugInformation {
+                DebugInformationView(model: DebugInformationViewModel())
+            }
+
             bottomMenuView()
         }
         .padding(5)
@@ -97,7 +101,7 @@ public struct NetworkProtectionStatusView: View {
 
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {
-            ForEach(model.menuItems, id: \.name) { menuItem in
+            ForEach(model.menuItems(), id: \.name) { menuItem in
                 MenuItemButton(menuItem.name, textColor: Color(.defaultText)) {
                     await menuItem.action()
                     dismiss()

@@ -33,7 +33,7 @@ extension Bundle {
         static let notificationsAgentBundleId = "NOTIFICATIONS_AGENT_BUNDLE_ID"
         static let notificationsAgentProductName = "NOTIFICATIONS_AGENT_PRODUCT_NAME"
 #endif
-        static let appGroup = "NETP_APP_GROUP"
+
         static let ipcAppGroup = "IPC_APP_GROUP"
 
 #if DBP
@@ -96,9 +96,18 @@ extension Bundle {
     }
 #endif
 
-    var appGroupName: String {
-        guard let appGroup = object(forInfoDictionaryKey: Keys.appGroup) as? String else {
-            fatalError("Info.plist is missing \(Keys.appGroup)")
+    func appGroup(bundle: BundleGroup) -> String {
+        var appGroupName: String
+
+        switch bundle {
+        case .dbp:
+            appGroupName = "DBP_APP_GROUP"
+        case .netP:
+            appGroupName = "NETP_APP_GROUP"
+        }
+
+        guard let appGroup = object(forInfoDictionaryKey: appGroupName) as? String else {
+            fatalError("Info.plist is missing \(appGroupName)")
         }
         return appGroup
     }
@@ -111,4 +120,9 @@ extension Bundle {
         return appGroup
     }
 
+}
+
+enum BundleGroup {
+    case netP
+    case dbp
 }

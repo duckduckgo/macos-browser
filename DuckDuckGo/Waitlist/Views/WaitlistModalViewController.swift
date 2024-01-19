@@ -31,6 +31,7 @@ final class WaitlistModalViewController<ContentView: View>: NSViewController {
     private let defaultSize = CGSize(width: 360, height: 650)
     private let model: WaitlistViewModel
     private let contentView: ContentView
+    private var dismissObserver: NSObjectProtocol?
 
     private var heightConstraint: NSLayoutConstraint?
 
@@ -42,6 +43,12 @@ final class WaitlistModalViewController<ContentView: View>: NSViewController {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        if let dismissObserver {
+            NotificationCenter.default.removeObserver(dismissObserver)
+        }
     }
 
     public override func loadView() {
@@ -69,7 +76,7 @@ final class WaitlistModalViewController<ContentView: View>: NSViewController {
             hostingView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
 
-        NotificationCenter.default.addObserver(forName: .waitlistModalViewControllerShouldDismiss, object: nil, queue: .main) { [weak self] _ in
+        dismissObserver = NotificationCenter.default.addObserver(forName: .waitlistModalViewControllerShouldDismiss, object: nil, queue: .main) { [weak self] _ in
             self?.dismissModal()
         }
     }

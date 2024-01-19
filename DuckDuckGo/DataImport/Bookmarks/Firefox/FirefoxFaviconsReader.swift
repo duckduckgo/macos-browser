@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import GRDB
 
@@ -33,9 +34,10 @@ final class FirefoxFaviconsReader {
         }
 
         var action: DataImportAction { .favicons }
-        var source: DataImport.Source { .firefox }
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .other }
     }
 
     final class FirefoxFavicon: FetchableRecord {
@@ -48,11 +50,11 @@ final class FirefoxFaviconsReader {
             NSImage(data: imageData)
         }
 
-        init(row: Row) {
-            pageURL = row["page_url"]
-            iconURL = row["icon_url"]
-            size = row["width"]
-            imageData = row["data"]
+        init(row: Row) throws {
+            pageURL = try row["page_url"] ?? { throw FetchableRecordError<FirefoxFavicon>(column: 0) }()
+            iconURL = try row["icon_url"] ?? { throw FetchableRecordError<FirefoxFavicon>(column: 1) }()
+            size = try row["width"] ?? { throw FetchableRecordError<FirefoxFavicon>(column: 2) }()
+            imageData = try row["data"] ?? { throw FetchableRecordError<FirefoxFavicon>(column: 3) }()
         }
     }
 

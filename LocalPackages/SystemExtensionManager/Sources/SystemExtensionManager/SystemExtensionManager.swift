@@ -19,7 +19,7 @@
 import Foundation
 import Cocoa
 import Combine
-@preconcurrency import SystemExtensions
+import SystemExtensions
 
 public enum SystemExtensionRequestError: Error {
     case unknownRequestResult

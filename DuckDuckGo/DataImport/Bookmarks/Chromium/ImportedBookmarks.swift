@@ -18,22 +18,30 @@
 
 import Foundation
 
-struct ImportedBookmarks: Decodable {
+struct ImportedBookmarks: Codable, Equatable {
 
-    struct BookmarkOrFolder: Decodable {
+    struct BookmarkOrFolder: Codable, Equatable {
         let name: String
-        let type: String
+
+        struct EntityType: RawRepresentable, Codable, Equatable {
+            let rawValue: String
+
+            static let bookmark = EntityType(rawValue: "bookmark")
+            static let folder = EntityType(rawValue: "folder")
+            static let url = EntityType(rawValue: "url")
+        }
+        let type: EntityType?
         let urlString: String?
-        let isDDGFavorite: Bool
+        var isDDGFavorite: Bool = false
 
         let children: [BookmarkOrFolder]?
 
         static func bookmark(name: String, urlString: String?, isDDGFavorite: Bool) -> BookmarkOrFolder {
-            .init(name: name, type: "bookmark", urlString: urlString, children: nil, isDDGFavorite: isDDGFavorite)
+            .init(name: name, type: .bookmark, urlString: urlString, children: nil, isDDGFavorite: isDDGFavorite)
         }
 
         static func folder(name: String, children: [BookmarkOrFolder]) -> BookmarkOrFolder {
-            .init(name: name, type: "folder", urlString: nil, children: children)
+            .init(name: name, type: .folder, urlString: nil, children: children)
         }
 
         var url: URL? {
@@ -45,7 +53,7 @@ struct ImportedBookmarks: Decodable {
         }
 
         var isFolder: Bool {
-            return type == "folder"
+            return type == .folder
         }
 
         fileprivate var numberOfBookmarks: Int {
@@ -62,16 +70,7 @@ struct ImportedBookmarks: Decodable {
             case children
         }
 
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            name = try container.decode(String.self, forKey: .name)
-            type = try container.decode(String.self, forKey: .type)
-            urlString = try container.decodeIfPresent(String.self, forKey: .urlString)
-            children = try container.decodeIfPresent([BookmarkOrFolder].self, forKey: .children)
-            isDDGFavorite = false
-        }
-
-        init(name: String, type: String, urlString: String?, children: [BookmarkOrFolder]?, isDDGFavorite: Bool = false) {
+        init(name: String, type: EntityType, urlString: String?, children: [BookmarkOrFolder]?, isDDGFavorite: Bool = false) {
             self.name = name.trimmingWhitespace()
             self.type = type
             self.urlString = urlString
@@ -80,20 +79,23 @@ struct ImportedBookmarks: Decodable {
         }
     }
 
-    struct TopLevelFolders: Decodable {
-        let bookmarkBar: BookmarkOrFolder
-        let otherBookmarks: BookmarkOrFolder
+    struct TopLevelFolders: Codable, Equatable {
+        let bookmarkBar: BookmarkOrFolder?
+        let otherBookmarks: BookmarkOrFolder?
+        let syncedBookmarks: BookmarkOrFolder?
 
         enum CodingKeys: String, CodingKey {
             case bookmarkBar = "bookmark_bar"
             case otherBookmarks = "other"
+            case syncedBookmarks = "synced"
         }
     }
 
     let topLevelFolders: TopLevelFolders
 
     var numberOfBookmarks: Int {
-        topLevelFolders.bookmarkBar.numberOfBookmarks + topLevelFolders.otherBookmarks.numberOfBookmarks
+        [topLevelFolders.bookmarkBar, topLevelFolders.otherBookmarks, topLevelFolders.syncedBookmarks]
+            .reduce(0) { $0 + ($1?.numberOfBookmarks ?? 0) }
     }
 
     enum CodingKeys: String, CodingKey {

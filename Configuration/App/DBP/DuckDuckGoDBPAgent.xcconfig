@@ -14,13 +14,13 @@
 //
 
 #include "../AppTargetsBase.xcconfig"
-#include "../../NetworkProtectionDeveloperID.xcconfig"
+#include "../../DeveloperID.xcconfig"
 
 // Override AppTargetsBase.xcconfig until we resolve bundle IDs.
-PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(DBP_AGENT_BUNDLE_ID)
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(DBP_AGENT_BUNDLE_ID)
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(DBP_AGENT_BUNDLE_ID)
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(DBP_AGENT_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID)
 
 INFOPLIST_FILE = DuckDuckGoDBPBackgroundAgent/Info.plist
 GENERATE_INFOPLIST_FILE = YES
@@ -40,7 +40,7 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
-PRODUCT_NAME = $(DBP_AGENT_PRODUCT_NAME)
+PRODUCT_NAME = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS DBP Agent - Review

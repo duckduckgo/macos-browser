@@ -37,6 +37,7 @@ protocol TabCollectionViewModelDelegate: AnyObject {
 }
 
 @MainActor
+// swiftlint:disable:next type_body_length
 final class TabCollectionViewModel: NSObject {
 
     weak var delegate: TabCollectionViewModelDelegate?
@@ -100,10 +101,10 @@ final class TabCollectionViewModel: NSObject {
 
     private var startupPreferences: StartupPreferences
     private var homePage: Tab.TabContent {
-        var homePage: Tab.TabContent = .homePage
+        var homePage: Tab.TabContent = .newtab
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
-            homePage = Tab.TabContent.contentFromURL(customURL)
+            homePage = Tab.TabContent.contentFromURL(customURL, source: .bookmark)
         }
         return homePage
     }
@@ -278,7 +279,7 @@ final class TabCollectionViewModel: NSObject {
 
     // MARK: - Addition
 
-    func appendNewTab(with content: Tab.TabContent = .homePage, selected: Bool = true, forceChange: Bool = false) {
+    func appendNewTab(with content: Tab.TabContent = .newtab, selected: Bool = true, forceChange: Bool = false) {
         if selectDisplayableTabIfPresent(content) {
             return
         }
@@ -289,7 +290,7 @@ final class TabCollectionViewModel: NSObject {
         guard changesEnabled || forceChange else { return }
 
         tabCollection.append(tab: tab)
-        if tab.content == .homePage {
+        if tab.content == .newtab {
             NotificationCenter.default.post(name: HomePage.Models.newHomePageTabOpen, object: nil)
         }
 
@@ -360,6 +361,16 @@ final class TabCollectionViewModel: NSObject {
     }
 
     // MARK: - Removal
+
+    func removeAll(with content: Tab.TabContent) {
+        let tabs = tabCollection.tabs.filter { $0.content == content }
+
+        for tab in tabs {
+            if let index = indexInAllTabs(of: tab) {
+                remove(at: index)
+            }
+        }
+    }
 
     func remove(at index: TabIndex, published: Bool = true, forceChange: Bool = false) {
         switch index {
@@ -480,7 +491,7 @@ final class TabCollectionViewModel: NSObject {
     func removeAllTabsAndAppendNew(forceChange: Bool = false) {
         guard changesEnabled || forceChange else { return }
 
-        tabCollection.removeAll(andAppend: Tab(content: .homePage, burnerMode: burnerMode))
+        tabCollection.removeAll(andAppend: Tab(content: .newtab, burnerMode: burnerMode))
         selectUnpinnedTab(at: 0, forceChange: forceChange)
 
         delegate?.tabCollectionViewModelDidMultipleChanges(self)
@@ -495,7 +506,7 @@ final class TabCollectionViewModel: NSObject {
 
         tabCollection.removeTabs(at: indexSet)
         if tabCollection.tabs.isEmpty {
-            tabCollection.append(tab: Tab(content: .homePage, burnerMode: burnerMode))
+            tabCollection.append(tab: Tab(content: .newtab, burnerMode: burnerMode))
             selectUnpinnedTab(at: 0, forceChange: forceChange)
         } else {
             let selectionDiff = indexSet.reduce(0) { result, index in
@@ -532,7 +543,7 @@ final class TabCollectionViewModel: NSObject {
             return
         }
 
-        let tabCopy = Tab(content: tab.content, favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, burnerMode: burnerMode, shouldLoadFromCache: true)
+        let tabCopy = Tab(content: tab.content.loadedFromCache(), favicon: tab.favicon, interactionStateData: tab.getActualInteractionStateData(), shouldLoadInBackground: true, burnerMode: burnerMode)
         let newIndex = tabIndex.makeNext()
 
         tabCollection(for: tabIndex)?.insert(tabCopy, at: newIndex.item)

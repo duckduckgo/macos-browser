@@ -25,7 +25,8 @@ import Foundation
 import Navigation
 import WebKit
 import UserScript
-import Account
+import Subscription
+import SubscriptionUI
 
 public extension Notification.Name {
     static let subscriptionPageCloseAndOpenPreferences = Notification.Name("com.duckduckgo.subscriptionPage.CloseAndOpenPreferences")
@@ -74,20 +75,32 @@ extension SubscriptionPagesUserScript: WKScriptMessageHandler {
 }
 
 ///
-/// Use Email sub-feature
+/// Use Subscription sub-feature
 ///
-struct SubscriptionPagesUseEmailFeature: Subfeature {
-    weak var broker: UserScriptMessageBroker?
+final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
+    var broker: UserScriptMessageBroker?
 
     var featureName = "useSubscription"
 
-    var messageOriginPolicy: MessageOriginPolicy = .all
+    var messageOriginPolicy: MessageOriginPolicy = .only(rules: [
+        .exact(hostname: "duckduckgo.com"),
+        .exact(hostname: "abrown.duckduckgo.com")
+    ])
+
+    func with(broker: UserScriptMessageBroker) {
+        self.broker = broker
+    }
 
     func handler(forMethodNamed methodName: String) -> Subfeature.Handler? {
         switch methodName {
         case "getSubscription": return getSubscription
         case "setSubscription": return setSubscription
         case "backToSettings": return backToSettings
+        case "getSubscriptionOptions": return getSubscriptionOptions
+        case "subscriptionSelected": return subscriptionSelected
+        case "activateSubscription": return activateSubscription
+        case "featureSelected": return featureSelected
+        case "completeStripePayment": return completeStripePayment
         default:
             return nil
         }
@@ -105,21 +118,12 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
         let token: String
     }
 
-    struct EmailProtectionValues: Codable {
-        enum CodingKeys: String, CodingKey {
-            case token
-            case user
-            case cohort
-        }
-        let token: String
-        let user: String
-        let cohort: String
-    }
-
     func getSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
-        let token = AccountManager().shortLivedToken ?? ""
-        let subscription = Subscription(token: token)
-        return subscription
+        if let authToken = AccountManager().authToken, let accessToken = AccountManager().accessToken {
+            return Subscription(token: authToken)
+        } else {
+            return Subscription(token: "")
+        }
     }
 
     func setSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
@@ -128,16 +132,282 @@ struct SubscriptionPagesUseEmailFeature: Subfeature {
             return nil
         }
 
-        AccountManager().exchangeTokenAndRefreshEntitlements(with: subscriptionValues.token)
+        let authToken = subscriptionValues.token
+        let accountManager = AccountManager()
+        if case let .success(accessToken) = await accountManager.exchangeAuthTokenToAccessToken(authToken),
+           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
+            accountManager.storeAuthToken(token: authToken)
+            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
+        }
+
         return nil
     }
 
     func backToSettings(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let accountManager = AccountManager()
+        if let accessToken = accountManager.accessToken,
+           case let .success(accountDetails) = await accountManager.fetchAccountDetails(with: accessToken) {
+            accountManager.storeAccount(token: accessToken, email: accountDetails.email, externalID: accountDetails.externalID)
+        }
+
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .subscriptionPageCloseAndOpenPreferences, object: self)
         }
 
         return nil
+    }
+
+    func getSubscriptionOptions(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+#if STRIPE
+        switch await StripePurchaseFlow.subscriptionOptions() {
+        case .success(let subscriptionOptions):
+            return subscriptionOptions
+        case .failure:
+            return nil
+        }
+#else
+        if #available(macOS 12.0, *) {
+            switch await AppStorePurchaseFlow.subscriptionOptions() {
+            case .success(let subscriptionOptions):
+                return subscriptionOptions
+            case .failure:
+                return nil
+            }
+        }
+        return nil
+#endif
+    }
+
+    // swiftlint:disable:next function_body_length
+    func subscriptionSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        struct SubscriptionSelection: Decodable {
+            let id: String
+        }
+
+        let message = original
+
+#if STRIPE
+        let emailAccessToken = try? EmailManager().getToken()
+
+        switch await StripePurchaseFlow.prepareSubscriptionPurchase(emailAccessToken: emailAccessToken) {
+        case .success(let purchaseUpdate):
+            await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
+        case .failure:
+            await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+            return nil
+        }
+#else
+        if #available(macOS 12.0, *) {
+            let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+            let progressViewController = await ProgressViewController(title: UserText.purchasingSubscriptionTitle)
+
+            defer {
+                Task {
+                    await mainViewController?.dismiss(progressViewController)
+                }
+            }
+
+            guard let subscriptionSelection: SubscriptionSelection = DecodableHelper.decode(from: params) else {
+                assertionFailure("SubscriptionPagesUserScript: expected JSON representation of SubscriptionSelection")
+                return nil
+            }
+
+            os_log(.info, log: .subscription, "[Purchase] Starting purchase for: %{public}s", subscriptionSelection.id)
+
+            await mainViewController?.presentAsSheet(progressViewController)
+
+            // Check for active subscriptions
+            if await PurchaseManager.hasActiveSubscription() {
+                os_log(.info, log: .subscription, "[Purchase] Found active subscription during purchase")
+                await WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionFoundAlert(originalMessage: message)
+                return nil
+            }
+
+            let emailAccessToken = try? EmailManager().getToken()
+
+            os_log(.info, log: .subscription, "[Purchase] Purchasing")
+            switch await AppStorePurchaseFlow.purchaseSubscription(with: subscriptionSelection.id, emailAccessToken: emailAccessToken) {
+            case .success:
+                break
+            case .failure(let error):
+                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                await WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                return nil
+            }
+
+            await progressViewController.updateTitleText(UserText.completingPurchaseTitle)
+
+            os_log(.info, log: .subscription, "[Purchase] Completing purchase")
+
+            switch await AppStorePurchaseFlow.completeSubscriptionPurchase() {
+            case .success(let purchaseUpdate):
+                await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: purchaseUpdate)
+            case .failure(let error):
+                os_log(.error, log: .subscription, "[Purchase] Error: %{public}s", String(reflecting: error))
+                await pushPurchaseUpdate(originalMessage: message, purchaseUpdate: PurchaseUpdate(type: "completed"))
+            }
+
+            os_log(.info, log: .subscription, "[Purchase] Purchase complete")
+        }
+#endif
+
+        return nil
+    }
+
+    func activateSubscription(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let message = original
+
+        Task { @MainActor in
+            let actionHandlers = SubscriptionAccessActionHandlers(
+                restorePurchases: {
+                    if #available(macOS 12.0, *) {
+                        Task {
+                            let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+                            let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
+
+                            defer { mainViewController?.dismiss(progressViewController) }
+
+                            mainViewController?.presentAsSheet(progressViewController)
+
+                            guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
+
+                            switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+                            case .success:
+                                message.webView?.reload()
+                            case .failure(let error):
+                                switch error {
+                                case .missingAccountOrTransactions:
+                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
+                                case .subscriptionExpired:
+                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
+                                default:
+                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                                }
+                            }
+                        }
+                    }
+                },
+                openURLHandler: { url in
+                    WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+                }, goToSyncPreferences: {
+                    WindowControllersManager.shared.show(url: .settingsPane(.sync), source: .ui, newTab: true)
+                })
+
+            let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
+            WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.presentAsSheet(vc)
+        }
+
+        return nil
+    }
+
+    func featureSelected(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        struct FeatureSelection: Codable {
+            let feature: String
+        }
+
+        guard let featureSelection: FeatureSelection = DecodableHelper.decode(from: params) else {
+            assertionFailure("SubscriptionPagesUserScript: expected JSON representation of FeatureSelection")
+            return nil
+        }
+
+        guard let subscriptionFeatureName = SubscriptionFeatureName(rawValue: featureSelection.feature) else {
+            assertionFailure("SubscriptionPagesUserScript: feature name does not matches mapping")
+            return nil
+        }
+
+        switch subscriptionFeatureName {
+        case .privateBrowsing:
+            NotificationCenter.default.post(name: .openPrivateBrowsing, object: self, userInfo: nil)
+        case .privateSearch:
+            NotificationCenter.default.post(name: .openPrivateSearch, object: self, userInfo: nil)
+        case .emailProtection:
+            NotificationCenter.default.post(name: .openEmailProtection, object: self, userInfo: nil)
+        case .appTrackingProtection:
+            NotificationCenter.default.post(name: .openAppTrackingProtection, object: self, userInfo: nil)
+        case .vpn:
+            NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
+        case .personalInformationRemoval:
+            NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
+        case .identityTheftRestoration:
+            NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+        }
+
+        return nil
+    }
+
+    func completeStripePayment(params: Any, original: WKScriptMessage) async throws -> Encodable? {
+        let mainViewController = await WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+        let progressViewController = await ProgressViewController(title: UserText.completingPurchaseTitle)
+
+        await mainViewController?.presentAsSheet(progressViewController)
+        await StripePurchaseFlow.completeSubscriptionPurchase()
+        await mainViewController?.dismiss(progressViewController)
+
+        return [String: String]() // cannot be nil
+    }
+
+    // MARK: Push actions
+
+    enum SubscribeActionName: String {
+        case onPurchaseUpdate
+    }
+
+    @MainActor
+    func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) async {
+        pushAction(method: .onPurchaseUpdate, webView: originalMessage.webView!, params: purchaseUpdate)
+    }
+
+    func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
+        let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
+        broker.push(method: method.rawValue, params: params, for: self, into: webView)
+    }
+}
+
+extension MainWindowController {
+
+    @MainActor
+    func showSomethingWentWrongAlert(environment: SubscriptionPurchaseEnvironment.Environment = SubscriptionPurchaseEnvironment.current) {
+        guard let window else { return }
+
+        switch environment {
+        case .appStore:
+            window.show(.somethingWentWrongAlert())
+        case .stripe:
+            window.show(.somethingWentWrongStripeAlert())
+        }
+
+    }
+
+    @MainActor
+    func showSubscriptionNotFoundAlert() {
+        guard let window else { return }
+
+        window.show(.subscriptionNotFoundAlert(), firstButtonAction: {
+            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
+        })
+    }
+
+    @MainActor
+    func showSubscriptionInactiveAlert() {
+        guard let window else { return }
+
+        window.show(.subscriptionInactiveAlert(), firstButtonAction: {
+            WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
+        })
+    }
+
+    @MainActor
+    func showSubscriptionFoundAlert(originalMessage: WKScriptMessage) {
+        guard let window else { return }
+
+        window.show(.subscriptionFoundAlert(), firstButtonAction: {
+            if #available(macOS 12.0, *) {
+                Task {
+                    _ = await AppStoreRestoreFlow.restoreAccountFromPastPurchase()
+                    originalMessage.webView?.reload()
+                }
+            }
+        })
     }
 }
 

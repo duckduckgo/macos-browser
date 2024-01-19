@@ -21,7 +21,7 @@ import Foundation
 extension Bundle {
 
     struct Keys {
-        static let appGroup = "NETP_APP_GROUP"
+        static let appGroup = "DBP_APP_GROUP"
     }
 
     var appGroupName: String {

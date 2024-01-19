@@ -81,11 +81,11 @@ extension AppDelegate {
             return
         }
 
-        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url), shouldLoadInBackground: true))
+        WindowsManager.openNewWindow(with: Tab(content: .contentFromURL(url, source: .historyEntry), shouldLoadInBackground: true))
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -95,7 +95,7 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -132,7 +132,7 @@ extension AppDelegate {
             return
         }
 
-        let tab = Tab(content: .url(url), shouldLoadInBackground: true)
+        let tab = Tab(content: .url(url, source: .bookmark), shouldLoadInBackground: true)
         WindowsManager.openNewWindow(with: tab)
     }
 
@@ -144,7 +144,7 @@ extension AppDelegate {
     }
 
     @objc func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .anySettingsPane)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -159,7 +159,7 @@ extension AppDelegate {
     }
 
     @objc func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportViewController.show()
+        DataImportView().show()
     }
 
     @objc func openExportLogins(_ sender: Any?) {
@@ -232,7 +232,7 @@ extension AppDelegate {
             assertionFailure("No reference to main window controller")
             return
         }
-        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin))
+        windowController.mainViewController.browserTabViewController.openNewTab(with: .url(URL.duckDuckGoEmailLogin, source: .ui))
     }
 
 }
@@ -266,19 +266,19 @@ extension MainViewController {
 
     @objc func openPreferences(_ sender: Any?) {
         makeKeyIfNeeded()
-        browserTabViewController.openNewTab(with: .anyPreferencePane)
+        browserTabViewController.openNewTab(with: .anySettingsPane)
     }
 
     // MARK: - File
 
     @objc func newTab(_ sender: Any?) {
         makeKeyIfNeeded()
-        browserTabViewController.openNewTab(with: .homePage)
+        browserTabViewController.openNewTab(with: .newtab)
     }
 
     @objc func openLocation(_ sender: Any?) {
         makeKeyIfNeeded()
-        guard let addressBarTextField = navigationBarViewController?.addressBarViewController?.addressBarTextField else {
+        guard let addressBarTextField = navigationBarViewController.addressBarViewController?.addressBarTextField else {
             os_log("MainViewController: Cannot reference address bar text field", type: .error)
             return
         }
@@ -342,15 +342,15 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage))
+                WindowsManager.openNewWindow(with: Tab(content: .newtab))
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
                 navigationBarViewController = wc.mainViewController.navigationBarViewController
             }
-            navigationBarViewController?.view.window?.makeKeyAndOrderFront(nil)
+            navigationBarViewController.view.window?.makeKeyAndOrderFront(nil)
         }
-        navigationBarViewController?.toggleDownloadsPopover(keepButtonVisible: false)
+        navigationBarViewController.toggleDownloadsPopover(keepButtonVisible: false)
     }
 
     @objc func toggleBookmarksBarFromMenu(_ sender: Any) {
@@ -380,7 +380,9 @@ extension MainViewController {
     }
 
     @objc func toggleNetworkProtectionShortcut(_ sender: Any) {
+#if NETWORK_PROTECTION
         LocalPinningManager.shared.togglePinning(for: .networkProtection)
+#endif
     }
 
     // MARK: - History
@@ -399,7 +401,7 @@ extension MainViewController {
         guard view.window?.isPopUpWindow == false,
             let (tab, _) = getActiveTabAndIndex(), tab === tabCollectionViewModel.selectedTab else {
 
-            browserTabViewController.openNewTab(with: .homePage)
+            browserTabViewController.openNewTab(with: .newtab)
             return
         }
         makeKeyIfNeeded()
@@ -414,7 +416,7 @@ extension MainViewController {
         }
 
         makeKeyIfNeeded()
-        getActiveTabAndIndex()?.tab.setContent(.contentFromURL(url))
+        getActiveTabAndIndex()?.tab.setContent(.contentFromURL(url, source: .historyEntry))
         adjustFirstResponder()
     }
 
@@ -459,7 +461,7 @@ extension MainViewController {
         }
         makeKeyIfNeeded()
 
-        navigationBarViewController?
+        navigationBarViewController
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: false, accessPoint: .init(sender: sender, default: .moreMenu))
@@ -472,7 +474,7 @@ extension MainViewController {
         }
         makeKeyIfNeeded()
 
-        navigationBarViewController?
+        navigationBarViewController
             .addressBarViewController?
             .addressBarButtonsViewController?
             .openBookmarkPopover(setFavorite: true, accessPoint: .init(sender: sender, default: .moreMenu))
@@ -501,7 +503,7 @@ extension MainViewController {
         }
 
         let tabs = models.compactMap { ($0.entity as? Bookmark)?.urlObject }.map {
-            Tab(content: .url($0),
+            Tab(content: .url($0, source: .bookmark),
                 shouldLoadInBackground: true,
                 burnerMode: tabCollectionViewModel.burnerMode)
         }
@@ -669,10 +671,15 @@ extension MainViewController {
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowImport.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowDuckPlayer.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowEmailProtection.rawValue)
-        UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowCookie.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay0.rawValue)
         UserDefaults.standard.set(true, forKey: UserDefaultsWrapper<Bool>.Key.homePageShowSurveyDay7.rawValue)
         UserDefaults.standard.set(false, forKey: UserDefaultsWrapper<Bool>.Key.homePageUserInteractedWithSurveyDay0.rawValue)
+    }
+
+    @objc func internalUserState(_ sender: Any?) {
+        guard let internalUserDecider = NSApp.delegateTyped.internalUserDecider as? DefaultInternalUserDecider else { return }
+        let state = internalUserDecider.isInternalUser
+        internalUserDecider.debugSetInternalUserState(!state)
     }
 
     @objc func resetDailyPixels(_ sender: Any?) {
@@ -710,9 +717,9 @@ extension MainViewController {
         #endif
     }
 
+    /// debug menu popup window test
     @objc func showPopUpWindow(_ sender: Any?) {
-        let tabURL = Tab.TabContent.url(URL(string: "https://duckduckgo.com")!)
-        let tab = Tab(content: tabURL,
+        let tab = Tab(content: .url(.duckDuckGo, source: .ui),
                       webViewConfiguration: WKWebViewConfiguration(),
                       parentTab: nil,
                       canBeClosedWithBack: false,
@@ -734,7 +741,7 @@ extension MainViewController {
     @objc func reloadConfigurationNow(_ sender: Any?) {
         OSLog.loggingCategories.insert(OSLog.AppCategories.config.rawValue)
 
-        ConfigurationManager.shared.forceRefresh()
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
     }
 
     private func setConfigurationUrl(_ configurationUrl: URL?) {
@@ -745,7 +752,7 @@ extension MainViewController {
             configurationProvider.resetToDefaultConfigurationUrl()
         }
         Configuration.setURLProvider(configurationProvider)
-        ConfigurationManager.shared.forceRefresh()
+        ConfigurationManager.shared.forceRefresh(isDebug: true)
         if let configurationUrl {
             os_log("New configuration URL set to \(configurationUrl.absoluteString)", type: .info)
         } else {

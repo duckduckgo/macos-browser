@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionWaitlistRootView.swift
+//  WaitlistRootView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -69,7 +69,13 @@ struct DataBrokerProtectionWaitlistRootView: View {
                     DataBrokerProtectionTermsAndConditionsContentView()
                 }
             case .readyToEnable:
-                EnableWaitlistFeatureView(viewData: EnableDataBrokerProtectionViewData())
+                // Hack to skip the readyToEnable step and close the modal
+                Text("")
+                    .onAppear {
+                        Task {
+                            await model.perform(action: .closeAndConfirmFeature)
+                        }
+                    }
             }
         }
         .environmentObject(model)

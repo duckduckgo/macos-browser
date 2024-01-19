@@ -47,7 +47,7 @@ extension NetworkProtectionStatusView {
 
         @MainActor
         @Published
-        private var connectionStatus: NetworkProtection.ConnectionStatus = .disconnected
+        private var connectionStatus: NetworkProtection.ConnectionStatus = .default
 
         /// The type of extension that's being used for NetP
         ///
@@ -66,9 +66,18 @@ extension NetworkProtectionStatusView {
         ///
         private let statusReporter: NetworkProtectionStatusReporter
 
+        /// The debug information publisher
+        ///
+        private let debugInformationPublisher: AnyPublisher<Bool, Never>
+
+        /// Whether we're showing debug information
+        ///
+        @Published
+        var showDebugInformation: Bool
+
         // MARK: - Extra Menu Items
 
-        public let menuItems: [MenuItem]
+        public let menuItems: () -> [MenuItem]
 
         // MARK: - Misc
 
@@ -90,12 +99,14 @@ extension NetworkProtectionStatusView {
         public init(controller: TunnelController,
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
-                    menuItems: [MenuItem],
+                    debugInformationPublisher: AnyPublisher<Bool, Never>,
+                    menuItems: @escaping () -> [MenuItem],
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
             self.statusReporter = statusReporter
+            self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
             self.runLoopMode = runLoopMode
 
@@ -107,12 +118,14 @@ extension NetworkProtectionStatusView {
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
             lastTunnelErrorMessage = statusReporter.connectionErrorObserver.recentValue
             lastControllerErrorMessage = statusReporter.controllerErrorMessageObserver.recentValue
+            showDebugInformation = false
 
             // Particularly useful when unit testing with an initial status of our choosing.
             subscribeToStatusChanges()
             subscribeToConnectivityIssues()
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
+            subscribeToDebugInformationChanges()
 
             onboardingStatusPublisher
                 .receive(on: DispatchQueue.main)
@@ -164,6 +177,14 @@ extension NetworkProtectionStatusView {
                     self.lastControllerErrorMessage = errorMessage
                 }
             }.store(in: &cancellables)
+        }
+
+        private func subscribeToDebugInformationChanges() {
+            debugInformationPublisher
+                .removeDuplicates()
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.showDebugInformation, onWeaklyHeld: self)
+                .store(in: &cancellables)
         }
 
         // MARK: - Connection Status: Errors

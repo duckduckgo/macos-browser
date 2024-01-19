@@ -20,6 +20,7 @@ import Cocoa
 import Combine
 import Common
 import SwiftUI
+import SwiftUIExtensions
 
 final class FeedbackViewController: NSViewController {
 
@@ -260,6 +261,9 @@ final class FeedbackViewController: NSViewController {
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackFeatureRequestDescription
         case .other:
             browserFeedbackDescriptionLabel.stringValue = UserText.feedbackOtherDescription
+        case .generalFeedback, .designFeedback, .usability, .dataImport:
+            assertionFailure("unexpected flow")
+            browserFeedbackDescriptionLabel.stringValue = "\(category)"
         }
     }
 

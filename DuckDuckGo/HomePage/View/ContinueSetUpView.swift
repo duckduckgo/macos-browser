@@ -146,14 +146,18 @@ extension HomePage.Views {
                                 .frame(alignment: .center)
                             VStack(spacing: 4) {
                                 Text(title)
-                                    .font(.system(size: 13))
                                     .bold()
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .font(.system(size: 13))
+                                    .fixedSize(horizontal: false, vertical: true)
                                 Text(summary)
                                     .frame(width: 216, alignment: .center)
                                     .multilineTextAlignment(.center)
                                     .lineLimit(3)
                                     .font(.system(size: 11))
                                     .foregroundColor(Color("GreyTextColor"))
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                             Spacer()
                         }
@@ -272,4 +276,8 @@ extension HomePage.Views {
             }
         }
     }
+}
+
+#Preview {
+    HomePage.Views.ContinueSetUpView()
 }

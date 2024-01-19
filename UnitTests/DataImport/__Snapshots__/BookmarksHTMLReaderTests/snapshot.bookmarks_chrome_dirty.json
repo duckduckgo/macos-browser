@@ -1,0 +1,31 @@
+{
+  "roots" : {
+    "bookmark_bar" : {
+      "children" : [
+        {
+          "name" : "Bookmark 1",
+          "type" : "bookmark",
+          "url" : "https:\/\/example.com"
+        },
+        {
+          "name" : "Bookmark 2",
+          "type" : "bookmark",
+          "url" : "https:\/\/example2.com"
+        }
+      ],
+      "name" : "Bookmarks Bar",
+      "type" : "folder"
+    },
+    "other" : {
+      "children" : [
+        {
+          "name" : "Bookmark 3",
+          "type" : "bookmark",
+          "url" : "https:\/\/example3.com"
+        }
+      ],
+      "name" : "Other bookmarks",
+      "type" : "folder"
+    }
+  }
+}

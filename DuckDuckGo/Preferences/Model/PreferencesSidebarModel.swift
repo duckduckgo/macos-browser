@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import SwiftUI
 import BrowserServicesKit
 import Combine
+import DDGSync
+import SwiftUI
 
 final class PreferencesSidebarModel: ObservableObject {
 
@@ -28,38 +29,90 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published var selectedTabIndex: Int = 0
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
 
+    // MARK: - Initializers
+
     init(
         loadSections: @escaping () -> [PreferencesSection],
         tabSwitcherTabs: [Tab.TabContent],
-        privacyConfigurationManager: PrivacyConfigurationManaging
+        privacyConfigurationManager: PrivacyConfigurationManaging,
+        syncService: DDGSyncing
     ) {
         self.loadSections = loadSections
         self.tabSwitcherTabs = tabSwitcherTabs
+
         resetTabSelectionIfNeeded()
         refreshSections()
 
-        privacyConfigCancellable = privacyConfigurationManager.updatesPublisher
+        let duckPlayerFeatureFlagDidChange = privacyConfigurationManager.updatesPublisher
             .map { [weak privacyConfigurationManager] in
                 privacyConfigurationManager?.privacyConfig.isEnabled(featureKey: .duckPlayer) == true
             }
             .removeDuplicates()
             .asVoid()
+
+        let syncFeatureFlagsDidChange = syncService.featureFlagsPublisher.map { $0.contains(.userInterface) }
+            .removeDuplicates()
+            .asVoid()
+
+        Publishers.Merge(duckPlayerFeatureFlagDidChange, syncFeatureFlagsDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.refreshSections()
             }
+            .store(in: &cancellables)
+
+#if NETWORK_PROTECTION
+        setupVPNPaneVisibility()
+#endif
     }
 
     @MainActor
     convenience init(
         tabSwitcherTabs: [Tab.TabContent] = Tab.TabContent.displayableTabTypes,
         privacyConfigurationManager: PrivacyConfigurationManaging = ContentBlocking.shared.privacyConfigurationManager,
+        syncService: DDGSyncing,
         includeDuckPlayer: Bool
     ) {
-        self.init(loadSections: { PreferencesSection.defaultSections(includingDuckPlayer: includeDuckPlayer) },
+        let loadSections = {
+#if NETWORK_PROTECTION
+            let includingVPN = DefaultNetworkProtectionVisibility().isOnboarded
+#else
+            let includingVPN = false
+#endif
+
+            return PreferencesSection.defaultSections(
+                includingDuckPlayer: includeDuckPlayer,
+                includingSync: syncService.featureFlags.contains(.userInterface),
+                includingVPN: includingVPN
+            )
+        }
+
+        self.init(loadSections: loadSections,
                   tabSwitcherTabs: tabSwitcherTabs,
-                  privacyConfigurationManager: privacyConfigurationManager)
+                  privacyConfigurationManager: privacyConfigurationManager,
+                  syncService: syncService)
     }
+
+    // MARK: - Setup
+
+#if NETWORK_PROTECTION
+    private func setupVPNPaneVisibility() {
+        DefaultNetworkProtectionVisibility().onboardStatusPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] onboardingStatus in
+                guard let self else { return }
+
+                if onboardingStatus != .completed && self.selectedPane == .vpn {
+                    self.selectedPane = .general
+                }
+
+                self.refreshSections()
+            }
+            .store(in: &cancellables)
+    }
+#endif
+
+    // MARK: - Refreshing logic
 
     func refreshSections() {
         sections = loadSections()
@@ -75,7 +128,7 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     func resetTabSelectionIfNeeded() {
-        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .anyPreferencePane) {
+        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .anySettingsPane) {
             if preferencesTabIndex != selectedTabIndex {
                 selectedTabIndex = preferencesTabIndex
             }
@@ -83,5 +136,5 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     private let loadSections: () -> [PreferencesSection]
-    private var privacyConfigCancellable: AnyCancellable?
+    private var cancellables = Set<AnyCancellable>()
 }

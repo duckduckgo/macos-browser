@@ -56,7 +56,8 @@ final class URLExtensionTests: XCTestCase {
             ("test string with spaces", "https://duckduckgo.com/?q=test%20string%20with%20spaces"),
             ("http://💩.la:8080 ", "http://xn--ls8h.la:8080"),
             ("http:// 💩.la:8080 ", "https://duckduckgo.com/?q=http%3A%2F%2F%20%F0%9F%92%A9.la%3A8080"),
-            ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource")
+            ("https://xn--ls8h.la/path/to/resource", "https://xn--ls8h.la/path/to/resource"),
+            ("1.4/3.4", "https://duckduckgo.com/?q=1.4%2F3.4")
         ]
 
         for (string, expected) in data {
@@ -114,6 +115,25 @@ final class URLExtensionTests: XCTestCase {
 
         let notURL = URL.makeURL(fromSuggestionPhrase: "type:pdf")
         XCTAssertNil(notURL)
+    }
+
+    func testThatEmailAddressesExtractsCommaSeparatedAddressesFromMailtoURL() throws {
+        let url1 = try XCTUnwrap(URL(string: "mailto:dax@duck.com,donald@duck.com,example@duck.com"))
+        XCTAssertEqual(url1.emailAddresses, ["dax@duck.com", "donald@duck.com", "example@duck.com"])
+
+        if let url2 = URL(string: "mailto:  dax@duck.com,    donald@duck.com,  example@duck.com ") {
+            XCTAssertEqual(url2.emailAddresses, ["dax@duck.com", "donald@duck.com", "example@duck.com"])
+        }
+    }
+
+    func testThatEmailAddressesExtractsInvalidEmailAddresses() throws {
+        // parity with Safari which also doesn't validate email addresses
+        let url1 = try XCTUnwrap(URL(string: "mailto:dax@duck.com,donald,example"))
+        XCTAssertEqual(url1.emailAddresses, ["dax@duck.com", "donald", "example"])
+
+        if let url2 = URL(string: "mailto:dax@duck.com, ,,, ,, donald") {
+            XCTAssertEqual(url2.emailAddresses, ["dax@duck.com", "donald"])
+        }
     }
 
 }

@@ -23,29 +23,31 @@ import WebKit
 import Combine
 
 final public class DataBrokerProtectionViewController: NSViewController {
-
-    private enum Constants {
-        static let dbpUiUrl = "https://use-devtesting18.duckduckgo.com/dbp"
-    }
-
     private let dataManager: DataBrokerProtectionDataManaging
     private let scheduler: DataBrokerProtectionScheduler
     private var webView: WKWebView?
-
+    private let webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable
     private let webUIViewModel: DBPUIViewModel
 
     private let openURLHandler: (URL?) -> Void
+    private var reloadObserver: NSObjectProtocol?
 
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
                 privacyConfig: PrivacyConfigurationManaging? = nil,
                 prefs: ContentScopeProperties? = nil,
+                webUISettings: DataBrokerProtectionWebUIURLSettingsRepresentable,
                 openURLHandler: @escaping (URL?) -> Void) {
         self.scheduler = scheduler
         self.dataManager = dataManager
         self.openURLHandler = openURLHandler
-
-        self.webUIViewModel = DBPUIViewModel(dataManager: dataManager, scheduler: scheduler, privacyConfig: privacyConfig, prefs: prefs, webView: webView)
+        self.webUISettings = webUISettings
+        self.webUIViewModel = DBPUIViewModel(dataManager: dataManager,
+                                             scheduler: scheduler,
+                                             webUISettings: webUISettings,
+                                             privacyConfig: privacyConfig,
+                                             prefs: prefs,
+                                             webView: webView)
 
         Task {
             _ = dataManager.fetchProfile(ignoresCache: true)
@@ -58,6 +60,16 @@ final public class DataBrokerProtectionViewController: NSViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        reloadObserver = NotificationCenter.default.addObserver(forName: DataBrokerProtectionNotifications.shouldReloadUI,
+                                               object: nil,
+                                               queue: .main) { [weak self] _ in
+            self?.webView?.reload()
+        }
+    }
+
     override public func loadView() {
         guard let configuration = webUIViewModel.setupCommunicationLayer() else { return }
 
@@ -65,7 +77,18 @@ final public class DataBrokerProtectionViewController: NSViewController {
         webView?.uiDelegate = self
         view = webView!
 
-        webView?.load(URL(string: Constants.dbpUiUrl)!)
+        if let url = URL(string: webUISettings.selectedURL) {
+            webView?.load(url)
+        } else {
+            assertionFailure("Selected URL is not valid \(webUISettings.selectedURL)")
+        }
+
+    }
+
+    deinit {
+        if let reloadObserver {
+            NotificationCenter.default.removeObserver(reloadObserver)
+        }
     }
 }
 

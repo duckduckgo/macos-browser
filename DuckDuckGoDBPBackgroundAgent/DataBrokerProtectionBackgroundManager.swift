@@ -1,5 +1,5 @@
 //
-//  DataBrokerProtectionManager.swift
+//  DataBrokerProtectionBackgroundManager.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -26,12 +26,14 @@ public final class DataBrokerProtectionBackgroundManager {
 
     static let shared = DataBrokerProtectionBackgroundManager()
 
+    private let pixelHandler: EventMapping<DataBrokerProtectionPixels> = DataBrokerProtectionPixelsHandler()
+
     private let authenticationRepository: AuthenticationRepository = KeychainAuthenticationData()
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
 
-    private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler)
+    private lazy var ipcServiceManager = IPCServiceManager(scheduler: scheduler, pixelHandler: pixelHandler)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -50,16 +52,21 @@ public final class DataBrokerProtectionBackgroundManager {
                                                   thirdPartyCredentialsProvider: false)
 
         let sessionKey = UUID().uuidString
-        let prefs = ContentScopeProperties.init(gpcEnabled: false,
+        let prefs = ContentScopeProperties(gpcEnabled: false,
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 
+        let pixelHandler = DataBrokerProtectionPixelsHandler()
+
+        let userNotificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
+
         return DefaultDataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
-                                                  contentScopeProperties: prefs,
-                                                  dataManager: dataManager,
-                                                  notificationCenter: NotificationCenter.default,
-                                                  pixelHandler: DataBrokerProtectionPixelsHandler(),
-                                                  redeemUseCase: redeemUseCase)
+                                                    contentScopeProperties: prefs,
+                                                    dataManager: dataManager,
+                                                    notificationCenter: NotificationCenter.default,
+                                                    pixelHandler: pixelHandler,
+                                                    redeemUseCase: redeemUseCase,
+                                                    userNotificationService: userNotificationService)
     }()
 
     private init() {
@@ -69,16 +76,21 @@ public final class DataBrokerProtectionBackgroundManager {
     }
 
     public func runOperationsAndStartSchedulerIfPossible() {
+        pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossible)
 
         // If there's no saved profile we don't need to start the scheduler
         if dataManager.fetchProfile() != nil {
             scheduler.runQueuedOperations(showWebView: false) { [weak self] error in
                 guard error == nil else {
+                    // Ideally we'd fire a pixel here, however at the moment the scheduler never ever returns an error
                     return
                 }
 
+                self?.pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleRunQueuedOperationsCallbackStartScheduler)
                 self?.scheduler.startScheduler()
             }
+        } else {
+            pixelHandler.fire(.backgroundAgentRunOperationsAndStartSchedulerIfPossibleNoSavedProfile)
         }
     }
 }

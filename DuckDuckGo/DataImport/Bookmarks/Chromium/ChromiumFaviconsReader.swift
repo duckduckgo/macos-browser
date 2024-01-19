@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import GRDB
 
@@ -33,12 +34,13 @@ final class ChromiumFaviconsReader {
         }
 
         var action: DataImportAction { .favicons }
-        let source: DataImport.Source
         let type: OperationType
         let underlyingError: Error?
+
+        var errorType: DataImport.ErrorType { .other }
     }
     func importError(type: ImportError.OperationType, underlyingError: Error) -> ImportError {
-        ImportError(source: source, type: type, underlyingError: underlyingError)
+        ImportError(type: type, underlyingError: underlyingError)
     }
 
     final class ChromiumFavicon: FetchableRecord {
@@ -51,21 +53,19 @@ final class ChromiumFaviconsReader {
             NSImage(data: imageData)
         }
 
-        init(row: Row) {
-            pageURL = row["page_url"]
-            iconURL = row["url"]
-            size = row["width"]
-            imageData = row["image_data"]
+        init(row: Row) throws {
+            pageURL = try row["page_url"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 0) }()
+            iconURL = try row["url"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 1) }()
+            size = try row["width"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 2) }()
+            imageData = try row["image_data"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 3) }()
         }
     }
 
     private let chromiumFaviconsDatabaseURL: URL
     private var currentOperationType: ImportError.OperationType = .copyTemporaryFile
-    private let source: DataImport.Source
 
-    init(chromiumDataDirectoryURL: URL, source: DataImport.Source) {
+    init(chromiumDataDirectoryURL: URL) {
         self.chromiumFaviconsDatabaseURL = chromiumDataDirectoryURL.appendingPathComponent(Constants.faviconsDatabaseName)
-        self.source = source
     }
 
     func readFavicons() -> DataImportResult<[String: [ChromiumFavicon]]> {

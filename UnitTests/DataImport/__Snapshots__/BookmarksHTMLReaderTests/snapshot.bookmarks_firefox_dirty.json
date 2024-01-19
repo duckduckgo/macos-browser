@@ -1,0 +1,42 @@
+{
+  "roots" : {
+    "bookmark_bar" : {
+      "children" : [
+        {
+          "name" : "Help and Tutorials",
+          "type" : "bookmark",
+          "url" : "https:\/\/support.mozilla.org\/en-US\/products\/firefox"
+        },
+        {
+          "name" : "Customize Firefox",
+          "type" : "bookmark",
+          "url" : "https:\/\/support.mozilla.org\/en-US\/kb\/customize-firefox-controls-buttons-and-toolbars"
+        }
+      ],
+      "name" : "Folder Name 1",
+      "type" : "folder"
+    },
+    "other" : {
+      "children" : [
+        {
+          "children" : [
+            {
+              "name" : "Get Involved",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla.org\/en-US\/contribute\/"
+            },
+            {
+              "name" : "About Us",
+              "type" : "bookmark",
+              "url" : "https:\/\/www.mozilla.org\/en-US\/about\/"
+            }
+          ],
+          "name" : "Folder Name B",
+          "type" : "folder"
+        }
+      ],
+      "name" : "Other bookmarks",
+      "type" : "folder"
+    }
+  }
+}

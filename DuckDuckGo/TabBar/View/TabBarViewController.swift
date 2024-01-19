@@ -69,6 +69,12 @@ final class TabBarViewController: NSViewController {
         }
     }
 
+    static func create(tabCollectionViewModel: TabCollectionViewModel) -> TabBarViewController {
+        NSStoryboard(name: "TabBar", bundle: nil).instantiateInitialController { coder in
+            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
+        }!
+    }
+
     required init?(coder: NSCoder) {
         fatalError("TabBarViewController: Bad initializer")
     }
@@ -135,7 +141,7 @@ final class TabBarViewController: NSViewController {
     }
 
     @objc func addButtonAction(_ sender: NSButton) {
-        tabCollectionViewModel.appendNewTab(with: .homePage)
+        tabCollectionViewModel.appendNewTab(with: .newtab)
     }
 
     @IBAction func rightScrollButtonAction(_ sender: NSButton) {
@@ -907,8 +913,7 @@ extension TabBarViewController: NSCollectionViewDelegate {
         let newIndex = min(indexPath.item + 1, tabCollectionViewModel.tabCollection.tabs.count)
         if let url = draggingInfo.draggingPasteboard.url {
             // dropping URL or file
-            tabCollectionViewModel.insert(Tab(content: .url(url),
-                                              burnerMode: tabCollectionViewModel.burnerMode),
+            tabCollectionViewModel.insert(Tab(content: .url(url, source: .appOpenUrl), burnerMode: tabCollectionViewModel.burnerMode),
                                           at: .unpinned(newIndex),
                                           selected: true)
 

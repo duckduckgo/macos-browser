@@ -1,0 +1,75 @@
+{
+  "roots" : {
+    "bookmark_bar" : {
+      "children" : [
+
+      ],
+      "name" : "",
+      "type" : "folder"
+    },
+    "other" : {
+      "children" : [
+        {
+          "name" : "News, sport and opinion from the Guardian's global edition | The Guardian",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.theguardian.com\/international"
+        },
+        {
+          "name" : "Digg - What the Internet is talking about right now",
+          "type" : "bookmark",
+          "url" : "https:\/\/digg.com"
+        },
+        {
+          "name" : "Hacker News",
+          "type" : "bookmark",
+          "url" : "https:\/\/news.ycombinator.com\/"
+        },
+        {
+          "name" : "TechCrunch – Startup and Technology News",
+          "type" : "bookmark",
+          "url" : "https:\/\/techcrunch.com"
+        },
+        {
+          "name" : "The Linux Programming Interface: A Linux and UNIX System Programming Handbook: Amazon.co.uk: Michael Kerrisk: 9781593272203: Books",
+          "type" : "bookmark",
+          "url" : "https:\/\/www.amazon.co.uk\/Linux-Programming-Interface-System-Handbook\/dp\/1593272200"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "name" : "DuckDuckGo — Privacy, simplified.",
+                  "type" : "bookmark",
+                  "url" : "https:\/\/duckduckgo.com"
+                }
+              ],
+              "name" : "FolderA-2",
+              "type" : "folder"
+            }
+          ],
+          "name" : "FolderA",
+          "type" : "folder"
+        },
+        {
+          "children" : [
+            {
+              "name" : "MacRumors: Apple News and Rumors",
+              "type" : "bookmark",
+              "url" : "https:\/\/macrumors.com"
+            }
+          ],
+          "name" : "FolderB",
+          "type" : "folder"
+        },
+        {
+          "name" : "Wikipedia",
+          "type" : "bookmark",
+          "url" : "https:\/\/wikipedia.org"
+        }
+      ],
+      "name" : "Other bookmarks",
+      "type" : "folder"
+    }
+  }
+}

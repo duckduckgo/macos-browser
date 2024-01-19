@@ -19,12 +19,16 @@
 import Foundation
 import SwiftUI
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 struct PreferencesSection: Hashable, Identifiable {
     let id: PreferencesSectionIdentifier
     let panes: [PreferencePaneIdentifier]
 
     @MainActor
-    static func defaultSections(includingDuckPlayer: Bool) -> [PreferencesSection] {
+    static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
 #if SUBSCRIPTION
             var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
@@ -34,16 +38,28 @@ struct PreferencesSection: Hashable, Identifiable {
                     panes.insert(.sync, at: generalIndex + 1)
                 }
             }
+
+            if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
+                if let subscriptionIndex = panes.firstIndex(of: .subscription) {
+                    panes.remove(at: subscriptionIndex)
+                }
+            }
 #else
             var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
 
-            if NSApp.delegateTyped.internalUserDecider.isInternalUser {
+            if includingSync {
                 panes.insert(.sync, at: 1)
             }
 #endif
             if includingDuckPlayer {
                 panes.append(.duckPlayer)
             }
+
+#if NETWORK_PROTECTION
+            if includingVPN {
+                panes.append(.vpn)
+            }
+#endif
 
             return panes
         }()
@@ -65,6 +81,9 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case sync
     case appearance
     case privacy
+#if NETWORK_PROTECTION
+    case vpn
+#endif
 #if SUBSCRIPTION
     case subscription
 #endif
@@ -78,19 +97,29 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     }
 
     init?(url: URL) {
-        // manually extract path because URLs such as "about:preferences" can't figure out their host or path
-        let path = url.absoluteString.dropping(prefix: URL.preferences.absoluteString + "/")
-        self.init(rawValue: path)
+        // manually extract path because URLs such as "about:settings" can't figure out their host or path
+        for urlPrefix in [URL.settings, URL.Invalid.aboutPreferences, URL.Invalid.aboutConfig, URL.Invalid.aboutSettings, URL.Invalid.duckConfig, URL.Invalid.duckPreferences] {
+            let prefix = urlPrefix.absoluteString + "/"
+            guard url.absoluteString.hasPrefix(prefix) else { continue }
+
+            let path = url.absoluteString.dropping(prefix: prefix)
+            self.init(rawValue: path)
+            return
+        }
+        return nil
     }
 
+    @MainActor
     var displayName: String {
         switch self {
         case .general:
             return UserText.general
         case .sync:
-            var isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
-            var isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
-            if isSyncBookmarksPaused || isSyncCredentialsPaused {
+            let isSyncBookmarksPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncBookmarksPaused.rawValue)
+            let isSyncCredentialsPaused = UserDefaults.standard.bool(forKey: UserDefaultsWrapper<Bool>.Key.syncCredentialsPaused.rawValue)
+            let syncService = NSApp.delegateTyped.syncService
+            let isDataSyncingDisabled = syncService?.featureFlags.contains(.dataSyncing) == false && syncService?.authState == .active
+            if isSyncBookmarksPaused || isSyncCredentialsPaused || isDataSyncingDisabled {
                 return UserText.sync + " ⚠️"
             }
             return UserText.sync
@@ -98,6 +127,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.appearance
         case .privacy:
             return UserText.privacy
+#if NETWORK_PROTECTION
+        case .vpn:
+            return UserText.vpn
+#endif
 #if SUBSCRIPTION
         case .subscription:
             return UserText.subscription
@@ -123,6 +156,10 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Appearance"
         case .privacy:
             return "Privacy"
+#if NETWORK_PROTECTION
+        case .vpn:
+            return "VPN"
+#endif
 #if SUBSCRIPTION
         case .subscription:
             return "Privacy"

@@ -28,6 +28,13 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
         isSubfeatureKeyEnabled?(subfeature, versionProvider) ?? false
     }
 
+    func stateFor(_ subfeature: any PrivacySubfeature, versionProvider: AppVersionProvider, randomizer: (Range<Double>) -> Double) -> PrivacyConfigurationFeatureState {
+        if isSubfeatureKeyEnabled?(subfeature, versionProvider) == true {
+            return .enabled
+        }
+        return .disabled(.disabledInConfig)
+    }
+
     var identifier: String = "MockPrivacyConfiguration"
     var userUnprotectedDomains: [String] = []
     var tempUnprotectedDomains: [String] = []
@@ -41,6 +48,13 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     func isEnabled(featureKey: PrivacyFeature, versionProvider: AppVersionProvider) -> Bool {
         isFeatureKeyEnabled?(featureKey, versionProvider) ?? true
     }
+    func stateFor(featureKey: PrivacyFeature, versionProvider: AppVersionProvider) -> PrivacyConfigurationFeatureState {
+        if isFeatureKeyEnabled?(featureKey, versionProvider) == true {
+            return .enabled
+        }
+        return .disabled(.disabledInConfig)
+    }
+
     func isFeature(_ feature: PrivacyFeature, enabledForDomain: String?) -> Bool { true }
     func isProtected(domain: String?) -> Bool { true }
     func isUserUnprotected(domain: String?) -> Bool { false }
@@ -49,6 +63,16 @@ final class MockPrivacyConfiguration: PrivacyConfiguration {
     func settings(for feature: PrivacyFeature) -> PrivacyConfigurationData.PrivacyFeature.FeatureSettings { featureSettings }
     func userEnabledProtection(forDomain: String) {}
     func userDisabledProtection(forDomain: String) {}
+}
+
+final class MockInternalUserStoring: InternalUserStoring {
+    var isInternalUser: Bool = false
+}
+
+extension DefaultInternalUserDecider {
+    convenience init(mockedStore: MockInternalUserStoring = MockInternalUserStoring()) {
+        self.init(store: mockedStore)
+    }
 }
 
 final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManaging {
@@ -70,6 +94,7 @@ final class MockPrivacyConfigurationManager: NSObject, PrivacyConfigurationManag
 
     var updatesPublisher: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     var privacyConfig: PrivacyConfiguration = MockPrivacyConfiguration()
+    var internalUserDecider: InternalUserDecider = DefaultInternalUserDecider()
 }
 
 #endif

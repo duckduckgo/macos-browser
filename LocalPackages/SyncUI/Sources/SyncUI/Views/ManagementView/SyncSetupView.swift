@@ -23,132 +23,77 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
 
     var body: some View {
-        Text(UserText.syncSetupExplanation)
-            .fixMultilineScrollableText()
-            .padding(.horizontal, 16)
-        PreferencePaneSection {
+        VStack(alignment: .leading, spacing: 24) {
+            VStack(spacing: 8) {
+                syncUnavailableView()
+                syncWithAnotherDeviceView()
+                SyncUIViews.TextDetailSecondary(text: UserText.beginSyncFooter)
+                    .frame(height: 28)
+                    .padding(.bottom, 24)
+                    .padding(.horizontal, 110)
+                    .font(.system(size: 11))
+            }
             VStack(alignment: .leading, spacing: 12) {
-                Group {
-                    if model.isCreatingAccount {
-                        ProgressView()
-                    } else {
-                        VStack(alignment: .leading, spacing: 24) {
-                            SyncSetupSyncAnotherDeviceCardView<ViewModel>(code: model.codeToDisplay ?? "")
-                                .environmentObject(model)
-                                .onAppear {
-                                    model.startPollingForRecoveryKey()
-                                }
-                                .onDisappear {
-                                    model.stopPollingForRecoveryKey()
-                                }
-                            SyncSetupStartCardView()
-                            SyncSetupRecoverCardView()
-                            Text(UserText.syncSetUpFooter)
-                                .font(.system(size: 11))
-                                .foregroundColor(Color("GreyTextColor"))
-                                .padding(.horizontal, 16)
-                        }
-                    }
-                }.frame(minWidth: 100)
-            }
-        }
-    }
-
-}
-
-// MARK: - Card Views
-extension SyncSetupView {
-    struct SyncSetupStartCardView: View {
-        @EnvironmentObject var model: ViewModel
-        var body: some View {
-            HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(UserText.syncFirstDeviceSetUpCardTitle)
-                            .fontWeight(.semibold)
-                        Text(UserText.syncFirstDeviceSetUpCardExplanation)
-                            .foregroundColor(Color("GreyTextColor"))
-                    }
-                    Button(UserText.syncFirstDeviceSetUpActionTitle) {
-                        model.turnOnSync()
-                    }
-                }
-                .frame(width: 424, alignment: .topLeading)
-                Image("Sync-Desktop-New-96x96")
-            }
-            .padding(16)
-            .roundedBorder()
-        }
-    }
-
-    struct SyncSetupRecoverCardView: View {
-        @EnvironmentObject var model: ViewModel
-        var body: some View {
-            HStack {
-                Button(UserText.syncRecoverDataActionTitle) {
-                    model.presentRecoverSyncAccountDialog()
-                }
-                Spacer()
-            }
-            .padding(16)
-            .frame(width: 512)
-            .roundedBorder()
-        }
-    }
-}
-
-// MARK: - QRCodeView
-struct QRCodeView: View {
-    let recoveryCode: String
-
-    var body: some View {
-        VStack(alignment: .center) {
-            QRCode(string: recoveryCode, size: .init(width: 160, height: 160))
-            Text("Scan this QR code with another device")
-                .foregroundColor(Color("GreyTextColor"))
-        }
-        .padding(.vertical, 16)
-        .frame(width: 480)
-        .background(ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color("BlackWhite10"), lineWidth: 1)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color("ClearColor"))
-        })
-    }
-}
-
-struct SyncSetupSyncAnotherDeviceCardView<ViewModel>: View where ViewModel: ManagementViewModel {
-    @EnvironmentObject var model: ViewModel
-    let code: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(UserText.syncAddDeviceCardExplanation)
-                    .foregroundColor(Color("GreyTextColor"))
-                QRCodeView(recoveryCode: code)
+                SyncUIViews.TextHeader2(text: UserText.otherOptionsSectionTitle)
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(UserText.syncAddDeviceCardActionsExplanation)
-                        .foregroundColor(Color("GreyTextColor"))
-                    Text(UserText.syncAddDeviceShowTextActionTitle)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color("LinkBlueColor"))
-                        .onTapGesture {
-                            model.presentShowTextCodeDialog()
-                        }
-                    Text(UserText.syncAddDeviceEnterCodeActionTitle)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color("LinkBlueColor"))
-                        .onTapGesture {
-                            model.presentManuallyEnterCodeDialog()
-                        }
+                    TextButton(UserText.syncThisDeviceLink, weight: .semibold, action: model.syncWithServerPressed)
+                        .disabled(!model.isAccountCreationAvailable)
+                    TextButton(UserText.recoverDataLink, weight: .semibold, action: model.recoverDataPressed)
+                        .disabled(!model.isAccountRecoveryAvailable)
                 }
             }
-            .frame(width: 424, alignment: .topLeading)
-            Image("Sync-Pair-96x96")
         }
-        .padding(16)
+    }
+
+    fileprivate func syncWithAnotherDeviceView() -> some View {
+        VStack(alignment: .center, spacing: 16) {
+            Image("Sync-Pair-96")
+            VStack(alignment: .center, spacing: 8) {
+                SyncUIViews.TextHeader(text: UserText.beginSyncTitle)
+                SyncUIViews.TextDetailSecondary(text: UserText.beginSyncDescription)
+            }
+            .padding(.bottom, 16)
+            Button(UserText.beginSyncButton, action: model.syncWithAnotherDevicePressed)
+                .buttonStyle(SyncWithAnotherDeviceButtonStyle(enabled: model.isConnectingDevicesAvailable))
+                .disabled(!model.isConnectingDevicesAvailable)
+        }
+        .frame(width: 512, height: 254)
         .roundedBorder()
+        .padding(.top, 20)
+    }
+
+    @ViewBuilder
+    fileprivate func syncUnavailableView() -> some View {
+        if !model.isDataSyncingAvailable || !model.isConnectingDevicesAvailable || !model.isAccountCreationAvailable {
+            SyncWarningMessage(title: UserText.syncUnavailableTitle, message: UserText.syncUnavailableMessage)
+                .padding(.top, 16)
+        } else {
+            EmptyView()
+        }
+    }
+}
+
+private struct SyncWithAnotherDeviceButtonStyle: ButtonStyle {
+
+    public let enabled: Bool
+
+    public init(enabled: Bool) {
+        self.enabled = enabled
+    }
+
+    public func makeBody(configuration: Self.Configuration) -> some View {
+
+        let enabledBackgroundColor = configuration.isPressed ? Color(NSColor.controlAccentColor).opacity(0.5) : Color(NSColor.controlAccentColor)
+        let disabledBackgroundColor = Color.gray.opacity(0.1)
+        let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
+
+        configuration.label
+            .lineLimit(1)
+            .font(.body.bold())
+            .frame(width: 220, height: 32)
+            .background(enabled ? enabledBackgroundColor : disabledBackgroundColor)
+            .foregroundColor(labelColor)
+            .cornerRadius(8)
+
     }
 }

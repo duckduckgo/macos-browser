@@ -21,29 +21,24 @@ import Carbon.HIToolbox
 import Combine
 import Common
 
+#if NETWORK_PROTECTION
+import NetworkProtection
+#endif
+
 final class MainViewController: NSViewController {
+    private lazy var mainView = MainView(frame: NSRect(x: 0, y: 0, width: 600, height: 660))
 
-    @IBOutlet weak var tabBarContainerView: NSView!
-    @IBOutlet weak var navigationBarContainerView: NSView!
-    @IBOutlet weak var webContainerView: NSView!
-    @IBOutlet weak var findInPageContainerView: NSView!
-    @IBOutlet weak var bookmarksBarContainerView: NSView!
-    @IBOutlet var navigationBarTopConstraint: NSLayoutConstraint!
-    @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
-    @IBOutlet var bookmarksBarHeightConstraint: NSLayoutConstraint!
-
-    @IBOutlet var divider: NSView!
-
-    private(set) var tabBarViewController: TabBarViewController!
-    private(set) var navigationBarViewController: NavigationBarViewController!
-    private(set) var browserTabViewController: BrowserTabViewController!
-    private(set) var findInPageViewController: FindInPageViewController!
-    private(set) var fireViewController: FireViewController!
-    private(set) var bookmarksBarViewController: BookmarksBarViewController!
+    let tabBarViewController: TabBarViewController
+    let navigationBarViewController: NavigationBarViewController
+    let browserTabViewController: BrowserTabViewController
+    let findInPageViewController: FindInPageViewController
+    let fireViewController: FireViewController
+    let bookmarksBarViewController: BookmarksBarViewController
 
     let tabCollectionViewModel: TabCollectionViewModel
     let isBurner: Bool
 
+    private var addressBarBookmarkIconVisibilityCancellable: AnyCancellable?
     private var selectedTabViewModelCancellable: AnyCancellable?
     private var bookmarksBarVisibilityChangedCancellable: AnyCancellable?
     private var navigationalCancellables = Set<AnyCancellable>()
@@ -59,30 +54,53 @@ final class MainViewController: NSViewController {
     }
 
     required init?(coder: NSCoder) {
-        self.tabCollectionViewModel = TabCollectionViewModel()
-        self.isBurner = tabCollectionViewModel.isBurner
-        super.init(coder: coder)
+        fatalError("MainViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init(tabCollectionViewModel: TabCollectionViewModel? = nil,
+         bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        let tabCollectionViewModel = tabCollectionViewModel ?? TabCollectionViewModel()
         self.tabCollectionViewModel = tabCollectionViewModel
         self.isBurner = tabCollectionViewModel.isBurner
-        super.init(coder: coder)
+
+        tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner)
+        browserTabViewController = BrowserTabViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        findInPageViewController = FindInPageViewController.create()
+        fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+
+        super.init(nibName: nil, bundle: nil)
+
+        findInPageViewController.delegate = self
+    }
+
+    override func loadView() {
+        view = mainView
+
+        addAndLayoutChild(tabBarViewController, into: mainView.tabBarContainerView)
+        addAndLayoutChild(bookmarksBarViewController, into: mainView.bookmarksBarContainerView)
+        addAndLayoutChild(navigationBarViewController, into: mainView.navigationBarContainerView)
+        addAndLayoutChild(browserTabViewController, into: mainView.webContainerView)
+        addAndLayoutChild(findInPageViewController, into: mainView.findInPageContainerView)
+        addAndLayoutChild(fireViewController, into: mainView.fireContainerView)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         listenToKeyDownEvents()
+        subscribeToMouseTrackingArea()
         subscribeToSelectedTabViewModel()
         subscribeToAppSettingsNotifications()
-        findInPageContainerView.applyDropShadow()
+        mainView.findInPageContainerView.applyDropShadow()
 
         view.registerForDraggedTypes([.URL, .fileURL])
     }
 
     override func viewDidAppear() {
         super.viewDidAppear()
+        mainView.setMouseAboveWebViewTrackingAreaEnabled(true)
         registerForBookmarkBarPromptNotifications()
     }
 
@@ -99,6 +117,7 @@ final class MainViewController: NSViewController {
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
+        mainView.setMouseAboveWebViewTrackingAreaEnabled(false)
         if let bookmarkBarPromptObserver {
             NotificationCenter.default.removeObserver(bookmarkBarPromptObserver)
         }
@@ -107,15 +126,15 @@ final class MainViewController: NSViewController {
     override func viewWillAppear() {
         if isInPopUpWindow {
             tabBarViewController.view.isHidden = true
-            tabBarContainerView.isHidden = true
-            navigationBarTopConstraint.constant = 0.0
-            addressBarHeightConstraint.constant = tabBarContainerView.frame.height
+            mainView.tabBarContainerView.isHidden = true
+            mainView.navigationBarTopConstraint.constant = 0.0
+            mainView.addressBarHeightConstraint.constant = mainView.tabBarContainerView.frame.height
             updateBookmarksBarViewVisibility(visible: false)
         } else {
-            navigationBarContainerView.wantsLayer = true
-            navigationBarContainerView.layer?.masksToBounds = false
+            mainView.navigationBarContainerView.wantsLayer = true
+            mainView.navigationBarContainerView.layer?.masksToBounds = false
 
-            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage, animated: false)
+            resizeNavigationBarForHomePage(tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab, animated: false)
 
             let bookmarksBarVisible = AppearancePreferences.shared.showBookmarksBar
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
@@ -125,7 +144,7 @@ final class MainViewController: NSViewController {
     }
 
     override func viewDidLayout() {
-        findInPageContainerView.applyDropShadow()
+        mainView.findInPageContainerView.applyDropShadow()
     }
 
     func windowDidBecomeMain() {
@@ -142,6 +161,7 @@ final class MainViewController: NSViewController {
 
 #if DBP
         DataBrokerProtectionAppEvents().windowDidBecomeMain()
+        refreshDataBrokerProtectionMessages()
 #endif
     }
 
@@ -172,72 +192,25 @@ final class MainViewController: NSViewController {
     }
 #endif
 
+#if DBP
+    private let dataBrokerProtectionMessaging = DefaultDataBrokerProtectionRemoteMessaging()
+
+    func refreshDataBrokerProtectionMessages() {
+        dataBrokerProtectionMessaging.fetchRemoteMessages()
+    }
+#endif
+
     override func encodeRestorableState(with coder: NSCoder) {
         fatalError("Default AppKit State Restoration should not be used")
     }
 
     func windowWillClose() {
         eventMonitorCancellables.removeAll()
-        tabBarViewController?.hideTabPreview()
-    }
-
-    @IBSegueAction
-    func createTabBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> TabBarViewController? {
-        guard let tabBarViewController = TabBarViewController(coder: coder,
-                                                              tabCollectionViewModel: tabCollectionViewModel) else {
-            fatalError("MainViewController: Failed to init TabBarViewController")
-        }
-
-        self.tabBarViewController = tabBarViewController
-        return tabBarViewController
-    }
-
-    @IBSegueAction
-    func createNavigationBarViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> NavigationBarViewController? {
-        guard let navigationBarViewController = NavigationBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner) else {
-            fatalError("MainViewController: Failed to init NavigationBarViewController")
-        }
-
-        self.navigationBarViewController = navigationBarViewController
-        return navigationBarViewController
-    }
-
-    @IBSegueAction
-    func createWebViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BrowserTabViewController? {
-        guard let browserTabViewController = BrowserTabViewController(coder: coder,
-                                                                      tabCollectionViewModel: tabCollectionViewModel) else {
-            fatalError("MainViewController: Failed to init BrowserTabViewController")
-        }
-
-        self.browserTabViewController = browserTabViewController
-        return browserTabViewController
-    }
-
-    @IBSegueAction
-    func createFindInPageViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FindInPageViewController? {
-        let findInPageViewController = FindInPageViewController(coder: coder)
-        findInPageViewController?.delegate = self
-        self.findInPageViewController = findInPageViewController
-        return findInPageViewController
-    }
-
-    @IBSegueAction
-    func createFireViewController(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> FireViewController? {
-        let fireViewController = FireViewController(coder: coder,
-                                                    tabCollectionViewModel: tabCollectionViewModel)
-        self.fireViewController = fireViewController
-        return fireViewController
-    }
-
-    @IBSegueAction
-    func createBookmarksBar(coder: NSCoder, sender: Any?, segueIdentifier: String?) -> BookmarksBarViewController? {
-        let bookmarksBarViewController = BookmarksBarViewController(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
-        self.bookmarksBarViewController = bookmarksBarViewController
-        return bookmarksBarViewController
+        tabBarViewController.hideTabPreview()
     }
 
     func toggleBookmarksBarVisibility() {
-        updateBookmarksBarViewVisibility(visible: !(bookmarksBarHeightConstraint.constant > 0))
+        updateBookmarksBarViewVisibility(visible: !(mainView.bookmarksBarHeightConstraint.constant > 0))
     }
 
     // Can be updated via keyboard shortcut so needs to be internal visibility
@@ -248,25 +221,35 @@ final class MainViewController: NSViewController {
             if bookmarksBarViewController.parent == nil {
                 addChild(bookmarksBarViewController)
 
-                bookmarksBarViewController.view.frame = bookmarksBarContainerView.bounds
-                bookmarksBarContainerView.addSubview(bookmarksBarViewController.view)
+                bookmarksBarViewController.view.frame = mainView.bookmarksBarContainerView.bounds
+                mainView.bookmarksBarContainerView.addSubview(bookmarksBarViewController.view)
             }
         } else {
             bookmarksBarViewController.removeFromParent()
             bookmarksBarViewController.view.removeFromSuperview()
         }
 
-        bookmarksBarHeightConstraint.constant = showBookmarksBar ? 34 : 0
+        mainView.bookmarksBarHeightConstraint?.constant = showBookmarksBar ? 34 : 0
+        mainView.layoutSubtreeIfNeeded()
+        mainView.updateTrackingAreas()
 
         updateDividerColor()
     }
 
     private func updateDividerColor() {
         NSAppearance.withAppAppearance {
-            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
             let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .addressBarSolidSeparatorColor
-            (divider as? ColorView)?.backgroundColor = backgroundColor
+            mainView.divider.backgroundColor = backgroundColor
         }
+    }
+
+    private func subscribeToMouseTrackingArea() {
+        addressBarBookmarkIconVisibilityCancellable = mainView.$isMouseAboveWebView
+            .sink { [weak self] isMouseAboveWebView in
+                self?.navigationBarViewController.addressBarViewController?
+                    .addressBarButtonsViewController?.isMouseOverNavigationBar = isMouseAboveWebView
+            }
     }
 
     private func subscribeToSelectedTabViewModel() {
@@ -308,7 +291,7 @@ final class MainViewController: NSViewController {
 
             let nonHomePageHeight: CGFloat = isInPopUpWindow ? 42 : 48
 
-            let height = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
+            let height = animated ? mainView.addressBarHeightConstraint.animator() : mainView.addressBarHeightConstraint
             height?.constant = homePage ? 52 : nonHomePageHeight
 
             updateDividerColor()
@@ -320,7 +303,7 @@ final class MainViewController: NSViewController {
     private func subscribeToTabContent() {
         tabCollectionViewModel.selectedTabViewModel?.tab.$content.receive(on: DispatchQueue.main).sink(receiveValue: { [weak self] content in
             guard let self = self else { return }
-            self.resizeNavigationBarForHomePage(content == .homePage, animated: content == .homePage && self.lastTabContent != .homePage)
+            self.resizeNavigationBarForHomePage(content == .newtab, animated: content == .newtab && self.lastTabContent != .newtab)
             self.updateBookmarksBar(content)
             self.lastTabContent = content
             self.adjustFirstResponderOnContentChange(content: content)
@@ -362,15 +345,15 @@ final class MainViewController: NSViewController {
 
     private func updateFindInPage() {
         guard let model = tabCollectionViewModel.selectedTabViewModel?.findInPage else {
-            findInPageViewController?.makeMeFirstResponder()
+            findInPageViewController.makeMeFirstResponder()
             os_log("MainViewController: Failed to get find in page model", type: .error)
             return
         }
 
-        findInPageContainerView.isHidden = !model.isVisible
-        findInPageViewController?.model = model
+        mainView.findInPageContainerView.isHidden = !model.isVisible
+        findInPageViewController.model = model
         if model.isVisible {
-            findInPageViewController?.makeMeFirstResponder()
+            findInPageViewController.makeMeFirstResponder()
         }
     }
 
@@ -427,22 +410,20 @@ final class MainViewController: NSViewController {
         }
 
         switch selectedTabViewModel.tab.content {
-        case .homePage:
+        case .newtab:
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .onboarding:
             self.view.makeMeFirstResponder()
         case .url:
             browserTabViewController.makeWebViewFirstResponder()
-        case .preferences:
+        case .settings:
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
         case .bookmarks:
             browserTabViewController.bookmarksViewController?.view.makeMeFirstResponder()
         case .none:
             shouldAdjustFirstResponderOnContentChange = true
-#if DBP
         case .dataBrokerProtection:
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
-#endif
         }
     }
 
@@ -473,7 +454,7 @@ extension MainViewController: NSDraggingDestination {
     func performDragOperation(_ draggingInfo: NSDraggingInfo) -> Bool {
         guard let url = draggingInfo.draggingPasteboard.url else { return false }
 
-        browserTabViewController.openNewTab(with: .url(url))
+        browserTabViewController.openNewTab(with: .url(url, source: .appOpenUrl))
         return true
     }
 
@@ -506,8 +487,8 @@ extension MainViewController {
         switch Int(event.keyCode) {
         case kVK_Escape:
             var isHandled = false
-            if !findInPageContainerView.isHidden {
-                findInPageViewController?.findInPageDone(self)
+            if !mainView.findInPageContainerView.isHidden {
+                findInPageViewController.findInPageDone(self)
                 isHandled = true
             }
             if let addressBarVC = navigationBarViewController.addressBarViewController {
@@ -540,7 +521,7 @@ extension MainViewController {
 
     func otherMouseUp(with event: NSEvent) -> NSEvent? {
         guard event.window === self.view.window,
-              self.webContainerView.isMouseLocationInsideBounds(event.locationInWindow)
+              mainView.webContainerView.isMouseLocationInsideBounds(event.locationInWindow)
         else { return event }
 
         if event.buttonNumber == 3,
@@ -556,5 +537,28 @@ extension MainViewController {
         return event
 
     }
-
 }
+
+#if DEBUG
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: 700, height: 660)) {
+
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
+        BookmarkFolder(id: "1", title: "Folder", children: [
+            Bookmark(id: "2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
+        ]),
+        Bookmark(id: "3", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "1")
+    ]))
+    bkman.loadBookmarks()
+
+    let vc = MainViewController(bookmarkManager: bkman)
+    var c: AnyCancellable!
+    c = vc.publisher(for: \.view.window).sink { window in
+        window?.titlebarAppearsTransparent = true
+        window?.titleVisibility = .hidden
+        withExtendedLifetime(c) {}
+    }
+
+    return vc
+}
+#endif

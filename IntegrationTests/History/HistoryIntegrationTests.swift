@@ -54,7 +54,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenPageTitleIsUpdated_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -72,7 +72,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
+        _=try await tab.setUrl(url, source: .link)?.result.get()
         _=try await titleChangedPromise1.value
 
         XCTAssertEqual(HistoryCoordinator.shared.history?.count, 1)
@@ -98,7 +98,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSameDocumentNavigation_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -118,7 +118,7 @@ class HistoryIntegrationTests: XCTestCase {
             URL(string: URL.testsServer.appendingTestParameters(data: html.utf8data).absoluteString + "#1")!,
         ]
 
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
 
         let titleChangedPromise = tab.$title
             .filter { $0 == "Title 2" }
@@ -142,16 +142,16 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingToSamePage_visitIsAdded() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
             URL.testsServer,
             URL.testsServer.appendingPathComponent("page1").appendingTestParameters(data: "".utf8data),
         ]
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.result.get()
-        _=try await tab.setUrl(urls[1], userEntered: nil)?.result.get()
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
+        _=try await tab.setUrl(urls[1], source: .link)?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
 
         let first = HistoryCoordinator.shared.history?.first(where: { $0.url == urls[0] })
         XCTAssertEqual(first?.numberOfVisits, 2)
@@ -162,15 +162,15 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingBack_visitIsNotAdded() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
             URL.testsServer,
             URL.testsServer.appendingPathComponent("page1").appendingTestParameters(data: "".utf8data),
         ]
-        _=try await tab.setUrl(urls[0], userEntered: nil)?.result.get()
-        _=try await tab.setUrl(urls[1], userEntered: nil)?.result.get()
+        _=try await tab.setUrl(urls[0], source: .link)?.result.get()
+        _=try await tab.setUrl(urls[1], source: .link)?.result.get()
         _=try await tab.goBack()?.result.get()
         _=try await tab.goForward()?.result.get()
 
@@ -185,7 +185,7 @@ class HistoryIntegrationTests: XCTestCase {
     func testWhenScriptTrackerLoaded_trackerAddedToHistory() async throws {
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
@@ -199,7 +199,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
+        _=try await tab.setUrl(url, source: .link)?.result.get()
         _=try await trackerPromise.value
 
         let first = HistoryCoordinator.shared.history?.first
@@ -213,7 +213,7 @@ class HistoryIntegrationTests: XCTestCase {
     func testWhenSurrogateTrackerLoaded_trackerAddedToHistory() async throws {
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-with-surrogate.html")!
@@ -227,7 +227,7 @@ class HistoryIntegrationTests: XCTestCase {
             .first()
             .promise()
 
-        _=try await tab.setUrl(url, userEntered: nil)?.result.get()
+        _=try await tab.setUrl(url, source: .link)?.result.get()
         _=try await trackerPromise.value
 
         let first = HistoryCoordinator.shared.history?.first

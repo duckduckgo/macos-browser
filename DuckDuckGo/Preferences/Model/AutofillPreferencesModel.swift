@@ -74,6 +74,8 @@ final class AutofillPreferencesModel: ObservableObject {
 
     @Published private(set) var isBitwardenSetupFlowPresented = false
 
+    @Published private(set) var hasNeverPromptWebsites: Bool = false
+
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
         threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil
@@ -121,19 +123,26 @@ final class AutofillPreferencesModel: ObservableObject {
     @MainActor
     func showAutofillPopover(_ selectedCategory: SecureVaultSorting.Category = .allItems) {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
-        guard let navigationViewController = parentWindowController.mainViewController.navigationBarViewController else { return }
+        let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
         navigationViewController.showPasswordManagerPopover(selectedCategory: selectedCategory)
+    }
+
+    func resetNeverPromptWebsites() {
+        _ = neverPromptWebsitesManager.deleteAllNeverPromptWebsites()
+        hasNeverPromptWebsites = !neverPromptWebsitesManager.neverPromptWebsites.isEmpty
     }
 
     @MainActor
     init(
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
-        bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService()
+        bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService(),
+        neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager = AutofillNeverPromptWebsitesManager.shared
     ) {
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
         self.bitwardenInstallationService = bitwardenInstallationService
+        self.neverPromptWebsitesManager = neverPromptWebsitesManager
 
         isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
@@ -143,11 +152,13 @@ final class AutofillPreferencesModel: ObservableObject {
         askToSavePaymentMethods = persistor.askToSavePaymentMethods
         autolockLocksFormFilling = persistor.autolockLocksFormFilling
         passwordManager = persistor.passwordManager
+        hasNeverPromptWebsites = !neverPromptWebsitesManager.neverPromptWebsites.isEmpty
     }
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
     private let bitwardenInstallationService: BWInstallationService
+    private let neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager
 
     // MARK: - Password Manager
 

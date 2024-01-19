@@ -272,6 +272,7 @@ final class DataBrokerOperationActionTests: XCTestCase {
             operationAwaitTime: 0,
             shouldRunNextStep: { true }
         )
+        sut.retriesCountOnError = 0
         captchaService.shouldThrow = true
         sut.webViewHandler = webViewHandler
         sut.actionsHandler = ActionsHandler(step: step)

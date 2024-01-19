@@ -44,7 +44,7 @@ final class FireTests: XCTestCase {
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 3)
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .newtab)
 
         let burningExpectation = expectation(description: "Burning")
 
@@ -63,9 +63,9 @@ final class FireTests: XCTestCase {
         let faviconManager = FaviconManagerMock()
 
         let pinnedTabs: [Tab] = [
-            .init(content: .url("https://duck.com/".url!)),
-            .init(content: .url("https://spreadprivacy.com/".url!)),
-            .init(content: .url("https://wikipedia.org/".url!))
+            .init(content: .url("https://duck.com/".url!, source: .link)),
+            .init(content: .url("https://spreadprivacy.com/".url!, source: .link)),
+            .init(content: .url("https://wikipedia.org/".url!, source: .link))
         ]
         let pinnedTabsManager = PinnedTabsManager(tabCollection: .init(tabs: pinnedTabs))
 
