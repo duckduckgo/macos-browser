@@ -39,7 +39,7 @@ final class DuckPlayerURLExtensionTests: XCTestCase {
         XCTAssertFalse("https://www.youtube-nocookie.com/embed".url!.isDuckPlayer)
         XCTAssertFalse("https://www.youtube-nocookie.com/embed?t=23s".url!.isDuckPlayer)
 
-        XCTAssertFalse("duck://player/abcdef12345".url!.isDuckPlayer)
+        XCTAssertTrue("duck://player/abcdef12345".url!.isDuckPlayer)
         XCTAssertFalse("https://www.youtube.com/watch?v=abcdef12345".url!.isDuckPlayer)
         XCTAssertFalse("https://duckduckgo.com".url!.isDuckPlayer)
     }

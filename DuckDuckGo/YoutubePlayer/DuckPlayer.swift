@@ -70,13 +70,7 @@ final class DuckPlayer {
         }
     }()
 
-    static let duckPlayerHost: String = {
-        if usesSimulatedRequests {
-            return "www.youtube-nocookie.com"
-        } else {
-            return "player"
-        }
-    }()
+    static let duckPlayerHost: String = "player"
     static let commonName = UserText.duckPlayer
 
     static let shared = DuckPlayer()

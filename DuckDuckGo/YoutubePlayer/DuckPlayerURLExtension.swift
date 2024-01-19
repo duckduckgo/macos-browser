@@ -54,14 +54,16 @@ extension URL {
     /**
      * Returns true if a URL represents a Private Player URL.
      *
-     * When simulated requests are in use (macOS 12 and above), the Private Player Scheme URL is replaced by
-     * `www.youtube-nocookie.com/embed/VIDEOID` URL. Otherwise, checks for `duck://player/` URL.
+     * It primarily checks for `duck://player/` URL, but on macOS 12 and above (when using simulated requests),
+     * the Duck Scheme URL is eventually replaced by `www.youtube-nocookie.com/embed/VIDEOID` URL so this
+     * is checked too and this function returns `true` if any of the two is true on macOS 12.
      */
     var isDuckPlayer: Bool {
+        let isPrivatePlayer = isDuckURLScheme && host == DuckPlayer.duckPlayerHost
         if DuckPlayer.usesSimulatedRequests {
-            return host == DuckPlayer.duckPlayerHost && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
+            return isPrivatePlayer || isYoutubeNoCookie
         } else {
-            return isDuckURLScheme && host == DuckPlayer.duckPlayerHost
+            return isPrivatePlayer
         }
     }
 
@@ -134,6 +136,10 @@ extension URL {
     }
 
     // MARK: - Private
+
+    private var isYoutubeNoCookie: Bool {
+        host == "www.youtube-nocookie.com" && pathComponents.count == 3 && pathComponents[safe: 1] == "embed"
+    }
 
     private var isYoutubeWatch: Bool {
         guard let host else { return false }
