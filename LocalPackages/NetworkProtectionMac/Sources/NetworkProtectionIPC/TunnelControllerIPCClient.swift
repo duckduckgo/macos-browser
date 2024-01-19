@@ -50,8 +50,13 @@ public final class TunnelControllerIPCClient {
 
     /// The delegate.
     ///
-    public weak var clientDelegate: IPCClientInterface?
-    private let xpcDelegate: TunnelControllerXPCClientDelegate?
+    public weak var clientDelegate: IPCClientInterface? {
+        didSet {
+            xpcDelegate.clientDelegate = self.clientDelegate
+        }
+    }
+
+    private let xpcDelegate: TunnelControllerXPCClientDelegate
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
@@ -75,14 +80,14 @@ public final class TunnelControllerIPCClient {
 private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
 
     weak var clientDelegate: IPCClientInterface?
-    weak var serverInfoObserver: ConnectionServerInfoObserverThroughIPC?
-    weak var connectionErrorObserver: ConnectionErrorObserverThroughIPC?
-    weak var connectionStatusObserver: ConnectionStatusObserverThroughIPC?
+    let serverInfoObserver: ConnectionServerInfoObserverThroughIPC
+    let connectionErrorObserver: ConnectionErrorObserverThroughIPC
+    let connectionStatusObserver: ConnectionStatusObserverThroughIPC
 
     init(clientDelegate: IPCClientInterface?,
-         serverInfoObserver: ConnectionServerInfoObserverThroughIPC?,
-         connectionErrorObserver: ConnectionErrorObserverThroughIPC?,
-         connectionStatusObserver: ConnectionStatusObserverThroughIPC?) {
+         serverInfoObserver: ConnectionServerInfoObserverThroughIPC,
+         connectionErrorObserver: ConnectionErrorObserverThroughIPC,
+         connectionStatusObserver: ConnectionStatusObserverThroughIPC) {
         self.clientDelegate = clientDelegate
         self.serverInfoObserver = serverInfoObserver
         self.connectionErrorObserver = connectionErrorObserver
@@ -90,7 +95,7 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
     }
 
     func errorChanged(error: String?) {
-        connectionErrorObserver?.publish(error)
+        connectionErrorObserver.publish(error)
         clientDelegate?.errorChanged(error)
     }
 
@@ -99,7 +104,7 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
             return
         }
 
-        serverInfoObserver?.publish(serverInfo)
+        serverInfoObserver.publish(serverInfo)
         clientDelegate?.serverInfoChanged(serverInfo)
     }
 
@@ -108,7 +113,7 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
             return
         }
 
-        connectionStatusObserver?.publish(status)
+        connectionStatusObserver.publish(status)
         clientDelegate?.statusChanged(status)
     }
 
