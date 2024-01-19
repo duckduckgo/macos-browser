@@ -90,7 +90,12 @@ final class BookmarkHTMLReader {
         while cursor != nil {
             let itemType: XMLNode.BookmarkItemType?
             if importSource?.supportsSafariBookmarksHTMLFormat == true {
-                itemType = findNextItemInSafariFormat(&cursor)
+                let initialCursor = cursor
+                itemType = findNextItemInSafariFormat(&cursor) ?? {
+                    // fallback to non-safari format
+                    cursor = initialCursor
+                    return findNextItem(&cursor)
+                }()
             } else {
                 itemType = findNextItem(&cursor)
             }
@@ -109,8 +114,8 @@ final class BookmarkHTMLReader {
             bookmarkBar = firstFolder
         }
 
-        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: "other", children: other)
-        let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks))
+        let otherBookmarks = ImportedBookmarks.BookmarkOrFolder.folder(name: UserText.otherBookmarksImportedFolderTitle, children: other)
+        let allBookmarks = ImportedBookmarks(topLevelFolders: .init(bookmarkBar: bookmarkBar, otherBookmarks: otherBookmarks, syncedBookmarks: nil))
         let result = HTMLImportedBookmarks(source: importSource, bookmarks: allBookmarks)
 
         return result
