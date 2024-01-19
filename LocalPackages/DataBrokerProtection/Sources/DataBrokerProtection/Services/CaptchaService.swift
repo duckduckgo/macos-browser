@@ -195,7 +195,7 @@ struct CaptchaService: CaptchaServiceProtocol {
 
     func submitCaptchaToBeResolved(for transactionID: CaptchaTransactionId,
                                    retries: Int = 100,
-                                   pollingInterval: Int = 40,
+                                   pollingInterval: Int = 50,
                                    shouldRunNextStep: @escaping () -> Bool) async throws -> CaptchaResolveData {
         guard let captchaResolveResult = try? await submitCaptchaToBeResolvedRequest(transactionID) else {
             throw CaptchaServiceError.errorWhenFetchingCaptchaResult

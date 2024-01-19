@@ -219,9 +219,7 @@ extension BookmarkManagementSidebarViewController: NSMenuDelegate {
 extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
     func newFolder(_ sender: NSMenuItem) {
-        let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.delegate = self
-        beginSheet(addFolderViewController)
+        AddBookmarkFolderModalView().show(in: view.window)
     }
 
     func renameFolder(_ sender: NSMenuItem) {
@@ -230,10 +228,8 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
             return
         }
 
-        let addFolderViewController = AddFolderModalViewController.create()
-        addFolderViewController.delegate = self
-        addFolderViewController.edit(folder: folder)
-        beginSheet(addFolderViewController)
+        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
+            .show(in: view.window)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
@@ -254,20 +250,6 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 
         let tabs = children.compactMap { ($0 as? Bookmark)?.urlObject }.map { Tab(content: .url($0, source: .bookmark), shouldLoadInBackground: true, burnerMode: tabCollection.burnerMode) }
         tabCollection.append(tabs: tabs)
-    }
-
-}
-
-// MARK: - Modal Delegates
-
-extension BookmarkManagementSidebarViewController: AddFolderModalViewControllerDelegate {
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        LocalBookmarkManager.shared.makeFolder(for: name, parent: nil, completion: { _ in })
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        LocalBookmarkManager.shared.update(folder: folder)
     }
 
 }

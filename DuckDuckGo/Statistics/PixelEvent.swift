@@ -178,6 +178,10 @@ extension Pixel {
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
         case networkProtectionEnabledOnSearch
+        case networkProtectionGeoswitchingOpened
+        case networkProtectionGeoswitchingSetNearest
+        case networkProtectionGeoswitchingSetCustom
+        case networkProtectionGeoswitchingNoLocations
 
         // Sync
         case syncSignupDirect
@@ -334,6 +338,14 @@ extension Pixel {
             case syncCredentialsFailed
             case syncSettingsFailed
             case syncSettingsMetadataUpdateFailed
+            case syncSignupError
+            case syncLoginError
+            case syncLogoutError
+            case syncUpdateDeviceError
+            case syncRemoveDeviceError
+            case syncDeleteAccountError
+            case syncLoginExistingAccountError
+            case syncCannotCreateRecoveryPDF
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -566,6 +578,14 @@ extension Pixel.Event {
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
+        case .networkProtectionGeoswitchingOpened:
+            return "m_mac_netp_imp_geoswitching_c"
+        case .networkProtectionGeoswitchingSetNearest:
+            return "m_mac_netp_ev_geoswitching_set_nearest"
+        case .networkProtectionGeoswitchingSetCustom:
+            return "m_mac_netp_ev_geoswitching_set_custom"
+        case .networkProtectionGeoswitchingNoLocations:
+            return "m_mac_netp_ev_geoswitching_no_locations"
         }
     }
 }
@@ -789,6 +809,14 @@ extension Pixel.Event.Debug {
         case .syncCredentialsFailed: return "sync_credentials_failed"
         case .syncSettingsFailed: return "sync_settings_failed"
         case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
+        case .syncSignupError: return "sync_signup_error"
+        case .syncLoginError: return "sync_login_error"
+        case .syncLogoutError: return "sync_logout_error"
+        case .syncUpdateDeviceError: return "sync_update_device_error"
+        case .syncRemoveDeviceError: return "sync_remove_device_error"
+        case .syncDeleteAccountError: return "sync_delete_account_error"
+        case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
+        case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"

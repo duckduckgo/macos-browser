@@ -19,7 +19,7 @@
 import AppKit
 import SwiftUI
 
-struct AddBookmarkModalView: View {
+struct AddBookmarkModalView: ModalView {
 
     @State private(set) var model: AddBookmarkModalViewModel
     @Environment(\.dismiss) private var dismiss
@@ -68,23 +68,6 @@ struct AddBookmarkModalView: View {
         .font(.system(size: 13))
         .padding()
         .frame(width: 437, height: 164)
-    }
-
-    @MainActor
-    func show(in window: NSWindow? = nil, completion: (() -> Void)? = nil) {
-
-        guard let window = window ?? WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
-
-        if !window.isKeyWindow {
-            window.makeKeyAndOrderFront(nil)
-        }
-
-        let sheetWindow = SheetHostingWindow(rootView: self)
-
-        window.beginSheet(sheetWindow, completionHandler: completion.map { completion in { _ in
-            completion()
-        }
-        })
     }
 
 }

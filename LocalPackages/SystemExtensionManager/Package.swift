@@ -16,7 +16,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.1.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "101.1.4"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

@@ -575,6 +575,7 @@ protocol NewWindowPolicyDecisionMaker {
     // MARK: - Event Publishers
 
     let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
+    let webViewDidReceiveRedirectPublisher = PassthroughSubject<Void, Never>()
     let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
@@ -1114,6 +1115,10 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         } catch {
             return .cancel
         }
+    }
+
+    func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
+        webViewDidReceiveRedirectPublisher.send()
     }
 
     @MainActor
