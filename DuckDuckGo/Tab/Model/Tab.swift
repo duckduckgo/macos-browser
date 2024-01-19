@@ -119,6 +119,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .anySettingsPane
             case URL.bookmarks, URL.Invalid.aboutBookmarks:
                 return .bookmarks
+            case URL.dataBrokerProtection:
+                return .dataBrokerProtection
             case URL.Invalid.aboutHome:
                 guard let customURL = URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else {
                     return .newtab
