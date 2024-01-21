@@ -258,10 +258,8 @@ extension BookmarksBarViewController: BookmarksBarViewModelDelegate {
 
             menu.popUp(positioning: nil, at: CGPoint(x: 0, y: item.view.frame.minY - 7), in: item.view)
         case .edit:
-            let addFolderViewController = AddFolderModalViewController.create()
-            addFolderViewController.delegate = self
-            addFolderViewController.edit(folder: folder)
-            beginSheet(addFolderViewController)
+            AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
+                .show(in: view.window)
         case .moveToEnd:
             bookmarkManager.move(objectUUIDs: [folder.id], toIndex: nil, withinParentFolder: .root) { _ in }
         case .deleteEntity:
@@ -287,20 +285,6 @@ extension BookmarksBarViewController: NSMenuDelegate {
     public func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
         BookmarksBarMenuFactory.addToMenu(menu)
-    }
-
-}
-
-// MARK: - Editing
-
-extension BookmarksBarViewController: AddFolderModalViewControllerDelegate {
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, addedFolderWith name: String) {
-        assertionFailure("Cannot add new folders to the bookmarks bar via the modal")
-    }
-
-    func addFolderViewController(_ viewController: AddFolderModalViewController, saved folder: BookmarkFolder) {
-        bookmarkManager.update(folder: folder)
     }
 
 }

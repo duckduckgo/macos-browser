@@ -54,6 +54,8 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionClientInvalidInviteCode
     case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
     case networkProtectionClientFailedToParseRedeemResponse(error: Error)
+    case networkProtectionClientFailedToFetchLocations(error: Error?)
+    case networkProtectionClientFailedToParseLocationsResponse(error: Error?)
     case networkProtectionClientInvalidAuthToken
 
     case networkProtectionServerListStoreFailedToEncodeServerList
@@ -158,6 +160,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionClientFailedToParseRedeemResponse:
             return "m_mac_netp_backend_api_error_parsing_redeem_response_failed"
 
+        case .networkProtectionClientFailedToFetchLocations:
+            return "m_mac_netp_backend_api_error_failed_to_fetch_location_list"
+
+        case .networkProtectionClientFailedToParseLocationsResponse:
+            return "m_mac_netp_backend_api_error_parsing_location_list_response_failed"
+
         case .networkProtectionClientInvalidAuthToken:
             return "m_mac_netp_backend_api_error_invalid_auth_token"
 
@@ -249,6 +257,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
             return error?.pixelParameters
 
         case .networkProtectionClientFailedToRedeemInviteCode(error: let error):
+            return error?.pixelParameters
+
+        case .networkProtectionClientFailedToFetchLocations(error: let error):
+            return error?.pixelParameters
+
+        case .networkProtectionClientFailedToParseLocationsResponse(error: let error):
             return error?.pixelParameters
 
         case .networkProtectionUnhandledError(let function, let line, let error):

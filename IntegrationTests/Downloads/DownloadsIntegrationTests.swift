@@ -37,7 +37,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     override class func setUp() {
-        window = WindowsManager.openNewWindow(with: .none)!
+        window = WindowsManager.openNewWindow(with: Tab(content: .none))!
     }
 
     override class func tearDown() {

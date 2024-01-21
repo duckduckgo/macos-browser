@@ -471,6 +471,13 @@ extension DataImportError /* : LocalizedError */ {
 
 }
 
+struct FetchableRecordError<T>: Error, CustomNSError {
+    let column: Int
+
+    static var errorDomain: String { "FetchableRecordError.\(T.self)" }
+    var errorCode: Int { column }
+}
+
 enum DataImportProgressEvent {
     case initial
     case importingPasswords(numberOfPasswords: Int?, fraction: Double)

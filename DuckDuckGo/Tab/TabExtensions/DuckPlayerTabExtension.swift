@@ -189,7 +189,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
         }
 
         // Always allow loading Private Player URLs (local HTML)
-        if navigationAction.url.isDuckPlayerScheme || navigationAction.url.isDuckPlayer {
+        if navigationAction.url.isDuckURLScheme || navigationAction.url.isDuckPlayer {
             if navigationAction.request.allHTTPHeaderFields?["Referer"] == URL.duckDuckGo.absoluteString {
                 Pixel.fire(.duckPlayerViewFromSERP)
             }
@@ -221,7 +221,7 @@ extension DuckPlayerTabExtension: NavigationResponder {
     private func decidePolicyWithDisabledDuckPlayer(for navigationAction: NavigationAction) -> NavigationActionPolicy? {
         // When the feature is disabled but the webView still gets a Private Player URL,
         // convert it back to a regular YouTube video URL.
-        if navigationAction.url.isDuckPlayerScheme {
+        if navigationAction.url.isDuckPlayer {
             guard let (videoID, timestamp) = navigationAction.url.youtubeVideoParams,
                   let mainFrame = navigationAction.mainFrameTarget else {
                 return .cancel
