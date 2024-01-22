@@ -211,7 +211,7 @@ private struct PasswordManagerItemView: View {
 
     var body: some View {
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
-        let font = Font.custom("SFProText-Regular", size: 13)
+        let font = Font.system(size: 13)
 
         Button(action: action, label: {
             HStack(spacing: 3) {
@@ -264,7 +264,7 @@ private struct ItemView: View {
 
         let selected = model.selected == item
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
-        let font = Font.custom("SFProText-Regular", size: 13)
+        let font = Font.system(size: 13)
 
         Button(action: action, label: {
             HStack(spacing: 2) {

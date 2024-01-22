@@ -77,7 +77,7 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
             return folderNode
         } ?? []
 
-        return nodes.bookmarksSortedAlphabetically()
+        return nodes
     }
 
     private func childNodes(for folder: BookmarkFolder, parentNode: BookmarkNode) -> [BookmarkNode] {
@@ -100,7 +100,7 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
             updatedChildNodes += [newNode]
         }
 
-        return updatedChildNodes.bookmarksSortedAlphabetically()
+        return updatedChildNodes
     }
 
 }

@@ -40,8 +40,8 @@ extension WKWebViewConfiguration {
         preferences.isFraudulentWebsiteWarningEnabled = false
 
         if SupportedOSChecker.isCurrentOSReceivingUpdates {
-            if urlSchemeHandler(forURLScheme: DuckPlayer.duckPlayerScheme) == nil {
-                setURLSchemeHandler(DuckPlayerSchemeHandler(), forURLScheme: DuckPlayer.duckPlayerScheme)
+            if urlSchemeHandler(forURLScheme: URL.NavigationalScheme.duck.rawValue) == nil {
+                setURLSchemeHandler(DuckURLSchemeHandler(), forURLScheme: URL.NavigationalScheme.duck.rawValue)
             }
         }
 

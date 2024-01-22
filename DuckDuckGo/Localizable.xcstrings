@@ -376,6 +376,9 @@
     "also applies here." : {
 
     },
+    "Always Show" : {
+      "comment" : "Preference for always showing the bookmarks bar"
+    },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
       "extractionState" : "extracted_with_value",
@@ -1480,19 +1483,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Always Show"
-          }
-        }
-      }
-    },
-    "bookmarks.bar.show.never" : {
-      "comment" : "Preference for never showing the bookmarks bar on new tab",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Never Show"
+            "value" : "Always show"
           }
         }
       }
@@ -1504,7 +1495,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Only Show on New Tab"
+            "value" : "Only show on New Tab"
           }
         }
       }
@@ -1517,6 +1508,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Imported from"
+          }
+        }
+      }
+    },
+    "bookmarks.imported.mobile.folder.title" : {
+      "comment" : "Name of the \"Mobile bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mobile bookmarks"
+          }
+        }
+      }
+    },
+    "bookmarks.imported.other.folder.title" : {
+      "comment" : "Name of the \"Other bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Other bookmarks"
           }
         }
       }
@@ -1825,6 +1840,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Copy"
+          }
+        }
+      }
+    },
+    "copy.email.address" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Email Address"
+          }
+        }
+      }
+    },
+    "copy.email.addresses" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Email Addresses"
           }
         }
       }
@@ -3345,7 +3384,7 @@
       "comment" : "Main Menu Help"
     },
     "Hide" : {
-      "comment" : "Main Menu > View > Home Button > None item"
+      "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item"
     },
     "Hide DuckDuckGo" : {
       "comment" : "Main Menu DuckDuckGo item"
@@ -5241,6 +5280,9 @@
         }
       }
     },
+    "Never Show" : {
+      "comment" : "Preference for never showing the bookmarks bar on new tab"
+    },
     "never.for.this.site" : {
       "comment" : "Never ask to save login credentials for this site button",
       "extractionState" : "extracted_with_value",
@@ -5834,6 +5876,9 @@
           }
         }
       }
+    },
+    "Only Show on New Tab" : {
+      "comment" : "Preference for only showing the bookmarks bar on new tab"
     },
     "open" : {
       "comment" : "Open button",
@@ -7920,7 +7965,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Reopen All Windows from Last Session"
+            "value" : "Reopen all windows from last session"
           }
         }
       }
@@ -8050,6 +8095,9 @@
           }
         }
       }
+    },
+    "Reopen All Windows from Last Session" : {
+      "comment" : "Main Menu History item"
     },
     "reopen.last.closed.tab" : {
       "extractionState" : "extracted_with_value",
@@ -8265,6 +8313,9 @@
       "comment" : "Main Menu View item"
     },
     "Show left of the back button" : {
+      "comment" : "Preferences > Home Button > left position item"
+    },
+    "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item"
     },
     "Show Next Tab" : {
@@ -8280,6 +8331,9 @@
       "comment" : "Main Menu View-Developer item"
     },
     "Show right of the reload button" : {
+      "comment" : "Preferences > Home Button > right position item"
+    },
+    "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item"
     },
     "Show Spelling and Grammar" : {

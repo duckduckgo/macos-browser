@@ -81,12 +81,11 @@ struct BookmarksBarPromptView: View {
                 .padding(.bottom, 16)
 
             Text(UserText.bookmarksBarPromptTitle)
-                .font(Font.custom("SF Pro Text", size: 15)
-                    .weight(.semibold))
+                .font(.system(size: 15).weight(.semibold))
                 .padding(.bottom, 16)
 
             Text(UserText.bookmarksBarPromptMessage)
-                .font(Font.custom("SF Pro Text", size: 13))
+                .font(.system(size: 13))
                 .padding(.bottom, 20)
 
             HStack {
@@ -94,7 +93,7 @@ struct BookmarksBarPromptView: View {
                     model.rejectBookmarksBar()
                 } label: {
                     Text(UserText.bookmarksBarPromptDismiss)
-                        .font(Font.custom("SF Pro Text", size: 13))
+                        .font(.system(size: 13))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .frame(height: 28)
@@ -106,7 +105,7 @@ struct BookmarksBarPromptView: View {
                     model.acceptBookmarksBar()
                 } label: {
                     Text(UserText.bookmarksBarPromptAccept)
-                        .font(Font.custom("SF Pro Text", size: 13))
+                        .font(.system(size: 13))
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .frame(height: 28)

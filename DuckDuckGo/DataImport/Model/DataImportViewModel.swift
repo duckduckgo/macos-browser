@@ -308,7 +308,10 @@ struct DataImportViewModel {
                     break
                 }
                 log("file read no permission for \(url.path)")
-                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
+
+                if url != selectedProfile?.profileURL.appendingPathComponent(SafariDataImporter.bookmarksFileName) {
+                    Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
+                }
                 screen = .getReadPermission(url)
                 return true
 

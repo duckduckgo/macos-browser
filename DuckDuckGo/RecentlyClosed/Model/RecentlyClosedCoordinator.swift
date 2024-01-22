@@ -178,7 +178,7 @@ final class RecentlyClosedCoordinator: RecentlyClosedCoordinating {
         var lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         if lastKeyMainWindowController == nil {
             // Create a new window if none exists
-            WindowsManager.openNewWindow(with: Tab(content: .homePage, shouldLoadInBackground: true))
+            WindowsManager.openNewWindow(with: Tab(content: .newtab, shouldLoadInBackground: true))
             lastKeyMainWindowController = WindowControllersManager.shared.lastKeyMainWindowController
         }
 
@@ -235,14 +235,14 @@ private extension RecentlyClosedTab {
 extension Tab.TabContent {
 
     var isEmpty: Bool {
-        self == .none || self == .homePage
+        self == .none || self == .newtab
     }
 
     func loadedFromCache() -> Self {
         switch self {
         case .url(let url, credential: let credential, source: _):
             .url(url, credential: credential, source: .pendingStateRestoration)
-        case .homePage, .preferences, .bookmarks, .onboarding, .none, .dataBrokerProtection:
+        case .newtab, .settings, .bookmarks, .onboarding, .none, .dataBrokerProtection:
             self
         }
     }
@@ -252,7 +252,7 @@ extension Tab.TabContent {
         case .url(let url, credential: let credential, source: let source):
             let newSource: URLSource = source == .pendingStateRestoration ? .loadedByStateRestoration : .reload
             return .url(url, credential: credential, source: newSource)
-        case .homePage, .preferences, .bookmarks, .onboarding, .none, .dataBrokerProtection:
+        case .newtab, .settings, .bookmarks, .onboarding, .none, .dataBrokerProtection:
             return self
         }
     }
