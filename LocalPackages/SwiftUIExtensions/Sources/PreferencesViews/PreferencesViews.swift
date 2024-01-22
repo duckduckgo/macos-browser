@@ -144,13 +144,11 @@ public struct PreferencePaneSection<Content>: View where Content: View {
 
     public let header: String?
     public let spacing: CGFloat
-    public let verticalPadding: CGFloat
     @ViewBuilder public let content: () -> Content
 
-    public init(_ header: String? = nil, spacing: CGFloat = 8, verticalPadding: CGFloat = 20, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ header: String? = nil, spacing: CGFloat = 8, @ViewBuilder content: @escaping () -> Content) {
         self.header = header
         self.spacing = spacing
-        self.verticalPadding = verticalPadding
         self.content = content
     }
 
@@ -161,7 +159,7 @@ public struct PreferencePaneSection<Content>: View where Content: View {
             }
             content()
         }
-        .padding(.bottom, 8)
+        .padding(.bottom, 16)
     }
 }
 

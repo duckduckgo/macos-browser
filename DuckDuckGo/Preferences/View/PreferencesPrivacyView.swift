@@ -64,7 +64,7 @@ extension Preferences {
                         }
                     }
 
-                    PreferencePaneSection {
+                    PreferencePaneSubSection {
                         Button(UserText.manageFireproofSites) {
                             model.presentManageFireproofSitesDialog()
                         }
