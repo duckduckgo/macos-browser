@@ -239,7 +239,7 @@ struct DataBrokerProtectionTermsAndConditionsContentView: View {
             }
             .padding(.leading, groupLeadingPadding)
 
-            Text("\nYou give DuckDuckGo authority to act on your behalf.")
+            Text("\nYou give DuckDuckGo authority to act on your Here's an updated version with the remaining content:")
                 .fontWeight(.bold)
                 .padding(.bottom, sectionBottomPadding)
 
