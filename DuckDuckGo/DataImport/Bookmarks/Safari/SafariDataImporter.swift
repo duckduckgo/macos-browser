@@ -60,7 +60,7 @@ final class SafariDataImporter: DataImporter {
         }
     }
 
-    static private let bookmarksFileName = "Bookmarks.plist"
+    static let bookmarksFileName = "Bookmarks.plist"
 
     private var fileUrl: URL {
         profile.profileURL.appendingPathComponent(Self.bookmarksFileName)
