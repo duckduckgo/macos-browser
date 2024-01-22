@@ -239,7 +239,7 @@ final class MainViewController: NSViewController {
     private func updateDividerColor() {
         NSAppearance.withAppAppearance {
             let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
-            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .addressBarSolidSeparatorColor
+            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .bookmarkBarBackground : .addressBarSolidSeparatorColor
             mainView.divider.backgroundColor = backgroundColor
         }
     }

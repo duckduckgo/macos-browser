@@ -331,7 +331,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func updateSubviews() {
         NSAppearance.withAppAppearance {
-            let backgroundColor = isSelected || isDragged ? NSColor.interfaceBackgroundColor : NSColor.clear
+            let backgroundColor = isSelected || isDragged ? NSColor.navigationBarBackground : NSColor.clear
             view.layer?.backgroundColor = backgroundColor.cgColor
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
