@@ -50,29 +50,18 @@ public final class TunnelControllerIPCClient: NSObject {
 
     /// The delegate.
     ///
-    public weak var clientDelegate: IPCClientInterface? {
-        didSet {
-            xpcDelegate.clientDelegate = self.clientDelegate
-        }
-    }
-
-    private let xpcDelegate: TunnelControllerXPCClientDelegate
+    public weak var clientDelegate: IPCClientInterface?
 
     public init(machServiceName: String) {
         let clientInterface = NSXPCInterface(with: XPCClientInterface.self)
         let serverInterface = NSXPCInterface(with: XPCServerInterface.self)
-        self.xpcDelegate = TunnelControllerXPCClientDelegate(
-            clientDelegate: self.clientDelegate,
-            serverInfoObserver: self.serverInfoObserver,
-            connectionErrorObserver: self.connectionErrorObserver,
-            connectionStatusObserver: self.connectionStatusObserver
-        )
 
         xpc = XPCClient(
             machServiceName: machServiceName,
             clientInterface: clientInterface,
             serverInterface: serverInterface)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         xpc.delegate = xpcDelegate
     }
@@ -101,6 +90,14 @@ private final class TunnelControllerXPCClientDelegate: XPCClientInterface {
     }
 }
 
+=======
+        super.init()
+
+        xpc.delegate = self
+    }
+}
+
+>>>>>>> d68434899 (Revert "Merge tag '1.71.0'")
 // MARK: - Incoming communication from the server
 
 extension TunnelControllerIPCClient: XPCClientInterface {
