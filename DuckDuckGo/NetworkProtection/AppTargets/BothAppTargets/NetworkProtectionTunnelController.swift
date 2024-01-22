@@ -113,7 +113,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         await setup(tunnelManager)
         try await tunnelManager.saveToPreferences()
         try await tunnelManager.loadFromPreferences()
-        try await tunnelManager.saveToPreferences()
     }
 
     // MARK: - Initialization
