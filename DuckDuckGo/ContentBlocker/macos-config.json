@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1705334213687,
+    "version": 1705618997789,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -264,6 +264,9 @@
                     "domain": "tuc.org.uk"
                 },
                 {
+                    "domain": "newsmax.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -283,7 +286,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "0e798c688c53c17c989fa3a41b8c9f65"
+            "hash": "b082ab4a63d22eb4eafee199c52b1c61"
         },
         "autofill": {
             "exceptions": [
@@ -4887,6 +4890,7 @@
                                 "rule": "c.amazon-adsystem.com/aax2/apstag.js",
                                 "domains": [
                                     "applesfera.com",
+                                    "inquirer.com",
                                     "thesurfersview.com",
                                     "wildrivers.lostcoastoutpost.com"
                                 ]
@@ -4915,6 +4919,17 @@
                                 "rule": "elb.amazonaws.com/public/digital-experience/js/common.js",
                                 "domains": [
                                     "cigna.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "anyclip.com": {
+                        "rules": [
+                            {
+                                "rule": "player.anyclip.com/anyclip-widget/lre-widget",
+                                "domains": [
+                                    "dictionary.com",
+                                    "thesaurus.com"
                                 ]
                             }
                         ]
@@ -5403,6 +5418,7 @@
                             {
                                 "rule": "doubleclick.net/ondemand/hls/content/",
                                 "domains": [
+                                    "10play.com.au",
                                     "history.com"
                                 ]
                             },
@@ -5441,12 +5457,20 @@
                                 "domains": [
                                     "ah.nl",
                                     "applesfera.com",
+                                    "goplay.be",
                                     "nytimes.com",
                                     "realmadrid.com",
                                     "rocketnews24.com",
+                                    "stuff.co.nz",
                                     "uwbadgers.com",
                                     "wunderground.com",
                                     "youmath.it"
+                                ]
+                            },
+                            {
+                                "rule": "securepubads.g.doubleclick.net/pagead/managed/js/gpt/.*/pubads_impl.js",
+                                "domains": [
+                                    "stuff.co.nz"
                                 ]
                             },
                             {
@@ -6374,6 +6398,8 @@
                                 "domains": [
                                     "essentialpraxis.com",
                                     "kidsguide.com",
+                                    "muc-off.com",
+                                    "paria.cc",
                                     "urbanebikes.com"
                                 ]
                             },
@@ -7595,7 +7621,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "64bacd744ef069efd7206f48c684a102"
+            "hash": "382d31e2e646df92c16cc183b57dc969"
         },
         "trackingCookies1p": {
             "settings": {
