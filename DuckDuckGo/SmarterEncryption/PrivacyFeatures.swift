@@ -41,11 +41,20 @@ final class AppPrivacyFeatures: PrivacyFeaturesProtocol {
     let contentBlocking: AnyContentBlocking
     let httpsUpgrade: HTTPSUpgrade
 
+    private static var lastReportedBloomFilterError: NSError?
     private static let httpsUpgradeDebugEvents = EventMapping<AppHTTPSUpgradeStore.ErrorEvents> { event, error, parameters, onComplete in
         let domainEvent: Pixel.Event.Debug
         switch event {
         case .dbSaveBloomFilterError:
             domainEvent = .dbSaveBloomFilterError
+            if let lastReportedBloomFilterError,
+               lastReportedBloomFilterError.domain == (error as NSError?)?.domain,
+               lastReportedBloomFilterError.code == (error as NSError?)?.code {
+                // don‘t report repeated failures
+                return
+            }
+            lastReportedBloomFilterError = error as NSError?
+
         case .dbSaveExcludedHTTPSDomainsError:
             domainEvent = .dbSaveExcludedHTTPSDomainsError
         }
