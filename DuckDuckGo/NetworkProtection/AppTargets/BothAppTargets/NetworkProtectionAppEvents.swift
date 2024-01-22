@@ -115,7 +115,6 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
 
         // should‘ve been run at least once with NetP enabled
