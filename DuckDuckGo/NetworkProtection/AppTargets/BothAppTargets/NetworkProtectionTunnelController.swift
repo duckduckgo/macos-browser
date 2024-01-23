@@ -179,7 +179,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 .setShowInMenuBar,
                 .setNetworkPathChange,
                 .setVPNFirstEnabled,
-                .setNetworkPathChange,
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
             break
