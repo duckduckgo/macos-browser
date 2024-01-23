@@ -37,7 +37,7 @@ extension UserText {
 
     // MARK: - Navigation Bar Status View
 
-    static let networkProtectionNavBarStatusViewShareFeedback = NSLocalizedString("network.protection.navbar.status.view.share.feedback", value: "Send Feedback…", comment: "Menu item for 'Send Feedback' in the Network Protection status view that's shown in the navigation bar")
+    static let networkProtectionNavBarStatusViewShareFeedback = NSLocalizedString("network.protection.navbar.status.view.share.feedback", value: "Send VPN Feedback…", comment: "Menu item for 'Send VPN Feedback' in the Network Protection status view that's shown in the navigation bar")
     static let networkProtectionNavBarStatusMenuVPNSettings = NSLocalizedString("network.protection.status.menu.vpn.settings", value: "VPN Settings…", comment: "The status menu 'VPN Settings' menu item")
 
     // MARK: - System Extension Installation Messages

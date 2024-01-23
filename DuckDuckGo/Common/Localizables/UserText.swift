@@ -332,7 +332,7 @@ struct UserText {
         comment: "Nearest city setting description")
     static let vpnLocationNearestAvailable = NSLocalizedString(
         "vpn.location.description.nearest.available",
-        value: "Nearest Available",
+        value: "Nearest available",
         comment: "Nearest available location setting description")
     static let vpnLocationNearestAvailableSubtitle = NSLocalizedString("vpn.location.nearest.available.title", value: "Automatically connect to the nearest server we can find.", comment: "Subtitle underneath the nearest available vpn location preference text.")
 
