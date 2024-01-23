@@ -514,6 +514,10 @@ extension MainViewController {
             NSApp.menu?.performKeyEquivalent(with: event)
             return true
 
+        case kVK_ANSI_Y:
+            (NSApp.mainMenuTyped.historyMenu.accessibilityParent() as? NSMenuItem)?.accessibilityPerformPress()
+            return true
+
         default:
             return false
         }
