@@ -41,6 +41,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
             scheduler.stopScheduler()
 
+            os_log("ELLETEST FeatureDisabler.disableLoginItem", log: .dbp, type: .info)
             scheduler.disableLoginItem()
 
             dataManager.removeAllData()

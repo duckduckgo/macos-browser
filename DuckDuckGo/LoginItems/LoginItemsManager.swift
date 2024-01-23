@@ -35,6 +35,9 @@ final class LoginItemsManager {
 
     func disableLoginItems(_ items: Set<LoginItem>) {
         for item in items {
+            if item == .dbpBackgroundAgent {
+                os_log("ELLETEST LoginItemsManager.disabledLoginItems", log: .dbp, type: .info)
+            }
             try? item.disable()
         }
     }

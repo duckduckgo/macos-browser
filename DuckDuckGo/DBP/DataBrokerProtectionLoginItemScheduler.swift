@@ -37,11 +37,13 @@ final class DataBrokerProtectionLoginItemScheduler {
 
     func disableLoginItem() {
         pixelHandler.fire(.disableLoginItem)
+        os_log("ELLETEST LoginItemScheduler.disableLoginItem", log: .dbp, type: .info)
         loginItemsManager.disableLoginItems([.dbpBackgroundAgent])
     }
 
     func enableLoginItem() {
         pixelHandler.fire(.enableLoginItem)
+        os_log("ELLETEST LoginItemScheduler.enableLoginItem", log: .dbp, type: .info)
         loginItemsManager.enableLoginItems([.dbpBackgroundAgent], log: .dbp)
     }
 }

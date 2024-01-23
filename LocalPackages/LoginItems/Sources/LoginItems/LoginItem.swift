@@ -85,7 +85,8 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            let didWork = SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            os_log("ELLETEST enable iten did work: %{public}@", log: log, didWork ? "yes" : "no")
         }
 
         launchInformation.updateLastEnabledTimestamp()
