@@ -18,6 +18,7 @@
 
 import Foundation
 import DataBrokerProtection
+import Common
 
 public extension Notification.Name {
     static let dbpWasDisabled = Notification.Name("com.duckduckgo.DBP.DBPWasDisabled")
@@ -41,7 +42,7 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
         if !DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist {
             scheduler.stopScheduler()
 
-            os_log("ELLETEST FeatureDisabler.disableLoginItem", log: .dbp, type: .info)
+            os_log("ELLETEST FeatureDisabler.disableLoginItem", log: .default)
             scheduler.disableLoginItem()
 
             dataManager.removeAllData()
