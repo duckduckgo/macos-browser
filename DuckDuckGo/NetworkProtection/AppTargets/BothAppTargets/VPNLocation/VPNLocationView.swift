@@ -216,7 +216,7 @@ private struct CountryItem: View {
         }
         .foregroundColor(.accentColor)
         .pickerStyle(.menu)
-        .frame(width: 90)
+        .frame(width: 120)
         .background(Color.clear)
     }
 }
