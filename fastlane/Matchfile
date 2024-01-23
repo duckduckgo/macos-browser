@@ -4,7 +4,7 @@ git_branch "macos"
 platform "macos"
 
 type "appstore"
-app_identifier "com.duckduckgo.mobile.ios"
+app_identifier ["com.duckduckgo.mobile.ios", "com.duckduckgo.mobile.ios.vpn.agent"]
 additional_cert_types ["mac_installer_distribution"]
 generate_apple_certs false
 
