@@ -53,6 +53,9 @@ final class LoginItemsManager {
         for item in items {
             do {
                 try action(item)()
+                if item == .dbpBackgroundAgent {
+                    os_log("ELLETEST Updating login item did not throw an error", log: .dbp, type: .info)
+                }
             } catch let error as NSError {
                 let event = Pixel.Event.Debug.loginItemUpdateError(
                     loginItemBundleID: item.agentBundleID,
@@ -63,6 +66,9 @@ final class LoginItemsManager {
 
                 DailyPixel.fire(pixel: .debug(event: event, error: error), frequency: .dailyAndCount, includeAppVersionParameter: true)
                 logOrAssertionFailure("🔴 Could not \(whatAreWeDoing) \(item): \(error.debugDescription)")
+                if item == .dbpBackgroundAgent {
+                    os_log("ELLETEST Updating login item threw an error: \(error.debugDescription)", log: .dbp, type: .info)
+                }
             }
         }
     }

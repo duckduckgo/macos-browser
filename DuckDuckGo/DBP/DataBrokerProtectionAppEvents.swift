@@ -84,6 +84,7 @@ struct DataBrokerProtectionAppEvents {
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
         pixelHandler.fire(.resetLoginItem)
+        os_log("ELLETEST Restarting background agent", log: .dbp, type: .info)
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 
