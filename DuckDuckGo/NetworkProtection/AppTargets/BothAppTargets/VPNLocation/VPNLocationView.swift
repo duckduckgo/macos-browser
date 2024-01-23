@@ -112,7 +112,7 @@ struct VPNLocationView: View {
 
     private var listLoadingView: some View {
         ZStack(alignment: .center) {
-            ProgressView()
+            EmptyView()
         }
         .frame(height: 270)
         .frame(idealWidth: .infinity, maxWidth: .infinity)
