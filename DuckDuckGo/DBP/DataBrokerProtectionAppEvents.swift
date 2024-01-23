@@ -84,8 +84,9 @@ struct DataBrokerProtectionAppEvents {
 
     private func restartBackgroundAgent(loginItemsManager: LoginItemsManager) {
         pixelHandler.fire(.resetLoginItem)
-        os_log("ELLETEST Restarting background agent", log: .dbp, type: .info)
+        os_log("ELLETEST AppEvents Restarting background agent", log: .dbp, type: .info)
         loginItemsManager.disableLoginItems([LoginItem.dbpBackgroundAgent])
+        os_log("ELLETEST AppEvents Restarting background agent. Done the disable, now to enable", log: .dbp, type: .info)
         loginItemsManager.enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
 
         // restartLoginItems doesn't work when we change the agent name

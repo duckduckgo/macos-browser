@@ -86,7 +86,7 @@ public struct LoginItem: Equatable, Hashable {
             try SMAppService.loginItem(identifier: agentBundleID).register()
         } else {
             let didWork = SMLoginItemSetEnabled(agentBundleID as CFString, true)
-            os_log("ELLETEST enable iten did work: %{public}@", log: log, didWork ? "yes" : "no")
+            os_log("ELLETEST enable item did work: %{public}@", log: log, didWork ? "yes" : "no")
         }
 
         launchInformation.updateLastEnabledTimestamp()
@@ -98,7 +98,8 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            let didWork = SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            os_log("ELLETEST disable item did work: %{public}@", log: log, didWork ? "yes" : "no")
         }
     }
 

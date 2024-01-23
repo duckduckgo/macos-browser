@@ -26,6 +26,7 @@ final class LoginItemsManager {
     // MARK: - Main Interactions
 
     func enableLoginItems(_ items: Set<LoginItem>, log: OSLog) {
+        os_log("ELLETEST LoginItemsManager.enableLoginItems (not necessisarily dbp)", log: .dbp, type: .info)
         updateLoginItems(items, whatAreWeDoing: "enable", using: LoginItem.enable)
     }
 
