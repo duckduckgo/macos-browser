@@ -177,6 +177,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 .setSelectedEnvironment,
                 .setSelectedLocation,
                 .setShowInMenuBar,
+                .setNetworkPathChange,
                 .setVPNFirstEnabled,
                 .setNetworkPathChange,
                 .setDisableRekeying:
