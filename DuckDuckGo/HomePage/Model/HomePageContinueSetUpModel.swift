@@ -40,10 +40,7 @@ extension HomePage.Models {
         let gridWidth = FeaturesGridDimensions.width
         let deleteActionTitle = UserText.newTabSetUpRemoveItemAction
         let privacyConfigurationManager: PrivacyConfigurationManaging
-
-#if NETWORK_PROTECTION || DBP
         let homePageRemoteMessaging: HomePageRemoteMessaging
-#endif
 
         var isDay0SurveyEnabled: Bool {
             let newTabContinueSetUpSettings = privacyConfigurationManager.privacyConfig.settings(for: .newTabContinueSetUp)
