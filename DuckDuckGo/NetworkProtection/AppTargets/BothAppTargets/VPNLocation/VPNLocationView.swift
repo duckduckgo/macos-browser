@@ -114,7 +114,7 @@ struct VPNLocationView: View {
         ZStack(alignment: .center) {
             EmptyView()
         }
-        .frame(height: 270)
+        .frame(height: 370)
         .frame(idealWidth: .infinity, maxWidth: .infinity)
         .roundedBorder()
     }
