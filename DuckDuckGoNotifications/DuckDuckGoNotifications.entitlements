@@ -10,7 +10,5 @@
 	<array>
 		<string>$(NETP_APP_GROUP)</string>
 	</array>
-	<key>com.apple.security.get-task-allow</key>
-	<true/>
 </dict>
 </plist>
