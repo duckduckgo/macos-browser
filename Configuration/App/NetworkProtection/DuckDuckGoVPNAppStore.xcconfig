@@ -45,7 +45,7 @@ CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 PRODUCT_NAME = $(AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = Mac Browser NetP Developer ID Not. (Distribution)
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent macos
 
 FEATURE_FLAGS[arch=*][sdk=*] = NETWORK_PROTECTION
 FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_PROTECTION
