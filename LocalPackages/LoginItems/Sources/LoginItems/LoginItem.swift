@@ -80,7 +80,7 @@ public struct LoginItem: Equatable, Hashable {
     }
 
     public func enable() throws {
-        os_log("🟢 registering login item %{public}@", log: log, self.debugDescription)
+        os_log("ELLETEST 🟢 registering login item %{public}@", log: log, self.debugDescription)
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
@@ -93,7 +93,7 @@ public struct LoginItem: Equatable, Hashable {
     }
 
     public func disable() throws {
-        os_log("🟢 unregistering login item %{public}@", log: log, self.debugDescription)
+        os_log("ELLETEST 🟢 unregistering login item %{public}@", log: log, self.debugDescription)
 
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
@@ -108,7 +108,7 @@ public struct LoginItem: Equatable, Hashable {
     ///
     public func restart() throws {
         guard [.enabled, .requiresApproval].contains(status) else {
-            os_log("🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
+            os_log("ELLETEST 🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
             return
         }
         try? disable()
@@ -117,7 +117,7 @@ public struct LoginItem: Equatable, Hashable {
 
     public func forceStop() {
         let runningApplications = runningApplications
-        os_log("🟢 stopping %{public}@", log: log, runningApplications.map { $0.processIdentifier }.description)
+        os_log("ELLETEST 🟢 stopping %{public}@", log: log, runningApplications.map { $0.processIdentifier }.description)
         runningApplications.forEach { $0.terminate() }
     }
 }

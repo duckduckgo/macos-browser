@@ -36,7 +36,7 @@ final class LoginItemsManager {
     func disableLoginItems(_ items: Set<LoginItem>) {
         for item in items {
             if item == .dbpBackgroundAgent {
-                os_log("ELLETEST LoginItemsManager.disabledLoginItems", log: .dbp, type: .info)
+                os_log("ELLETEST LoginItemsManager.disableLoginItems", log: .dbp, type: .info)
             }
             try? item.disable()
         }
@@ -55,6 +55,9 @@ final class LoginItemsManager {
     private func updateLoginItems(_ items: Set<LoginItem>, whatAreWeDoing: String, using action: (LoginItem) -> () throws -> Void) {
         for item in items {
             do {
+                if item == .dbpBackgroundAgent {
+                    os_log("ELLETEST LoginItemsManager.updateLoginItem doing action", log: .dbp, type: .info)
+                }
                 try action(item)()
                 if item == .dbpBackgroundAgent {
                     os_log("ELLETEST Updating login item did not throw an error", log: .dbp, type: .info)
