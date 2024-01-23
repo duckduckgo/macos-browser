@@ -21,7 +21,7 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
 
-public enum SMLoginItemSetEnabledErorr: Error {
+public enum SMLoginItemSetEnabledError: Error {
     case failed
 }
 
@@ -91,7 +91,7 @@ public struct LoginItem: Equatable, Hashable {
         } else {
             let success = SMLoginItemSetEnabled(agentBundleID as CFString, true)
             if !success {
-                throw SMLoginItemSetEnabledErorr.failed
+                throw SMLoginItemSetEnabledError.failed
             }
         }
 
@@ -106,7 +106,7 @@ public struct LoginItem: Equatable, Hashable {
         } else {
             let success = SMLoginItemSetEnabled(agentBundleID as CFString, false)
             if !success {
-                throw SMLoginItemSetEnabledErorr.failed
+                throw SMLoginItemSetEnabledError.failed
             }
         }
     }
