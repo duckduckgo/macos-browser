@@ -119,6 +119,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .anySettingsPane
             case URL.bookmarks, URL.Invalid.aboutBookmarks:
                 return .bookmarks
+            case URL.dataBrokerProtection:
+                return .dataBrokerProtection
             case URL.Invalid.aboutHome:
                 guard let customURL = URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else {
                     return .newtab
@@ -541,7 +543,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor(unsafe)
     private func cleanUpBeforeClosing(onDeinit: Bool) {
         let job = { [webView, userContentController] in
-            webView.stopAllMediaAndLoading()
+            webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
@@ -558,7 +560,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func stopAllMediaAndLoading() {
-        webView.stopAllMediaAndLoading()
+        webView.stopAllMedia(shouldStopLoading: true)
     }
 
 #if DEBUG
@@ -593,7 +595,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published private(set) var content: TabContent {
         didSet {
             if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
-                webView.stopAllMediaAndLoading()
+                webView.stopAllMedia(shouldStopLoading: false)
             }
             handleFavicon(oldValue: oldValue)
             invalidateInteractionStateData()
@@ -812,12 +814,12 @@ protocol NewWindowPolicyDecisionMaker {
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
             webView.load(URLRequest(url: customURL))
         } else {
-            content = .newtab
+            webView.load(URLRequest(url: .newtab))
         }
     }
 
     func startOnboarding() {
-        content = .onboarding
+        webView.load(URLRequest(url: .welcome))
     }
 
     func reload() {
