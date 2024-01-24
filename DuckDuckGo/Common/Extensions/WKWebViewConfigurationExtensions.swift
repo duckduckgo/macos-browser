@@ -52,14 +52,14 @@ extension WKWebViewConfiguration {
         self.userContentController = userContentController
         self.processPool.geolocationProvider = GeolocationProvider(processPool: self.processPool)
 
-        _=NSPopover.swizzleCurrentFrameOnScreenOnce
+        _=NSPopover.swizzleShowRelativeToRectOnce
      }
 
 }
 
 extension NSPopover {
 
-    fileprivate static let swizzleCurrentFrameOnScreenOnce: () = {
+    fileprivate static let swizzleShowRelativeToRectOnce: () = {
         guard let originalMethod = class_getInstanceMethod(NSPopover.self, #selector(show(relativeTo:of:preferredEdge:))),
               let swizzledMethod = class_getInstanceMethod(NSPopover.self, #selector(swizzled_show(relativeTo:of:preferredEdge:))) else {
             assertionFailure("Methods not available")
@@ -74,7 +74,7 @@ extension NSPopover {
     @objc(swizzled_showRelativeToRect:ofView:preferredEdge:)
     private dynamic func swizzled_show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
         if positioningView.superview == nil {
-            var observer: Cancellable!
+            var observer: Cancellable?
             observer = positioningView.observe(\.window) { positioningView, _ in
                 if positioningView.window != nil {
                     self.swizzled_show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
