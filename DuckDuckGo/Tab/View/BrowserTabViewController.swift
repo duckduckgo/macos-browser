@@ -205,7 +205,7 @@ final class BrowserTabViewController: NSViewController {
             self.previouslySelectedTab = nil
         }
 
-        openNewTab(with: .preferences(pane: .subscription))
+        openNewTab(with: .settings(pane: .subscription))
     }
 #endif
 
@@ -350,7 +350,8 @@ final class BrowserTabViewController: NSViewController {
                     return Just(()).eraseToAnyPublisher()
                 }
 
-                return Publishers.Merge3(
+                return Publishers.Merge4(
+                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
                     tabViewModel.tab.webViewDidCommitNavigationPublisher,
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
                     tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
@@ -490,7 +491,7 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
-        case let .preferences(pane):
+        case let .settings(pane):
             removeAllTabContent()
             let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
@@ -511,7 +512,7 @@ final class BrowserTabViewController: NSViewController {
                 changeWebView(tabViewModel: tabViewModel)
             }
 
-        case .homePage:
+        case .newtab:
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
@@ -876,6 +877,7 @@ extension BrowserTabViewController: TabDelegate {
         let context = PrintContext(request: request)
         let contextInfo = Unmanaged<PrintContext>.passRetained(context).toOpaque()
 
+        printOperation.printPanel.options.formUnion([.showsPaperSize, .showsOrientation, .showsScaling])
         printOperation.runModal(for: window, delegate: self, didRun: didRunSelector, contextInfo: contextInfo)
 
         // get the Print Panel that (hopefully) was added to the window.sheets
@@ -937,8 +939,8 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
             return
         }
 
-        if case .preferences = selectedTab.content {
-            selectedTab.setContent(.preferences(pane: identifier))
+        if case .settings = selectedTab.content {
+            selectedTab.setContent(.settings(pane: identifier))
         }
     }
 

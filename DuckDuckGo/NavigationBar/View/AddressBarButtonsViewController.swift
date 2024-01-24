@@ -521,6 +521,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         privacyEntryPointButton.contentTintColor = .privacyEnabledColor
+        privacyEntryPointButton.sendAction(on: .leftMouseDown)
 
         imageButton.applyFaviconStyle()
         (imageButton.cell as? NSButtonCell)?.highlightsBy = NSCell.StyleMask(rawValue: 0)

@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import Foundation
 import GRDB
 
@@ -52,11 +53,11 @@ final class ChromiumFaviconsReader {
             NSImage(data: imageData)
         }
 
-        init(row: Row) {
-            pageURL = row["page_url"]
-            iconURL = row["url"]
-            size = row["width"]
-            imageData = row["image_data"]
+        init(row: Row) throws {
+            pageURL = try row["page_url"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 0) }()
+            iconURL = try row["url"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 1) }()
+            size = try row["width"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 2) }()
+            imageData = try row["image_data"] ?? { throw FetchableRecordError<ChromiumFavicon>(column: 3) }()
         }
     }
 
