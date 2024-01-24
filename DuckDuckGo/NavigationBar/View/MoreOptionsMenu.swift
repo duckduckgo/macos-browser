@@ -370,7 +370,7 @@ final class MoreOptionsMenu: NSMenu {
             .withImage(NSImage(named: "SubscriptionIcon"))
 
         let attributedText = NSMutableAttributedString(string: UserText.subscriptionOptionsMenuItem)
-        attributedText.append (NSAttributedString(string: "  "))
+        attributedText.append(NSAttributedString(string: "  "))
 
         let imageAttachment = NSTextAttachment()
         imageAttachment.image = NSImage(named: "NewLabel")

@@ -357,7 +357,7 @@ final class AddressBarButtonsViewController: NSViewController {
         privacyDashboardPopover.close()
         _privacyDashboardPopover = nil
     }
-    
+
     func openPrivacyDashboard() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
         let privacyDashboardViewController = privacyDashboardPopover.viewController, // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
