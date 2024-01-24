@@ -270,7 +270,12 @@ final class AddressBarButtonsViewController: NSViewController {
             permissionAuthorizationPopover.close()
         }
         popupBlockedPopover?.close()
-        openPrivacyDashboard()
+
+        if privacyDashboardPopover.isShown {
+            closePrivacyDashboard()
+        } else {
+            openPrivacyDashboard()
+        }
     }
 
     private func updateBookmarkButtonVisibility() {
@@ -348,17 +353,15 @@ final class AddressBarButtonsViewController: NSViewController {
         query.wasShownOnce = true
     }
 
+    func closePrivacyDashboard() {
+        privacyDashboardPopover.close()
+        _privacyDashboardPopover = nil
+    }
+    
     func openPrivacyDashboard() {
-
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
         let privacyDashboardViewController = privacyDashboardPopover.viewController, // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
         privacyDashboardViewController.isPendingUpdates() == false else {
-            return
-        }
-
-        guard !privacyDashboardPopover.isShown else {
-            privacyDashboardPopover.close()
-            _privacyDashboardPopover = nil
             return
         }
 
@@ -521,7 +524,7 @@ final class AddressBarButtonsViewController: NSViewController {
         }
 
         privacyEntryPointButton.contentTintColor = .privacyEnabledColor
-        privacyEntryPointButton.sendAction(on: .leftMouseDown)
+        privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
         (imageButton.cell as? NSButtonCell)?.highlightsBy = NSCell.StyleMask(rawValue: 0)
@@ -1023,7 +1026,7 @@ extension AddressBarButtonsViewController: NSPopoverDelegate {
                 NotificationCenter.default.post(name: .bookmarkPromptShouldShow, object: nil)
             }
             updateBookmarkButtonVisibility()
-
+            bookmarkPopover = nil
         case privacyDashboardPopover:
             privacyEntryPointButton.state = .off
             _privacyDashboardPopover = nil
