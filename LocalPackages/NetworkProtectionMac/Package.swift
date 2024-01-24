@@ -27,6 +27,7 @@ let package = Package(
     ],
     products: [
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
+        .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
@@ -35,6 +36,17 @@ let package = Package(
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
+        // MARK: - NetworkProtectionController
+
+        .target(
+            name: "NetworkProtectionController",
+            dependencies: [],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
+
         // MARK: - NetworkProtectionIPC
 
         .target(
@@ -43,6 +55,17 @@ let package = Package(
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "XPCHelper", package: "XPCHelper")
             ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
+
+        // MARK: - NetworkProtectionProxy
+
+        .target(
+            name: "NetworkProtectionProxy",
+            dependencies: [],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],

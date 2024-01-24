@@ -130,9 +130,9 @@ extension NetworkProtectionStatusView {
             onboardingStatusPublisher
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] status in
-                self?.onboardingStatus = status
-            }
-            .store(in: &cancellables)
+                    self?.onboardingStatus = status
+                }
+                .store(in: &cancellables)
         }
 
         private func subscribeToStatusChanges() {
@@ -154,14 +154,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.tunnelErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastTunnelErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastTunnelErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToControllerErrorMessages() {
@@ -169,14 +169,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.controllerErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastControllerErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastControllerErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToDebugInformationChanges() {
@@ -259,6 +259,23 @@ extension NetworkProtectionStatusView {
                 return OnboardingStepView.Model(step: step) { [weak self] in
                     self?.tunnelControllerViewModel.startNetworkProtection()
                 }
+            }
+        }
+
+        // - VPN Benefits
+
+        var vpnBenefitsEnabled = true
+
+        var showVPNBenefitsView: Bool {
+            guard vpnBenefitsEnabled else {
+                return false
+            }
+
+            switch connectionStatus {
+            case .connected:
+                return true
+            default:
+                return false
             }
         }
     }

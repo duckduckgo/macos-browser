@@ -54,9 +54,11 @@ public struct NetworkProtectionStatusView: View {
                 OnboardingStepView(model: onboardingStepViewModel)
                     .padding(.horizontal, 5)
                     .padding(.top, 5)
+                    .transition(.slide)
             } else {
                 if let healthWarning = model.issueDescription {
                     connectionHealthWarningView(message: healthWarning)
+                        .transition(.slide)
                 }
             }
 
@@ -67,12 +69,24 @@ public struct NetworkProtectionStatusView: View {
 
             if model.showDebugInformation {
                 DebugInformationView(model: DebugInformationViewModel())
+                    .transition(.slide)
             }
 
             bottomMenuView()
+
+            if model.showVPNBenefitsView {
+                VStack(spacing: 0) {
+                    Divider()
+                        .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
+
+                    VPNBenefitsView()
+                }
+                .transition(.slide)
+            }
         }
         .padding(5)
         .frame(maxWidth: 350, alignment: .top)
+        .transition(.slide)
     }
 
     // MARK: - Composite Views

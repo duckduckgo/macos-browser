@@ -215,7 +215,8 @@ struct RedeemResponse: Codable {
 public struct AuthenticationService: DataBrokerProtectionAuthenticationService {
     private struct Constants {
 #if DEBUG
-        static let redeemURL = "https://dbp-staging.duckduckgo.com/dbp/redeem?"
+        //static let redeemURL = "https://dbp-staging.duckduckgo.com/dbp/redeem?"
+        static let redeemURL = "https://dbp.duckduckgo.com/dbp/redeem?"
 #else
         static let redeemURL = "https://dbp.duckduckgo.com/dbp/redeem?"
 #endif

@@ -154,6 +154,7 @@ public struct TunnelControllerView: View {
             if model.showServerDetails {
                 connectionStatusView()
                     .disabled(on: !isEnabled)
+                    .transition(.slide)
             }
         }
     }
