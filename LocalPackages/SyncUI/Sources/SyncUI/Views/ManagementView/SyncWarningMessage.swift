@@ -45,6 +45,7 @@ struct SyncWarningMessage: View {
                     }
                 }
             }
+            .padding(.horizontal)
         }
         .frame(width: 512, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))

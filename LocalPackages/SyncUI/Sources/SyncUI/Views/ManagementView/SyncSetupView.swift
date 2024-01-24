@@ -65,8 +65,13 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
     @ViewBuilder
     fileprivate func syncUnavailableView() -> some View {
         if !model.isDataSyncingAvailable || !model.isConnectingDevicesAvailable || !model.isAccountCreationAvailable {
-            SyncWarningMessage(title: UserText.syncUnavailableTitle, message: UserText.syncUnavailableMessage)
-                .padding(.top, 16)
+            if model.isAppVersionNotSupported {
+                SyncWarningMessage(title: UserText.syncUnavailableTitle, message: UserText.syncUnavailableMessageUpgradeRequired)
+                    .padding(.top, 16)
+            } else {
+                SyncWarningMessage(title: UserText.syncUnavailableTitle, message: UserText.syncUnavailableMessage)
+                    .padding(.top, 16)
+            }
         } else {
             EmptyView()
         }
