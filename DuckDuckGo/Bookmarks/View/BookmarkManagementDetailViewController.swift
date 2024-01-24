@@ -68,7 +68,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                     if editingBookmarkIndex != nil {
                         colorView.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
                     } else {
-                        colorView.animator().layer?.backgroundColor = NSColor.interfaceBackgroundColor.cgColor
+                        colorView.animator().layer?.backgroundColor = NSColor.bookmarkPageBackground.cgColor
                     }
                 }
             }
