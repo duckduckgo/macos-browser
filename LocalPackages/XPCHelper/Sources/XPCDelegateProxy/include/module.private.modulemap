@@ -1,0 +1,4 @@
+module XPCDelegateProxy {
+    header "XPCDelegateProxy.h"
+    export *
+}

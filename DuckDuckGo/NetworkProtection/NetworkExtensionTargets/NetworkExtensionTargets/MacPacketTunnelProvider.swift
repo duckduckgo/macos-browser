@@ -176,6 +176,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                     NetworkProtectionPixelEvent.networkProtectionTunnelFailureRecovered,
                     frequency: .dailyAndContinuous,
                     includeAppVersionParameter: true)
+            case .networkPathChanged:
+                break
             }
         case .reportLatency(let result):
             switch result {

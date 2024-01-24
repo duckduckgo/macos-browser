@@ -31,8 +31,8 @@ class SafariBookmarksReaderTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar.type, "folder")
-        XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
+        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar?.type, .folder)
+        XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks?.type, .folder)
     }
 
     private func bookmarksFileURL() -> URL {

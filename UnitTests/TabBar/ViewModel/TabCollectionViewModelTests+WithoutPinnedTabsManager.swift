@@ -61,7 +61,7 @@ extension TabCollectionViewModelTests {
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: TabCollection())
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 1)
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs[0].content, .homePage)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs[0].content, .newtab)
     }
 
     // MARK: - Select
@@ -134,38 +134,38 @@ extension TabCollectionViewModelTests {
 
     func test_WithoutPinnedTabsManager_WhenPreferencesTabIsPresentThenSelectDisplayableTabIfPresentSelectsPreferencesTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .anyPreferencePane))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .anySettingsPane))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(0))
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anySettingsPane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
     }
 
     func test_WithoutPinnedTabsManager_WhenPreferencesTabIsPresentThenOpeningPreferencesWithDifferentPaneUpdatesPaneOnExistingTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences(pane: .appearance)))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .settings(pane: .appearance)))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.preferences(pane: .privacy)))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.settings(pane: .privacy)))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
-        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .preferences(pane: .privacy))
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .settings(pane: .privacy))
     }
 
     func test_WithoutPinnedTabsManager_WhenPreferencesTabIsPresentThenOpeningPreferencesWithAnyPaneDoesNotUpdatePaneOnExistingTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .preferences(pane: .appearance)))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .settings(pane: .appearance)))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
 
-        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
+        XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.anySettingsPane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 1))
-        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .preferences(pane: .appearance))
+        XCTAssertEqual(tabCollectionViewModel.selectedTabViewModel?.tab.content, .settings(pane: .appearance))
     }
 
     func test_WithoutPinnedTabsManager_WhenBookmarksTabIsPresentThenSelectDisplayableTabIfPresentSelectsBookmarksTab() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(0))
 
         XCTAssertTrue(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
@@ -174,8 +174,8 @@ extension TabCollectionViewModelTests {
 
     func test_WithoutPinnedTabsManager_SelectDisplayableTabDoesNotChangeSelectionIfDisplayableTabIsNotPresent() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(2))
 
         XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.bookmarks))
@@ -185,10 +185,10 @@ extension TabCollectionViewModelTests {
     func test_WithoutPinnedTabsManager_SelectDisplayableTabDoesNotChangeSelectionIfDisplayableTabTypeDoesNotMatch() {
         let tabCollectionViewModel = TabCollectionViewModel.aTabCollectionViewModel()
         tabCollectionViewModel.tabCollection.append(tab: .init(content: .bookmarks))
-        tabCollectionViewModel.tabCollection.append(tab: .init(content: .homePage))
+        tabCollectionViewModel.tabCollection.append(tab: .init(content: .newtab))
         tabCollectionViewModel.select(at: .unpinned(2))
 
-        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.anyPreferencePane))
+        XCTAssertFalse(tabCollectionViewModel.selectDisplayableTabIfPresent(.anySettingsPane))
         XCTAssert(tabCollectionViewModel.selectedTabViewModel === tabCollectionViewModel.tabViewModel(at: 2))
     }
 
