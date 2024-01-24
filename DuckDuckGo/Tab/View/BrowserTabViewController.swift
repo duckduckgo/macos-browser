@@ -541,7 +541,12 @@ final class BrowserTabViewController: NSViewController {
     func generateNativePreviewIfNeeded() {
         switch tabViewModel?.tab.content {
         case .bookmarks, .preferences, .onboarding, .homePage, .dataBrokerProtection:
-            tabViewModel?.tab.tabPreviews?.generateNativePreview(from: view)
+            guard let hostingView = view.findNSHostingSubview() else {
+                assertionFailure("Didn't find NSHostingView")
+                return
+            }
+
+            tabViewModel?.tab.tabPreviews?.generateNativePreview(from: hostingView)
         default:
             return
         }
@@ -1065,4 +1070,18 @@ extension BrowserTabViewController {
             }
         }
     }
+}
+
+fileprivate extension NSView {
+
+    // Function returns subview for the generation of preview
+    func findNSHostingSubview() -> NSView? {
+        guard let hostingSubview = subviews.last?.subviews.first as? NSView else {
+            assertionFailure("Couldn't find NSHostingView")
+            return nil
+        }
+
+        return hostingSubview
+    }
+
 }

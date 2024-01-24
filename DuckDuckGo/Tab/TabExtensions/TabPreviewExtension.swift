@@ -129,16 +129,10 @@ final class TabPreviewExtension {
 
     private var nativePreview: NSImage?
 
-    //TODO: Pass hosting view directly
-    //TODO: What to do after restoration?
     func generateNativePreview(from view: NSView) {
-        guard let hostingView = view.subviews.last?.subviews.first else {
-            return
-        }
+        //TODO: Optimize
 
-        //TODO: Avoid unnecessary generations
-
-        let originalSize = hostingView.bounds.size
+        let originalSize = view.bounds.size
         let targetWidth = CGFloat(TabPreviewWindowController.Size.width.rawValue)
         let targetHeight = originalSize.height * (targetWidth / originalSize.width) // Preserving aspect ratio
 
@@ -163,7 +157,7 @@ final class TabPreviewExtension {
         if let cgContext = context?.cgContext {
             cgContext.translateBy(x: 0, y: originalSize.height)
             cgContext.scaleBy(x: 1.0, y: -1.0)
-            hostingView.layer?.render(in: cgContext)
+            view.layer?.render(in: cgContext)
         }
 
         NSGraphicsContext.restoreGraphicsState()
@@ -204,6 +198,7 @@ extension TabPreviewExtension: NSCodingExtension {
     }
 
     func encode(using coder: NSCoder) {
+        //TODO: native previews too
 //        if let previewData {
 //            coder.encode(previewData.url.absoluteString as NSString, forKey: NSSecureCodingKeys.tabPreviewUrl)
 //            coder.encode(Double(previewData.scrollPosition), forKey: NSSecureCodingKeys.tabPreviewScrollPosition)
