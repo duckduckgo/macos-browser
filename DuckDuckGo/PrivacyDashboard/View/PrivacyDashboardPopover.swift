@@ -38,10 +38,10 @@ final class PrivacyDashboardPopover: NSPopover {
     override init() {
         super.init()
 #if DEBUG
-         self.behavior = .semitransient
- #else
-         self.behavior = .transient
- #endif
+        self.behavior = .semitransient
+#else
+        self.behavior = .transient
+#endif
         setupContentController()
     }
 

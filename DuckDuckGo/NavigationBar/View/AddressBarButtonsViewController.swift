@@ -354,14 +354,19 @@ final class AddressBarButtonsViewController: NSViewController {
     }
 
     func closePrivacyDashboard() {
+
+        // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
+        guard let privacyDashboardViewController = privacyDashboardPopover.viewController,
+              privacyDashboardViewController.isPendingUpdates() == false else {
+            return
+        }
+
         privacyDashboardPopover.close()
-        _privacyDashboardPopover = nil
     }
 
     func openPrivacyDashboard() {
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
-        let privacyDashboardViewController = privacyDashboardPopover.viewController, // Prevent popover from being closed with Privacy Entry Point Button, while pending updates
-        privacyDashboardViewController.isPendingUpdates() == false else {
+        let privacyDashboardViewController = privacyDashboardPopover.viewController else {
             return
         }
 
@@ -597,7 +602,7 @@ final class AddressBarButtonsViewController: NSViewController {
             self?.subscribeToPermissions()
             self?.subscribeToPrivacyEntryPointIconUpdateTrigger()
             self?.subscribeToTrackerAnimationTrigger()
-            self?._privacyDashboardPopover?.close()
+            self?.closePrivacyDashboard()
             self?.updatePrivacyEntryPointIcon()
         }
     }
