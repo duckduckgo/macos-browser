@@ -125,52 +125,76 @@ final class TabPreviewExtension {
         previewData = nil
     }
 
-    // MARK: - Native views
+    // MARK: - Native Previews
 
     private var nativePreview: NSImage?
 
     func generateNativePreview(from view: NSView) {
-        //TODO: Optimize
+        let originalBounds = view.bounds
 
-        let originalSize = view.bounds.size
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let resizedImage = self.createResizedImage(from: view, with: originalBounds) else {
+                DispatchQueue.main.async { [weak self] in
+                    self?.nativePreview = nil
+                }
+                return
+            }
+
+            DispatchQueue.main.async { [weak self] in
+                self?.nativePreview = resizedImage
+            }
+        }
+    }
+
+    private func createResizedImage(from view: NSView, with bounds: CGRect) -> NSImage? {
+        let originalSize = bounds.size
         let targetWidth = CGFloat(TabPreviewWindowController.Size.width.rawValue)
-        let targetHeight = originalSize.height * (targetWidth / originalSize.width) // Preserving aspect ratio
+        let targetHeight = originalSize.height * (targetWidth / originalSize.width)
 
-        guard let bitmapRep = NSBitmapImageRep(
+        guard let bitmapRep = createBitmapRepresentation(size: originalSize) else { return nil }
+        renderView(view, to: bitmapRep, size: originalSize)
+
+        let originalImage = NSImage(size: originalSize)
+        originalImage.addRepresentation(bitmapRep)
+
+        return resizeImage(originalImage, to: NSSize(width: targetWidth, height: targetHeight))
+    }
+
+    private func createBitmapRepresentation(size: CGSize) -> NSBitmapImageRep? {
+        NSBitmapImageRep(
             bitmapDataPlanes: nil,
-            pixelsWide: Int(originalSize.width),
-            pixelsHigh: Int(originalSize.height),
+            pixelsWide: Int(size.width),
+            pixelsHigh: Int(size.height),
             bitsPerSample: 8,
             samplesPerPixel: 4,
             hasAlpha: true,
             isPlanar: false,
             colorSpaceName: NSColorSpaceName.deviceRGB,
             bytesPerRow: 0,
-            bitsPerPixel: 0) else {
-            return
-        }
+            bitsPerPixel: 0)
+    }
 
+    private func renderView(_ view: NSView, to bitmapRep: NSBitmapImageRep, size: CGSize) {
         NSGraphicsContext.saveGraphicsState()
-        let context = NSGraphicsContext(bitmapImageRep: bitmapRep)
-        NSGraphicsContext.current = context
+        defer { NSGraphicsContext.restoreGraphicsState() }
 
-        if let cgContext = context?.cgContext {
-            cgContext.translateBy(x: 0, y: originalSize.height)
-            cgContext.scaleBy(x: 1.0, y: -1.0)
-            view.layer?.render(in: cgContext)
+        if let context = NSGraphicsContext(bitmapImageRep: bitmapRep) {
+            NSGraphicsContext.current = context
+            DispatchQueue.main.sync {
+                assert(Thread.isMainThread)
+                context.cgContext.translateBy(x: 0, y: size.height)
+                context.cgContext.scaleBy(x: 1.0, y: -1.0)
+                view.layer?.render(in: context.cgContext)
+            }
         }
+    }
 
-        NSGraphicsContext.restoreGraphicsState()
-
-        let originalImage = NSImage(size: originalSize)
-        originalImage.addRepresentation(bitmapRep)
-
-        // Resize the image to the target width while preserving the aspect ratio
-        let resizedImage = NSImage(size: NSSize(width: targetWidth, height: targetHeight))
+    private func resizeImage(_ image: NSImage, to size: NSSize) -> NSImage {
+        let resizedImage = NSImage(size: size)
         resizedImage.lockFocus()
-        originalImage.draw(in: NSRect(x: 0, y: 0, width: targetWidth, height: targetHeight), from: NSRect.zero, operation: .copy, fraction: 1.0)
-        resizedImage.unlockFocus()
-        nativePreview = resizedImage
+        defer { resizedImage.unlockFocus() }
+        image.draw(in: NSRect(x: 0, y: 0, width: size.width, height: size.height), from: NSRect.zero, operation: .copy, fraction: 1.0)
+        return resizedImage
     }
 
 }
