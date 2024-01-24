@@ -606,6 +606,8 @@ struct HomePageRemoteMessaging {
             dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: .dbp
         )
+#else
+        return HomePageRemoteMessaging()
 #endif
     }
 
