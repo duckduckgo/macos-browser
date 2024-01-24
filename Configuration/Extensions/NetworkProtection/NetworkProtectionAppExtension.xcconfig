@@ -23,6 +23,7 @@ CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
 CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
+CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
 CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] = Developer ID Application
