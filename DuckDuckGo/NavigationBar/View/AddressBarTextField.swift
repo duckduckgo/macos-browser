@@ -40,7 +40,7 @@ final class AddressBarTextField: NSTextField {
     }
 
     private var isHomePage: Bool {
-        tabCollectionViewModel.selectedTabViewModel?.tab.content == .homePage
+        tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
     }
 
     private var isBurner: Bool {
@@ -116,7 +116,7 @@ final class AddressBarTextField: NSTextField {
         contentTypeCancellable = tabCollectionViewModel.selectedTabViewModel?.tab.$content
             .receive(on: DispatchQueue.main)
             .sink { [weak self] contentType in
-                self?.font = .systemFont(ofSize: contentType == .homePage ? 15 : 13)
+                self?.font = .systemFont(ofSize: contentType == .newtab ? 15 : 13)
             }
     }
 

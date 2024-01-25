@@ -103,7 +103,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertFalse(isToggleOn)
@@ -122,7 +123,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -149,7 +151,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertTrue(isToggleOn)
@@ -170,7 +173,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -187,7 +191,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
         let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
 
         controller.startCallback = {
@@ -217,7 +222,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")
 

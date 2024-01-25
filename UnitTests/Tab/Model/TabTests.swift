@@ -71,8 +71,8 @@ final class TabTests: XCTestCase {
     // MARK: - Tab Content
 
     func testWhenSettingURLThenTabTypeChangesToStandard() {
-        let tab = Tab(content: .preferences(pane: .autofill))
-        XCTAssertEqual(tab.content, .preferences(pane: .autofill))
+        let tab = Tab(content: .settings(pane: .autofill))
+        XCTAssertEqual(tab.content, .settings(pane: .autofill))
 
         tab.url = URL.duckDuckGo
         XCTAssertEqual(tab.content, .url(.duckDuckGo, source: .link))
@@ -339,10 +339,10 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testIfTabIsBurner_ThenFaviconManagerIsInMemory() throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         XCTAssertTrue(tab.faviconManagement === FaviconManager.shared)
 
-        let burnerTab = Tab(content: .homePage, burnerMode: BurnerMode(isBurner: true))
+        let burnerTab = Tab(content: .newtab, burnerMode: BurnerMode(isBurner: true))
         XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
     }
 
@@ -354,7 +354,7 @@ extension Tab {
             content.url
         }
         set {
-            setContent(newValue.map { TabContent.url($0, source: .link) } ?? .homePage)
+            setContent(newValue.map { TabContent.url($0, source: .link) } ?? .newtab)
         }
     }
 }

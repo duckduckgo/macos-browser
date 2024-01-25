@@ -96,7 +96,7 @@ final class WindowControllersManager: WindowControllersManagerProtocol {
             (
                 mainWindowControllers.count == 1 &&
                 mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.count == 1 &&
-                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .homePage &&
+                mainWindowControllers.first?.mainViewController.tabCollectionViewModel.tabs.first?.content == .newtab &&
                 pinnedTabsManager.tabCollection.tabs.isEmpty
             )
         }
@@ -119,7 +119,7 @@ extension WindowControllersManager {
     }
 
     func showPreferencesTab(withSelectedPane pane: PreferencePaneIdentifier? = nil) {
-        showTab(with: .preferences(pane: pane))
+        showTab(with: .settings(pane: pane))
     }
 
     /// Opens a bookmark in a tab, respecting the current modifier keys when deciding where to open the bookmark's URL.
@@ -150,14 +150,14 @@ extension WindowControllersManager {
 
             if tabCollection.tabs.count == 1,
                let firstTab = tabCollection.tabs.first,
-               case .homePage = firstTab.content,
+               case .newtab = firstTab.content,
                !newTab {
-                firstTab.setContent(url.map { .url($0, source: source) } ?? .homePage)
+                firstTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
             } else if let tab = tabCollectionViewModel.selectedTabViewModel?.tab, !newTab {
-                tab.setContent(url.map { .url($0, source: source) } ?? .homePage)
+                tab.setContent(url.map { .url($0, source: source) } ?? .newtab)
             } else {
-                let newTab = Tab(content: url.map { .url($0, source: source) } ?? .homePage, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
-                newTab.setContent(url.map { .url($0, source: source) } ?? .homePage)
+                let newTab = Tab(content: url.map { .url($0, source: source) } ?? .newtab, shouldLoadInBackground: true, burnerMode: tabCollectionViewModel.burnerMode)
+                newTab.setContent(url.map { .url($0, source: source) } ?? .newtab)
                 tabCollectionViewModel.append(tab: newTab)
             }
         }

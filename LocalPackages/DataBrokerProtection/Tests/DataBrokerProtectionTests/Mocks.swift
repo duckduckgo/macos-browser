@@ -232,7 +232,7 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail() async throws -> String {
+    func getEmail(dataBrokerName: String?) async throws -> String {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }

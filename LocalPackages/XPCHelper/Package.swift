@@ -30,18 +30,22 @@ let package = Package(
         .library(name: "XPCHelper", targets: ["XPCHelper"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "1485390207daeb45afa2f96d155eb1160e7e7499"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "102.0.0"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "XPCHelper",
-            dependencies: [],
+            dependencies: [
+                .targetItem(name: "XPCDelegateProxy", condition: nil)
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
+
+        .target(
+            name: "XPCDelegateProxy"
         )
     ]
 )
