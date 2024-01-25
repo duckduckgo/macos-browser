@@ -20,6 +20,7 @@ import Foundation
 import SwiftUI
 
 struct MenuItemButton: View {
+    @Environment(\.colorScheme) private var colorScheme
     private let iconName: NetworkProtectionAsset?
     private let title: String
     private let detailTitle: String?
@@ -31,7 +32,7 @@ struct MenuItemButton: View {
     @State private var isHovered = false
     @State private var animatingTap = false
 
-    init(iconName: NetworkProtectionAsset? = nil, _ title: String, detailTitle: String? = nil, textColor: Color, action: @escaping () async -> Void) {
+    init(iconName: NetworkProtectionAsset? = nil, title: String, detailTitle: String? = nil, textColor: Color, action: @escaping () async -> Void) {
         self.iconName = iconName
         self.title = title
         self.detailTitle = detailTitle
@@ -53,7 +54,8 @@ struct MenuItemButton: View {
                 Spacer()
                 if let detailTitle {
                     Text(detailTitle)
-                        .foregroundColor(isHovered ? .white : .secondary)
+                        .opacity(Opacity.detailText(colorScheme: colorScheme))
+                        .foregroundColor(isHovered ? .white : textColor)
                 }
             }.padding([.top, .bottom], 3)
                 .padding([.leading, .trailing], 9)
@@ -99,5 +101,11 @@ struct MenuItemButton: View {
                 }
             }
         }
+    }
+}
+
+private enum Opacity {
+    static func detailText(colorScheme: ColorScheme) -> Double {
+        colorScheme == .light ? Double(0.6) : Double(0.5)
     }
 }

@@ -194,7 +194,7 @@ public struct TunnelControllerView: View {
 
             MenuItemButton(
                 iconName: .serverLocationIcon,
-                UserText.networkProtectionStatusViewLocation,
+                title: UserText.networkProtectionStatusViewLocation,
                 detailTitle: model.serverLocation,
                 textColor: Color(.defaultText)) {
                     model.showLocationSettings()
