@@ -44,8 +44,8 @@ private struct DomainEntry: Hashable {
 }
 
 private var entries = Set([
-    DomainEntry(domain: "DuckDuckGo.com -> google.com", color: randomColorDominant()),
-    DomainEntry(domain: "apple.com", color: randomColorDominant())
+    DomainEntry(domain: "DuckDuckGo.app ↔️ google.com", color: randomColorDominant()),
+    DomainEntry(domain: "Safari.app ↔️ apple.com", color: randomColorDominant())
 ])
 
 struct VPNBenefitsView: View {

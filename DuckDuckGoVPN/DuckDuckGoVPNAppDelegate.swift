@@ -23,7 +23,7 @@ import LoginItems
 import Networking
 import NetworkExtension
 import NetworkProtection
-import NetworkProtectionIPC
+import NetworkProtectionController
 import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
@@ -70,15 +70,53 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private lazy var tunnelSettings = VPNSettings(defaults: .netP)
 
+    @MainActor
+    private lazy var proxyController = ProxyController(extensionID: networkExtensionBundleID) { [weak self] manager in
+
+        guard let self else { return }
+
+        manager.localizedDescription = "DuckDuckGo VPN Proxy"
+
+        if !manager.isEnabled {
+            manager.isEnabled = true
+        }
+
+        manager.protocolConfiguration = {
+            let protocolConfiguration = manager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
+            protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
+            protocolConfiguration.providerBundleIdentifier = self.networkExtensionBundleID
+
+            // always-on
+            protocolConfiguration.disconnectOnSleep = false
+
+            // kill switch
+            //protocolConfiguration.enforceRoutes = false
+
+            // this setting breaks Connection Tester
+            //protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
+
+            // This is intentionally not used but left here for documentation purposes.
+            // The reason for this is that we want to have full control of the routes that
+            // are excluded, so instead of using this setting we're just configuring the
+            // excluded routes through our VPNSettings class, which our extension reads directly.
+            // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
+
+            return protocolConfiguration
+        }()
+    }
+
+    @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,
         networkExtensionController: networkExtensionController,
+        proxyController: proxyController,
         settings: tunnelSettings)
 
     /// An IPC server that provides access to the tunnel controller.
     ///
     /// This is used by our main app to control the tunnel through the VPN login item.
     ///
+    @MainActor
     private lazy var tunnelControllerIPCService: TunnelControllerIPCService = {
         let ipcServer = TunnelControllerIPCService(
             tunnelController: tunnelController,
@@ -110,6 +148,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         )
     }()
 
+    @MainActor
     private lazy var vpnAppEventsHandler = {
         VPNAppEventsHandler(tunnelController: tunnelController)
     }()

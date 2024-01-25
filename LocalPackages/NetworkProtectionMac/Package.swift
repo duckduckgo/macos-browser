@@ -26,6 +26,7 @@ let package = Package(
         .macOS("11.4")
     ],
     products: [
+        .library(name: "NetworkProtectionController", targets: ["NetworkProtectionController"]),
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
         .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])

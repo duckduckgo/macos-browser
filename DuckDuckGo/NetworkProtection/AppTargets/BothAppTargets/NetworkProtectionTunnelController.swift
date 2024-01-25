@@ -24,6 +24,7 @@ import SwiftUI
 import Common
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionController
 import NetworkProtectionUI
 import SystemExtensionManager
 import SystemExtensions
@@ -34,6 +35,12 @@ typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionSt
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
+
+    // MARK: - Proxy Controller
+
+    private let proxyController: ProxyController
+
+    // MARK: - Settings
 
     let settings: VPNSettings
 
@@ -125,6 +132,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
+         proxyController: ProxyController,
          settings: VPNSettings,
          notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
@@ -133,6 +141,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
+        self.proxyController = proxyController
         self.settings = settings
         self.tokenStore = tokenStore
 
@@ -164,6 +173,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private func handleSettingsChange(_ change: VPNSettings.Change) async throws {
         switch change {
+        case .setExcludedApps(let excludedApps):
+            // TODO: implement handling of this
+            break
         case .setIncludeAllNetworks(let includeAllNetworks):
             try await handleSetIncludeAllNetworks(includeAllNetworks)
         case .setEnforceRoutes(let enforceRoutes):
@@ -213,6 +225,21 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     private func relaySettingsChange(_ change: VPNSettings.Change) async throws {
+        try await relaySettingsChangeToProxy(change)
+        try await relaySettingsChangeToTunnel(change)
+    }
+
+    private func relaySettingsChangeToProxy(_ change: VPNSettings.Change) async throws {
+        guard await proxyController.isConnected,
+              let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
+
+        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderRequest(.changeTunnelSetting(change))
+        if let errorMessage {
+            throw TunnelFailureError(errorDescription: errorMessage.value)
+        }
+    }
+
+    private func relaySettingsChangeToTunnel(_ change: VPNSettings.Change) async throws {
         guard await isConnected,
               let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
 
@@ -403,6 +430,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
         }
+
+        do {
+            try await proxyController.start()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 
     private func start(_ tunnelManager: NETunnelProviderManager) async throws {
@@ -449,6 +482,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     /// Stops the VPN connection used for Network Protection
     ///
     func stop() async {
+        await proxyController.stop()
+
         guard let tunnelManager = await loadTunnelManager() else {
             return
         }

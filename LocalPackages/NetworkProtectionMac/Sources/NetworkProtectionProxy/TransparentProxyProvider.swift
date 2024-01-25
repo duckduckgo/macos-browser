@@ -85,6 +85,7 @@ public final class TransparentProxyProvider: NETransparentProxyProvider {
 
         nw_path_monitor_start(monitor)
 
+        os_log("🤌 Starting up tunnel")
         setTunnelNetworkSettings(proxySettings) { error in
             if let applyError = error {
                 os_log("🤌 Failed to apply proxy settings: %{public}@", applyError.localizedDescription)
