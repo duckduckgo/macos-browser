@@ -131,7 +131,6 @@ final internal class PixelExperimentLogic {
     // You'll need additional pixels for your experiment.  Pass the cohort as a paramter.
     func fireEnrollmentPixel() {
         // You'll probably need this at least.
-        guard allocatedCohort != nil, let cohort else { return }
     }
 
     // Often used
