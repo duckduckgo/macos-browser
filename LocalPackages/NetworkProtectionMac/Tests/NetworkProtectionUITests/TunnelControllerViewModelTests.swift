@@ -103,7 +103,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertFalse(isToggleOn)
@@ -122,14 +123,15 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusDisconnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
         XCTAssertFalse(model.showServerDetails)
         XCTAssertEqual(model.serverAddress, "Unknown")
-        XCTAssertEqual(model.serverLocation, "Unknown")
+        XCTAssertEqual(model.serverLocation, "Unknown...")
     }
 
     /// We expect the model to properly reflect the connected status.
@@ -149,7 +151,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         let isToggleOn = model.isToggleOn.wrappedValue
         XCTAssertTrue(isToggleOn)
@@ -158,7 +161,7 @@ final class TunnelControllerViewModelTests: XCTestCase {
         XCTAssertEqual(model.featureStatusDescription, UserText.networkProtectionStatusViewFeatureOn)
         XCTAssertTrue(model.showServerDetails)
         XCTAssertEqual(model.serverAddress, mockServerIP)
-        XCTAssertEqual(model.serverLocation, mockServerLocation)
+        XCTAssertEqual(model.serverLocation, "Los Angeles, United States...")
     }
 
     /// We expect the model to properly reflect the connecting status.
@@ -170,7 +173,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         XCTAssertEqual(model.connectionStatusDescription, UserText.networkProtectionStatusConnecting)
         XCTAssertEqual(model.timeLapsed, UserText.networkProtectionStatusViewTimerZero)
@@ -187,7 +191,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
         let networkProtectionWasStarted = expectation(description: "The model started network protection when appropriate")
 
         controller.startCallback = {
@@ -217,7 +222,8 @@ final class TunnelControllerViewModelTests: XCTestCase {
         let model = TunnelControllerViewModel(
             controller: controller,
             onboardingStatusPublisher: Just(OnboardingStatus.completed).eraseToAnyPublisher(),
-            statusReporter: statusReporter)
+            statusReporter: statusReporter,
+            showLocationsAction: {})
 
         let networkProtectionWasStopped = expectation(description: "The model stopped network protection when appropriate")
 

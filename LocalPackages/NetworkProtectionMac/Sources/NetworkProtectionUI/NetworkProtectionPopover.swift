@@ -50,6 +50,7 @@ public final class NetworkProtectionPopover: NSPopover {
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
+                         showLocationsAction: @escaping () async -> Void,
                          menuItems: @escaping () -> [MenuItem]) {
 
         self.statusReporter = statusReporter
@@ -63,6 +64,7 @@ public final class NetworkProtectionPopover: NSPopover {
                                onboardingStatusPublisher: onboardingStatusPublisher,
                                statusReporter: statusReporter,
                                debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
+                               showLocationsAction: showLocationsAction,
                                menuItems: menuItems)
     }
 
@@ -74,12 +76,13 @@ public final class NetworkProtectionPopover: NSPopover {
                                         onboardingStatusPublisher: OnboardingStatusPublisher,
                                         statusReporter: NetworkProtectionStatusReporter,
                                         debugInformationPublisher: AnyPublisher<Bool, Never>,
+                                        showLocationsAction: @escaping () async -> Void,
                                         menuItems: @escaping () -> [MenuItem]) {
 
         let model = NetworkProtectionStatusView.Model(controller: controller,
                                                       onboardingStatusPublisher: onboardingStatusPublisher,
                                                       statusReporter: statusReporter,
-                                                      debugInformationPublisher: debugInformationPublisher,
+                                                      debugInformationPublisher: debugInformationPublisher, showLocationsAction: showLocationsAction,
                                                       menuItems: menuItems)
 
         let view = NetworkProtectionStatusView(model: model).environment(\.dismiss, { [weak self] in

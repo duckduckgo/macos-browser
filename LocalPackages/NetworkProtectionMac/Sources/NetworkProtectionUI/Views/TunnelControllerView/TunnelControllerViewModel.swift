@@ -47,6 +47,8 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let statusReporter: NetworkProtectionStatusReporter
 
+    private let showLocationsAction: () async -> Void
+
     // MARK: - Misc
 
     /// The `RunLoop` for the timer.
@@ -82,12 +84,14 @@ public final class TunnelControllerViewModel: ObservableObject {
     public init(controller: TunnelController,
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
-                runLoopMode: RunLoop.Mode? = nil) {
+                runLoopMode: RunLoop.Mode? = nil,
+                showLocationsAction: @escaping () async -> Void) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
         self.statusReporter = statusReporter
         self.runLoopMode = runLoopMode
+        self.showLocationsAction = showLocationsAction
 
         connectionStatus = statusReporter.statusObserver.recentValue
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
@@ -421,10 +425,10 @@ public final class TunnelControllerViewModel: ObservableObject {
 
         switch connectionStatus {
         case .connected:
-            return internalServerLocation
+            return UserText.networkProtectionFormattedServerLocation(internalServerLocation)
         case .disconnecting:
             if case .connected = previousConnectionStatus {
-                return internalServerLocation
+                return UserText.networkProtectionFormattedServerLocation(internalServerLocation)
             } else {
                 return UserText.networkProtectionServerLocationUnknown
             }
@@ -459,6 +463,12 @@ public final class TunnelControllerViewModel: ObservableObject {
             await tunnelController.stop()
             toggleTransition = .idle
             refreshInternalIsRunning()
+        }
+    }
+
+    func showLocationSettings() {
+        Task { @MainActor in
+            await showLocationsAction()
         }
     }
 }

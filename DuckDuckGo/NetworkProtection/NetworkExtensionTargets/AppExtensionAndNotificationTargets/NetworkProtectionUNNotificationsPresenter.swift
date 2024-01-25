@@ -111,37 +111,37 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         }
         let content = notificationContent(title: UserText.networkProtectionConnectionSuccessNotificationTitle,
                                           subtitle: subtitle)
-        showNotification(content)
+        showNotification(.connected, content)
     }
 
     func showReconnectingNotification() {
         let content = notificationContent(title: UserText.networkProtectionConnectionInterruptedNotificationTitle,
                                           subtitle: UserText.networkProtectionConnectionInterruptedNotificationSubtitle)
-        showNotification(content)
+        showNotification(.reconnecting, content)
     }
 
     func showConnectionFailureNotification() {
         let content = notificationContent(title: UserText.networkProtectionConnectionFailureNotificationTitle,
                                           subtitle: UserText.networkProtectionConnectionFailureNotificationSubtitle)
-        showNotification(content)
+        showNotification(.disconnected, content)
     }
 
     func showSupersededNotification() {
         let content = notificationContent(title: UserText.networkProtectionSupersededNotificationTitle,
                                           subtitle: UserText.networkProtectionSupersededNotificationSubtitle,
                                           category: .superseded)
-        showNotification(content)
+        showNotification(.superseded, content)
     }
 
     func showTestNotification() {
         // These strings are deliberately hardcoded as we don't want them localized, they're only for debugging:
         let content = notificationContent(title: "Test notification",
                                           subtitle: "Test notification")
-        showNotification(content)
+        showNotification(.test, content)
     }
 
-    private func showNotification(_ content: UNNotificationContent) {
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: .none)
+    private func showNotification(_ identifier: NetworkProtectionNotificationIdentifier, _ content: UNNotificationContent) {
+        let request = UNNotificationRequest(identifier: identifier.rawValue, content: content, trigger: .none)
 
         requestAlertAuthorization { authorized in
             guard authorized else {
@@ -149,10 +149,19 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
             }
 
             _=self.registerNotificationCategoriesOnce
+            self.userNotificationCenter.removeDeliveredNotifications(withIdentifiers: [identifier.rawValue])
             self.userNotificationCenter.add(request)
         }
     }
 
+}
+
+public enum NetworkProtectionNotificationIdentifier: String {
+    case disconnected = "network-protection.notification.disconnected"
+    case reconnecting = "network-protection.notification.reconnecting"
+    case connected = "network-protection.notification.connected"
+    case superseded = "network-protection.notification.superseded"
+    case test = "network-protection.notification.test"
 }
 
 extension NetworkProtectionUNNotificationsPresenter: UNUserNotificationCenterDelegate {

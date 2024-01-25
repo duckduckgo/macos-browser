@@ -144,7 +144,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
             controller: tunnelController,
-            iconProvider: iconProvider) {
+            iconProvider: iconProvider,
+            showLocationsAction: { [weak self] in
+                await self?.appLauncher.launchApp(withCommand: .showVPNLocations)
+            }
+        ) {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showSettings)
