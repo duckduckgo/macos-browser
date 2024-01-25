@@ -635,9 +635,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     @discardableResult
     func setUrl(_ url: URL?, source: TabContent.URLSource) -> ExpectedNavigation? {
-        if url == .welcome {
-            OnboardingViewModel().restart()
-        }
         return self.setContent(.contentFromURL(url, source: source))
     }
 

@@ -501,7 +501,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
+            if !OnboardingViewModel.isOnboardingFinished {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
