@@ -37,7 +37,6 @@ struct VPNLocationView: View {
                         nearestSection
                         countriesSection
                     }
-                    .animation(.default, value: model.state.isLoading)
                     .padding(0)
                 }
                 .padding(.horizontal, 56)
@@ -58,12 +57,12 @@ struct VPNLocationView: View {
                 }
             }
         }
-        .frame(minWidth: 624, maxWidth: .infinity, minHeight: 514, maxHeight: 514, alignment: .top)
+        .frame(minWidth: 624, maxWidth: .infinity, minHeight: 640, maxHeight: .infinity, alignment: .top)
     }
 
     @ViewBuilder
     private var nearestSection: some View {
-        PreferencePaneSection(verticalPadding: 0) {
+        PreferencePaneSection {
             Text(UserText.vpnLocationRecommendedSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
@@ -98,17 +97,26 @@ struct VPNLocationView: View {
 
     @ViewBuilder
     private var countriesSection: some View {
-        PreferencePaneSection(verticalPadding: 0) {
+        PreferencePaneSection {
             Text(UserText.vpnLocationCustomSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
             switch model.state {
             case .loading:
-                EmptyView()
+                listLoadingView
             case .loaded(let countryItems):
                 countriesList(countries: countryItems)
             }
         }
+    }
+
+    private var listLoadingView: some View {
+        ZStack(alignment: .center) {
+            EmptyView()
+        }
+        .frame(height: 370)
+        .frame(idealWidth: .infinity, maxWidth: .infinity)
+        .roundedBorder()
     }
 
     private func countriesList(countries: [VPNCountryItemModel]) -> some View {
@@ -208,7 +216,7 @@ private struct CountryItem: View {
         }
         .foregroundColor(.accentColor)
         .pickerStyle(.menu)
-        .frame(width: 90)
+        .frame(width: 120)
         .background(Color.clear)
     }
 }

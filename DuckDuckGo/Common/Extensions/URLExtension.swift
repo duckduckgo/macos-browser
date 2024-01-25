@@ -22,6 +22,8 @@ import BrowserServicesKit
 
 extension URL.NavigationalScheme {
 
+    static let duck = URL.NavigationalScheme(rawValue: "duck")
+
     static var validSchemes: [URL.NavigationalScheme] {
         return [.http, .https, .file]
     }
@@ -122,28 +124,34 @@ extension URL {
         return url
     }
 
-    static var blankPage: URL {
-        return URL(string: "about:blank")!
+    static let blankPage = URL(string: "about:blank")!
+
+    static let newtab = URL(string: "duck://newtab")!
+    static let welcome = URL(string: "duck://welcome")!
+    static let settings = URL(string: "duck://settings")!
+    static let bookmarks = URL(string: "duck://bookmarks")!
+
+    static let dataBrokerProtection = URL(string: "duck://dbp")!
+
+    static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
+        return settings.appendingPathComponent(pane.rawValue)
     }
 
-    static var homePage: URL {
-        return URL(string: "about:home")!
-    }
+    enum Invalid {
+        static let aboutNewtab = URL(string: "about:newtab")!
+        static let duckHome = URL(string: "duck://home")!
 
-    static var welcome: URL {
-        return URL(string: "about:welcome")!
-    }
+        static let aboutWelcome = URL(string: "about:welcome")!
 
-    static var preferences: URL {
-        return URL(string: "about:preferences")!
-    }
+        static let aboutHome = URL(string: "about:home")!
 
-    static var dataBrokerProtection: URL {
-        return URL(string: "about:dbp")!
-    }
+        static let aboutSettings = URL(string: "about:settings")!
+        static let aboutPreferences = URL(string: "about:preferences")!
+        static let duckPreferences = URL(string: "duck://preferences")!
+        static let aboutConfig = URL(string: "about:config")!
+        static let duckConfig = URL(string: "duck://config")!
 
-    static func preferencePane(_ pane: PreferencePaneIdentifier) -> URL {
-        return Self.preferences.appendingPathComponent(pane.rawValue)
+        static let aboutBookmarks = URL(string: "about:bookmarks")!
     }
 
     var isHypertextURL: Bool {

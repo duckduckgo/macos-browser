@@ -6,5 +6,10 @@
 	<string>$(DBP_APP_GROUP)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

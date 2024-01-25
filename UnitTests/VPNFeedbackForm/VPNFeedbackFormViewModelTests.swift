@@ -85,8 +85,21 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
     func collectMetadata() async -> VPNMetadata {
         self.collectedMetadata = true
 
-        let appInfo = VPNMetadata.AppInfo(appVersion: "1.2.3", lastVersionRun: "1.2.3", isInternalUser: false)
-        let deviceInfo = VPNMetadata.DeviceInfo(osVersion: "14.0.0", buildFlavor: "dmg", lowPowerModeEnabled: false)
+        let appInfo = VPNMetadata.AppInfo(
+            appVersion: "1.2.3",
+            lastVersionRun: "1.2.3",
+            isInternalUser: false,
+            isAdminUser: "true",
+            isInApplicationsDirectory: true
+        )
+
+        let deviceInfo = VPNMetadata.DeviceInfo(
+            osVersion: "14.0.0",
+            buildFlavor: "dmg",
+            lowPowerModeEnabled: false,
+            cpuArchitecture: "arm64"
+        )
+
         let networkInfo = VPNMetadata.NetworkInfo(currentPath: "path")
 
         let vpnState = VPNMetadata.VPNState(
@@ -108,7 +121,12 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             selectedEnvironment: "production"
         )
 
-        let loginItemState = VPNMetadata.LoginItemState(vpnMenuState: "enabled", notificationsAgentState: "enabled")
+        let loginItemState = VPNMetadata.LoginItemState(
+            vpnMenuState: "enabled",
+            vpnMenuIsRunning: true,
+            notificationsAgentState: "enabled",
+            notificationsAgentIsRunning: true
+        )
 
         return VPNMetadata(
             appInfo: appInfo,

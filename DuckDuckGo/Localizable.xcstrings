@@ -1512,6 +1512,30 @@
         }
       }
     },
+    "bookmarks.imported.mobile.folder.title" : {
+      "comment" : "Name of the \"Mobile bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mobile bookmarks"
+          }
+        }
+      }
+    },
+    "bookmarks.imported.other.folder.title" : {
+      "comment" : "Name of the \"Other bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Other bookmarks"
+          }
+        }
+      }
+    },
     "bookmarks.manage" : {
       "comment" : "Button for opening the bookmarks management interface",
       "extractionState" : "extracted_with_value",
@@ -5173,13 +5197,13 @@
       }
     },
     "network.protection.navbar.status.view.share.feedback" : {
-      "comment" : "Menu item for 'Send Feedback' in the Network Protection status view that's shown in the navigation bar",
+      "comment" : "Menu item for 'Send VPN Feedback' in the Network Protection status view that's shown in the navigation bar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Send Feedback…"
+            "value" : "Send VPN Feedback…"
           }
         }
       }
@@ -9236,7 +9260,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Nearest Available"
+            "value" : "Nearest available"
           }
         }
       }

@@ -62,10 +62,7 @@ extension Preferences {
         }
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-                TextMenuTitle(UserText.autofill)
+            PreferencePane(UserText.autofill) {
 
                 // Autofill Content  Button
                 PreferencePaneSection {
@@ -85,8 +82,8 @@ extension Preferences {
 
 #if !APPSTORE
                 // SECTION 1: Password Manager
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.autofillPasswordManager)
+                PreferencePaneSection(UserText.autofillPasswordManager) {
+
                     VStack(alignment: .leading, spacing: 6) {
                         Picker(selection: passwordManagerBinding, content: {
                             Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)

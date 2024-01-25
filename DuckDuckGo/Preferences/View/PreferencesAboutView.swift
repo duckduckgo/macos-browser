@@ -31,7 +31,8 @@ extension Preferences {
         @ObservedObject var model: AboutModel
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            PreferencePane {
+
                 TextMenuTitle(UserText.aboutDuckDuckGo)
 
                 if !SupportedOSChecker.isCurrentOSReceivingUpdates {

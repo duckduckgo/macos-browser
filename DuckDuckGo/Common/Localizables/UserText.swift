@@ -334,7 +334,7 @@ struct UserText {
         comment: "Nearest city setting description")
     static let vpnLocationNearestAvailable = NSLocalizedString(
         "vpn.location.description.nearest.available",
-        value: "Nearest Available",
+        value: "Nearest available",
         comment: "Nearest available location setting description")
     static let vpnLocationNearestAvailableSubtitle = NSLocalizedString("vpn.location.nearest.available.title", value: "Automatically connect to the nearest server we can find.", comment: "Subtitle underneath the nearest available vpn location preference text.")
 
@@ -453,6 +453,9 @@ struct UserText {
     static let bookmarksShowToolbarPanel = NSLocalizedString("bookmarks.show-toolbar-panel", value: "Open Bookmarks Panel", comment: "Menu item for opening the bookmarks panel")
     static let bookmarksManageBookmarks = NSLocalizedString("bookmarks.manage-bookmarks", value: "Manage Bookmarks", comment: "Menu item for opening the bookmarks management interface")
     static let bookmarkImportedFromFolder = NSLocalizedString("bookmarks.imported.from.folder", value: "Imported from", comment: "Name of the folder the imported bookmarks are saved into")
+
+    static let otherBookmarksImportedFolderTitle = NSLocalizedString("bookmarks.imported.other.folder.title", value: "Other bookmarks", comment: "Name of the \"Other bookmarks\" folder imported from other browser")
+    static let mobileBookmarksImportedFolderTitle = NSLocalizedString("bookmarks.imported.mobile.folder.title", value: "Mobile bookmarks", comment: "Name of the \"Mobile bookmarks\" folder imported from other browser")
 
     static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
 
