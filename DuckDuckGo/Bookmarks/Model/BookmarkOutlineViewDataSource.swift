@@ -161,11 +161,16 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
                      validateDrop info: NSDraggingInfo,
                      proposedItem item: Any?,
                      proposedChildIndex index: Int) -> NSDragOperation {
-        if contentMode == .foldersOnly, index != -1 {
+        let destinationNode = nodeForItem(item)
+
+        if contentMode == .foldersOnly {
+            // when in folders sidebar mode only allow moving a folder to another folder (or root)
+            if destinationNode.representedObject is BookmarkFolder
+                || (destinationNode.representedObject as? PseudoFolder == .bookmarks) {
+                return .move
+            }
             return .none
         }
-
-        let destinationNode = nodeForItem(item)
 
         let bookmarks = PasteboardBookmark.pasteboardBookmarks(with: info.draggingPasteboard)
         let folders = PasteboardFolder.pasteboardFolders(with: info.draggingPasteboard)
@@ -255,7 +260,8 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         // Handle the nil destination case:
 
-        if let pseudoFolder = representedObject as? PseudoFolder {
+        if contentMode == .bookmarksAndFolders,
+           let pseudoFolder = representedObject as? PseudoFolder {
             if pseudoFolder == .favorites {
                 bookmarkManager.update(objectsWithUUIDs: draggedObjectIdentifiers, update: { entity in
                     let bookmark = entity as? Bookmark
@@ -278,25 +284,30 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
         // Handle the existing destination case:
 
-        if let parent = representedObject as? BookmarkFolder {
-            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .parent(uuid: parent.id)) { error in
-                if let error = error {
-                    os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
-                }
-            }
+        var index = index
+        // for folders-only calculate new real index based on the nearest folder index
+        if contentMode == .foldersOnly,
+           index > -1,
+           // get folder before the insertion point (or the first one)
+           let nearestObject = (outlineView.child(max(0, index - 1), ofItem: item) as? BookmarkNode)?.representedObject as? BookmarkFolder,
+           // get all the children of a new parent folder
+           let siblings = (representedObject as? BookmarkFolder)?.children ?? bookmarkManager.list?.topLevelEntities {
 
-            return true
-        } else if representedObject == nil {
-            bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: .root) { error in
-                if let error = error {
-                    os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
-                }
-            }
-
-            return true
-        } else {
-            return false
+            // insert after the nearest item (or in place of the nearest item for index == 0)
+            index = (siblings.firstIndex(of: nearestObject) ?? 0) + (index == 0 ? 0 : 1)
+        } else if index == -1 {
+            // drop onto folder
+            index = 0
         }
+
+        let parent: ParentFolderType = (representedObject as? BookmarkFolder).map { .parent(uuid: $0.id) } ?? .root
+        bookmarkManager.move(objectUUIDs: draggedObjectIdentifiers, toIndex: index, withinParentFolder: parent) { error in
+            if let error = error {
+                os_log("Failed to accept existing parent drop via outline view: %s", error.localizedDescription)
+            }
+        }
+
+        return true
     }
 
     func outlineView(_ outlineView: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {

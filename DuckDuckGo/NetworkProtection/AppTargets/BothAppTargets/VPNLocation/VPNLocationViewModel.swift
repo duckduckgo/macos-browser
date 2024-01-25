@@ -23,6 +23,7 @@ import Combine
 import NetworkProtection
 
 final class VPNLocationViewModel: ObservableObject {
+    private static var cachedLocations: [VPNCountryItemModel]?
     private let locationListRepository: NetworkProtectionLocationListRepository
     private let settings: VPNSettings
     private var selectedLocation: VPNSettings.SelectedLocation
@@ -53,7 +54,11 @@ final class VPNLocationViewModel: ObservableObject {
         self.settings = settings
         selectedLocation = settings.selectedLocation
         self.isNearestSelected = selectedLocation == .nearest
-        state = .loading
+        if let cachedLocations = Self.cachedLocations {
+            state = .loaded(countryItems: cachedLocations)
+        } else {
+            state = .loading
+        }
         Task {
             await reloadList()
         }
@@ -123,6 +128,7 @@ final class VPNLocationViewModel: ObservableObject {
                 )
             )
         }
+        Self.cachedLocations = countryItems
         state = .loaded(countryItems: countryItems)
     }
 }

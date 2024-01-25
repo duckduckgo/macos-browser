@@ -113,10 +113,10 @@ final class SafariBookmarksReader {
 
         }
 
-        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: "other", type: "folder", urlString: nil, children: otherBookmarks)
-        let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: "folder", urlString: nil, children: [])
+        let otherBookmarksFolder = ImportedBookmarks.BookmarkOrFolder(name: UserText.otherBookmarksImportedFolderTitle, type: .folder, urlString: nil, children: otherBookmarks)
+        let emptyFolder = ImportedBookmarks.BookmarkOrFolder(name: "bar", type: .folder, urlString: nil, children: [])
 
-        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder)
+        let topLevelFolder = ImportedBookmarks.TopLevelFolders(bookmarkBar: bookmarksBar ?? emptyFolder, otherBookmarks: otherBookmarksFolder, syncedBookmarks: nil)
         let importedBookmarks = ImportedBookmarks(topLevelFolders: topLevelFolder)
 
         return importedBookmarks
@@ -135,11 +135,11 @@ final class SafariBookmarksReader {
             assert(entry[Constants.typeKey] as? String == Constants.listType)
 
             let children = children.compactMap { bookmarkOrFolder(from: $0) }
-            return ImportedBookmarks.BookmarkOrFolder(name: title, type: "folder", urlString: nil, children: children)
+            return ImportedBookmarks.BookmarkOrFolder(name: title, type: .folder, urlString: nil, children: children)
         } else if let url = entry[Constants.urlStringKey] as? String {
             assert(entry[Constants.typeKey] as? String == Constants.leafType)
 
-            return ImportedBookmarks.BookmarkOrFolder(name: title, type: "bookmark", urlString: url, children: nil)
+            return ImportedBookmarks.BookmarkOrFolder(name: title, type: .bookmark, urlString: url, children: nil)
         }
 
         return nil

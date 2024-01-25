@@ -27,7 +27,6 @@ import BrowserServicesKit
 
 final class VPNPreferencesModel: ObservableObject {
 
-    let shouldShowLocationItem: Bool
     @Published var locationItem: VPNLocationPreferenceItemModel
 
     @Published var alwaysON = true
@@ -70,8 +69,7 @@ final class VPNPreferencesModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     init(settings: VPNSettings = .init(defaults: .netP),
-         defaults: UserDefaults = .netP,
-         featureFlagger: FeatureFlagger = NSApp.delegateTyped.featureFlagger) {
+         defaults: UserDefaults = .netP) {
         self.settings = settings
 
         connectOnLogin = settings.connectOnLogin
@@ -81,7 +79,6 @@ final class VPNPreferencesModel: ObservableObject {
         showUninstallVPN = defaults.networkProtectionOnboardingStatus != .default
         onboardingStatus = defaults.networkProtectionOnboardingStatus
         locationItem = VPNLocationPreferenceItemModel(selectedLocation: settings.selectedLocation)
-        shouldShowLocationItem = featureFlagger.isFeatureOn(.vpnGeoswitching)
 
         subscribeToOnboardingStatusChanges(defaults: defaults)
         subscribeToShowInMenuBarSettingChanges()

@@ -177,6 +177,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
                 .setSelectedEnvironment,
                 .setSelectedLocation,
                 .setShowInMenuBar,
+                .setNetworkPathChange,
                 .setVPNFirstEnabled,
                 .setDisableRekeying:
             // Intentional no-op as this is handled by the extension or the agent's app delegate
@@ -411,6 +412,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         options[NetworkProtectionOptionKey.authToken] = try tokenStore.fetchToken() as NSString?
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
+
+#if NETP_SYSTEM_EXTENSION
+        if let data = try? JSONEncoder().encode(settings.selectedLocation) {
+            options[NetworkProtectionOptionKey.selectedLocation] = NSData(data: data)
+        }
+#endif
 
         if case .custom(let keyValidity) = settings.registrationKeyValidity {
             options[NetworkProtectionOptionKey.keyValidity] = String(describing: keyValidity) as NSString
