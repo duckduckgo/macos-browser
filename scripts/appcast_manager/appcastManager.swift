@@ -6,6 +6,11 @@
 
 import Foundation
 
+signal(SIGINT) { signal in
+    print("Received Ctrl+C. Terminating...")
+    exit(1)
+}
+
 let appcastURLString = "https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml"
 let appcastURL = URL(string: appcastURLString)!
 let tmpDir = NSString(string: "~/Developer").expandingTildeInPath
@@ -108,9 +113,9 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
         exit(1)
     }
 
-    print("Action: Add to internal channel")
-    print("DMG Path: \(dmgPath)")
-    print("Release Notes Path: \(releaseNotesPath)")
+    print("➡️  Action: Add to internal channel")
+    print("➡️  DMG Path: \(dmgPath)")
+    print("➡️  Release Notes Path: \(releaseNotesPath)")
 
     performCommonChecksAndOperations()
 
@@ -146,7 +151,7 @@ case .releaseToPublicChannel:
     performCommonChecksAndOperations()
 
     guard let dmgFileName = findDMG(for: versionIdentifier, in: specificDir) else {
-        print("Version \(versionIdentifier) does not exist in the downloaded appcast items.")
+        print("❌ Version \(versionIdentifier) does not exist in the downloaded appcast items.")
         exit(1)
     }
     print("Verified: Version \(versionIdentifier) exists in the downloaded appcast items: \(dmgFileName)")
@@ -157,14 +162,14 @@ case .releaseToPublicChannel:
         let dmgURLForPublic = specificDir.appendingPathComponent(dmgFileName)
         handleReleaseNotesFile(path: releaseNotesPath, updatesDirectoryURL: specificDir, dmgURL: dmgURLForPublic)
     } else {
-        print("No new release notes provided. Keeping existing release notes.")
+        print("👀 No new release notes provided. Keeping existing release notes.")
     }
 
     // Process appcast content
     guard processAppcast(removing: versionNumber, appcastFilePath: appcastFilePath) else {
         exit(1)
     }
-    print("Version \(versionIdentifier) removed from the appcast.")
+    print("⚠️  Version \(versionIdentifier) removed from the appcast.")
 
     runGenerateAppcast(with: versionNumber, rolloutInterval: "43200")
 }
@@ -174,7 +179,7 @@ case .releaseToPublicChannel:
 func extractVersionNumber(from versionIdentifier: String) -> String {
     let components = versionIdentifier.components(separatedBy: ".")
     guard components.count == 4 else {
-        print("Invalid version identifier format. Expected 'X.Y.Z.B'")
+        print("❌ Invalid version identifier format. Expected 'X.Y.Z.B'")
         exit(1)
     }
     let versionNumber = components[3]
@@ -205,13 +210,13 @@ func checkSparkleToolRecency(toolName: String) -> Bool {
     let binaryPath = shell("which", toolName).trimmingCharacters(in: .whitespacesAndNewlines)
 
     if binaryPath.isEmpty {
-        print("Failed to find the path for \(toolName).")
+        print("❌ Failed to find the path for \(toolName).")
         return false
     }
 
     guard let binaryAttributes = try? FileManager.default.attributesOfItem(atPath: binaryPath),
           let modificationDate = binaryAttributes[.modificationDate] as? Date else {
-        print("Failed to get the modification date for \(toolName).")
+        print("❌ Failed to get the modification date for \(toolName).")
         return false
     }
 
@@ -222,12 +227,12 @@ func checkSparkleToolRecency(toolName: String) -> Bool {
 
     guard let releaseDateString = try? String(contentsOf: releaseDateFilePath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
           let releaseDate = DateFormatter.yyyyMMddUTC.date(from: releaseDateString) else {
-        print("Failed to get the release date from .sparkle_tools_release_date.")
+        print("❌ Failed to get the release date from .sparkle_tools_release_date.")
         return false
     }
 
     if modificationDate < releaseDate {
-        print("\(toolName) from Sparkle binary utilities is outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
+        print("❌ \(toolName) from Sparkle binary utilities is outdated. Please visit https://github.com/sparkle-project/Sparkle/releases and install tools from the latest version.")
         return false
     }
 
@@ -252,7 +257,7 @@ func verifySigningKeys() -> Bool {
     if publicKeyOutput == desiredPublicKey {
         return true
     } else {
-        print("Incorrect or missing public signing key. Please ensure you have the correct keys installed.")
+        print("❌ Incorrect or missing public signing key. Please ensure you have the correct keys installed.")
         return false
     }
 }
@@ -262,6 +267,32 @@ func verifySigningKeys() -> Bool {
 final class AppcastDownloader {
 
     private let dispatchGroup = DispatchGroup()
+    private let cacheDir = specificDir.appendingPathComponent("cache")
+    private var downloadTasks = [String: URLSessionDownloadTask]() {
+        didSet {
+            guard oldValue.isEmpty && downloadTasks.count == 1 else { return }
+
+            // Report download progress
+            timer = DispatchSource.makeTimerSource(queue: queue)
+            timer.schedule(deadline: .now(), repeating: 0.5)
+            timer.setEventHandler {
+                guard !self.downloadTasks.isEmpty else {
+                    self.timer.cancel()
+                    self.timer = nil
+                    return
+                }
+                let progress = self.downloadTasks.values.reduce((total: Int64(0), received: Int64(0))) { result, task in
+                    guard task.countOfBytesExpectedToReceive > 0 else { return result }
+                    return (total: result.total + task.countOfBytesExpectedToReceive, received: result.received + task.countOfBytesReceived)
+                }
+
+                updateProgress(progress.total, received: progress.received)
+            }
+            timer.resume()
+        }
+    }
+    private let queue = DispatchQueue(label: "AppcastDownloader.queue")
+    private var timer: DispatchSourceTimer!
 
     func download() {
         prepareDirectories()
@@ -270,34 +301,137 @@ final class AppcastDownloader {
         parseAndDownloadFilesFromAppcast()
         dispatchGroup.wait()
 
-        print("All builds downloaded.")
+        print("🥬 All builds downloaded.",
+              "                                              ") // overwrite progress bar
+        cleanup()
     }
 
     private func prepareDirectories() {
-        // Delete directory if it already exists
-        if FileManager.default.fileExists(atPath: specificDir.path) {
+        let fm = FileManager.default
+
+        guard !fm.fileExists(atPath: specificDir.path) || specificDir.isDirectory else {
+            print("❌ There‘s an existing file at \(specificDir.path)")
+            exit(1)
+        }
+
+        do {
+            if !cacheDir.isDirectory {
+                print("Creating ", cacheDir.path)
+                try? fm.removeItem(at: cacheDir)
+                try fm.createDirectory(at: cacheDir, withIntermediateDirectories: true, attributes: nil)
+            }
+        } catch {
+            print("❌ Failed to create directory \(cacheDir.path): \(error).")
+            exit(1)
+        }
+
+        // Clean-up sparkle-updates directory
+        for file in (try? fm.contentsOfDirectory(atPath: specificDir.path)) ?? [] {
+            let url = specificDir.appendingPathComponent(file)
+            guard url.path != cacheDir.path else { continue }
+
             do {
-                try FileManager.default.removeItem(at: specificDir)
-                print("Old \(specificDir) removed.")
+                // cache old .dmg and .delta files
+                if ["dmg", "delta"].contains(url.pathExtension) {
+                    do {
+                        let cachedUrl = cacheDir.appendingPathComponent(file)
+                        if fm.fileExists(atPath: cachedUrl.path) {
+                            print("Removing \(cachedUrl.path)")
+                            try fm.removeItem(at: cachedUrl)
+                        }
+                        print("Caching \(url.path)")
+                        try fm.moveItem(at: url, to: cachedUrl)
+                    } catch {
+                        print("❗️ Failed to move file \(url.path) to cache, removing: \(error)")
+                        try fm.removeItem(at: url)
+                    }
+                } else {
+                    print("Removing \(url.path)")
+                    try fm.removeItem(at: url)
+                }
+
             } catch {
-                print("Failed to remove old \(specificDir): \(error).")
+                print("❌ Failed to remove \(url.path): \(error).")
                 exit(1)
             }
         }
+    }
 
-        // Create new directory
+    private func downloadFile(_ url: URL, _ destinationURL: URL, cachePolicy: URLRequest.CachePolicy, completion: @escaping (Error?) -> Void) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+
+        if cachePolicy != .returnCacheDataElseLoad {
+            reallyDownloadFile(url, destinationURL, cachePolicy: cachePolicy, completion: completion)
+            return
+        }
+
+        // Create a data task with the HEAD request to receive a remote file length
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let error = error {
+                completion(error)
+
+            } else if let response = response as? HTTPURLResponse {
+                if response.statusCode == 200 {
+                    // do we already have a cached file of the same size?
+                    if self.useCachedFileIfValid(for: destinationURL, response: response) {
+                        print("💾 Using cached file for \(destinationURL.path)")
+                        completion(nil)
+                        return
+                    }
+
+                    // file not cached, download
+                    self.reallyDownloadFile(url, destinationURL, cachePolicy: cachePolicy, completion: completion)
+
+                } else {
+                    print("❌ Server did status code \(response.statusCode) for \(destinationURL.lastPathComponent). Aborting download.")
+                    completion(NSError(domain: "HTTPURLResponseCode", code: response.statusCode, userInfo: nil))
+                }
+
+            } else {
+                completion(NSError(domain: "NotHTTPURLResponse", code: 0, userInfo: nil))
+            }
+        }
+
+        task.resume()
+    }
+
+    /// compare HTTP Response expected content length with a cached file size
+    /// move it to the destinationURL if matches
+    ///
+    /// returns: `true` if cached file found and moved to the destinationURL, `false` - otherwise
+    private func useCachedFileIfValid(for destinationURL: URL, response: HTTPURLResponse) -> Bool {
+        let cachedFileUrl = cacheDir.appendingPathComponent(destinationURL.lastPathComponent)
+        let fm = FileManager.default
+
+        guard fm.fileExists(atPath: cachedFileUrl.path) else { return false }
+
+        guard let attributes = try? fm.attributesOfItem(atPath: cachedFileUrl.path),
+              let fileSize = attributes[.size] as? Int,
+              fileSize == response.expectedContentLength else {
+            print("❗️ Invalidating cached file: \(destinationURL.path)")
+            try? fm.removeItem(at: destinationURL)
+            return false
+        }
+
         do {
-            try FileManager.default.createDirectory(at: specificDir, withIntermediateDirectories: true, attributes: nil)
-            print("Directory for new build created.")
+            try fm.moveItem(at: cachedFileUrl, to: destinationURL)
+            return true
+
         } catch {
-            print("Failed to create directory: \(error).")
-            exit(1)
+            print("❗️ Could not move cached file \(cachedFileUrl.path) to \(destinationURL.path): \(error)")
+            return false
         }
     }
 
-    private func downloadFile(_ url: URL, _ destinationURL: URL, completion: @escaping (Error?) -> Void) {
-        print("Downloading file from: \(url.absoluteString)")
-        let task = URLSession.shared.downloadTask(with: url) { (location, _, error) in
+    private func reallyDownloadFile(_ url: URL, _ destinationURL: URL, cachePolicy: URLRequest.CachePolicy, completion: @escaping (Error?) -> Void) {
+        print("⬇️  Downloading file from: \(url.absoluteString)")
+        let request = URLRequest(url: url, cachePolicy: cachePolicy)
+        let task = URLSession.shared.downloadTask(with: request) { (location, _, error) in
+            self.queue.async {
+                self.downloadTasks[destinationURL.lastPathComponent] = nil
+            }
+
             guard let location = location else {
                 completion(error)
                 return
@@ -305,23 +439,30 @@ final class AppcastDownloader {
 
             do {
                 try FileManager.default.moveItem(at: location, to: destinationURL)
+                print("✅ File downloaded to: \(destinationURL.path)")
                 completion(nil)
             } catch {
                 completion(error)
             }
         }
+
+        queue.async {
+            self.downloadTasks[destinationURL.lastPathComponent] = task
+        }
+
         task.resume()
     }
 
     private func downloadAppcast() {
         dispatchGroup.enter()
-        downloadFile(appcastURL, appcastFilePath) { [self] error in
+        downloadFile(appcastURL, appcastFilePath, cachePolicy: .useProtocolCachePolicy) { [self] error in
             if let error = error {
-                print("Error downloading appcast: \(error)")
+                print("❌ Error downloading appcast: \(error)")
+                exit(1)
             } else {
-                print("Appcast downloaded to: \(appcastFilePath.path)")
+                print("✅ Appcast downloaded to: \(appcastFilePath.path)")
+                self.dispatchGroup.leave()
             }
-            self.dispatchGroup.leave()
         }
     }
 
@@ -331,9 +472,18 @@ final class AppcastDownloader {
         parser?.delegate = delegate
         if !(parser?.parse() ?? false) {
             if let error = parser?.parserError {
-                print("Error parsing XML: \(error)")
+                print("❌ Error parsing XML: \(error)")
                 exit(1)
             }
+        }
+    }
+
+    private func cleanup() {
+        do {
+            print("Removing \(cacheDir.path)")
+            try FileManager.default.removeItem(at: cacheDir)
+        } catch {
+            print("❗️ Failed to remove cache directory \(cacheDir.path): \(error).")
         }
     }
 
@@ -343,10 +493,12 @@ final class AppcastDownloader {
         var releaseNotesHTML: String?
         var currentVersion: String?
 
-        private let downloadFile: (URL, URL, @escaping (Error?) -> Void) -> Void
+        typealias DownloadFileCallback = (URL, URL, URLRequest.CachePolicy, @escaping (Error?) -> Void) -> Void
+
+        private let downloadFile: DownloadFileCallback
         private let dispatchGroup: DispatchGroup
 
-        init(downloadFile: @escaping (URL, URL, @escaping (Error?) -> Void) -> Void, dispatchGroup: DispatchGroup) {
+        init(downloadFile: @escaping DownloadFileCallback, dispatchGroup: DispatchGroup) {
             self.downloadFile = downloadFile
             self.dispatchGroup = dispatchGroup
         }
@@ -359,13 +511,13 @@ final class AppcastDownloader {
                     let fileName = url.lastPathComponent
                     let destinationURL = specificDir.appendingPathComponent(fileName)
                     self.dispatchGroup.enter()
-                    self.downloadFile(url, destinationURL) { error in
+                    self.downloadFile(url, destinationURL, .returnCacheDataElseLoad) { error in
                         if let error = error {
-                            print("Error downloading file: \(error)")
+                            print("❌ Error downloading file: \(error)")
+                            exit(1)
                         } else {
-                            print("File downloaded to: \(destinationURL.path)")
+                            self.dispatchGroup.leave()
                         }
-                        self.dispatchGroup.leave()
                     }
                 }
             } else if elementName == "item" {
@@ -389,16 +541,16 @@ final class AppcastDownloader {
                     do {
                         try releaseNotesHTML.write(toFile: releaseNotesPath, atomically: true, encoding: .utf8)
                     } catch {
-                        print("Failed to write release notes: \(error)")
+                        print("❌ Failed to write release notes: \(error)")
                         exit(1)
                     }
-                    print("Release notes for \(version) saved into \(releaseNotesPath)")
+                    print("✅ Release notes for \(version) saved into \(releaseNotesPath)")
                 }
             }
         }
 
         func parser(_ parser: XMLParser, parseErrorOccurred parseError: Error) {
-            print("XML Parse Error: \(parseError)")
+            print("❌ XML Parse Error: \(parseError)")
             exit(1)
         }
     }
@@ -432,10 +584,10 @@ func handleReleaseNotesFile(path: String, updatesDirectoryURL: URL, dmgURL: URL)
 
         // Save the converted release notes to the destination file
         try releaseNotesHTML.write(to: destinationReleaseNotesURL, atomically: true, encoding: .utf8)
-        print("New release notes file copied to the updates directory and converted to HTML.")
+        print("✅ New release notes file copied to the updates directory and converted to HTML.")
 
     } catch {
-        print("Failed to copy and convert release notes file: \(error).")
+        print("❌ Failed to copy and convert release notes file: \(error).")
         exit(1)
     }
 }
@@ -445,7 +597,7 @@ func getVersionNumberFromDMGFileName(dmgURL: URL) -> String {
     let filename = dmgURL.lastPathComponent
     let components = filename.components(separatedBy: "-")
     guard components.count >= 2 else {
-        print("Invalid DMG file name format. Expected 'duckduckgo-X.Y.Z.B.dmg'")
+        print("❌ Invalid DMG file name format. Expected 'duckduckgo-X.Y.Z.B.dmg'")
         exit(1)
     }
     let versionWithExtension = components[1]
@@ -471,7 +623,7 @@ func handleDMGFile(dmgPath: String, updatesDirectoryURL: URL) -> URL? {
         print("New dmg file copied to the updates directory.")
         return destinationDMGURL
     } catch {
-        print("Failed to copy dmg file: \(error).")
+        print("❌ Failed to copy dmg file: \(error).")
         return nil
     }
 }
@@ -489,11 +641,11 @@ func findDMG(for versionIdentifier: String, in dir: URL) -> String? {
 
 func processAppcast(removing versionNumber: String, appcastFilePath: URL) -> Bool {
     guard let appcastContent = readAppcastContent(from: appcastFilePath) else {
-        print("Failed to read the appcast file.")
+        print("❌ Failed to read the appcast file.")
         return false
     }
     guard let modifiedAppcastContent = removeVersionFromAppcast(versionNumber, appcastContent: appcastContent) else {
-        print("Failed to remove version #\(versionNumber) from the appcast.")
+        print("❌ Failed to remove version #\(versionNumber) from the appcast.")
         return false
     }
     writeAppcastContent(modifiedAppcastContent, to: appcastFilePath)
@@ -511,7 +663,7 @@ func removeVersionFromAppcast(_ version: String, appcastContent: String) -> Stri
           let startMatch = regex.firstMatch(in: appcastContent, range: NSRange(appcastContent.startIndex..., in: appcastContent)),
           let endRange = appcastContent.range(of: "</item>", options: [], range: Range(startMatch.range, in: appcastContent)!)
     else {
-        print("Failed to match version \(version) in the appcast content.")
+        print("❌ Failed to match version \(version) in the appcast content.")
         return nil
     }
 
@@ -524,7 +676,7 @@ func writeAppcastContent(_ content: String, to filePath: URL) {
     do {
         try content.write(to: filePath, atomically: true, encoding: .utf8)
     } catch {
-        print("Failed to write the modified appcast file: \(error).")
+        print("❌ Failed to write the modified appcast file: \(error).")
         exit(1)
     }
 }
@@ -537,7 +689,7 @@ func runGenerateAppcast(with versionNumber: String, channel: String? = nil, roll
         do {
             try FileManager.default.removeItem(at: backupFileURL)
         } catch {
-            print("Error removing existing backup file: \(error)")
+            print("❌ Error removing existing backup file: \(error)")
             exit(1)
         }
     }
@@ -546,7 +698,7 @@ func runGenerateAppcast(with versionNumber: String, channel: String? = nil, roll
     do {
         try FileManager.default.copyItem(at: appcastFilePath, to: backupFileURL)
     } catch {
-        print("Error backing up appcast2.xml: \(error)")
+        print("❌ Error backing up appcast2.xml: \(error)")
         exit(1)
     }
 
@@ -581,15 +733,15 @@ func runGenerateAppcast(with versionNumber: String, channel: String? = nil, roll
     task.waitUntilExit()
 
     if task.terminationStatus != 0 {
-        print("generate_appcast command failed with exit code \(task.terminationStatus).")
+        print("❌ generate_appcast command failed with exit code \(task.terminationStatus).")
         exit(1)
     }
 
-    print("generate_appcast command executed successfully.")
+    print("✅ generate_appcast command executed successfully.")
 
     // Verify presense of old builds
     if !verifyAppcastContainsBuild(lastCatalinaBuildVersion, in: appcastFilePath) {
-        print("Error: Appcast does not contain the build (\(lastCatalinaBuildVersion)).")
+        print("❌ Error: Appcast does not contain the build (\(lastCatalinaBuildVersion)).")
         exit(1)
     }
 
@@ -600,7 +752,7 @@ func runGenerateAppcast(with versionNumber: String, channel: String? = nil, roll
         try diffResult.write(toFile: diffFilePath, atomically: true, encoding: .utf8)
         print("Differences in appcast file saved to: \(diffFilePath)")
     } catch {
-        print("Error writing diff to file: \(error)")
+        print("❗️ Error writing diff to file: \(error)")
     }
 
     // Move files back to the original location
@@ -623,7 +775,7 @@ func moveFiles(from sourceDir: URL, to destinationDir: URL) {
             try fileManager.moveItem(at: fileURL, to: destinationURL)
         }
     } catch {
-        print("Failed to move files from \(sourceDir.path) to \(destinationDir.path): \(error).")
+        print("❌ Failed to move files from \(sourceDir.path) to \(destinationDir.path): \(error).")
         exit(1)
     }
 }
@@ -646,12 +798,70 @@ func moveFiles(from sourceDir: URL, to destinationDir: URL) {
 
 func verifyAppcastContainsBuild(_ buildVersion: String, in filePath: URL) -> Bool {
     guard let appcastContent = try? String(contentsOf: filePath, encoding: .utf8) else {
-        print("Failed to read the appcast file.")
+        print("❌ Failed to read the appcast file.")
         return false
     }
 
     let buildString = "<sparkle:version>\(buildVersion)</sparkle:version>"
     return appcastContent.contains(buildString)
+}
+
+// MARK: - Helpers
+
+/// pretty-print number of bytes (61,9 MB)
+func formatBytes(_ bytes: Int64) -> String {
+    let formatter = ByteCountFormatter()
+    formatter.allowedUnits = [.useKB, .useMB, .useGB]
+    formatter.countStyle = .file
+    formatter.zeroPadsFractionDigits = true
+    return formatter.string(fromByteCount: bytes)
+}
+
+enum ProgressSpinner: Int, CustomStringConvertible {
+    case a, b, c, d
+    var description: String {
+        switch self {
+        case .a: "-"
+        case .b: "\\"
+        case .c: "|"
+        case .d: "/"
+        }
+    }
+}
+
+/// draws animated progress bar: [=========---------------------] / (19,8 MB of 61,9 MB)
+var progressSpinnerState: ProgressSpinner!
+func updateProgress(_ total: Int64, received: Int64) {
+    guard total > 0 else { return }
+
+    if progressSpinnerState == nil {
+        progressSpinnerState = ProgressSpinner.a
+        print("")
+    }
+
+    let max: Double = 30
+    let progress = Double(received) / Double(total)
+    let filled = Int(max * progress)
+    let remaining = Int(max) - filled
+
+    print("\r  [" + String(repeating: "=", count: filled) + String(repeating: "-", count: remaining) + "]",
+          progressSpinnerState.description,
+          "(" + formatBytes(received),
+          "of",
+          formatBytes(total) + ")",
+          "           ", // overwrite last progress
+          terminator: "")
+    print("\r", terminator: "") // caret return for other log messages
+    fflush(stdout)
+
+    progressSpinnerState = .init(rawValue: progressSpinnerState.rawValue + 1) ?? .a
+}
+
+extension URL {
+    var isDirectory: Bool {
+        var isDir: ObjCBool = false
+        return FileManager.default.fileExists(atPath: path, isDirectory: &isDir) && isDir.boolValue
+    }
 }
 
 // swiftlint:enable line_length
