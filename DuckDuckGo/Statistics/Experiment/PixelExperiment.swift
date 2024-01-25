@@ -69,7 +69,6 @@ extension PixelExperiment {
         logic.fireDay21To27SerpPixel()
     }
 
-
 }
 
 final internal class PixelExperimentLogic {
