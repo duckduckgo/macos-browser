@@ -193,9 +193,15 @@ public struct TunnelControllerView: View {
                 .applySectionHeaderAttributes(colorScheme: colorScheme)
                 .padding(EdgeInsets(top: 6, leading: 9, bottom: 6, trailing: 9))
 
-            connectionStatusRow(icon: .serverLocationIcon,
-                                title: UserText.networkProtectionStatusViewLocation,
-                                details: model.serverLocation)
+            MenuItemButton(
+                iconName: .serverLocationIcon,
+                title: UserText.networkProtectionStatusViewLocation,
+                detailTitle: model.serverLocation,
+                textColor: Color(.defaultText)) {
+                    model.showLocationSettings()
+                    dismiss()
+            }.applyMenuAttributes()
+
             connectionStatusRow(icon: .ipAddressIcon,
                                 title: UserText.networkProtectionStatusViewIPAddress,
                                 details: model.serverAddress)

@@ -21,7 +21,7 @@ import SwiftUIExtensions
 import Combine
 import NetworkProtection
 
-fileprivate extension View {
+extension View {
     func applyMenuAttributes() -> some View {
         opacity(0.9)
             .font(.system(size: 13, weight: .regular, design: .default))
@@ -116,7 +116,7 @@ public struct NetworkProtectionStatusView: View {
     private func bottomMenuView() -> some View {
         VStack(spacing: 0) {
             ForEach(model.menuItems(), id: \.name) { menuItem in
-                MenuItemButton(menuItem.name, textColor: Color(.defaultText)) {
+                MenuItemButton(title: menuItem.name, textColor: Color(.defaultText)) {
                     await menuItem.action()
                     dismiss()
                 }.applyMenuAttributes()

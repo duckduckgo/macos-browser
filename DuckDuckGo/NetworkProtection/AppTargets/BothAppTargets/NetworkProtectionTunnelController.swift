@@ -86,22 +86,13 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
-    // MARK: - Connection Status
-
-    private let statusTransitionAwaiter = ConnectionStatusTransitionAwaiter(
-        statusObserver: ConnectionStatusObserverThroughSession(
-            platformNotificationCenter: NSWorkspace.shared.notificationCenter,
-            platformDidWakeNotification: NSWorkspace.didWakeNotification
-        ),
-        transitionTimeout: .seconds(10)
-    )
-
     // MARK: - Tunnel Manager
 
     /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
     /// a new one will NOT be created.  This is useful for querying the connection state and information without triggering
     /// a VPN-access popup to the user.
     ///
+    @MainActor
     private func loadTunnelManager() async -> NETunnelProviderManager? {
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
         return tunnels?.first {
@@ -109,6 +100,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
+    @MainActor
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
         let tunnelManager = await loadTunnelManager() ?? NETunnelProviderManager()
 
@@ -116,8 +108,9 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         return tunnelManager
     }
 
+    @MainActor
     private func setupAndSave(_ tunnelManager: NETunnelProviderManager) async throws {
-        await setup(tunnelManager)
+        setup(tunnelManager)
         try await tunnelManager.saveToPreferences()
         try await tunnelManager.loadFromPreferences()
     }
@@ -446,6 +439,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         options[NetworkProtectionOptionKey.selectedEnvironment] = settings.selectedEnvironment.rawValue as NSString
         options[NetworkProtectionOptionKey.selectedServer] = settings.selectedServer.stringValue as? NSString
 
+#if NETP_SYSTEM_EXTENSION
+        if let data = try? JSONEncoder().encode(settings.selectedLocation) {
+            options[NetworkProtectionOptionKey.selectedLocation] = NSData(data: data)
+        }
+#endif
+
         if case .custom(let keyValidity) = settings.registrationKeyValidity {
             options[NetworkProtectionOptionKey.keyValidity] = String(describing: keyValidity) as NSString
         }
@@ -466,7 +465,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
 
         try tunnelManager.connection.startVPNTunnel(options: options)
-        try await statusTransitionAwaiter.waitUntilConnectionStarted()
 
         PixelKit.fire(
             NetworkProtectionPixelEvent.networkProtectionNewUser,
@@ -481,6 +479,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     /// Stops the VPN connection used for Network Protection
     ///
+    @MainActor
     func stop() async {
         await proxyController.stop()
 
@@ -495,6 +494,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
+    @MainActor
     func stop(tunnelManager: NETunnelProviderManager) async throws {
         // disable reconnect on demand if requested to stop
         try? await disableOnDemand(tunnelManager: tunnelManager)
@@ -502,7 +502,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         switch tunnelManager.connection.status {
         case .connected, .connecting, .reasserting:
             tunnelManager.connection.stopVPNTunnel()
-            try await statusTransitionAwaiter.waitUntilConnectionStopped()
         default:
             break
         }
@@ -512,6 +511,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     @MainActor
     func enableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
+        try await tunnelManager.loadFromPreferences()
+
         let rule = NEOnDemandRuleConnect()
         rule.interfaceTypeMatch = .any
 
@@ -523,6 +524,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     @MainActor
     func disableOnDemand(tunnelManager: NETunnelProviderManager) async throws {
+        try await tunnelManager.loadFromPreferences()
+
         tunnelManager.isOnDemandEnabled = false
 
         try await tunnelManager.saveToPreferences()

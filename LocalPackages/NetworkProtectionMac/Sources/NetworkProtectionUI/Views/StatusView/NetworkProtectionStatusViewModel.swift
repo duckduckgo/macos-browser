@@ -100,6 +100,7 @@ extension NetworkProtectionStatusView {
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
+                    showLocationsAction: @escaping () async -> Void,
                     menuItems: @escaping () -> [MenuItem],
                     runLoopMode: RunLoop.Mode? = nil) {
 
@@ -112,7 +113,8 @@ extension NetworkProtectionStatusView {
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
-                                                                  statusReporter: statusReporter)
+                                                                  statusReporter: statusReporter,
+                                                                  showLocationsAction: showLocationsAction)
 
             connectionStatus = statusReporter.statusObserver.recentValue
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
