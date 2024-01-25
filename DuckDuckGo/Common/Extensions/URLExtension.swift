@@ -224,9 +224,9 @@ extension URL {
     }
 
     func toString(decodePunycode: Bool,
-                          dropScheme: Bool,
-                          needsWWW: Bool? = nil,
-                          dropTrailingSlash: Bool) -> String {
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
