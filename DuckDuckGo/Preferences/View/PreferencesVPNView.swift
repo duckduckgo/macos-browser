@@ -28,11 +28,7 @@ extension Preferences {
         @ObservedObject var model: VPNPreferencesModel
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-
-                TextMenuTitle(UserText.vpn)
+            PreferencePane(UserText.vpn) {
 
                 PreferencePaneSection {
                     TextMenuItemHeader(UserText.vpnLocationTitle)
@@ -41,8 +37,7 @@ extension Preferences {
 
                 // SECTION: Manage VPN
 
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.vpnGeneralTitle)
+                PreferencePaneSection(UserText.vpnGeneralTitle) {
 
                     SpacedCheckbox {
                         ToggleMenuItem(UserText.vpnConnectOnLoginSettingTitle, isOn: $model.connectOnLogin)
@@ -90,8 +85,7 @@ extension Preferences {
 
                 // SECTION: VPN Notifications
 
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.vpnNotificationsSettingsTitle)
+                PreferencePaneSection(UserText.vpnNotificationsSettingsTitle) {
 
                     ToggleMenuItem("VPN connection drops or status changes", isOn: $model.notifyStatusChanges)
                 }
