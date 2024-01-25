@@ -35,35 +35,32 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Sync Enabled
-        PreferencePaneSection(verticalPadding: 8) {
+        PreferencePaneSection {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
         }
 
         // Synced Devices
-        PreferencePaneSection(verticalPadding: 8) {
-            TextMenuItemHeader(UserText.syncedDevices)
-
+        PreferencePaneSection(UserText.syncedDevices) {
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
         }
 
         // Options
-        PreferencePaneSection(verticalPadding: 8) {
-            TextMenuItemHeader(UserText.optionsSectionTitle)
+        PreferencePaneSection(UserText.optionsSectionTitle) {
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.fetchFaviconsOptionTitle, isOn: $model.isFaviconsFetchingEnabled)
+                TextMenuItemCaption(UserText.fetchFaviconsOptionCaption)
+            }
 
-            ToggleMenuItem(UserText.fetchFaviconsOptionTitle, isOn: $model.isFaviconsFetchingEnabled)
-            TextMenuItemCaption(UserText.fetchFaviconsOptionCaption)
-                .padding(.bottom, 8)
-
-            ToggleMenuItem(UserText.shareFavoritesOptionTitle, isOn: $model.isUnifiedFavoritesEnabled)
-            TextMenuItemCaption(UserText.shareFavoritesOptionCaption)
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.shareFavoritesOptionTitle, isOn: $model.isUnifiedFavoritesEnabled)
+                TextMenuItemCaption(UserText.shareFavoritesOptionCaption)
+            }
         }
 
         // Recovery
-        PreferencePaneSection(verticalPadding: 8) {
-            TextMenuItemHeader(UserText.recovery)
-
+        PreferencePaneSection(UserText.recovery) {
             HStack(alignment: .top, spacing: 12) {
                 Text(UserText.recoveryInstructions)
                     .fixMultilineScrollableText()
@@ -75,7 +72,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Turn Off and Delete Data
-        PreferencePaneSection(verticalPadding: 8) {
+        PreferencePaneSection {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
