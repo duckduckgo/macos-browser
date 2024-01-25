@@ -51,14 +51,14 @@ extension TabPreviewViewController {
                                                     dropScheme: true,
                                                     needsWWW: false,
                                                     dropTrailingSlash: true)
-        case .bookmarks, .dataBrokerProtection, .homePage, .onboarding, .preferences:
+        case .bookmarks, .dataBrokerProtection, .newtab, .onboarding, .settings:
             urlTextField.stringValue = "DuckDuckGo Browser"
         default:
             urlTextField.stringValue = ""
         }
 
         if !isSelected, let preview = tabViewModel.tab.tabPreview {
-            screenshotImageView.image = tabViewModel.tab.tabPreview
+            screenshotImageView.image = preview
             screenshotImageViewHeightConstraint.constant = getHeight(for: tabViewModel.tab.tabPreview)
         } else {
             screenshotImageView.image = nil

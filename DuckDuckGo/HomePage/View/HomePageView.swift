@@ -157,7 +157,7 @@ extension HomePage.Views {
         var body: some View {
             Text(UserText.newTabBottomPopoverTitle)
                 .bold()
-                .font(.custom("SFProText-Regular", size: 13))
+                .font(.system(size: 13))
             Divider()
             if includeContinueSetUpCards {
                 HStack {

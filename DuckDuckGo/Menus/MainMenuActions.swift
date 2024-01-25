@@ -85,7 +85,7 @@ extension AppDelegate {
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -95,7 +95,7 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -144,7 +144,7 @@ extension AppDelegate {
     }
 
     @objc func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .anySettingsPane)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -159,7 +159,7 @@ extension AppDelegate {
     }
 
     @objc func openImportBrowserDataWindow(_ sender: Any?) {
-        DataImportView.show()
+        DataImportView().show()
     }
 
     @objc func openExportLogins(_ sender: Any?) {
@@ -266,14 +266,14 @@ extension MainViewController {
 
     @objc func openPreferences(_ sender: Any?) {
         makeKeyIfNeeded()
-        browserTabViewController.openNewTab(with: .anyPreferencePane)
+        browserTabViewController.openNewTab(with: .anySettingsPane)
     }
 
     // MARK: - File
 
     @objc func newTab(_ sender: Any?) {
         makeKeyIfNeeded()
-        browserTabViewController.openNewTab(with: .homePage)
+        browserTabViewController.openNewTab(with: .newtab)
     }
 
     @objc func openLocation(_ sender: Any?) {
@@ -342,7 +342,7 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage))
+                WindowsManager.openNewWindow(with: Tab(content: .newtab))
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
@@ -401,7 +401,7 @@ extension MainViewController {
         guard view.window?.isPopUpWindow == false,
             let (tab, _) = getActiveTabAndIndex(), tab === tabCollectionViewModel.selectedTab else {
 
-            browserTabViewController.openNewTab(with: .homePage)
+            browserTabViewController.openNewTab(with: .newtab)
             return
         }
         makeKeyIfNeeded()

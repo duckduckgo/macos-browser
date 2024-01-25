@@ -38,12 +38,9 @@ enum FirefoxBerkeleyDatabaseReader {
                 Data(bytes: pointer, count: currentDataDBT.size)
             }
 
-            let currentKeyHexadecimalString = currentKeyData.hexadecimalString
-            let currentKeyString = String(bytes: currentKeyData, encoding: .utf8)
-
-            if currentKeyHexadecimalString == Self.firefoxASN1Key {
+            if currentKeyData == Self.firefoxASN1Key {
                 results["data"] = currentData
-            } else if let currentKeyString {
+            } else if let currentKeyString = currentKeyData.utf8String() {
                 results[currentKeyString] = currentData
             }
         }
@@ -51,11 +48,5 @@ enum FirefoxBerkeleyDatabaseReader {
         return results
     }
 
-    private static let firefoxASN1Key: String = "f8000000000000000000000000000001"
-}
-
-private extension Data {
-    var hexadecimalString: String {
-        Array(self).reduce(into: String()) { $0.append(String(format: "%02lx", $1)) }
-    }
+    private static let firefoxASN1Key = Data([0xf8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01])
 }

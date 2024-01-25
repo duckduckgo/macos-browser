@@ -30,72 +30,81 @@ extension Preferences {
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-                TextMenuTitle(UserText.general)
+            PreferencePane(UserText.general) {
 
                 // SECTION 1: Default Browser
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.defaultBrowser)
+                PreferencePaneSection(UserText.defaultBrowser) {
 
-                    HStack {
-                        if defaultBrowserModel.isDefault {
-                            Image("SolidCheckmark")
-                            Text(UserText.isDefaultBrowser)
-                        } else {
-                            Image("Warning").foregroundColor(Color("LinkBlueColor"))
-                            Text(UserText.isNotDefaultBrowser)
-                            Button(UserText.makeDefaultBrowser) {
-                                defaultBrowserModel.becomeDefault()
+                    PreferencePaneSubSection {
+                        HStack {
+                            if defaultBrowserModel.isDefault {
+                                Image("SolidCheckmark")
+                                Text(UserText.isDefaultBrowser)
+                            } else {
+                                Image("Warning").foregroundColor(Color("LinkBlueColor"))
+                                Text(UserText.isNotDefaultBrowser)
+                                Button(UserText.makeDefaultBrowser) {
+                                    defaultBrowserModel.becomeDefault()
+                                }
                             }
                         }
                     }
                 }
 
                 // SECTION 2: On Startup
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.onStartup)
-                    Picker(selection: $startupModel.restorePreviousSession, content: {
-                        Text(UserText.showHomePage).tag(false)
-                        Text(UserText.reopenAllWindowsFromLastSession).tag(true)
-                    }, label: {})
-                    .pickerStyle(.radioGroup)
-                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                PreferencePaneSection(UserText.onStartup) {
+
+                    PreferencePaneSubSection {
+                        Picker(selection: $startupModel.restorePreviousSession, content: {
+                            Text(UserText.showHomePage).tag(false)
+                                .padding(.bottom, 4)
+                            Text(UserText.reopenAllWindowsFromLastSession).tag(true)
+                        }, label: {})
+                        .pickerStyle(.radioGroup)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
+                    }
                 }
 
                 // SECTION 3: Home Page
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.homePage)
-                    TextMenuItemCaption(UserText.homePageDescription)
-                    Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
-                        Text(UserText.newTab).tag(false)
-                        VStack(alignment: .leading) {
-                            HStack(spacing: 15) {
-                                Text(UserText.specificPage)
-                                Button(UserText.setPage) {
-                                    showingCustomHomePageSheet.toggle()
-                                }.disabled(!startupModel.launchToCustomHomePage)
-                            }
-                            TextMenuItemCaption(startupModel.friendlyURL)
-                                .padding(.top, 0)
-                                .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
+                PreferencePaneSection(UserText.homePage) {
 
-                        }.tag(true)
+                    PreferencePaneSubSection {
+
+                        TextMenuItemCaption(UserText.homePageDescription)
+
+                        Picker(selection: $startupModel.launchToCustomHomePage, label: EmptyView()) {
+                            Text(UserText.newTab).tag(false)
+                            VStack(alignment: .leading, spacing: 0) {
+                                HStack(spacing: 15) {
+                                    Text(UserText.specificPage)
+                                    Button(UserText.setPage) {
+                                        showingCustomHomePageSheet.toggle()
+                                    }.disabled(!startupModel.launchToCustomHomePage)
+                                }
+                                TextMenuItemCaption(startupModel.friendlyURL)
+                                    .padding(.top, 0)
+                                    .visibility(!startupModel.launchToCustomHomePage ? .gone : .visible)
+
+                            }.tag(true)
+                        }
+                        .pickerStyle(.radioGroup)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                     }
-                    .pickerStyle(.radioGroup)
-                    .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
-                    .padding(.bottom, 0)
-                    HStack {
-                        Picker(UserText.mainMenuHomeButton, selection: $startupModel.homeButtonPosition) {
-                            ForEach(HomeButtonPosition.allCases, id: \.self) { position in
-                                Text(UserText.mainMenuHomeButton(for: position)).tag(position)
+
+                    PreferencePaneSubSection {
+                        HStack {
+                            Picker(UserText.mainMenuHomeButton, selection: $startupModel.homeButtonPosition) {
+                                ForEach(HomeButtonPosition.allCases, id: \.self) { position in
+                                    Text(UserText.homeButtonMode(for: position)).tag(position)
+                                }
                             }
-                        }.scaledToFit()
-                        .onChange(of: startupModel.homeButtonPosition) { _ in
-                            startupModel.updateHomeButton()
+                            .scaledToFit()
+                            .onChange(of: startupModel.homeButtonPosition) { _ in
+                                startupModel.updateHomeButton()
+                            }
                         }
                     }
+
                 }.sheet(isPresented: $showingCustomHomePageSheet) {
                     CustomHomePageSheet(startupModel: startupModel, isSheetPresented: $showingCustomHomePageSheet)
                 }

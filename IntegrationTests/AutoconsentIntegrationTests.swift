@@ -40,7 +40,7 @@ class AutoconsentIntegrationTests: XCTestCase {
         // disable GPC redirects
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        window = WindowsManager.openNewWindow(with: .none)!
+        window = WindowsManager.openNewWindow(with: Tab(content: .none))
     }
 
     override func tearDown() {

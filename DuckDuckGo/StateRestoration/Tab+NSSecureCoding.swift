@@ -90,7 +90,7 @@ private extension Tab.TabContent {
         case url = 0
         case preferences = 1
         case bookmarks = 2
-        case homePage = 3
+        case newtab = 3
         case onboarding = 4
         case duckPlayer = 5
         case dataBrokerProtection = 6
@@ -98,15 +98,15 @@ private extension Tab.TabContent {
 
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
         switch type {
-        case .homePage:
-            self = .homePage
+        case .newtab:
+            self = .newtab
         case .url:
             guard let url = url else { return nil }
             self = .url(url, source: .pendingStateRestoration)
         case .bookmarks:
             self = .bookmarks
         case .preferences:
-            self = .preferences(pane: preferencePane)
+            self = .settings(pane: preferencePane)
         case .onboarding:
             self = .onboarding
         case .duckPlayer:
@@ -120,18 +120,18 @@ private extension Tab.TabContent {
     var type: ContentType {
         switch self {
         case .url: return .url
-        case .homePage: return .homePage
+        case .newtab: return .newtab
         case .bookmarks: return .bookmarks
-        case .preferences: return .preferences
+        case .settings: return .preferences
         case .onboarding: return .onboarding
-        case .none: return .homePage
+        case .none: return .newtab
         case .dataBrokerProtection: return .dataBrokerProtection
         }
     }
 
     var preferencePane: PreferencePaneIdentifier? {
         switch self {
-        case let .preferences(pane: pane):
+        case let .settings(pane: pane):
             return pane
         default:
             return nil

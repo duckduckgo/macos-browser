@@ -162,10 +162,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     @objc private func setWebUICustomURL() {
         showCustomURLAlert { [weak self] value in
-            if let url = value {
-                let modifiedURL = url.hasPrefix("https://") ? url : "https://\(url)"
-                self?.webUISettings.setCustomURL(modifiedURL)
-            }
+
+            guard let value = value,
+                  URL(string: value) != nil else { return }
+
+            self?.webUISettings.setCustomURL(value)
         }
     }
 
