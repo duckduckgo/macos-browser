@@ -112,7 +112,11 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         if model.isDataSyncingAvailable {
             EmptyView()
         } else {
-            SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            if model.isAppVersionNotSupported {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessageUpgradeRequired)
+            } else {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            }
         }
     }
 
