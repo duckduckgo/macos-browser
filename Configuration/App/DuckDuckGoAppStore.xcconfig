@@ -28,7 +28,6 @@ CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGoAppStore.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoAppStoreCI.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
-CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
