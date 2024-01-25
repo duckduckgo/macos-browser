@@ -78,7 +78,7 @@
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
         "branch" : "12-14-feat_macos_allow_direct_navigation_to_breakage_form",
-        "revision" : "24b6260043a888827998124bc12104f4779e010f"
+        "revision" : "97bcd73095bb9c306c638c0d5ff1299160b1256f"
       }
     },
     {
