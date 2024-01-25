@@ -57,10 +57,8 @@ final class OnboardingViewModel: ObservableObject {
 
     weak var delegate: OnboardingDelegate?
 
-    init(
-        delegate: OnboardingDelegate? = nil) {
+    init(delegate: OnboardingDelegate? = nil) {
         self.delegate = delegate
-        self.state = onboardingFinished ? .startBrowsing : .startFlow
     }
 
     func onSplashFinished() {
@@ -106,11 +104,6 @@ final class OnboardingViewModel: ObservableObject {
         } else {
             state = .startFlow
         }
-    }
-
-    func restart() {
-        onboardingFinished = false
-        state = .startFlow
     }
 
 }
