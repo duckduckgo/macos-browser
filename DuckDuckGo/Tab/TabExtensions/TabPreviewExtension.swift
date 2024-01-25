@@ -25,25 +25,24 @@ import SwiftUI
 final class TabPreviewExtension {
 
     struct PreviewData {
-        var url: URL
+        var url: URL?
         var scrollPosition: CGFloat
         var image: NSImage
         var webviewBoundsSize: NSSize
-        var afterLoadPreview: Bool
+
+        static func previewDataForNativeView(from image: NSImage) -> PreviewData {
+            return PreviewData(url: nil, scrollPosition: 0, image: image, webviewBoundsSize: NSSize.zero)
+        }
+
+        static let restoredScrollPosition: CGFloat = -1.0
+        static let unknownScrollPosition: CGFloat = -2.0
     }
 
     private var previewData: PreviewData?
     private var generatePreviewAfterLoad = false
 
     var preview: NSImage? {
-        switch tabContent {
-        case .homePage, .preferences, .bookmarks, .onboarding, .dataBrokerProtection:
-            return nativePreview
-        case .url:
-            return previewData?.image
-        default:
-            return nil
-        }
+        return previewData?.image
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -63,14 +62,9 @@ final class TabPreviewExtension {
     }
 
     // MARK: - Webviews
-    
-    @MainActor
-    func generatePreview() async {
-        await generatePreview(afterLoad: false)
-    }
 
     @MainActor
-    func generatePreview(afterLoad: Bool = false) async {
+    func generatePreview() async {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let webView, let tabContent, let url = tabContent.url else {
@@ -82,7 +76,6 @@ final class TabPreviewExtension {
         let scrollPosition = try? await getScrollPosition(webView: webView)
         if let previewData,
            let scrollPosition,
-           !previewData.afterLoadPreview,
            previewData.webviewBoundsSize == webView.bounds.size,
            previewData.url == url,
            previewData.scrollPosition == scrollPosition {
@@ -90,18 +83,18 @@ final class TabPreviewExtension {
             return
         }
 
+        os_log("Preview rendering started", log: .tabPreviews)
         let configuration = WKSnapshotConfiguration.makeConfiguration()
         webView.takeSnapshot(with: configuration) { [weak self] image, _ in
             guard let image = image else {
-                os_log("TabPreviewExtension: failed to create a snapshot of webView", log: .tabPreviews, type: .error)
+                os_log("Failed to create a snapshot of webView", log: .tabPreviews, type: .error)
                 return
             }
             self?.generatePreviewAfterLoad = false
             self?.previewData = PreviewData(url: url,
-                                            scrollPosition: scrollPosition ?? -1,
+                                            scrollPosition: scrollPosition ?? PreviewData.unknownScrollPosition,
                                             image: image,
-                                            webviewBoundsSize: webView.bounds.size,
-                                            afterLoadPreview: afterLoad)
+                                            webviewBoundsSize: webView.bounds.size)
 
             os_log("Preview rendered: \(url) ", log: .tabPreviews)
         }
@@ -127,21 +120,22 @@ final class TabPreviewExtension {
 
     // MARK: - Native Previews
 
-    private var nativePreview: NSImage?
-
     func generateNativePreview(from view: NSView) {
         let originalBounds = view.bounds
 
+        os_log("Native preview rendering started", log: .tabPreviews)
         DispatchQueue.global(qos: .userInitiated).async {
             guard let resizedImage = self.createResizedImage(from: view, with: originalBounds) else {
                 DispatchQueue.main.async { [weak self] in
-                    self?.nativePreview = nil
+                    os_log("Native preview rendering failed", log: .tabPreviews, type: .error)
+                    self?.clearPreview()
                 }
                 return
             }
 
             DispatchQueue.main.async { [weak self] in
-                self?.nativePreview = resizedImage
+                self?.previewData = PreviewData.previewDataForNativeView(from: resizedImage)
+                os_log("Preview of native page rendered", log: .tabPreviews)
             }
         }
     }
@@ -202,32 +196,26 @@ final class TabPreviewExtension {
 extension TabPreviewExtension: NSCodingExtension {
 
     private enum NSSecureCodingKeys {
-        static let tabPreviewImage = "tabPreviewImage"
-        static let tabPreviewUrl = "tabPreviewUrl"
-        static let tabPreviewScrollPosition = "tabPreviewScrollPosition"
+        static let tabPreviewImage = "TabPreviewImage"
     }
 
     func awakeAfter(using decoder: NSCoder) {
-        //TODO: Decoding and encoding
-//        guard let urlString = decoder.decodeObject(forKey: NSSecureCodingKeys.tabPreviewUrl) as? NSString,
-//              let url = URL(string: urlString as String),
-//              let image = decoder.decodeObject(forKey: NSSecureCodingKeys.tabPreviewImage) as? NSImage else {
-//            return
-//        }
-//        let scrollPosition = CGFloat(decoder.decodeDouble(forKey: NSSecureCodingKeys.tabPreviewScrollPosition))
-//
-//        previewData = PreviewData(url: url, scrollPosition: scrollPosition, image: image)
-        //TODO: If we don't have data
-        generatePreviewAfterLoad = true
+        guard let data = decoder.decodeObject(of: NSData.self, forKey: NSSecureCodingKeys.tabPreviewImage),
+              let image = NSImage(data: data as Data) else {
+            os_log("Preview restoration failed", log: .tabPreviews)
+            return
+        }
+
+        previewData = PreviewData(url: nil, scrollPosition: PreviewData.restoredScrollPosition, image: image, webviewBoundsSize: NSSize.zero)
+        os_log("Preview restored from the session state", log: .tabPreviews)
+        generatePreviewAfterLoad = false
     }
 
     func encode(using coder: NSCoder) {
-        //TODO: native previews too
-//        if let previewData {
-//            coder.encode(previewData.url.absoluteString as NSString, forKey: NSSecureCodingKeys.tabPreviewUrl)
-//            coder.encode(Double(previewData.scrollPosition), forKey: NSSecureCodingKeys.tabPreviewScrollPosition)
-//            coder.encode(previewData.image, forKey: NSSecureCodingKeys.tabPreviewImage)
-//        }
+        if let previewData {
+            os_log("Preview saved to the session state", log: .tabPreviews)
+            coder.encode(previewData.image.tiffRepresentation, forKey: NSSecureCodingKeys.tabPreviewImage)
+        }
     }
 
 }
@@ -236,14 +224,16 @@ extension TabPreviewExtension: NavigationResponder {
 
     @MainActor
     func willStart(_ navigation: Navigation) {
-        clearPreview()
+        if previewData?.scrollPosition != PreviewData.restoredScrollPosition {
+            clearPreview()
+        }
     }
 
     @MainActor
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
         if generatePreviewAfterLoad {
             Task {
-                await generatePreview(afterLoad: true)
+                await generatePreview()
             }
         }
     }
