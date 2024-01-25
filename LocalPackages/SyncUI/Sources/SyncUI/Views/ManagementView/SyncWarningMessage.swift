@@ -44,7 +44,6 @@ struct SyncWarningMessage: View {
                         .padding(.top, 8)
                 }
             }
-            .padding(.horizontal)
         }
         .padding(.leading, -12)
         .frame(maxWidth: .infinity)

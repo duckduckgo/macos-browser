@@ -57,7 +57,8 @@ struct SyncSetupView<ViewModel>: View where ViewModel: ManagementViewModel {
                 .buttonStyle(SyncWithAnotherDeviceButtonStyle(enabled: model.isConnectingDevicesAvailable))
                 .disabled(!model.isConnectingDevicesAvailable)
         }
-        .frame(width: 512, height: 254)
+        .frame(maxWidth: .infinity)
+        .frame(height: 254)
         .roundedBorder()
         .padding(.top, 20)
     }
