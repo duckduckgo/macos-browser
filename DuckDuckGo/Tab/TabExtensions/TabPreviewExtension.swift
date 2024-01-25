@@ -21,6 +21,7 @@ import Common
 import Foundation
 import Navigation
 import SwiftUI
+import WebKit
 
 final class TabPreviewExtension {
 
@@ -102,14 +103,20 @@ final class TabPreviewExtension {
 
     @MainActor
     private func getScrollPosition(webView: WKWebView) async throws -> CGFloat? {
-        do {
-            let result = try await webView.evaluateJavaScript("window.scrollY")
-            if let scrollPosition = result as? CGFloat {
-                return scrollPosition
+        try await withCheckedThrowingContinuation { continuation in
+            let javascript = "window.scrollY"
+            webView.evaluateJavaScript(javascript, in: nil, in: .defaultClient) { result in
+                switch result {
+                case .success(let value):
+                    if let scrollPosition = value as? CGFloat {
+                        continuation.resume(returning: scrollPosition)
+                    } else {
+                        continuation.resume(returning: nil)
+                    }
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
             }
-            return nil
-        } catch {
-            throw error
         }
     }
 
