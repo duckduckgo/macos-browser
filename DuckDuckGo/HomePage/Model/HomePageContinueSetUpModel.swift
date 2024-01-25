@@ -322,7 +322,7 @@ extension HomePage.Models {
 #if DEBUG
             isFirstSession = false
 #endif
-            if OnboardingViewModel().onboardingFinished {
+            if OnboardingViewModel.isOnboardingFinished {
                 isFirstSession = false
             }
         }

@@ -63,7 +63,7 @@ struct VPNLocationView: View {
 
     @ViewBuilder
     private var nearestSection: some View {
-        PreferencePaneSection(verticalPadding: 0) {
+        PreferencePaneSection {
             Text(UserText.vpnLocationRecommendedSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
@@ -98,7 +98,7 @@ struct VPNLocationView: View {
 
     @ViewBuilder
     private var countriesSection: some View {
-        PreferencePaneSection(verticalPadding: 0) {
+        PreferencePaneSection {
             Text(UserText.vpnLocationCustomSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
