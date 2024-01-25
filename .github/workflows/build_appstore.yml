@@ -10,6 +10,7 @@ on:
         type: choice
         options:
         - testflight
+        - testflight_review
         - appstore
       asana-task-url:
         description: "Asana release task URL"
