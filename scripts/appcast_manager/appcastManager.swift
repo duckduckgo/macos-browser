@@ -341,7 +341,24 @@ final class AppcastDownloader {
         var currentElement: String = ""
         var enclosureURL: String = ""
         var releaseNotesHTML: String?
-        var currentVersion: String?
+        var marketingVersion: String? // e.g. 1.70.0
+        var buildNumber: String? // e.g. 104 (but 1.70.0 for old versions before we switched to using integer build number)
+
+        /**
+         * This represents the version as indicated in the file name.
+         *
+         * For old versions, where build number was equal to the marketing version, it's just the marketing version.
+         * For new versions, where build number is an integer, it's the marketing version and the build number joined by a dot.
+         */
+        var currentVersionIdentifier: String? {
+            guard let marketingVersion else {
+                return nil
+            }
+            guard let buildNumber, buildNumber != marketingVersion else {
+                return marketingVersion
+            }
+            return [marketingVersion, buildNumber].joined(separator: ".")
+        }
 
         private let downloadFile: (URL, URL, @escaping (Error?) -> Void) -> Void
         private let dispatchGroup: DispatchGroup
@@ -369,7 +386,8 @@ final class AppcastDownloader {
                     }
                 }
             } else if elementName == "item" {
-                currentVersion = nil
+                marketingVersion = nil
+                buildNumber = nil
                 releaseNotesHTML = nil
             }
         }
@@ -377,22 +395,24 @@ final class AppcastDownloader {
         func parser(_ parser: XMLParser, foundCharacters string: String) {
             if currentElement == "description" {
                 releaseNotesHTML = (releaseNotesHTML ?? "") + string.trimmingCharacters(in: .whitespacesAndNewlines)
+            } else if currentElement == "sparkle:shortVersionString" {
+                marketingVersion = ((marketingVersion ?? "") + string.trimmingCharacters(in: .whitespacesAndNewlines))
             } else if currentElement == "sparkle:version" {
-                currentVersion = ((currentVersion ?? "") + string.trimmingCharacters(in: .whitespacesAndNewlines))
+                buildNumber = ((buildNumber ?? "") + string.trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
 
         func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
             if elementName == "item" {
-                if let releaseNotesHTML = releaseNotesHTML, let version = currentVersion {
-                    let releaseNotesPath = specificDir.appendingPathComponent("duckduckgo-\(version).html").path
+                if let releaseNotesHTML = releaseNotesHTML, let versionIdentifier = currentVersionIdentifier {
+                    let releaseNotesPath = specificDir.appendingPathComponent("duckduckgo-\(versionIdentifier).html").path
                     do {
                         try releaseNotesHTML.write(toFile: releaseNotesPath, atomically: true, encoding: .utf8)
                     } catch {
                         print("Failed to write release notes: \(error)")
                         exit(1)
                     }
-                    print("Release notes for \(version) saved into \(releaseNotesPath)")
+                    print("Release notes for \(versionIdentifier) saved into \(releaseNotesPath)")
                 }
             }
         }
