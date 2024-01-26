@@ -30,10 +30,9 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.vpn) {
 
-                if model.shouldShowLocationItem {
-                    PreferencePaneSection(UserText.vpnLocationTitle) {
-                        VPNLocationPreferenceItem(model: model.locationItem)
-                    }
+                PreferencePaneSection {
+                    TextMenuItemHeader(UserText.vpnLocationTitle)
+                    VPNLocationPreferenceItem(model: model.locationItem)
                 }
 
                 // SECTION: Manage VPN
