@@ -53,7 +53,7 @@ public final class NetworkProtectionPopover: NSPopover {
     public required init(controller: TunnelController,
                          onboardingStatusPublisher: OnboardingStatusPublisher,
                          statusReporter: NetworkProtectionStatusReporter,
-                         showLocationsAction: @escaping () async -> Void,
+                         appLauncher: AppLaunching,
                          menuItems: @escaping () -> [MenuItem],
                          agentLoginItem: LoginItem?) {
 
@@ -62,7 +62,7 @@ public final class NetworkProtectionPopover: NSPopover {
                                                       onboardingStatusPublisher: onboardingStatusPublisher,
                                                       statusReporter: statusReporter,
                                                       debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
-                                                      showLocationsAction: showLocationsAction,
+                                                      appLauncher: appLauncher,
                                                       menuItems: menuItems,
                                                       agentLoginItem: agentLoginItem)
 

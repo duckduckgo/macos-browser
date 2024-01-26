@@ -53,7 +53,7 @@ public final class StatusBarMenu: NSObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
-                showLocationsAction: @escaping () async -> Void,
+                appLauncher: AppLaunching,
                 menuItems: @escaping () -> [MenuItem],
                 agentLoginItem: LoginItem?) {
 
@@ -65,7 +65,7 @@ public final class StatusBarMenu: NSObject {
         popover = NetworkProtectionPopover(controller: controller,
                                            onboardingStatusPublisher: onboardingStatusPublisher,
                                            statusReporter: statusReporter,
-                                           showLocationsAction: showLocationsAction,
+                                           appLauncher: appLauncher,
                                            menuItems: menuItems,
                                            agentLoginItem: agentLoginItem)
         popover.behavior = .transient

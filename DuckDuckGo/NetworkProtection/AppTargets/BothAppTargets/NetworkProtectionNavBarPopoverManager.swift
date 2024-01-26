@@ -68,9 +68,7 @@ final class NetworkProtectionNavBarPopoverManager {
             let popover = NetworkProtectionPopover(controller: controller,
                                                    onboardingStatusPublisher: onboardingStatusPublisher,
                                                    statusReporter: statusReporter,
-                                                   showLocationsAction: {
-                await appLauncher.launchApp(withCommand: .showVPNLocations)
-            },
+                                                   appLauncher: appLauncher,
                                                    menuItems: {
                 let menuItems = [
                     NetworkProtectionStatusView.Model.MenuItem(

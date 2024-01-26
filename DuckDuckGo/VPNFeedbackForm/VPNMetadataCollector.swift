@@ -237,6 +237,8 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
                 onboardingState = "pending-extension-approval"
             case .userNeedsToAllowVPNConfiguration:
                 onboardingState = "pending-vpn-approval"
+            case .userNeedsToMoveAppToApplications:
+                onboardingState = "pending-move-to-applications"
             }
         }
 

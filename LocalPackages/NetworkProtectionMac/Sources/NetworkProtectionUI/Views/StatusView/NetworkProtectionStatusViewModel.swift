@@ -108,7 +108,7 @@ extension NetworkProtectionStatusView {
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
-                    showLocationsAction: @escaping () async -> Void,
+                    appLauncher: AppLaunching,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
                     runLoopMode: RunLoop.Mode? = nil) {
@@ -124,7 +124,7 @@ extension NetworkProtectionStatusView {
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
                                                                   statusReporter: statusReporter,
-                                                                  showLocationsAction: showLocationsAction)
+                                                                  appLauncher: appLauncher)
 
             connectionStatus = statusReporter.statusObserver.recentValue
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
@@ -289,7 +289,7 @@ extension NetworkProtectionStatusView {
                 switch step {
                 case .userNeedsToMoveAppToApplications:
                     return OnboardingStepView.Model(step: step) { [weak self] in
-                        // self?.tunnelControllerViewModel.
+                        self?.tunnelControllerViewModel.moveToApplications()
                     }
                 case .userNeedsToAllowExtension, .userNeedsToAllowVPNConfiguration:
                     return OnboardingStepView.Model(step: step) { [weak self] in

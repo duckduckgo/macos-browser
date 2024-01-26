@@ -18,6 +18,7 @@
 
 import Common
 import Foundation
+import AppKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -142,6 +143,11 @@ final class URLEventHandler {
         case AppLaunchCommand.showVPNLocations.launchURL:
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
             WindowControllersManager.shared.showLocationPickerSheet()
+        case AppLaunchCommand.moveAppToApplications.launchURL:
+#if !APPSTORE && !DBP
+            // this should be run after NSApplication.shared is set
+            PFMoveToApplicationsFolderIfNecessary()
+#endif
         default:
             return
         }
