@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1706033634940,
+    "version": 1706192562672,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1098,8 +1098,8 @@
                 }
             },
             "exceptions": [],
-            "minSupportedVersion": "1.68.0",
-            "hash": "04f130fe1e3e088c7859ef6aa4a64e5c"
+            "minSupportedVersion": "1.70.0",
+            "hash": "c90b300b1e5ab20c29a726c8de9fd2da"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -5502,6 +5502,12 @@
                                 ]
                             },
                             {
+                                "rule": "doubleclick.net/pixel",
+                                "domains": [
+                                    "sbs.com.au"
+                                ]
+                            },
+                            {
                                 "rule": "doubleclick.net",
                                 "domains": [
                                     "rocketnews24.com"
@@ -7312,6 +7318,16 @@
                             }
                         ]
                     },
+                    "tremorhub.com": {
+                        "rules": [
+                            {
+                                "rule": "tremorhub.com/getTVID",
+                                "domains": [
+                                    "sbs.com.au"
+                                ]
+                            }
+                        ]
+                    },
                     "trustpilot.com": {
                         "rules": [
                             {
@@ -7626,7 +7642,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "382d31e2e646df92c16cc183b57dc969"
+            "hash": "82ea04107975fb96d073fcf8816c7228"
         },
         "trackingCookies1p": {
             "settings": {
