@@ -92,6 +92,9 @@
 		1ED910D12B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */; };
 		1ED910D22B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */; };
 		1ED910D32B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */; };
+		1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
+		1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
+		1ED910D72B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		3143C8792B0D1F3D00382627 /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 3143C8782B0D1F3D00382627 /* DataBrokerProtection */; };
@@ -3249,6 +3252,7 @@
 		1E862A882A9FC01200F84D4B /* SubscriptionUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SubscriptionUI; sourceTree = "<group>"; };
 		1E8F997E2B221B3600AC5D34 /* Subscription */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Subscription; sourceTree = "<group>"; };
 		1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+IdentityTheftRestoration.swift"; sourceTree = "<group>"; };
+		1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTheftRestorationPagesUserScript.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionManager.swift; sourceTree = "<group>"; };
@@ -4741,6 +4745,7 @@
 			isa = PBXGroup;
 			children = (
 				1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */,
+				1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */,
 			);
 			path = ITR;
 			sourceTree = "<group>";
@@ -9552,6 +9557,7 @@
 				3706FB3D293F65D500E42796 /* FocusRingView.swift in Sources */,
 				3706FB3E293F65D500E42796 /* BookmarksBarViewModel.swift in Sources */,
 				3706FB3F293F65D500E42796 /* NSPopUpButtonView.swift in Sources */,
+				1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */,
 				3706FB40293F65D500E42796 /* ContextualMenu.swift in Sources */,
 				3706FB41293F65D500E42796 /* NavigationBarViewController.swift in Sources */,
 				4B7534CC2A1FD7EA00158A99 /* NetworkProtectionInviteDialog.swift in Sources */,
@@ -10601,6 +10607,7 @@
 				4B9579D12AC7AE700062CA31 /* SafariVersionReader.swift in Sources */,
 				4B9579D22AC7AE700062CA31 /* LoginFaviconView.swift in Sources */,
 				4B9579D32AC7AE700062CA31 /* FireproofDomainsViewController.swift in Sources */,
+				1ED910D72B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */,
 				4B9579D42AC7AE700062CA31 /* URLEventHandler.swift in Sources */,
 				3158B15E2B0BF76F00AF130C /* DataBrokerProtectionAppEvents.swift in Sources */,
 				4B9579D52AC7AE700062CA31 /* SupportedOsChecker.swift in Sources */,
@@ -11231,6 +11238,7 @@
 				3158B15C2B0BF76D00AF130C /* DataBrokerProtectionAppEvents.swift in Sources */,
 				4B723E0E26B0006300E14D75 /* LoginImport.swift in Sources */,
 				4B9DB03E2A983B24000927DB /* JoinWaitlistView.swift in Sources */,
+				1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */,
 				37534CA028113101002621E7 /* LazyLoadable.swift in Sources */,
 				EAE42800275D47FA00DAC26B /* ClickToLoadModel.swift in Sources */,
 				0230C0A3272080090018F728 /* KeyedCodingExtension.swift in Sources */,
