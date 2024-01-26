@@ -225,7 +225,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
-            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -489,7 +488,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
         if Pixel.isNewUser {
-            PixelExperiment.fireEmailProtectionEnabledPixel()
+            Pixel.fire(.emailEnabledInitial, limitTo: .initial)
         }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
@@ -506,7 +505,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
         if Pixel.isNewUser {
-            PixelExperiment.fireImportDataInitialPixel()
+            Pixel.fire(.importDataInitial, limitTo: .initial)
         }
     }
 

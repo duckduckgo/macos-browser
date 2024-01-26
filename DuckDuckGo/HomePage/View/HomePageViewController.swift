@@ -97,10 +97,8 @@ final class HomePageViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        if !PixelExperiment.isExperimentInstalled {
-            if OnboardingViewModel.isOnboardingFinished && Pixel.isNewUser {
-                Pixel.fire(.newTabInitial(), limitTo: .initial)
-            }
+        if OnboardingViewModel.isOnboardingFinished && Pixel.isNewUser {
+            Pixel.fire(.newTabInitial, limitTo: .initial)
         }
         subscribeToHistory()
     }
