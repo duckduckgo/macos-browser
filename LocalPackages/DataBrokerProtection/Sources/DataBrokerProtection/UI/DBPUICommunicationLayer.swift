@@ -36,6 +36,7 @@ protocol DBPUICommunicationDelegate: AnyObject {
     func startScanAndOptOut() -> Bool
     func getInitialScanState() async -> DBPUIInitialScanState
     func getMaintananceScanState() async -> DBPUIScanAndOptOutMaintenanceState
+    func getDataBrokers() async -> [DBPUIDataBroker]
 }
 
 enum DBPUIReceivedMethodName: String {
@@ -53,6 +54,7 @@ enum DBPUIReceivedMethodName: String {
     case startScanAndOptOut
     case initialScanStatus
     case maintenanceScanStatus
+    case getDataBrokers
 }
 
 enum DBPUISendableMethodName: String {
@@ -101,6 +103,7 @@ struct DBPUICommunicationLayer: Subfeature {
         case .startScanAndOptOut: return startScanAndOptOut
         case .initialScanStatus: return initialScanStatus
         case .maintenanceScanStatus: return maintenanceScanStatus
+        case .getDataBrokers: return getDataBrokers
         }
 
     }
@@ -262,6 +265,10 @@ struct DBPUICommunicationLayer: Subfeature {
         }
 
         return maintenanceScanStatus
+    }
+
+    func getDataBrokers(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
+        await delegate?.getDataBrokers()
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {
