@@ -290,4 +290,19 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
 
         return mapper.maintenanceScanState(brokerProfileQueryData)
     }
+
+    func getDataBrokers() async -> [DBPUIDataBroker] {
+        let dataBrokers = brokerProfileQueryData.map { $0.dataBroker }
+
+        let mappedData: [DBPUIDataBroker] = dataBrokers.flatMap { dataBroker -> [DBPUIDataBroker] in
+            var result: [DBPUIDataBroker] = []
+            result.append(DBPUIDataBroker(name: dataBroker.name))
+            for mirrorSite in dataBroker.mirrorSites {
+                result.append(DBPUIDataBroker(name: mirrorSite.name))
+            }
+            return result
+        }
+
+        return mappedData
+    }
 }
