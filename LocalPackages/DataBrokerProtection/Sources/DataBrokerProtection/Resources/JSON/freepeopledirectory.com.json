@@ -10,19 +10,16 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "b769c871-8ee8-4daf-981e-2258efb86b34",
+          "id": "815a1cd3-2577-4f43-a163-0cf4d22e66a4",
           "url": "https://www.freepeopledirectory.com/name/${firstName}-${lastName}/${state|upcase}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "fdae35ba-6f2c-47e9-8c04-49e666e08112",
+          "id": "10738ba0-bc6b-42ba-a37c-487ff3927dd5",
           "selector": ".whole-card",
           "profile": {
             "name": {
               "selector": ".card-title"
-            },
-            "age": {
-              "selector": ".//td[3]"
             },
             "addressCityState": {
               "selector": ".city"
