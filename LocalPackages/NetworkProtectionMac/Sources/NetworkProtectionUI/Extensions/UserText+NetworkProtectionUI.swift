@@ -42,6 +42,10 @@ final class UserText {
     static let networkProtectionOnboardingAllowVPNDescSuffix = NSLocalizedString("network.protection.onboarding.allow.vpn.desc.suffix", value: " when prompted to finish setting up Network Protection.", comment: "Non-bold suffix for the onboarding allow-VPN description")
     static let networkProtectionOnboardingAllowVPNAction = NSLocalizedString("network.protection.onboarding.allow.vpn.action", value: "Add VPN Configuration...", comment: "Action button title for the onboarding allow-VPN view")
 
+    static let networkProtectionOnboardingMoveToApplicationsTitle = NSLocalizedString("network.protection.onboarding.move.to.applications.title", value: "Move App to Applications Directory", comment: "Title for the onboarding move-app-to-applications step")
+    static let networkProtectionOnboardingMoveToApplicationsDesc = NSLocalizedString("network.protection.onboarding.move.to.applications.desc", value: "DuckDuckGo needs to be moved to the Applications directory to connect.", comment: "Description for the onboarding move-app-to-applications step")
+    static let networkProtectionOnboardingMoveToApplicationsAction = NSLocalizedString("network.protection.onboarding.move.to.applications.action", value: "Move to Applications...", comment: "Action buttn title for the onboarding move-app-to-applications step")
+
     // MARK: - Connection Status
 
     static let networkProtectionStatusDisconnected = NSLocalizedString("network.protection.status.disconnected", value: "Not connected", comment: "The label for the NetP VPN when disconnected")

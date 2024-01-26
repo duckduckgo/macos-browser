@@ -286,9 +286,17 @@ extension NetworkProtectionStatusView {
             case .completed:
                 return nil
             case .isOnboarding(let step):
-                return OnboardingStepView.Model(step: step) { [weak self] in
-                    self?.tunnelControllerViewModel.startNetworkProtection()
+                switch step {
+                case .userNeedsToMoveAppToApplications:
+                    return OnboardingStepView.Model(step: step) { [weak self] in
+                        // self?.tunnelControllerViewModel.
+                    }
+                case .userNeedsToAllowExtension, .userNeedsToAllowVPNConfiguration:
+                    return OnboardingStepView.Model(step: step) { [weak self] in
+                        self?.tunnelControllerViewModel.startNetworkProtection()
+                    }
                 }
+
             }
         }
     }

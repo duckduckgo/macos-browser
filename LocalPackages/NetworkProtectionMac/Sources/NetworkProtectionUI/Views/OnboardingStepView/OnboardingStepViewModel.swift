@@ -48,6 +48,8 @@ extension OnboardingStepView {
                 return .appleVaultIcon
             case .userNeedsToAllowVPNConfiguration:
                 return .appleVPNIcon
+            case .userNeedsToMoveAppToApplications:
+                return .appleApplicationsIcon
             }
         }
 
@@ -57,6 +59,8 @@ extension OnboardingStepView {
                 return UserText.networkProtectionOnboardingInstallExtensionTitle
             case .userNeedsToAllowVPNConfiguration:
                 return UserText.networkProtectionOnboardingAllowVPNTitle
+            case .userNeedsToMoveAppToApplications:
+                return UserText.networkProtectionOnboardingMoveToApplicationsTitle
             }
         }
 
@@ -74,6 +78,10 @@ extension OnboardingStepView {
                     .init(text: UserText.networkProtectionOnboardingAllowVPNDescAllow, isEmphasized: true),
                     .init(text: UserText.networkProtectionOnboardingAllowVPNDescSuffix),
                 ]
+            case .userNeedsToMoveAppToApplications:
+                return [
+                    .init(text: UserText.networkProtectionOnboardingMoveToApplicationsDesc)
+                ]
             }
         }
 
@@ -83,6 +91,8 @@ extension OnboardingStepView {
                 return UserText.networkProtectionOnboardingAllowExtensionAction
             case .userNeedsToAllowVPNConfiguration:
                 return UserText.networkProtectionOnboardingAllowVPNAction
+            case .userNeedsToMoveAppToApplications:
+                return UserText.networkProtectionOnboardingMoveToApplicationsAction
             }
         }
 
@@ -95,6 +105,8 @@ extension OnboardingStepView {
                     return .allowSysexScreenshotBigSur
                 }
             case .userNeedsToAllowVPNConfiguration:
+                return nil
+            case .userNeedsToMoveAppToApplications:
                 return nil
             }
         }

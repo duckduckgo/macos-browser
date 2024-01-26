@@ -66,6 +66,10 @@ public enum OnboardingStatus: RawRepresentable, Equatable {
 ///
 @frozen
 public enum OnboardingStep: String, Equatable {
+    /// The user needs to move the DuckDuckGo.app file to /Applications
+    ///
+    case userNeedsToMoveAppToApplications
+
     /// The user needs to allow the system extension in macOS
     ///
     case userNeedsToAllowExtension
