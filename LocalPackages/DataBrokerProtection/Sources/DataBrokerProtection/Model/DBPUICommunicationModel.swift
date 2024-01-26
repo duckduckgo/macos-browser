@@ -103,6 +103,12 @@ struct DBPUIAddressAtIndex: Codable {
 /// Message Object representing a data broker
 struct DBPUIDataBroker: Codable, Hashable {
     let name: String
+    let url: String
+
+    init(name: String) {
+        self.name = name
+        self.url = name
+    }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(name)
