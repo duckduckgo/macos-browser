@@ -1,0 +1,55 @@
+{
+  "name": "freepeopledirectory.com",
+  "version": "0.1.1",
+  "parent": "spokeo.com",
+  "addedDatetime": 1674540000000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "b769c871-8ee8-4daf-981e-2258efb86b34",
+          "url": "https://www.freepeopledirectory.com/name/${firstName}-${lastName}/${state|upcase}/${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "fdae35ba-6f2c-47e9-8c04-49e666e08112",
+          "selector": ".whole-card",
+          "profile": {
+            "name": {
+              "selector": ".card-title"
+            },
+            "age": {
+              "selector": ".//td[3]"
+            },
+            "addressCityState": {
+              "selector": ".city"
+            },
+            "addressCityStateList": {
+              "selector": ".//h3/span[contains(text(),'Lived In:')]/following-sibling::span"
+            },
+            "relativesList": {
+              "selector": ".//h3/span[contains(text(),'May Know:')]/following-sibling::span",
+              "separator": ","
+            },
+            "profileUrl": {
+              "selector": ".//a[@class='button']"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}
