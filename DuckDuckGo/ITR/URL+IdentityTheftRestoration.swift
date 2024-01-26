@@ -1,7 +1,7 @@
 //
-//  DuckDuckGoPrivacyPro.xcconfig
+//  URL+IdentityTheftRestoration.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 //  limitations under the License.
 //
 
-// Configuration settings file format documentation can be found at:
-// https://help.apple.com/xcode/#/dev745c5c974
+import Foundation
 
-#include "DuckDuckGo.xcconfig"
+public extension URL {
 
-FEATURE_FLAGS = FEEDBACK NETWORK_PROTECTION SPARKLE SUBSCRIPTION DBP NOSTRIPE
-PRODUCT_NAME = $(PRODUCT_NAME_PREFIX) Privacy Pro
-PRODUCT_MODULE_NAME = DuckDuckGo_Privacy_Browser
+    static var identityTheftRestoration: URL {
+        URL(string: "https://abrown.duckduckgo.com/identity-theft-restoration")!
+    }
+}

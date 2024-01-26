@@ -89,6 +89,9 @@
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
 		1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E402912A10D0051A99B /* PrivacyDashboard */; };
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
+		1ED910D12B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */; };
+		1ED910D22B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */; };
+		1ED910D32B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */; };
 		310E79BF294A19A8007C49E8 /* FireproofingReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */; };
 		311B262728E73E0A00FD181A /* TabShadowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B262628E73E0A00FD181A /* TabShadowConfig.swift */; };
 		3143C8792B0D1F3D00382627 /* DataBrokerProtection in Frameworks */ = {isa = PBXBuildFile; productRef = 3143C8782B0D1F3D00382627 /* DataBrokerProtection */; };
@@ -3245,6 +3248,7 @@
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		1E862A882A9FC01200F84D4B /* SubscriptionUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SubscriptionUI; sourceTree = "<group>"; };
 		1E8F997E2B221B3600AC5D34 /* Subscription */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Subscription; sourceTree = "<group>"; };
+		1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+IdentityTheftRestoration.swift"; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
 		3139A1512AA4B3C000969C7D /* DataBrokerProtectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionManager.swift; sourceTree = "<group>"; };
@@ -4731,6 +4735,14 @@
 				1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */,
 			);
 			path = OsVersion;
+			sourceTree = "<group>";
+		};
+		1ED910CF2B63A90C00936947 /* ITR */ = {
+			isa = PBXGroup;
+			children = (
+				1ED910D02B63A95400936947 /* URL+IdentityTheftRestoration.swift */,
+			);
+			path = ITR;
 			sourceTree = "<group>";
 		};
 		3171D6DC2889B6700068632A /* CookieManaged */ = {
@@ -6629,6 +6641,7 @@
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				31F28C4B28C8EE9000119F70 /* YoutubePlayer */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
+				1ED910CF2B63A90C00936947 /* ITR */,
 				4B677454255DC18000025BD8 /* Bridging.h */,
 				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
@@ -9436,6 +9449,7 @@
 				3706FAEB293F65D500E42796 /* HistoryMenu.swift in Sources */,
 				3706FAEC293F65D500E42796 /* ContentScopeFeatureFlagging.swift in Sources */,
 				3706FAED293F65D500E42796 /* OnboardingButtonStyles.swift in Sources */,
+				1ED910D22B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */,
 				3706FAEE293F65D500E42796 /* SaveIdentityPopover.swift in Sources */,
 				3706FAF0293F65D500E42796 /* YoutubePlayerNavigationHandler.swift in Sources */,
 				37197EA32942441D00394917 /* UserDialogRequest.swift in Sources */,
@@ -10635,6 +10649,7 @@
 				4B9579FB2AC7AE700062CA31 /* ConnectBitwardenViewModel.swift in Sources */,
 				4B9579FC2AC7AE700062CA31 /* NSNotificationName+DataImport.swift in Sources */,
 				4B9579FD2AC7AE700062CA31 /* StoredPermission.swift in Sources */,
+				1ED910D32B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */,
 				4B9579FE2AC7AE700062CA31 /* FirePopoverCollectionViewHeader.swift in Sources */,
 				4B9579FF2AC7AE700062CA31 /* FireViewController.swift in Sources */,
 				4B957A002AC7AE700062CA31 /* OutlineSeparatorViewCell.swift in Sources */,
@@ -11567,6 +11582,7 @@
 				3171D6DB2889B64D0068632A /* CookieManagedNotificationContainerView.swift in Sources */,
 				B6E61EE3263AC0C8004E11AB /* FileManagerExtension.swift in Sources */,
 				B6DB3CFB26A17CB800D459B7 /* PermissionModel.swift in Sources */,
+				1ED910D12B63A95400936947 /* URL+IdentityTheftRestoration.swift in Sources */,
 				4B92929C26670D2A00AD2C21 /* PasteboardFolder.swift in Sources */,
 				3171D6B82889849F0068632A /* CookieManagedNotificationView.swift in Sources */,
 				EEA3EEB32B24EC0600E8333A /* VPNLocationViewModel.swift in Sources */,

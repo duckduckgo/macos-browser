@@ -108,7 +108,8 @@ enum Preferences {
             }, openPersonalInformationRemoval: {
                 NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             }, openIdentityTheftRestoration: {
-                NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+//                NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+                WindowControllersManager.shared.show(url: .identityTheftRestoration, source: .ui, newTab: true)
             })
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
