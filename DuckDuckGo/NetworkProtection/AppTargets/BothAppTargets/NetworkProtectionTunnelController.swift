@@ -86,6 +86,10 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
+    // MARK: - Status Observer
+
+    let statusObserver: ConnectionStatusObserver
+
     // MARK: - Tunnel Manager
 
     /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
@@ -126,8 +130,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
          proxyController: ProxyController,
+         statusObserver: ConnectionStatusObserver,
          settings: VPNSettings,
-         notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
@@ -135,10 +139,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
         self.proxyController = proxyController
+        self.statusObserver = statusObserver
         self.settings = settings
         self.tokenStore = tokenStore
 
         subscribeToSettingsChanges()
+        subscribeToStatusChanges()
     }
 
     // MARK: - Tunnel Settings
@@ -240,6 +246,23 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
+    }
+
+    // MARK: - Status Changes
+
+    private func subscribeToStatusChanges() {
+        statusObserver.publisher.sink { status in
+            Task {
+                switch status {
+                case .connected:
+                    try? await self.proxyController.start()
+                case .disconnected:
+                    await self.proxyController.stop()
+                default:
+                    break
+                }
+            }
+        }.store(in: &cancellables)
     }
 
     // MARK: - Tunnel Configuration
@@ -423,12 +446,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
             await stop()
             controllerErrorStore.lastErrorMessage = error.localizedDescription
         }
-
-        do {
-            try await proxyController.start()
-        } catch {
-            print(error.localizedDescription)
-        }
     }
 
     private func start(_ tunnelManager: NETunnelProviderManager) async throws {
@@ -481,8 +498,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     @MainActor
     func stop() async {
-        await proxyController.stop()
-
         guard let tunnelManager = await loadTunnelManager() else {
             return
         }
