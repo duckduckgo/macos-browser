@@ -1,7 +1,7 @@
 //
 //  TransparentProxyController.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import SystemExtensions
 /// Controller for ``TransparentProxyProvider``
 ///
 @MainActor
-public final class ProxyController {
+public final class TransparentProxyController {
 
     public typealias ManagerSetupCallback = (_ manager: NETransparentProxyManager) async -> Void
 
@@ -35,18 +35,35 @@ public final class ProxyController {
     ///
     public let setup: ManagerSetupCallback
 
+    /// Whether the proxy settings should be stored in the provider configuration.
+    ///
+    /// We recommend setting this to true if the provider is running in a System Extension and can't access
+    /// shared `TransparentProxySettings`.  If the provider is in an App Extension you should instead
+    /// use a shared `TransparentProxySettings` and set this to false.
+    ///
+    private let storeSettingsInProviderConfiguration: Bool
+
+    private let settings: TransparentProxySettings
+
     /// Default initializer.
     ///
     /// - Parameters:
-    ///     - extensionID: the bundleID of the extension containing the ``TransparentProxyProvider``.
+    ///     - extensionID: the bundleID for the extension that contains the ``TransparentProxyProvider``.
     ///         This class DOES NOT take any responsibility in installing the system extension.  It only uses
     ///         the extensionID to identify the appropriate manager configuration to load / save.
+    ///     - settings: the settings to use for this proxy.
     ///     - setup: a callback that will be called whenever a ``NETransparentProxyManager`` needs
     ///         to be setup.
     ///
-    public init(extensionID: String, setup: @escaping ManagerSetupCallback) {
+    public init(extensionID: String,
+                storeSettingsInProviderConfiguration: Bool,
+                settings: TransparentProxySettings,
+                setup: @escaping ManagerSetupCallback) {
+
         self.extensionID = extensionID
+        self.settings = settings
         self.setup = setup
+        self.storeSettingsInProviderConfiguration = storeSettingsInProviderConfiguration
     }
 
     /// Loads the configuration matching our ``extensionID``.
@@ -65,6 +82,7 @@ public final class ProxyController {
         let manager = await loadExisting() ?? NETransparentProxyManager()
 
         await setup(manager)
+        setupAdditionalProviderConfiguration(manager)
 
         do {
             try await manager.saveToPreferences()
@@ -74,6 +92,22 @@ public final class ProxyController {
         }
 
         return manager
+    }
+
+    private func setupAdditionalProviderConfiguration(_ manager: NETransparentProxyManager) {
+        guard storeSettingsInProviderConfiguration else {
+            return
+        }
+
+        guard var providerConfiguration = (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration,
+              let encodedSettings = try? JSONEncoder().encode(settings.snapshot()) else {
+
+            assertionFailure("Could not set provider configuration, proxy will fail to start up")
+            //os_log("Could not set provider configuration, proxy will fail to start up")
+            return
+        }
+
+        providerConfiguration[TransparentProxySettingsSnapshot.key] = encodedSettings as NSData
     }
 
     /// Queries Network Protection to know if its VPN is connected.
@@ -95,12 +129,9 @@ public final class ProxyController {
         }
     }
 
-    public func start(dryMode: Bool = false) async throws {
+    public func start() async throws {
         let manager = try await loadOrCreateConfiguration()
-
-        try manager.connection.startVPNTunnel(options: [
-            "dryMode": NSNumber(value: dryMode)
-        ])
+        try manager.connection.startVPNTunnel(options: [:])
 
         do {
             try await enableOnDemand(tunnelManager: manager)

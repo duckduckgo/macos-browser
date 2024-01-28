@@ -23,9 +23,12 @@ import Foundation
 import AppKit
 import Common
 import LoginItems
+import NetworkProtectionProxy
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
+
+    private let transparentProxySettings = TransparentProxySettings(defaults: .netP)
 
     private let waitlistTokenItem = NSMenuItem(title: "Waitlist Token:")
     private let waitlistTimestampItem = NSMenuItem(title: "Waitlist Timestamp:")
@@ -41,6 +44,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let customURLLabelMenuItem = NSMenuItem(title: "")
 
     private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
+
+    private let excludeDBPTrafficFromVPN = NSMenuItem(title: "Exclude DBP traffic from VPN", action: #selector(DataBrokerProtectionDebugMenu.toggleExcludeDBPTrafficFromVPN))
 
     // swiftlint:disable:next function_body_length
     init() {
@@ -80,6 +85,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                     .targetting(self)
 
                 NSMenuItem(title: "Restart", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentRestart))
+                    .targetting(self)
+
+                NSMenuItem.separator()
+
+                NSMenuItem(title: "Open interactive browser", action: #selector(DataBrokerProtectionDebugMenu.openInteractiveBrowserInAgent))
                     .targetting(self)
             }
 
@@ -127,6 +137,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 customURLLabelMenuItem
             }
 
+            NSMenuItem(title: "VPN Integration") {
+                excludeDBPTrafficFromVPN.targetting(self)
+            }
+
             NSMenuItem.separator()
 
             NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
@@ -143,6 +157,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     override func update() {
         updateWaitlistItems()
         updateWebUIMenuItemsState()
+        updateVPNIntegrationItems()
     }
 
     // MARK: - Menu functions
@@ -236,6 +251,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         window.delegate = self
     }
 
+    @objc private func openInteractiveBrowserInAgent() {
+        DataBrokerProtectionManager.shared.openInteractiveBrowserInAgent()
+    }
+
     @objc private func resetWaitlistState() {
         DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         KeychainAuthenticationData().reset()
@@ -268,6 +287,17 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         Task {
             try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
         }
+    }
+
+    @objc private func toggleExcludeDBPTrafficFromVPN() {
+        switch transparentProxySettings.excludeDBP {
+        case .dontExclude:
+            let appIdentifier = AppIdentifier(bundleID: Bundle.main.dbpBackgroundAgentBundleId)
+            transparentProxySettings.excludeDBP = .exclude(appIdentifier)
+        case .exclude:
+            transparentProxySettings.excludeDBP = .dontExclude
+        }
+        transparentProxySettings.excludeDBP = .dontExclude
     }
 
     // MARK: - Utility Functions
@@ -318,6 +348,15 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         waitlistTermsAndConditionsAcceptedItem.title = "T&C Accepted: \(accepted ? "Yes" : "No")"
 
         waitlistBypassItem.state = DefaultDataBrokerProtectionFeatureVisibility.bypassWaitlist ? .on : .off
+    }
+
+    private func updateVPNIntegrationItems() {
+        switch transparentProxySettings.excludeDBP {
+        case .dontExclude:
+            excludeDBPTrafficFromVPN.state = .off
+        case .exclude:
+            excludeDBPTrafficFromVPN.state = .on
+        }
     }
 }
 

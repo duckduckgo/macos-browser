@@ -1,7 +1,7 @@
 //
 //  TransparentProxyProvider.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -21,7 +21,13 @@ import NetworkExtension
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SystemConfiguration
 
-public final class TransparentProxyProvider: NETransparentProxyProvider {
+open class TransparentProxyProvider: NETransparentProxyProvider {
+
+    public enum StartError: Error {
+        case missingVendorOptions
+    }
+
+    public typealias LoadOptionsCallback = (_ options: [String: Any]?) throws -> Void
 
     var tcpFlowManagers = Set<TCPFlowManager>()
     var udpFlowManagers = Set<UDPFlowManager>()
@@ -32,24 +38,47 @@ public final class TransparentProxyProvider: NETransparentProxyProvider {
     private let bMonitor = NWPathMonitor()
     var interface: NWInterface?
 
-    private var dryMode = false
+    /// Whether the proxy settings should be loaded from the provider configuration.
+    ///
+    /// We recommend setting this to true if the provider is running in a System Extension and can't access
+    /// shared `TransparentProxySettings`.  If the provider is in an App Extension you should instead
+    /// use a shared `TransparentProxySettings` and set this to false.
+    ///
+    public var loadSettingsFromProviderConfiguration: Bool
+    public var settings: TransparentProxySettings
 
-    override public func startProxy(options: [String: Any]?, completionHandler: @escaping (Error?) -> Void) {
+    // MARK: - Init
 
-        dryMode = options?["dryMode"] as? Bool ?? false
+    public init(loadSettingsFromProviderConfiguration: Bool, settings: TransparentProxySettings) {
+        self.loadSettingsFromProviderConfiguration = loadSettingsFromProviderConfiguration
+        self.settings = settings
+    }
 
-        // Add code here to start the process of connecting the tunnel.
-        os_log("🤌 Started")
+    private func loadProviderConfiguration() throws {
+        guard loadSettingsFromProviderConfiguration else {
+            return
+        }
 
-        let proxySettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
+        guard let providerConfiguration = (protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration,
+              let encodedSettings = providerConfiguration[TransparentProxySettingsSnapshot.key] as? Data else {
 
-        proxySettings.excludedNetworkRules = [
+            throw StartError.missingVendorOptions
+        }
+
+        let snapshot = try JSONDecoder().decode(TransparentProxySettingsSnapshot.self, from: encodedSettings)
+        settings.apply(snapshot)
+    }
+
+    private func makeNetworkSettings() -> NETransparentProxyNetworkSettings {
+        let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
+
+        networkSettings.excludedNetworkRules = [
             // We want to make sure DNS queries are still resolved through the VPN
             // This will need to be updated dynamically by the VPN.
             NENetworkRule(destinationNetwork: .init(hostname: "10.11.12.1", port: "0"), prefix: 32, protocol: .any)
         ]
 
-        proxySettings.includedNetworkRules = [
+        networkSettings.includedNetworkRules = [
             NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .TCP, direction: .outbound)
             //NENetworkRule(destinationNetwork: NWHostEndpoint(hostname: "0.0.0.0", port: "443"), prefix: 0, protocol: .TCP),
             //NENetworkRule(destinationNetwork: NWHostEndpoint(hostname: "0.0.0.0", port: "80"), prefix: 0, protocol: .TCP),
@@ -58,6 +87,20 @@ public final class TransparentProxyProvider: NETransparentProxyProvider {
         ]
 
         //let tunnelSettings = NETunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
+        return networkSettings
+    }
+
+    override public func startProxy(options: [String: Any]?, completionHandler: @escaping (Error?) -> Void) {
+
+        // Add code here to start the process of connecting the tunnel.
+        os_log("🤌 Started")
+
+        do {
+            try loadProviderConfiguration()
+        } catch {
+            completionHandler(error)
+            return
+        }
 
         bMonitor.pathUpdateHandler = { [weak self] path in
             self?.interface = path.availableInterfaces.first { interface in
@@ -86,7 +129,7 @@ public final class TransparentProxyProvider: NETransparentProxyProvider {
         nw_path_monitor_start(monitor)
 
         os_log("🤌 Starting up tunnel")
-        setTunnelNetworkSettings(proxySettings) { error in
+        setTunnelNetworkSettings(makeNetworkSettings()) { error in
             if let applyError = error {
                 os_log("🤌 Failed to apply proxy settings: %{public}@", applyError.localizedDescription)
             }
@@ -122,14 +165,14 @@ public final class TransparentProxyProvider: NETransparentProxyProvider {
                String(describing: flow.metaData.filterFlowIdentifier?.uuidString),
                String(describing: flow.metaData.sourceAppSigningIdentifier))
 
-        guard !dryMode else {
+        guard !settings.dryMode else {
             return false
         }
 
         //os_log("🤌 New flow to %{public}@", String(describing: flow.remoteHostname))
         //os_log("🤌 Metadata %{public}@", String(describing: flow.metaData))
 
-        guard isOwnedByTargetApp(flow) else {
+        guard isFromExcludedApp(flow) else {
             //os_log("🤌 Ignoring app!")
             return false
         }
@@ -166,11 +209,11 @@ public final class TransparentProxyProvider: NETransparentProxyProvider {
                String(describing: flow.metaData.filterFlowIdentifier?.uuidString),
                String(describing: flow.metaData.sourceAppSigningIdentifier))
 
-        guard !dryMode else {
+        guard !settings.dryMode else {
             return false
         }
 
-        guard isOwnedByTargetApp(flow) else {
+        guard isFromExcludedApp(flow) else {
             os_log("🤌 Ignoring app!")
             return false
         }
@@ -202,7 +245,20 @@ public final class TransparentProxyProvider: NETransparentProxyProvider {
         return "🤌 Transparent proxy processed message".data(using: .utf8)
     }
 
-    private func isOwnedByTargetApp(_ flow: NEAppProxyFlow) -> Bool {
-        flow.metaData.sourceAppSigningIdentifier.hasPrefix("com.duckduckgo.macos.browser")
+    private func isFromExcludedApp(_ flow: NEAppProxyFlow) -> Bool {
+
+        if case FeatureExclusion.exclude(let appIdentifier) = settings.excludeDBP,
+           flow.metaData.sourceAppSigningIdentifier == appIdentifier.bundleID {
+
+            os_log("🤌 Excluding DBP app traffic")
+            return true
+        }
+
+        for app in settings.excludedApps where flow.metaData.sourceAppSigningIdentifier == app.bundleID {
+            os_log("🤌 Excluding app traffic")
+            return true
+        }
+
+        return false
     }
 }

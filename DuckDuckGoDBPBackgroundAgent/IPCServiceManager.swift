@@ -17,10 +17,10 @@
 //
 
 import Combine
-import Foundation
-import DataBrokerProtection
-import PixelKit
 import Common
+import DataBrokerProtection
+import Foundation
+import PixelKit
 
 /// Manages the IPC service for the Agent app
 ///
@@ -33,6 +33,10 @@ final class IPCServiceManager {
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private var cancellables = Set<AnyCancellable>()
 
+#if DEBUG || REVIEW
+    private var interactiveBrowserManager: InteractiveBrowserWindowManager
+#endif
+
     init(ipcServer: DataBrokerProtectionIPCServer = .init(machServiceName: Bundle.main.bundleIdentifier!),
          scheduler: DataBrokerProtectionScheduler,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>) {
@@ -40,6 +44,10 @@ final class IPCServiceManager {
         self.ipcServer = ipcServer
         self.scheduler = scheduler
         self.pixelHandler = pixelHandler
+
+#if DEBUG || REVIEW
+        interactiveBrowserManager = InteractiveBrowserWindowManager()
+#endif
 
         ipcServer.serverDelegate = self
         ipcServer.activate()
@@ -102,4 +110,14 @@ extension IPCServiceManager: IPCServerInterface {
         pixelHandler.fire(.ipcServerRunAllOperations)
         scheduler.runAllOperations(showWebView: showWebView)
     }
+
+#if DEBUG || REVIEW
+
+    func openInteractiveBrowser() {
+        Task { @MainActor in
+            interactiveBrowserManager.show()
+        }
+    }
+
+#endif
 }

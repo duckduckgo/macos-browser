@@ -24,7 +24,7 @@ import SwiftUI
 import Common
 import NetworkExtension
 import NetworkProtection
-import NetworkProtectionController
+import NetworkProtectionProxy
 import NetworkProtectionUI
 import SystemExtensionManager
 import SystemExtensions
@@ -38,7 +38,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Proxy Controller
 
-    private let proxyController: ProxyController
+    private let proxyController: TransparentProxyController
 
     // MARK: - Settings
 
@@ -129,7 +129,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
-         proxyController: ProxyController,
+         proxyController: TransparentProxyController,
          statusObserver: ConnectionStatusObserver,
          settings: VPNSettings,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
@@ -172,9 +172,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private func handleSettingsChange(_ change: VPNSettings.Change) async throws {
         switch change {
-        case .setExcludedApps(let excludedApps):
-            // TODO: implement handling of this
-            break
         case .setIncludeAllNetworks(let includeAllNetworks):
             try await handleSetIncludeAllNetworks(includeAllNetworks)
         case .setEnforceRoutes(let enforceRoutes):

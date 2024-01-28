@@ -23,7 +23,7 @@ import LoginItems
 import Networking
 import NetworkExtension
 import NetworkProtection
-import NetworkProtectionController
+import NetworkProtectionProxy
 import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
@@ -68,10 +68,22 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
 #endif
 
+    private var storeProxySettingsInProviderConfiguration: Bool {
+#if NETP_SYSTEM_EXTENSION
+        true
+#else
+        false
+#endif
+    }
+
     private lazy var tunnelSettings = VPNSettings(defaults: .netP)
+    private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
 
     @MainActor
-    private lazy var proxyController = ProxyController(extensionID: networkExtensionBundleID) { [weak self] manager in
+    private lazy var proxyController = TransparentProxyController(
+        extensionID: networkExtensionBundleID,
+        storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
+        settings: proxySettings) { [weak self] manager in
 
         guard let self else { return }
 

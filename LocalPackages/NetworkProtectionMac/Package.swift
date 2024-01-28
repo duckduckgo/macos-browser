@@ -26,7 +26,6 @@ let package = Package(
         .macOS("11.4")
     ],
     products: [
-        .library(name: "NetworkProtectionController", targets: ["NetworkProtectionController"]),
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
         .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
@@ -37,17 +36,6 @@ let package = Package(
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
-        // MARK: - NetworkProtectionController
-
-        .target(
-            name: "NetworkProtectionController",
-            dependencies: [],
-            swiftSettings: [
-                .define("DEBUG", .when(configuration: .debug))
-            ],
-            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
-        ),
-
         // MARK: - NetworkProtectionIPC
 
         .target(
