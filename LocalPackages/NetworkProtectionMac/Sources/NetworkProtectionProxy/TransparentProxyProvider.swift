@@ -76,7 +76,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         ]
 
         networkSettings.includedNetworkRules = [
-            NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .TCP, direction: .outbound)
+            NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
             //NENetworkRule(destinationNetwork: NWHostEndpoint(hostname: "0.0.0.0", port: "443"), prefix: 0, protocol: .TCP),
             //NENetworkRule(destinationNetwork: NWHostEndpoint(hostname: "0.0.0.0", port: "80"), prefix: 0, protocol: .TCP),
             //NENetworkRule(destinationHost: NWHostEndpoint(hostname: "google.com", port: "0"), protocol: .TCP)
