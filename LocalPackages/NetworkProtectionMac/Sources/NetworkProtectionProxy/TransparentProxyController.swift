@@ -99,15 +99,23 @@ public final class TransparentProxyController {
             return
         }
 
-        guard var providerConfiguration = (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration,
-              let encodedSettings = try? JSONEncoder().encode(settings.snapshot()) else {
-
-            assertionFailure("Could not set provider configuration, proxy will fail to start up")
-            //os_log("Could not set provider configuration, proxy will fail to start up")
+        guard let providerProtocol = manager.protocolConfiguration as? NETunnelProviderProtocol else {
+            assertionFailure("Could not retrieve providerProtocol. The proxy will fail to start up")
             return
         }
 
-        providerConfiguration[TransparentProxySettingsSnapshot.key] = encodedSettings as NSData
+        var providerConfiguration = providerProtocol.providerConfiguration ?? [String: Any]()
+
+        guard let encodedSettings = try? JSONEncoder().encode(settings.snapshot()),
+              let encodedSettingsString = String(data: encodedSettings, encoding: .utf8) else {
+
+            assertionFailure("Could not encode settings. The proxy will fail to start up")
+            return
+        }
+
+        providerConfiguration[TransparentProxySettingsSnapshot.key] = encodedSettingsString as NSString
+        providerProtocol.providerConfiguration = providerConfiguration
+
     }
 
     /// Queries Network Protection to know if its VPN is connected.

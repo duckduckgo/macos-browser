@@ -24,32 +24,17 @@ extension UserDefaults {
         "vpnProxyExcludeDBP"
     }
 
-    dynamic var vpnProxyExcludeDBP: FeatureExclusion {
+    dynamic var vpnProxyExcludeDBP: Bool {
         get {
-            guard let data = object(forKey: vpnProxyExcludeDBPKey) as? Data,
-                  let excludeDBP = try? JSONDecoder().decode(FeatureExclusion.self, from: data) else {
-                return .dontExclude
-            }
-
-            return excludeDBP
+            bool(forKey: vpnProxyExcludeDBPKey)
         }
 
         set {
-            if case .dontExclude = newValue {
-                removeObject(forKey: vpnProxyExcludeDBPKey)
-                return
-            }
-
-            guard let data = try? JSONEncoder().encode(newValue) else {
-                removeObject(forKey: vpnProxyExcludeDBPKey)
-                return
-            }
-
-            set(data, forKey: vpnProxyExcludeDBPKey)
+            set(newValue, forKey: vpnProxyExcludeDBPKey)
         }
     }
 
-    var vpnProxyExcludeDBPPublisher: AnyPublisher<FeatureExclusion, Never> {
+    var vpnProxyExcludeDBPPublisher: AnyPublisher<Bool, Never> {
         publisher(for: \.vpnProxyExcludeDBP).eraseToAnyPublisher()
     }
 

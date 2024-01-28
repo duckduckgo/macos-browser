@@ -28,13 +28,6 @@ public struct AppIdentifier: Codable {
     }
 }
 
-/// Just a convenient enum to make excluding features more semantically clear.
-///
-public enum FeatureExclusion: Codable {
-    case dontExclude
-    case exclude(_ appIdentifier: AppIdentifier)
-}
-
 public final class TransparentProxySettings {
     let defaults: UserDefaults
 
@@ -52,7 +45,7 @@ public final class TransparentProxySettings {
         }
     }
 
-    public var excludeDBP: FeatureExclusion {
+    public var excludeDBP: Bool {
         get {
             defaults.vpnProxyExcludeDBP
         }
@@ -89,6 +82,6 @@ public struct TransparentProxySettingsSnapshot: Codable {
     public static let key = "com.duckduckgo.TransparentProxySettingsSnapshot"
 
     public let dryMode: Bool
-    public let excludeDBP: FeatureExclusion
+    public let excludeDBP: Bool
     public let excludedApps: [AppIdentifier]
 }

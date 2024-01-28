@@ -38,29 +38,26 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     private let bMonitor = NWPathMonitor()
     var interface: NWInterface?
 
-    /// Whether the proxy settings should be loaded from the provider configuration.
-    ///
-    /// We recommend setting this to true if the provider is running in a System Extension and can't access
-    /// shared `TransparentProxySettings`.  If the provider is in an App Extension you should instead
-    /// use a shared `TransparentProxySettings` and set this to false.
-    ///
-    public var loadSettingsFromProviderConfiguration: Bool
-    public var settings: TransparentProxySettings
+    public let configuration: Configuration
+    public let settings: TransparentProxySettings
 
     // MARK: - Init
 
-    public init(loadSettingsFromProviderConfiguration: Bool, settings: TransparentProxySettings) {
-        self.loadSettingsFromProviderConfiguration = loadSettingsFromProviderConfiguration
+    public init(settings: TransparentProxySettings,
+                configuration: Configuration) {
+
+        self.configuration = configuration
         self.settings = settings
     }
 
     private func loadProviderConfiguration() throws {
-        guard loadSettingsFromProviderConfiguration else {
+        guard configuration.loadSettingsFromProviderConfiguration else {
             return
         }
 
         guard let providerConfiguration = (protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration,
-              let encodedSettings = providerConfiguration[TransparentProxySettingsSnapshot.key] as? Data else {
+              let encodedSettingsString = providerConfiguration[TransparentProxySettingsSnapshot.key] as? String,
+              let encodedSettings = encodedSettingsString.data(using: .utf8) else {
 
             throw StartError.missingVendorOptions
         }
@@ -91,9 +88,9 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     }
 
     override public func startProxy(options: [String: Any]?, completionHandler: @escaping (Error?) -> Void) {
-
-        // Add code here to start the process of connecting the tunnel.
-        os_log("🤌 Started")
+        os_log("🤌 Starting tunnel\n> configuration: %{public}@\n> options: %{public}@",
+               String(describing: configuration),
+               String(describing: options))
 
         do {
             try loadProviderConfiguration()
@@ -247,8 +244,12 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     private func isFromExcludedApp(_ flow: NEAppProxyFlow) -> Bool {
 
-        if case FeatureExclusion.exclude(let appIdentifier) = settings.excludeDBP,
-           flow.metaData.sourceAppSigningIdentifier == appIdentifier.bundleID {
+        if flow.metaData.sourceAppSigningIdentifier.hasPrefix("com.duckduckgo.macos") {
+            return true
+        }
+
+        if settings.excludeDBP
+            && flow.metaData.sourceAppSigningIdentifier == configuration.dbpAgentBundleID {
 
             os_log("🤌 Excluding DBP app traffic")
             return true

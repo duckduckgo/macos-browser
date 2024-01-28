@@ -290,14 +290,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func toggleExcludeDBPTrafficFromVPN() {
-        switch transparentProxySettings.excludeDBP {
-        case .dontExclude:
-            let appIdentifier = AppIdentifier(bundleID: Bundle.main.dbpBackgroundAgentBundleId)
-            transparentProxySettings.excludeDBP = .exclude(appIdentifier)
-        case .exclude:
-            transparentProxySettings.excludeDBP = .dontExclude
-        }
-        transparentProxySettings.excludeDBP = .dontExclude
+        transparentProxySettings.excludeDBP.toggle()
     }
 
     // MARK: - Utility Functions
@@ -351,12 +344,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     private func updateVPNIntegrationItems() {
-        switch transparentProxySettings.excludeDBP {
-        case .dontExclude:
-            excludeDBPTrafficFromVPN.state = .off
-        case .exclude:
-            excludeDBPTrafficFromVPN.state = .on
-        }
+        excludeDBPTrafficFromVPN.state = transparentProxySettings.excludeDBP ? .on : .off
     }
 }
 

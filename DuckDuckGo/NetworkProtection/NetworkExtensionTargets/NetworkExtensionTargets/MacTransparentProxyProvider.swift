@@ -22,7 +22,7 @@ import NetworkProtectionProxy
 
 final class MacTransparentProxyProvider: TransparentProxyProvider {
 
-    init() {
+    @objc init() {
         let loadSettingsFromStartupOptions: Bool = {
 #if NETP_SYSTEM_EXTENSION
             true
@@ -43,7 +43,10 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
 #endif
         }()
 
-        super.init(loadSettingsFromProviderConfiguration: loadSettingsFromStartupOptions,
-                   settings: settings)
+        let configuration = TransparentProxyProvider.Configuration(
+            dbpAgentBundleID: Bundle.main.dbpBackgroundAgentBundleId,
+            loadSettingsFromProviderConfiguration: loadSettingsFromStartupOptions)
+
+        super.init(settings: settings, configuration: configuration)
     }
 }
