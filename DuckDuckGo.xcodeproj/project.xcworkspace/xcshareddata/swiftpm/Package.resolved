@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "fcappelli/breakage_improvement_mac",
-        "revision" : "ce5701ccb7f5868d364fce5978729014f2d53c7a"
+        "revision" : "e4d8dca3e4a7ad56065c75363303624a2af3ab4a"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "branch" : "12-14-feat_macos_allow_direct_navigation_to_breakage_form",
-        "revision" : "97bcd73095bb9c306c638c0d5ff1299160b1256f"
+        "revision" : "c67d268bf234760f49034a0fe7a6137a1b216b05",
+        "version" : "3.2.0"
       }
     },
     {
