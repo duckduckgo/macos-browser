@@ -139,6 +139,9 @@ final class URLEventHandler {
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
         case AppLaunchCommand.shareFeedback.launchURL:
             WindowControllersManager.shared.showShareFeedbackModal()
+        case AppLaunchCommand.showVPNLocations.launchURL:
+            WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
+            WindowControllersManager.shared.showLocationPickerSheet()
         default:
             return
         }

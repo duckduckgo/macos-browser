@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1705931475791,
+    "version": 1706192562672,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1055,6 +1055,8 @@
         },
         "customUserAgent": {
             "settings": {
+                "defaultPolicy": "brand",
+                "defaultSites": [],
                 "webViewDefault": [
                     {
                         "domain": "accounts.google.com",
@@ -1076,7 +1078,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "ba77bfe2a8c42227b0d05dc501e29704"
+            "hash": "005f62f0e37756cedcc2acfcb4216966"
         },
         "dbp": {
             "state": "enabled",
@@ -1096,8 +1098,8 @@
                 }
             },
             "exceptions": [],
-            "minSupportedVersion": "1.68.0",
-            "hash": "04f130fe1e3e088c7859ef6aa4a64e5c"
+            "minSupportedVersion": "1.70.0",
+            "hash": "c90b300b1e5ab20c29a726c8de9fd2da"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -4240,6 +4242,9 @@
                     "domain": "tirerack.com"
                 },
                 {
+                    "domain": "sephora.com"
+                },
+                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -4261,7 +4266,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "1a1373bcf16647d63220659fce650a83"
+            "hash": "0e4353dbfbf35914b784ef12e0073447"
         },
         "harmfulApis": {
             "settings": {
@@ -5494,6 +5499,12 @@
                                 "domains": [
                                     "applesfera.com",
                                     "triblive.com"
+                                ]
+                            },
+                            {
+                                "rule": "doubleclick.net/pixel",
+                                "domains": [
+                                    "sbs.com.au"
                                 ]
                             },
                             {
@@ -7307,6 +7318,16 @@
                             }
                         ]
                     },
+                    "tremorhub.com": {
+                        "rules": [
+                            {
+                                "rule": "tremorhub.com/getTVID",
+                                "domains": [
+                                    "sbs.com.au"
+                                ]
+                            }
+                        ]
+                    },
                     "trustpilot.com": {
                         "rules": [
                             {
@@ -7621,7 +7642,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "382d31e2e646df92c16cc183b57dc969"
+            "hash": "82ea04107975fb96d073fcf8816c7228"
         },
         "trackingCookies1p": {
             "settings": {

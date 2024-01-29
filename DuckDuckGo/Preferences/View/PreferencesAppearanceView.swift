@@ -86,28 +86,24 @@ extension Preferences {
         @ObservedObject var model: AppearancePreferences
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-
-                // TITLE
-                TextMenuTitle(UserText.appearance)
+            PreferencePane(UserText.appearance) {
 
                 // SECTION 1: Theme
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.theme)
+                PreferencePaneSection(UserText.theme) {
+
                     ThemePicker()
                         .environmentObject(model)
                 }
 
                 // SECTION 2: Address Bar
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.addressBar)
+                PreferencePaneSection(UserText.addressBar) {
                     ToggleMenuItem(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
 
                 // SECTION 3: New Tab Page
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.newTabBottomPopoverTitle)
+                PreferencePaneSection(UserText.newTabBottomPopoverTitle) {
+
                     if model.isContinueSetUpAvailable {
                         ToggleMenuItem(UserText.newTabSetUpSectionTitle, isOn: $model.isContinueSetUpVisible)
                     }
@@ -116,8 +112,8 @@ extension Preferences {
                 }
 
                 // SECTION 4: Bookmarks Bar
-                PreferencePaneSection {
-                    TextMenuItemHeader("Bookmarks Bar")
+                PreferencePaneSection(UserText.showBookmarksBar) {
+
                     HStack {
                         ToggleMenuItem(UserText.showBookmarksBarPreference, isOn: $model.showBookmarksBar)
                         NSPopUpButtonView(selection: $model.bookmarksBarAppearance) {
@@ -137,8 +133,8 @@ extension Preferences {
                 }
 
                 // SECTION 5: Zoom Setting
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.zoomSettingTitle)
+                PreferencePaneSection(UserText.zoomSettingTitle) {
+
                     HStack {
                         Text(UserText.zoomPickerTitle)
                         NSPopUpButtonView(selection: $model.defaultPageZoom) {

@@ -26,13 +26,11 @@ extension Preferences {
         @ObservedObject var model: DownloadsPreferences
 
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                // TITLE
-                TextMenuTitle(UserText.downloads)
+            PreferencePane(UserText.downloads) {
 
                 // SECTION 1: Location
-                PreferencePaneSection {
-                    TextMenuItemHeader(UserText.downloadsLocation)
+                PreferencePaneSection(UserText.downloadsLocation) {
+
                     HStack {
                         NSPathControlView(url: model.selectedDownloadLocation)
 #if !APPSTORE

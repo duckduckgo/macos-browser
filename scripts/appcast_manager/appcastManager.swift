@@ -492,6 +492,17 @@ final class AppcastDownloader {
         var enclosureURL: String = ""
         var releaseNotesHTML: String?
         var currentVersion: String?
+        var currentVersionNumber: String?
+
+        var currentVersionIdentifier: String? {
+            guard let currentVersion else {
+                return nil
+            }
+            guard let currentVersionNumber, currentVersionNumber != currentVersion else {
+                return currentVersion
+            }
+            return [currentVersion, currentVersionNumber].joined(separator: ".")
+        }
 
         typealias DownloadFileCallback = (URL, URL, URLRequest.CachePolicy, @escaping (Error?) -> Void) -> Void
 
@@ -522,6 +533,7 @@ final class AppcastDownloader {
                 }
             } else if elementName == "item" {
                 currentVersion = nil
+                currentVersionNumber = nil
                 releaseNotesHTML = nil
             }
         }
@@ -529,22 +541,24 @@ final class AppcastDownloader {
         func parser(_ parser: XMLParser, foundCharacters string: String) {
             if currentElement == "description" {
                 releaseNotesHTML = (releaseNotesHTML ?? "") + string.trimmingCharacters(in: .whitespacesAndNewlines)
-            } else if currentElement == "sparkle:version" {
+            } else if currentElement == "sparkle:shortVersionString" {
                 currentVersion = ((currentVersion ?? "") + string.trimmingCharacters(in: .whitespacesAndNewlines))
+            } else if currentElement == "sparkle:version" {
+                currentVersionNumber = ((currentVersionNumber ?? "") + string.trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
 
         func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
             if elementName == "item" {
-                if let releaseNotesHTML = releaseNotesHTML, let version = currentVersion {
-                    let releaseNotesPath = specificDir.appendingPathComponent("duckduckgo-\(version).html").path
+                if let releaseNotesHTML = releaseNotesHTML, let versionIdentifier = currentVersionIdentifier {
+                    let releaseNotesPath = specificDir.appendingPathComponent("duckduckgo-\(versionIdentifier).html").path
                     do {
                         try releaseNotesHTML.write(toFile: releaseNotesPath, atomically: true, encoding: .utf8)
                     } catch {
                         print("❌ Failed to write release notes: \(error)")
                         exit(1)
                     }
-                    print("✅ Release notes for \(version) saved into \(releaseNotesPath)")
+                    print("✅ Release notes for \(versionIdentifier) saved into \(releaseNotesPath)")
                 }
             }
         }

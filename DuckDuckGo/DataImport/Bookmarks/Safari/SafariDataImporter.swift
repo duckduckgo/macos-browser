@@ -26,7 +26,6 @@ final class SafariDataImporter: DataImporter {
         let openPanel = NSOpenPanel()
         // if file does not exist, grant permission to its parent folder
         openPanel.directoryURL = fileUrl.deletingLastPathComponent()
-        openPanel.directoryURL = fileUrl
         openPanel.message = UserText.bookmarkImportSafariRequestPermissionButtonTitle
         openPanel.allowsOtherFileTypes = false
         openPanel.canChooseFiles = false

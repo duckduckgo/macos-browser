@@ -24,6 +24,7 @@ public protocol ManagementViewModel: ObservableObject {
     var isConnectingDevicesAvailable: Bool { get }
     var isAccountCreationAvailable: Bool { get }
     var isAccountRecoveryAvailable: Bool { get }
+    var isAppVersionNotSupported: Bool { get }
 
     var isSyncEnabled: Bool { get }
     var isCreatingAccount: Bool { get }
