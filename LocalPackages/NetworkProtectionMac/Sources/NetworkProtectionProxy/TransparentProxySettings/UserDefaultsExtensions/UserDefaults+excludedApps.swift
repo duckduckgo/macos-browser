@@ -71,7 +71,6 @@ extension UserDefaults {
         publisher(for: \.vpnProxyExcludedAppsData).map { [weak self] _ in
             self?.vpnProxyExcludedApps ?? []
         }.eraseToAnyPublisher()
-        //Just([]).eraseToAnyPublisher()
     }
 
     func resetVPNProxyExcludedApps() {

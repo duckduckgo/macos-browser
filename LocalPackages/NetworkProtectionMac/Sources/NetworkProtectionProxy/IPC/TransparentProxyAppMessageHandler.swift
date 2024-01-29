@@ -82,6 +82,8 @@ final class TransparentProxyAppMessageHandler {
             settings.excludeDBP = newValue
         case .excludedApps(let excludedApps):
             settings.excludedApps = excludedApps
+        case .excludedDomains(let excludedDomains):
+            settings.excludedDomains = excludedDomains
         }
     }
 }

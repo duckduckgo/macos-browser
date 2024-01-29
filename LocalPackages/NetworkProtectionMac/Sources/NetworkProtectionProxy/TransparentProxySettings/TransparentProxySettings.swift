@@ -34,6 +34,7 @@ public final class TransparentProxySettings {
         case dryMode(_ value: Bool)
         case excludeDBP(_ value: Bool)
         case excludedApps(_ excludedApps: [AppIdentifier])
+        case excludedDomains(_ excludedDomains: [String])
     }
 
     let defaults: UserDefaults
@@ -57,6 +58,12 @@ public final class TransparentProxySettings {
                 .removeDuplicates()
                 .map { excludedApps in
                     Change.excludedApps(excludedApps)
+                }.eraseToAnyPublisher(),
+            defaults.vpnProxyExcludedDomainsPublisher
+                .dropFirst()
+                .removeDuplicates()
+                .map { excludedDomains in
+                    Change.excludedDomains(excludedDomains)
                 }.eraseToAnyPublisher()
         ).eraseToAnyPublisher()
     }()
@@ -92,6 +99,16 @@ public final class TransparentProxySettings {
 
         set {
             defaults.vpnProxyExcludedApps = newValue
+        }
+    }
+
+    public var excludedDomains: [String] {
+        get {
+            defaults.vpnProxyExcludedDomains
+        }
+
+        set {
+            defaults.vpnProxyExcludedDomains = newValue
         }
     }
 

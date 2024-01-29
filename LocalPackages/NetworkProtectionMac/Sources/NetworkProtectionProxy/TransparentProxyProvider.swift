@@ -171,8 +171,8 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         //os_log("🤌 New flow to %{public}@", String(describing: flow.remoteHostname))
         //os_log("🤌 Metadata %{public}@", String(describing: flow.metaData))
 
-        guard isFromExcludedApp(flow) else {
-            //os_log("🤌 Ignoring app!")
+        guard needsRerouting(flow) else {
+            //os_log("🤌 Re-routing flow!")
             return false
         }
         os_log("🤌 New flow to %{public}@", String(describing: flow.remoteHostname))
@@ -212,8 +212,8 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             return false
         }
 
-        guard isFromExcludedApp(flow) else {
-            os_log("🤌 Ignoring app!")
+        guard needsRerouting(flow) else {
+            os_log("🤌 Re-routing flow!")
             return false
         }
 
@@ -238,6 +238,12 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         return true
     }
 
+    // MARK: - VPN exclusions logic
+
+    private func needsRerouting(_ flow: NEAppProxyFlow) -> Bool {
+        isFromExcludedApp(flow) || isToExcludedDomain(flow)
+    }
+
     private func isFromExcludedApp(_ flow: NEAppProxyFlow) -> Bool {
         if settings.excludeDBP
             && flow.metaData.sourceAppSigningIdentifier == configuration.dbpAgentBundleID {
@@ -248,6 +254,27 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
         for app in settings.excludedApps where flow.metaData.sourceAppSigningIdentifier == app.bundleID {
             os_log("🤌 Excluding app traffic")
+            return true
+        }
+
+        return false
+    }
+
+    private func isToExcludedDomain(_ flow: NEAppProxyFlow) -> Bool {
+        guard let remoteHostname = flow.remoteHostname else {
+
+            os_log("🤌🟢 Bailing out from domain exclusion check for flow with remote hostname %{public}@", String(describing: flow.remoteHostname))
+            //os_log("🤌🟢 Bailing out from domain exclusion check for flow %{public}@", flow)
+            return false
+        }
+
+        if !settings.excludedDomains.contains("google.com") {
+            os_log("🤌🟢 Adding google.com to domain exclusions for testing")
+            settings.excludedDomains.append("google.com")
+        }
+
+        for excludedDomain in settings.excludedDomains where remoteHostname.hasSuffix(excludedDomain) {
+            os_log("🤌🟢 Excluded!")
             return true
         }
 
