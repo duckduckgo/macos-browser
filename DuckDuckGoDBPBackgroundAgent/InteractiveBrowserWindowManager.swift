@@ -26,11 +26,11 @@ import WebKit
 ///
 /// This class is meant to aid with debugging and should not be included in release builds.
 /// .
-final class InteractiveBrowserWindowManager: NSObject {
+final class BrowserWindowManager: NSObject {
     private var interactiveBrowserWindow: NSWindow?
 
     @MainActor
-    func show() {
+    func show(domain: String) {
         if let interactiveBrowserWindow, interactiveBrowserWindow.isVisible {
             return
         }
@@ -50,7 +50,7 @@ final class InteractiveBrowserWindowManager: NSObject {
         window.contentView!.addSubview(webView)
 
         // Load a URL.
-        let url = URL(string: "https://www.whatismyip.com")!
+        let url = URL(string: domain)!
         let request = URLRequest(url: url)
         webView.load(request)
 
@@ -59,7 +59,7 @@ final class InteractiveBrowserWindowManager: NSObject {
     }
 }
 
-extension InteractiveBrowserWindowManager: NSWindowDelegate {
+extension BrowserWindowManager: NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
         interactiveBrowserWindow = nil
     }

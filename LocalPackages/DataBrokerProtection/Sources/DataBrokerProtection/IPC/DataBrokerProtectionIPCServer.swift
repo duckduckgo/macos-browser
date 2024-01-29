@@ -47,8 +47,9 @@ public protocol IPCServerInterface: AnyObject {
 
     // MARK: - Debugging Features
 
-    /// Opens an interactive browser.  Useful for
-    func openInteractiveBrowser()
+    /// Opens a browser window with the specified domain
+    ///
+    func openBrowser(domain: String)
 
 #endif
 }
@@ -85,8 +86,9 @@ protocol XPCServerInterface {
 
     // MARK: - Debugging Features
 
-    /// Opens an interactive browser.  Useful for
-    func openInteractiveBrowser()
+    /// Opens a browser window with the specified domain
+    ///
+    func openBrowser(domain: String)
 
 #endif
 }
@@ -166,8 +168,8 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
     }
 
 #if DEBUG || REVIEW
-    func openInteractiveBrowser() {
-        serverDelegate?.openInteractiveBrowser()
+    func openBrowser(domain: String) {
+        serverDelegate?.openBrowser(domain: domain)
     }
 #endif
 }

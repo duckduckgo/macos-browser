@@ -62,8 +62,8 @@ public final class DataBrokerProtectionManager {
 
     // MARK: - Debugging Features
 
-    public func openInteractiveBrowserInAgent() {
-        ipcClient.openInteractiveBrowser()
+    public func showAgentIPAddress() {
+        ipcClient.openBrowser(domain: "https://www.whatismyip.com")
     }
 #endif
 }

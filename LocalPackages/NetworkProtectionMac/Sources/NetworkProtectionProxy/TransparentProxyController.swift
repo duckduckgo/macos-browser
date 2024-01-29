@@ -16,8 +16,11 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import NetworkExtension
+import NetworkProtection
+import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SystemExtensions
 
 /// Controller for ``TransparentProxyProvider``
@@ -45,6 +48,10 @@ public final class TransparentProxyController {
 
     private let settings: TransparentProxySettings
 
+    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Initializers
+
     /// Default initializer.
     ///
     /// - Parameters:
@@ -65,6 +72,33 @@ public final class TransparentProxyController {
         self.setup = setup
         self.storeSettingsInProviderConfiguration = storeSettingsInProviderConfiguration
     }
+
+    // MARK: - Relay Settings Changes
+
+    private func subscribeToSettingsChanges() {
+        settings.changePublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: relay(_:))
+            .store(in: &cancellables)
+    }
+
+    private func relay(_ change: TransparentProxySettings.Change) {
+        Task { @MainActor in
+            guard await isConnected,
+                  let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: extensionID) else { return }
+
+            do {
+                try TransparentProxySession(activeSession).send(.changeSetting(change, responseHandler: {
+                    os_log("🤌 Setting change relay: All good")
+                }))
+            } catch {
+                // throw error?
+                os_log("🤌 Setting change relay: Some error! %{public}@", String(describing: error))
+            }
+        }
+    }
+
+    // MARK: - Setting up NETransparentProxyManager
 
     /// Loads the configuration matching our ``extensionID``.
     ///
@@ -118,6 +152,8 @@ public final class TransparentProxyController {
 
     }
 
+    // MARK: - Connection
+
     /// Queries Network Protection to know if its VPN is connected.
     ///
     /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
@@ -166,7 +202,7 @@ public final class TransparentProxyController {
         manager.connection.stopVPNTunnel()
     }
 
-    // MARK: - On Demand & Kill Switch
+    // MARK: - On Demand
 
     @MainActor
     func enableOnDemand(tunnelManager: NETransparentProxyManager) async throws {

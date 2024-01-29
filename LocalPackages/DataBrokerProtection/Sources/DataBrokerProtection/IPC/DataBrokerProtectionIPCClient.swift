@@ -153,10 +153,10 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
 
 #if DEBUG || REVIEW
 
-    public func openInteractiveBrowser() {
+    public func openBrowser(domain: String) {
         self.pixelHandler.fire(.ipcServerRunAllOperations)
         xpc.execute(call: { server in
-            server.openInteractiveBrowser()
+            server.openBrowser(domain: domain)
         }, xpcReplyErrorHandler: { error in
             os_log("Error \(error.localizedDescription)")
             // Intentional no-op as there's no completion block

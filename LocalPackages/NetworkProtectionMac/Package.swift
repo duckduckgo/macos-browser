@@ -54,7 +54,9 @@ let package = Package(
 
         .target(
             name: "NetworkProtectionProxy",
-            dependencies: [],
+            dependencies: [
+                .product(name: "NetworkProtection", package: "BrowserServicesKit")
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],

@@ -41,6 +41,8 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     public let configuration: Configuration
     public let settings: TransparentProxySettings
 
+    private lazy var appMessageHandler = TransparentProxyAppMessageHandler(settings: settings)
+
     // MARK: - Init
 
     public init(settings: TransparentProxySettings,
@@ -236,12 +238,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         return true
     }
 
-    override public func handleAppMessage(_ messageData: Data) async -> Data? {
-        os_log("🤌 Transparent proxy handling message: %{public}@", String(data: messageData, encoding: .utf8) ?? "null")
-
-        return "🤌 Transparent proxy processed message".data(using: .utf8)
-    }
-
     private func isFromExcludedApp(_ flow: NEAppProxyFlow) -> Bool {
 
         if flow.metaData.sourceAppSigningIdentifier.hasPrefix("com.duckduckgo.macos") {
@@ -261,5 +257,11 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         }
 
         return false
+    }
+
+    // MARK: - Communication with App
+
+    override public func handleAppMessage(_ messageData: Data) async -> Data? {
+        await appMessageHandler.handle(messageData)
     }
 }

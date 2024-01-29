@@ -34,7 +34,7 @@ final class IPCServiceManager {
     private var cancellables = Set<AnyCancellable>()
 
 #if DEBUG || REVIEW
-    private var interactiveBrowserManager: InteractiveBrowserWindowManager
+    private var browserWindowManager: BrowserWindowManager
 #endif
 
     init(ipcServer: DataBrokerProtectionIPCServer = .init(machServiceName: Bundle.main.bundleIdentifier!),
@@ -46,7 +46,7 @@ final class IPCServiceManager {
         self.pixelHandler = pixelHandler
 
 #if DEBUG || REVIEW
-        interactiveBrowserManager = InteractiveBrowserWindowManager()
+        browserWindowManager = BrowserWindowManager()
 #endif
 
         ipcServer.serverDelegate = self
@@ -113,9 +113,9 @@ extension IPCServiceManager: IPCServerInterface {
 
 #if DEBUG || REVIEW
 
-    func openInteractiveBrowser() {
+    func openBrowser(domain: String) {
         Task { @MainActor in
-            interactiveBrowserManager.show()
+            browserWindowManager.show(domain: domain)
         }
     }
 

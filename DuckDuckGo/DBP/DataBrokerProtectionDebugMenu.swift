@@ -89,7 +89,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
                 NSMenuItem.separator()
 
-                NSMenuItem(title: "Open interactive browser", action: #selector(DataBrokerProtectionDebugMenu.openInteractiveBrowserInAgent))
+                NSMenuItem(title: "Show agent IP address", action: #selector(DataBrokerProtectionDebugMenu.showAgentIPAddress))
                     .targetting(self)
             }
 
@@ -251,8 +251,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         window.delegate = self
     }
 
-    @objc private func openInteractiveBrowserInAgent() {
-        DataBrokerProtectionManager.shared.openInteractiveBrowserInAgent()
+    @objc private func showAgentIPAddress() {
+        DataBrokerProtectionManager.shared.showAgentIPAddress()
     }
 
     @objc private func resetWaitlistState() {

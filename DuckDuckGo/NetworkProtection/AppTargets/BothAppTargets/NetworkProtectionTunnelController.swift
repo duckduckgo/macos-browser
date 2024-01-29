@@ -221,21 +221,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     private func relaySettingsChange(_ change: VPNSettings.Change) async throws {
-        try await relaySettingsChangeToProxy(change)
-        try await relaySettingsChangeToTunnel(change)
-    }
-
-    private func relaySettingsChangeToProxy(_ change: VPNSettings.Change) async throws {
-        guard await proxyController.isConnected,
-              let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
-
-        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderRequest(.changeTunnelSetting(change))
-        if let errorMessage {
-            throw TunnelFailureError(errorDescription: errorMessage.value)
-        }
-    }
-
-    private func relaySettingsChangeToTunnel(_ change: VPNSettings.Change) async throws {
         guard await isConnected,
               let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
 

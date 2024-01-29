@@ -16,11 +16,12 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 
 /// This right now only includes
 ///
-public struct AppIdentifier: Codable {
+public struct AppIdentifier: Codable, Equatable {
     public let bundleID: String
 
     public init(bundleID: String) {
@@ -29,7 +30,36 @@ public struct AppIdentifier: Codable {
 }
 
 public final class TransparentProxySettings {
+    public enum Change: Codable {
+        case dryMode(_ value: Bool)
+        case excludeDBP(_ value: Bool)
+        case excludedApps(_ excludedApps: [AppIdentifier])
+    }
+
     let defaults: UserDefaults
+
+    private(set) public lazy var changePublisher: AnyPublisher<Change, Never> = {
+        Publishers.MergeMany(
+            defaults.vpnProxyDryModePublisher
+                .dropFirst()
+                .removeDuplicates()
+                .map { value in
+                    Change.dryMode(value)
+                }.eraseToAnyPublisher(),
+            defaults.vpnProxyExcludeDBPPublisher
+                .dropFirst()
+                .removeDuplicates()
+                .map { value in
+                    Change.excludeDBP(value)
+                }.eraseToAnyPublisher(),
+            defaults.vpnProxyExcludedAppsPublisher
+                .dropFirst()
+                .removeDuplicates()
+                .map { excludedApps in
+                    Change.excludedApps(excludedApps)
+                }.eraseToAnyPublisher()
+        ).eraseToAnyPublisher()
+    }()
 
     public init(defaults: UserDefaults) {
         self.defaults = defaults
