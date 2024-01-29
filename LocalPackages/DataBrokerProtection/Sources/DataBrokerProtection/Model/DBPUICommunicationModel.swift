@@ -104,10 +104,12 @@ struct DBPUIAddressAtIndex: Codable {
 struct DBPUIDataBroker: Codable, Hashable {
     let name: String
     let url: String
+    let date: Double?
 
-    init(name: String) {
+    init(name: String, date: Double? = nil) {
         self.name = name
         self.url = name
+        self.date = date
     }
 
     func hash(into hasher: inout Hasher) {

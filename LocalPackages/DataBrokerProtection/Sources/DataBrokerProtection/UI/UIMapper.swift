@@ -127,8 +127,11 @@ struct MapperToUI {
         let completedOptOuts = completedOptOutsDictionary.map { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
             DBPUIOptOutMatch(dataBroker: key, matches: value.count)
         }
-        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData)
-        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData)
+
+        let nearestScanByBrokerURL = nearestRunDates(for: brokerProfileQueryData)
+
+        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData, nearestScanOperationByBroker: nearestScanByBrokerURL)
+        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData, nearestScanOperationByBroker: nearestScanByBrokerURL)
 
         return DBPUIScanAndOptOutMaintenanceState(
             inProgressOptOuts: inProgressOptOuts,
@@ -140,7 +143,8 @@ struct MapperToUI {
 
     private func getLastScanInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                         currentDate: Date = Date(),
-                                        format: String = "dd/MM/yyyy") -> DBUIScanDate {
+                                        format: String = "dd/MM/yyyy",
+                                        nearestScanOperationByBroker: [String: Date]) -> DBUIScanDate {
         let scansGroupedByLastRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.lastRunDate?.toFormat(format) })
         let closestScansBeforeToday = scansGroupedByLastRunDate
             .filter { $0.key != nil && $0.key!.toDate(using: format) < currentDate }
@@ -148,12 +152,13 @@ struct MapperToUI {
             .flatMap { [$0.key?.toDate(using: format): $0.value] }
             .last
 
-        return scanDate(element: closestScansBeforeToday)
+        return scanDate(element: closestScansBeforeToday, nearestScanOperationByBroker: nearestScanOperationByBroker)
     }
 
     private func getNextScansInformation(brokerProfileQueryData: [BrokerProfileQueryData],
                                          currentDate: Date = Date(),
-                                         format: String = "dd/MM/yyyy") -> DBUIScanDate {
+                                         format: String = "dd/MM/yyyy",
+                                         nearestScanOperationByBroker: [String: Date]) -> DBUIScanDate {
         let scansGroupedByPreferredRunDate = Dictionary(grouping: brokerProfileQueryData, by: { $0.scanOperationData.preferredRunDate?.toFormat(format) })
         let closestScansAfterToday = scansGroupedByPreferredRunDate
             .filter { $0.key != nil && $0.key!.toDate(using: format) > currentDate }
@@ -161,18 +166,43 @@ struct MapperToUI {
             .flatMap { [$0.key?.toDate(using: format): $0.value] }
             .first
 
-        return scanDate(element: closestScansAfterToday)
+        return scanDate(element: closestScansAfterToday, nearestScanOperationByBroker: nearestScanOperationByBroker)
     }
 
-    private func scanDate(element: Dictionary<Date?, [BrokerProfileQueryData]>.Element?) -> DBUIScanDate {
+    // A dictionary containing the closest scan by broker
+    private func nearestRunDates(for brokerData: [BrokerProfileQueryData]) -> [String: Date] {
+        let today = Date()
+        let nearestDates = brokerData.reduce(into: [String: Date]()) { result, data in
+            // TODO: Change NAME to URL
+            let url = data.dataBroker.name
+            if let operationDate = data.scanOperationData.preferredRunDate {
+                if operationDate > today {
+                    if let existingDate = result[url] {
+                        if operationDate < existingDate {
+                            result[url] = operationDate
+                        }
+                    } else {
+                        result[url] = operationDate
+                    }
+                }
+            }
+        }
+        return nearestDates
+    }
+
+    private func scanDate(element: Dictionary<Date?, [BrokerProfileQueryData]>.Element?,
+                          nearestScanOperationByBroker: [String: Date]) -> DBUIScanDate {
         if let element = element, let date = element.key {
+
             return DBUIScanDate(
                 date: date.timeIntervalSince1970,
                 dataBrokers: element.value.flatMap {
-                    var brokers = [DBPUIDataBroker(name: $0.dataBroker.name)]
+                    // TODO: Change NAME to URL
+                    let brokerOperationDate = nearestScanOperationByBroker[$0.dataBroker.name]
 
+                    var brokers = [DBPUIDataBroker(name: $0.dataBroker.name, date: brokerOperationDate?.timeIntervalSince1970 ?? nil)]
                     for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: date) {
-                        brokers.append(DBPUIDataBroker(name: mirrorSite.name))
+                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, date: brokerOperationDate?.timeIntervalSince1970 ?? nil))
                     }
 
                     return brokers
