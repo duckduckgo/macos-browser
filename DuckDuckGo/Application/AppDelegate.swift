@@ -29,6 +29,7 @@ import DDGSync
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
+import PixelKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -116,8 +117,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if NSApplication.runType.requiresEnvironment {
 #if DEBUG
             Pixel.setUp(dryRun: true)
+            Self.setUpPixelKit(dryRun: true)
 #else
             Pixel.setUp()
+            Self.setUpPixelKit(dryRun: false)
 #endif
 
             Database.shared.loadStore { _, error in
@@ -357,6 +360,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private func applyPreferredTheme() {
         let appearancePreferences = AppearancePreferences()
         appearancePreferences.updateUserInterfaceStyle()
+    }
+
+    private static func setUpPixelKit(dryRun: Bool) {
+#if APPSTORE
+        let source = "browser-appstore"
+#else
+        let source = "browser-dmg"
+#endif
+
+        PixelKit.setUp(dryRun: dryRun,
+                       appVersion: AppVersion.shared.versionNumber,
+                       source: source,
+                       defaultHeaders: [:],
+                       log: .networkProtectionPixel,
+                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+
+            let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+            let request = APIRequest(configuration: configuration)
+
+            request.fetch { _, error in
+                onComplete(error == nil, error)
+            }
+        }
     }
 
     // MARK: - Sync
