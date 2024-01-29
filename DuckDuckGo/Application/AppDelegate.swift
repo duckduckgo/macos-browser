@@ -363,6 +363,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     }
 
     private static func setUpPixelKit(dryRun: Bool) {
+#if NETWORK_PROTECTION
 #if APPSTORE
         let source = "browser-appstore"
 #else
@@ -385,6 +386,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
                 onComplete(error == nil, error)
             }
         }
+#endif
     }
 
     // MARK: - Sync
