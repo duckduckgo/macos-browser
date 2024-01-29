@@ -77,6 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
+    var privacyDashboardWindow: NSWindow?
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
     private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
