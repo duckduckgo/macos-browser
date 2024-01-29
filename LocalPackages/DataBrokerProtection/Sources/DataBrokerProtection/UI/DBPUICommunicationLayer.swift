@@ -268,7 +268,8 @@ struct DBPUICommunicationLayer: Subfeature {
     }
 
     func getDataBrokers(params: Any, origin: WKScriptMessage) async throws -> Encodable? {
-        await delegate?.getDataBrokers()
+        let dataBrokers = await delegate?.getDataBrokers() ?? [DBPUIDataBroker]()
+        return DBPUIDataBrokerList(dataBrokers: dataBrokers)
     }
 
     func sendMessageToUI(method: DBPUISendableMethodName, params: DBPUISendableMessage, into webView: WKWebView) {
