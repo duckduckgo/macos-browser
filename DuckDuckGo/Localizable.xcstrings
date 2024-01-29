@@ -5185,13 +5185,13 @@
       }
     },
     "network.protection.navbar.status.view.share.feedback" : {
-      "comment" : "Menu item for 'Send Feedback' in the Network Protection status view that's shown in the navigation bar",
+      "comment" : "Menu item for 'Send VPN Feedback' in the Network Protection status view that's shown in the navigation bar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Send Feedback…"
+            "value" : "Send VPN Feedback…"
           }
         }
       }
@@ -9272,7 +9272,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Nearest Available"
+            "value" : "Nearest available"
           }
         }
       }

@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "fcappelli/breakage_improvement_mac",
-        "revision" : "e4d8dca3e4a7ad56065c75363303624a2af3ab4a"
+        "revision" : "5af8fbcff0913aa543ba3eea60cc24e706a3a4e5",
+        "version" : "103.0.0"
       }
     },
     {

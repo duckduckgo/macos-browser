@@ -100,12 +100,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     @Published var isConnectingDevicesAvailable: Bool = true
     @Published var isAccountCreationAvailable: Bool = true
     @Published var isAccountRecoveryAvailable: Bool = true
+    @Published var isAppVersionNotSupported: Bool = true
 
     private func updateSyncFeatureFlags(_ syncFeatureFlags: SyncFeatureFlags) {
         isDataSyncingAvailable = syncFeatureFlags.contains(.dataSyncing)
         isConnectingDevicesAvailable = syncFeatureFlags.contains(.connectFlows)
         isAccountCreationAvailable = syncFeatureFlags.contains(.accountCreation)
         isAccountRecoveryAvailable = syncFeatureFlags.contains(.accountRecovery)
+        isAppVersionNotSupported = syncFeatureFlags.unavailableReason == .appVersionNotSupported
     }
 
     var recoveryCode: String? {
