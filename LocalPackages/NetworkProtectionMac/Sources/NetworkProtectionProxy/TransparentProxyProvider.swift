@@ -239,11 +239,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     }
 
     private func isFromExcludedApp(_ flow: NEAppProxyFlow) -> Bool {
-
-        if flow.metaData.sourceAppSigningIdentifier.hasPrefix("com.duckduckgo.macos") {
-            return true
-        }
-
         if settings.excludeDBP
             && flow.metaData.sourceAppSigningIdentifier == configuration.dbpAgentBundleID {
 

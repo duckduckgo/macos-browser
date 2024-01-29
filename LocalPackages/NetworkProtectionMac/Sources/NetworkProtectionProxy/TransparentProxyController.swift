@@ -71,6 +71,8 @@ public final class TransparentProxyController {
         self.settings = settings
         self.setup = setup
         self.storeSettingsInProviderConfiguration = storeSettingsInProviderConfiguration
+
+        subscribeToSettingsChanges()
     }
 
     // MARK: - Relay Settings Changes
@@ -84,8 +86,9 @@ public final class TransparentProxyController {
 
     private func relay(_ change: TransparentProxySettings.Change) {
         Task { @MainActor in
-            guard await isConnected,
-                  let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: extensionID) else { return }
+            guard await isConnected, let activeSession = await activeSession() else {
+                return
+            }
 
             do {
                 try TransparentProxySession(activeSession).send(.changeSetting(change, responseHandler: {
@@ -150,6 +153,19 @@ public final class TransparentProxyController {
         providerConfiguration[TransparentProxySettingsSnapshot.key] = encodedSettingsString as NSString
         providerProtocol.providerConfiguration = providerConfiguration
 
+    }
+
+    // MARK: - Session
+
+    public func activeSession() async -> NETunnelProviderSession? {
+        guard let manager = await loadExisting(),
+              let session = manager.connection as? NETunnelProviderSession else {
+
+            // The active connection is not running, so there's no session, this is acceptable
+            return nil
+        }
+
+        return session
     }
 
     // MARK: - Connection

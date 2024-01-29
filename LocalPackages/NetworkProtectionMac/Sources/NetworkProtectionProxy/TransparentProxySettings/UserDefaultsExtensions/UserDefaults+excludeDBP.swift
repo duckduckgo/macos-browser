@@ -24,6 +24,7 @@ extension UserDefaults {
         "vpnProxyExcludeDBP"
     }
 
+    @objc
     dynamic var vpnProxyExcludeDBP: Bool {
         get {
             bool(forKey: vpnProxyExcludeDBPKey)

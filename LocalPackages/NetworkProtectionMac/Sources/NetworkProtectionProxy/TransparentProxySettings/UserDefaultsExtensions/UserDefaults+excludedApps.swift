@@ -20,13 +20,31 @@ import Combine
 import Foundation
 
 extension UserDefaults {
-    private var vpnProxyExcludedAppsKey: String {
-        "vpnProxyExcludedApps"
+    private var vpnProxyExcludedAppsDataKey: String {
+        "vpnProxyExcludedAppsData"
     }
 
-    dynamic var vpnProxyExcludedApps: [AppIdentifier] {
+    @objc
+    dynamic var vpnProxyExcludedAppsData: Data? {
         get {
-            guard let data = object(forKey: vpnProxyExcludedAppsKey) as? Data,
+            object(forKey: vpnProxyExcludedAppsDataKey) as? Data
+        }
+
+        set {
+            guard let newValue,
+               newValue.count > 0 else {
+
+                removeObject(forKey: vpnProxyExcludedAppsDataKey)
+                return
+            }
+
+            set(newValue, forKey: vpnProxyExcludedAppsDataKey)
+        }
+    }
+
+    var vpnProxyExcludedApps: [AppIdentifier] {
+        get {
+            guard let data = vpnProxyExcludedAppsData,
                   let excludedApps = try? JSONDecoder().decode([AppIdentifier].self, from: data) else {
                 return []
             }
@@ -36,24 +54,27 @@ extension UserDefaults {
 
         set {
             if newValue.isEmpty {
-                removeObject(forKey: vpnProxyExcludedAppsKey)
+                vpnProxyExcludedAppsData = nil
                 return
             }
 
             guard let data = try? JSONEncoder().encode(newValue) else {
-                removeObject(forKey: vpnProxyExcludedAppsKey)
+                vpnProxyExcludedAppsData = nil
                 return
             }
 
-            set(data, forKey: vpnProxyExcludedAppsKey)
+            vpnProxyExcludedAppsData = data
         }
     }
 
     var vpnProxyExcludedAppsPublisher: AnyPublisher<[AppIdentifier], Never> {
-        publisher(for: \.vpnProxyExcludedApps).eraseToAnyPublisher()
+        publisher(for: \.vpnProxyExcludedAppsData).map { [weak self] _ in
+            self?.vpnProxyExcludedApps ?? []
+        }.eraseToAnyPublisher()
+        //Just([]).eraseToAnyPublisher()
     }
 
     func resetVPNProxyExcludedApps() {
-        removeObject(forKey: vpnProxyExcludedAppsKey)
+        removeObject(forKey: vpnProxyExcludedAppsDataKey)
     }
 }
