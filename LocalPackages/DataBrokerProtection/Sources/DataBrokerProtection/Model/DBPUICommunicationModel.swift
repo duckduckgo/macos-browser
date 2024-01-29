@@ -115,6 +115,10 @@ struct DBPUIDataBroker: Codable, Hashable {
     }
 }
 
+struct DBPUIDataBrokerList: DBPUISendableMessage {
+    let dataBrokers: [DBPUIDataBroker]
+}
+
 /// Message Object representing a requested change to the user profile's brith year
 struct DBPUIBirthYear: Codable {
     let year: Int
