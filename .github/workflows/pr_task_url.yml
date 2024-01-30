@@ -60,3 +60,32 @@ jobs:
     - name: Report status
       run: |
         exit ${{ steps.check-task-url.outputs.failure }}
+
+  mark-waiting-for-release:
+
+    name: Move to Waiting for Release
+
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+
+    steps:
+      - name: Get Task ID
+        id: get-task-id
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          task_id=$(grep -i "task/issue url.*https://app.asana.com/" <<< "$BODY" \
+            | sed -E 's|.*https://(.*)|\1|' \
+            | cut -d '/' -f 4)
+          echo "task_id=$task_id" >> $GITHUB_OUTPUT
+
+      - name: Move to Waiting for Release
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+        run: |
+          curl -fLSs -X POST "https://app.asana.com/api/1.0/sections/${{ vars.MACOS_APP_BOARD_WAITING_FOR_RELEASE_SECTION_ID }}/addTask" \
+            -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --output /dev/null \
+            -d "{\"data\": {\"task\": \"${{ steps.get-task-id.outputs.task_id }}\"}}"
