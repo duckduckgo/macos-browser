@@ -21,6 +21,10 @@ import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import Foundation
 import ServiceManagement
 
+public enum SMLoginItemSetEnabledError: Error {
+    case failed
+}
+
 /// Takes care of enabling and disabling a login item.
 ///
 public struct LoginItem: Equatable, Hashable {
@@ -85,7 +89,10 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).register()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            let success = SMLoginItemSetEnabled(agentBundleID as CFString, true)
+            if !success {
+                throw SMLoginItemSetEnabledError.failed
+            }
         }
 
         launchInformation.updateLastEnabledTimestamp()
@@ -97,7 +104,10 @@ public struct LoginItem: Equatable, Hashable {
         if #available(macOS 13.0, *) {
             try SMAppService.loginItem(identifier: agentBundleID).unregister()
         } else {
-            SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            let success = SMLoginItemSetEnabled(agentBundleID as CFString, false)
+            if !success {
+                throw SMLoginItemSetEnabledError.failed
+            }
         }
     }
 
