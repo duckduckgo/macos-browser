@@ -35,13 +35,13 @@ jobs:
           | jq -r .data.projects[].gid)"
 
         if grep -q "\b${{ env.ASANA_PROJECT_ID }}\b" <<< $project_ids; then
-          echo "success=1" >> $GITHUB_OUTPUT
+          echo "failure=0" >> $GITHUB_OUTPUT
         else
-          echo "success=0" >> $GITHUB_OUTPUT
+          echo "failure=1" >> $GITHUB_OUTPUT
         fi
 
     - name: Comment on the PR
-      if: ${{ steps.check-task-url.outputs.success == '0' }}
+      if: ${{ steps.check-task-url.outputs.failure == '0' }}
       env:
         ASANA_PROJECT_NAME: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_NAME }}
       uses: marocchino/sticky-pull-request-comment@v2
@@ -51,7 +51,7 @@ jobs:
           :no_entry_sign: The Asana task linked in the PR description is not added to ${{ env.ASANA_PROJECT_NAME }} project.
 
     - name: Delete comment on the PR
-      if: ${{ steps.check-task-url.outputs.success == '1' }}
+      if: ${{ steps.check-task-url.outputs.failure == '1' }}
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         header: asana-task-check-status
@@ -59,4 +59,4 @@ jobs:
     
     - name: Report status
       run: |
-        exit ${{ steps.check-task-url.outputs.success }}
+        exit ${{ steps.check-task-url.outputs.failure }}
