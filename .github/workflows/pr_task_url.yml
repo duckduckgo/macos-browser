@@ -16,9 +16,10 @@ jobs:
     - name: Get Task ID
       id: get-task-id
       run: |
-        task_id=$(grep -i "task/issue url.*https://app.asana.com/" <<< ${{ github.event.pull_request.body }} \
-          | sed -E 's/.*(https.*)/\1/' \
-          | cut -d '/' -f 6)
+        body="${{ github.event.pull_request.body }}"
+        task_id=$(grep -i "task/issue url.*https://app.asana.com/" <<< $body \
+          | sed -E 's|.*https://(.*)|\1|' \
+          | cut -d '/' -f 4)
         echo "task_id=$task_id" >> $GITHUB_OUTPUT
 
     - name: Check Task URL
