@@ -33,7 +33,6 @@ struct VPNMetadata: Encodable {
         let appVersion: String
         let lastVersionRun: String
         let isInternalUser: Bool
-        let isAdminUser: String
         let isInApplicationsDirectory: Bool
     }
 
@@ -69,9 +68,11 @@ struct VPNMetadata: Encodable {
 
     struct LoginItemState: Encodable {
         let vpnMenuState: String
+        let vpnMenuIsRunning: Bool
 
 #if NETP_SYSTEM_EXTENSION
         let notificationsAgentState: String
+        let notificationsAgentIsRunning: Bool
 #endif
     }
 
@@ -158,14 +159,12 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
         let appVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
-        let isAdminUser = isAdminUser()
         let isInApplicationsDirectory = Bundle.main.isInApplicationsDirectory
 
         return .init(
             appVersion: appVersion,
             lastVersionRun: versionStore.lastVersionRun ?? "Unknown",
             isInternalUser: isInternalUser,
-            isAdminUser: isAdminUser,
             isInApplicationsDirectory: isInApplicationsDirectory
         )
     }
@@ -251,12 +250,21 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     func collectLoginItemState() -> VPNMetadata.LoginItemState {
         let vpnMenuState = String(describing: LoginItem.vpnMenu.status)
+        let vpnMenuIsRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: LoginItem.vpnMenu.agentBundleID).isEmpty
 
 #if NETP_SYSTEM_EXTENSION
         let notificationsAgentState = String(describing: LoginItem.notificationsAgent.status)
-        return .init(vpnMenuState: vpnMenuState, notificationsAgentState: notificationsAgentState)
+        let notificationsAgentIsRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: LoginItem.notificationsAgent.agentBundleID).isEmpty
+
+        return .init(
+            vpnMenuState: vpnMenuState,
+            vpnMenuIsRunning: vpnMenuIsRunning,
+            notificationsAgentState: notificationsAgentState,
+            notificationsAgentIsRunning: notificationsAgentIsRunning)
 #else
-        return .init(vpnMenuState: vpnMenuState)
+        return .init(
+            vpnMenuState: vpnMenuState,
+            vpnMenuIsRunning: vpnMenuIsRunning)
 #endif
     }
 
@@ -273,61 +281,6 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             selectedServer: settings.selectedServer.stringValue ?? "automatic",
             selectedEnvironment: settings.selectedEnvironment.rawValue
         )
-    }
-
-}
-
-// MARK: - Admin User
-
-private enum AdminQueryError: Error {
-    case queryExecutionFailed
-    case queriedWithoutResult
-}
-
-extension VPNMetadataCollector {
-
-    private func getUser() throws -> CSIdentity? {
-        let query = CSIdentityQueryCreateForCurrentUser(kCFAllocatorDefault).takeRetainedValue()
-        let flags = CSIdentityQueryFlags()
-
-        guard CSIdentityQueryExecute(query, flags, nil) else {
-            throw AdminQueryError.queryExecutionFailed
-        }
-
-        let users = CSIdentityQueryCopyResults(query).takeRetainedValue() as? [CSIdentity]
-        return users?.first
-    }
-
-    private func getAdminGroup() throws -> CSIdentity {
-        let privilegeGroup = "admin" as CFString
-        let authority = CSGetDefaultIdentityAuthority().takeRetainedValue()
-        let query = CSIdentityQueryCreateForName(kCFAllocatorDefault,
-                                                 privilegeGroup,
-                                                 kCSIdentityQueryStringEquals,
-                                                 kCSIdentityClassGroup,
-                                                 authority).takeRetainedValue()
-        let flags = CSIdentityQueryFlags()
-
-        guard CSIdentityQueryExecute(query, flags, nil) else { throw AdminQueryError.queryExecutionFailed }
-        let groups = CSIdentityQueryCopyResults(query).takeRetainedValue() as? [CSIdentity]
-
-        guard let adminGroup = groups?.first else {
-            throw AdminQueryError.queriedWithoutResult
-        }
-
-        return adminGroup
-    }
-
-    fileprivate func isAdminUser() -> String {
-        do {
-            let user = try self.getUser()
-            let group = try self.getAdminGroup()
-
-            let isAdmin = CSIdentityIsMemberOfGroup(user, group)
-            return String(describing: isAdmin)
-        } catch {
-            return "error checking status: \(error.localizedDescription)"
-        }
     }
 
 }
