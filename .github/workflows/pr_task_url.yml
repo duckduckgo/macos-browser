@@ -1,0 +1,25 @@
+name: Asana PR Task URL
+
+on: 
+  pull_request:
+    types: [opened, edited, closed]
+
+jobs:
+  check-asana-task-url:
+
+    name: Check Asana Task URL
+
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+      ASANA_PROJECT_NAME: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_NAME }}
+
+    steps:
+    - name: Find Task URL
+      run: |
+        echo ${{ github.event.pull_request.body }}
+        # github.event.pull_request.body | match("https://app.asana.com/0/[0-9]+/([0-9]+)") | .captures[0].string | "ASANA_TASK_URL=$it" >> $GITHUB_ENV
