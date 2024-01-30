@@ -1,5 +1,5 @@
 //
-//  Download+WKUIDelegate.swift
+//  Download+WKUIDelegateTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
