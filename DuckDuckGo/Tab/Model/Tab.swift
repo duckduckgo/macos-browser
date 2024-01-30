@@ -274,6 +274,7 @@ protocol NewWindowPolicyDecisionMaker {
     private let webViewConfiguration: WKWebViewConfiguration
 
     let startupPreferences: StartupPreferences
+    let downloadsPreferences: DownloadsPreferences
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -296,6 +297,7 @@ protocol NewWindowPolicyDecisionMaker {
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
                      downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
+                     downloadsPreferences: DownloadsPreferences = DownloadsPreferences(),
                      permissionManager: PermissionManagerProtocol = PermissionManager.shared,
                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
@@ -334,6 +336,7 @@ protocol NewWindowPolicyDecisionMaker {
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
                   downloadManager: downloadManager,
+                  downloadsPreferences: downloadsPreferences,
                   permissionManager: permissionManager,
                   geolocationService: geolocationService,
                   extensionsBuilder: extensionsBuilder,
@@ -364,6 +367,7 @@ protocol NewWindowPolicyDecisionMaker {
          privacyFeatures: AnyPrivacyFeatures,
          duckPlayer: DuckPlayer,
          downloadManager: FileDownloadManagerProtocol,
+         downloadsPreferences: DownloadsPreferences,
          permissionManager: PermissionManagerProtocol,
          geolocationService: GeolocationServiceProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
@@ -395,6 +399,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
+        self.downloadsPreferences = downloadsPreferences
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
