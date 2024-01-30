@@ -12,14 +12,46 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
 
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
-      ASANA_PROJECT_NAME: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_NAME }}
-
     steps:
-    - name: Find Task URL
+    - name: Get Task ID
+      id: get-task-id
       run: |
-        echo ${{ github.event.pull_request.body }}
-        # github.event.pull_request.body | match("https://app.asana.com/0/[0-9]+/([0-9]+)") | .captures[0].string | "ASANA_TASK_URL=$it" >> $GITHUB_ENV
+        task_id=$(echo ${{ github.event.pull_request.body }} \
+          | grep -i "task/issue url.*https://app.asana.com/" \
+          | sed -E 's/.*(https.*)/\1/' \
+          | cut -d '/' -f 6)
+        echo "task_id=$task_id" >> $GITHUB_OUTPUT
+
+    - name: Check Task URL
+      id: check-task-url
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+      run: |
+        project_ids="$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${{ steps.get-task-id.outputs.task_id }}?opt_fields=projects" \
+          -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
+          | jq -r .data.projects[].gid)"
+
+        if grep -q "\b${{ env.ASANA_PROJECT_ID }}\b" <<< $project_ids; then
+          echo "success=1" >> $GITHUB_OUTPUT
+        else
+          echo "success=0" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Comment on the PR
+      if: ${{ steps.check-task-url.outputs.success == '0' }}
+      env:
+        ASANA_PROJECT_NAME: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_NAME }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: asana-task-check-status
+        message: |
+          The Asana task linked in the PR description is not added to ${{ env.ASANA_PROJECT_NAME }} project.
+
+    - name: Delete comment on the PR
+      if: ${{ steps.check-task-url.outputs.success == '1' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: asana-task-check-status
+        delete: true
