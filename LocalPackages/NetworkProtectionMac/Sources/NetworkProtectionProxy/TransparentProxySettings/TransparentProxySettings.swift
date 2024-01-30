@@ -112,6 +112,20 @@ public final class TransparentProxySettings {
         }
     }
 
+    // MARK: - App Exclusions Support
+
+    public func isExcluding(_ appIdentifier: AppIdentifier) -> Bool {
+        excludedApps.contains(appIdentifier)
+    }
+
+    public func toggleExclusion(for appIdentifier: AppIdentifier) {
+        if isExcluding(appIdentifier) {
+            excludedApps.removeAll { $0 == appIdentifier }
+        } else {
+            excludedApps.append(appIdentifier)
+        }
+    }
+
     // MARK: - Snapshot support
 
     public func snapshot() -> TransparentProxySettingsSnapshot {

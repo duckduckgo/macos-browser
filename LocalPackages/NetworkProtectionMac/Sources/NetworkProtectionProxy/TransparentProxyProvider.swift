@@ -41,6 +41,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     public let configuration: Configuration
     public let settings: TransparentProxySettings
+    public var tunnelConfiguration: TunnelConfiguration?
 
     private lazy var appMessageHandler = TransparentProxyAppMessageHandler(settings: settings)
 
@@ -70,8 +71,26 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     }
 
     @MainActor
-    public func updateNetworkSettings(_ tunnelConfiguration: TunnelConfiguration? = nil) {
-        let networkSettings = makeNetworkSettings()
+    public func updateNetworkSettings() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let networkSettings = makeNetworkSettings()
+
+            setTunnelNetworkSettings(networkSettings) { error in
+                if let error {
+                    os_log("🤌 Failed to apply proxy settings: %{public}@", error.localizedDescription)
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                //os_log("🤌 Included network rules are %{public}@", String(describing: proxySettings.includedNetworkRules?.debugDescription))
+                os_log("🤌 Updated network settings!")
+                continuation.resume()
+            }
+        }
+    }
+
+    private func makeNetworkSettings() -> NETransparentProxyNetworkSettings {
+        let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
 
         if let tunnelConfiguration {
             let networkRules = tunnelConfiguration.interface.dns.map { dnsServer in
@@ -86,34 +105,13 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
         ]
 
-        setTunnelNetworkSettings(networkSettings) { error in
-            if let applyError = error {
-                os_log("🤌 Failed to apply proxy settings: %{public}@", applyError.localizedDescription)
-            }
-
-            //os_log("🤌 Included network rules are %{public}@", String(describing: proxySettings.includedNetworkRules?.debugDescription))
-            os_log("🤌 Updated network settings!")
-        }
-    }
-
-    private func makeNetworkSettings() -> NETransparentProxyNetworkSettings {
-        let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
-
-/*        networkSettings.excludedNetworkRules = [
-            // We want to make sure DNS queries are still resolved through the VPN
-            // This will need to be updated dynamically by the VPN.
-            NENetworkRule(destinationNetwork: .init(hostname: "10.11.12.1", port: "0"), prefix: 32, protocol: .any)
-        ]*/
-
-        networkSettings.includedNetworkRules = [
-            NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
-        ]
-
         //let tunnelSettings = NETunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
         return networkSettings
     }
 
-    override public func startProxy(options: [String: Any]?, completionHandler: @escaping (Error?) -> Void) {
+    override public func startProxy(options: [String: Any]?,
+                                    completionHandler: @escaping (Error?) -> Void) {
+
         os_log("🤌 Starting tunnel\n> configuration: %{public}@\n> options: %{public}@",
                String(describing: configuration),
                String(describing: options))
@@ -152,6 +150,17 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         nw_path_monitor_start(monitor)
 
         os_log("🤌 Starting up tunnel")
+
+        Task { @MainActor in
+            do {
+                try await updateNetworkSettings()
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
+        }
+
+        /*
         setTunnelNetworkSettings(makeNetworkSettings()) { error in
             if let applyError = error {
                 os_log("🤌 Failed to apply proxy settings: %{public}@", applyError.localizedDescription)
@@ -161,7 +170,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             os_log("🤌 Setup Done!")
 
             completionHandler(error)
-        }
+        }*/
     }
 
     override public func stopProxy(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {

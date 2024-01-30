@@ -57,6 +57,7 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
         super.init(settings: settings, configuration: configuration)
 
         Task { @MainActor in
+            self.tunnelConfiguration = extensionSharedMemory.tunnelConfiguration
             subscribeToDNSChanges()
         }
     }
@@ -64,7 +65,12 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
     @MainActor
     private func subscribeToDNSChanges() {
         extensionSharedMemory.tunnelConfiguration.publisher.sink { [weak self] tunnelConfiguration in
-            self?.updateNetworkSettings(tunnelConfiguration)
+            guard let self else { return }
+
+            Task { @MainActor in
+                self.tunnelConfiguration = tunnelConfiguration
+                try? await self.updateNetworkSettings()
+            }
         }.store(in: &cancellables)
     }
 }
