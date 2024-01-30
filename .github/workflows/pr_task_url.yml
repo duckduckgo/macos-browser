@@ -16,8 +16,9 @@ jobs:
     - name: Get Task ID
       id: get-task-id
       run: |
-        body="${{ github.event.pull_request.body }}"
-        task_id=$(grep -i "task/issue url.*https://app.asana.com/" <<< "${body//\`/\'}" \
+        body=$(echo ${{ github.event.pull_request.body }}"
+        escaped_body=$(echo "$body" | sed 's/`/\\`/g')
+        task_id=$(grep -i "task/issue url.*https://app.asana.com/" <<< "$escaped_body" \
           | sed -E 's|.*https://(.*)|\1|' \
           | cut -d '/' -f 4)
         echo "task_id=$task_id" >> $GITHUB_OUTPUT
