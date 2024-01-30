@@ -1,7 +1,7 @@
 //
-//  LoginItem+DataBrokerProtection.swift
+//  VPNExtensionSharedMemory.swift
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 //
 
 import Foundation
-import LoginItems
+import NetworkProtection
 
-#if DBP
+/// A container for memory shared between the VPN tunnel and the VPN proxy network extensions.
+///
+@MainActor
+final class VPNExtensionSharedMemory: ObservableObject {
+    static let shared = VPNExtensionSharedMemory()
 
-extension LoginItem {
-
-    static let dbpBackgroundAgent = LoginItem(bundleId: Bundle.main.dbpBackgroundAgentBundleId, defaults: .dbp, log: .dbp)
-
+    @Published
+    var tunnelConfiguration: TunnelConfiguration?
 }
-
-#endif

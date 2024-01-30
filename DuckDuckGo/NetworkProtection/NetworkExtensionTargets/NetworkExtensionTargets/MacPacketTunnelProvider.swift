@@ -39,6 +39,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     private let appLauncher: AppLaunching?
 
+    private var extensionSharedMemory: VPNExtensionSharedMemory {
+        VPNExtensionSharedMemory.shared
+    }
+
     // MARK: - Error Reporting
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
@@ -321,13 +325,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         case missingPixelHeaders
     }
 
-    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
-        super.prepareToConnect(using: provider)
-
-        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
-        try? loadDefaultPixelHeaders(from: options)
-    }
-
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
         try super.loadVendorOptions(from: provider)
 
@@ -346,6 +343,22 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
 
         setupPixels(defaultHeaders: defaultPixelHeaders)
+    }
+
+    // MARK: - Overrideable Connection Events
+
+    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
+        super.prepareToConnect(using: provider)
+
+        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
+        try? loadDefaultPixelHeaders(from: options)
+    }
+
+    @MainActor
+    override func handleConnected(with tunnelConfiguration: TunnelConfiguration) {
+        super.handleConnected(with: tunnelConfiguration)
+
+        extensionSharedMemory.tunnelConfiguration = tunnelConfiguration
     }
 
     // MARK: - Start/Stop Tunnel

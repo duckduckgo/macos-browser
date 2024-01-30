@@ -16,11 +16,18 @@
 //  limitations under the License.
 //
 
+import Combine
 import Foundation
 import NetworkExtension
 import NetworkProtectionProxy
 
 final class MacTransparentProxyProvider: TransparentProxyProvider {
+
+    private var extensionSharedMemory: VPNExtensionSharedMemory {
+        VPNExtensionSharedMemory.shared
+    }
+
+    private var cancellables = Set<AnyCancellable>()
 
     @objc init() {
         let loadSettingsFromStartupOptions: Bool = {
@@ -48,5 +55,16 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
             loadSettingsFromProviderConfiguration: loadSettingsFromStartupOptions)
 
         super.init(settings: settings, configuration: configuration)
+
+        Task { @MainActor in
+            subscribeToDNSChanges()
+        }
+    }
+
+    @MainActor
+    private func subscribeToDNSChanges() {
+        extensionSharedMemory.tunnelConfiguration.publisher.sink { [weak self] tunnelConfiguration in
+            self?.updateNetworkSettings(tunnelConfiguration)
+        }.store(in: &cancellables)
     }
 }

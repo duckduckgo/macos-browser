@@ -73,7 +73,7 @@ public struct NetworkProtectionStatusView: View {
             }
 
             bottomMenuView()
-
+/*
             if model.showVPNBenefitsView {
                 VStack(spacing: 0) {
                     Divider()
@@ -82,7 +82,7 @@ public struct NetworkProtectionStatusView: View {
                     VPNBenefitsView()
                 }
                 .transition(.slide)
-            }
+            }*/
         }
         .padding(5)
         .frame(maxWidth: 350, alignment: .top)

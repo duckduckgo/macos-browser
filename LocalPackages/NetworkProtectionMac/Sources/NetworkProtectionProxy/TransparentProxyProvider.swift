@@ -18,6 +18,7 @@
 
 import Foundation
 import NetworkExtension
+import NetworkProtection
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 import SystemConfiguration
 
@@ -68,21 +69,44 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         settings.apply(snapshot)
     }
 
-    private func makeNetworkSettings() -> NETransparentProxyNetworkSettings {
-        let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
+    @MainActor
+    public func updateNetworkSettings(_ tunnelConfiguration: TunnelConfiguration? = nil) {
+        let networkSettings = makeNetworkSettings()
 
-        networkSettings.excludedNetworkRules = [
-            // We want to make sure DNS queries are still resolved through the VPN
-            // This will need to be updated dynamically by the VPN.
-            NENetworkRule(destinationNetwork: .init(hostname: "10.11.12.1", port: "0"), prefix: 32, protocol: .any)
-        ]
+        if let tunnelConfiguration {
+            let networkRules = tunnelConfiguration.interface.dns.map { dnsServer in
+                os_log("🤌 Adding DNS server %{public}@", dnsServer.stringRepresentation)
+                return NENetworkRule(destinationNetwork: .init(hostname: dnsServer.stringRepresentation, port: "0"), prefix: 32, protocol: .any)
+            }
+
+            networkSettings.excludedNetworkRules = networkRules
+        }
 
         networkSettings.includedNetworkRules = [
             NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
-            //NENetworkRule(destinationNetwork: NWHostEndpoint(hostname: "0.0.0.0", port: "443"), prefix: 0, protocol: .TCP),
-            //NENetworkRule(destinationNetwork: NWHostEndpoint(hostname: "0.0.0.0", port: "80"), prefix: 0, protocol: .TCP),
-            //NENetworkRule(destinationHost: NWHostEndpoint(hostname: "google.com", port: "0"), protocol: .TCP)
-            //NENetworkRule(destinationHost: .init(hostname: "google.com", port: "443"), protocol: .TCP)
+        ]
+
+        setTunnelNetworkSettings(networkSettings) { error in
+            if let applyError = error {
+                os_log("🤌 Failed to apply proxy settings: %{public}@", applyError.localizedDescription)
+            }
+
+            //os_log("🤌 Included network rules are %{public}@", String(describing: proxySettings.includedNetworkRules?.debugDescription))
+            os_log("🤌 Updated network settings!")
+        }
+    }
+
+    private func makeNetworkSettings() -> NETransparentProxyNetworkSettings {
+        let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
+
+/*        networkSettings.excludedNetworkRules = [
+            // We want to make sure DNS queries are still resolved through the VPN
+            // This will need to be updated dynamically by the VPN.
+            NENetworkRule(destinationNetwork: .init(hostname: "10.11.12.1", port: "0"), prefix: 32, protocol: .any)
+        ]*/
+
+        networkSettings.includedNetworkRules = [
+            NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
         ]
 
         //let tunnelSettings = NETunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
