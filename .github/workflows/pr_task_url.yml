@@ -16,8 +16,7 @@ jobs:
     - name: Get Task ID
       id: get-task-id
       run: |
-        task_id=$(echo "${{ github.event.pull_request.body }}" \
-          | grep -i "task/issue url.*https://app.asana.com/" \
+        task_id=$(grep -i "task/issue url.*https://app.asana.com/" <<< ${{ github.event.pull_request.body }} \
           | sed -E 's/.*(https.*)/\1/' \
           | cut -d '/' -f 6)
         echo "task_id=$task_id" >> $GITHUB_OUTPUT
@@ -47,7 +46,7 @@ jobs:
       with:
         header: asana-task-check-status
         message: |
-          The Asana task linked in the PR description is not added to ${{ env.ASANA_PROJECT_NAME }} project.
+          :no_entry_sign: The Asana task linked in the PR description is not added to ${{ env.ASANA_PROJECT_NAME }} project.
 
     - name: Delete comment on the PR
       if: ${{ steps.check-task-url.outputs.success == '1' }}
@@ -55,3 +54,7 @@ jobs:
       with:
         header: asana-task-check-status
         delete: true
+    
+    - name: Report status
+      run: |
+        exit ${{ steps.check-task-url.outputs.success }}
