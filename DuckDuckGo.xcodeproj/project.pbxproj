@@ -2352,6 +2352,8 @@
 		9DB6E7242AA0DC5800A17F3C /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DB6E7232AA0DC5800A17F3C /* LoginItems */; };
 		9DC70B1A2AA1FA5B005A844B /* LoginItems in Frameworks */ = {isa = PBXBuildFile; productRef = 9DC70B192AA1FA5B005A844B /* LoginItems */; };
 		9DEF97E12B06C4EE00764F03 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = 9DEF97E02B06C4EE00764F03 /* Networking */; };
+		9F3910622B68C35600CB5112 /* Download+WKUIDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910612B68C35600CB5112 /* Download+WKUIDelegateTests.swift */; };
+		9F3910632B68C35600CB5112 /* Download+WKUIDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910612B68C35600CB5112 /* Download+WKUIDelegateTests.swift */; };
 		9F3910652B68D64F00CB5112 /* ProgressDownloadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910642B68D64F00CB5112 /* ProgressDownloadOperation.swift */; };
 		9F3910662B68D64F00CB5112 /* ProgressDownloadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910642B68D64F00CB5112 /* ProgressDownloadOperation.swift */; };
 		9F3910672B68D64F00CB5112 /* ProgressDownloadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910642B68D64F00CB5112 /* ProgressDownloadOperation.swift */; };
@@ -3840,6 +3842,7 @@
 		9D9AE9282AAA43EB0026E7DC /* DataBrokerProtectionBackgroundManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionBackgroundManager.swift; sourceTree = "<group>"; };
 		9D9AE92B2AAB84FF0026E7DC /* DBPMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBPMocks.swift; sourceTree = "<group>"; };
 		9DB6E7222AA0DA7A00A17F3C /* LoginItems */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LoginItems; sourceTree = "<group>"; };
+		9F3910612B68C35600CB5112 /* Download+WKUIDelegateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Download+WKUIDelegateTests.swift"; sourceTree = "<group>"; };
 		9F3910642B68D64F00CB5112 /* ProgressDownloadOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressDownloadOperation.swift; sourceTree = "<group>"; };
 		9F3910682B68D87B00CB5112 /* ProgressDownloadOperationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressDownloadOperationTests.swift; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
@@ -6060,6 +6063,7 @@
 				B630793926731F2600DCEE41 /* FileDownloadManagerTests.swift */,
 				B693955C26F19CD70015B914 /* DownloadListStoreTests.swift */,
 				B693955E26F1C17F0015B914 /* DownloadListCoordinatorTests.swift */,
+				9F3910612B68C35600CB5112 /* Download+WKUIDelegateTests.swift */,
 				9F3910682B68D87B00CB5112 /* ProgressDownloadOperationTests.swift */,
 			);
 			path = FileDownload;
@@ -10128,6 +10132,7 @@
 				3706FE45293F661700E42796 /* ProgressEstimationTests.swift in Sources */,
 				B6619F072B17138D00CD9186 /* DataImportSourceViewModelTests.swift in Sources */,
 				3706FE46293F661700E42796 /* EncryptedValueTransformerTests.swift in Sources */,
+				9F3910632B68C35600CB5112 /* Download+WKUIDelegateTests.swift in Sources */,
 				3706FE47293F661700E42796 /* URLExtensionTests.swift in Sources */,
 				1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */,
 				317295D52AF058D3002C3206 /* MockWaitlistFeatureSetupHandler.swift in Sources */,
@@ -11992,6 +11997,7 @@
 				B63ED0E326B3E7FA00A9DAD1 /* CLLocationManagerMock.swift in Sources */,
 				37CD54BB27F25A4000F1F7B9 /* DownloadsPreferencesTests.swift in Sources */,
 				4BE344EE2B2376DF003FC223 /* VPNFeedbackFormViewModelTests.swift in Sources */,
+				9F3910622B68C35600CB5112 /* Download+WKUIDelegateTests.swift in Sources */,
 				4B9DB0562A983B55000927DB /* MockNotificationService.swift in Sources */,
 				4B02199C25E063DE00ED7DEA /* FireproofDomainsTests.swift in Sources */,
 				AA0F3DB7261A566C0077F2D9 /* SuggestionLoadingMock.swift in Sources */,

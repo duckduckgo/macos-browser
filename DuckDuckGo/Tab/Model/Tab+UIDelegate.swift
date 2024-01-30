@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Navigation
 import UniformTypeIdentifiers
@@ -36,20 +37,39 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        let prefs = DownloadsPreferences()
-        if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.effectiveDownloadLocation {
+        if !downloadsPreferences.alwaysRequestDownloadLocation,
+           let location = downloadsPreferences.effectiveDownloadLocation {
             let url = location.appendingPathComponent(suggestedFilename)
-            try? data.writeFileWithProgress(to: url)
+            save(data: data, to: url)
             return
         }
 
         let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
-        let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
-            guard let url = (try? result.get())?.url else { return }
-            try? data.writeFileWithProgress(to: url)
+        let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { [weak self] result in
+            guard
+                let self,
+                let url = (try? result.get())?.url
+            else {
+                return
+            }
+            save(data: data, to: url)
         })
         userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
+    }
+
+    func save(data: Data, to toURL: URL) {
+        let fm = FileManager.default
+        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
+        do {
+            // First save file in a temporary directory
+            try data.write(to: tempURL)
+            // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
+            try ProgressDownloadOperation(destURL: toURL) {
+                _ = try fm.moveItem(at: tempURL, to: toURL, incrementingIndexIfExists: true)
+            }.start()
+        } catch {
+            os_log("Failed to save PDF file to Downloads folder", type: .error)
+        }
     }
 
     @MainActor
