@@ -72,22 +72,6 @@ final class NetworkProtectionAppEvents {
 
             restartNetworkProtectionIfVersionChanged(using: loginItemsManager)
             refreshNetworkProtectionServers()
-
-            let appPath = Bundle.main.bundleURL.deletingLastPathComponent()
-            let dirPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .allDomainsMask, true)
-            var applicationIsAtCorrectPath = false
-            for path in dirPaths where appPath.absoluteString.hasPrefix(path) {
-                applicationIsAtCorrectPath = true
-            }
-
-            if appPath.pathComponents.contains("Applications") {
-                applicationIsAtCorrectPath = true
-            }
-            if !applicationIsAtCorrectPath {
-                UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToMoveAppToApplications).rawValue
-            } else {
-                UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.isOnboarding(step: .userNeedsToAllowExtension).rawValue
-            }
         }
     }
 
