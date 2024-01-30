@@ -13,5 +13,8 @@ jobs:
         uses: danger/danger-js@11.2.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+          ASANA_PROJECT_NAME: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_NAME }}
         with:
-          args: "--dangerfile duckduckgo/danger-settings/org/allPRs.ts@main"
+          args: "--dangerfile duckduckgo/danger-settings/org/allPRs.ts@dominik/verify-asana-project"
