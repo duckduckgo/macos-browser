@@ -26,7 +26,8 @@ struct MapperToUI {
             name: extractedProfile.fullName ?? "No name",
             addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
             alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String]()
+            relatives: extractedProfile.relatives ?? [String](),
+            date: extractedProfile.removedDate?.timeIntervalSince1970
         )
     }
 
@@ -36,7 +37,8 @@ struct MapperToUI {
             name: extractedProfile.fullName ?? "No name",
             addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
             alternativeNames: extractedProfile.alternativeNames ?? [String](),
-            relatives: extractedProfile.relatives ?? [String]()
+            relatives: extractedProfile.relatives ?? [String](),
+            date: extractedProfile.removedDate?.timeIntervalSince1970
         )
     }
 
@@ -124,17 +126,21 @@ struct MapperToUI {
         }
 
         let completedOptOutsDictionary = Dictionary(grouping: removedProfiles, by: { $0.dataBroker })
-        let completedOptOuts = completedOptOutsDictionary.map { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
-            DBPUIOptOutMatch(dataBroker: key, matches: value.count)
-        }
+        let completedOptOuts: [DBPUIOptOutMatch] = completedOptOutsDictionary.compactMap { (key: DBPUIDataBroker, value: [DBPUIDataBrokerProfileMatch]) in
+            value.compactMap { match in
+                guard let removedDate = match.date else { return nil }
+                return DBPUIOptOutMatch(dataBroker: key,
+                                 matches: value.count,
+                                 name: match.name,
+                                 alternativeNames: match.alternativeNames,
+                                 addresses: match.addresses,
+                                 date: removedDate)
+            }
+        }.flatMap { $0 }
 
         let nearestScanByBrokerURL = nearestRunDates(for: brokerProfileQueryData)
-
-        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData,
-                                               nearestScanOperationByBroker: nearestScanByBrokerURL)
-
-        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData,
-                                                nearestScanOperationByBroker: nearestScanByBrokerURL)
+        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData, nearestScanOperationByBroker: nearestScanByBrokerURL)
+        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData, nearestScanOperationByBroker: nearestScanByBrokerURL)
 
         return DBPUIScanAndOptOutMaintenanceState(
             inProgressOptOuts: inProgressOptOuts,

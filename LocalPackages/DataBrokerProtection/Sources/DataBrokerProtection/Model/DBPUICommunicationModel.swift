@@ -135,6 +135,7 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let addresses: [DBPUIUserProfileAddress]
     let alternativeNames: [String]
     let relatives: [String]
+    let date: Double? // Used in some methods to set the removedDate or found date
 }
 
 /// Protocol to represent a message that can be passed from the host to the UI
@@ -151,6 +152,10 @@ struct DBPUIScanAndOptOutMaintenanceState: DBPUISendableMessage {
 struct DBPUIOptOutMatch: DBPUISendableMessage {
     let dataBroker: DBPUIDataBroker
     let matches: Int
+    let name: String
+    let alternativeNames: [String]
+    let addresses: [DBPUIUserProfileAddress]
+    let date: Double
 }
 
 /// Data representing the initial scan progress
