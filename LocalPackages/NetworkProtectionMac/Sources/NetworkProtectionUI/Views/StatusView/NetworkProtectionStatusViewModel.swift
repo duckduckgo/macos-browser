@@ -282,17 +282,26 @@ extension NetworkProtectionStatusView {
         let tunnelControllerViewModel: TunnelControllerViewModel
 
         var onboardingStepViewModel: OnboardingStepView.Model? {
+            guard Bundle.main.isInApplicationDirectory else {
+                return OnboardingStepView.Model(presentationData: MoveToApplicationsPromptPresentationData()) { [weak self] in
+                    self?.tunnelControllerViewModel.moveToApplications()
+                }
+            }
+
+            guard !loginItemNeedsApproval else {
+                return OnboardingStepView.Model(presentationData: LoginItemsPromptPresentationData()) { [weak self] in
+                    self?.openLoginItemSettings()
+                }
+            }
+
             switch onboardingStatus {
             case .completed:
                 return nil
             case .isOnboarding(let step):
                 switch step {
-                case .userNeedsToMoveAppToApplications:
-                    return OnboardingStepView.Model(step: step) { [weak self] in
-                        self?.tunnelControllerViewModel.moveToApplications()
-                    }
+
                 case .userNeedsToAllowExtension, .userNeedsToAllowVPNConfiguration:
-                    return OnboardingStepView.Model(step: step) { [weak self] in
+                    return OnboardingStepView.Model(presentationData: step) { [weak self] in
                         self?.tunnelControllerViewModel.startNetworkProtection()
                     }
                 }

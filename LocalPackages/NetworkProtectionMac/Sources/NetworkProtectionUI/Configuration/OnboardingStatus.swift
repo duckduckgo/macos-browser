@@ -25,16 +25,23 @@ public typealias OnboardingStatusPublisher = AnyPublisher<OnboardingStatus, Neve
 ///
 @frozen
 public enum OnboardingStatus: RawRepresentable, Equatable {
+//    case notStarted
+
     /// The onboarding has been completed at least once
     ///
     case completed
 
     case isOnboarding(step: OnboardingStep)
 
+    static let notStartedRawValue = "notStarted"
     static let completedRawValue = "completed"
     static let isOnboardingRawValue = "isOnboarding."
 
     public init?(rawValue: String) {
+//        if rawValue == Self.notStartedRawValue {
+//            self = .notStarted
+//            return
+//        } else
         if rawValue == Self.completedRawValue {
             self = .completed
             return
@@ -54,6 +61,8 @@ public enum OnboardingStatus: RawRepresentable, Equatable {
 
     public var rawValue: String {
         switch self {
+//        case .notStarted:
+//            return Self.notStartedRawValue
         case .completed:
             return Self.completedRawValue
         case .isOnboarding(let step):
@@ -66,10 +75,6 @@ public enum OnboardingStatus: RawRepresentable, Equatable {
 ///
 @frozen
 public enum OnboardingStep: String, Equatable {
-    /// The user needs to move the DuckDuckGo.app file to /Applications
-    ///
-    case userNeedsToMoveAppToApplications
-
     /// The user needs to allow the system extension in macOS
     ///
     case userNeedsToAllowExtension
