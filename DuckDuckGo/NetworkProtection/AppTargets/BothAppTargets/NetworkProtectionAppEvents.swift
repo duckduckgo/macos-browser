@@ -48,10 +48,6 @@ final class NetworkProtectionAppEvents {
 
     private let featureVisibility: NetworkProtectionFeatureVisibility
 
-    // MARK: - Onboarding Status
-    @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
-    private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
-
     init(featureVisibility: NetworkProtectionFeatureVisibility = DefaultNetworkProtectionVisibility()) {
         self.featureVisibility = featureVisibility
     }
