@@ -1,5 +1,5 @@
 //
-//  OnboardingStepView.swift
+//  PromptActionView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -61,7 +61,7 @@ fileprivate extension View {
     }
 }
 
-struct OnboardingStepView: View {
+struct PromptActionView: View {
 
     @Environment(\.colorScheme) var colorScheme
 

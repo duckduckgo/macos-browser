@@ -1,5 +1,5 @@
 //
-//  OnboardingStepViewModel.swift
+//  PromptActionViewModel.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import AppKit
 import Foundation
 
-extension OnboardingStepView {
+extension PromptActionView {
 
     /// Model for AllowSystemExtensionView
     ///
@@ -55,16 +55,6 @@ extension OnboardingStepView {
     }
 }
 
-struct StyledTextFragment {
-    let text: String
-    let isEmphasized: Bool
-
-    init(text: String, isEmphasized: Bool = false) {
-        self.text = text
-        self.isEmphasized = isEmphasized
-    }
-}
-
 protocol PromptPresentable {
     var icon: NetworkProtectionAsset { get }
 
@@ -75,6 +65,16 @@ protocol PromptPresentable {
     var actionTitle: String { get }
 
     var actionScreenshot: NetworkProtectionAsset? { get }
+}
+
+struct StyledTextFragment {
+    let text: String
+    let isEmphasized: Bool
+
+    init(text: String, isEmphasized: Bool = false) {
+        self.text = text
+        self.isEmphasized = isEmphasized
+    }
 }
 
 extension OnboardingStep: PromptPresentable {
