@@ -66,6 +66,7 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
     case networkProtectionKeychainReadError(field: String, status: Int32)
     case networkProtectionKeychainWriteError(field: String, status: Int32)
+    case networkProtectionKeychainUpdateError(field: String, status: Int32)
     case networkProtectionKeychainDeleteError(status: Int32)
 
     case networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
@@ -190,6 +191,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionKeychainWriteError:
             return "m_mac_netp_keychain_error_write_failed"
 
+        case .networkProtectionKeychainUpdateError:
+            return "m_mac_netp_keychain_error_update_failed"
+
         case .networkProtectionKeychainDeleteError:
             return "m_mac_netp_keychain_error_delete_failed"
 
@@ -234,6 +238,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
             ]
 
         case .networkProtectionKeychainWriteError(let field, let status):
+            return [
+                PixelKit.Parameters.keychainFieldName: field,
+                PixelKit.Parameters.errorCode: String(status)
+            ]
+
+        case .networkProtectionKeychainUpdateError(let field, let status):
             return [
                 PixelKit.Parameters.keychainFieldName: field,
                 PixelKit.Parameters.errorCode: String(status)

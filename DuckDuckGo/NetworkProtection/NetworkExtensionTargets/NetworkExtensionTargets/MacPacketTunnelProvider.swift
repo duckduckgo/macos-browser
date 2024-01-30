@@ -100,6 +100,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                 domainEvent = .networkProtectionKeychainReadError(field: field, status: status)
             case .keychainWriteError(let field, let status):
                 domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
+            case .keychainUpdateError(let field, let status):
+                domainEvent = .networkProtectionKeychainUpdateError(field: field, status: status)
             case .keychainDeleteError(let status):
                 domainEvent = .networkProtectionKeychainDeleteError(status: status)
             case .wireGuardCannotLocateTunnelFileDescriptor:
