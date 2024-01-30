@@ -130,8 +130,11 @@ struct MapperToUI {
 
         let nearestScanByBrokerURL = nearestRunDates(for: brokerProfileQueryData)
 
-        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData, nearestScanOperationByBroker: nearestScanByBrokerURL)
-        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData, nearestScanOperationByBroker: nearestScanByBrokerURL)
+        let lastScans = getLastScanInformation(brokerProfileQueryData: brokerProfileQueryData,
+                                               nearestScanOperationByBroker: nearestScanByBrokerURL)
+
+        let nextScans = getNextScansInformation(brokerProfileQueryData: brokerProfileQueryData,
+                                                nearestScanOperationByBroker: nearestScanByBrokerURL)
 
         return DBPUIScanAndOptOutMaintenanceState(
             inProgressOptOuts: inProgressOptOuts,
@@ -193,7 +196,6 @@ struct MapperToUI {
     private func scanDate(element: Dictionary<Date?, [BrokerProfileQueryData]>.Element?,
                           nearestScanOperationByBroker: [String: Date]) -> DBUIScanDate {
         if let element = element, let date = element.key {
-
             return DBUIScanDate(
                 date: date.timeIntervalSince1970,
                 dataBrokers: element.value.flatMap {
@@ -207,6 +209,12 @@ struct MapperToUI {
 
                     return brokers
                 }
+                    .reduce(into: []) { result, dataBroker in // Remove dupes
+                        guard !result.contains(where: { $0.url == dataBroker.url }) else {
+                            return
+                        }
+                        result.append(dataBroker)
+                    }
             )
         } else {
             return DBUIScanDate(date: 0, dataBrokers: [DBPUIDataBroker]())
