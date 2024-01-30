@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1706192562672,
+    "version": 1706568909205,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -5943,7 +5943,8 @@
                                     "pandora.com",
                                     "paper-io.com",
                                     "rawstory.com",
-                                    "usatoday.com"
+                                    "usatoday.com",
+                                    "washingtonpost.com"
                                 ]
                             }
                         ]
@@ -7642,7 +7643,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "82ea04107975fb96d073fcf8816c7228"
+            "hash": "4b11a2e6e70c2de69177ce188cb9af8c"
         },
         "trackingCookies1p": {
             "settings": {
