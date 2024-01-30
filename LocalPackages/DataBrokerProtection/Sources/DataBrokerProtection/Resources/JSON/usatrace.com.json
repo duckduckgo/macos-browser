@@ -1,0 +1,52 @@
+{
+  "name": "usatrace.com",
+  "version": "0.1.1",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1674540000000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "5071e480-88ae-49b5-91b6-1daf26c55acf",
+          "url": "https://www.usatrace.com/people-search/${firstName}-${lastName}/${city}-${state|upcase}"
+        },
+        {
+          "actionType": "extract",
+          "id": "3237fc09-247c-4942-9920-9bbb937f6ac2",
+          "selector": "//table/tbody/tr[position() > 1]",
+          "profile": {
+            "name": {
+              "selector": ".//td[2]"
+            },
+            "age": {
+              "selector": ".//td[3]"
+            },
+            "addressCityStateList": {
+              "selector": ".//td[4]"
+            },
+            "relativesList": {
+              "selector": ".//td[7]/a",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[@class='btn red-btn']"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}
