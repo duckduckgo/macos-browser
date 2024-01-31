@@ -67,6 +67,7 @@ jobs:
         message: |
           :no_entry_sign: The Asana task linked in the PR description is not added to ${{ env.ASANA_PROJECT_NAME }} project.
           1. Verify that the correct task is linked in the PR.
+            * Please use the actual implementation task, rather than the Code Review subtask.
           2. Verify that the task is added to ${{ env.ASANA_PROJECT_NAME }} project.
           3. When ready, remove the `bot: not in app board` label to retrigger the check.
 
