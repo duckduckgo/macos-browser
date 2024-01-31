@@ -47,9 +47,9 @@ jobs:
 
   # If a task is missing from the App Board project, add a comment to the PR and fail the check.
   # Otherwise, delete the comment and pass the check.
-  report-task-missing-from-project:
+  update-project-membership-report:
 
-    name: Report Task Missing from Project
+    name: Update Project Membership Report
 
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
@@ -100,7 +100,8 @@ jobs:
             });
           } catch (error) {
             console.error("12345");
-            console.error(error);
+            console.error(error.status);
+            console.error("67890");
             if (error.status !== 404) {
               throw error;
             }
