@@ -27,32 +27,31 @@ final class TabPreviewExtension {
 
     struct PreviewData {
         var url: URL?
-        var scrollPosition: CGFloat
         var image: NSImage
         var webviewBoundsSize: NSSize
+        var isRestored: Bool
 
         static func previewDataForNativeView(from image: NSImage) -> PreviewData {
-            return PreviewData(url: nil, scrollPosition: 0, image: image, webviewBoundsSize: NSSize.zero)
+            return PreviewData(url: nil, image: image, webviewBoundsSize: NSSize.zero, isRestored: false)
         }
-
-        static let restoredScrollPosition: CGFloat = -1.0
-        static let unknownScrollPosition: CGFloat = -2.0
     }
 
     private var previewData: PreviewData?
     private var generatePreviewAfterLoad = false
+    private var userDidScroll = false
 
     var preview: NSImage? {
         return previewData?.image
     }
 
     private var cancellables = Set<AnyCancellable>()
-    private weak var webView: WKWebView?
+    private weak var webView: WebView?
     private var tabContent: Tab.TabContent?
 
     init(webViewPublisher: some Publisher<WKWebView, Never>, contentPublisher: some Publisher<Tab.TabContent, Never>) {
         webViewPublisher.sink { [weak self] webView in
-            self?.webView = webView
+            self?.webView = webView as? WebView
+            self?.webView?.scrollEventDelegate = self
         }.store(in: &cancellables)
 
         contentPublisher.sink { [weak self] tabContent in
@@ -74,18 +73,17 @@ final class TabPreviewExtension {
         }
 
         // Avoid unnecessary generations
-        let scrollPosition = try? await getScrollPosition(webView: webView)
         if let previewData,
-           let scrollPosition,
+           !userDidScroll,
            previewData.webviewBoundsSize == webView.bounds.size,
-           previewData.url == url,
-           previewData.scrollPosition == scrollPosition {
-            os_log("Skipping preview rendering, it is already generated. url: \(url) scrollPosition \(scrollPosition)", log: .tabPreviews)
+           previewData.url == url {
+            os_log("Skipping preview rendering, it is already generated. url: \(url)", log: .tabPreviews)
             return
         }
 
         os_log("Preview rendering started", log: .tabPreviews)
         let configuration = WKSnapshotConfiguration.makeConfiguration()
+
         webView.takeSnapshot(with: configuration) { [weak self] image, _ in
             guard let image = image else {
                 os_log("Failed to create a snapshot of webView", log: .tabPreviews, type: .error)
@@ -93,30 +91,11 @@ final class TabPreviewExtension {
             }
             self?.generatePreviewAfterLoad = false
             self?.previewData = PreviewData(url: url,
-                                            scrollPosition: scrollPosition ?? PreviewData.unknownScrollPosition,
                                             image: image,
-                                            webviewBoundsSize: webView.bounds.size)
+                                            webviewBoundsSize: webView.bounds.size,
+                                            isRestored: false)
 
             os_log("Preview rendered: \(url) ", log: .tabPreviews)
-        }
-    }
-
-    @MainActor
-    private func getScrollPosition(webView: WKWebView) async throws -> CGFloat? {
-        try await withCheckedThrowingContinuation { continuation in
-            let javascript = "window.scrollY"
-            webView.evaluateJavaScript(javascript, in: nil, in: .defaultClient) { result in
-                switch result {
-                case .success(let value):
-                    if let scrollPosition = value as? CGFloat {
-                        continuation.resume(returning: scrollPosition)
-                    } else {
-                        continuation.resume(returning: nil)
-                    }
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
-            }
         }
     }
 
@@ -200,6 +179,18 @@ final class TabPreviewExtension {
 
 }
 
+extension TabPreviewExtension: WebViewScrollEventDelegate {
+
+    func webView(_ webView: WebView, didScrollWheel event: NSEvent) {
+        userDidScroll = true
+    }
+
+    func webView(_ webView: WebView, didScrollKey event: NSEvent) {
+        userDidScroll = true
+    }
+
+}
+
 extension TabPreviewExtension: NSCodingExtension {
 
     private enum NSSecureCodingKeys {
@@ -213,7 +204,7 @@ extension TabPreviewExtension: NSCodingExtension {
             return
         }
 
-        previewData = PreviewData(url: nil, scrollPosition: PreviewData.restoredScrollPosition, image: image, webviewBoundsSize: NSSize.zero)
+        previewData = PreviewData(url: nil, image: image, webviewBoundsSize: NSSize.zero, isRestored: true)
         os_log("Preview restored from the session state", log: .tabPreviews)
         generatePreviewAfterLoad = false
     }
@@ -231,9 +222,11 @@ extension TabPreviewExtension: NavigationResponder {
 
     @MainActor
     func willStart(_ navigation: Navigation) {
-        if previewData?.scrollPosition != PreviewData.restoredScrollPosition {
+        if previewData?.isRestored == false {
             clearPreview()
         }
+
+        userDidScroll = false
     }
 
     @MainActor

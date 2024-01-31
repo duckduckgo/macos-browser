@@ -24,9 +24,15 @@ protocol WebViewContextMenuDelegate: AnyObject {
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?)
 }
 
+protocol WebViewScrollEventDelegate: AnyObject {
+    func webView(_ webView: WebView, didScrollWheel event: NSEvent)
+    func webView(_ webView: WebView, didScrollKey event: NSEvent)
+}
+
 final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
+    weak var scrollEventDelegate: WebViewScrollEventDelegate?
 
     override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
@@ -103,6 +109,27 @@ final class WebView: WKWebView {
     override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
         super.didCloseMenu(menu, with: event)
         contextMenuDelegate?.webView(self, didCloseContextMenu: menu, with: event)
+    }
+
+    // MARK: - Scroll events
+
+    override func scrollWheel(with event: NSEvent) {
+        super.scrollWheel(with: event)
+        scrollEventDelegate?.webView(self, didScrollWheel: event)
+    }
+
+    static let scrollKeyCodes: Set<UInt16> = [126, // arrow up
+                                              125, // arrow down
+                                              49,  // space
+                                              116, // page up
+                                              121] // page down
+
+    override func keyDown(with event: NSEvent) {
+        super.keyDown(with: event)
+
+        if Self.scrollKeyCodes.contains(event.keyCode) {
+            scrollEventDelegate?.webView(self, didScrollKey: event)
+        }
     }
 
     // MARK: - Developer Tools
