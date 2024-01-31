@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Navigation
 
 struct UserText {
 
@@ -200,11 +201,12 @@ struct UserText {
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Welcome", comment: "Tab onboarding title")
     static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
+    static let errorPageHeader = NSLocalizedString("page.error.header", value: "DuckDuckGo can’t load this page.", comment: "Error page heading text")
+    static let webProcessCrashPageHeader = NSLocalizedString("page.crash.header", value: "Web Process did terminate 😢", comment: "Error page heading text shown when a Web Page process had crashed")
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
     static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "")
     static let checkForUpdate = NSLocalizedString("check.for.update", value: "Check for Update", comment: "Button users can use to check for a new update")
 
-    static let unknownErrorMessage = NSLocalizedString("error.unknown", value: "An unknown error has occurred", comment: "Error page subtitle")
     static let unknownErrorTryAgainMessage = NSLocalizedString("error.unknown.try.again", value: "An unknown error has occurred", comment: "Generic error message on a dialog for when the cause is not known.")
 
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
@@ -1022,4 +1024,21 @@ struct UserText {
     static let restoringSubscriptionTitle = NSLocalizedString("subscription.progress.view.restoring.subscription", value: "Restoring subscription...", comment: "Progress view title when restoring past subscription purchase")
     static let completingPurchaseTitle = NSLocalizedString("subscription.progress.view.completing.purchase", value: "Completing purchase...", comment: "Progress view title when completing the purchase")
 #endif
+}
+
+extension WKProcessTerminationReason {
+
+    var localizedDescription: String {
+        switch self {
+        case .exceededMemoryLimit:
+            "Memory limit exceeded."
+        case .exceededCPULimit:
+            "CPU limit exceeded."
+        case .requestedByClient:
+            "Requested by client."
+        case .crash:
+            "Web Process has crashed."
+        }
+    }
+
 }

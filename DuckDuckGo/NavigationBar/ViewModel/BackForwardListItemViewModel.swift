@@ -1,5 +1,5 @@
 //
-//  WKBackForwardListItemViewModel.swift
+//  BackForwardListItemViewModel.swift
 //
 //  Copyright © 2020 DuckDuckGo. All rights reserved.
 //
@@ -17,9 +17,8 @@
 //
 
 import Cocoa
-import WebKit
 
-final class WKBackForwardListItemViewModel {
+final class BackForwardListItemViewModel {
 
     private let backForwardListItem: BackForwardListItem
     private let faviconManagement: FaviconManagement
@@ -37,40 +36,31 @@ final class WKBackForwardListItemViewModel {
     }
 
     var title: String {
-        switch backForwardListItem {
-        case .backForwardListItem(let item):
-            if item.url == .newtab {
+        switch backForwardListItem.kind {
+        case .url(let url):
+            if url == .newtab {
                 return UserText.tabHomeTitle
             }
 
-            var title = item.title
+            var title = backForwardListItem.title
 
             if title == nil || (title?.isEmpty ?? false) {
-                title = historyCoordinating.title(for: item.url)
+                title = historyCoordinating.title(for: url)
             }
 
-            return title ??
-                item.url.host ??
-                item.url.absoluteString
+            return (title ?? url.host ?? url.absoluteString).truncated(length: MainMenu.Constants.maxTitleLength)
 
-        case .goBackToCloseItem(parentTab: let tab):
-            if let title = tab.title,
-               !title.isEmpty {
-                return String(format: UserText.closeAndReturnToParentFormat, title)
+        case .goBackToClose(let url):
+            if let title = backForwardListItem.title ?? url?.absoluteString, !title.isEmpty {
+                return String(format: UserText.closeAndReturnToParentFormat, title.truncated(length: MainMenu.Constants.maxTitleLength))
             } else {
                 return UserText.closeAndReturnToParent
             }
-        case .error:
-            return UserText.tabErrorTitle
         }
     }
 
     @MainActor(unsafe)
     var image: NSImage? {
-        if case .error = backForwardListItem {
-            return nil
-        }
-
         if backForwardListItem.url == .newtab {
             return NSImage(named: "HomeFavicon")
         }
@@ -89,19 +79,7 @@ final class WKBackForwardListItemViewModel {
     }
 
     var state: NSControl.StateValue {
-        if case .goBackToCloseItem = backForwardListItem {
-            return .off
-        }
-
-        return isCurrentItem ? .on : .off
-    }
-
-    var isGoBackToCloseItem: Bool {
-        if case .goBackToCloseItem = backForwardListItem {
-            return true
-        }
-
-        return false
+        isCurrentItem ? .on : .off
     }
 
 }

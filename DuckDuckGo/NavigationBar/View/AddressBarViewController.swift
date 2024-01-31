@@ -257,12 +257,13 @@ final class AddressBarViewController: NSViewController {
             }
             .store(in: &tabViewModelCancellables)
 
-        selectedTabViewModel.$isLoading
-            .sink { [weak self] isLoading in
+        selectedTabViewModel.$isLoading.combineLatest(selectedTabViewModel.tab.$error)
+            .sink { [weak self] isLoading, error in
                 guard let progressIndicator = self?.progressIndicator else { return }
 
                 if isLoading,
-                   selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch == false {
+                   selectedTabViewModel.tab.content.url?.isDuckDuckGoSearch == false,
+                   error == nil {
 
                     progressIndicator.show(progress: selectedTabViewModel.progress, startTime: selectedTabViewModel.loadingStartTime)
 

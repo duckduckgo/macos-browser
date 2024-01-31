@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Common
+import Foundation
 import UniformTypeIdentifiers
 
 extension String {
@@ -32,6 +33,16 @@ extension String {
         self.replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "'", with: "\\'")
+            .replacingOccurrences(of: "\n", with: "\\n")
+    }
+
+    func escapedHtmlString() -> String {
+        do {
+            return try NSAttributedString(string: self).htmlString()
+        } catch {
+            os_log(.error, "could not produce html-escaped string: \(error)")
+            return self
+        }
     }
 
     init(_ staticString: StaticString) {

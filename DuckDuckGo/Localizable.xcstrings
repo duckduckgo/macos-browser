@@ -2774,18 +2774,6 @@
     "Error message & code" : {
 
     },
-    "error.unknown" : {
-      "comment" : "Error page subtitle",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "An unknown error has occurred"
-          }
-        }
-      }
-    },
     "error.unknown.try.again" : {
       "comment" : "Generic error message on a dialog for when the cause is not known.",
       "extractionState" : "extracted_with_value",
@@ -6058,6 +6046,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Remove Fireproofing"
+          }
+        }
+      }
+    },
+    "page.crash.header" : {
+      "comment" : "Error page heading text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Web Process did terminate 😢"
+          }
+        }
+      }
+    },
+    "page.error.header" : {
+      "comment" : "Error page heading text",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo can’t load this page."
           }
         }
       }

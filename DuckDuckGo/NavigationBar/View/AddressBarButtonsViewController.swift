@@ -690,8 +690,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updatePermissionButtons() {
         permissionButtons.isHidden = isTextFieldEditorFirstResponder
-            || isAnyTrackerAnimationPlaying
-            || (tabCollectionViewModel.selectedTabViewModel?.errorViewState.isVisible ?? true)
+        || isAnyTrackerAnimationPlaying
+        || (tabCollectionViewModel.selectedTabViewModel?.isShowingErrorPage ?? true)
         defer {
             showOrHidePermissionPopoverIfNeeded()
         }
@@ -774,12 +774,12 @@ final class AddressBarButtonsViewController: NSViewController {
         let isLocalUrl = selectedTabViewModel.tab.content.url?.isLocalURL ?? false
 
         // Privacy entry point button
-        privacyEntryPointButton.isHidden = isEditingMode ||
-            isTextFieldEditorFirstResponder ||
-            !isHypertextUrl ||
-            selectedTabViewModel.errorViewState.isVisible ||
-            isTextFieldValueText ||
-            isLocalUrl
+        privacyEntryPointButton.isHidden = isEditingMode
+        || isTextFieldEditorFirstResponder
+        || !isHypertextUrl
+        || selectedTabViewModel.isShowingErrorPage
+        || isTextFieldValueText
+        || isLocalUrl
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying

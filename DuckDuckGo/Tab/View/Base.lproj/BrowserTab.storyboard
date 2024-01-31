@@ -17,40 +17,6 @@
                             <containerView translatesAutoresizingMaskIntoConstraints="NO" id="aUo-25-0iW">
                                 <rect key="frame" x="0.0" y="0.0" width="513" height="492"/>
                             </containerView>
-                            <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bol-qn-wuI" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="513" height="492"/>
-                                <subviews>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="RNn-86-Wkx">
-                                        <rect key="frame" x="141" y="253" width="232" height="17"/>
-                                        <textFieldCell key="cell" lineBreakMode="clipping" title="DuckDuckGo can’t load this page." id="W60-yd-bv3">
-                                            <font key="font" metaFont="systemSemibold" size="14"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <textField focusRingType="none" horizontalHuggingPriority="351" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="iH5-FT-P9e">
-                                        <rect key="frame" x="157" y="229" width="199" height="16"/>
-                                        <textFieldCell key="cell" title="An unknown error has occurred." id="rLZ-IC-OXf">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="top" secondItem="RNn-86-Wkx" secondAttribute="bottom" constant="8" id="TGu-KU-L1y"/>
-                                    <constraint firstItem="RNn-86-Wkx" firstAttribute="centerY" secondItem="bol-qn-wuI" secondAttribute="centerY" constant="-15" id="m7c-MA-Rcm"/>
-                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bol-qn-wuI" secondAttribute="leading" constant="20" id="mJQ-P7-aBb"/>
-                                    <constraint firstItem="RNn-86-Wkx" firstAttribute="centerX" secondItem="bol-qn-wuI" secondAttribute="centerX" id="nuD-3G-hI8"/>
-                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="iH5-FT-P9e" secondAttribute="trailing" constant="20" id="qCW-WQ-F8g"/>
-                                    <constraint firstItem="iH5-FT-P9e" firstAttribute="centerX" secondItem="bol-qn-wuI" secondAttribute="centerX" id="tff-7d-2X3"/>
-                                </constraints>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
-                                        <color key="value" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="TI8-MI-JdM" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="-2" y="-4" width="139" height="31"/>
                                 <subviews>
@@ -85,13 +51,9 @@
                         <constraints>
                             <constraint firstItem="aUo-25-0iW" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" id="1BG-3M-Xsm"/>
                             <constraint firstItem="TI8-MI-JdM" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" constant="-2" id="8sR-UO-sN7"/>
-                            <constraint firstItem="bol-qn-wuI" firstAttribute="leading" secondItem="aev-t9-Epw" secondAttribute="leading" id="ROr-Er-6IN"/>
-                            <constraint firstAttribute="trailing" secondItem="bol-qn-wuI" secondAttribute="trailing" id="ea5-1F-Gwm"/>
-                            <constraint firstAttribute="bottom" secondItem="bol-qn-wuI" secondAttribute="bottom" id="ef9-7H-3hy"/>
                             <constraint firstAttribute="bottom" secondItem="TI8-MI-JdM" secondAttribute="bottom" constant="-4" id="hPN-cK-C0T"/>
                             <constraint firstItem="aUo-25-0iW" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="m93-YS-jGz"/>
                             <constraint firstAttribute="trailing" secondItem="aUo-25-0iW" secondAttribute="trailing" id="u46-hj-61D"/>
-                            <constraint firstItem="bol-qn-wuI" firstAttribute="top" secondItem="aev-t9-Epw" secondAttribute="top" id="v8E-6v-8Tx"/>
                             <constraint firstAttribute="bottom" secondItem="aUo-25-0iW" secondAttribute="bottom" id="yMX-f1-FK0"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
@@ -101,8 +63,6 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
-                        <outlet property="errorMessageLabel" destination="iH5-FT-P9e" id="xyD-i9-O2O"/>
-                        <outlet property="errorView" destination="bol-qn-wuI" id="gbL-AN-fxw"/>
                         <outlet property="homePageView" destination="aUo-25-0iW" id="Pv3-xk-Aef"/>
                         <outlet property="hoverLabel" destination="v5b-uq-Sj6" id="QJc-vr-PTj"/>
                         <outlet property="hoverLabelContainer" destination="TI8-MI-JdM" id="xIh-fo-8Bz"/>

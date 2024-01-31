@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import Navigation
 import WebKit
 
@@ -231,6 +232,25 @@ extension WKWebView {
         self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
     }
 
+    func replaceLocation(with url: URL, in frame: WKFrameInfo? = nil) {
+        self.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: frame, in: .defaultClient)
+    }
+
+    func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL) {
+        guard responds(to: Selector.loadAlternateHTMLString) else {
+            if #available(macOS 12.0, *) {
+                os_log(.error, log: .navigation, "WKWebView._loadAlternateHTMLString not available")
+                loadSimulatedRequest(URLRequest(url: failingURL), responseHTML: html)
+            }
+            return
+        }
+        self.perform(Selector.loadAlternateHTMLString, withArguments: [html, baseURL, failingURL])
+    }
+
+    func setDocumentHtml(_ html: String) {
+        self.evaluateJavaScript("document.open; document.write('\(html.escapedJavaScriptString())'); document.close()", in: nil, in: .defaultClient)
+    }
+
     @MainActor
     var mimeType: String? {
         get async {
@@ -285,6 +305,7 @@ extension WKWebView {
     enum Selector {
         static let fullScreenPlaceholderView = NSSelectorFromString("_fullScreenPlaceholderView")
         static let printOperationWithPrintInfoForFrame = NSSelectorFromString("_printOperationWithPrintInfo:forFrame:")
+        static let loadAlternateHTMLString = NSSelectorFromString("_loadAlternateHTMLString:baseURL:forUnreachableURL:")
     }
 
 }

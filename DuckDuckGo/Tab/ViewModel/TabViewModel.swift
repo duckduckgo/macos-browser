@@ -48,15 +48,8 @@ final class TabViewModel {
     }
     @Published var progress: Double = 0.0
 
-    struct ErrorViewState {
-        var isVisible: Bool = false
-        var message: String?
-    }
-    @Published var errorViewState = ErrorViewState() {
-        didSet {
-            updateTitle()
-            updateFavicon()
-        }
+    var isShowingErrorPage: Bool {
+        tab.error != nil
     }
 
     @Published var autofillDataToSave: AutofillData?
@@ -80,7 +73,7 @@ final class TabViewModel {
     }
 
     var canSaveContent: Bool {
-        self.canReload && !tab.webView.isInFullScreenMode
+        !isShowingErrorPage && canReload && !tab.webView.isInFullScreenMode
     }
 
     init(tab: Tab, appearancePreferences: AppearancePreferences = .shared) {
@@ -169,18 +162,10 @@ final class TabViewModel {
     }
 
     private func subscribeToTabError() {
-        tab.$error
-            .map { error -> ErrorViewState in
-
-                if let error = error, !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-                    // don‘t show error for interrupted load like downloads and for cancelled loads
-                    return .init(isVisible: true, message: error.localizedDescription)
-                } else {
-                    return .init(isVisible: false, message: nil)
-                }
-            }
-            .assign(to: \.errorViewState, onWeaklyHeld: self)
-            .store(in: &cancellables)
+        tab.$error.sink { [weak self] _ in
+            self?.updateTitle()
+            self?.updateFavicon()
+        }.store(in: &cancellables)
     }
 
     private func subscribeToPermissions() {
@@ -221,14 +206,6 @@ final class TabViewModel {
     }
 
     func updateAddressBarStrings() {
-        guard !errorViewState.isVisible else {
-            let failingUrl = tab.error?.failingUrl
-            let failingUrlHost = failingUrl?.host?.droppingWwwPrefix() ?? ""
-            addressBarString = failingUrl?.absoluteString ?? ""
-            passiveAddressBarString = appearancePreferences.showFullURL ? addressBarString : failingUrlHost
-            return
-        }
-
         guard tab.content.isUrl, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""
@@ -274,7 +251,7 @@ final class TabViewModel {
     }
 
     private func updateTitle() {
-        guard !errorViewState.isVisible else {
+        guard !isShowingErrorPage else {
             title = UserText.tabErrorTitle
             return
         }
@@ -307,7 +284,7 @@ final class TabViewModel {
     }
 
     private func updateFavicon() {
-        guard !errorViewState.isVisible else {
+        guard !isShowingErrorPage else {
             favicon = nil
             return
         }

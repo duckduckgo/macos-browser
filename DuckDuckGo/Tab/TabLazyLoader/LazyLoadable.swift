@@ -38,7 +38,7 @@ extension Tab: LazyLoadable {
     var url: URL? { content.url }
 
     var loadingFinishedPublisher: AnyPublisher<Tab, Never> {
-        Publishers.Merge(webViewDidFinishNavigationPublisher, webViewDidFailNavigationPublisher)
+        webViewDidFinishNavigationPublisher
             .prefix(1)
             .map { self }
             .eraseToAnyPublisher()
