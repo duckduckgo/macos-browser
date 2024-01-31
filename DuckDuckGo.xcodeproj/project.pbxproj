@@ -3223,15 +3223,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4BF97ADE2B43C8D500EB4240 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = Contents/Library/LoginItems;
-			dstSubfolderSpec = 1;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B6EC37E629B5DA2A001ACE79 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -8163,7 +8154,6 @@
 				3706FA7A293F65D500E42796 /* Sources */,
 				3706FCA6293F65D500E42796 /* Frameworks */,
 				3706FCB1293F65D500E42796 /* Resources */,
-				4BF97ADE2B43C8D500EB4240 /* CopyFiles */,
 				4BBA2D272B6AC09D00F6A470 /* Embed Login Items */,
 			);
 			buildRules = (
