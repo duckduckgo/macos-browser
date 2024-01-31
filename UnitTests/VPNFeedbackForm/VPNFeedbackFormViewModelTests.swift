@@ -89,7 +89,6 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             appVersion: "1.2.3",
             lastVersionRun: "1.2.3",
             isInternalUser: false,
-            isAdminUser: "true",
             isInApplicationsDirectory: true
         )
 
@@ -123,7 +122,9 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
 
         let loginItemState = VPNMetadata.LoginItemState(
             vpnMenuState: "enabled",
-            notificationsAgentState: "enabled"
+            vpnMenuIsRunning: true,
+            notificationsAgentState: "enabled",
+            notificationsAgentIsRunning: true
         )
 
         return VPNMetadata(

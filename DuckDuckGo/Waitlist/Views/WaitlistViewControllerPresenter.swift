@@ -61,7 +61,7 @@ struct NetworkProtectionWaitlistViewControllerPresenter: WaitlistViewControllerP
                 let viewController = WaitlistModalViewController(viewModel: viewModel, contentView: NetworkProtectionWaitlistRootView())
                 windowController.mainViewController.beginSheet(viewController) { _ in
                     // If the user dismissed the waitlist flow without signing up, hide the button.
-                    var waitlist = NetworkProtectionWaitlist()
+                    let waitlist = NetworkProtectionWaitlist()
                     if !waitlist.waitlistStorage.isOnWaitlist {
                         waitlist.waitlistSignUpPromptDismissed = true
                         NotificationCenter.default.post(name: .networkProtectionWaitlistAccessChanged, object: nil)

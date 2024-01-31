@@ -30,7 +30,7 @@ final class PrivacySecurityPreferences {
     @Published
     var gpcEnabled: Bool = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true).wrappedValue {
         didSet {
-            var udWrapper = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
+            let udWrapper = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
             udWrapper.wrappedValue = gpcEnabled
         }
     }
