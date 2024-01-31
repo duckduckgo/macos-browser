@@ -39,6 +39,7 @@ final class DataBrokerOperationsCollection: Operation {
     private let runner: WebOperationRunner
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private let showWebView: Bool
+    private let userNotificationService: DataBrokerProtectionUserNotificationService
 
     deinit {
         os_log("Deinit operation: %{public}@", log: .dataBrokerProtection, String(describing: id.uuidString))
@@ -52,6 +53,7 @@ final class DataBrokerOperationsCollection: Operation {
          notificationCenter: NotificationCenter = NotificationCenter.default,
          runner: WebOperationRunner,
          pixelHandler: EventMapping<DataBrokerProtectionPixels>,
+         userNotificationService: DataBrokerProtectionUserNotificationService,
          showWebView: Bool) {
 
         self.brokerProfileQueriesData = brokerProfileQueriesData
@@ -63,6 +65,7 @@ final class DataBrokerOperationsCollection: Operation {
         self.runner = runner
         self.pixelHandler = pixelHandler
         self.showWebView = showWebView
+        self.userNotificationService = userNotificationService
         super.init()
     }
 
@@ -145,6 +148,7 @@ final class DataBrokerOperationsCollection: Operation {
                                                                                 runner: runner,
                                                                                 pixelHandler: pixelHandler,
                                                                                 showWebView: showWebView,
+                                                                                userNotificationService: userNotificationService,
                                                                                 shouldRunNextStep: { [weak self] in
                     guard let self = self else { return false }
                     return !self.isCancelled

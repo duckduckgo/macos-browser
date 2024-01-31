@@ -96,6 +96,7 @@ public final class XPCClient<ClientInterface: AnyObject, ServerInterface: AnyObj
             }
 
             Task { @XPCConnectionActor in
+                self.internalConnection?.invalidate()
                 self.internalConnection = nil
             }
         }

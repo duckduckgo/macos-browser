@@ -19,7 +19,7 @@
 import Cocoa
 import Bookmarks
 
-internal class BaseBookmarkEntity {
+internal class BaseBookmarkEntity: Identifiable {
 
     static func singleEntity(with uuid: String) -> NSFetchRequest<BookmarkEntity> {
         let request = BookmarkEntity.fetchRequest()

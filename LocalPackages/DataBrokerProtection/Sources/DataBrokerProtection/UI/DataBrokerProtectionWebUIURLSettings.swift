@@ -82,13 +82,16 @@ public final class DataBrokerProtectionWebUIURLSettings: DataBrokerProtectionWeb
 private extension String {
     var hostname: String? {
         if let url = URL(string: self) {
+            if let host = url.host, let port = url.port {
+                return "\(host):\(port)"
+            }
             return url.host
         }
         return nil
     }
 }
 
-extension UserDefaults {
+private extension UserDefaults {
     enum Key: String {
         case customURLValue
         case urlType

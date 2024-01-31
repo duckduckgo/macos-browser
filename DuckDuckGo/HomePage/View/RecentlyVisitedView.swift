@@ -317,6 +317,7 @@ struct RecentlyVisitedTitle: View {
                     model.showPagesOnHover.toggle()
                 }
                 .padding(.leading, isExpanded ? 5 : 0)
+                .padding(.top, 4)
 
             VStack(alignment: isExpanded ? .leading : .center, spacing: 6) {
                 Text(UserText.homePageProtectionSummaryMessage(numberOfTrackersBlocked: model.numberOfTrackersBlocked))

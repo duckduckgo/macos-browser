@@ -95,6 +95,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
                 .targetting(self)
 
+            NSMenuItem(title: "Log Feedback Metadata to Console", action: #selector(NetworkProtectionDebugMenu.logFeedbackMetadataToConsole))
+                .targetting(self)
+
             NSMenuItem(title: "Onboarding")
                 .submenu(NetworkProtectionOnboardingMenu())
 
@@ -233,6 +236,17 @@ final class NetworkProtectionDebugMenu: NSMenu {
             } catch {
                 await NSAlert(error: error).runModal()
             }
+        }
+    }
+
+    /// Prints feedback collector metadata to the console. This is to facilitate easier iteration of the metadata collector, without having to go through the feedback form flow every time.
+    ///
+    @objc func logFeedbackMetadataToConsole(_ sender: Any?) {
+        Task { @MainActor in
+            let collector = DefaultVPNMetadataCollector()
+            let metadata = await collector.collectMetadata()
+
+            print(metadata.toPrettyPrintedJSON()!)
         }
     }
 
@@ -501,7 +515,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     @objc func resetNetworkProtectionRemoteMessages(_ sender: Any?) {
-        DefaultNetworkProtectionRemoteMessagingStorage().removeStoredAndDismissedMessages()
+        DefaultHomePageRemoteMessagingStorage.networkProtection().removeStoredAndDismissedMessages()
         DefaultNetworkProtectionRemoteMessaging(minimumRefreshInterval: 0).resetLastRefreshTimestamp()
     }
 
@@ -518,7 +532,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func overrideNetworkProtectionActivationDate(to date: Date?) {
-        let store = DefaultWaitlistActivationDateStore()
+        let store = DefaultWaitlistActivationDateStore(source: .netP)
 
         if let date {
             store.updateActivationDate(date)

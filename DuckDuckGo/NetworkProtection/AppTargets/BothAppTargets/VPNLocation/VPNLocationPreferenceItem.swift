@@ -22,7 +22,7 @@ import Foundation
 import SwiftUI
 
 struct VPNLocationPreferenceItem: View {
-    let model: VPNLocationPreferenceItemModel
+    @ObservedObject var model: VPNLocationPreferenceItemModel
     @State private var isShowingLocationSheet: Bool = false
 
     var body: some View {
@@ -30,14 +30,13 @@ struct VPNLocationPreferenceItem: View {
             HStack(spacing: 10) {
                 switch model.icon {
                 case .defaultIcon:
-                    Image(systemName: "location.fill")
-                        .resizable()
-                        .frame(width: 18, height: 18)
+                    Image("Location-16-Solid")
+                        .foregroundColor(Color("BlackWhite100").opacity(0.9))
                 case .emoji(let string):
-                    Text(string).font(.system(size: 20))
+                    Text(string).font(.system(size: 16))
                 }
 
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(model.title)
                         .font(.system(size: 13))
                         .foregroundColor(.primary)
@@ -52,13 +51,15 @@ struct VPNLocationPreferenceItem: View {
                     isShowingLocationSheet = true
                 }
                 .sheet(isPresented: $isShowingLocationSheet) {
-                    VPNLocationView(isPresented: $isShowingLocationSheet)
+                    VPNLocationView(model: model.locationsViewModel, isPresented: $isShowingLocationSheet)
                 }
             }
         }
         .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .topLeading)
-        .padding(10)
+        .frame(height: 52)
+        .padding(.horizontal, 10)
         .background(Color("BlackWhite1"))
+        .animation(.default)
         .roundedBorder()
     }
 

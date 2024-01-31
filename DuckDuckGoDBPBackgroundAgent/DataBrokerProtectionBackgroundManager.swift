@@ -56,12 +56,17 @@ public final class DataBrokerProtectionBackgroundManager {
                                                 sessionKey: sessionKey,
                                                 featureToggles: features)
 
+        let pixelHandler = DataBrokerProtectionPixelsHandler()
+
+        let userNotificationService = DefaultDataBrokerProtectionUserNotificationService(pixelHandler: pixelHandler)
+
         return DefaultDataBrokerProtectionScheduler(privacyConfigManager: privacyConfigurationManager,
-                                                  contentScopeProperties: prefs,
-                                                  dataManager: dataManager,
-                                                  notificationCenter: NotificationCenter.default,
-                                                  pixelHandler: DataBrokerProtectionPixelsHandler(),
-                                                  redeemUseCase: redeemUseCase)
+                                                    contentScopeProperties: prefs,
+                                                    dataManager: dataManager,
+                                                    notificationCenter: NotificationCenter.default,
+                                                    pixelHandler: pixelHandler,
+                                                    redeemUseCase: redeemUseCase,
+                                                    userNotificationService: userNotificationService)
     }()
 
     private init() {

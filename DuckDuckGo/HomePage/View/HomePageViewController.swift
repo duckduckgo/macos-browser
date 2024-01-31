@@ -97,10 +97,8 @@ final class HomePageViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
-        if !PixelExperiment.isExperimentInstalled {
-            if onboardingViewModel.onboardingFinished && Pixel.isNewUser {
-                Pixel.fire(.newTabInitial(), limitTo: .initial)
-            }
+        if OnboardingViewModel.isOnboardingFinished && Pixel.isNewUser {
+            Pixel.fire(.newTabInitial, limitTo: .initial)
         }
         subscribeToHistory()
     }
@@ -140,14 +138,16 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION && DBP
         let vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
             networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
-            appGroupUserDefaults: .netP
+            dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: .netP,
+            dataBrokerProtectionUserDefaults: .dbp
         )
 #else
         let vm = HomePage.Models.ContinueSetUpModel(
@@ -244,9 +244,8 @@ final class HomePageViewController: NSViewController {
     }
 
     private func showAddEditController(for bookmark: Bookmark? = nil) {
-        let addEditFavoriteViewController = AddEditFavoriteViewController.create(bookmark: bookmark)
-
-        self.beginSheet(addEditFavoriteViewController)
+        AddBookmarkModalView(model: AddBookmarkModalViewModel(originalBookmark: bookmark, isFavorite: true))
+            .show(in: self.view.window)
     }
 
     private var burningDataCancellable: AnyCancellable?

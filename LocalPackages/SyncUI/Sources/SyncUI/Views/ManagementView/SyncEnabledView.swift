@@ -17,7 +17,7 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
+import PreferencesViews
 
 struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
@@ -35,89 +35,47 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Sync Enabled
-        PreferencePaneSection(verticalPadding: 12) {
+        PreferencePaneSection {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
-                .frame(width: 513, alignment: .topLeading)
         }
 
         // Synced Devices
-        PreferencePaneSection(verticalPadding: 12) {
-            Text(UserText.syncedDevices)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
+        PreferencePaneSection(UserText.syncedDevices) {
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
-                .frame(width: 513, alignment: .topLeading)
         }
 
         // Options
-        PreferencePaneSection(verticalPadding: 12) {
-            Text(UserText.optionsSectionTitle)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-                .padding(.horizontal, 16)
-            Toggle(isOn: $model.isFaviconsFetchingEnabled) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(UserText.fetchFaviconsOptionTitle)
-                        Text(UserText.fetchFaviconsOptionCaption)
-                            .font(Const.Fonts.preferencePaneCaption)
-                            .foregroundColor(Color("BlackWhite60"))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .multilineTextAlignment(.leading)
-                    }
-                    Spacer(minLength: 30)
-                }
+        PreferencePaneSection(UserText.optionsSectionTitle) {
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.fetchFaviconsOptionTitle, isOn: $model.isFaviconsFetchingEnabled)
+                TextMenuItemCaption(UserText.fetchFaviconsOptionCaption)
             }
-            .padding(.horizontal, 16)
-            .toggleStyle(.switch)
-            .padding(.vertical, 12)
-            .roundedBorder()
-            .frame(width: 513, alignment: .topLeading)
-            Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(UserText.shareFavoritesOptionTitle)
-                        Text(UserText.shareFavoritesOptionCaption)
-                            .font(Const.Fonts.preferencePaneCaption)
-                            .foregroundColor(Color("BlackWhite60"))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .multilineTextAlignment(.leading)
-                    }
-                    Spacer(minLength: 30)
-                }
+
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.shareFavoritesOptionTitle, isOn: $model.isUnifiedFavoritesEnabled)
+                TextMenuItemCaption(UserText.shareFavoritesOptionCaption)
             }
-            .padding(.horizontal, 16)
-            .toggleStyle(.switch)
-            .padding(.vertical, 12)
-            .roundedBorder()
-            .frame(width: 513, alignment: .topLeading)
         }
 
         // Recovery
-        PreferencePaneSection(verticalPadding: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(UserText.recovery)
-                    .font(Const.Fonts.preferencePaneSectionHeader)
-                HStack(alignment: .top, spacing: 12) {
-                    Text(UserText.recoveryInstructions)
-                        .fixMultilineScrollableText()
-                    Spacer()
-                    Button(UserText.saveRecoveryPDF) {
-                        model.saveRecoveryPDF()
-                    }
+        PreferencePaneSection(UserText.recovery) {
+            HStack(alignment: .top, spacing: 12) {
+                Text(UserText.recoveryInstructions)
+                    .fixMultilineScrollableText()
+                Spacer()
+                Button(UserText.saveRecoveryPDF) {
+                    model.saveRecoveryPDF()
                 }
             }
-            .padding(.horizontal, 16)
-            .frame(width: 513, alignment: .topLeading)
         }
 
-        // Turn Off and Delate Data
-        PreferencePaneSection(verticalPadding: 12) {
+        // Turn Off and Delete Data
+        PreferencePaneSection {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
-            .padding(16)
         }
     }
 
@@ -154,7 +112,11 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         if model.isDataSyncingAvailable {
             EmptyView()
         } else {
-            SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            if model.isAppVersionNotSupported {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessageUpgradeRequired)
+            } else {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            }
         }
     }
 
