@@ -32,7 +32,7 @@ on:
     secrets:
       ASANA_ACCESS_TOKEN:
         required: true
-      GHA_MERGE_TOKEN:
+      GHA_ELEVATED_PERMISSIONS_TOKEN:
         required: true
 
 jobs:
@@ -92,7 +92,7 @@ jobs:
       id: merge
       uses: actions/github-script@v7
       with:
-        github-token: ${{ secrets.GHA_MERGE_TOKEN }}
+        github-token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
         script: |
           github.rest.repos.merge({
             owner: context.repo.owner,
