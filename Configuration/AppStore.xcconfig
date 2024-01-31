@@ -48,6 +48,7 @@ AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
 AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
 
 AGENT_PRODUCT_NAME = DuckDuckGo VPN App Store
+AGENT_RELEASE_PRODUCT_NAME = DuckDuckGo VPN
 
 SYSEX_BUNDLE_ID[sdk=*] = com.duckduckgo.mobile.ios.vpn.agent
 SYSEX_BUNDLE_ID[config=Debug][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.debug.network-protection-extension
@@ -73,6 +74,7 @@ DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Release][sdk=*] = $(DISTRIBUTED_NOTIFICA
 // DBP
 
 DBP_BACKGROUND_AGENT_PRODUCT_NAME = DuckDuckGo Personal Information Removal App Store
+DBP_BACKGROUND_AGENT_RELEASE_PRODUCT_NAME = DuckDuckGo Personal Information Removal
 
 DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.mobile.ios.DBP.backgroundAgent
 DBP_BACKGROUND_AGENT_BUNDLE_ID[sdk=*] = $(DBP_BACKGROUND_AGENT_BUNDLE_ID_BASE)
