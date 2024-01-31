@@ -17,4 +17,4 @@ jobs:
           ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
           ASANA_PROJECT_NAME: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_NAME }}
         with:
-          args: "--dangerfile duckduckgo/danger-settings/org/allPRs.ts@dominik/verify-asana-project"
+          args: "--dangerfile duckduckgo/danger-settings/org/allPRs.ts@dominik/improve-asana-url-checking"
