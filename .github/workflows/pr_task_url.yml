@@ -91,12 +91,18 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
-          github.rest.issues.removeLabel({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            name: 'bot: not in app board'
-          })
+          try {
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'bot: not in app board'
+            });
+          } catch (error) {
+            if (error.status !== 404) {
+              throw error;
+            }
+          }
 
     - name: Report status
       run: |
