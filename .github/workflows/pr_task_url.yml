@@ -99,9 +99,6 @@ jobs:
               name: 'bot: not in app board'
             });
           } catch (error) {
-            console.error("12345");
-            console.error(error.status);
-            console.error("67890");
             if (error.status !== 404) {
               throw error;
             }
