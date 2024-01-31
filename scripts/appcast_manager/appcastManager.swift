@@ -6,7 +6,7 @@
 
 import Foundation
 
-signal(SIGINT) { signal in
+signal(SIGINT) { _ in
     print("Received Ctrl+C. Terminating...")
     exit(1)
 }
@@ -367,7 +367,7 @@ final class AppcastDownloader {
         }
 
         // Create a data task with the HEAD request to receive a remote file length
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+        let task = URLSession.shared.dataTask(with: request) { (_, response, error) in
             if let error = error {
                 completion(error)
 
@@ -508,16 +508,6 @@ final class AppcastDownloader {
                 return marketingVersion
             }
             return [marketingVersion, buildNumber].joined(separator: ".")
-        }
-
-        var currentVersionIdentifier: String? {
-            guard let currentVersion else {
-                return nil
-            }
-            guard let currentVersionNumber, currentVersionNumber != currentVersion else {
-                return currentVersion
-            }
-            return [currentVersion, currentVersionNumber].joined(separator: ".")
         }
 
         typealias DownloadFileCallback = (URL, URL, URLRequest.CachePolicy, @escaping (Error?) -> Void) -> Void
