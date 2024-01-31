@@ -507,7 +507,26 @@ private struct NotesView: View {
                         model.copy(model.notes)
                     })
                 }))
+                .modifier(TextSelectionModifier())
         }
+    }
+
+}
+
+private struct TextSelectionModifier: ViewModifier {
+
+    func body(content: Content) -> some View {
+#if APPSTORE
+        content
+            .textSelection(.enabled)
+#else
+        if #available(macOS 12, *) {
+            content
+                .textSelection(.enabled)
+        } else {
+            content
+        }
+#endif
     }
 
 }
