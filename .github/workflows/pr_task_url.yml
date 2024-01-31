@@ -9,7 +9,7 @@ jobs:
   # This job is used to assert that the task linked in the PR description belongs to the specified project (App Board).
   assert-project-membership:
 
-    name: Check Task Project Membership
+    name: Check App Board Project Membership
 
     runs-on: ubuntu-latest
 
@@ -49,7 +49,7 @@ jobs:
   # Otherwise, delete the comment and pass the check.
   update-project-membership-report:
 
-    name: App Board Membership Report
+    name: App Board Project Membership Report
 
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
