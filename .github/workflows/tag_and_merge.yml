@@ -22,7 +22,7 @@ on:
         required: false
         type: string
     secrets:
-      ASANA_PERSONAL_ACCESS_TOKEN:
+      ASANA_ACCESS_TOKEN:
         required: true
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
       if: env.asana-task-url
       uses: ./.github/actions/extract-asana-task-assignee
       with:
-        access-token: ${{ secrets.ASANA_PERSONAL_ACCESS_TOKEN }}
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-id: ${{ steps.get-task-id.outputs.task-id }}
 
     - name: Check out the code
