@@ -89,7 +89,6 @@ private class MockVPNMetadataCollector: VPNMetadataCollector {
             appVersion: "1.2.3",
             lastVersionRun: "1.2.3",
             isInternalUser: false,
-            isAdminUser: "true",
             isInApplicationsDirectory: true
         )
 
