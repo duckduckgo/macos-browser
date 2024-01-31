@@ -69,10 +69,15 @@ jobs:
 
     - name: Add a label to the PR
       if: ${{ needs.assert-project-membership.result.failure == '1' }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh pr edit ${{ github.event.pull_request.number }} --add-label "bot: not in app board"
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.addLabels({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: ['bot: not in app board']
+          })
 
     - name: Delete comment on the PR
       if: ${{ needs.assert-project-membership.result.failure == '0' }}
@@ -81,12 +86,17 @@ jobs:
         header: asana-task-check-status
         delete: true
 
-    - name: Remove the label from the PR
+    - name: Remove the label from the PR using github-script
       if: ${{ needs.assert-project-membership.result.failure == '0' }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh pr edit ${{ github.event.pull_request.number }} --remove-label "bot: not in app board"
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.removeLabel({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            name: 'bot: not in app board'
+          })
 
     - name: Report status
       run: |
