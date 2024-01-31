@@ -100,23 +100,27 @@ jobs:
 
     - name: Create Asana task on failed merge
       if: failure()
+      env:
+        ASSIGNEE_ID: ${{ steps.get-assignee-id.outputs.assignee-id }}
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        TASK_NAME: "Merging ${{ env.branch }} to ${{ env.base-branch }} failed"
+        TASK_BODY: "Automatic merge failed. Please resolve conflicts and merge ${{ env.branch }} to ${{ env.base-branch }} manually."
+        TASK_ID: ${{ steps.get-task-id.outputs.task-id }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
-        task_name="Merging ${{ env.branch }} to ${{ env.base-branch }} failed"
-        task_body="Automatic merge failed. Please resolve conflicts and merge ${{ env.branch }} to ${{ env.base-branch }} manually."
-        assignee="${{ steps.get-assignee-id.outputs.assignee-id }}"
-        return_code=$(curl -X POST -fLSs "https://app.asana.com/api/1.0/tasks/${parent_task_id}/subtasks" \
-          -H "Authorization: Bearer ${asana_personal_access_token}" \
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/subtasks" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
           -H 'content-type: application/json' \
           --write-out '%{http_code}' \
           --output /dev/null \
-            -d "{
-                  \"data\": {
-                    \"name\": \"${task_name}\",
-                    \"resource_subtype\": \"default_task\",
-                    \"notes\": \"${task_body}\",
-                    \"assignee\": \"${assignee}\"
-                  }
+          -d "{
+                \"data\": {
+                  \"name\": \"${TASK_NAME}\",
+                  \"resource_subtype\": \"default_task\",
+                  \"notes\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\",
+                  \"assignee\": \"${ASSIGNEE_ID}\"
                 }
+              }
           ")
 
         if [ $return_code -ne 201 ]; then
