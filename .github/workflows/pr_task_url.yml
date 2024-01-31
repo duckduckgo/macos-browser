@@ -2,14 +2,14 @@ name: Asana PR Task URL
 
 on: 
   pull_request:
-    types: [opened, edited, closed]
+    types: [opened, edited, closed, unlabeled]
 
 jobs:
 
   # This job is used to assert that the task linked in the PR description belongs to the specified project (App Board).
   assert-project-membership:
 
-    name: Check Asana Task Project Membership
+    name: Check Task Project Membership
 
     runs-on: ubuntu-latest
 
@@ -49,7 +49,7 @@ jobs:
   # Otherwise, delete the comment and pass the check.
   report-task-missing-from-project:
 
-    name: Report Asana Task Missing From Project
+    name: Report Task Missing from Project
 
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
@@ -67,13 +67,27 @@ jobs:
         message: |
           :no_entry_sign: The Asana task linked in the PR description is not added to ${{ env.ASANA_PROJECT_NAME }} project.
 
+    - name: Add a label to the PR
+      if: ${{ needs.assert-project-membership.result.failure == '1' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh pr edit ${{ github.event.pull_request.number }} --add-label "bot: not in app board"
+
     - name: Delete comment on the PR
       if: ${{ needs.assert-project-membership.result.failure == '0' }}
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         header: asana-task-check-status
         delete: true
-    
+
+    - name: Remove the label from the PR
+      if: ${{ needs.assert-project-membership.result.failure == '0' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh pr edit ${{ github.event.pull_request.number }} --remove-label "bot: not in app board"
+
     - name: Report status
       run: |
         exit ${{ needs.assert-project-membership.result.failure }}
@@ -81,7 +95,7 @@ jobs:
   # When a PR is merged, move the task to the Waiting for Release section of the App Board.
   mark-waiting-for-release:
 
-    name: Move to Waiting for Release
+    name: Move to Waiting for Release on Merge
 
     runs-on: ubuntu-latest
     if: github.event.action == 'closed' && github.event.pull_request.merged == true
