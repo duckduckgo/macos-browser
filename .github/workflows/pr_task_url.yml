@@ -49,7 +49,7 @@ jobs:
   # Otherwise, delete the comment and pass the check.
   update-project-membership-report:
 
-    name: Update Project Membership Report
+    name: App Board Membership Report
 
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
