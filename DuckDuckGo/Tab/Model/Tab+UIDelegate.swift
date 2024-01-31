@@ -37,39 +37,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        if !downloadsPreferences.alwaysRequestDownloadLocation,
-           let location = downloadsPreferences.effectiveDownloadLocation {
-            let url = location.appendingPathComponent(suggestedFilename)
-            save(data: data, to: url)
-            return
-        }
-
-        let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
-        let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { [weak self] result in
-            guard
-                let self,
-                let url = (try? result.get())?.url
-            else {
-                return
-            }
-            save(data: data, to: url)
-        })
-        userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
-    }
-
-    func save(data: Data, to toURL: URL) {
-        let fm = FileManager.default
-        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
-        do {
-            // First save file in a temporary directory
-            try data.write(to: tempURL)
-            // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
-            try ProgressDownloadOperation(destURL: toURL) {
-                _ = try fm.moveItem(at: tempURL, to: toURL, incrementingIndexIfExists: true)
-            }.start()
-        } catch {
-            os_log("Failed to save PDF file to Downloads folder", type: .error)
-        }
+        saveDownloaded(data: data, suggestedFilename: suggestedFilename, mimeType: mimeType)
     }
 
     @MainActor

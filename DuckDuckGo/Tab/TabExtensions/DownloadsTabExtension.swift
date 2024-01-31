@@ -194,6 +194,8 @@ protocol DownloadsTabExtensionProtocol: AnyObject, NavigationResponder, Download
     var savePanelDialogPublisher: AnyPublisher<Tab.UserDialog?, Never> { get }
 
     func saveWebViewContentAs(_ webView: WKWebView)
+
+    func saveDownloaded(data: Data, to toURL: URL)
 }
 
 extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
@@ -203,6 +205,21 @@ extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
         $savePanelDialogRequest.map { $0.map { request in
             Tab.UserDialog(sender: .user, dialog: .savePanel(request))
         }}.eraseToAnyPublisher()
+    }
+
+    func saveDownloaded(data: Data, to toURL: URL) {
+        let fm = FileManager.default
+        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
+        do {
+            // First save file in a temporary directory
+            try data.write(to: tempURL)
+            // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
+            try ProgressDownloadOperation(destURL: toURL) {
+                _ = try fm.moveItem(at: tempURL, to: toURL, incrementingIndexIfExists: true)
+            }.start()
+        } catch {
+            os_log("Failed to save PDF file to Downloads folder", type: .error)
+        }
     }
 }
 
@@ -216,6 +233,30 @@ extension Tab {
 
     func saveWebContentAs() {
         self.downloads?.saveWebViewContentAs(webView)
+    }
+
+    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String) {
+        if !downloadsPreferences.alwaysRequestDownloadLocation,
+           let location = downloadsPreferences.effectiveDownloadLocation {
+            let url = location.appendingPathComponent(suggestedFilename)
+            self.downloads?.saveDownloaded(data: data, to: url)
+            return
+        }
+
+        let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
+        let savePanelDialogRequest = savePanelDialogRequestFactory.makeSavePanelDialogRequest(suggestedFilename: suggestedFilename, fileTypes: fileTypes) { [weak self] result in
+            guard
+                let self,
+                let url = (try? result.get())?.url
+            else {
+                return
+            }
+            self.downloads?.saveDownloaded(data: data, to: url)
+        }
+
+        let dialog = Tab.UserDialogType.savePanel(savePanelDialogRequest)
+
+        userInteractionDialog = Tab.UserDialog(sender: .user, dialog: dialog)
     }
 
 }

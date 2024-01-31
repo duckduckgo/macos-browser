@@ -275,6 +275,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let startupPreferences: StartupPreferences
     let downloadsPreferences: DownloadsPreferences
+    let savePanelDialogRequestFactory: SavePanelDialogRequestFactoryProtocol
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -312,7 +313,8 @@ protocol NewWindowPolicyDecisionMaker {
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
-                     startupPreferences: StartupPreferences = StartupPreferences.shared
+                     startupPreferences: StartupPreferences = StartupPreferences.shared,
+                     savePanelDialogRequestFactory: SavePanelDialogRequestFactoryProtocol = SavePanelDialogRequestFactory()
     ) {
 
         let duckPlayer = duckPlayer
@@ -352,7 +354,8 @@ protocol NewWindowPolicyDecisionMaker {
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
                   webViewSize: webViewSize,
-                  startupPreferences: startupPreferences)
+                  startupPreferences: startupPreferences,
+                  savePanelDialogRequestFactory: savePanelDialogRequestFactory)
     }
 
     @MainActor
@@ -383,7 +386,8 @@ protocol NewWindowPolicyDecisionMaker {
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
          webViewSize: CGSize,
-         startupPreferences: StartupPreferences
+         startupPreferences: StartupPreferences,
+         savePanelDialogRequestFactory: SavePanelDialogRequestFactoryProtocol
     ) {
 
         self.content = content
@@ -400,6 +404,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
         self.downloadsPreferences = downloadsPreferences
+        self.savePanelDialogRequestFactory = savePanelDialogRequestFactory
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,
