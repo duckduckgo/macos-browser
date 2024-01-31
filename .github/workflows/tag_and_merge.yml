@@ -7,6 +7,14 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      base-branch:
+        description: "Base branch name"
+        required: false
+        type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
   workflow_call:
     inputs:
       asana-task-url:
@@ -39,6 +47,12 @@ jobs:
 
     steps:
 
+    - name: Check out the code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
+
     - name: Get Asana task ID
       id: get-task-id
       if: env.asana-task-url
@@ -54,12 +68,6 @@ jobs:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-id: ${{ steps.get-task-id.outputs.task-id }}
 
-    - name: Check out the code
-      uses: actions/checkout@v3
-      with:
-        submodules: recursive
-        ref: ${{ inputs.branch || github.ref_name }}
-
     - name: Set up git
       run: |
         git config --global user.name "Dax the Duck"
@@ -69,8 +77,8 @@ jobs:
       id: construct-tag
       run: |
         version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
-        build_number="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
-        tag="v${version}-${build_number}"
+        build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
+        tag="${version}-${build_number}"
         echo "tag=${tag}" >> $GITHUB_OUTPUT
 
     - name: Tag the repo
@@ -80,17 +88,18 @@ jobs:
 
     - name: Merge to base branch
       id: merge
-      run: |
-        git checkout ${{ env.base-branch }}
-        git pull origin ${{ env.base-branch }}
-        if git merge ${{ inputs.branch || github.ref_name }}; then
-          git push origin ${{ env.base-branch }}
-        else
-          echo "merge_success=false" >> $GITHUB_OUTPUT
-        fi
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.repos.merge({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            base: "${{ env.base-branch }}",
+            head: "${{ env.branch }}"
+          })
 
     - name: Create Asana task on failed merge
-      if: ${{ steps.merge.outputs.merge_success == 'false' }}
+      if: failure()
       run: |
         task_name="Merging ${{ env.branch }} to ${{ env.base-branch }} failed"
         task_body="Automatic merge failed. Please resolve conflicts and merge ${{ env.branch }} to ${{ env.base-branch }} manually."

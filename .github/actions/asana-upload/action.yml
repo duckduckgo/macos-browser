@@ -17,7 +17,7 @@ runs:
   using: "composite"
   steps:
     - run: |
-        curl -s "https://app.asana.com/api/1.0/tasks/${task_id}/attachments" \
+        curl -s "https://app.asana.com/api/1.0/tasks/${{ inputs.task-id }}/attachments" \
           -H "Authorization: Bearer ${{ inputs.access-token }}" \
           --form "file=@${{ inputs.file-name }}"
       shell: bash

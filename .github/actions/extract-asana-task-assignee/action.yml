@@ -18,7 +18,7 @@ runs:
   steps:
     - id: extract-assignee-id
       run: |
-        assignee_id=$(curl -s "https://app.asana.com/api/1.0/tasks/${task_id}?opt_fields=assignee" \
+        assignee_id=$(curl -s "https://app.asana.com/api/1.0/tasks/${{ inputs.task-id }}?opt_fields=assignee" \
           -H "Authorization: Bearer ${{ inputs.access-token }}" \
           | jq -r '.data.assignee.gid')
       shell: bash
