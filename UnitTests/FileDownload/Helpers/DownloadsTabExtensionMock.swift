@@ -29,7 +29,8 @@ class DownloadsTabExtensionMock: NSObject, DownloadsTabExtensionProtocol {
 
     private(set) var didCallSaveDownloadedData = false
     private(set) var capturedSavedDownloadData: Data?
-    private(set) var capturedSavedDownloadURL: URL?
+    private(set) var capturedSuggestedFilename: String?
+    private(set) var capturedMimeType: String?
 
     var savePanelDialogSubject = PassthroughSubject<DuckDuckGo_Privacy_Browser.Tab.UserDialog?, Never>()
 
@@ -44,10 +45,11 @@ class DownloadsTabExtensionMock: NSObject, DownloadsTabExtensionProtocol {
         capturedWebView = webView
     }
 
-    func saveDownloaded(data: Data, to toURL: URL) {
+    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String) {
         didCallSaveDownloadedData = true
         capturedSavedDownloadData = data
-        capturedSavedDownloadURL = toURL
+        capturedSuggestedFilename = suggestedFilename
+        capturedMimeType = mimeType
     }
 
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {}

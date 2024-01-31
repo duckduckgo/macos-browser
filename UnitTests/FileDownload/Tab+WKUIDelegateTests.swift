@@ -55,7 +55,7 @@ final class TabWKUIDelegateTests: XCTestCase {
         let filename = "Test Document.pdf"
         XCTAssertFalse(downloadExtensionMock.didCallSaveDownloadedData)
         XCTAssertNil(downloadExtensionMock.capturedSavedDownloadData)
-        XCTAssertNil(downloadExtensionMock.capturedSavedDownloadURL)
+        XCTAssertNil(downloadExtensionMock.capturedMimeType)
 
         // WHEN
         sut.webView(WKWebView(), saveDataToFile: testData, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: originatingURL)
@@ -63,79 +63,7 @@ final class TabWKUIDelegateTests: XCTestCase {
         // THEN
         XCTAssertTrue(downloadExtensionMock.didCallSaveDownloadedData)
         XCTAssertEqual(downloadExtensionMock.capturedSavedDownloadData, testData)
-        XCTAssertNotNil(downloadExtensionMock.capturedSavedDownloadURL?.absoluteString.contains(filename))
-    }
-
-    @MainActor
-    func testWhenAlwaysRequestDownloadLocationIsFalseThenShouldAskDownloadsTabExtensionToSaveData() throws {
-        // GIVEN
-        let preferencesPersistorMock = DownloadsPreferencesPersistorMock(
-            selectedDownloadLocation: testDirectory.absoluteString,
-            alwaysRequestDownloadLocation: false
-        )
-        let downloadPreferences = DownloadsPreferences(persistor: preferencesPersistorMock)
-        let downloadExtensionMock = DownloadsTabExtensionMock()
-        let extensionBuilder = TestTabExtensionsBuilder(load: [DownloadsTabExtensionMock.self]) { builder in { _, _ in
-            builder.override {
-                downloadExtensionMock
-            }
-        }}
-        let tab = Tab(content: .none, downloadsPreferences: downloadPreferences, extensionsBuilder: extensionBuilder)
-        XCTAssertFalse(downloadExtensionMock.didCallSaveDownloadedData)
-        XCTAssertNil(downloadExtensionMock.capturedSavedDownloadData)
-        XCTAssertNil(downloadExtensionMock.capturedSavedDownloadURL)
-
-        // WHEN
-        tab.webView(WKWebView(), saveDataToFile: testData, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: originatingURL)
-
-        // THEN
-        XCTAssertTrue(downloadExtensionMock.didCallSaveDownloadedData)
-        XCTAssertEqual(downloadExtensionMock.capturedSavedDownloadData, testData)
-        XCTAssertEqual(downloadExtensionMock.capturedSavedDownloadURL, testDirectory.appendingPathComponent(filename))
-    }
-
-    @MainActor
-    func testWhenAlwaysRequestDownloadLocationIsTrueThenShouldAskDownloadsTabExtensionToSaveData() throws {
-        // GIVEN
-        let preferencesPersistorMock = DownloadsPreferencesPersistorMock(
-            selectedDownloadLocation: testDirectory.absoluteString,
-            alwaysRequestDownloadLocation: true
-        )
-        let downloadPreferences = DownloadsPreferences(persistor: preferencesPersistorMock)
-        let downloadExtensionMock = DownloadsTabExtensionMock()
-        let extensionBuilder = TestTabExtensionsBuilder(load: [DownloadsTabExtensionMock.self]) { builder in { _, _ in
-            builder.override {
-                downloadExtensionMock
-            }
-        }}
-        let savePanelDialogRequestFactoryMock = SavePanelDialogRequestFactoryMock()
-        let tab = Tab(content: .none, downloadsPreferences: downloadPreferences, extensionsBuilder: extensionBuilder, savePanelDialogRequestFactory: savePanelDialogRequestFactoryMock)
-
-        XCTAssertFalse(downloadExtensionMock.didCallSaveDownloadedData)
-        XCTAssertNil(downloadExtensionMock.capturedSavedDownloadData)
-        XCTAssertNil(downloadExtensionMock.capturedSavedDownloadURL)
-        tab.webView(WKWebView(), saveDataToFile: testData, suggestedFilename: filename, mimeType: "application/pdf", originatingURL: originatingURL)
-        let expectedURL = testDirectory.appendingPathComponent(filename)
-
-        // WHEN
-        savePanelDialogRequestFactoryMock.completionHandler?(.success((expectedURL, nil)))
-
-        // THEN
-        XCTAssertTrue(downloadExtensionMock.didCallSaveDownloadedData)
-        XCTAssertEqual(downloadExtensionMock.capturedSavedDownloadData, testData)
-        XCTAssertEqual(downloadExtensionMock.capturedSavedDownloadURL, expectedURL)
-    }
-
-}
-
-final class SavePanelDialogRequestFactoryMock: SavePanelDialogRequestFactoryProtocol {
-
-    var completionHandler: ((Result<(url: URL, fileType: UTType?)?, DuckDuckGo_Privacy_Browser.UserDialogRequestError>) -> Void)?
-
-    func makeSavePanelDialogRequest(suggestedFilename: String, fileTypes: [UTType], completionHandler: @escaping (Result<(url: URL, fileType: UTType?)?, DuckDuckGo_Privacy_Browser.UserDialogRequestError>) -> Void) -> DuckDuckGo_Privacy_Browser.SavePanelDialogRequest {
-        self.completionHandler = completionHandler
-
-        return .init(.init(suggestedFilename: suggestedFilename, fileTypes: fileTypes), callback: completionHandler)
+        XCTAssertNotNil(downloadExtensionMock.capturedMimeType, "application/pdf")
     }
 
 }

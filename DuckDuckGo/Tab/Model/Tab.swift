@@ -274,8 +274,6 @@ protocol NewWindowPolicyDecisionMaker {
     private let webViewConfiguration: WKWebViewConfiguration
 
     let startupPreferences: StartupPreferences
-    let downloadsPreferences: DownloadsPreferences
-    let savePanelDialogRequestFactory: SavePanelDialogRequestFactoryProtocol
 
     private var extensions: TabExtensions
     // accesing TabExtensions‘ Public Protocols projecting tab.extensions.extensionName to tab.extensionName
@@ -298,7 +296,6 @@ protocol NewWindowPolicyDecisionMaker {
                      privacyFeatures: AnyPrivacyFeatures? = nil,
                      duckPlayer: DuckPlayer? = nil,
                      downloadManager: FileDownloadManagerProtocol = FileDownloadManager.shared,
-                     downloadsPreferences: DownloadsPreferences = DownloadsPreferences(),
                      permissionManager: PermissionManagerProtocol = PermissionManager.shared,
                      geolocationService: GeolocationServiceProtocol = GeolocationService.shared,
                      cbaTimeReporter: ContentBlockingAssetsCompilationTimeReporter? = ContentBlockingAssetsCompilationTimeReporter.shared,
@@ -313,8 +310,7 @@ protocol NewWindowPolicyDecisionMaker {
                      canBeClosedWithBack: Bool = false,
                      lastSelectedAt: Date? = nil,
                      webViewSize: CGSize = CGSize(width: 1024, height: 768),
-                     startupPreferences: StartupPreferences = StartupPreferences.shared,
-                     savePanelDialogRequestFactory: SavePanelDialogRequestFactoryProtocol = SavePanelDialogRequestFactory()
+                     startupPreferences: StartupPreferences = StartupPreferences.shared
     ) {
 
         let duckPlayer = duckPlayer
@@ -338,7 +334,6 @@ protocol NewWindowPolicyDecisionMaker {
                   privacyFeatures: privacyFeatures,
                   duckPlayer: duckPlayer,
                   downloadManager: downloadManager,
-                  downloadsPreferences: downloadsPreferences,
                   permissionManager: permissionManager,
                   geolocationService: geolocationService,
                   extensionsBuilder: extensionsBuilder,
@@ -354,8 +349,7 @@ protocol NewWindowPolicyDecisionMaker {
                   canBeClosedWithBack: canBeClosedWithBack,
                   lastSelectedAt: lastSelectedAt,
                   webViewSize: webViewSize,
-                  startupPreferences: startupPreferences,
-                  savePanelDialogRequestFactory: savePanelDialogRequestFactory)
+                  startupPreferences: startupPreferences)
     }
 
     @MainActor
@@ -370,7 +364,6 @@ protocol NewWindowPolicyDecisionMaker {
          privacyFeatures: AnyPrivacyFeatures,
          duckPlayer: DuckPlayer,
          downloadManager: FileDownloadManagerProtocol,
-         downloadsPreferences: DownloadsPreferences,
          permissionManager: PermissionManagerProtocol,
          geolocationService: GeolocationServiceProtocol,
          extensionsBuilder: TabExtensionsBuilderProtocol,
@@ -386,8 +379,7 @@ protocol NewWindowPolicyDecisionMaker {
          canBeClosedWithBack: Bool,
          lastSelectedAt: Date?,
          webViewSize: CGSize,
-         startupPreferences: StartupPreferences,
-         savePanelDialogRequestFactory: SavePanelDialogRequestFactoryProtocol
+         startupPreferences: StartupPreferences
     ) {
 
         self.content = content
@@ -403,8 +395,6 @@ protocol NewWindowPolicyDecisionMaker {
         self.interactionState = interactionStateData.map(InteractionState.loadCachedFromTabContent) ?? .none
         self.lastSelectedAt = lastSelectedAt
         self.startupPreferences = startupPreferences
-        self.downloadsPreferences = downloadsPreferences
-        self.savePanelDialogRequestFactory = savePanelDialogRequestFactory
 
         let configuration = webViewConfiguration ?? WKWebViewConfiguration()
         configuration.applyStandardConfiguration(contentBlocking: privacyFeatures.contentBlocking,

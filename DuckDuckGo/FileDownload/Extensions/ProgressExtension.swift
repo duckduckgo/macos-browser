@@ -108,6 +108,33 @@ extension Progress {
         self.unpublish()
     }
 
+    /// Initialize a new Progress that publishes the progress of a file operation.
+    ///
+    /// Primarily this is used to show a bounce if the file is in a location on the user's dock (e.g. Downloads)
+    /// - Parameters:
+    ///   - url: The URL of the file to observe.
+    ///   - block: A closure used to perform an operation on the file at the specified `url`.
+    static func withPublishedProgress(url: URL, block: () throws -> Void) throws {
+        let progress = Progress(
+            totalUnitCount: 1,
+            fileOperationKind: .downloading,
+            kind: .file,
+            isPausable: false,
+            isCancellable: false,
+            fileURL: url
+        )
+
+        defer { progress.unpublish() }
+        progress.publish()
+
+        do {
+            try block()
+            progress.completedUnitCount = progress.totalUnitCount
+        } catch {
+            throw error
+        }
+    }
+
 }
 
 extension ProgressUserInfoKey {

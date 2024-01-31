@@ -16,7 +16,10 @@
 //  limitations under the License.
 //
 
+import Combine
 import XCTest
+import UniformTypeIdentifiers
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class DownloadsTabExtensionTests: XCTestCase {
@@ -24,34 +27,54 @@ final class DownloadsTabExtensionTests: XCTestCase {
     private let filename = "Document.pdf"
     private let fileManager = FileManager.default
     private var testDirectory: URL!
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
 
         testData = try XCTUnwrap("test".data(using: .utf8))
         testDirectory = fileManager.temporaryDirectory
+        cancellables = []
     }
 
     override func tearDownWithError() throws {
         testData = nil
         testDirectory = nil
+        cancellables = nil
         try super.tearDownWithError()
     }
 
-    // MARK: - Save Data
+    @MainActor
+    func testWhenAlwaysRequestDownloadLocationIsTrueThenShouldAskDownloadsTabExtensionToSaveData() throws {
+        // GIVEN
+        let expectedURL = testDirectory.appendingPathComponent(filename)
+        let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: true)
+        XCTAssertFalse(fileManager.fileExists(atPath: expectedURL.path))
+
+        // WHEN
+        sut.saveDownloaded(data: testData, suggestedFilename: filename, mimeType: "application/pdf")
+        sut.$savePanelDialogRequest
+            .sink { request in
+                request?.submit( (url: expectedURL, fileType: nil))
+            }
+            .store(in: &cancellables)
+
+        // THEN
+        XCTAssertTrue(fileManager.fileExists(atPath: expectedURL.path))
+    }
 
     @MainActor
     func testWhenSaveDataAndFileExistThenURLShouldIncrementIndex() throws {
         // GIVEN
-        let sut = DownloadsTabExtension(downloadManager: FileDownloadManagerMock(), isBurner: false)
-        let expectedFilename = "Document 1.pdf"
         let destURL = testDirectory.appendingPathComponent(filename)
+        let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: false)
+        let expectedFilename = "Document 1.pdf"
         let expectedDestURL = testDirectory.appendingPathComponent(expectedFilename)
         try testData.write(to: destURL)
         XCTAssertFalse(fileManager.fileExists(atPath: expectedDestURL.path))
 
         // WHEN
-        sut.saveDownloaded(data: testData, to: destURL)
+        sut.saveDownloaded(data: testData, suggestedFilename: filename, mimeType: "application/pdf")
 
         // THEN
         XCTAssertTrue(fileManager.fileExists(atPath: expectedDestURL.path))
@@ -60,15 +83,27 @@ final class DownloadsTabExtensionTests: XCTestCase {
     @MainActor
     func testWhenSaveDataAndFileDoesNotExistThenURLShouldNotIncrementIndex() throws {
         // GIVEN
-        let sut = DownloadsTabExtension(downloadManager: FileDownloadManagerMock(), isBurner: false)
         let destURL = testDirectory.appendingPathComponent(filename)
+        let sut = makeSUT(downloadLocation: testDirectory, alwaysRequestDownloadLocation: false)
         XCTAssertFalse(fileManager.fileExists(atPath: destURL.path))
 
         // WHEN
-        sut.saveDownloaded(data: testData, to: destURL)
+        sut.saveDownloaded(data: testData, suggestedFilename: filename, mimeType: "application/pdf")
 
         // THEN
         XCTAssertTrue(fileManager.fileExists(atPath: destURL.path))
     }
 
+}
+
+private extension DownloadsTabExtensionTests {
+
+    func makeSUT(downloadLocation: URL, alwaysRequestDownloadLocation: Bool) -> DownloadsTabExtension {
+        let preferencesPersistorMock = DownloadsPreferencesPersistorMock(
+            selectedDownloadLocation: downloadLocation.absoluteString,
+            alwaysRequestDownloadLocation: alwaysRequestDownloadLocation
+        )
+        let downloadPreferences = DownloadsPreferences(persistor: preferencesPersistorMock)
+        return DownloadsTabExtension(downloadManager: FileDownloadManagerMock(), isBurner: false, downloadsPreferences: downloadPreferences)
+    }
 }

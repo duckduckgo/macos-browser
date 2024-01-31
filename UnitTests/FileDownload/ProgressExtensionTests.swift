@@ -1,5 +1,5 @@
 //
-//  ProgressDownloadOperationTests.swift
+//  ProgressExtensionTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,9 +20,9 @@ import XCTest
 
 @testable import DuckDuckGo_Privacy_Browser
 
-final class ProgressDownloadOperationTests: XCTestCase {
+final class ProgressExtensionTests: XCTestCase {
 
-    func testWhenOperationStartThenShouldReceiveProgressUpdates() throws {
+    func testWhenExecuteWithPublishedProgressThenShouldReceiveProgressUpdates() throws {
         // GIVEN
         let expectation = self.expectation(description: #function)
         let testData = try XCTUnwrap("test".data(using: .utf8))
@@ -35,13 +35,13 @@ final class ProgressDownloadOperationTests: XCTestCase {
             expectation.fulfill()
             return {}
         }
-        let progressOperation = ProgressDownloadOperation(destURL: url) {
-            try testData.write(to: url)
-        }
+
         XCTAssertFalse(didReceiveProgressUpdates)
 
         // WHEN
-        try progressOperation.start()
+        try Progress.withPublishedProgress(url: url) {
+            try testData.write(to: url)
+        }
 
         // THEN
         waitForExpectations(timeout: 0.5)
