@@ -245,7 +245,7 @@ public struct UserDefaultsWrapper<T> {
 
             return value
         }
-        set {
+        nonmutating set {
             setValue(newValue)
         }
     }

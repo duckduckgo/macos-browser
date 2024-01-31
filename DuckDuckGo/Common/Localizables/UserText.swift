@@ -46,6 +46,9 @@ struct UserText {
     static let pasteAndSearch = NSLocalizedString("paste.and.search", value: "Paste & Search", comment: "Paste & Search button")
     static let clear = NSLocalizedString("clear", value: "Clear", comment: "Clear button")
     static let `continue` = NSLocalizedString("`continue`", value: "Continue", comment: "Continue button")
+    static let bookmarkDialogAdd = NSLocalizedString("bookmark.dialog.add", value: "Add", comment: "Button to confim a bookmark creation")
+    static let newFolderDialogAdd = NSLocalizedString("folder.dialog.add", value: "Add", comment: "Button to confim a bookmark folder creation")
+
     static func openIn(value: String) -> String {
         let localized = NSLocalizedString("open.in",
                                           value: "Open in %@",
@@ -132,14 +135,14 @@ struct UserText {
     static let mainMenuViewHome = NSLocalizedString("Home", comment: "Main Menu View item")
     static let mainMenuHomeButton = NSLocalizedString("Home Button", comment: "Main Menu > View > Home Button item")
         
-    static func mainMenuHomeButton(for position: HomeButtonPosition) -> String {
+    static func mainMenuHomeButtonMode(for position: HomeButtonPosition) -> String {
         switch position {
         case .hidden:
             return NSLocalizedString("Hide", comment: "Main Menu > View > Home Button > None item")
         case .left:
-            return NSLocalizedString("Show left of the back button", comment: "Main Menu > View > Home Button > left position item")
+            return NSLocalizedString("Show Left of the Back Button", comment: "Main Menu > View > Home Button > left position item")
         case .right:
-            return NSLocalizedString("Show right of the reload button", comment: "Main Menu > View > Home Button > right position item")
+            return NSLocalizedString("Show Right of the Reload Button", comment: "Main Menu > View > Home Button > right position item")
         }
     }
     
@@ -164,6 +167,12 @@ struct UserText {
     static let mainMenuHistoryClearAllHistory = NSLocalizedString("Clear All History…", comment: "Main Menu History item")
     static let mainMenuHistoryManageBookmarks = NSLocalizedString("Manage Bookmarks", comment: "Main Menu History item")
     static let mainMenuHistoryFavoriteThisPage = NSLocalizedString("Favorite This Page…", comment: "Main Menu History item")
+    static let mainMenuHistoryReopenAllWindowsFromLastSession = NSLocalizedString("Reopen All Windows from Last Session", comment: "Main Menu History item")
+
+    // MARK: - Main Menu -> Bookmarks -> Bookmarks Bar
+    static let mainMenuBookmarksShowBookmarksBarAlways = NSLocalizedString("Always Show", comment: "Preference for always showing the bookmarks bar")
+    static let mainMenuBookmarksShowBookmarksBarNewTabOnly = NSLocalizedString("Only Show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
+    static let mainMenuBookmarksShowBookmarksBarNever = NSLocalizedString("Never Show", comment: "Preference for never showing the bookmarks bar on new tab")
 
     // MARK: - Main Menu -> Window
     static let mainMenuWindow = NSLocalizedString("Window", comment: "Main Menu ")
@@ -226,6 +235,8 @@ struct UserText {
     static let openImageInNewBurnerTab = NSLocalizedString("open.image.in.new.burner.tab", value: "Open Image in New Fire Tab", comment: "Context menu item")
     static let copyImageAddress = NSLocalizedString("copy.image.address", value: "Copy Image Address", comment: "Context menu item")
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
+    static let copyEmailAddress = NSLocalizedString("copy.email.address", value: "Copy Email Address", comment: "Context menu item")
+    static let copyEmailAddresses = NSLocalizedString("copy.email.addresses", value: "Copy Email Addresses", comment: "Context menu item")
     static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As…", comment: "Context menu item")
     static let addLinkToBookmarks = NSLocalizedString("add.link.to.bookmarks", value: "Add Link to Bookmarks", comment: "Context menu item")
     static let bookmarkPage = NSLocalizedString("bookmark.page", value: "Bookmark Page", comment: "Context menu item")
@@ -323,7 +334,7 @@ struct UserText {
         comment: "Nearest city setting description")
     static let vpnLocationNearestAvailable = NSLocalizedString(
         "vpn.location.description.nearest.available",
-        value: "Nearest Available",
+        value: "Nearest available",
         comment: "Nearest available location setting description")
     static let vpnLocationNearestAvailableSubtitle = NSLocalizedString("vpn.location.nearest.available.title", value: "Automatically connect to the nearest server we can find.", comment: "Subtitle underneath the nearest available vpn location preference text.")
 
@@ -431,6 +442,7 @@ struct UserText {
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let favorites = NSLocalizedString("favorites", value: "Favorites", comment: "Title text for the Favorites menu item")
+    static let newBookmark = NSLocalizedString("bookmarks.add.dialog.title", value: "New Bookmark", comment: "Bookmark creation dialog title")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
     static let addToFavorites = NSLocalizedString("add.to.favorites", value: "Add to Favorites", comment: "Button for adding bookmarks to favorites")
     static let addFavorite = NSLocalizedString("add.favorite", value: "Add Favorite", comment: "Button for adding a favorite bookmark")
@@ -441,6 +453,12 @@ struct UserText {
     static let bookmarksShowToolbarPanel = NSLocalizedString("bookmarks.show-toolbar-panel", value: "Open Bookmarks Panel", comment: "Menu item for opening the bookmarks panel")
     static let bookmarksManageBookmarks = NSLocalizedString("bookmarks.manage-bookmarks", value: "Manage Bookmarks", comment: "Menu item for opening the bookmarks management interface")
     static let bookmarkImportedFromFolder = NSLocalizedString("bookmarks.imported.from.folder", value: "Imported from", comment: "Name of the folder the imported bookmarks are saved into")
+
+    static let reportBrokenSite = NSLocalizedString("report.broken.site", value: "Report Broken Site", comment: "Menu with feedback commands")
+    static let browserFeedback = NSLocalizedString("send.browser.feedback", value: "Send Browser Feedback", comment: "Menu with feedback commands")
+    
+    static let otherBookmarksImportedFolderTitle = NSLocalizedString("bookmarks.imported.other.folder.title", value: "Other bookmarks", comment: "Name of the \"Other bookmarks\" folder imported from other browser")
+    static let mobileBookmarksImportedFolderTitle = NSLocalizedString("bookmarks.imported.mobile.folder.title", value: "Mobile bookmarks", comment: "Name of the \"Mobile bookmarks\" folder imported from other browser")
 
     static let zoom = NSLocalizedString("zoom", value: "Zoom", comment: "Menu with Zooming commands")
 
@@ -454,6 +472,8 @@ struct UserText {
     static let newFolder = NSLocalizedString("folder.optionsMenu.newFolder", value: "New Folder", comment: "Option for creating a new folder")
     static let renameFolder = NSLocalizedString("folder.optionsMenu.renameFolder", value: "Rename Folder", comment: "Option for renaming a folder")
     static let deleteFolder = NSLocalizedString("folder.optionsMenu.deleteFolder", value: "Delete Folder", comment: "Option for deleting a folder")
+    static let newFolderDialogFolderNameTitle = NSLocalizedString("add.folder.name", value: "Name:", comment: "Add Folder popover: folder name text field title")
+    static let newBookmarkDialogBookmarkNameTitle = NSLocalizedString("add.bookmark.name", value: "Name:", comment: "New bookmark folder dialog folder name field heading")
 
     static let updateBookmark = NSLocalizedString("bookmark.update", value: "Update Bookmark", comment: "Option for updating a bookmark")
 
@@ -528,7 +548,7 @@ struct UserText {
     static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
     static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default…", comment: "")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")
-    static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen All Windows from Last Session", comment: "Option to control session restoration")
+    static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
     static let showHomePage = NSLocalizedString("preferences.show-home", value: "Open a new window", comment: "Option to control session startup")
     
     static let homePage = NSLocalizedString("preferences-homepage", value: "Homepage", comment: "Title for Homepage section in settings")
@@ -539,7 +559,18 @@ struct UserText {
 
     static let setHomePage = NSLocalizedString("preferences-homepage-set-homePage", value: "Set Homepage", comment: "Set Homepage dialog title")
     static let addressLabel = NSLocalizedString("preferences-homepage-address", value: "Address:", comment: "Homepage address field label")
-    
+
+    static func homeButtonMode(for position: HomeButtonPosition) -> String {
+        switch position {
+        case .hidden:
+            return NSLocalizedString("Hide", comment: "Preferences > Home Button > None item")
+        case .left:
+            return NSLocalizedString("Show left of the back button", comment: "Preferences > Home Button > left position item")
+        case .right:
+            return NSLocalizedString("Show right of the reload button", comment: "Preferences > Home Button > right position item")
+        }
+    }
+
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")
@@ -568,7 +599,6 @@ struct UserText {
 
     static let sendFeedback = NSLocalizedString("preferences.about.send-feedback", value: "Send Feedback", comment: "Feedback button in the about preferences page")
 
-    static let feedbackBreakageDisclaimer = NSLocalizedString("feedback.breakage.disclaimer", value: "Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your optional message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version.", comment: "Disclaimer in breakage form")
     static let feedbackDisclaimer = NSLocalizedString("feedback.disclaimer", value: "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.", comment: "Disclaimer in breakage form")
 
     static let feedbackBugDescription = NSLocalizedString("feedback.bug.description", value: "Please describe the problem in as much detail as possible:", comment: "Label in the feedback form")
@@ -760,9 +790,8 @@ struct UserText {
 
     static let showBookmarksBar = NSLocalizedString("bookmarks.bar.show", value: "Bookmarks Bar", comment: "Menu item for showing the bookmarks bar")
     static let showBookmarksBarPreference = NSLocalizedString("bookmarks.bar.show", value: "Show Bookmarks Bar", comment: "Preference item for showing the bookmarks bar")
-    static let showBookmarksBarAlways = NSLocalizedString("bookmarks.bar.show.always", value: "Always Show", comment: "Preference for always showing the bookmarks bar")
-    static let showBookmarksBarNewTabOnly = NSLocalizedString("bookmarks.bar.show.new-tab-only", value: "Only Show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
-    static let showBookmarksBarNever = NSLocalizedString("bookmarks.bar.show.never", value: "Never Show", comment: "Preference for never showing the bookmarks bar on new tab")
+    static let showBookmarksBarAlways = NSLocalizedString("bookmarks.bar.show.always", value: "Always show", comment: "Preference for always showing the bookmarks bar")
+    static let showBookmarksBarNewTabOnly = NSLocalizedString("bookmarks.bar.show.new-tab-only", value: "Only show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
     static let bookmarksBarFolderEmpty = NSLocalizedString("bookmarks.bar.folder.empty", value: "Empty", comment: "Empty state for a bookmarks bar folder")
     static let bookmarksBarContextMenuCopy = NSLocalizedString("bookmarks.bar.context-menu.copy", value: "Copy", comment: "Copy menu item for the bookmarks bar context menu")
     static let bookmarksBarContextMenuDelete = NSLocalizedString("bookmarks.bar.context-menu.delete", value: "Delete", comment: "Delete menu item for the bookmarks bar context menu")
@@ -824,8 +853,8 @@ struct UserText {
     static let showDownloadsShortcut = NSLocalizedString("pinning.show-downloads-shortcut", value: "Show Downloads Shortcut", comment: "Menu item for showing the downloads shortcut")
     static let hideDownloadsShortcut = NSLocalizedString("pinning.hide-downloads-shortcut", value: "Hide Downloads Shortcut", comment: "Menu item for hiding the downloads shortcut")
 
-    static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show Network Protection", comment: "Menu item for showing the NetP shortcut")
-    static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide Network Protection", comment: "Menu item for hiding the NetP shortcut")
+    static let showNetworkProtectionShortcut = NSLocalizedString("pinning.show-netp-shortcut", value: "Show VPN Shortcut", comment: "Menu item for showing the NetP shortcut")
+    static let hideNetworkProtectionShortcut = NSLocalizedString("pinning.hide-netp-shortcut", value: "Hide VPN Shortcut", comment: "Menu item for hiding the NetP shortcut")
 
     static let showHomeShortcut = NSLocalizedString("pinning.show-home-shortcut", value: "Show Home Button", comment: "Menu item for showing the Home shortcut")
     static let hideHomeShortcut = NSLocalizedString("pinning.hide-home-shortcut", value: "Hide Home Button", comment: "Menu item for hiding the Home shortcut")

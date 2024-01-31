@@ -23,6 +23,7 @@ import Combine
 import NetworkProtection
 
 final class VPNLocationViewModel: ObservableObject {
+    private static var cachedLocations: [VPNCountryItemModel]?
     private let locationListRepository: NetworkProtectionLocationListRepository
     private let settings: VPNSettings
     private var selectedLocation: VPNSettings.SelectedLocation
@@ -51,21 +52,31 @@ final class VPNLocationViewModel: ObservableObject {
     init(locationListRepository: NetworkProtectionLocationListRepository, settings: VPNSettings) {
         self.locationListRepository = locationListRepository
         self.settings = settings
-        state = .loading
         selectedLocation = settings.selectedLocation
         self.isNearestSelected = selectedLocation == .nearest
+        if let cachedLocations = Self.cachedLocations {
+            state = .loaded(countryItems: cachedLocations)
+        } else {
+            state = .loading
+        }
+        Task {
+            await reloadList()
+        }
     }
 
     func onViewAppeared() async {
+        Pixel.fire(.networkProtectionGeoswitchingOpened)
         await reloadList()
     }
 
     func onNearestItemSelection() async {
+        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetNearest, frequency: .dailyAndCount, includeAppVersionParameter: true)
         selectedLocation = .nearest
         await reloadList()
     }
 
     func onCountryItemSelection(id: String, cityId: String? = nil) async {
+        DailyPixel.fire(pixel: .networkProtectionGeoswitchingSetCustom, frequency: .dailyAndCount, includeAppVersionParameter: true)
         let location = NetworkProtectionSelectedLocation(country: id, city: cityId)
         selectedLocation = .location(location)
         await reloadList()
@@ -77,43 +88,50 @@ final class VPNLocationViewModel: ObservableObject {
 
     @MainActor
     private func reloadList() async {
-        guard let list = try? await locationListRepository.fetchLocationList() else { return }
+        guard let locations = try? await locationListRepository.fetchLocationList().sortedByName() else { return }
+        if locations.isEmpty {
+            DailyPixel.fire(pixel: .networkProtectionGeoswitchingNoLocations, frequency: .dailyAndCount, includeAppVersionParameter: true)
+        }
         let isNearestSelected = selectedLocation == .nearest
+        self.isNearestSelected = isNearestSelected
+        var countryItems = [VPNCountryItemModel]()
 
-        let countryItems = list.map { currentLocation in
+        for i in 0..<locations.count {
+            let currentLocation = locations[i]
             let isCountrySelected: Bool
-            var cityPickerItems: [CityItem]
-            let selectedCityItem: CityItem
+            var cityPickerItems: [VPNCityItemModel]
+            let selectedCityItem: VPNCityItemModel
 
             switch selectedLocation {
             case .location(let location):
                 isCountrySelected = location.country == currentLocation.country
                 cityPickerItems = currentLocation.cities.map { currentCity in
-                    return CityItem(cityName: currentCity.name)
+                    return VPNCityItemModel(cityName: currentCity.name)
                 }
-                selectedCityItem = location.city.flatMap(CityItem.init(cityName:)) ?? .nearest
+                selectedCityItem = location.city.flatMap(VPNCityItemModel.init(cityName:)) ?? .nearest
             case .nearest:
                 isCountrySelected = false
                 cityPickerItems = currentLocation.cities.map { currentCity in
-                    CityItem(cityName: currentCity.name)
+                    VPNCityItemModel(cityName: currentCity.name)
                 }
                 selectedCityItem = .nearest
             }
+            let isFirstItem = i == 0
 
-            return VPNCountryItemModel(
-                netPLocation: currentLocation,
-                isSelected: isCountrySelected,
-                cityPickerItems: cityPickerItems,
-                selectedCityItem: selectedCityItem
+            countryItems.append(
+                VPNCountryItemModel(
+                    netPLocation: currentLocation,
+                    isSelected: isCountrySelected,
+                    cityPickerItems: cityPickerItems,
+                    selectedCityItem: selectedCityItem,
+                    isFirstItem: isFirstItem
+                )
             )
         }
-        self.isNearestSelected = isNearestSelected
+        Self.cachedLocations = countryItems
         state = .loaded(countryItems: countryItems)
     }
 }
-
-private typealias CountryItem = VPNCountryItemModel
-private typealias CityItem = VPNCityItemModel
 
 struct VPNCountryItemModel: Identifiable {
     private let labelsModel: NetworkProtectionVPNCountryLabelsModel
@@ -131,8 +149,9 @@ struct VPNCountryItemModel: Identifiable {
     let cityPickerItems: [VPNCityItemModel]
     let selectedCityItem: VPNCityItemModel
     let shouldShowPicker: Bool
+    let isFirstItem: Bool
 
-    fileprivate init(netPLocation: NetworkProtectionLocation, isSelected: Bool, cityPickerItems: [VPNCityItemModel], selectedCityItem: VPNCityItemModel) {
+    fileprivate init(netPLocation: NetworkProtectionLocation, isSelected: Bool, cityPickerItems: [VPNCityItemModel], selectedCityItem: VPNCityItemModel, isFirstItem: Bool = false) {
         self.labelsModel = .init(country: netPLocation.country)
         self.isSelected = isSelected
         self.id = netPLocation.country
@@ -141,6 +160,7 @@ struct VPNCountryItemModel: Identifiable {
         self.cityPickerItems = cityPickerItems
         self.shouldShowPicker = hasMultipleCities
         self.selectedCityItem = selectedCityItem
+        self.isFirstItem = isFirstItem
     }
 }
 
@@ -178,6 +198,20 @@ extension VPNLocationViewModel {
             locationListRepository: locationListRepository,
             settings: VPNSettings(defaults: .netP)
         )
+    }
+}
+
+private extension Array where Element == NetworkProtectionLocation {
+    func sortedByName() -> Self {
+        sorted(by: { lhs, rhs in
+            lhs.country.localizedLocationFromCountryCode < rhs.country.localizedLocationFromCountryCode
+        })
+    }
+}
+
+private extension String {
+    var localizedLocationFromCountryCode: String {
+        Locale.current.localizedString(forRegionCode: self) ?? ""
     }
 }
 

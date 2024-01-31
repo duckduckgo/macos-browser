@@ -83,7 +83,7 @@ final class PasswordManagementViewController: NSViewController {
 
             let string = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLabel + " ")
             let linkString = NSMutableAttributedString(string: UserText.pmLockScreenPreferencesLink, attributes: [
-                .link: URL.preferencePane(.autofill)
+                .link: URL.settingsPane(.autofill)
             ])
 
             let paragraphStyle = NSMutableParagraphStyle()
@@ -293,7 +293,7 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBAction func onImportClicked(_ sender: NSButton) {
         self.dismiss()
-        DataImportView.show()
+        DataImportView().show()
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {

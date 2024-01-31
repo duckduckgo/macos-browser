@@ -282,11 +282,11 @@ final class TabViewModel {
         switch tab.content {
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
-        case .preferences:
+        case .settings:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
             title = UserText.tabBookmarksTitle
-        case .homePage:
+        case .newtab:
             if tab.burnerMode.isBurner {
                 title = UserText.burnerTabHomeTitle
             } else {
@@ -316,14 +316,14 @@ final class TabViewModel {
         case .dataBrokerProtection:
             favicon = Favicon.dataBrokerProtection
             return
-        case .homePage:
+        case .newtab:
             if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome
             } else {
                 favicon = Favicon.home
             }
             return
-        case .preferences:
+        case .settings:
             favicon = Favicon.preferences
             return
         case .bookmarks:

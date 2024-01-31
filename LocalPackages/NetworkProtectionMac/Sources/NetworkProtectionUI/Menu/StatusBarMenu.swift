@@ -52,6 +52,7 @@ public final class StatusBarMenu: NSObject {
                 statusReporter: NetworkProtectionStatusReporter,
                 controller: TunnelController,
                 iconProvider: IconProvider,
+                showLocationsAction: @escaping () async -> Void,
                 menuItems: @escaping () -> [MenuItem]) {
 
         self.model = model
@@ -62,6 +63,7 @@ public final class StatusBarMenu: NSObject {
         popover = NetworkProtectionPopover(controller: controller,
                                            onboardingStatusPublisher: onboardingStatusPublisher,
                                            statusReporter: statusReporter,
+                                           showLocationsAction: showLocationsAction,
                                            menuItems: menuItems)
         popover.behavior = .transient
 
@@ -123,8 +125,14 @@ public final class StatusBarMenu: NSObject {
         menu.delegate = self
         menu.items = model.contextMenuItems
 
+        // I'm not sure why +8 is needed, but that seems to be the right positioning to make this work well
+        // across all systems.  I'm seeing an issue where the menu looks right for me but not for others testing
+        // this, and this seems to fix it:
+        // Ref: https://app.asana.com/0/0/1206318017787812/1206336583680668/f
+        let yPosition = statusItem.statusBar!.thickness + 8
+
         menu.popUp(positioning: nil,
-                   at: .zero,
+                   at: NSPoint(x: 0, y: yPosition),
                    in: statusItem.button)
     }
 

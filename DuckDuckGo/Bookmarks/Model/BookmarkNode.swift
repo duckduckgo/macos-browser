@@ -31,17 +31,6 @@ final class BookmarkNode: Hashable {
         return node
     }
 
-    class func bookmarkNodesSortedAlphabetically(_ nodes: [BookmarkNode]) -> [BookmarkNode] {
-        return nodes.sorted { (firstNode, secondNode) -> Bool in
-            guard let firstBookmark = firstNode.representedObject as? BaseBookmarkEntity,
-                  let secondBookmark = secondNode.representedObject as? BaseBookmarkEntity else {
-                return false
-            }
-
-            return firstBookmark.title.localizedStandardCompare(secondBookmark.title) == .orderedAscending
-        }
-    }
-
     weak var parent: BookmarkNode?
 
     let uniqueID: Int
@@ -230,10 +219,6 @@ extension Array where Element == BookmarkNode {
 
     func representedObjects() -> [AnyObject] {
         return self.map { $0.representedObject }
-    }
-
-    func bookmarksSortedAlphabetically() -> [BookmarkNode] {
-        return BookmarkNode.bookmarkNodesSortedAlphabetically(self)
     }
 
 }

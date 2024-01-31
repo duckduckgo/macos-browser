@@ -23,105 +23,128 @@ import SwiftUI
 import SwiftUIExtensions
 
 struct VPNLocationView: View {
-    @StateObject var model = VPNLocationViewModel()
+    @StateObject var model: VPNLocationViewModel
     @Binding var isPresented: Bool
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(UserText.vpnLocationListTitle)
-                .font(.system(size: 17, weight: .bold))
-                .foregroundColor(.primary)
-            VStack(alignment: .leading, spacing: 16) {
-                nearest(isSelected: model.isNearestSelected)
-                countries()
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(UserText.vpnLocationListTitle)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.primary)
+                    VStack(alignment: .leading, spacing: 20) {
+                        nearestSection
+                        countriesSection
+                    }
+                    .padding(0)
+                }
+                .padding(.horizontal, 56)
+                .padding(.top, 32)
+                .padding(.bottom, 20)
             }
-            .padding(0)
-        }
-        .padding(.horizontal, 56)
-        .padding(.top, 32)
-        .padding(.bottom, 20)
-        .frame(minWidth: 624, maxWidth: .infinity, minHeight: 514, maxHeight: 514, alignment: .top)
-        Spacer()
-        Group {
             VPNLocationViewButtons(
                 onDone: {
                     model.onSubmit()
                     isPresented = false
                 }, onCancel: {
                     isPresented = false
-                })
-            .navigationTitle(UserText.vpnFeedbackFormTitle)
+                }
+            )
             .onAppear {
                 Task {
                     await model.onViewAppeared()
                 }
             }
         }
-        .background(Color.secondary.opacity(0.1))
+        .frame(minWidth: 624, maxWidth: .infinity, minHeight: 640, maxHeight: .infinity, alignment: .top)
     }
 
     @ViewBuilder
-    private func nearest(isSelected: Bool) -> some View {
-        PreferencePaneSection(verticalPadding: 12) {
+    private var nearestSection: some View {
+        PreferencePaneSection {
             Text(UserText.vpnLocationRecommendedSectionTitle)
                 .font(.system(size: 15))
                 .foregroundColor(.primary)
-            ChecklistItem(
-                isSelected: isSelected,
-                action: {
-                    Task {
-                        await model.onNearestItemSelection()
-                    }
-                }, label: {
-                    Image(systemName: "location.fill")
-                        .resizable()
-                        .frame(width: 18, height: 18)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(UserText.vpnLocationNearestAvailable)
-                            .foregroundColor(.primary)
-                        Text(UserText.vpnLocationNearestAvailableSubtitle)
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-                }
-            )
-            .frame(idealWidth: .infinity, maxWidth: .infinity)
-            .padding(10)
-            .background(Color("BlackWhite1"))
-            .roundedBorder()
+            nearestItem
         }
     }
 
     @ViewBuilder
-    private func countries() -> some View {
-        switch model.state {
-        case .loading:
-            EmptyView()
-                .listRowBackground(Color.clear)
-        case .loaded(let countryItems):
-            PreferencePaneSection(verticalPadding: 12) {
-                Text(UserText.vpnLocationCustomSectionTitle)
-                    .font(.system(size: 15))
-                    .foregroundColor(.primary)
-                LazyVStack(alignment: .leading) {
-                    ForEach(countryItems) { item in
-                        CountryItem(
-                            itemModel: item,
-                            action: {
-                                Task {
-                                    await model.onCountryItemSelection(id: item.id)
-                                }
-                            }, cityPickerAction: { selection in
-                                Task {
-                                    await model.onCountryItemSelection(id: item.id, cityId: selection)
-                                }
-                            })
-                        .padding(10)
-                    }
+    private var nearestItem: some View {
+        ChecklistItem(
+            isSelected: model.isNearestSelected,
+            action: {
+                Task {
+                    await model.onNearestItemSelection()
                 }
-                .roundedBorder()
+            }, label: {
+                Image("Location-16-Solid")
+                    .padding(4)
+                    .foregroundColor(Color("BlackWhite100").opacity(0.9))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(UserText.vpnLocationNearestAvailable)
+                        .font(.system(size: 13))
+                        .foregroundColor(.primary)
+                    Text(UserText.vpnLocationNearestAvailableSubtitle)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+            }
+        )
+        .roundedBorder()
+    }
+
+    @ViewBuilder
+    private var countriesSection: some View {
+        PreferencePaneSection {
+            Text(UserText.vpnLocationCustomSectionTitle)
+                .font(.system(size: 15))
+                .foregroundColor(.primary)
+            switch model.state {
+            case .loading:
+                listLoadingView
+            case .loaded(let countryItems):
+                countriesList(countries: countryItems)
             }
         }
+    }
+
+    private var listLoadingView: some View {
+        ZStack(alignment: .center) {
+            EmptyView()
+        }
+        .frame(height: 370)
+        .frame(idealWidth: .infinity, maxWidth: .infinity)
+        .roundedBorder()
+    }
+
+    private func countriesList(countries: [VPNCountryItemModel]) -> some View {
+        VStack(spacing: 0) {
+            ForEach(countries) { country in
+                if !country.isFirstItem {
+                    Rectangle()
+                        .fill(Color("BlackWhite10"))
+                        .frame(height: 1)
+                        .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
+                }
+
+                CountryItem(
+                    itemModel: country,
+                    action: {
+                        Task {
+                            await model.onCountryItemSelection(id: country.id)
+                        }
+                    },
+                    cityPickerAction: { selection in
+                        Task {
+                            await model.onCountryItemSelection(id: country.id, cityId: selection)
+                        }
+                    }
+                )
+            }
+        }
+        .roundedBorder()
     }
 }
 
@@ -150,30 +173,51 @@ private struct CountryItem: View {
             action: action,
             label: {
                 Text(itemModel.emoji)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(itemModel.title)
-                        .foregroundColor(.primary)
-                    if let subtitle = itemModel.subtitle {
-                        Text(subtitle)
-                            .foregroundColor(.secondary)
-                    }
-                }
+                    .font(.system(size: 16))
+                    .padding(4)
+                labels
                 if itemModel.shouldShowPicker {
                     Spacer()
-                    Picker("", selection: selectedCityItemBinding) {
-                        Text(itemModel.nearestCityPickerItem.name)
-                            .tag(itemModel.nearestCityPickerItem)
-                        Divider()
-                        ForEach(itemModel.cityPickerItems) { cityItem in
-                            Text(cityItem.name)
-                                .tag(cityItem)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .frame(width: 90)
+                    picker
                 }
             }
         )
+        .frame(idealWidth: .infinity, maxWidth: .infinity)
+        .background(Color("BlackWhite1"))
+    }
+
+    @ViewBuilder
+    private var labels: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(itemModel.title)
+                .font(.system(size: 13))
+                .foregroundColor(.primary)
+                .background(Color.clear)
+            if let subtitle = itemModel.subtitle {
+                Text(subtitle)
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                    .background(Color.clear)
+            }
+        }
+        .background(Color.clear)
+    }
+
+    @ViewBuilder
+    private var picker: some View {
+        Picker("", selection: selectedCityItemBinding) {
+            Text(itemModel.nearestCityPickerItem.name)
+                .tag(itemModel.nearestCityPickerItem)
+            Divider()
+            ForEach(itemModel.cityPickerItems) { cityItem in
+                Text(cityItem.name)
+                    .tag(cityItem)
+            }
+        }
+        .foregroundColor(.accentColor)
+        .pickerStyle(.menu)
+        .frame(width: 120)
+        .background(Color.clear)
     }
 }
 
@@ -183,17 +227,20 @@ private struct ChecklistItem<Content>: View where Content: View {
     @ViewBuilder let label: () -> Content
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "checkmark")
-                .foregroundColor(Color.accentColor)
-                .if(!isSelected) {
-                    $0.hidden()
-                }
-            label()
+        HStack(alignment: .center, spacing: 10) {
+            HStack {
+                Image(systemName: "checkmark")
+                    .foregroundColor(.accentColor)
+                    .if(!isSelected) {
+                        $0.hidden()
+                    }
+                label()
+            }
+            .padding(10)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .frame(height: 52)
         .contentShape(Rectangle())
-        .background(Color("BlackWhite1"))
         .onTapGesture {
             action()
         }
@@ -205,18 +252,24 @@ private struct VPNLocationViewButtons: View {
     let onCancel: () -> Void
 
     var body: some View {
-        HStack {
-            Spacer()
-            button(text: UserText.vpnLocationCancelButtonTitle, action: onCancel)
-                .keyboardShortcut(.cancelAction)
-                .buttonStyle(DismissActionButtonStyle())
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(Color("BlackWhite10"))
+                .frame(height: 1)
+            HStack {
+                Spacer()
+                button(text: UserText.vpnLocationCancelButtonTitle, action: onCancel)
+                    .keyboardShortcut(.cancelAction)
+                    .buttonStyle(DismissActionButtonStyle())
 
-            button(text: UserText.vpnLocationSubmitButtonTitle, action: onDone)
-                .keyboardShortcut(.defaultAction)
-                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                button(text: UserText.vpnLocationSubmitButtonTitle, action: onDone)
+                    .keyboardShortcut(.defaultAction)
+                    .buttonStyle(DefaultActionButtonStyle(enabled: true))
+            }
+            .padding(.vertical, 16)
+            .padding(.horizontal, 20)
+            .background(Color("BlackWhite1"))
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 20)
     }
 
     @ViewBuilder

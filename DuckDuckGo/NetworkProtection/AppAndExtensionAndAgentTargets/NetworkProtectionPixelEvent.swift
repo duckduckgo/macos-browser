@@ -54,6 +54,8 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionClientInvalidInviteCode
     case networkProtectionClientFailedToRedeemInviteCode(error: Error?)
     case networkProtectionClientFailedToParseRedeemResponse(error: Error)
+    case networkProtectionClientFailedToFetchLocations(error: Error?)
+    case networkProtectionClientFailedToParseLocationsResponse(error: Error?)
     case networkProtectionClientInvalidAuthToken
 
     case networkProtectionServerListStoreFailedToEncodeServerList
@@ -64,6 +66,7 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
     case networkProtectionKeychainErrorFailedToCastKeychainValueToData(field: String)
     case networkProtectionKeychainReadError(field: String, status: Int32)
     case networkProtectionKeychainWriteError(field: String, status: Int32)
+    case networkProtectionKeychainUpdateError(field: String, status: Int32)
     case networkProtectionKeychainDeleteError(status: Int32)
 
     case networkProtectionWireguardErrorCannotLocateTunnelFileDescriptor
@@ -158,6 +161,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
         case .networkProtectionClientFailedToParseRedeemResponse:
             return "m_mac_netp_backend_api_error_parsing_redeem_response_failed"
 
+        case .networkProtectionClientFailedToFetchLocations:
+            return "m_mac_netp_backend_api_error_failed_to_fetch_location_list"
+
+        case .networkProtectionClientFailedToParseLocationsResponse:
+            return "m_mac_netp_backend_api_error_parsing_location_list_response_failed"
+
         case .networkProtectionClientInvalidAuthToken:
             return "m_mac_netp_backend_api_error_invalid_auth_token"
 
@@ -181,6 +190,9 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
 
         case .networkProtectionKeychainWriteError:
             return "m_mac_netp_keychain_error_write_failed"
+
+        case .networkProtectionKeychainUpdateError:
+            return "m_mac_netp_keychain_error_update_failed"
 
         case .networkProtectionKeychainDeleteError:
             return "m_mac_netp_keychain_error_delete_failed"
@@ -231,6 +243,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
                 PixelKit.Parameters.errorCode: String(status)
             ]
 
+        case .networkProtectionKeychainUpdateError(let field, let status):
+            return [
+                PixelKit.Parameters.keychainFieldName: field,
+                PixelKit.Parameters.errorCode: String(status)
+            ]
+
         case .networkProtectionKeychainDeleteError(let status):
             return [
                 PixelKit.Parameters.errorCode: String(status)
@@ -249,6 +267,12 @@ enum NetworkProtectionPixelEvent: PixelKitEvent {
             return error?.pixelParameters
 
         case .networkProtectionClientFailedToRedeemInviteCode(error: let error):
+            return error?.pixelParameters
+
+        case .networkProtectionClientFailedToFetchLocations(error: let error):
+            return error?.pixelParameters
+
+        case .networkProtectionClientFailedToParseLocationsResponse(error: let error):
             return error?.pixelParameters
 
         case .networkProtectionUnhandledError(let function, let line, let error):

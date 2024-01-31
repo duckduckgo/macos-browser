@@ -51,24 +51,11 @@ extension Pixel.Event {
 
         case .launchInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
+
         case .serpInitial(let cohort):
             return [PixelKit.Parameters.experimentCohort: cohort]
+
         case .serpDay21to27(let cohort):
-            return [PixelKit.Parameters.experimentCohort: cohort]
-        case .setAsDefaultInitial(let cohort):
-            guard let cohort else { return nil }
-            return [PixelKit.Parameters.experimentCohort: cohort]
-        case .newTabInitial(let cohort):
-            guard let cohort else { return nil }
-            return [PixelKit.Parameters.experimentCohort: cohort]
-        case  .emailEnabledInitial(let cohort):
-            guard let cohort else { return nil }
-            return [PixelKit.Parameters.experimentCohort: cohort]
-        case  .watchInDuckPlayerInitial(let cohort):
-            guard let cohort else { return nil }
-            return [PixelKit.Parameters.experimentCohort: cohort]
-        case  .importDataInitial(let cohort):
-            guard let cohort else { return nil }
             return [PixelKit.Parameters.experimentCohort: cohort]
 
         case .dailyPixel(let pixel, isFirst: _):
@@ -118,6 +105,11 @@ extension Pixel.Event {
              .emailUserPressedUseAlias,
              .emailUserPressedUseAddress,
              .jsPixel,
+             .emailEnabledInitial,
+             .watchInDuckPlayerInitial,
+             .importDataInitial,
+             .newTabInitial,
+             .setAsDefaultInitial,
              .favoriteSectionHidden,
              .recentActivitySectionHidden,
              .continueSetUpSectionHidden,
@@ -144,6 +136,10 @@ extension Pixel.Event {
              .networkProtectionRemoteMessageDismissed,
              .networkProtectionRemoteMessageOpened,
              .networkProtectionEnabledOnSearch,
+             .networkProtectionGeoswitchingOpened,
+             .networkProtectionGeoswitchingSetNearest,
+             .networkProtectionGeoswitchingSetCustom,
+             .networkProtectionGeoswitchingNoLocations,
              .syncSignupDirect,
              .syncSignupConnect,
              .syncLogin,
@@ -271,6 +267,14 @@ extension Pixel.Event.Debug {
                 .syncCredentialsFailed,
                 .syncSettingsFailed,
                 .syncSettingsMetadataUpdateFailed,
+                .syncSignupError,
+                .syncLoginError,
+                .syncLogoutError,
+                .syncUpdateDeviceError,
+                .syncRemoveDeviceError,
+                .syncDeleteAccountError,
+                .syncLoginExistingAccountError,
+                .syncCannotCreateRecoveryPDF,
                 .bookmarksCleanupFailed,
                 .bookmarksCleanupAttemptedWhileSyncWasEnabled,
                 .favoritesCleanupFailed,

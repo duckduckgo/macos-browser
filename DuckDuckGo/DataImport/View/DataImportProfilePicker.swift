@@ -22,14 +22,29 @@ struct DataImportProfilePicker: View {
 
     private let profiles: [DataImport.BrowserProfile]
     @Binding private var selectedProfile: DataImport.BrowserProfile?
-    private let shouldDisplayFolderName: Bool
+
+    private enum ProfileSubtitle {
+        case none
+        case parentFolderName
+        case profileFolderName
+    }
+    private let profileSubtitle: ProfileSubtitle
 
     init(profileList: DataImport.BrowserProfileList?, selectedProfile: Binding<DataImport.BrowserProfile?>) {
         self.profiles = profileList?.validImportableProfiles ?? []
         self._selectedProfile = selectedProfile
-        shouldDisplayFolderName = Set(self.profiles.map {
+        // display parent folder name as a subtitle if there are multiple
+        // browser build profile folders (Chrome, Chrome Dev, Canary...)
+        if Set(profiles.map {
             $0.profileURL.deletingLastPathComponent()
-        }).count > 1
+        }).count > 1 {
+            profileSubtitle = .parentFolderName
+        } else if Set(profiles.map(\.profileName)).count != profiles.count {
+            // when there‘re repeated profile names display profile folder names
+            profileSubtitle = .profileFolderName
+        } else {
+            profileSubtitle = .none
+        }
     }
 
     var body: some View {
@@ -44,13 +59,19 @@ struct DataImportProfilePicker: View {
             }) {
                 ForEach(profiles.indices, id: \.self) { idx in
                     // display profiles folder name if multiple profiles folders are present (Chrome, Chrome Canary…)
-                    if shouldDisplayFolderName {
+                    switch profileSubtitle {
+                    case .parentFolderName:
                         Text(profiles[idx].profileName + "  ")
                         + Text(profiles[idx].profileURL
                             .deletingLastPathComponent().lastPathComponent)
                             .font(.system(size: 10))
                             .fontWeight(.light)
-                    } else {
+                    case .profileFolderName:
+                        Text(profiles[idx].profileName + "  ")
+                        + Text(profiles[idx].profileURL.lastPathComponent)
+                            .font(.system(size: 10))
+                            .fontWeight(.light)
+                    case .none:
                         Text(profiles[idx].profileName)
                     }
                 }

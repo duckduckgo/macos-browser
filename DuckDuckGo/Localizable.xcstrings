@@ -151,8 +151,29 @@
     "Actual Size" : {
       "comment" : "Main Menu View item"
     },
+    "Add" : {
+      "comment" : "Button to confim a bookmark creation"
+    },
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
+    },
+    "Add Folder" : {
+      "comment" : "Add Folder popover: Create folder button"
+    },
+    "Add to Favorites" : {
+
+    },
+    "add.bookmark.name" : {
+      "comment" : "New bookmark folder dialog folder name field heading",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
+          }
+        }
+      }
     },
     "add.favorite" : {
       "comment" : "Button for adding a favorite bookmark",
@@ -162,6 +183,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Add Favorite"
+          }
+        }
+      }
+    },
+    "add.folder.name" : {
+      "comment" : "Add Folder popover: folder name text field title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name:"
           }
         }
       }
@@ -192,6 +225,9 @@
     },
     "Address" : {
 
+    },
+    "Address:" : {
+      "comment" : "Add Bookmark dialog bookmark url field heading"
     },
     "address.bar.search.suffix" : {
       "comment" : "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo",
@@ -339,6 +375,9 @@
     },
     "also applies here." : {
 
+    },
+    "Always Show" : {
+      "comment" : "Preference for always showing the bookmarks bar"
     },
     "auth.alert.login.button" : {
       "comment" : "Authentication Alert Sign In Button",
@@ -1236,11 +1275,26 @@
         }
       }
     },
+    "Bookmark Added" : {
+      "comment" : "Bookmark Added popover title"
+    },
     "Bookmark import failed:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) failed to import."
     },
     "Bookmark import failed." : {
       "comment" : "Data import summary message of failed bookmarks import."
+    },
+    "bookmark.dialog.add" : {
+      "comment" : "Button to confim a bookmark creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add"
+          }
+        }
+      }
     },
     "bookmark.page" : {
       "comment" : "Context menu item",
@@ -1290,6 +1344,9 @@
         }
       }
     },
+    "Bookmarks" : {
+
+    },
     "Bookmarks Import Complete:" : {
       "comment" : "Bookmarks Data Import result summary headline"
     },
@@ -1298,6 +1355,18 @@
     },
     "Bookmarks…" : {
       "comment" : "Main Menu File-Export item"
+    },
+    "bookmarks.add.dialog.title" : {
+      "comment" : "Bookmark creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Bookmark"
+          }
+        }
+      }
     },
     "bookmarks.bar.context-menu.copy" : {
       "comment" : "Copy menu item for the bookmarks bar context menu",
@@ -1414,19 +1483,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Always Show"
-          }
-        }
-      }
-    },
-    "bookmarks.bar.show.never" : {
-      "comment" : "Preference for never showing the bookmarks bar on new tab",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Never Show"
+            "value" : "Always show"
           }
         }
       }
@@ -1438,7 +1495,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Only Show on New Tab"
+            "value" : "Only show on New Tab"
           }
         }
       }
@@ -1451,6 +1508,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Imported from"
+          }
+        }
+      }
+    },
+    "bookmarks.imported.mobile.folder.title" : {
+      "comment" : "Name of the \"Mobile bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mobile bookmarks"
+          }
+        }
+      }
+    },
+    "bookmarks.imported.other.folder.title" : {
+      "comment" : "Name of the \"Other bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Other bookmarks"
           }
         }
       }
@@ -1585,6 +1666,9 @@
           }
         }
       }
+    },
+    "Cancel" : {
+
     },
     "cannot.open.file.alert.header" : {
       "comment" : "Header of the alert dialog informing user it is not possible to open the file",
@@ -1756,6 +1840,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Copy"
+          }
+        }
+      }
+    },
+    "copy.email.address" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Email Address"
+          }
+        }
+      }
+    },
+    "copy.email.addresses" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Email Addresses"
           }
         }
       }
@@ -2245,6 +2353,9 @@
       }
     },
     "Display progress" : {
+
+    },
+    "Done" : {
 
     },
     "dont.quit" : {
@@ -2813,18 +2924,6 @@
         }
       }
     },
-    "feedback.breakage.disclaimer" : {
-      "comment" : "Disclaimer in breakage form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your optional message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version."
-          }
-        }
-      }
-    },
     "feedback.bug.description" : {
       "comment" : "Label in the feedback form",
       "extractionState" : "extracted_with_value",
@@ -3185,6 +3284,18 @@
         }
       }
     },
+    "folder.dialog.add" : {
+      "comment" : "Button to confim a bookmark folder creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add"
+          }
+        }
+      }
+    },
     "folder.optionsMenu.deleteFolder" : {
       "comment" : "Option for deleting a folder",
       "extractionState" : "extracted_with_value",
@@ -3261,7 +3372,7 @@
       "comment" : "Main Menu Help"
     },
     "Hide" : {
-      "comment" : "Main Menu > View > Home Button > None item"
+      "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item"
     },
     "Hide DuckDuckGo" : {
       "comment" : "Main Menu DuckDuckGo item"
@@ -4127,6 +4238,9 @@
     },
     "Let’s try doing it manually. It won’t take long." : {
       "comment" : "Suggestion to switch to a Manual File Data Import when data import fails."
+    },
+    "Location:" : {
+      "comment" : "Add Folder popover: parent folder picker title"
     },
     "looking.for.bitwarden" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -5071,13 +5185,13 @@
       }
     },
     "network.protection.navbar.status.view.share.feedback" : {
-      "comment" : "Menu item for 'Send Feedback' in the Network Protection status view that's shown in the navigation bar",
+      "comment" : "Menu item for 'Send VPN Feedback' in the Network Protection status view that's shown in the navigation bar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Send Feedback…"
+            "value" : "Send VPN Feedback…"
           }
         }
       }
@@ -5154,6 +5268,9 @@
         }
       }
     },
+    "Never Show" : {
+      "comment" : "Preference for never showing the bookmarks bar on new tab"
+    },
     "never.for.this.site" : {
       "comment" : "Never ask to save login credentials for this site button",
       "extractionState" : "extracted_with_value",
@@ -5165,6 +5282,9 @@
           }
         }
       }
+    },
+    "New Folder" : {
+      "comment" : "Title for New bookmark folder dialog"
     },
     "New Tab" : {
       "comment" : "Main Menu File item"
@@ -5744,6 +5864,9 @@
           }
         }
       }
+    },
+    "Only Show on New Tab" : {
+      "comment" : "Preference for only showing the bookmarks bar on new tab"
     },
     "open" : {
       "comment" : "Open button",
@@ -6411,7 +6534,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Hide Network Protection"
+            "value" : "Hide VPN Shortcut"
           }
         }
       }
@@ -6471,7 +6594,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Show Network Protection"
+            "value" : "Show VPN Shortcut"
           }
         }
       }
@@ -7878,7 +8001,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Reopen All Windows from Last Session"
+            "value" : "Reopen all windows from last session"
           }
         }
       }
@@ -7982,6 +8105,9 @@
         }
       }
     },
+    "Remove" : {
+      "comment" : "Remove bookmark button title"
+    },
     "remove-favorite" : {
       "comment" : "Remove Favorite button",
       "extractionState" : "extracted_with_value",
@@ -8006,6 +8132,9 @@
         }
       }
     },
+    "Reopen All Windows from Last Session" : {
+      "comment" : "Main Menu History item"
+    },
     "reopen.last.closed.tab" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -8024,6 +8153,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Reopen Last Closed Window"
+          }
+        }
+      }
+    },
+    "report.broken.site" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Report Broken Site"
           }
         }
       }
@@ -8144,6 +8285,18 @@
         }
       }
     },
+    "send.browser.feedback" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Browser Feedback"
+          }
+        }
+      }
+    },
     "Services" : {
       "comment" : "Main Menu DuckDuckGo item"
     },
@@ -8220,6 +8373,9 @@
       "comment" : "Main Menu View item"
     },
     "Show left of the back button" : {
+      "comment" : "Preferences > Home Button > left position item"
+    },
+    "Show Left of the Back Button" : {
       "comment" : "Main Menu > View > Home Button > left position item"
     },
     "Show Next Tab" : {
@@ -8235,6 +8391,9 @@
       "comment" : "Main Menu View-Developer item"
     },
     "Show right of the reload button" : {
+      "comment" : "Preferences > Home Button > right position item"
+    },
+    "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item"
     },
     "Show Spelling and Grammar" : {
@@ -8428,6 +8587,9 @@
     },
     "The version of the browser you are trying to import from" : {
       "comment" : "Data import failure Report dialog description of a report field providing version of a browser user is trying to import data from"
+    },
+    "Title:" : {
+      "comment" : "Add Bookmark dialog bookmark title field heading"
     },
     "tooltip.addToFavorites" : {
       "comment" : "Tooltip for add to favorites button",
@@ -9158,7 +9320,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Nearest Available"
+            "value" : "Nearest available"
           }
         }
       }
