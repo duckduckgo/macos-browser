@@ -144,3 +144,8 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       SSH_PRIVATE_KEY_FASTLANE_MATCH: ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
+
+  tag_and_merge:
+    name: Tag and Merge Branch
+    needs: [ prepare_release ]
+    uses: ./.github/workflows/tag_and_merge.yml

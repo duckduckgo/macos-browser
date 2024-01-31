@@ -1,0 +1,116 @@
+name: Tag and Merge
+
+on:
+  workflow_dispatch:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      base-branch:
+        description: "Base branch name"
+        required: false
+        type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+    secrets:
+      ASANA_PERSONAL_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  tag-and-merge:
+
+    name: Tag and Merge
+
+    runs-on: ubuntu-latest
+
+    env:
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      base-branch: ${{ inputs.base-branch || 'main' }}
+      branch: ${{ inputs.branch || github.ref_name }}
+
+    steps:
+
+    - name: Get Asana task ID
+      id: get-task-id
+      if: env.asana-task-url
+      uses: ./.github/actions/extract-asana-task-id
+      with:
+        task-url: ${{ env.asana-task-url }}
+
+    - name: Get Asana task assignee
+      id: get-assignee-id
+      if: env.asana-task-url
+      uses: ./.github/actions/extract-asana-task-assignee
+      with:
+        access-token: ${{ secrets.ASANA_PERSONAL_ACCESS_TOKEN }}
+        task-id: ${{ steps.get-task-id.outputs.task-id }}
+
+    - name: Check out the code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Set up git
+      run: |
+        git config --global user.name "Dax the Duck"
+        git config --global user.email "dax@duckduckgo.com"
+
+    - name: Construct a tag
+      id: construct-tag
+      run: |
+        version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        build_number="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        tag="v${version}-${build_number}"
+        echo "tag=${tag}" >> $GITHUB_OUTPUT
+
+    - name: Tag the repo
+      run: |
+        git tag ${{ steps.construct-tag.outputs.tag }}
+        git push origin ${{ steps.construct-tag.outputs.tag }}
+
+    - name: Merge to base branch
+      id: merge
+      run: |
+        git checkout ${{ env.base-branch }}
+        git pull origin ${{ env.base-branch }}
+        if git merge ${{ inputs.branch || github.ref_name }}; then
+          git push origin ${{ env.base-branch }}
+        else
+          echo "merge_success=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Asana task on failed merge
+      if: ${{ steps.merge.outputs.merge_success == 'false' }}
+      run: |
+        task_name="Merging ${{ env.branch }} to ${{ env.base-branch }} failed"
+        task_body="Automatic merge failed. Please resolve conflicts and merge ${{ env.branch }} to ${{ env.base-branch }} manually."
+        assignee="${{ steps.get-assignee-id.outputs.assignee-id }}"
+        return_code=$(curl -X POST -fLSs "https://app.asana.com/api/1.0/tasks/${parent_task_id}/subtasks" \
+          -H "Authorization: Bearer ${asana_personal_access_token}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+            -d "{
+                  \"data\": {
+                    \"name\": \"${task_name}\",
+                    \"resource_subtype\": \"default_task\",
+                    \"notes\": \"${task_body}\",
+                    \"assignee\": \"${assignee}\"
+                  }
+                }
+          ")
+
+        if [ $return_code -ne 201 ]; then
+          echo "::error::Failed to create Asana task"
+          exit 1
+        fi
