@@ -66,6 +66,9 @@ jobs:
         header: asana-task-check-status
         message: |
           :no_entry_sign: The Asana task linked in the PR description is not added to ${{ env.ASANA_PROJECT_NAME }} project.
+          1. Verify that the correct task is linked in the PR.
+          2. Verify that the task is added to ${{ env.ASANA_PROJECT_NAME }} project.
+          3. When ready, remove the `bot: not in app board` label to retrigger the check.
 
     - name: Add a label to the PR
       if: ${{ needs.assert-project-membership.outputs.failure == '1' }}
@@ -86,7 +89,7 @@ jobs:
         header: asana-task-check-status
         delete: true
 
-    - name: Remove the label from the PR using github-script
+    - name: Remove the label from the PR
       if: ${{ needs.assert-project-membership.outputs.failure == '0' }}
       uses: actions/github-script@v7
       with:
