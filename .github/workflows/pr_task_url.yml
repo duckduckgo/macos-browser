@@ -92,14 +92,15 @@ jobs:
       with:
         script: |
           try {
-            github.rest.issues.removeLabel({
+            await github.rest.issues.removeLabel({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: 'bot: not in app board'
             });
           } catch (error) {
-            console.log(error);
+            console.error("12345");
+            console.error(error);
             if (error.status !== 404) {
               throw error;
             }
