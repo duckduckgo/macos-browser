@@ -58,14 +58,14 @@ jobs:
     - name: Get Asana task ID
       id: get-task-id
       if: env.asana-task-url
-      uses: ./.github/actions/extract-asana-task-id
+      uses: ./.github/actions/asana-extract-task-id
       with:
         task-url: ${{ env.asana-task-url }}
 
     - name: Get Asana task assignee
       id: get-assignee-id
       if: env.asana-task-url
-      uses: ./.github/actions/extract-asana-task-assignee
+      uses: ./.github/actions/asana-extract-task-assignee
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-id: ${{ steps.get-task-id.outputs.task-id }}

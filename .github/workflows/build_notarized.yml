@@ -173,7 +173,7 @@ jobs:
     - name: Extract Asana Task ID
       id: task-id
       if: env.asana-task-url
-      uses: ./.github/actions/extract-asana-task-id
+      uses: ./.github/actions/asana-extract-task-id
       with:
         task-url: ${{ env.asana-task-url }}
 
@@ -255,9 +255,9 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        mkdir -p "${{ github.workspace }}/.github/actions/extract-asana-task-id"
-        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/.github/actions/extract-asana-task-id/action.yml?ref=${{ github.ref }} --jq .download_url) \
-          --output "${{ github.workspace }}/.github/actions/extract-asana-task-id/action.yml"
+        mkdir -p "${{ github.workspace }}/.github/actions/asana-extract-task-id"
+        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/.github/actions/asana-extract-task-id/action.yml?ref=${{ github.ref }} --jq .download_url) \
+          --output "${{ github.workspace }}/.github/actions/asana-extract-task-id/action.yml"
 
         mkdir -p "${{ github.workspace }}/.github/actions/asana-upload"
         curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/.github/actions/asana-upload/action.yml?ref=${{ github.ref }} --jq .download_url) \
@@ -266,7 +266,7 @@ jobs:
     - name: Extract Asana Task ID
       id: task-id
       if: env.asana-task-url
-      uses: ./.github/actions/extract-asana-task-id
+      uses: ./.github/actions/asana-extract-task-id
       with:
         task-url: ${{ env.asana-task-url }}
 

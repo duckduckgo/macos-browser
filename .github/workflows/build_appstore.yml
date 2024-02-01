@@ -116,7 +116,7 @@ jobs:
     - name: Get Asana Task ID
       id: get-task-id
       if: env.asana-task-url
-      uses: ./.github/actions/extract-asana-task-id
+      uses: ./.github/actions/asana-extract-task-id
       with:
         task-url: ${{ env.asana-task-url }}
 
