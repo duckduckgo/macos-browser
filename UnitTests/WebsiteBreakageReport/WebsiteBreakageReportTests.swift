@@ -43,7 +43,9 @@ class WebsiteBreakageReportTests: XCTestCase {
             ampURL: "https://example.test",
             urlParametersRemoved: false,
             protectionsState: true,
-            reportFlow: .appMenu
+            reportFlow: .appMenu,
+            error: nil,
+            httpStatusCode: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
@@ -84,7 +86,9 @@ class WebsiteBreakageReportTests: XCTestCase {
             ampURL: "https://example.test",
             urlParametersRemoved: false,
             protectionsState: true,
-            reportFlow: .appMenu
+            reportFlow: .appMenu,
+            error: nil,
+            httpStatusCode: nil
         )
 
         let urlRequest = makeURLRequest(with: breakage.requestParameters)
