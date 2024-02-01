@@ -74,7 +74,7 @@ jobs:
       uses: ./.github/actions/create-tag-and-github-release
       with:
         prerelease: true
-        GH_TOKEN: ${{ github.token }}
+        github-token: ${{ github.token }}
 
     - name: Merge to base branch
       id: merge
