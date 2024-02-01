@@ -205,7 +205,13 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "DataBrokerProfileQueryOperationManagerTests">
+                  Identifier = "DataBrokerProfileQueryOperationManagerTests/testWhenNewExtractedProfileIsNotInDatabase_thenIsAddedToTheDatabaseAndOptOutOperationIsCreated()">
+               </Test>
+               <Test
+                  Identifier = "DataBrokerProfileQueryOperationManagerTests/testWhenRemovedProfileIsFound_thenOptOutConfirmedIsAddedRemoveDateIsUpdatedAndPreferredRunDateIsSetToNil()">
+               </Test>
+               <Test
+                  Identifier = "DataBrokerProfileQueryOperationManagerTests/testWhenScannedProfileIsAlreadyInTheDatabaseAndWasNotFoundInBroker_thenTheRemovedDateIsSet()">
                </Test>
             </SkippedTests>
          </TestableReference>
