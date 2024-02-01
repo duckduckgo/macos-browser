@@ -56,7 +56,7 @@ static BOOL IsApplicationAtPathRunning(NSString *path);
 static BOOL IsApplicationAtPathNested(NSString *path);
 static NSString *ContainingDiskImageDevice(NSString *path);
 static BOOL Trash(NSString *path);
-static BOOL DeleteOrTrash(NSString *path, NSURL *url);
+static BOOL DeleteOrTrash(NSString *path);
 static BOOL AuthorizedInstall(NSString *srcPath, NSString *dstPath, BOOL *canceled);
 static BOOL CopyBundle(NSString *srcPath, NSString *dstPath);
 static NSString *ShellQuotedString(NSString *string);
@@ -79,7 +79,6 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 
 	// Path of the bundle
 	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
-    NSURL *bundleURL = [[NSBundle mainBundle] bundleURL];
 
 	// Check if the bundle is embedded in another application
 	BOOL isNestedApplication = IsApplicationAtPathNested(bundlePath);
@@ -198,7 +197,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 		// NOTE: This final delete does not work if the source bundle is in a network mounted volume.
 		//       Calling rm or file manager's delete method doesn't work either. It's unlikely to happen
 		//       but it'd be great if someone could fix this.
-		if (!isNestedApplication && diskImageDevice == nil && !DeleteOrTrash(bundlePath, bundleURL)) {
+		if (!isNestedApplication && diskImageDevice == nil && !DeleteOrTrash(bundlePath)) {
 			NSLog(@"WARNING -- Could not delete application after moving it to Applications folder");
 		}
 
@@ -420,15 +419,12 @@ static BOOL Trash(NSString *path) {
 	return result;
 }
 
-static BOOL DeleteOrTrash(NSString *path, NSURL *url) {
+static BOOL DeleteOrTrash(NSString *path) {
 	NSError *error;
 
 	if ([[NSFileManager defaultManager] removeItemAtPath:path error:&error]) {
 		return YES;
 	}
-    else if ([[NSFileManager defaultManager] removeItemAtURL:url error:&error]) {
-        return YES;
-    }
 	else {
 		// Don't log warning if on Sierra and running inside App Translocation path
 		if ([path rangeOfString:@"/AppTranslocation/"].location == NSNotFound)
