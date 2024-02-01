@@ -155,3 +155,44 @@ jobs:
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+
+  report_success:
+
+    name: Report Success
+
+    needs: [ create_release_branch, tag_and_merge ]
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+
+      - name: Check out the code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Get Asana automation subtask
+        id: get-automation-subtask
+        uses: ./.github/actions/asana-get-release-automation-subtask-id
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
+
+      - name: Comment on Asana task
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+          TASK_BODY: "Build is ready. Repository is tagged with ${{ needs.tag_and_merge.outputs.tag }} tag. Branch is merged to main."
+          WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
+            -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+            -H 'content-type: application/json' \
+            --write-out '%{http_code}' \
+            --output /dev/null \
+            -d "{
+                  \"data\": {
+                    \"text\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\"
+                  }
+                }"

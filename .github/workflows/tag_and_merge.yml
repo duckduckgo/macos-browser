@@ -47,6 +47,9 @@ jobs:
       base-branch: ${{ inputs.base-branch || 'main' }}
       branch: ${{ inputs.branch || github.ref_name }}
 
+    outputs:
+      tag: ${{ steps.create-tag.outputs.tag }}
+
     steps:
 
     - name: Check out the code
