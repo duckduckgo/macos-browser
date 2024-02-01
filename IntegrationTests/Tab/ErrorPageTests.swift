@@ -43,6 +43,65 @@ class ErrorPageTests: XCTestCase {
     static let alternativeTitle = "alternative page"
     static let alternativeHtml = "<html><head><title>\(alternativeTitle)</title></head><body>alternative body</body></html>"
 
+    static let sessionStateData = Data.sessionRestorationMagic + """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+    <key>IsAppInitiated</key>
+    <true/>
+    <key>SessionHistory</key>
+    <dict>
+        <key>SessionHistoryVersion</key>
+        <integer>1</integer>
+        <key>SessionHistoryEntries</key>
+        <array>
+            <dict>
+                <key>SessionHistoryEntryOriginalURL</key>
+                <string>\(URL.newtab.absoluteString)</string>
+                <key>SessionHistoryEntryTitle</key>
+                <string></string>
+                <key>SessionHistoryEntryShouldOpenExternalURLsPolicyKey</key>
+                <integer>1</integer>
+                <key>SessionHistoryEntryData</key>
+                <data>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAEGPVpVAQBgAAAAAAAAAAAP////8AAAAAD2PVpVAQBgD/////AAAAAAAAAAAAAIA/AAAAAP////8=</data>
+                <key>SessionHistoryEntryURL</key>
+                <string>\(URL.newtab.absoluteString)</string>
+            </dict>
+            <dict>
+                <key>SessionHistoryEntryOriginalURL</key>
+                <string>\(URL.test.absoluteString)</string>
+                <key>SessionHistoryEntryTitle</key>
+                <string>test page</string>
+                <key>SessionHistoryEntryShouldOpenExternalURLsPolicyKey</key>
+                <integer>1</integer>
+                <key>SessionHistoryEntryData</key>
+                <data>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAwvZLp1AQBgAAAAAAAAAAAP////8AAAAAwfZLp1AQBgD/////AAAAAAAAAAAAAIA/AAAAAP////8=</data>
+                <key>SessionHistoryEntryURL</key>
+                <string>\(URL.test.absoluteString)</string>
+            </dict>
+            <dict>
+                <key>SessionHistoryEntryOriginalURL</key>
+                <string>\(URL.alternative.absoluteString)</string>
+                <key>SessionHistoryEntryTitle</key>
+                <string>alternative page</string>
+                <key>SessionHistoryEntryShouldOpenExternalURLsPolicyKey</key>
+                <integer>1</integer>
+                <key>SessionHistoryEntryData</key>
+                <data>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAeWCYp1AQBgAAAAAAAAAAAP////8AAAAAeGCYp1AQBgD/////AAAAAAAAAAAAAAAAAAAAAP////8=</data>
+                <key>SessionHistoryEntryURL</key>
+                <string>\(URL.alternative.absoluteString)</string>
+            </dict>
+        </array>
+        <key>SessionHistoryCurrentIndex</key>
+        <integer>1</integer>
+    </dict>
+    <key>RenderTreeSize</key>
+    <integer>4</integer>
+    </dict>
+    </plist>
+    """.utf8data
+
     @MainActor
     override func setUp() async throws {
         schemeHandler = TestSchemeHandler()
@@ -713,13 +772,88 @@ class ErrorPageTests: XCTestCase {
         XCTAssertTrue(tab.canReload)
     }
 
-    func testWhenLoadingFailsAfterSessionRestoration_navigationHistoryIsPreserved() {
+    func testWhenLoadingFailsAfterSessionRestoration_navigationHistoryIsPreserved() async throws {
+        schemeHandler.middleware = [{ _ in
+            .failure(NSError.noConnection)
+        }]
 
+        let tab = Tab(content: .url(.test, source: .pendingStateRestoration), webViewConfiguration: webViewConfiguration, interactionStateData: Self.sessionStateData)
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        try await eNewtabPageLoaded.value
+
+        XCTAssertTrue(tab.canReload)
+
+        schemeHandler.middleware = [{ _ in
+            .ok(.html(Self.testHtml))
+        }]
+        // open new tab
+        viewModel.appendNewTab()
+
+        // select the failing tab triggering its reload
+        let eReloadFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        viewModel.select(at: .unpinned(0))
+        _=try await eReloadFinished.value
+
+        XCTAssertEqual(tab.currentHistoryItem?.url, .test)
+        XCTAssertEqual(tab.currentHistoryItem?.title, Self.pageTitle)
+
+        XCTAssertEqual(tab.backHistoryItems.count, 1)
+        XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
+        XCTAssertEqual(tab.backHistoryItems.first?.title ?? "", "")
+        XCTAssertTrue(tab.canGoBack)
+
+        XCTAssertEqual(tab.forwardHistoryItems.count, 1)
+        XCTAssertEqual(tab.forwardHistoryItems.first?.url, .alternative)
+        XCTAssertEqual(tab.forwardHistoryItems.first?.title, Self.alternativeTitle)
+        XCTAssertTrue(tab.canGoForward)
+
+        XCTAssertTrue(tab.canReload)
     }
 
-    func testPinnedTabDoesNotNavigateAway() {
+    func testPinnedTabDoesNotNavigateAway() async throws {
+        schemeHandler.middleware = [{ _ in
+            .ok(.html(Self.testHtml))
+        }]
 
+        let tab = Tab(content: .url(.alternative, source: .ui), webViewConfiguration: webViewConfiguration)
+        let manager = PinnedTabsManager()
+        manager.pin(tab)
+
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: []), pinnedTabsManager: manager)
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        viewModel.select(at: .pinned(0))
+
+        // wait for tab to load
+        let eNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        _=try await eNavigationFinished.value
+
+        // refresh: fail
+        schemeHandler.middleware = [{ _ in
+            .failure(NSError.noConnection)
+        }]
+        let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
+        let eNavigationFinished2 = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        tab.reload()
+        _=try await eNavigationFailed.value
+        _=try await eNavigationFinished2.value
+
+        XCTAssertNotNil(tab.error)
+
+        schemeHandler.middleware = [{ _ in
+            .ok(.html(Self.testHtml))
+        }]
+        let eNavigationFinished5 = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        tab.reload()
+        _=try await eNavigationFinished5.value
+
+        XCTAssertNil(tab.error)
+        XCTAssertEqual(viewModel.tabs.count, 1)
     }
+
 }
 
 private extension URL {
@@ -745,5 +879,11 @@ private extension NSError {
         let errorDescription = "connection lost"
         return URLError(.networkConnectionLost, userInfo: [NSLocalizedDescriptionKey: errorDescription]) as NSError
     }()
+
+}
+
+extension Data {
+
+    static let sessionRestorationMagic = Data([0x00, 0x00, 0x00, 0x02])
 
 }

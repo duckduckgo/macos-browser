@@ -258,6 +258,7 @@ final class AddressBarViewController: NSViewController {
             .store(in: &tabViewModelCancellables)
 
         selectedTabViewModel.$isLoading.combineLatest(selectedTabViewModel.tab.$error)
+            .debounce(for: 0.1, scheduler: RunLoop.main)
             .sink { [weak self] isLoading, error in
                 guard let progressIndicator = self?.progressIndicator else { return }
 

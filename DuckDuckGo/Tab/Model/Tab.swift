@@ -917,7 +917,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         let forceReload = (url.absoluteString == content.userEnteredValue) ? shouldLoadInBackground : (source == .reload)
         if forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
-            if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading, content.isUserEnteredUrl {
+            if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
                 return reload()
             }
             if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
