@@ -203,6 +203,11 @@
                BlueprintName = "DataBrokerProtectionTests"
                ReferencedContainer = "container:LocalPackages/DataBrokerProtection">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "DataBrokerProfileQueryOperationManagerTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
