@@ -240,7 +240,6 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
         let savedExtractedProfiles = database.fetchAllBrokerProfileQueryData().flatMap { $0.extractedProfiles }
 
         guard savedExtractedProfiles.count > 0 else {
-            assertionFailure("If no extracted profiles are saved, removed profiles should always be empty")
             return
         }
 
