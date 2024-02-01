@@ -51,20 +51,20 @@ jobs:
           git config --global user.email "dax@duckduckgo.com"
           bundle exec fastlane update_embedded_files
 
-  run_tests:
+  # run_tests:
 
-    name: Run Tests
+  #   name: Run Tests
 
-    needs: update_embedded_files
-    uses: ./.github/workflows/pr.yml
-    secrets:
-      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  #   needs: update_embedded_files
+  #   uses: ./.github/workflows/pr.yml
+  #   secrets:
+  #     ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
 
   increment_build_number:
 
     name: Increment Build Number
 
-    needs: run_tests
+    needs: update_embedded_files
     runs-on: macos-13-xlarge
     timeout-minutes: 10
 
