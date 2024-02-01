@@ -2779,6 +2779,8 @@
 		B690152C2ACBF4DA00AD0BAB /* MenuPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B690152B2ACBF4DA00AD0BAB /* MenuPreview.swift */; };
 		B690152D2ACBF4DA00AD0BAB /* MenuPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B690152B2ACBF4DA00AD0BAB /* MenuPreview.swift */; };
 		B690152F2ACBF4DA00AD0BAB /* MenuPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B690152B2ACBF4DA00AD0BAB /* MenuPreview.swift */; };
+		B693766E2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693766D2B6B5F26005BD9D4 /* ErrorPageTests.swift */; };
+		B693766F2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693766D2B6B5F26005BD9D4 /* ErrorPageTests.swift */; };
 		B693954A26F04BEB0015B914 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953C26F04BE70015B914 /* NibLoadable.swift */; };
 		B693954B26F04BEB0015B914 /* MouseOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953D26F04BE70015B914 /* MouseOverView.swift */; };
 		B693954C26F04BEB0015B914 /* FocusRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B693953E26F04BE70015B914 /* FocusRingView.swift */; };
@@ -4169,6 +4171,7 @@
 		B68C92C0274E3EF4002AC6B0 /* PopUpWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopUpWindow.swift; sourceTree = "<group>"; };
 		B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataRecord.swift; sourceTree = "<group>"; };
 		B690152B2ACBF4DA00AD0BAB /* MenuPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPreview.swift; sourceTree = "<group>"; };
+		B693766D2B6B5F26005BD9D4 /* ErrorPageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorPageTests.swift; sourceTree = "<group>"; };
 		B693953C26F04BE70015B914 /* NibLoadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
 		B693953D26F04BE70015B914 /* MouseOverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MouseOverView.swift; sourceTree = "<group>"; };
 		B693953E26F04BE70015B914 /* FocusRingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
@@ -5140,7 +5143,7 @@
 				B603973229BEF84900902A34 /* HTTPSUpgrade */,
 				B62A233A29C322A000D22475 /* NavigationProtection */,
 				B603973629BF0E9400902A34 /* PrivacyDashboard */,
-				B644B43C29D56811003FA9AB /* TabExtensions */,
+				B644B43C29D56811003FA9AB /* Tab */,
 				4B1AD91625FC46FB00261379 /* CoreDataEncryptionTests.swift */,
 				4BA1A6EA258C288C00F6F690 /* EncryptionKeyStoreTests.swift */,
 				4B1AD8A125FC27E200261379 /* Info.plist */,
@@ -7697,12 +7700,13 @@
 			path = History;
 			sourceTree = "<group>";
 		};
-		B644B43C29D56811003FA9AB /* TabExtensions */ = {
+		B644B43C29D56811003FA9AB /* Tab */ = {
 			isa = PBXGroup;
 			children = (
 				B644B43929D565DB003FA9AB /* SearchNonexistentDomainTests.swift */,
+				B693766D2B6B5F26005BD9D4 /* ErrorPageTests.swift */,
 			);
-			path = TabExtensions;
+			path = Tab;
 			sourceTree = "<group>";
 		};
 		B647EFB32922539400BA628D /* TabExtensions */ = {
@@ -10271,6 +10275,7 @@
 				B603972D29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				3706FEA6293F662100E42796 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F5656A299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
+				B693766F2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10311,6 +10316,7 @@
 				B603972C29BEDF2100902A34 /* ExpectedNavigationExtension.swift in Sources */,
 				4B1AD8D525FC38DD00261379 /* EncryptionKeyStoreTests.swift in Sources */,
 				B6F56568299A414300A04298 /* WKWebViewMockingExtension.swift in Sources */,
+				B693766E2B6B5F27005BD9D4 /* ErrorPageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13161,7 +13167,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = c2335e8f4949098d63d9044d4bd50ac82e3c8d2b;
+				revision = 0679fed68bd415e46d4f9363544f2da2902b3e32;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

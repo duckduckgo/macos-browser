@@ -41,7 +41,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window?.close()
         window = nil
 
