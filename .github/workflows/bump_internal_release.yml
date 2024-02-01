@@ -64,7 +64,7 @@ jobs:
 
     name: Increment Build Number
 
-    # needs: run_tests
+    needs: update_embedded_files
     runs-on: macos-13-xlarge
     timeout-minutes: 10
 
