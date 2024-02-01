@@ -879,22 +879,24 @@ protocol NewWindowPolicyDecisionMaker {
         webView.load(URLRequest(url: .welcome))
     }
 
-    func reload() {
+    @MainActor(unsafe)
+    @discardableResult
+    func reload() -> ExpectedNavigation? {
         userInteractionDialog = nil
 
         // In the case of an error only reload web URLs to prevent uxss attacks via redirecting to javascript://
-        if let error = error, let failingUrl = error.failingUrl, failingUrl.isHttp || failingUrl.isHttps {
+        if let error = error, let failingUrl = error.failingUrl ?? content.urlForWebView, failingUrl.isHttp || failingUrl.isHttps {
             // navigate in-place to preserve back-forward history
             webView.replaceLocation(with: failingUrl)
-            return
+            return nil
         }
 
         if webView.url == nil, content.isUrl {
             self.content = content.forceReload()
             // load from cache or interactionStateData when called by lazy loader
-            reloadIfNeeded(shouldLoadInBackground: true)
+            return reloadIfNeeded(shouldLoadInBackground: true)
         } else {
-            webView.reload()
+            return webView.navigator(distributedNavigationDelegate: navigationDelegate).reload(withExpectedNavigationType: .reload)
         }
     }
 
@@ -915,6 +917,9 @@ protocol NewWindowPolicyDecisionMaker {
 
         let forceReload = (url.absoluteString == content.userEnteredValue) ? shouldLoadInBackground : (source == .reload)
         if forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
+            if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading, content.isUserEnteredUrl {
+                return reload()
+            }
             if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
 
             if url.isFileURL {
@@ -1025,6 +1030,7 @@ protocol NewWindowPolicyDecisionMaker {
         }.store(in: &webViewCancellables)
 
         webView.publisher(for: \.url)
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.handleUrlDidChange()

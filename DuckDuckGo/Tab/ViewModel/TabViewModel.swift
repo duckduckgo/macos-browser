@@ -250,13 +250,11 @@ final class TabViewModel {
         }
     }
 
-    private func updateTitle() {
-        guard !isShowingErrorPage else {
-            title = UserText.tabErrorTitle
-            return
-        }
-
+    private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
+        let title: String
         switch tab.content {
+        case _ where isShowingErrorPage:
+            title = UserText.tabErrorTitle
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
         case .settings:
@@ -272,14 +270,16 @@ final class TabViewModel {
         case .onboarding:
             title = UserText.tabOnboardingTitle
         case .url, .none:
-            if let title = tab.title?.trimmingWhitespace(),
-               !title.isEmpty {
-                self.title = title
+            if let tabTitle = tab.title?.trimmingWhitespace(), !tabTitle.isEmpty {
+                title = tabTitle
             } else if let host = tab.url?.host?.droppingWwwPrefix() {
-                self.title = host
+                title = host
             } else {
-                self.title = addressBarString
+                title = addressBarString
             }
+        }
+        if self.title != title {
+            self.title = title
         }
     }
 

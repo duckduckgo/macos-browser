@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Combine
+import Foundation
+import Navigation
 
 protocol LazyLoadable: AnyObject, Identifiable {
 
@@ -28,7 +29,7 @@ protocol LazyLoadable: AnyObject, Identifiable {
     var isLazyLoadingInProgress: Bool { get set }
     var loadingFinishedPublisher: AnyPublisher<Self, Never> { get }
 
-    func reload()
+    func reload() -> ExpectedNavigation?
     func isNewer(than other: Self) -> Bool
 }
 
