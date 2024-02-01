@@ -41,7 +41,8 @@ class NavigationProtectionIntegrationTests: XCTestCase {
 
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window?.close()
         window = nil
 
@@ -163,7 +164,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         }.timeout(40, "didFinish").first().promise().value
 
         // download results
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
         // download task promise
         let downloadTaskPromise = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
@@ -251,7 +252,7 @@ class NavigationProtectionIntegrationTests: XCTestCase {
         ]
         // retry several times for correct results to come
         for _ in 0..<5 {
-            var persistor = DownloadsPreferencesUserDefaultsPersistor()
+            let persistor = DownloadsPreferencesUserDefaultsPersistor()
             persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
             let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
             _=try await tab.webView.evaluateJavaScript("(function() { document.getElementById('download').click(); return true })()")

@@ -27,7 +27,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
     func testWhenAccountIsSelectedThenModelReflectsThat() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.select(item: accounts[0])
@@ -47,7 +47,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
     func testWhenFilterAppliedThenDisplayedAccountsOnlyContainFilteredMatches() {
 
         let createdAccounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: createdAccounts)
         model.filter = "domain5"
@@ -66,7 +66,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
     }
 
     func testWhenAccountIsSelectedThenCallbackReceivesOldAndNewVersion() {
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
         let account = makeAccount(id: 1)
 
         model.update(items: [account])
@@ -77,12 +77,12 @@ final class PasswordManagementItemListModelTests: XCTestCase {
     }
 
     func testWhenGettingEmptyState_AndViewModelIsNewlyCreated_ThenEmptyStateIsNone() {
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
         XCTAssertEqual(model.emptyState, .none)
     }
 
     func testWhenGettingEmptyState_AndViewModelGetsGivenEmptyDataSet_ThenEmptyStateIsNoData() {
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
         model.update(items: [])
 
         XCTAssertEqual(model.emptyState, .noData)
@@ -90,7 +90,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
     func testWhenGettingEmptyState_AndViewModelHasData_AndCategoryIsAllItems_AndViewModelIsFiltered_ThenEmptyStateIsNone() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         XCTAssertEqual(model.emptyState, .none)
@@ -104,7 +104,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
     func testWhenGettingEmptyState_AndViewModelHasData_AndCategoryIsLogins_AndViewModelIsFiltered_ThenEmptyStateIsLogins() {
         let accounts = (0 ..< 10).map { makeAccount(id: $0, domain: "domain\($0)") }
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.sortDescriptor.category = .logins
@@ -123,7 +123,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let account3 = makeAccount(id: 3, domain: "otherdomain.com")
         let accounts = [account1, account2, account3]
 
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.selectLoginWithDomainOrFirst(domain: "dummy.com")
@@ -138,7 +138,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let account3 = makeAccount(id: 3, domain: "otherdomain.com")
         let accounts = [account1, account2, account3]
 
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.selectLoginWithDomainOrFirst(domain: "example.com")
@@ -153,7 +153,7 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         let account3 = makeAccount(id: 3, domain: "www.example.com")
         let accounts = [account1, account2, account3]
 
-        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected)
+        let model = PasswordManagementItemListModel(onItemSelected: onItemSelected, onAddItemSelected: onAddItemSelected)
 
         model.update(items: accounts)
         model.selectLoginWithDomainOrFirst(domain: "sub.example.com")
@@ -180,6 +180,8 @@ final class PasswordManagementItemListModelTests: XCTestCase {
         newSelection = new
     }
 
+    func onAddItemSelected(category: SecureVaultSorting.Category) {}
+
     private func accounts(from sections: [PasswordManagementListSection]) -> [SecureVaultModels.WebsiteAccount] {
         var accounts = [SecureVaultModels.WebsiteAccount]()
 
@@ -201,9 +203,11 @@ final class PasswordManagementItemListModelTests: XCTestCase {
 
 extension PasswordManagementItemListModel {
 
-    convenience init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void) {
+    convenience init(onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
+                     onAddItemSelected: @escaping (_ category: SecureVaultSorting.Category) -> Void) {
         self.init(passwordManagerCoordinator: PasswordManagerCoordinatingMock(),
-                  onItemSelected: onItemSelected)
+                  onItemSelected: onItemSelected,
+                  onAddItemSelected: onAddItemSelected)
     }
 
 }

@@ -287,7 +287,9 @@ extension PrivacyDashboardViewController {
                                               ampURL: ampURL,
                                               urlParametersRemoved: urlParametersRemoved,
                                               protectionsState: protectionsState,
-                                              reportFlow: source)
+                                              reportFlow: source,
+                                              error: nil,
+                                              httpStatusCode: nil)
         return websiteBreakage
     }
 }
