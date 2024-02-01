@@ -70,23 +70,11 @@ jobs:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-id: ${{ steps.get-task-id.outputs.task-id }}
 
-    - name: Set up git
-      run: |
-        git config --global user.name "Dax the Duck"
-        git config --global user.email "dax@duckduckgo.com"
-
-    - name: Construct a tag
-      id: construct-tag
-      run: |
-        version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
-        build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
-        tag="${version}-${build_number}"
-        echo "tag=${tag}" >> $GITHUB_OUTPUT
-
-    - name: Tag the repo
-      run: |
-        git tag ${{ steps.construct-tag.outputs.tag }}
-        git push origin ${{ steps.construct-tag.outputs.tag }}
+    - name: Create Tag and GitHub Release
+      uses: ./.github/actions/create-tag-and-github-release
+      with:
+        prerelease: true
+        GH_TOKEN: ${{ github.token }}
 
     - name: Merge to base branch
       id: merge
