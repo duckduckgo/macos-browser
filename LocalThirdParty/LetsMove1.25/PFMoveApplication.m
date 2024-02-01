@@ -390,21 +390,10 @@ static NSString *ContainingDiskImageDevice(NSString *path) {
 
 static BOOL Trash(NSString *path) {
 	BOOL result = NO;
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_8
 	if (floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_8) {
 		result = [[NSFileManager defaultManager] trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:NULL error:NULL];
 	}
-#endif
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_11
-	if (!result) {
-		result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation
-															  source:[path stringByDeletingLastPathComponent]
-														 destination:@""
-															   files:[NSArray arrayWithObject:[path lastPathComponent]]
-																 tag:NULL];
-	}
-#endif
-	
+
 	// As a last resort try trashing with AppleScript.
 	// This allows us to trash the app in macOS Sierra even when the app is running inside
 	// an app translocation image.
