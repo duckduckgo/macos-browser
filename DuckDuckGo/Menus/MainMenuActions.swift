@@ -118,6 +118,30 @@ extension AppDelegate {
         FeedbackPresenter.presentFeedbackForm()
     }
 
+    @objc func openReportBrokenSite(_ sender: Any?) {
+        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
+        let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
+            PrivacyDashboardViewController(coder: coder, initMode: .reportBrokenSite)
+        }
+
+        privacyDashboardViewController.sizeDelegate = self
+
+        let window = NSWindow(contentViewController: privacyDashboardViewController)
+        window.styleMask.remove(.resizable)
+        window.setFrame(NSRect(x: 0, y: 0, width: PrivacyDashboardViewController.Constants.initialContentWidth,
+                               height: PrivacyDashboardViewController.Constants.reportBrokenSiteInitialContentHeight),
+                        display: true)
+        privacyDashboardWindow = window
+
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let tabModel = parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel else {
+            assertionFailure("AppDelegate: Failed to present PrivacyDashboard")
+            return
+        }
+        privacyDashboardViewController.updateTabViewModel(tabModel)
+        parentWindowController.window?.beginSheet(window) { _ in }
+    }
+
     #endif
 
     @objc func navigateToBookmark(_ sender: Any?) {
@@ -932,6 +956,9 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.openExportLogins(_:)):
             return areTherePasswords
 
+        case #selector(AppDelegate.openReportBrokenSite(_:)):
+            return WindowControllersManager.shared.selectedTab?.canReload ?? false
+
         default:
             return true
         }
@@ -981,4 +1008,11 @@ extension MainViewController: FindInPageDelegate {
         activeTabViewModel?.closeFindInPage()
     }
 
+}
+
+extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
+
+    func privacyDashboardViewControllerDidChange(size: NSSize) {
+        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
+    }
 }

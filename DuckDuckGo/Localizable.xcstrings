@@ -2924,18 +2924,6 @@
         }
       }
     },
-    "feedback.breakage.disclaimer" : {
-      "comment" : "Disclaimer in breakage form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your optional message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version."
-          }
-        }
-      }
-    },
     "feedback.bug.description" : {
       "comment" : "Label in the feedback form",
       "extractionState" : "extracted_with_value",
@@ -6638,6 +6626,54 @@
         }
       }
     },
+    "pm.add.card" : {
+      "comment" : "Add New Credit Card button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Credit Card"
+          }
+        }
+      }
+    },
+    "pm.add.identity" : {
+      "comment" : "Add New Identity button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Identity"
+          }
+        }
+      }
+    },
+    "pm.add.login" : {
+      "comment" : "Add New Login button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Password"
+          }
+        }
+      }
+    },
+    "pm.add.new" : {
+      "comment" : "Add New item button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add New"
+          }
+        }
+      }
+    },
     "pm.added" : {
       "comment" : "Label for login added data",
       "extractionState" : "extracted_with_value",
@@ -8121,6 +8157,18 @@
         }
       }
     },
+    "report.broken.site" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Report Broken Site"
+          }
+        }
+      }
+    },
     "restart.bitwarden" : {
       "comment" : "Button to restart Bitwarden application",
       "extractionState" : "extracted_with_value",
@@ -8233,6 +8281,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Select Bitwarden → Settings from the Mac menu bar."
+          }
+        }
+      }
+    },
+    "send.browser.feedback" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Browser Feedback"
           }
         }
       }
