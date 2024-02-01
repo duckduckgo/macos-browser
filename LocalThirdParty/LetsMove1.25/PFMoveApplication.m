@@ -390,10 +390,12 @@ static NSString *ContainingDiskImageDevice(NSString *path) {
 }
 
 static BOOL Trash(NSString *path) {
-	BOOL result = NO;
-	if (floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_8) {
-		result = [[NSFileManager defaultManager] trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:NULL error:NULL];
-	}
+    NSError *error;
+	BOOL result = [[NSFileManager defaultManager] trashItemAtURL:[NSURL fileURLWithPath:path] resultingItemURL:NULL error:&error];
+
+    if (error) {
+        NSLog(@"Trash NSFileManager error: %@", error);
+    }
 
 	// As a last resort try trashing with AppleScript.
 	// This allows us to trash the app in macOS Sierra even when the app is running inside
@@ -430,10 +432,8 @@ static BOOL DeleteOrTrash(NSString *path, NSURL *url) {
         return YES;
     }
 	else {
-		// Don't log warning if on Sierra and running inside App Translocation path
-		if ([path rangeOfString:@"/AppTranslocation/"].location == NSNotFound)
-			NSLog(@"WARNING -- Could not delete '%@': %@", path, [error localizedDescription]);
-		
+        NSLog(@"WARNING -- Could not delete '%@': %@", path, [error localizedDescription]);
+
 		return Trash(path);
 	}
 }
