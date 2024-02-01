@@ -48,7 +48,7 @@ runs:
       run: |
         latest_release="$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')"
         if [[ "${{ inputs.prerelease }}" == "true" ]]; then
-          gh release create ${{ steps.compute-tag.outcome.tag }} --generate-notes --prerelease --notes-start-tag ${latest_release}
+          gh release create ${{ steps.compute-tag.output.tag }} --generate-notes --prerelease --notes-start-tag ${latest_release}
         else
-          gh release create ${{ steps.compute-tag.outcome.tag }} --generate-notes --notes-start-tag ${latest_release}
+          gh release create ${{ steps.compute-tag.output.tag }} --generate-notes --notes-start-tag ${latest_release}
         fi
