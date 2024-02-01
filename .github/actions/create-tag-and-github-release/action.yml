@@ -1,0 +1,51 @@
+name: Tag Repository and Create GitHub Release
+description: Tags the repository and creates a GitHub release
+inputs:
+  prerelease:
+    description: "Whether the release is a prerelease"
+    required: false
+    type: boolean
+    default: true
+  GH_TOKEN:
+    description: "GitHub token"
+    required: true
+    type: string
+outputs:
+  tag:
+    description: "Tag that has been added"
+    value: ${{ steps.compute-tag.outputs.tag }}
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        git config --global user.name "Dax the Duck"
+        git config --global user.email "dax@duckduckgo.com"
+      shell: bash
+
+    - id: compute-tag
+      run: |
+        version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
+        if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+          build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
+          tag="${version}-${build_number}"
+        else
+          tag="${version}"
+        fi
+        echo "tag=${tag}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - id: tag-repo
+      run: |
+        git tag ${{ steps.compute-tag.outputs.tag }}
+        git push origin ${{ steps.compute-tag.outputs.tag }}
+      shell: bash
+
+    - id: create-github-release
+      run: |
+        latest_release="$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')"
+        if [[ "${{ inputs.prerelease }}" == "true" ]]; then
+          gh release create ${{ steps.compute-tag.outcome.tag }} --generate-notes --prerelease --notes-start-tag ${latest_release}
+        else
+          gh release create ${{ steps.compute-tag.outcome.tag }} --generate-notes --notes-start-tag ${latest_release}
+        fi
+      shell: bash
