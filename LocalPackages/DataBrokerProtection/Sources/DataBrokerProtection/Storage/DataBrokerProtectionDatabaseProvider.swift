@@ -85,6 +85,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     public init(file: URL = DefaultDataBrokerProtectionDatabaseProvider.defaultDatabaseURL(), key: Data) throws {
         try super.init(file: file, key: key, writerType: .pool) { migrator in
             migrator.registerMigration("v1", migrate: Self.migrateV1(database:))
+            migrator.registerMigration("v2", migrate: Self.migrateV2(database:))
+
         }
     }
 
@@ -259,6 +261,15 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
             $0.column(OptOutAttemptDB.Columns.startDate.name, .date).notNull()
         }
     }
+
+    static func migrateV2(database: Database) throws {
+        if try database.tableExists(BrokerDB.databaseTableName) {
+            try database.alter(table: BrokerDB.databaseTableName) {
+                $0.add(column: BrokerDB.Columns.url.name, .text).notNull().defaults(to: "")
+            }
+        }
+    }
+
     // swiftlint:enable function_body_length
 
     func updateProfile(profile: DataBrokerProtectionProfile, mapperToDB: MapperToDB) throws -> Int64 {
