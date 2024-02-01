@@ -55,21 +55,6 @@ jobs:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
 
-    - name: Get Asana task ID
-      id: get-task-id
-      if: env.asana-task-url
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ env.asana-task-url }}
-
-    - name: Get Asana task assignee
-      id: get-assignee-id
-      if: env.asana-task-url
-      uses: ./.github/actions/asana-extract-task-assignee
-      with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        task-id: ${{ steps.get-task-id.outputs.task-id }}
-
     - name: Create Tag and GitHub Release
       id: create-tag
       uses: ./.github/actions/create-tag-and-github-release
@@ -90,15 +75,23 @@ jobs:
             head: "${{ env.branch }}"
           })
 
+    - name: Get Asana automation subtask
+      id: get-automation-subtask
+      if: failure() && env.asana-task-url
+      uses: ./.github/actions/asana-get-release-automation-subtask-id
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        task-url: ${{ env.asana-task-url }}
+
     - name: Create Asana task on failed merge
-      if: failure()
+      if: failure() && env.asana-task-url
       env:
-        ASSIGNEE_ID: ${{ steps.get-assignee-id.outputs.assignee-id }}
+        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
         ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         TASK_NAME: "Merging ${{ env.branch }} to ${{ env.base-branch }} failed"
         TASK_BODY: "The ${{ steps.create-tag.outputs.tag }} release has been successfully tagged and published in GitHub releases,
           but merging to ${{ env.base-branch }} failed. Please resolve conflicts and merge ${{ env.branch }} to ${{ env.base-branch }} manually."
-        TASK_ID: ${{ steps.get-task-id.outputs.task-id }}
+        TASK_ID: ${{ steps.get-automation-subtask.outputs.task-id }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/subtasks" \
