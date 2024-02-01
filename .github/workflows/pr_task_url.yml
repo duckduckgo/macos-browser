@@ -45,7 +45,7 @@ jobs:
           echo "failure=1" >> $GITHUB_OUTPUT
         fi
 
-  # If a task is missing from the App Board project, add a comment to the PR and fail the check.
+  # If a task URL is present, but task is missing from the App Board project, add a comment to the PR and fail the check.
   # Otherwise, delete the comment and pass the check.
   update-project-membership-report:
 
@@ -58,7 +58,7 @@ jobs:
 
     steps:
     - name: Comment on the PR
-      if: ${{ needs.assert-project-membership.outputs.failure == '1' }}
+      if: ${{ needs.assert-project-membership.outputs.task_id && needs.assert-project-membership.outputs.failure == '1' }}
       env:
         ASANA_PROJECT_NAME: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_NAME }}
       uses: marocchino/sticky-pull-request-comment@v2
@@ -72,7 +72,7 @@ jobs:
           3. When ready, remove the `bot: not in app board` label to retrigger the check.
 
     - name: Add a label to the PR
-      if: ${{ needs.assert-project-membership.outputs.failure == '1' }}
+      if: ${{ needs.assert-project-membership.outputs.task_id && needs.assert-project-membership.outputs.failure == '1' }}
       uses: actions/github-script@v7
       with:
         script: |
@@ -84,14 +84,14 @@ jobs:
           })
 
     - name: Delete comment on the PR
-      if: ${{ needs.assert-project-membership.outputs.failure == '0' }}
+      if: ${{ needs.assert-project-membership.outputs.task_id == '' || needs.assert-project-membership.outputs.failure == '0' }}
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         header: asana-task-check-status
         delete: true
 
     - name: Remove the label from the PR
-      if: ${{ needs.assert-project-membership.outputs.failure == '0' }}
+      if: ${{ needs.assert-project-membership.outputs.task_id == '' || needs.assert-project-membership.outputs.failure == '0' }}
       uses: actions/github-script@v7
       with:
         script: |
@@ -109,8 +109,8 @@ jobs:
           }
 
     - name: Report status
-      run: |
-        exit ${{ needs.assert-project-membership.outputs.failure }}
+      if: ${{ needs.assert-project-membership.outputs.task_id }}
+      run: exit ${{ needs.assert-project-membership.outputs.failure }}
 
   # When a PR is merged, move the task to the Waiting for Release section of the App Board.
   mark-waiting-for-release:
