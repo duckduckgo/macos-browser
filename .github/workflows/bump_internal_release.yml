@@ -133,3 +133,4 @@ jobs:
       base-branch: ${{ github.event.inputs.base-branch || 'main' }}
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
