@@ -44,7 +44,8 @@ class HistoryIntegrationTests: XCTestCase {
         }
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window?.close()
         window = nil
         PrivacySecurityPreferences.shared.gpcEnabled = true
