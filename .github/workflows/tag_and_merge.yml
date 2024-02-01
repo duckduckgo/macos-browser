@@ -80,6 +80,7 @@ jobs:
 
     - name: Get Asana automation subtask
       id: get-automation-subtask
+      if: always()
       uses: ./.github/actions/asana-get-release-automation-subtask-id
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
