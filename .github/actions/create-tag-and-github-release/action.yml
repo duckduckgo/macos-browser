@@ -6,7 +6,7 @@ inputs:
     required: false
     type: boolean
     default: true
-  GH_TOKEN:
+  github-token:
     description: "GitHub token"
     required: true
     type: string
@@ -17,12 +17,14 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - run: |
+    - id: setup-git
+      shell: bash
+      run: |
         git config --global user.name "Dax the Duck"
         git config --global user.email "dax@duckduckgo.com"
-      shell: bash
 
     - id: compute-tag
+      shell: bash
       run: |
         version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
         if [[ "${{ inputs.prerelease }}" == "true" ]]; then
@@ -32,15 +34,17 @@ runs:
           tag="${version}"
         fi
         echo "tag=${tag}" >> $GITHUB_OUTPUT
-      shell: bash
 
     - id: tag-repo
+      shell: bash
       run: |
         git tag ${{ steps.compute-tag.outputs.tag }}
         git push origin ${{ steps.compute-tag.outputs.tag }}
-      shell: bash
 
     - id: create-github-release
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         latest_release="$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')"
         if [[ "${{ inputs.prerelease }}" == "true" ]]; then
@@ -48,4 +52,3 @@ runs:
         else
           gh release create ${{ steps.compute-tag.outcome.tag }} --generate-notes --notes-start-tag ${latest_release}
         fi
-      shell: bash
