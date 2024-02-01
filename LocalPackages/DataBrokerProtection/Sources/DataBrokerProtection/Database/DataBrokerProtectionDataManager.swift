@@ -296,10 +296,10 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
 
         let mappedData: [DBPUIDataBroker] = dataBrokers.flatMap { dataBroker -> [DBPUIDataBroker] in
             var result: [DBPUIDataBroker] = []
-            result.append(DBPUIDataBroker(name: dataBroker.name))
-            
+            result.append(DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url))
+
             for mirrorSite in dataBroker.mirrorSites {
-                result.append(DBPUIDataBroker(name: mirrorSite.name))
+                result.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url))
             }
             return result
         }

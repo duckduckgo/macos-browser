@@ -31,9 +31,9 @@ struct MapperToUI {
         )
     }
 
-    func mapToUI(_ dataBrokerName: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
+    func mapToUI(_ dataBrokerName: String, databrokerURL: String, extractedProfile: ExtractedProfile) -> DBPUIDataBrokerProfileMatch {
         DBPUIDataBrokerProfileMatch(
-            dataBroker: DBPUIDataBroker(name: dataBrokerName),
+            dataBroker: DBPUIDataBroker(name: dataBrokerName, url: databrokerURL),
             name: extractedProfile.fullName ?? "No name",
             addresses: extractedProfile.addresses?.map(mapToUI) ?? [],
             alternativeNames: extractedProfile.alternativeNames ?? [String](),
@@ -43,7 +43,7 @@ struct MapperToUI {
     }
 
     func mapToUI(_ dataBroker: DataBroker) -> DBPUIDataBroker {
-        DBPUIDataBroker(name: dataBroker.name)
+        DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url)
     }
 
     func mapToUI(_ address: AddressCityState) -> DBPUIUserProfileAddress {
@@ -77,7 +77,7 @@ struct MapperToUI {
                 if !$0.dataBroker.mirrorSites.isEmpty {
                     let mirrorSitesMatches = $0.dataBroker.mirrorSites.compactMap { mirrorSite in
                         if mirrorSite.shouldWeIncludeMirrorSite() {
-                            return mapToUI(mirrorSite.name, extractedProfile: extractedProfile)
+                            return mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
                         }
 
                         return nil
@@ -112,7 +112,7 @@ struct MapperToUI {
 
                 if let closestMatchesFoundEvent = scanOperation.closestMatchesFoundEvent() {
                     for mirrorSite in dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: closestMatchesFoundEvent.date) {
-                        let mirrorSiteMatch = mapToUI(mirrorSite.name, extractedProfile: extractedProfile)
+                        let mirrorSiteMatch = mapToUI(mirrorSite.name, databrokerURL: mirrorSite.url, extractedProfile: extractedProfile)
 
                         if let extractedProfileRemovedDate = extractedProfile.removedDate,
                             mirrorSite.shouldWeIncludeMirrorSite(for: extractedProfileRemovedDate) {
@@ -182,8 +182,7 @@ struct MapperToUI {
     private func nearestRunDates(for brokerData: [BrokerProfileQueryData]) -> [String: Date] {
         let today = Date()
         let nearestDates = brokerData.reduce(into: [String: Date]()) { result, data in
-            // TODO: Change NAME to URL
-            let url = data.dataBroker.name
+            let url = data.dataBroker.url
             if let operationDate = data.scanOperationData.preferredRunDate {
                 if operationDate > today {
                     if let existingDate = result[url] {
@@ -205,12 +204,11 @@ struct MapperToUI {
             return DBUIScanDate(
                 date: date.timeIntervalSince1970,
                 dataBrokers: element.value.flatMap {
-                    // TODO: Change NAME to URL
-                    let brokerOperationDate = nearestScanOperationByBroker[$0.dataBroker.name]
+                    let brokerOperationDate = nearestScanOperationByBroker[$0.dataBroker.url]
 
-                    var brokers = [DBPUIDataBroker(name: $0.dataBroker.name, date: brokerOperationDate?.timeIntervalSince1970 ?? nil)]
+                    var brokers = [DBPUIDataBroker(name: $0.dataBroker.name, url: $0.dataBroker.url, date: brokerOperationDate?.timeIntervalSince1970 ?? nil)]
                     for mirrorSite in $0.dataBroker.mirrorSites where mirrorSite.shouldWeIncludeMirrorSite(for: date) {
-                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, date: brokerOperationDate?.timeIntervalSince1970 ?? nil))
+                        brokers.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url, date: brokerOperationDate?.timeIntervalSince1970 ?? nil))
                     }
 
                     return brokers

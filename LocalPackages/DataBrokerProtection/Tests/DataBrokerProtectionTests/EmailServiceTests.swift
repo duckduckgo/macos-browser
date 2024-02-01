@@ -41,7 +41,7 @@ final class EmailServiceTests: XCTestCase {
         let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            _ = try await sut.getEmail(dataBrokerName: "fakeBroker")
+            _ = try await sut.getEmail(dataBrokeURL: "fakeBroker")
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? EmailError,
@@ -62,7 +62,7 @@ final class EmailServiceTests: XCTestCase {
         let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            _ = try await sut.getEmail(dataBrokerName: "fakeBroker")
+            _ = try await sut.getEmail(dataBrokeURL: "fakeBroker")
             XCTFail("Expected an error to be thrown")
         } catch {
             if let error = error as? EmailError, case .cantFindEmail = error {
@@ -81,7 +81,7 @@ final class EmailServiceTests: XCTestCase {
         let sut = EmailService(urlSession: mockURLSession, redeemUseCase: MockRedeemUseCase())
 
         do {
-            let email = try await sut.getEmail(dataBrokerName: "fakeBroker")
+            let email = try await sut.getEmail(dataBrokeURL: "fakeBroker")
             XCTAssertEqual("test@ddg.com", email)
         } catch {
             XCTFail("Unexpected. It should not throw")

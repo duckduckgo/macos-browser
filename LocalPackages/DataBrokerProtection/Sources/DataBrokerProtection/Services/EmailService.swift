@@ -30,7 +30,7 @@ public enum EmailError: Error, Equatable, Codable {
 }
 
 protocol EmailServiceProtocol {
-    func getEmail(dataBrokerName: String?) async throws -> String
+    func getEmail(dataBrokeURL: String?) async throws -> String
     func getConfirmationLink(from email: String,
                              numberOfRetries: Int,
                              pollingIntervalInSeconds: Int,
@@ -51,10 +51,10 @@ struct EmailService: EmailServiceProtocol {
         self.redeemUseCase = redeemUseCase
     }
 
-    func getEmail(dataBrokerName: String? = nil) async throws -> String {
+    func getEmail(dataBrokeURL: String? = nil) async throws -> String {
         var urlString = Constants.baseUrl + "/generate"
 
-        if let dataBrokerValue = dataBrokerName {
+        if let dataBrokerValue = dataBrokeURL {
             urlString += "?dataBroker=\(dataBrokerValue)"
         }
 

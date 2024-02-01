@@ -106,9 +106,9 @@ struct DBPUIDataBroker: Codable, Hashable {
     let url: String
     let date: Double?
 
-    init(name: String, date: Double? = nil) {
+    init(name: String, url: String, date: Double? = nil) {
         self.name = name
-        self.url = name
+        self.url = url
         self.date = date
     }
 
