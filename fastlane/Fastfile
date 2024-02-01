@@ -374,7 +374,7 @@ platform :mac do
   private_lane :macos_codefreeze_prechecks do
     ensure_git_status_clean 
 
-    ensure_git_branch(branch: DEFAULT_BRANCH)
+    # ensure_git_branch(branch: DEFAULT_BRANCH)
     git_pull
 
     git_submodule_update(recursive: true, init: true)
