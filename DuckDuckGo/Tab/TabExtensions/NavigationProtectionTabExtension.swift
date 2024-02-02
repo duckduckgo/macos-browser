@@ -60,7 +60,6 @@ final class NavigationProtectionTabExtension {
 
 extension NavigationProtectionTabExtension: NavigationResponder {
 
-    // swiftlint:disable:next cyclomatic_complexity
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // We don‘t handle opening new tabs here because a new Tab is opened in
         // Tab+Navigation and it will run through this procedure again for its NavigationAction
@@ -108,25 +107,13 @@ extension NavigationProtectionTabExtension: NavigationResponder {
             request = newRequest
         }
 
-        guard request != navigationAction.request else { return .next }
-
-        // if can add headers without redirect
-        if NavigationPreferences.customHeadersSupported,
-           // url should match the original
-           request.url == navigationAction.request.url,
-           // there should be no removed header fields
-           Set((navigationAction.request.allHTTPHeaderFields ?? [:]).keys).subtracting((request.allHTTPHeaderFields ?? [:]).keys).isEmpty,
-           // there should be added or modified headers
-           let newHeaders = request.allHTTPHeaderFields?.filter({ navigationAction.request.allHTTPHeaderFields?[$0.key] != $0.value }),
-           let customHeaders = CustomHeaderFields(fields: newHeaders) {
-
-            preferences.customHeaders = [customHeaders]
-            return .next
+        if request != navigationAction.request {
+            return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
+                $0.load(request)
+            }
         }
 
-        return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
-            $0.load(request)
-        }
+        return .next
     }
 
     @MainActor
