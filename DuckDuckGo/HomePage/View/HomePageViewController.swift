@@ -138,27 +138,13 @@ final class HomePageViewController: NSViewController {
     }
 
     func createFeatureModel() -> HomePage.Models.ContinueSetUpModel {
-#if NETWORK_PROTECTION && DBP
-        let vm = HomePage.Models.ContinueSetUpModel(
+        return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: SystemDefaultBrowserProvider(),
             dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
             tabCollectionViewModel: tabCollectionViewModel,
             duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor(),
-            networkProtectionRemoteMessaging: DefaultNetworkProtectionRemoteMessaging(),
-            dataBrokerProtectionRemoteMessaging: DefaultDataBrokerProtectionRemoteMessaging(),
-            networkProtectionUserDefaults: .netP,
-            dataBrokerProtectionUserDefaults: .dbp
+            homePageRemoteMessaging: .defaultMessaging()
         )
-#else
-        let vm = HomePage.Models.ContinueSetUpModel(
-            defaultBrowserProvider: SystemDefaultBrowserProvider(),
-            dataImportProvider: BookmarksAndPasswordsImportStatusProvider(),
-            tabCollectionViewModel: tabCollectionViewModel,
-            duckPlayerPreferences: DuckPlayerPreferencesUserDefaultsPersistor()
-        )
-#endif
-
-        return vm
     }
 
     func createDefaultBrowserModel() -> HomePage.Models.DefaultBrowserModel {
