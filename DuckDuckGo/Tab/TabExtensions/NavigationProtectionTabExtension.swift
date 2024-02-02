@@ -60,6 +60,7 @@ final class NavigationProtectionTabExtension {
 
 extension NavigationProtectionTabExtension: NavigationResponder {
 
+    // swiftlint:disable:next cyclomatic_complexity
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
         // We don‘t handle opening new tabs here because a new Tab is opened in
         // Tab+Navigation and it will run through this procedure again for its NavigationAction
