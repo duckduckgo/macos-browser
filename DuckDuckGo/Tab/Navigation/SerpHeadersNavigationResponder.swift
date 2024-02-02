@@ -34,11 +34,16 @@ struct SerpHeadersNavigationResponder: NavigationResponder {
             return .next
         }
 
+        if NavigationPreferences.customHeadersSupported,
+           let customHeaders = CustomHeaderFields(fields: Self.headers) {
+            preferences.customHeaders = [customHeaders]
+            return .next
+        }
+
         var request = navigationAction.request
         for (key, value) in Self.headers {
             request.setValue(value, forHTTPHeaderField: key)
         }
-
         return .redirectInvalidatingBackItemIfNeeded(navigationAction) { navigator in
             navigator.load(request)
         }

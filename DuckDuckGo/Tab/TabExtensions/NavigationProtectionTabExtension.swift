@@ -107,13 +107,25 @@ extension NavigationProtectionTabExtension: NavigationResponder {
             request = newRequest
         }
 
-        if request != navigationAction.request {
-            return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
-                $0.load(request)
-            }
+        guard request != navigationAction.request else { return .next }
+
+        // if can add headers without redirect
+        if NavigationPreferences.customHeadersSupported,
+           // url should match the original
+           request.url == navigationAction.request.url,
+           // there should be no removed header fields
+           Set((navigationAction.request.allHTTPHeaderFields ?? [:]).keys).subtracting((request.allHTTPHeaderFields ?? [:]).keys).isEmpty,
+           // there should be added or modified headers
+           let newHeaders = request.allHTTPHeaderFields?.filter({ navigationAction.request.allHTTPHeaderFields?[$0.key] != $0.value }),
+           let customHeaders = CustomHeaderFields(fields: newHeaders) {
+
+            preferences.customHeaders = [customHeaders]
+            return .next
         }
 
-        return .next
+        return .redirectInvalidatingBackItemIfNeeded(navigationAction) {
+            $0.load(request)
+        }
     }
 
     @MainActor
