@@ -31,9 +31,10 @@ final class DownloadsTabExtension: NSObject {
 
     private let downloadManager: FileDownloadManagerProtocol
     private let isBurner: Bool
+    private let downloadsPreferences: DownloadsPreferences
 
     @Published
-    private var savePanelDialogRequest: SavePanelDialogRequest? {
+    private(set) var savePanelDialogRequest: SavePanelDialogRequest? {
         didSet {
             savePanelDialogRequest?.addCompletionHandler { [weak self, weak savePanelDialogRequest] _ in
                 if let self,
@@ -48,9 +49,10 @@ final class DownloadsTabExtension: NSObject {
 
     weak var delegate: TabDownloadsDelegate?
 
-    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool) {
+    init(downloadManager: FileDownloadManagerProtocol, isBurner: Bool, downloadsPreferences: DownloadsPreferences = DownloadsPreferences()) {
         self.downloadManager = downloadManager
         self.isBurner = isBurner
+        self.downloadsPreferences = downloadsPreferences
         super.init()
     }
 
@@ -77,6 +79,21 @@ final class DownloadsTabExtension: NSObject {
         self.savePanelDialogRequest = SavePanelDialogRequest(parameters) { result in
             guard let (url, fileType) = try? result.get() else { return }
             webView.exportWebContent(to: url, as: fileType.flatMap(WKWebView.ContentExportType.init) ?? .html)
+        }
+    }
+
+    private func saveDownloaded(data: Data, to toURL: URL) {
+        let fm = FileManager.default
+        let tempURL = fm.temporaryDirectory.appendingPathComponent(.uniqueFilename())
+        do {
+            // First save file in a temporary directory
+            try data.write(to: tempURL)
+            // Then move the file to the download location and show a bounce if the file is in a location on the user's dock.
+            try Progress.withPublishedProgress(url: toURL) {
+                _ = try fm.moveItem(at: tempURL, to: toURL, incrementingIndexIfExists: true)
+            }
+        } catch {
+            os_log("Failed to save PDF file to Downloads folder", type: .error)
         }
     }
 
@@ -194,6 +211,8 @@ protocol DownloadsTabExtensionProtocol: AnyObject, NavigationResponder, Download
     var savePanelDialogPublisher: AnyPublisher<Tab.UserDialog?, Never> { get }
 
     func saveWebViewContentAs(_ webView: WKWebView)
+
+    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String)
 }
 
 extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
@@ -203,6 +222,23 @@ extension DownloadsTabExtension: TabExtension, DownloadsTabExtensionProtocol {
         $savePanelDialogRequest.map { $0.map { request in
             Tab.UserDialog(sender: .user, dialog: .savePanel(request))
         }}.eraseToAnyPublisher()
+    }
+
+    @MainActor
+    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String) {
+        if !downloadsPreferences.alwaysRequestDownloadLocation,
+           let location = downloadsPreferences.effectiveDownloadLocation {
+            let url = location.appendingPathComponent(suggestedFilename)
+            saveDownloaded(data: data, to: url)
+            return
+        }
+
+        let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
+        chooseDestination(suggestedFilename: suggestedFilename, directoryURL: nil, fileTypes: fileTypes) { [weak self] url, _ in
+            guard let url else { return }
+
+            self?.saveDownloaded(data: data, to: url)
+        }
     }
 }
 
@@ -216,6 +252,10 @@ extension Tab {
 
     func saveWebContentAs() {
         self.downloads?.saveWebViewContentAs(webView)
+    }
+
+    func saveDownloaded(data: Data, suggestedFilename: String, mimeType: String) {
+        self.downloads?.saveDownloaded(data: data, suggestedFilename: suggestedFilename, mimeType: mimeType)
     }
 
 }

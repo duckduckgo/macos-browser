@@ -17,10 +17,10 @@
 #include "../AppStore.xcconfig"
 #include "ManualAppStoreRelease.xcconfig"
 
-AGENT_BUNDLE_ID[sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent
-AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.debug
-AGENT_BUNDLE_ID[config=CI][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.debug
-AGENT_BUNDLE_ID[config=Review][sdk=*] = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection.agent.review
+AGENT_BUNDLE_ID[sdk=*] = com.duckduckgo.mobile.ios.vpn.agent
+AGENT_BUNDLE_ID[config=Debug][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.debug
+AGENT_BUNDLE_ID[config=CI][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.debug
+AGENT_BUNDLE_ID[config=Review][sdk=*] = com.duckduckgo.mobile.ios.vpn.agent.review
 
 PRODUCT_BUNDLE_IDENTIFIER = $(MAIN_BUNDLE_IDENTIFIER)
 
@@ -28,7 +28,6 @@ CODE_SIGN_ENTITLEMENTS = DuckDuckGo/DuckDuckGoAppStore.entitlements
 CODE_SIGN_ENTITLEMENTS[config=CI][arch=*][sdk=*] = DuckDuckGo/DuckDuckGoAppStoreCI.entitlements
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
-CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] = Developer ID Application
 CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
@@ -43,6 +42,6 @@ PRODUCT_NAME[config=Release][arch=*][sdk=*] = $(RELEASE_PRODUCT_NAME_OVERRIDE:de
 PROVISIONING_PROFILE_SPECIFIER[config=Debug][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios macos
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = Sandbox MacOS Browser Product Review
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.review macos
 
 #include? "../../LocalOverridesAppStore.xcconfig"

@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import LoginItems
 import Common
@@ -98,3 +100,5 @@ struct DataBrokerProtectionAppEvents {
         // restartLoginItems doesn't work when we change the agent name
     }
 }
+
+#endif
