@@ -69,7 +69,7 @@ final class TabViewModel {
     @Published private(set) var permissionAuthorizationQuery: PermissionAuthorizationQuery?
 
     var canPrint: Bool {
-        self.canReload && tab.webView.canPrint
+        !isShowingErrorPage && canReload && tab.webView.canPrint
     }
 
     var canSaveContent: Bool {
@@ -194,7 +194,7 @@ final class TabViewModel {
     }
 
     private func updateCanBeBookmarked() {
-        canBeBookmarked = tab.content.url ?? .blankPage != .blankPage
+        canBeBookmarked = !isShowingErrorPage && (tab.content.url ?? .blankPage) != .blankPage
     }
 
     private var tabURL: URL? {

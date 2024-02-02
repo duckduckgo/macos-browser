@@ -282,12 +282,18 @@ final class AddressBarButtonsViewController: NSViewController {
         guard view.window?.isPopUpWindow == false else { return }
         bookmarkButton.setAccessibilityIdentifier("Bookmarks Button")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
-        var isUrlBookmarked = false
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
-            bookmarkManager.isUrlBookmarked(url: url) {
-            isUrlBookmarked = true
+        var showBookmarkButton: Bool {
+            guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+                  selectedTabViewModel.canBeBookmarked else { return false }
+
+            var isUrlBookmarked = false
+            if let url = selectedTabViewModel.tab.content.url,
+               bookmarkManager.isUrlBookmarked(url: url) {
+                isUrlBookmarked = true
+            }
+
+            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
         }
-        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
 
         bookmarkButton.isHidden = !showBookmarkButton
     }
@@ -612,15 +618,18 @@ final class AddressBarButtonsViewController: NSViewController {
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             updateBookmarkButtonImage()
-            updateBookmarkButtonVisibility()
+            updateButtons()
             return
         }
 
-        urlCancellable = selectedTabViewModel.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.stopAnimations()
-            self?.updateBookmarkButtonImage()
-            self?.updateBookmarkButtonVisibility()
-        }
+        urlCancellable = selectedTabViewModel.tab.$content
+            .combineLatest(selectedTabViewModel.tab.$error)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.stopAnimations()
+                self?.updateBookmarkButtonImage()
+                self?.updateButtons()
+            }
     }
 
     private func subscribeToPermissions() {
@@ -780,6 +789,7 @@ final class AddressBarButtonsViewController: NSViewController {
         || selectedTabViewModel.isShowingErrorPage
         || isTextFieldValueText
         || isLocalUrl
+        || selectedTabViewModel.isShowingErrorPage
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying
