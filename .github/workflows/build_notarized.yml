@@ -224,6 +224,13 @@ jobs:
 
     steps:
 
+    - name: Check out the code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
+        sparse-checkout: .github
+
     - name: Fetch app bundle
       uses: actions/download-artifact@v4
       with:
@@ -240,9 +247,11 @@ jobs:
       run: brew install create-dmg
 
     - name: Create DMG
+      id: create-dmg
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
+        dmg="duckduckgo-${{ env.app-version }}.dmg"
         curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/scripts/assets/dmg-background.png?ref=${{ github.ref }} --jq .download_url) \
             --output dmg-background.png
         create-dmg --volname "${{ env.app-name }}" \
@@ -250,14 +259,15 @@ jobs:
             --background "dmg-background.png" \
             --window-size 600 400 \
             --icon-size 120 \
-            --app-drop-link 430 160 "duckduckgo-${{ env.app-version }}.dmg" \
+            --app-drop-link 430 160 "${dmg}" \
             "dmg"
+        echo "dmg=${dmg}" >> $GITHUB_OUTPUT
 
     - name: Upload DMG artifact
       uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
-        path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg
+        path: ${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }}
 
     - name: Upload DMG to S3
       if: ${{ env.upload-to == 's3' }}
@@ -269,21 +279,15 @@ jobs:
         RELEASE_BUCKET_PREFIX: ${{ vars.RELEASE_BUCKET_PREFIX }}
       run: |
         aws s3 cp \
-          ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg \
+          ${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }} \
           s3://${{ env.RELEASE_BUCKET_NAME }}/${{ env.RELEASE_BUCKET_PREFIX }}/
 
-    - name: Fetch Asana actions
-      if: ${{ env.upload-to == 'asana' }}
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        mkdir -p "${{ github.workspace }}/.github/actions/asana-extract-task-id"
-        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/.github/actions/asana-extract-task-id/action.yml?ref=${{ github.ref }} --jq .download_url) \
-          --output "${{ github.workspace }}/.github/actions/asana-extract-task-id/action.yml"
-
-        mkdir -p "${{ github.workspace }}/.github/actions/asana-upload"
-        curl -fLSs $(gh api https://api.github.com/repos/${{ github.repository }}/contents/.github/actions/asana-upload/action.yml?ref=${{ github.ref }} --jq .download_url) \
-          --output "${{ github.workspace }}/.github/actions/asana-upload/action.yml"
+    - name: Report success
+      uses: ./.github/actions/asana-log-message
+      with:
+        task-url: ${{ env.asana-task-url }}
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        comment: "DMG for ${{ env.app-version }} is available at ${{ vars.DMG_URL_ROOT }}/${{ steps.create-dmg.outputs.dmg }}."
 
     - name: Extract Asana Task ID
       id: task-id

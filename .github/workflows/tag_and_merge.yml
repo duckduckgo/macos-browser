@@ -138,22 +138,10 @@ jobs:
 
     - name: Report success
       if: success()
-      env:
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-        TASK_BODY: "New internal build is ready. Repository is tagged with ${{ steps.create-tag.outputs.tag }} tag.
+      uses: ./.github/actions/asana-log-message
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        task-url: ${{ env.asana-task-url }}
+        comment: "New internal build is ready. Repository is tagged with ${{ steps.create-tag.outputs.tag }} tag.
           ${{ env.branch }} branch has been sucessfully merged to ${{ env.base-branch }} and GitHub release
           is created at https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}."
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      run: |
-        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
-          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-          -H 'content-type: application/json' \
-          --write-out '%{http_code}' \
-          --output /dev/null \
-          -d "{ \"data\": { \"text\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }")
-
-        if [ $return_code -ne 201 ]; then
-          echo "::error::Failed to add a comment to the Asana task"
-          exit 1
-        fi

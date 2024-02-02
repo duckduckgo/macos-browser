@@ -1,0 +1,62 @@
+name: Add a Log Message to Asana Task
+description: Adds a collaborator to an Asana task
+inputs:
+  access-token:
+    description: "Asana access token"
+    required: true
+    type: string
+  task-url:
+    description: "Asana release task URL"
+    required: false
+    type: string
+  comment:
+    description: "Comment to add to the Asana task"
+    required: true
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - id: get-automation-subtask
+      uses: ./.github/actions/asana-get-release-automation-subtask-id
+      with:
+        access-token: ${{ input.access-token }}
+        task-url: ${{ input.task-url }}
+
+    - id: add-colaborator
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+        ASSIGNEE_ID: ${{ steps.add-comment.outputs.assignee-id }}
+        TASK_ID: ${{ steps.get-automation-task.outputs.automation-task-id }}
+      run: |
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/addFollowers" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+          -d "{ \"data\": { \"followers\": [ \"${{ steps.ASSIGNEE_ID}\" ] } }")
+
+        if [ $return_code -ne 200 ]; then
+          echo "::error::Failed to add a collaborator to the Asana task"
+          exit 1
+        fi
+
+    - id: add-comment
+      shell: bash
+      env:
+        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
+        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        TASK_BODY: ${{ inputs.comment }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+          -d "{ \"data\": { \"text\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }")
+
+        if [ $return_code -ne 201 ]; then
+          echo "::error::Failed to add a comment to the Asana task"
+          exit 1
+        fi
