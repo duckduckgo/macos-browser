@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import BrowserServicesKit
 import Common
@@ -110,3 +112,5 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         }
     }
 }
+
+#endif
