@@ -24,11 +24,9 @@ final class TCPFlowManager {
     private let flow: NEAppProxyTCPFlow
     private var connectionTask: Task<Void, Error>?
     private var connection: NWConnection?
-    private let logger: Logger
 
-    init(flow: NEAppProxyTCPFlow, logger: Logger) {
+    init(flow: NEAppProxyTCPFlow) {
         self.flow = flow
-        self.logger = logger
     }
 
     deinit {
@@ -46,8 +44,7 @@ final class TCPFlowManager {
     }
 
     private func connectAndStartRunLoop(remoteEndpoint: NWHostEndpoint, interface: NWInterface) async throws {
-        let (remoteConnection, canary) = try await connect(to: remoteEndpoint, interface: interface)
-        print(canary)
+        let remoteConnection = try await connect(to: remoteEndpoint, interface: interface)
         try await flow.open(withLocalEndpoint: nil)
 
         do {
@@ -63,15 +60,12 @@ final class TCPFlowManager {
         }
     }
 
-    @MainActor
-    static var count = 0
-
-    func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface /*, metadataParameters: nw_parameters_t*/) async throws -> (Network.NWConnection, TestingCanary) {
+    func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface) async throws -> NWConnection {
         try await withCheckedThrowingContinuation { continuation in
             connect(to: remoteEndpoint, interface: interface) { result in
                 switch result {
-                case .success((let connection, let canary)):
-                    continuation.resume(returning: (connection, canary))
+                case .success(let connection):
+                    continuation.resume(returning: connection)
                 case .failure(let error):
                     continuation.resume(throwing: error)
                 }
@@ -79,15 +73,9 @@ final class TCPFlowManager {
         }
     }
 
-    public final class TestingCanary {
-
-    }
-
-    func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface, completion: @escaping (Result<(NWConnection, TestingCanary), Error>) -> Void) {
+    func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface, completion: @escaping (Result<NWConnection, Error>) -> Void) {
         let host = Network.NWEndpoint.Host(remoteEndpoint.hostname)
         let port = Network.NWEndpoint.Port(remoteEndpoint.port)!
-
-        let canary = TestingCanary()
 
         let parameters = NWParameters.tcp
         parameters.preferNoProxies = true
@@ -101,7 +89,7 @@ final class TCPFlowManager {
             switch state {
             case .ready:
                 connection.stateUpdateHandler = nil
-                completion(.success((connection, canary)))
+                completion(.success(connection))
             case .cancelled:
                 connection.stateUpdateHandler = nil
                 completion(.failure(RemoteConnectionError.cancelled))

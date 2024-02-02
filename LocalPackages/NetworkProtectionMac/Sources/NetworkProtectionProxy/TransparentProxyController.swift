@@ -92,7 +92,7 @@ public final class TransparentProxyController {
 
             do {
                 try TransparentProxySession(activeSession).send(.changeSetting(change, responseHandler: {
-                    os_log("🤌 Setting change relay: All good")
+                    // no-op
                 }))
             } catch {
                 // throw error?
@@ -192,14 +192,6 @@ public final class TransparentProxyController {
     public func start() async throws {
         let manager = try await loadOrCreateConfiguration()
         try manager.connection.startVPNTunnel(options: [:])
-
-        do {
-            try await enableOnDemand(tunnelManager: manager)
-        } catch {
-            // fire pixel
-            // log error
-            // don't re-throw because this shouldn't interrupt the connection
-        }
     }
 
     public func stop() async {
@@ -207,38 +199,6 @@ public final class TransparentProxyController {
             return
         }
 
-        do {
-            try await disableOnDemand(tunnelManager: manager)
-        } catch {
-            // fire pixel
-            // log error
-            // don't re-throw because this shouldn't interrupt the connection
-        }
-
         manager.connection.stopVPNTunnel()
-    }
-
-    // MARK: - On Demand
-
-    @MainActor
-    func enableOnDemand(tunnelManager: NETransparentProxyManager) async throws {
-        /*
-        let rule = NEOnDemandRuleConnect()
-        rule.interfaceTypeMatch = .any
-
-        tunnelManager.onDemandRules = [rule]
-        tunnelManager.isOnDemandEnabled = true
-
-        try await tunnelManager.saveToPreferences()
-         */
-    }
-
-    @MainActor
-    func disableOnDemand(tunnelManager: NETransparentProxyManager) async throws {
-        /*
-        tunnelManager.isOnDemandEnabled = false
-
-        try await tunnelManager.saveToPreferences()
-         */
     }
 }

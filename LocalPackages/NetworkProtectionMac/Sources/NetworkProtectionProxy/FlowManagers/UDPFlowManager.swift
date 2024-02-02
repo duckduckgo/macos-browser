@@ -29,36 +29,15 @@ final class UDPFlowManager {
 
     func start(interface: NWInterface, initialRemoteEndpoint remoteEndpoint: NWEndpoint) async {
         guard let remoteEndpoint = remoteEndpoint as? NWHostEndpoint else {
-            os_log("🤌 Remote endpoint is not a host")
             return
         }
 
-        os_log("🤌 Interface %{public}@", String(describing: flow.networkInterface))
-        os_log("🤌 New interface %{public}@", String(describing: flow.networkInterface))
-
-        //let metadataParameters = nw_parameters_create_secure_tcp(_nw_parameters_configure_protocol_disable, _nw_parameters_configure_protocol_default_configuration)
-
-        //flow.setMetadata(metadataParameters)
-/*
-        let endpoint = nw_endpoint_create_host(flow.remoteHostname!, remoteEndpoint.port)
-        let connection = nw_connection_create(endpoint, metadataParameters)
-        nw_connection_start(connection)
-        connections.append(connection)
-
-        try? await flow.open(withLocalEndpoint: nil)
-        try? await Task.sleep(nanoseconds: 20 * NSEC_PER_SEC)*/
-
-        //os_log("🤌 Parameters %{public}@", String(describing: metadataParameters))
-
-        await connectAndStartRunLoop(remoteEndpoint: remoteEndpoint, interface: interface) //, metadataParameters: metadataParameters)
+        await connectAndStartRunLoop(remoteEndpoint: remoteEndpoint, interface: interface)
     }
 
     private func connectAndStartRunLoop(remoteEndpoint: NWHostEndpoint, interface: NWInterface) async {
         do {
-            os_log("🤌 Establishing UDP proxy connection to remote: %{public}@", String(describing: remoteEndpoint))
-            let remoteConnection = try await connect(to: remoteEndpoint, interface: interface) //, metadataParameters: metadataParameters)
-            //let localHost = (remoteConnection.currentPath?.localEndpoint as? NWHostEndpoint)!.hostname
-            //let localPort = (remoteConnection.currentPath?.localEndpoint as? NWHostEndpoint)!.port
+            let remoteConnection = try await connect(to: remoteEndpoint, interface: interface)
 
             try await flow.open(withLocalEndpoint: nil)
             try await startDataCopyLoop(for: remoteConnection, remoteEndpoint: remoteEndpoint)
@@ -66,49 +45,44 @@ final class UDPFlowManager {
             flow.closeReadWithError(nil)
             flow.closeWriteWithError(nil)
         } catch {
-            os_log("🤌 UDP Proxy routing failed with error %{public}@", String(describing: error))
             flow.closeReadWithError(error)
             flow.closeWriteWithError(error)
         }
     }
 
     private func startDataCopyLoop(for remoteConnection: NWConnection, remoteEndpoint: NWHostEndpoint) async throws {
-        os_log("🤌 Starting UDP data copy loop")
-
-        await withTaskGroup(of: Void.self) { group in
+        try await withThrowingTaskGroup(of: Void.self) { group in
             group.addTask { [weak self] in
-                do {
-                    while true {
-                        guard let self else {
-                            throw RemoteConnectionError.cancelled
-                        }
-
-                        try Task.checkCancellation()
-                        try await self.copyOutoundTraffic(to: remoteConnection)
+                while true {
+                    guard let self else {
+                        throw RemoteConnectionError.cancelled
                     }
-                } catch {
-                    remoteConnection.forceCancel()
-                    os_log("🤌 [UDP] Closing outbound")
+
+                    try Task.checkCancellation()
+                    try await self.copyOutoundTraffic(to: remoteConnection)
                 }
             }
 
             group.addTask { [weak self] in
-                do {
-                    while true {
-                        guard let self else {
-                            throw RemoteConnectionError.cancelled
-                        }
-
-                        try Task.checkCancellation()
-                        try await self.copyInboundTraffic(from: remoteConnection, remoteEndpoint: remoteEndpoint)
+                while true {
+                    guard let self else {
+                        throw RemoteConnectionError.cancelled
                     }
-                } catch {
-                    remoteConnection.forceCancel()
-                    os_log("🤌 [UDP] Closing inbound")
+
+                    try Task.checkCancellation()
+                    try await self.copyInboundTraffic(from: remoteConnection, remoteEndpoint: remoteEndpoint)
                 }
             }
 
-            await group.waitForAll()
+            while !group.isEmpty {
+                 do {
+                     try await group.next()
+
+                 } catch {
+                     group.cancelAll()
+                     throw error
+                 }
+            }
         }
     }
 
@@ -123,66 +97,39 @@ final class UDPFlowManager {
         let host = Network.NWEndpoint.Host(remoteEndpoint.hostname)
         let port = Network.NWEndpoint.Port(remoteEndpoint.port)!
 
-        os_log("🤌 Interface (UDP) %{public}@", String(describing: interface))
-
         let parameters = NWParameters.udp
         parameters.preferNoProxies = true
         parameters.requiredInterface = interface
         parameters.prohibitedInterfaceTypes = [.other]
-        /*
-        parameters.attribution = {
-            switch nw_parameters_get_attribution(metadataParameters) {
-            case .user:
-                return .user
-            case .developer:
-                return .developer
-            @unknown default:
-                assertionFailure()
-                return .developer
-            }
-        }()*/
-
-        os_log("🤌 Host (UDP) %{public}@", remoteEndpoint.hostname)
-        os_log("🤌 Port (UDP) %{public}@", remoteEndpoint.port)
 
         let connection = NWConnection(host: host, port: port, using: parameters)
 
-        os_log("🤌 Starting UDP connection %{public}@", String(describing: connection))
-
-        try await withTaskCancellationHandler {
-            try await withCheckedThrowingContinuation { continuation in
-                connection.stateUpdateHandler = { state in
-                    switch state {
-                    case .ready:
-                        os_log("🤌 UDP Connection ready")
-                        connection.stateUpdateHandler = nil
-                        continuation.resume()
-                    case .cancelled:
-                        os_log("🤌 UDP Connection cancelled")
-                        connection.stateUpdateHandler = nil
-                        continuation.resume(throwing: RemoteConnectionError.cancelled)
-                    case .failed(let error):
-                        os_log("🤌 UDP Connection failed with error %{public}@", String(describing: error))
-                        connection.stateUpdateHandler = nil
-                        continuation.resume(throwing: RemoteConnectionError.couldNotEstablishConnection(error))
-                    default:
-                        break
-                    }
+        try await withCheckedThrowingContinuation { continuation in
+            connection.stateUpdateHandler = { state in
+                switch state {
+                case .ready:
+                    connection.stateUpdateHandler = nil
+                    continuation.resume()
+                case .cancelled:
+                    connection.stateUpdateHandler = nil
+                    continuation.resume(throwing: RemoteConnectionError.cancelled)
+                case .failed(let error):
+                    connection.stateUpdateHandler = nil
+                    continuation.resume(throwing: RemoteConnectionError.couldNotEstablishConnection(error))
+                default:
+                    break
                 }
             }
-            connection.start(queue: .global())
-        } onCancel: {
-            connection.forceCancel()
         }
+
+        connection.start(queue: .global())
 
         return connection
     }
 
     func copyInboundTraffic(from remoteConnection: NWConnection, remoteEndpoint: NWHostEndpoint) async throws {
-
-        //os_log("🤌 ⬅️ Copying UDP inbound traffic")
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            remoteConnection.receiveMessage { [weak self] data, contentContext, isComplete, error in
+            remoteConnection.receiveMessage { [weak self] data, _, isComplete, error in
 
                 guard let self else {
                     continuation.resume(throwing: RemoteConnectionError.cancelled)
@@ -210,32 +157,49 @@ final class UDPFlowManager {
     }
 
     func copyOutoundTraffic(to remoteConnection: NWConnection) async throws {
-        //os_log("🤌 ⬅️ Copying UDP outbound traffic")
+        let (datagrams, endpoints) = try await read()
 
-        let (datagrams, endpoints, error) = await read()
-
-        if let datagrams,
-           let endpoints {
-
-            if datagrams.isEmpty {
-                throw NEAppProxyFlowError(.aborted)
-            }
-
-            for (datagram, endpoint) in zip(datagrams, endpoints) {
-                //let connection = NWConnection(to: endpoint, using: .udp)
-                try await send(datagram: datagram, through: remoteConnection)
-            }
+        // Ref: https://developer.apple.com/documentation/networkextension/neappproxyudpflow/1406576-readdatagrams
+        if datagrams.isEmpty || endpoints.isEmpty {
+            throw NEAppProxyFlowError(.aborted)
         }
 
-        if let error {
-            throw error
+        for (datagram, endpoint) in zip(datagrams, endpoints) {
+            /*
+            let host = Network.NWEndpoint.Host(endpoint.hostname)
+            let port = Network.NWEndpoint.Port(endpoint.port)!
+
+            let parameters = NWParameters.udp
+            parameters.preferNoProxies = true
+            parameters.requiredInterface = interface
+            parameters.prohibitedInterfaceTypes = [.other]
+
+            let outgoingConnection = Network.NWConnection(to: endpoint, using: .udp)
+            NetworkExtension.NWConnection(to: endpoint, using: .udp)*/
+
+            try await send(datagram: datagram, through: remoteConnection)
         }
     }
 
-    private func read() async -> (datagrams: [Data]?, endpoints: [NWEndpoint]?, error: Error?) {
-        await withCheckedContinuation { (continuation: CheckedContinuation<([Data]?, [NWEndpoint]?, Error?), Never>) in
+    /// Reads datagrams from the flow.
+    ///
+    /// Apple's documentation is very bad here, but it seems each datagram is corresponded with an endpoint at the same position in the array
+    /// as mentioned here: https://developer.apple.com/forums/thread/75893
+    ///
+    private func read() async throws -> (datagrams: [Data], endpoints: [NWEndpoint]) {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<([Data], [NWEndpoint]), Error>) in
             flow.readDatagrams { datagrams, endpoints, error in
-                continuation.resume(returning: (datagrams, endpoints, error))
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                guard let datagrams, let endpoints else {
+                    continuation.resume(throwing: NEAppProxyFlowError(.aborted))
+                    return
+                }
+
+                continuation.resume(returning: (datagrams, endpoints))
             }
         }
     }

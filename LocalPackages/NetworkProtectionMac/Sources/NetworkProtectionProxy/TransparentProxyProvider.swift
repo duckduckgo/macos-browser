@@ -124,7 +124,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
         ]
 
-        //let tunnelSettings = NETunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
         return networkSettings
     }
 
@@ -146,36 +145,10 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             return
         }
 
-        bMonitor.pathUpdateHandler = { [weak self, logger] path in
-            logger.log("Available interfaces updated: \(String(reflecting: path.availableInterfaces), privacy: .public)")
-
-            self?.interface = path.availableInterfaces.first { interface in
-                interface.type != .other
-            }
-        }
-        bMonitor.start(queue: .main)
-
-        nw_path_monitor_set_queue(monitor, .main)
-        nw_path_monitor_set_update_handler(monitor) { [weak self, logger] path in
-            guard let self else { return }
-
-            let interfaces = SCNetworkInterfaceCopyAll()
-            logger.log("Available interfaces updated: \(String(reflecting: interfaces), privacy: .public)")
-
-            nw_path_enumerate_interfaces(path) { interface in
-                guard nw_interface_get_type(interface) != nw_interface_type_other else {
-                    return true
-                }
-
-                self.directInterface = interface
-                return false
-            }
-        }
-
-        nw_path_monitor_start(monitor)
-
         Task { @MainActor in
             do {
+                startMonitoringNetworkInterfaces()
+
                 try await updateNetworkSettings()
                 logger.log("Proxy started successfully")
                 completionHandler(nil)
@@ -188,21 +161,31 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     override public func stopProxy(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         logger.log("Stopping proxy with reason: \(String(reflecting: reason), privacy: .public)")
-        completionHandler()
+
+        Task { @MainActor in
+            stopMonitoringNetworkInterfaces()
+            completionHandler()
+        }
     }
 
     override public func sleep(completionHandler: @escaping () -> Void) {
-        logger.log("The proxy is now sleeping")
-        completionHandler()
+        Task { @MainActor in
+            stopMonitoringNetworkInterfaces()
+            logger.log("The proxy is now sleeping")
+            completionHandler()
+        }
     }
 
     override public func wake() {
-        logger.log("The proxy is now awake")
+        Task { @MainActor in
+            logger.log("The proxy is now awake")
+            startMonitoringNetworkInterfaces()
+        }
     }
 
     override public func handleNewFlow(_ flow: NEAppProxyFlow) -> Bool {
         guard let flow = flow as? NEAppProxyTCPFlow else {
-            logger.error("Expected a TCP flow, but got something else.  We're ignoring it.")
+            logger.info("Expected a TCP flow, but got something else.  We're ignoring it.")
             return false
         }
 
@@ -298,6 +281,45 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         return true
     }
 
+    // MARK: - Path Monitors
+
+    @MainActor
+    private func startMonitoringNetworkInterfaces() {
+        bMonitor.pathUpdateHandler = { [weak self, logger] path in
+            logger.log("Available interfaces updated: \(String(reflecting: path.availableInterfaces), privacy: .public)")
+
+            self?.interface = path.availableInterfaces.first { interface in
+                interface.type != .other
+            }
+        }
+        bMonitor.start(queue: .main)
+
+        nw_path_monitor_set_queue(monitor, .main)
+        nw_path_monitor_set_update_handler(monitor) { [weak self, logger] path in
+            guard let self else { return }
+
+            let interfaces = SCNetworkInterfaceCopyAll()
+            logger.log("Available interfaces updated: \(String(reflecting: interfaces), privacy: .public)")
+
+            nw_path_enumerate_interfaces(path) { interface in
+                guard nw_interface_get_type(interface) != nw_interface_type_other else {
+                    return true
+                }
+
+                self.directInterface = interface
+                return false
+            }
+        }
+
+        nw_path_monitor_start(monitor)
+    }
+
+    @MainActor
+    private func stopMonitoringNetworkInterfaces() {
+        bMonitor.cancel()
+        nw_path_monitor_cancel(monitor)
+    }
+
     // MARK: - VPN exclusions logic
 
     private enum FlowPath {
@@ -311,7 +333,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     }
 
     private func path(for flow: NEAppProxyFlow) -> FlowPath {
-        guard isFromExcludedApp(flow) else {
+        guard !isFromExcludedApp(flow) else {
             return .excludedFromVPN(reason: .appIsExcluded(bundleID: flow.metaData.sourceAppSigningIdentifier))
         }
 
