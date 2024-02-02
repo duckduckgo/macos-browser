@@ -41,13 +41,17 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var passwordManagerTitle: NSView!
     @IBOutlet var passwordManagerAccountLabel: NSTextField!
+    @IBOutlet weak var passwordManagerTitleLabel: NSTextField!
     @IBOutlet var unlockPasswordManagerTitle: NSView!
     @IBOutlet var faviconImage: NSImageView!
     @IBOutlet var domainLabel: NSTextField!
     @IBOutlet var usernameField: NSTextField!
     @IBOutlet var hiddenPasswordField: NSSecureTextField!
     @IBOutlet var visiblePasswordField: NSTextField!
-
+    @IBOutlet weak var unlockPasswordManagerTitleLabel: NSTextField!
+    @IBOutlet weak var usernameFieldTitleLabel: NSTextField!
+    @IBOutlet weak var passwordFieldTitleLabel: NSTextField!
+    
     @IBOutlet var notNowSegmentedControl: NSSegmentedControl!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
@@ -58,6 +62,7 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet weak var passwordManagerNotNowButton: NSButton!
 
     @IBOutlet var fireproofCheck: NSButton!
+    @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
 
     weak var delegate: SaveCredentialsDelegate?
 
@@ -82,6 +87,7 @@ final class SaveCredentialsViewController: NSViewController {
         visiblePasswordField.isHidden = true
         saveButton.becomeFirstResponder()
         updateSaveSegmentedControl()
+        setUpStrings()
     }
 
     override func viewWillAppear() {
@@ -93,6 +99,23 @@ final class SaveCredentialsViewController: NSViewController {
 
     override func viewWillDisappear() {
         passwordManagerStateCancellable = nil
+    }
+
+    private func setUpStrings() {
+        passwordManagerTitleLabel.stringValue = UserText.passwordManagementSaveCredentialsPasswordManagerTitle
+        unlockPasswordManagerTitleLabel.stringValue = UserText.passwordManagementSaveCredentialsUnlockPasswordManager
+        usernameFieldTitleLabel.stringValue = UserText.authAlertUsernamePlaceholder
+        passwordFieldTitleLabel.stringValue = UserText.authAlertPasswordPlaceholder
+        fireproofCheck.title = UserText.passwordManagementSaveCredentialsFireproofCheckboxTitle
+        fireproofCheckDescription.title = UserText.passwordManagementSaveCredentialsFireproofCheckboxDescription
+        saveButton.title = UserText.save
+        notNowSegmentedControl.setLabel(UserText.dontSave, forSegment: 0)
+        updateButton.title = UserText.update
+        openPasswordManagerButton.title = UserText.bitwardenPreferencesOpenBitwarden
+        dontUpdateButton.title = UserText.dontUpdate
+        doneButton.title = UserText.done
+        editButton.title = UserText.edit
+        passwordManagerNotNowButton.title = UserText.notNow
     }
 
     /// Note that if the credentials.account.id is not nil, then we consider this an update rather than a save.
@@ -133,7 +156,7 @@ final class SaveCredentialsViewController: NSViewController {
 
             titleLabel.isHidden = passwordManagerCoordinator.isEnabled
             passwordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || passwordManagerCoordinator.isLocked
-            passwordManagerAccountLabel.stringValue = "Connected to \(passwordManagerCoordinator.activeVaultEmail ?? "")"
+            passwordManagerAccountLabel.stringValue = UserText.passwordManagementSaveCredentialsAccountLabel(activeVault: passwordManagerCoordinator.activeVaultEmail ?? "")
             unlockPasswordManagerTitle.isHidden = !passwordManagerCoordinator.isEnabled || !passwordManagerCoordinator.isLocked
             titleLabel.stringValue = UserText.pmSaveCredentialsEditableTitle
             usernameField.makeMeFirstResponder()

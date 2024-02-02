@@ -55,7 +55,7 @@ final class FireproofDomainsViewController: NSViewController {
     }
 
     private func setUpStrings() {
-        removeDomainButton.title = UserText.removeButton
+        removeDomainButton.title = UserText.remove
         removeAllDomainsButton.title = UserText.fireproofRemoveAllButton
         doneButton.title = UserText.done
         fireproofSitesLabel.stringValue = UserText.fireproofSites

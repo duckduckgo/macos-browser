@@ -45,6 +45,14 @@ final class PasswordManagementViewController: NSViewController {
 
     weak var delegate: PasswordManagementDelegate?
 
+
+    @IBOutlet weak var lockMenuItem: NSMenuItem!
+    @IBOutlet weak var importPasswordMenuItem: NSMenuItem!
+    @IBOutlet weak var exportLoginsMenuItem: NSMenuItem!
+    @IBOutlet weak var settingsMenuItem: NSMenuItem!
+
+    @IBOutlet weak var unlockYourAutofillLabel: FlatButton!
+    @IBOutlet weak var autofillTitleLabel: NSTextField!
     @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
     @IBOutlet var listContainer: NSView!
     @IBOutlet var itemContainer: NSView!
@@ -159,7 +167,7 @@ final class PasswordManagementViewController: NSViewController {
         super.viewDidLoad()
         createListView()
         createLoginItemView()
-
+        setupStrings()
         reloadDataAfterSyncCancellable = bindSyncDidFinish()
 
         emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
@@ -174,7 +182,6 @@ final class PasswordManagementViewController: NSViewController {
         exportLoginItem.title = UserText.exportLogins
         unlockYourAutofillInfo.setAccessibilityIdentifier("Unlock Autofill")
         addVaultItemButton.setAccessibilityIdentifier("add item")
-
         NotificationCenter.default.publisher(for: .deviceBecameLocked)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -188,6 +195,17 @@ final class PasswordManagementViewController: NSViewController {
                 self?.refreshData()
             }
             .store(in: &cancellables)
+    }
+
+    private func setupStrings() {
+        importPasswordMenuItem.title = UserText.importPasswords
+        exportLoginItem.title = UserText.exportLogins
+        settingsMenuItem.title = UserText.settingsSuspended
+        unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
+        autofillTitleLabel.stringValue = UserText.autofill
+        emptyStateTitle.stringValue = UserText.passwordManagerEmptyStateTitle
+        emptyStateMessage.stringValue = UserText.passwordManagerEmptyStateMessage
+        emptyStateButton.stringValue = UserText.importData
     }
 
     private func bindSyncDidFinish() -> AnyCancellable? {

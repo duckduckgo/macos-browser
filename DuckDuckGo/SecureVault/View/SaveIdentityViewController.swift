@@ -43,7 +43,10 @@ final class SaveIdentityViewController: NSViewController {
     }
 
     @IBOutlet private var identityStackView: NSStackView!
-
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var notNowButton: NSButton!
+    @IBOutlet weak var saveButton: NSButton!
+    
     weak var delegate: SaveIdentityDelegate?
 
     private var identity: SecureVaultModels.Identity?
@@ -82,6 +85,11 @@ final class SaveIdentityViewController: NSViewController {
 
     // MARK: - Public
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpStrings()
+    }
+
     func saveIdentity(_ identity: SecureVaultModels.Identity) {
         self.identity = identity
 
@@ -117,6 +125,12 @@ final class SaveIdentityViewController: NSViewController {
 
         identityStackView.addArrangedSubview(NSTextField.optionalLabel(titled: identity.emailAddress))
 
+    }
+
+    private func setUpStrings() {
+        titleLabel.stringValue = UserText.passwordManagementSaveAddress
+        notNowButton.title = UserText.notNow
+        saveButton.title = UserText.save
     }
 
 }
