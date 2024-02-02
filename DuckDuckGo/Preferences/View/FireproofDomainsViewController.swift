@@ -51,6 +51,7 @@ final class FireproofDomainsViewController: NSViewController {
 
         applyModalWindowStyleIfNeeded()
         reloadData()
+        setUpStrings()
     }
 
     private func setUpStrings() {
