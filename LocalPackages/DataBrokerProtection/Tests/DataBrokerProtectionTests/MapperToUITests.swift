@@ -140,9 +140,9 @@ final class MapperToUITests: XCTestCase {
 
     func testLastScans_areMappedCorrectly() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", lastRunDate: Date().yesterday),
-            .mock(dataBrokerName: "Broker #2", lastRunDate: Date().yesterday),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", lastRunDate: Date().yesterday),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", lastRunDate: Date().yesterday),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
@@ -153,9 +153,9 @@ final class MapperToUITests: XCTestCase {
 
     func testNextScans_areMappedCorrectly() {
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", preferredRunDate: Date().tomorrow),
-            .mock(dataBrokerName: "Broker #2", preferredRunDate: Date().tomorrow),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", preferredRunDate: Date().tomorrow),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", preferredRunDate: Date().tomorrow),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
@@ -279,9 +279,9 @@ final class MapperToUITests: XCTestCase {
         let includedMirrorSite = MirrorSite(name: "mirror #1", url: "mirror1.com", addedAt: Date.distantPast, removedAt: nil)
         let notIncludedMirrorSite = MirrorSite(name: "mirror #2", url: "mirror2.com", addedAt: Date(), removedAt: nil)
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", lastRunDate: Date().yesterday, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
-            .mock(dataBrokerName: "Broker #2", lastRunDate: Date().yesterday),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", lastRunDate: Date().yesterday, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", lastRunDate: Date().yesterday),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
@@ -294,9 +294,9 @@ final class MapperToUITests: XCTestCase {
         let includedMirrorSite = MirrorSite(name: "mirror #1", url: "mirror1.com", addedAt: Date.distantPast, removedAt: nil)
         let notIncludedMirrorSite = MirrorSite(name: "mirror #2", url: "mirror2.com", addedAt: Date.distantPast, removedAt: Date())
         let brokerProfileQueryData: [BrokerProfileQueryData] = [
-            .mock(dataBrokerName: "Broker #1", preferredRunDate: Date().tomorrow, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
-            .mock(dataBrokerName: "Broker #2", preferredRunDate: Date().tomorrow),
-            .mock(dataBrokerName: "Broker #3")
+            .mock(dataBrokerName: "Broker #1", url: "broker1.com", preferredRunDate: Date().tomorrow, mirrorSites: [includedMirrorSite, notIncludedMirrorSite]),
+            .mock(dataBrokerName: "Broker #2", url: "broker2.com", preferredRunDate: Date().tomorrow),
+            .mock(dataBrokerName: "Broker #3", url: "broker3.com")
         ]
 
         let result = sut.maintenanceScanState(brokerProfileQueryData)
