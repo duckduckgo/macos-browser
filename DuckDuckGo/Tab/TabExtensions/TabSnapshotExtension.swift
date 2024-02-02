@@ -94,20 +94,6 @@ final class TabSnapshotExtension {
             return
         }
 
-        guard !webView.isLoading else {
-            generateSnapshotAfterLoad = true
-            return
-        }
-
-        // Avoid unnecessary generations
-        if let snapshotData,
-           !userDidScroll,
-           snapshotData.webviewBoundsSize == webView.bounds.size,
-           snapshotData.url == url {
-            os_log("Skipping snapshot rendering, it is already generated. url: \(url)", log: .tabSnapshots)
-            return
-        }
-
         os_log("Preview rendering started", log: .tabSnapshots)
         let configuration = WKSnapshotConfiguration.makeConfiguration()
 
