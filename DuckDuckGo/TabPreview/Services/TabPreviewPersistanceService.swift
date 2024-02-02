@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-import Foundation
+import Cocoa
 import Common
 
 final class TabSnapshotPersistenceService {

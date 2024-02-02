@@ -537,7 +537,7 @@ final class BrowserTabViewController: NSViewController {
                 return
             }
 
-            tabViewModel?.tab.tabPreviews?.generateNativePreview(from: hostingView)
+            tabViewModel?.tab.tabSnapshots?.generateNativeSnapshot(from: hostingView)
         default:
             return
         }

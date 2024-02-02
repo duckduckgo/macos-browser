@@ -77,10 +77,16 @@ final class TabSnapshotExtension {
         generateSnapshotAfterLoad = true
     }
 
+    deinit {
+        if let identifier {
+            tabSnapshotPersistanceService.clearSnapshot(tabID: identifier)
+        }
+    }
+
     // MARK: - Webviews
 
     @MainActor
-    func generatePreview() async {
+    func generateSnapshot() async {
         dispatchPrecondition(condition: .onQueue(.main))
 
         guard let webView, let tabContent, let url = tabContent.url else {
@@ -116,13 +122,13 @@ final class TabSnapshotExtension {
     }
 
     @MainActor
-    private func clearPreview() {
+    private func clearSnapshot() {
         snapshotData = nil
     }
 
-    // MARK: - Native Previews
+    // MARK: - Native Snapshots
 
-    func generateNativePreview(from view: NSView) {
+    func generateNativeSnapshot(from view: NSView) {
         let originalBounds = view.bounds
 
         os_log("Native snapshot rendering started", log: .tabSnapshots)
@@ -130,7 +136,7 @@ final class TabSnapshotExtension {
             guard let resizedImage = self.createResizedImage(from: view, with: originalBounds) else {
                 DispatchQueue.main.async { [weak self] in
                     os_log("Native snapshot rendering failed", log: .tabSnapshots, type: .error)
-                    self?.clearPreview()
+                    self?.clearSnapshot()
                 }
                 return
             }
@@ -138,7 +144,7 @@ final class TabSnapshotExtension {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.snapshotData = SnapshotData.snapshotDataForNativeView(from: resizedImage)
-                os_log("Preview of native page rendered", log: .tabSnapshots)
+                os_log("Snapshot of native page rendered", log: .tabSnapshots)
             }
         }
     }
@@ -243,7 +249,6 @@ extension TabSnapshotExtension: NSCodingExtension {
         if let identifier {
             coder.encode(identifier.uuidString,
                          forKey: NSSecureCodingKeys.tabSnapshotIdentifier)
-            os_log("Snapshot id saved to the session state", log: .tabSnapshots)
         }
     }
 
@@ -254,7 +259,7 @@ extension TabSnapshotExtension: NavigationResponder {
     @MainActor
     func willStart(_ navigation: Navigation) {
         if snapshotData?.isRestored == false {
-            clearPreview()
+            clearSnapshot()
         }
 
         userDidScroll = false
@@ -264,40 +269,40 @@ extension TabSnapshotExtension: NavigationResponder {
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
         if generateSnapshotAfterLoad {
             Task {
-                await generatePreview()
+                await generateSnapshot()
             }
         }
     }
 
 }
 
-protocol TabPreviewExtensionProtocol: AnyObject, NavigationResponder {
+protocol TabSnapshotExtensionProtocol: AnyObject, NavigationResponder {
 
     var snapshot: NSImage? { get }
 
-    func generatePreview() async
-    func generateNativePreview(from view: NSView)
+    func generateSnapshot() async
+    func generateNativeSnapshot(from view: NSView)
 
 }
 
-extension TabSnapshotExtension: TabPreviewExtensionProtocol, TabExtension {
-    func getPublicProtocol() -> TabPreviewExtensionProtocol { self }
+extension TabSnapshotExtension: TabSnapshotExtensionProtocol, TabExtension {
+    func getPublicProtocol() -> TabSnapshotExtensionProtocol { self }
 }
 
 extension TabExtensions {
-    var tabPreviews: TabPreviewExtensionProtocol? { resolve(TabSnapshotExtension.self) }
+    var tabSnapshots: TabSnapshotExtensionProtocol? { resolve(TabSnapshotExtension.self) }
 }
 
 extension Tab {
 
     var tabSnapshot: NSImage? {
-        return self.tabPreviews?.snapshot
+        return self.tabSnapshots?.snapshot
     }
 
     // Called from the outside of extension when a tab is switched
-    func generateTabPreview() {
+    func generateTabSnapshot() {
         Task { [weak self] in
-            await self?.tabPreviews?.generatePreview()
+            await self?.tabSnapshots?.generateSnapshot()
         }
     }
 
