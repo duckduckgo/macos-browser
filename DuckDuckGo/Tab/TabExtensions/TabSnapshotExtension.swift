@@ -94,6 +94,11 @@ final class TabSnapshotExtension {
             return
         }
 
+        guard !webView.isLoading else {
+            generateSnapshotAfterLoad = true
+            return
+        }
+
         // Avoid unnecessary generations
         if let snapshotData,
            !userDidScroll,
