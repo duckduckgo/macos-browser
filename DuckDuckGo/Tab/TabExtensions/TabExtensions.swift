@@ -156,7 +156,8 @@ extension TabExtensionsBuilder {
                                   isBurner: args.isTabBurner)
         }
         add {
-            TabPreviewExtension(webViewPublisher: args.webViewFuture, contentPublisher: args.contentPublisher)
+            TabPreviewExtension(webViewPublisher: args.webViewFuture,
+                                contentPublisher: args.contentPublisher)
         }
         add {
             SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)

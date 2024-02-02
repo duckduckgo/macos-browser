@@ -36,7 +36,16 @@ final class TabPreviewExtension {
         }
     }
 
-    private var previewData: PreviewData?
+    private var identifier: UUID?
+
+    private var previewData: PreviewData? {
+        didSet {
+            if let previewData, let identifier {
+                tabSnapshotPersistanceService.persistSnapshot(previewData.image,
+                                                             id: identifier)
+            }
+        }
+    }
     private var generatePreviewAfterLoad = false
     private var userDidScroll = false
 
@@ -48,7 +57,14 @@ final class TabPreviewExtension {
     private weak var webView: WebView?
     private var tabContent: Tab.TabContent?
 
-    init(webViewPublisher: some Publisher<WKWebView, Never>, contentPublisher: some Publisher<Tab.TabContent, Never>) {
+    private let tabSnapshotPersistanceService: TabSnapshotPersistenceService
+
+    init(fileStore: FileStore = NSApplication.shared.delegateTyped.fileStore,
+         webViewPublisher: some Publisher<WKWebView, Never>,
+         contentPublisher: some Publisher<Tab.TabContent, Never>) {
+
+        tabSnapshotPersistanceService = TabSnapshotPersistenceService(fileStore: fileStore)
+
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView as? WebView
             self?.webView?.scrollEventDelegate = self
@@ -120,7 +136,8 @@ final class TabPreviewExtension {
             }
 
             DispatchQueue.main.async { [weak self] in
-                self?.previewData = PreviewData.previewDataForNativeView(from: resizedImage)
+                guard let self = self else { return }
+                self.previewData = PreviewData.previewDataForNativeView(from: resizedImage)
                 os_log("Preview of native page rendered", log: .tabPreviews)
             }
         }
@@ -194,25 +211,39 @@ extension TabPreviewExtension: WebViewScrollEventDelegate {
 extension TabPreviewExtension: NSCodingExtension {
 
     private enum NSSecureCodingKeys {
-        static let tabPreviewImage = "TabPreviewImage"
+        static let tabSnapshotIdentifier = "TabSnapshotIdentifier"
     }
 
     func awakeAfter(using decoder: NSCoder) {
-        guard let data = decoder.decodeObject(of: NSData.self, forKey: NSSecureCodingKeys.tabPreviewImage),
-              let image = NSImage(data: data as Data) else {
-            os_log("Preview restoration failed", log: .tabPreviews)
+        guard let uuidString = decoder.decodeObject(of: NSString.self, forKey: NSSecureCodingKeys.tabSnapshotIdentifier),
+              let identifier = UUID(uuidString: uuidString as String) else {
+            os_log("Snapshot id restoration failed", log: .tabPreviews)
+            self.identifier = UUID()
             return
         }
 
-        previewData = PreviewData(url: nil, image: image, webviewBoundsSize: NSSize.zero, isRestored: true)
-        os_log("Preview restored from the session state", log: .tabPreviews)
-        generatePreviewAfterLoad = false
+        self.identifier = identifier
+
+        tabSnapshotPersistanceService.loadSnapshot(for: identifier) { [weak self] image in
+            guard let image else {
+                os_log("No snapshot restored", log: .tabPreviews)
+                return
+            }
+            self?.previewData = PreviewData(url: nil,
+                                            image: image,
+                                            webviewBoundsSize: NSSize.zero,
+                                            isRestored: true)
+            os_log("Snapshot restored", log: .tabPreviews)
+
+            self?.generatePreviewAfterLoad = false
+        }
     }
 
     func encode(using coder: NSCoder) {
-        if let previewData {
-            os_log("Preview saved to the session state", log: .tabPreviews)
-            coder.encode(previewData.image.tiffRepresentation, forKey: NSSecureCodingKeys.tabPreviewImage)
+        if let identifier {
+            coder.encode(identifier.uuidString,
+                         forKey: NSSecureCodingKeys.tabSnapshotIdentifier)
+            os_log("Snapshot id saved to the session state", log: .tabPreviews)
         }
     }
 

@@ -1,0 +1,95 @@
+//
+//  TabPreviewPersistanceService.swift
+//
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+import Foundation
+import Common
+
+final class TabSnapshotPersistenceService {
+
+    static let directoryName: String = "tabSnapshots"
+
+    private let fileStore: FileStore
+
+    init(fileStore: FileStore) {
+        self.fileStore = fileStore
+    }
+
+    func persistSnapshot(_ snapshot: NSImage, id: UUID) {
+        guard let data = snapshot.tiffRepresentation else {
+            os_log("TabSnapshotPersistenceService: Failed to create tiff representation", type: .error)
+            return
+        }
+
+        Task {
+            let url = URL.persistenceLocation(for: id)
+            createDirectoryIfNeeded()
+            guard fileStore.persist(data, url: url) else {
+                os_log("TabSnapshotPersistenceService: Saving of snapshot failed", type: .error)
+                return
+            }
+        }
+    }
+
+    func clearSnapshot(tabID: UUID) {
+        Task {
+            let url = URL.persistenceLocation(for: tabID)
+            fileStore.remove(fileAtURL: url)
+        }
+    }
+
+    func loadSnapshot(for tabID: UUID, completion: @escaping (NSImage?) -> Void) {
+        Task {
+            let url = URL.persistenceLocation(for: tabID)
+            if let data = fileStore.loadData(at: url) {
+                DispatchQueue.main.async {
+                    let image = NSImage(data: data)
+                    completion(image)
+                }
+            } else {
+                os_log("TabSnapshotPersistenceService: Loading of snapshot failed", type: .error)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
+        }
+    }
+
+    private func createDirectoryIfNeeded() {
+        let directoryURL = URL.persistenceLocation(for: Self.directoryName)
+
+        if !FileManager.default.fileExists(atPath: directoryURL.path) {
+            do {
+                try FileManager.default.createDirectory(at: directoryURL,
+                                                        withIntermediateDirectories: true,
+                                                        attributes: nil)
+            } catch {
+                fatalError("Failed to create directory at \(directoryURL.path)")
+            }
+        }
+    }
+
+}
+
+fileprivate extension URL {
+
+    static func persistenceLocation(for id: UUID) -> URL {
+        let fileName = "\(TabSnapshotPersistenceService.directoryName)/\(id.uuidString)"
+        return URL.persistenceLocation(for: fileName)
+    }
+
+}
