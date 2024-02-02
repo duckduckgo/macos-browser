@@ -46,7 +46,7 @@ final class SaveIdentityViewController: NSViewController {
     @IBOutlet weak var titleLabel: NSTextField!
     @IBOutlet weak var notNowButton: NSButton!
     @IBOutlet weak var saveButton: NSButton!
-    
+
     weak var delegate: SaveIdentityDelegate?
 
     private var identity: SecureVaultModels.Identity?

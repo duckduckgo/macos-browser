@@ -51,7 +51,6 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet weak var unlockPasswordManagerTitleLabel: NSTextField!
     @IBOutlet weak var usernameFieldTitleLabel: NSTextField!
     @IBOutlet weak var passwordFieldTitleLabel: NSTextField!
-    
     @IBOutlet var notNowSegmentedControl: NSSegmentedControl!
     @IBOutlet var saveButton: NSButton!
     @IBOutlet var updateButton: NSButton!
@@ -60,7 +59,6 @@ final class SaveCredentialsViewController: NSViewController {
     @IBOutlet var editButton: NSButton!
     @IBOutlet var openPasswordManagerButton: NSButton!
     @IBOutlet weak var passwordManagerNotNowButton: NSButton!
-
     @IBOutlet var fireproofCheck: NSButton!
     @IBOutlet weak var fireproofCheckDescription: NSTextFieldCell!
 
