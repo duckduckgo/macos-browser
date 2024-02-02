@@ -594,7 +594,6 @@ protocol NewWindowPolicyDecisionMaker {
                 webView.stopAllMedia(shouldStopLoading: false)
             }
             handleFavicon(oldValue: oldValue)
-            invalidateInteractionStateData()
             if navigationDelegate.currentNavigation == nil {
                 updateCanGoBackForward(withCurrentNavigation: nil)
             }
@@ -921,6 +920,7 @@ protocol NewWindowPolicyDecisionMaker {
                 return reload()
             }
             if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
+            invalidateInteractionStateData()
 
             if url.isFileURL {
                 return webView.navigator(distributedNavigationDelegate: navigationDelegate)
@@ -931,7 +931,6 @@ protocol NewWindowPolicyDecisionMaker {
             if #available(macOS 12.0, *), content.isUserEnteredUrl {
                 request.attribution = .user
             }
-            invalidateInteractionStateData()
 
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .load(request, withExpectedNavigationType: source.navigationType)
