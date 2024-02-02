@@ -1,0 +1,60 @@
+{
+  "name": "cyberbackgroundchecks.com",
+  "version": "0.1.1",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1705644000000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "4b7037f3-9c6a-42b5-929e-621256e0a044",
+          "url": "https://www.cyberbackgroundchecks.com/people/${firstName}-${lastName}/${state}/${city}"
+        },
+        {
+          "actionType": "extract",
+          "id": "f36a73d7-9efb-452e-8c60-6d9df2964bcf",
+          "selector": ".card",
+          "profile": {
+            "name": {
+              "selector": ".name-given"
+            },
+            "alternativeNamesList": {
+              "selector": ".aka",
+              "findElements": true
+            },
+            "age": {
+              "selector": ".age"
+            },
+            "addressFull": {
+              "selector": ".//p[contains(@class, 'address-current')]//a[@class='address']"
+            },
+            "addressFullList": {
+              "selector": ".//p[contains(@class, 'address-previous')]//a[@class='address']",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".relative",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".//a[@class='btn btn-primary btn-block']"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

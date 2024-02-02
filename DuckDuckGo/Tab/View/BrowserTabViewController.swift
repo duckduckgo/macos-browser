@@ -345,21 +345,7 @@ final class BrowserTabViewController: NSViewController {
                 }
                 return old == new
             })
-            .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
-                guard let tabViewModel, tabContent.isUrl else {
-                    return Just(()).eraseToAnyPublisher()
-                }
-
-                return Publishers.Merge4(
-                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
-                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
-                    tabViewModel.tab.webViewDidFailNavigationPublisher,
-                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
-                )
-                .prefix(1)
-                .eraseToAnyPublisher()
-            }
-            .switchToLatest()
+            .asVoid()
             .receive(on: DispatchQueue.main)
             .sink { [weak self, weak tabViewModel] in
                 guard let tabViewModel else { return }
@@ -501,7 +487,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
+            if !OnboardingViewModel.isOnboardingFinished {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
@@ -877,6 +863,7 @@ extension BrowserTabViewController: TabDelegate {
         let context = PrintContext(request: request)
         let contextInfo = Unmanaged<PrintContext>.passRetained(context).toOpaque()
 
+        printOperation.printPanel.options.formUnion([.showsPaperSize, .showsOrientation, .showsScaling])
         printOperation.runModal(for: window, delegate: self, didRun: didRunSelector, contextInfo: contextInfo)
 
         // get the Print Panel that (hopefully) was added to the window.sheets

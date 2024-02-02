@@ -119,6 +119,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .anySettingsPane
             case URL.bookmarks, URL.Invalid.aboutBookmarks:
                 return .bookmarks
+            case URL.dataBrokerProtection:
+                return .dataBrokerProtection
             case URL.Invalid.aboutHome:
                 guard let customURL = URL(string: StartupPreferences.shared.formattedCustomHomePageURL) else {
                     return .newtab
@@ -541,7 +543,7 @@ protocol NewWindowPolicyDecisionMaker {
     @MainActor(unsafe)
     private func cleanUpBeforeClosing(onDeinit: Bool) {
         let job = { [webView, userContentController] in
-            webView.stopAllMediaAndLoading()
+            webView.stopAllMedia(shouldStopLoading: true)
 
             userContentController?.cleanUpBeforeClosing()
             webView.assertObjectDeallocated(after: 4.0)
@@ -558,7 +560,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     func stopAllMediaAndLoading() {
-        webView.stopAllMediaAndLoading()
+        webView.stopAllMedia(shouldStopLoading: true)
     }
 
 #if DEBUG
@@ -574,9 +576,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     // MARK: - Event Publishers
 
-    let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
-    let webViewDidReceiveRedirectPublisher = PassthroughSubject<Void, Never>()
-    let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
@@ -593,7 +592,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published private(set) var content: TabContent {
         didSet {
             if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
-                webView.stopAllMediaAndLoading()
+                webView.stopAllMedia(shouldStopLoading: false)
             }
             handleFavicon(oldValue: oldValue)
             invalidateInteractionStateData()
@@ -633,9 +632,6 @@ protocol NewWindowPolicyDecisionMaker {
 
     @discardableResult
     func setUrl(_ url: URL?, source: TabContent.URLSource) -> ExpectedNavigation? {
-        if url == .welcome {
-            OnboardingViewModel().restart()
-        }
         return self.setContent(.contentFromURL(url, source: source))
     }
 
@@ -812,12 +808,12 @@ protocol NewWindowPolicyDecisionMaker {
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
             webView.load(URLRequest(url: customURL))
         } else {
-            content = .newtab
+            webView.load(URLRequest(url: .newtab))
         }
     }
 
     func startOnboarding() {
-        content = .onboarding
+        webView.load(URLRequest(url: .welcome))
     }
 
     func reload() {
@@ -1091,9 +1087,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic else { return nil }
 
-        // send this event only when we're interrupting loading and showing extra UI to the user
-        webViewDidReceiveUserInteractiveChallengePublisher.send()
-
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if case .url(let url, credential: .some(let credential), source: let source) = content,
            url.matches(challenge.protectionSpace),
@@ -1115,15 +1108,6 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         } catch {
             return .cancel
         }
-    }
-
-    func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
-        webViewDidReceiveRedirectPublisher.send()
-    }
-
-    @MainActor
-    func didCommit(_ navigation: Navigation) {
-        webViewDidCommitNavigationPublisher.send()
     }
 
     @MainActor

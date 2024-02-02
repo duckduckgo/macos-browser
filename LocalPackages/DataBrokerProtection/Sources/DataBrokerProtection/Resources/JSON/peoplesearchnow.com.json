@@ -1,0 +1,60 @@
+{
+  "name": "peoplesearchnow.com",
+  "version": "0.1.1",
+  "parent": "peoplefinders.com",
+  "addedDatetime": 1705989600000,
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "id": "b6994b26-9904-407b-9bcf-0fd6f809771d",
+          "url": "https://peoplesearchnow.com/person/${firstName}-${lastName}_${city}_${state}/"
+        },
+        {
+          "actionType": "extract",
+          "id": "4e7f0e9a-1d24-47c0-886f-a08d88074878",
+          "selector": ".result-search-block",
+          "profile": {
+            "name": {
+              "selector": ".//p[@class='ellipsis pull-left']"
+            },
+            "age": {
+              "selector": ".//div[contains(@class, 'result-search-block-desc')]/p[span[text()='Approximate Age:']]/span[2]"
+            },
+            "addressCityState": {
+              "selector": ".//p[span[text()='Current Address:']]/span[@itemprop='address']",
+              "beforeText": "*",
+              "afterText": ";"
+            },
+            "addressCityStateList": {
+              "selector": ".//p[span[text()='Used to Live:']]/span[@itemprop='address']/a",
+              "findElements": true,
+              "beforeText": "*",
+              "afterText": ";"
+            },
+            "relativesList": {
+              "selector": ".//a[@itemprop='relatedTo']",
+              "findElements": true
+            },
+            "profileUrl": {
+              "selector": ".result-search-block-title a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "parentSiteOptOut",
+      "actions": []
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 240
+  }
+}

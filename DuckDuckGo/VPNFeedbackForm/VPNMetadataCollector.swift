@@ -32,12 +32,14 @@ struct VPNMetadata: Encodable {
         let appVersion: String
         let lastVersionRun: String
         let isInternalUser: Bool
+        let isInApplicationsDirectory: Bool
     }
 
     struct DeviceInfo: Encodable {
         let osVersion: String
         let buildFlavor: String
         let lowPowerModeEnabled: Bool
+        let cpuArchitecture: String
     }
 
     struct NetworkInfo: Encodable {
@@ -65,9 +67,11 @@ struct VPNMetadata: Encodable {
 
     struct LoginItemState: Encodable {
         let vpnMenuState: String
+        let vpnMenuIsRunning: Bool
 
 #if NETP_SYSTEM_EXTENSION
         let notificationsAgentState: String
+        let notificationsAgentIsRunning: Bool
 #endif
     }
 
@@ -151,11 +155,17 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
     // MARK: - Metadata Collection
 
     private func collectAppInfoMetadata() -> VPNMetadata.AppInfo {
-        let appVersion = AppVersion.shared.versionNumber
+        let appVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
         let isInternalUser = NSApp.delegateTyped.internalUserDecider.isInternalUser
+        let isInApplicationsDirectory = Bundle.main.isInApplicationsDirectory
 
-        return .init(appVersion: appVersion, lastVersionRun: versionStore.lastVersionRun ?? "Unknown", isInternalUser: isInternalUser)
+        return .init(
+            appVersion: appVersion,
+            lastVersionRun: versionStore.lastVersionRun ?? "Unknown",
+            isInternalUser: isInternalUser,
+            isInApplicationsDirectory: isInApplicationsDirectory
+        )
     }
 
     private func collectDeviceInfoMetadata() -> VPNMetadata.DeviceInfo {
@@ -169,7 +179,23 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
             lowPowerModeEnabled = false
         }
 
-        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled)
+        let architecture = getMachineArchitecture()
+
+        return .init(osVersion: osVersion, buildFlavor: buildFlavor, lowPowerModeEnabled: lowPowerModeEnabled, cpuArchitecture: architecture)
+    }
+
+    private func getMachineArchitecture() -> String {
+        #if arch(arm)
+            return "arm"
+        #elseif arch(arm64)
+            return "arm64"
+        #elseif arch(i386)
+            return "i386"
+        #elseif arch(x86_64)
+            return "x86_64"
+        #else
+            return "unknown"
+        #endif
     }
 
     func collectNetworkInformation() async -> VPNMetadata.NetworkInfo {
@@ -223,12 +249,21 @@ final class DefaultVPNMetadataCollector: VPNMetadataCollector {
 
     func collectLoginItemState() -> VPNMetadata.LoginItemState {
         let vpnMenuState = String(describing: LoginItem.vpnMenu.status)
+        let vpnMenuIsRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: LoginItem.vpnMenu.agentBundleID).isEmpty
 
 #if NETP_SYSTEM_EXTENSION
         let notificationsAgentState = String(describing: LoginItem.notificationsAgent.status)
-        return .init(vpnMenuState: vpnMenuState, notificationsAgentState: notificationsAgentState)
+        let notificationsAgentIsRunning = !NSRunningApplication.runningApplications(withBundleIdentifier: LoginItem.notificationsAgent.agentBundleID).isEmpty
+
+        return .init(
+            vpnMenuState: vpnMenuState,
+            vpnMenuIsRunning: vpnMenuIsRunning,
+            notificationsAgentState: notificationsAgentState,
+            notificationsAgentIsRunning: notificationsAgentIsRunning)
 #else
-        return .init(vpnMenuState: vpnMenuState)
+        return .init(
+            vpnMenuState: vpnMenuState,
+            vpnMenuIsRunning: vpnMenuIsRunning)
 #endif
     }
 
