@@ -17,6 +17,7 @@
 //
 
 import Combine
+import Common
 import Foundation
 import Navigation
 import UniformTypeIdentifiers
@@ -36,20 +37,7 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
 
     @objc(_webView:saveDataToFile:suggestedFilename:mimeType:originatingURL:)
     func webView(_ webView: WKWebView, saveDataToFile data: Data, suggestedFilename: String, mimeType: String, originatingURL: URL) {
-        let prefs = DownloadsPreferences()
-        if !prefs.alwaysRequestDownloadLocation,
-           let location = prefs.effectiveDownloadLocation {
-            let url = location.appendingPathComponent(suggestedFilename)
-            try? data.writeFileWithProgress(to: url)
-            return
-        }
-
-        let fileTypes = UTType(mimeType: mimeType).map { [$0] } ?? []
-        let dialog = UserDialogType.savePanel(.init(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
-            guard let url = (try? result.get())?.url else { return }
-            try? data.writeFileWithProgress(to: url)
-        })
-        userInteractionDialog = UserDialog(sender: .user, dialog: dialog)
+        saveDownloaded(data: data, suggestedFilename: suggestedFilename, mimeType: mimeType)
     }
 
     @MainActor
