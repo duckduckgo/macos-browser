@@ -3248,6 +3248,18 @@
         }
       }
     },
+    "fireproof.domains.remove.all" : {
+      "comment" : "Label of a button that allows the user to remove all the websites from the fireproofed list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove All"
+          }
+        }
+      }
+    },
     "fireproof.explanation" : {
       "comment" : "Fireproofing mechanism explanation",
       "extractionState" : "extracted_with_value",
@@ -3328,6 +3340,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Rename Folder"
+          }
+        }
+      }
+    },
+    "generic.remove.button" : {
+      "comment" : "Label of a button that allows the user to remove an item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove"
           }
         }
       }
