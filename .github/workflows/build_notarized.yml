@@ -79,9 +79,9 @@ on:
         required: true
       MM_WEBHOOK_URL:
         required: true
-      AWS_ACCESS_KEY_ID:
+      TEST_AWS_ACCESS_KEY_ID:
         required: true
-      AWS_SECRET_ACCESS_KEY:
+      TEST_AWS_SECRET_ACCESS_KEY:
         required: true
 
 jobs:
@@ -196,15 +196,15 @@ jobs:
     - name: Upload dSYMs to S3
       if: ${{ env.upload-to == 's3' }}
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-        DSYM_BUCKET_NAME: ${{ vars.DSYM_BUCKET_NAME }}
-        DSYM_BUCKET_PREFIX: ${{ vars.DSYM_BUCKET_PREFIX }}
+        TEST_AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+        TEST_AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        TEST_DSYM_BUCKET_NAME: ${{ vars.TEST_DSYM_BUCKET_NAME }}
+        TEST_DSYM_BUCKET_PREFIX: ${{ vars.TEST_DSYM_BUCKET_PREFIX }}
       run: |
         aws s3 cp \
           ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip \
-          s3://${{ env.DSYM_BUCKET_NAME }}/${{ env.DSYM_BUCKET_PREFIX }}/
+          s3://${{ env.TEST_DSYM_BUCKET_NAME }}/${{ env.TEST_DSYM_BUCKET_PREFIX }}/
 
   create-dmg:
 
@@ -272,22 +272,22 @@ jobs:
     - name: Upload DMG to S3
       if: ${{ env.upload-to == 's3' }}
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
-        RELEASE_BUCKET_NAME: ${{ vars.RELEASE_BUCKET_NAME }}
-        RELEASE_BUCKET_PREFIX: ${{ vars.RELEASE_BUCKET_PREFIX }}
+        TEST_AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+        TEST_AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        TEST_RELEASE_BUCKET_NAME: ${{ vars.TEST_RELEASE_BUCKET_NAME }}
+        TEST_RELEASE_BUCKET_PREFIX: ${{ vars.TEST_RELEASE_BUCKET_PREFIX }}
       run: |
         aws s3 cp \
           ${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }} \
-          s3://${{ env.RELEASE_BUCKET_NAME }}/${{ env.RELEASE_BUCKET_PREFIX }}/
+          s3://${{ env.TEST_RELEASE_BUCKET_NAME }}/${{ env.TEST_RELEASE_BUCKET_PREFIX }}/
 
     - name: Report success
       uses: ./.github/actions/asana-log-message
       with:
         task-url: ${{ env.asana-task-url }}
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        comment: "DMG for ${{ env.app-version }} is available at ${{ vars.DMG_URL_ROOT }}/${{ steps.create-dmg.outputs.dmg }}."
+        comment: "DMG for ${{ env.app-version }} is available at ${{ vars.TEST_DMG_URL_ROOT }}/${{ steps.create-dmg.outputs.dmg }}."
 
     - name: Extract Asana Task ID
       id: task-id
