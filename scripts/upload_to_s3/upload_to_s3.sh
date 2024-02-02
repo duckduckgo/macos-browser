@@ -1,14 +1,20 @@
 #!/bin/bash
 
 # Constants
-S3_PATH="s3://ddg-staticcdn/macos-desktop-browser/"
+S3_PATH="s3://ddgstaticcdn/macos-desktop-browser/"
 
 # Defaults
-DIRECTORY="$HOME/Developer/sparkle-updates"
-PROFILE="ddg-macos"
+if [[ -n "$CI" ]]; then
+    DIRECTORY="sparkle-updates"
+else
+    DIRECTORY="$HOME/Developer/sparkle-updates"
+fi
+
+PROFILE="tfc-dev"
 DEBUG=0
 OVERWRITE_DMG_VERSION=""
 RUN_COMMAND=0
+FORCE=0
 
 # Print the usage
 function print_usage() {
@@ -17,7 +23,7 @@ NAME
     upload_to_s3.sh – automation tool for uploading files to AWS S3 for macOS Desktop Browser
 
 SYNOPSIS
-    $0 --run [--directory directory_path] [--overwrite-duckduckgo-dmg version] [--debug]
+    $0 --run [--directory directory_path] [--overwrite-duckduckgo-dmg version] [--debug] [--force]
     $0 --help
 
 DESCRIPTION
@@ -34,6 +40,9 @@ DESCRIPTION
 
     --debug
         In debug mode, no 'aws cp' commands will be executed; they will only be printed to stdout.
+
+    --force
+        Forces the upload process to continue without asking for confirmation.
 
     --help
         Displays this help message.
@@ -105,6 +114,7 @@ while [[ "$#" -gt 0 ]]; do
         --debug) DEBUG=1 ;;
         --help) print_usage; exit 0 ;; # Display the help and exit immediately.
         --run) RUN_COMMAND=1 ;;
+        --force) FORCE=1 ;;
         *) echo "Unknown parameter passed: $1"; print_usage; exit 1 ;; # Display the help and exit with error.
     esac
     shift
@@ -169,10 +179,12 @@ if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
         echo "The file duckduckgo-$OVERWRITE_DMG_VERSION.dmg will be used to overwrite duckduckgo.dmg on S3."
     fi
 
-    read -p "Do you wish to continue? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
+    if [[ $FORCE -eq 0 ]]; then
+        read -p "Do you wish to continue? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 fi
 
