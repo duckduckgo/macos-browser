@@ -18,10 +18,14 @@
 
 import Combine
 import Foundation
+import BrowserServicesKit
 import NetworkExtension
 import NetworkProtectionProxy
+import os.log // swiftlint:disable:this enforce_os_log_wrapper
 
 final class MacTransparentProxyProvider: TransparentProxyProvider {
+
+    static var vpnProxyLogger = Logger(subsystem: OSLog.subsystem, category: "VPN Proxy")
 
     private var extensionSharedMemory: VPNExtensionSharedMemory {
         VPNExtensionSharedMemory.shared
@@ -54,7 +58,9 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
             dbpAgentBundleID: Bundle.main.dbpBackgroundAgentBundleId,
             loadSettingsFromProviderConfiguration: loadSettingsFromStartupOptions)
 
-        super.init(settings: settings, configuration: configuration)
+        super.init(settings: settings,
+                   configuration: configuration,
+                   logger: Self.vpnProxyLogger)
 
         Task { @MainActor in
             self.tunnelConfiguration = extensionSharedMemory.tunnelConfiguration
