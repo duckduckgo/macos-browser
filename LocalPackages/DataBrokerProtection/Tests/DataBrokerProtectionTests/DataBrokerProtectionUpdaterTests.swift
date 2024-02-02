@@ -107,11 +107,48 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
         }
     }
 
+<<<<<<< HEAD
     func testWhenSavedBrokerIsOnAnOldVersion_thenWeUpdateIt() {
         if let vault = self.vault {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
             repository.lastCheckedVersion = nil
             resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
+=======
+    func testWhen24PassedSinceLastRunDate_thenWeTryToUpdateBrokers() {
+        if let vault = self.vault {
+            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
+            repository.lastRunDate = substract(hours: 25, to: Date())
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
+
+            sut.checkForUpdatesInBrokerJSONFiles()
+
+            XCTAssertTrue(repository.wasSaveLastRunDateCalled)
+            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
+        } else {
+            XCTFail("Mock vault issue")
+        }
+    }
+
+    func testWhenLastRunDateIsNil_thenWeTryToUpdateBrokers() {
+        if let vault = self.vault {
+            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
+            repository.lastRunDate = nil
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
+
+            sut.checkForUpdatesInBrokerJSONFiles()
+
+            XCTAssertTrue(repository.wasSaveLastRunDateCalled)
+            XCTAssertTrue(resources.wasFetchBrokerFromResourcesFilesCalled)
+        } else {
+            XCTFail("Mock vault issue")
+        }
+    }
+
+    func testWhenSavedBrokerIsOnAnOldVersion_thenWeUpdateIt() {
+        if let vault = self.vault {
+            let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
+            repository.lastCheckedVersion = nil
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
             vault.shouldReturnOldVersionBroker = true
 
             sut.checkForUpdatesInBrokerJSONFiles()
@@ -129,7 +166,7 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
         if let vault = self.vault {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
             repository.lastCheckedVersion = nil
-            resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)]
             vault.shouldReturnNewVersionBroker = true
 
             sut.checkForUpdatesInBrokerJSONFiles()
@@ -146,7 +183,7 @@ final class DataBrokerProtectionUpdaterTests: XCTestCase {
         if let vault = self.vault {
             let sut = DataBrokerProtectionBrokerUpdater(repository: repository, resources: resources, vault: vault)
             repository.lastCheckedVersion = nil
-            resources.brokersList = [.init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)]
+            resources.brokersList = [.init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)]
             vault.profileQueries = [.mock]
 
             sut.checkForUpdatesInBrokerJSONFiles()
