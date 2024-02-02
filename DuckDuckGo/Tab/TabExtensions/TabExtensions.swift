@@ -73,7 +73,7 @@ protocol TabExtensionDependencies {
 
 // swiftlint:disable:next large_tuple
 typealias TabExtensionsBuilderArguments = (
-    tabIdentifier: UUID,
+    tabIdentifier: UInt64,
     isTabPinned: () -> Bool,
     isTabBurner: Bool,
     contentPublisher: AnyPublisher<Tab.TabContent, Never>,
