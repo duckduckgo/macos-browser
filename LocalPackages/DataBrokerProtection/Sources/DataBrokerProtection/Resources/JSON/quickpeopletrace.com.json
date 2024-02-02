@@ -1,6 +1,7 @@
 {
-  "name": "quickpeopletrace.com",
-  "version": "0.1.1",
+  "name": "Quick People Trace",
+  "url": "quickpeopletrace.com",
+  "version": "0.1.4",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "45443ab2-7563-4c7d-8bf2-b1b550f4b825",
+          "id": "2db8c120-a8c3-4aa0-a9ce-b075ca85fc68",
           "url": "https://www.quickpeopletrace.com/search/?addresssearch=1&tabid=1&teaser-firstname=${firstName}&teaser-middlename=&teaser-lastname=${lastName}&teaser-city=${city}&teaser-state=${state|upcase}&teaser-submitted=Search"
         },
         {
           "actionType": "extract",
-          "id": "08607047-96e8-4fbb-9af9-bf7b8e163b20",
+          "id": "bd48b737-89c4-408a-a28c-2dfa828aebd8",
           "selector": "//table/tbody/tr[position() > 1]",
           "profile": {
             "name": {
@@ -23,9 +24,6 @@
             },
             "age": {
               "selector": ".//td[3]"
-            },
-            "addressCityState": {
-              "selector": ".//td[4]/strong"
             },
             "addressCityStateList": {
               "selector": ".//td[4]"
