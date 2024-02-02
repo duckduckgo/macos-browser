@@ -104,7 +104,6 @@ extension NavigationProtectionTabExtension: NavigationResponder {
         if let newRequest = GPCRequestFactory().requestForGPC(basedOn: request,
                                                               config: contentBlocking.privacyConfigurationManager.privacyConfig,
                                                               gpcEnabled: PrivacySecurityPreferences.shared.gpcEnabled) {
-            print("❗️", "GPC request", request.url!.absoluteString)
             request = newRequest
         }
 

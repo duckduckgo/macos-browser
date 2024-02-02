@@ -789,7 +789,6 @@ final class AddressBarButtonsViewController: NSViewController {
         || selectedTabViewModel.isShowingErrorPage
         || isTextFieldValueText
         || isLocalUrl
-        || selectedTabViewModel.isShowingErrorPage
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying
