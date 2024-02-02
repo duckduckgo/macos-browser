@@ -43,6 +43,13 @@ struct MirrorSite: Codable, Sendable {
         case removedAt
     }
 
+    init(name: String, url: String, addedAt: Date, removedAt: Date? = nil) {
+        self.name = name
+        self.url = url
+        self.addedAt = addedAt
+        self.removedAt = removedAt
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
