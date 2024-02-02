@@ -420,7 +420,7 @@ protocol NewWindowPolicyDecisionMaker {
         let webViewPromise = Future<WKWebView, Never>.promise()
         var tabGetter: () -> Tab? = { nil }
         self.extensions = extensionsBuilder
-            .build(with: (tabIdentifier: instrumentation.currentTabIdentifier,
+            .build(with: (tabIdentifier: UUID(),
                           isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
                           isTabBurner: burnerMode.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),

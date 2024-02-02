@@ -24,21 +24,13 @@ final class TabInstrumentation: TabInstrumentationProtocol {
     static let tabsLog = OSLog(subsystem: "com.duckduckgo.instrumentation",
                                category: "TabInstrumentation")
 
-    static var tabMaxIdentifier: UInt64 = 0
-
     private var siteLoadingSPID: Any?
     private var currentURL: String?
-    private(set) var currentTabIdentifier: UInt64
-
-    init() {
-        type(of: self).tabMaxIdentifier += 1
-        currentTabIdentifier = type(of: self).tabMaxIdentifier
-    }
 
     private var tabInitSPID: Any?
 
     func willPrepareWebView() {
-        tabInitSPID = Instruments.shared.startTimedEvent(.tabInitialisation, info: "Tab-\(currentTabIdentifier)")
+        tabInitSPID = Instruments.shared.startTimedEvent(.tabInitialisation)
     }
 
     func didPrepareWebView() {
@@ -54,7 +46,7 @@ final class TabInstrumentation: TabInstrumentationProtocol {
                     log: type(of: self).tabsLog,
                     name: "Load Page",
                     signpostID: id,
-                    "Loading URL: %@ in %llu", url.absoluteString, currentTabIdentifier)
+                    "Loading URL: %@", url.absoluteString)
 
     }
 
