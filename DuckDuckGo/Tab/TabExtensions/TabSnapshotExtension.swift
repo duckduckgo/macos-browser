@@ -1,5 +1,5 @@
 //
-//  TabPreviewExtension.swift
+//  TabSnapshotExtension.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -23,34 +23,34 @@ import Navigation
 import SwiftUI
 import WebKit
 
-final class TabPreviewExtension {
+final class TabSnapshotExtension {
 
-    struct PreviewData {
+    struct SnapshotData {
         var url: URL?
         var image: NSImage
         var webviewBoundsSize: NSSize
         var isRestored: Bool
 
-        static func previewDataForNativeView(from image: NSImage) -> PreviewData {
-            return PreviewData(url: nil, image: image, webviewBoundsSize: NSSize.zero, isRestored: false)
+        static func snapshotDataForNativeView(from image: NSImage) -> SnapshotData {
+            return SnapshotData(url: nil, image: image, webviewBoundsSize: NSSize.zero, isRestored: false)
         }
     }
 
     private var identifier: UUID?
 
-    private var previewData: PreviewData? {
+    private var snapshotData: SnapshotData? {
         didSet {
-            if let previewData, let identifier {
-                tabSnapshotPersistanceService.persistSnapshot(previewData.image,
+            if let snapshotData, let identifier {
+                tabSnapshotPersistanceService.persistSnapshot(snapshotData.image,
                                                              id: identifier)
             }
         }
     }
-    private var generatePreviewAfterLoad = false
+    private var generateSnapshotAfterLoad = false
     private var userDidScroll = false
 
-    var preview: NSImage? {
-        return previewData?.image
+    var snapshot: NSImage? {
+        return snapshotData?.image
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -74,7 +74,7 @@ final class TabPreviewExtension {
             self?.tabContent = tabContent
         }.store(in: &cancellables)
 
-        generatePreviewAfterLoad = true
+        generateSnapshotAfterLoad = true
     }
 
     // MARK: - Webviews
@@ -89,35 +89,35 @@ final class TabPreviewExtension {
         }
 
         // Avoid unnecessary generations
-        if let previewData,
+        if let snapshotData,
            !userDidScroll,
-           previewData.webviewBoundsSize == webView.bounds.size,
-           previewData.url == url {
-            os_log("Skipping preview rendering, it is already generated. url: \(url)", log: .tabPreviews)
+           snapshotData.webviewBoundsSize == webView.bounds.size,
+           snapshotData.url == url {
+            os_log("Skipping snapshot rendering, it is already generated. url: \(url)", log: .tabSnapshots)
             return
         }
 
-        os_log("Preview rendering started", log: .tabPreviews)
+        os_log("Preview rendering started", log: .tabSnapshots)
         let configuration = WKSnapshotConfiguration.makeConfiguration()
 
         webView.takeSnapshot(with: configuration) { [weak self] image, _ in
             guard let image = image else {
-                os_log("Failed to create a snapshot of webView", log: .tabPreviews, type: .error)
+                os_log("Failed to create a snapshot of webView", log: .tabSnapshots, type: .error)
                 return
             }
-            self?.generatePreviewAfterLoad = false
-            self?.previewData = PreviewData(url: url,
+            self?.generateSnapshotAfterLoad = false
+            self?.snapshotData = SnapshotData(url: url,
                                             image: image,
                                             webviewBoundsSize: webView.bounds.size,
                                             isRestored: false)
 
-            os_log("Preview rendered: \(url) ", log: .tabPreviews)
+            os_log("Preview rendered: \(url) ", log: .tabSnapshots)
         }
     }
 
     @MainActor
     private func clearPreview() {
-        previewData = nil
+        snapshotData = nil
     }
 
     // MARK: - Native Previews
@@ -125,11 +125,11 @@ final class TabPreviewExtension {
     func generateNativePreview(from view: NSView) {
         let originalBounds = view.bounds
 
-        os_log("Native preview rendering started", log: .tabPreviews)
+        os_log("Native snapshot rendering started", log: .tabSnapshots)
         DispatchQueue.global(qos: .userInitiated).async {
             guard let resizedImage = self.createResizedImage(from: view, with: originalBounds) else {
                 DispatchQueue.main.async { [weak self] in
-                    os_log("Native preview rendering failed", log: .tabPreviews, type: .error)
+                    os_log("Native snapshot rendering failed", log: .tabSnapshots, type: .error)
                     self?.clearPreview()
                 }
                 return
@@ -137,8 +137,8 @@ final class TabPreviewExtension {
 
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                self.previewData = PreviewData.previewDataForNativeView(from: resizedImage)
-                os_log("Preview of native page rendered", log: .tabPreviews)
+                self.snapshotData = SnapshotData.snapshotDataForNativeView(from: resizedImage)
+                os_log("Preview of native page rendered", log: .tabSnapshots)
             }
         }
     }
@@ -196,7 +196,7 @@ final class TabPreviewExtension {
 
 }
 
-extension TabPreviewExtension: WebViewScrollEventDelegate {
+extension TabSnapshotExtension: WebViewScrollEventDelegate {
 
     func webView(_ webView: WebView, didScrollWheel event: NSEvent) {
         userDidScroll = true
@@ -208,7 +208,7 @@ extension TabPreviewExtension: WebViewScrollEventDelegate {
 
 }
 
-extension TabPreviewExtension: NSCodingExtension {
+extension TabSnapshotExtension: NSCodingExtension {
 
     private enum NSSecureCodingKeys {
         static let tabSnapshotIdentifier = "TabSnapshotIdentifier"
@@ -217,7 +217,7 @@ extension TabPreviewExtension: NSCodingExtension {
     func awakeAfter(using decoder: NSCoder) {
         guard let uuidString = decoder.decodeObject(of: NSString.self, forKey: NSSecureCodingKeys.tabSnapshotIdentifier),
               let identifier = UUID(uuidString: uuidString as String) else {
-            os_log("Snapshot id restoration failed", log: .tabPreviews)
+            os_log("Snapshot id restoration failed", log: .tabSnapshots)
             self.identifier = UUID()
             return
         }
@@ -226,16 +226,16 @@ extension TabPreviewExtension: NSCodingExtension {
 
         tabSnapshotPersistanceService.loadSnapshot(for: identifier) { [weak self] image in
             guard let image else {
-                os_log("No snapshot restored", log: .tabPreviews)
+                os_log("No snapshot restored", log: .tabSnapshots)
                 return
             }
-            self?.previewData = PreviewData(url: nil,
+            self?.snapshotData = SnapshotData(url: nil,
                                             image: image,
                                             webviewBoundsSize: NSSize.zero,
                                             isRestored: true)
-            os_log("Snapshot restored", log: .tabPreviews)
+            os_log("Snapshot restored", log: .tabSnapshots)
 
-            self?.generatePreviewAfterLoad = false
+            self?.generateSnapshotAfterLoad = false
         }
     }
 
@@ -243,17 +243,17 @@ extension TabPreviewExtension: NSCodingExtension {
         if let identifier {
             coder.encode(identifier.uuidString,
                          forKey: NSSecureCodingKeys.tabSnapshotIdentifier)
-            os_log("Snapshot id saved to the session state", log: .tabPreviews)
+            os_log("Snapshot id saved to the session state", log: .tabSnapshots)
         }
     }
 
 }
 
-extension TabPreviewExtension: NavigationResponder {
+extension TabSnapshotExtension: NavigationResponder {
 
     @MainActor
     func willStart(_ navigation: Navigation) {
-        if previewData?.isRestored == false {
+        if snapshotData?.isRestored == false {
             clearPreview()
         }
 
@@ -262,7 +262,7 @@ extension TabPreviewExtension: NavigationResponder {
 
     @MainActor
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
-        if generatePreviewAfterLoad {
+        if generateSnapshotAfterLoad {
             Task {
                 await generatePreview()
             }
@@ -273,25 +273,25 @@ extension TabPreviewExtension: NavigationResponder {
 
 protocol TabPreviewExtensionProtocol: AnyObject, NavigationResponder {
 
-    var preview: NSImage? { get }
+    var snapshot: NSImage? { get }
 
     func generatePreview() async
     func generateNativePreview(from view: NSView)
 
 }
 
-extension TabPreviewExtension: TabPreviewExtensionProtocol, TabExtension {
+extension TabSnapshotExtension: TabPreviewExtensionProtocol, TabExtension {
     func getPublicProtocol() -> TabPreviewExtensionProtocol { self }
 }
 
 extension TabExtensions {
-    var tabPreviews: TabPreviewExtensionProtocol? { resolve(TabPreviewExtension.self) }
+    var tabPreviews: TabPreviewExtensionProtocol? { resolve(TabSnapshotExtension.self) }
 }
 
 extension Tab {
 
-    var tabPreview: NSImage? {
-        return self.tabPreviews?.preview
+    var tabSnapshot: NSImage? {
+        return self.tabPreviews?.snapshot
     }
 
     // Called from the outside of extension when a tab is switched

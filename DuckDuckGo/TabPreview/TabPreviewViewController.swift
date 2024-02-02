@@ -22,8 +22,8 @@ final class TabPreviewViewController: NSViewController {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var urlTextField: NSTextField!
-    @IBOutlet weak var screenshotImageView: NSImageView!
-    @IBOutlet weak var screenshotImageViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var snapshotImageView: NSImageView!
+    @IBOutlet weak var snapshotImageViewHeightConstraint: NSLayoutConstraint!
 
 }
 
@@ -57,12 +57,12 @@ extension TabPreviewViewController {
             urlTextField.stringValue = ""
         }
 
-        if !isSelected, let preview = tabViewModel.tab.tabPreview {
-            screenshotImageView.image = preview
-            screenshotImageViewHeightConstraint.constant = getHeight(for: tabViewModel.tab.tabPreview)
+        if !isSelected, let snapshot = tabViewModel.tab.tabSnapshot {
+            snapshotImageView.image = snapshot
+            snapshotImageViewHeightConstraint.constant = getHeight(for: tabViewModel.tab.tabSnapshot)
         } else {
-            screenshotImageView.image = nil
-            screenshotImageViewHeightConstraint.constant = 0
+            snapshotImageView.image = nil
+            snapshotImageViewHeightConstraint.constant = 0
         }
     }
 

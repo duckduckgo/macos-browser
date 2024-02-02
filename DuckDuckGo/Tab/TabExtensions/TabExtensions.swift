@@ -156,7 +156,7 @@ extension TabExtensionsBuilder {
                                   isBurner: args.isTabBurner)
         }
         add {
-            TabPreviewExtension(webViewPublisher: args.webViewFuture,
+            TabSnapshotExtension(webViewPublisher: args.webViewFuture,
                                 contentPublisher: args.contentPublisher)
         }
         add {

@@ -40,7 +40,7 @@ extension OSLog {
         case bitwarden = "Bitwarden"
         case navigation = "Navigation"
         case duckPlayer = "Duck Player"
-        case tabPreviews = "Tab Previews"
+        case tabSnapshots = "Tab Snapshots"
         case sync = "Sync"
         case networkProtection = "Network Protection"
         case dbp = "dbp"
@@ -69,7 +69,7 @@ extension OSLog {
     @OSLogWrapper(.bitwarden) static var bitwarden
     @OSLogWrapper(.navigation) static var navigation
     @OSLogWrapper(.duckPlayer) static var duckPlayer
-    @OSLogWrapper(.tabPreviews) static var tabPreviews
+    @OSLogWrapper(.tabSnapshots) static var tabSnapshots
     @OSLogWrapper(.sync) static var sync
     @OSLogWrapper(.networkProtection) static var networkProtection
     @OSLogWrapper(.dbp) static var dbp

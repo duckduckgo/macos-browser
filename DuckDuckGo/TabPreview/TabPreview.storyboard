@@ -105,8 +105,8 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="screenshotImageView" destination="K3E-VN-I4d" id="TOZ-BA-GZr"/>
-                        <outlet property="screenshotImageViewHeightConstraint" destination="EEs-7i-SUi" id="tZj-Dj-YMw"/>
+                        <outlet property="snapshotImageView" destination="K3E-VN-I4d" id="TOZ-BA-GZr"/>
+                        <outlet property="snapshotImageViewHeightConstraint" destination="EEs-7i-SUi" id="tZj-Dj-YMw"/>
                         <outlet property="titleTextField" destination="lWf-Z2-vYW" id="kQC-OK-4cw"/>
                         <outlet property="urlTextField" destination="jLi-sz-Wfx" id="aEV-ev-OCG"/>
                     </connections>
