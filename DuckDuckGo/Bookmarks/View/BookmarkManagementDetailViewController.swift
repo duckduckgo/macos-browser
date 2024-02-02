@@ -33,23 +33,21 @@ private struct EditedBookmarkMetadata {
 final class BookmarkManagementDetailViewController: NSViewController, NSMenuItemValidation {
 
     fileprivate enum Constants {
-        static let bookmarkCellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksCellIdentifier")
         static let animationSpeed: TimeInterval = 0.3
     }
 
-    private lazy var tableView = NSTableView()
-    private lazy var colorView = ColorView(frame: .zero, backgroundColor: .interfaceBackgroundColor)
-
-    private lazy var emptyState = NSView()
-    private lazy var emptyStateTitle = NSTextField()
-    private lazy var emptyStateMessage = NSTextField()
-    private lazy var importButton = NSButton()
+    private lazy var newBookmarkButton = MouseOverButton(title: "  " + UserText.newBookmark, target: self, action: #selector(presentAddBookmarkModal))
+    private lazy var newFolderButton = MouseOverButton(title: "  " + UserText.newFolder, target: self, action: #selector(presentAddFolderModal))
 
     private lazy var separator = NSBox()
     private lazy var scrollView = NSScrollView()
-    private lazy var imageView = NSImageView()
-    private lazy var newBookmarkButton = MouseOverButton()
-    private lazy var newFolderButton = MouseOverButton()
+    private lazy var tableView = NSTableView()
+
+    private lazy var emptyState = NSView()
+    private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
+    private lazy var emptyStateTitle = NSTextField()
+    private lazy var emptyStateMessage = NSTextField()
+    private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
@@ -73,9 +71,9 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
                 NSAppearance.withAppAppearance {
                     if editingBookmarkIndex != nil {
-                        colorView.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
                     } else {
-                        colorView.animator().layer?.backgroundColor = NSColor.interfaceBackgroundColor.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.interfaceBackgroundColor.cgColor
                     }
                 }
             }
@@ -97,17 +95,20 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     // swiftlint:disable:next function_body_length
     override func loadView() {
-        view = NSView()
+        view = ColorView(frame: .zero, backgroundColor: .interfaceBackgroundColor)
         view.translatesAutoresizingMaskIntoConstraints = false
 
-        view.addSubview(colorView)
         view.addSubview(separator)
         view.addSubview(scrollView)
         view.addSubview(emptyState)
         view.addSubview(newBookmarkButton)
         view.addSubview(newFolderButton)
 
-        newBookmarkButton.contentTintColor = .button
+        newBookmarkButton.bezelStyle = .shadowlessSquare
+        newBookmarkButton.cornerRadius = 4
+        newBookmarkButton.normalTintColor = .button
+        newBookmarkButton.mouseDownColor = .buttonMouseDownColor
+        newBookmarkButton.mouseOverColor = .buttonMouseOverColor
         newBookmarkButton.imageHugsTitle = true
         newBookmarkButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
         newBookmarkButton.translatesAutoresizingMaskIntoConstraints = false
@@ -115,15 +116,12 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         newBookmarkButton.font = .systemFont(ofSize: 13)
         newBookmarkButton.image = .addBookmark
         newBookmarkButton.imagePosition = .imageLeading
-        newBookmarkButton.title = "  " + UserText.newBookmark
-        newBookmarkButton.target = self
-        newBookmarkButton.action = #selector(presentAddBookmarkModal)
 
-        newBookmarkButton.cornerRadius = 4
-        newBookmarkButton.mouseDownColor = .buttonMouseDownColor
-        newBookmarkButton.mouseOverColor = .buttonMouseOverColor
-
-        newFolderButton.contentTintColor = .button
+        newFolderButton.bezelStyle = .shadowlessSquare
+        newFolderButton.cornerRadius = 4
+        newFolderButton.normalTintColor = .button
+        newFolderButton.mouseDownColor = .buttonMouseDownColor
+        newFolderButton.mouseOverColor = .buttonMouseOverColor
         newFolderButton.imageHugsTitle = true
         newFolderButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
         newFolderButton.translatesAutoresizingMaskIntoConstraints = false
@@ -131,32 +129,14 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         newFolderButton.font = .systemFont(ofSize: 13)
         newFolderButton.image = .addFolder
         newFolderButton.imagePosition = .imageLeading
-        newFolderButton.title = "  " + UserText.newFolder
-        newFolderButton.target = self
-        newFolderButton.action = #selector(presentAddFolderModal)
 
-        newFolderButton.cornerRadius = 4
-        newFolderButton.mouseDownColor = .buttonMouseDownColor
-        newFolderButton.mouseOverColor = .buttonMouseOverColor
-
-        emptyState.addSubview(imageView)
+        emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
         emptyState.addSubview(emptyStateMessage)
         emptyState.addSubview(importButton)
 
         emptyState.isHidden = true
         emptyState.translatesAutoresizingMaskIntoConstraints = false
-
-        emptyStateMessage.isEditable = false
-        emptyStateMessage.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        emptyStateMessage.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateMessage.translatesAutoresizingMaskIntoConstraints = false
-        emptyStateMessage.alignment = .center
-        emptyStateMessage.drawsBackground = false
-        emptyStateMessage.isBordered = false
-        emptyStateMessage.font = .systemFont(ofSize: 13)
-        emptyStateMessage.stringValue = "If your bookmarks are saved in another browser, you can import them into DuckDuckGo."
-        emptyStateMessage.textColor = .labelColor
 
         emptyStateTitle.isEditable = false
         emptyStateTitle.setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -166,24 +146,28 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         emptyStateTitle.drawsBackground = false
         emptyStateTitle.isBordered = false
         emptyStateTitle.font = .systemFont(ofSize: 15, weight: .semibold)
-        emptyStateTitle.stringValue = "No bookmarks yet"
         emptyStateTitle.textColor = .labelColor
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateTitle,
+                                                                        lineHeight: 1.14,
+                                                                        kern: -0.23)
 
-        importButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        importButton.translatesAutoresizingMaskIntoConstraints = false
-        importButton.alignment = .center
-        importButton.bezelStyle = .rounded
-        importButton.font = .systemFont(ofSize: 13)
-        importButton.title = UserText.importBookmarksButtonTitle
-        importButton.target = self
-        importButton.action = #selector(onImportClicked)
+        emptyStateMessage.isEditable = false
+        emptyStateMessage.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        emptyStateMessage.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        emptyStateMessage.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateMessage.alignment = .center
+        emptyStateMessage.drawsBackground = false
+        emptyStateMessage.isBordered = false
+        emptyStateMessage.font = .systemFont(ofSize: 13)
+        emptyStateMessage.textColor = .labelColor
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateMessage,
+                                                                          lineHeight: 1.05,
+                                                                          kern: -0.08)
 
-        imageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        imageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.alignment = .left
-        imageView.image = .bookmarksEmpty
-        imageView.imageScaling = .scaleProportionallyDown
+        emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+        emptyStateImageView.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateImageView.imageScaling = .scaleProportionallyDown
 
         scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
@@ -208,6 +192,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         tableView.backgroundColor = .clear
         tableView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         tableView.style = .plain
+        tableView.selectionHighlightStyle = .none
         tableView.usesAutomaticRowHeights = true
         tableView.action = #selector(handleClick)
         tableView.doubleAction = #selector(handleDoubleClick)
@@ -219,7 +204,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         separator.boxType = .separator
         separator.setContentHuggingPriority(.defaultHigh, for: .vertical)
         separator.translatesAutoresizingMaskIntoConstraints = false
-        colorView.translatesAutoresizingMaskIntoConstraints = false
         setupLayout()
     }
 
@@ -229,10 +213,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         separator.topAnchor.constraint(equalTo: newBookmarkButton.bottomAnchor, constant: 24).isActive = true
         emptyState.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20).isActive = true
         scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor).isActive = true
-        colorView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        colorView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        colorView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        colorView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+
         view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         view.trailingAnchor.constraint(greaterThanOrEqualTo: newFolderButton.trailingAnchor, constant: 20).isActive = true
         view.trailingAnchor.constraint(equalTo: separator.trailingAnchor, constant: 58).isActive = true
@@ -252,22 +233,24 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         newFolderButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
 
         emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+
+        importButton.translatesAutoresizingMaskIntoConstraints = false
         importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8).isActive = true
         emptyState.heightAnchor.constraint(equalToConstant: 218).isActive = true
         emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8).isActive = true
         importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
-        imageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+        emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
         emptyState.widthAnchor.constraint(equalToConstant: 224).isActive = true
-        imageView.topAnchor.constraint(equalTo: emptyState.topAnchor).isActive = true
+        emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor).isActive = true
         emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
-        emptyStateTitle.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8).isActive = true
+        emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8).isActive = true
 
         emptyStateMessage.widthAnchor.constraint(equalToConstant: 192).isActive = true
 
         emptyStateTitle.widthAnchor.constraint(equalToConstant: 192).isActive = true
 
-        imageView.widthAnchor.constraint(equalToConstant: 128).isActive = true
-        imageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        emptyStateImageView.widthAnchor.constraint(equalToConstant: 128).isActive = true
+        emptyStateImageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
     }
 
     override func viewDidLoad() {
@@ -278,10 +261,6 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                                            FolderPasteboardWriter.folderUTIInternalType])
 
         reloadData()
-        self.tableView.selectionHighlightStyle = .none
-
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
     }
 
     override func viewDidDisappear() {
@@ -313,11 +292,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         tableView.scroll(scrollPosition)
     }
 
-    @IBAction func onImportClicked(_ sender: NSButton) {
+    @objc func onImportClicked(_ sender: NSButton) {
         DataImportView().show()
     }
 
-    @IBAction func handleDoubleClick(_ sender: NSTableView) {
+    @objc func handleDoubleClick(_ sender: NSTableView) {
         if sender.selectedRowIndexes.count > 1 {
             let entities = sender.selectedRowIndexes.map { fetchEntity(at: $0) }
             let bookmarks = entities.compactMap { $0 as? Bookmark }
@@ -346,7 +325,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }
     }
 
-    @IBAction func handleClick(_ sender: NSTableView) {
+    @objc func handleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
 
         if index != editingBookmarkIndex?.index {
@@ -354,17 +333,17 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }
     }
 
-    @IBAction func presentAddBookmarkModal(_ sender: Any) {
+    @objc func presentAddBookmarkModal(_ sender: Any) {
         AddBookmarkModalView(model: AddBookmarkModalViewModel(parent: selectionState.folder))
             .show(in: view.window)
     }
 
-    @IBAction func presentAddFolderModal(_ sender: Any) {
+    @objc func presentAddFolderModal(_ sender: Any) {
         AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(parent: selectionState.folder))
             .show(in: view.window)
     }
 
-    @IBAction func delete(_ sender: AnyObject) {
+    @objc func delete(_ sender: AnyObject) {
         deleteSelectedItems()
     }
 
@@ -478,8 +457,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         guard let entity = fetchEntity(at: row) else { return nil }
 
-        let cell = tableView.makeView(withIdentifier: Constants.bookmarkCellIdentifier, owner: nil) as? BookmarkTableCellView
-            ?? BookmarkTableCellView(identifier: Constants.bookmarkCellIdentifier)
+        let cell = tableView.makeView(withIdentifier: .init(BookmarkTableCellView.className()), owner: nil) as? BookmarkTableCellView
+            ?? BookmarkTableCellView(identifier: .init(BookmarkTableCellView.className()))
 
         cell.delegate = self
 

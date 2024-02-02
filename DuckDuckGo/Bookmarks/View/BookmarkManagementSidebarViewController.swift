@@ -16,13 +16,14 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Combine
+import PreferencesViews
 
 protocol BookmarkManagementSidebarViewControllerDelegate: AnyObject {
 
-    func bookmarkManagementSidebarViewController(_ sidebarViewController: BookmarkManagementSidebarViewController,
-                                                 enteredState state: BookmarkManagementSidebarViewController.SelectionState)
+    func sidebarSelectionStateDidChange(_ state: BookmarkManagementSidebarViewController.SelectionState)
+    func sidebarSelectedTabContentDidChange(_ content: Tab.TabContent)
 
 }
 
@@ -42,29 +43,19 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         }
     }
 
-    private lazy var viewColorView = ColorView(frame: .zero, backgroundColor: .interfaceBackground)
-    private lazy var tableColumnCell = NSTextFieldCell()
-    private lazy var tableColumn = NSTableColumn()
-    private lazy var scrollView = NSScrollView()
-    private lazy var customMenu = NSMenu()
-    private lazy var customMenuItemBookmarks = NSMenuItem(title: UserText.bookmarks, action: nil, keyEquivalent: "")
-    let tabSwitcherButton = NSPopUpButton()
-    private lazy var outlineView = BookmarksOutlineView()
-
-    weak var delegate: BookmarkManagementSidebarViewControllerDelegate?
-
     private let bookmarkManager: BookmarkManager
-    private let treeControllerDataSource = BookmarkSidebarTreeController()
+    private let treeControllerDataSource: BookmarkSidebarTreeController
 
-    private lazy var treeController: BookmarkTreeController = {
-        return BookmarkTreeController(dataSource: treeControllerDataSource)
-    }()
+    private lazy var tabSwitcherButton = NSPopUpButton()
+    private lazy var scrollView = NSScrollView(frame: NSRect(x: 0, y: 0, width: 232, height: 410))
+    private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
-    private lazy var dataSource: BookmarkOutlineViewDataSource = {
-        BookmarkOutlineViewDataSource(contentMode: .foldersOnly, treeController: treeController)
-    }()
+    private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
+    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
 
     private var cancellables = Set<AnyCancellable>()
+
+    weak var delegate: BookmarkManagementSidebarViewControllerDelegate?
 
     private var selectedNodes: [BookmarkNode] {
         if let nodes = outlineView.selectedItems as? [BookmarkNode] {
@@ -75,6 +66,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.bookmarkManager = bookmarkManager
+        treeControllerDataSource = .init(bookmarkManager: bookmarkManager)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -82,149 +74,92 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         fatalError("\(type(of: self)): Bad initializer")
     }
 
-    // swiftlint:disable:next function_body_length
     override func loadView() {
-        view = NSView()
+        view = ColorView(frame: .zero, backgroundColor: .interfaceBackground)
 
-        view.addSubview(viewColorView)
-        view.addSubview(scrollView)
         view.addSubview(tabSwitcherButton)
+        view.addSubview(scrollView)
 
         tabSwitcherButton.translatesAutoresizingMaskIntoConstraints = false
-        tabSwitcherButton.alignment = .left
-        tabSwitcherButton.bezelStyle = .rounded
-        if #available(macOS 11.0, *) {
-            tabSwitcherButton.controlSize = .large
+        tabSwitcherButton.font = PreferencesViews.Const.Fonts.popUpButton
+        tabSwitcherButton.setButtonType(.momentaryLight)
+        tabSwitcherButton.isBordered = false
+        tabSwitcherButton.target = self
+        tabSwitcherButton.action = #selector(selectedTabContentDidChange)
+        tabSwitcherButton.menu = NSMenu {
+            for content in Tab.TabContent.displayableTabTypes {
+                NSMenuItem(title: content.title!, representedObject: content)
+            }
         }
-        tabSwitcherButton.font = .systemFont(ofSize: 22)
-        tabSwitcherButton.imageScaling = .scaleProportionallyDown
-        tabSwitcherButton.lineBreakMode = .byTruncatingTail
-        tabSwitcherButton.title = UserText.bookmarks
-        tabSwitcherButton.cell?.state = .on
+        tabSwitcherButton.select(tabSwitcherButton.itemArray.first(where: { $0.representedObject as? Tab.TabContent == .bookmarks }))
 
-        customMenu.addItem(customMenuItemBookmarks)
-
-        customMenuItemBookmarks.state = .on
-
-        scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
-        scrollView.hasHorizontalScroller = false
-        scrollView.horizontalLineScroll = 28
-        scrollView.horizontalPageScroll = 10
+        scrollView.drawsBackground = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.hasHorizontalScroller = false
         scrollView.usesPredominantAxisScrolling = false
-        scrollView.verticalLineScroll = 28
-        scrollView.verticalPageScroll = 10
 
-        let clipView = NSClipView()
-        clipView.documentView = outlineView
-
-        clipView.autoresizingMask = [.width, .height]
-        clipView.backgroundColor = .clear
-        clipView.drawsBackground = false
-        clipView.frame = CGRect(x: 0, y: 0, width: 234, height: 410)
-
-        outlineView.addTableColumn(NSTableColumn())
-
-        outlineView.allowsColumnResizing = false
+        let column = NSTableColumn()
+        column.width = scrollView.frame.width - 32
+        outlineView.addTableColumn(column)
+        outlineView.translatesAutoresizingMaskIntoConstraints = true
+        outlineView.autoresizesOutlineColumn = false
+        outlineView.autoresizingMask = [.width, .height]
+        outlineView.headerView = nil
         outlineView.allowsEmptySelection = false
         outlineView.allowsExpansionToolTips = true
         outlineView.allowsMultipleSelection = false
-        outlineView.autoresizingMask = [.width, .height]
-        outlineView.autosaveTableColumns = false
         outlineView.backgroundColor = .clear
-        outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
-        outlineView.frame = CGRect(x: 0, y: 0, width: 234, height: 410)
-        outlineView.gridColor = .gridColor
         outlineView.indentationPerLevel = 13
-        outlineView.intercellSpacing = CGSize(width: 17, height: 0)
-        outlineView.outlineTableColumn = tableColumn
         outlineView.rowHeight = 28
-        outlineView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        outlineView.target = nil
+        outlineView.target = self
         outlineView.doubleAction = #selector(onDoubleClick)
         outlineView.menu = NSMenu()
         outlineView.menu!.delegate = self
+        outlineView.dataSource = dataSource
+        outlineView.delegate = dataSource
 
-        tableColumn.maxWidth = 1000
-        tableColumn.minWidth = 120
-        tableColumn.resizingMask = [.autoresizingMask, .userResizingMask]
-        tableColumn.width = 202
-
-        tableColumnCell.backgroundColor = .controlBackgroundColor
-        tableColumnCell.font = .systemFont(ofSize: 13)
-        tableColumnCell.isEditable = true
-        tableColumnCell.isSelectable = true
-        tableColumnCell.lineBreakMode = .byTruncatingTail
-        tableColumnCell.stringValue = "Text Cell"
-        tableColumnCell.textColor = .controlTextColor
-
-        tableColumn.headerCell.backgroundColor = .headerColor
-        tableColumn.headerCell.isBordered = true
-        tableColumn.headerCell.lineBreakMode = .byTruncatingTail
-        tableColumn.headerCell.textColor = .headerTextColor
-
+        let clipView = NSClipView(frame: scrollView.frame)
+        clipView.translatesAutoresizingMaskIntoConstraints = true
+        clipView.autoresizingMask = [.width, .height]
+        clipView.documentView = outlineView
+        clipView.drawsBackground = false
         scrollView.contentView = clipView
-
-        viewColorView.translatesAutoresizingMaskIntoConstraints = false
 
         setupLayout()
     }
 
     private func setupLayout() {
-
-        view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 12).isActive = true
-        view.trailingAnchor.constraint(equalTo: tabSwitcherButton.trailingAnchor, constant: 23).isActive = true
-        scrollView.topAnchor.constraint(equalTo: tabSwitcherButton.bottomAnchor, constant: 12).isActive = true
-        viewColorView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        tabSwitcherButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 18).isActive = true
+        tabSwitcherButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         tabSwitcherButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 23).isActive = true
+        view.trailingAnchor.constraint(equalTo: tabSwitcherButton.trailingAnchor, constant: 23).isActive = true
+
+        scrollView.topAnchor.constraint(equalTo: tabSwitcherButton.bottomAnchor, constant: 12).isActive = true
+        view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 12).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
         view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        viewColorView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        viewColorView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        viewColorView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        tabSwitcherButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 18).isActive = true
-
-        tabSwitcherButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
-    }
-
-    @IBAction func onDoubleClick(_ sender: NSOutlineView) {
-        guard let item = sender.item(atRow: sender.clickedRow) else { return }
-        if sender.isItemExpanded(item) {
-            sender.animator().collapseItem(item)
-        } else {
-            sender.animator().expandItem(item)
-        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        outlineView.register(BookmarkOutlineViewCell.nib, forIdentifier: BookmarkOutlineViewCell.identifier)
-        outlineView.dataSource = dataSource
-        outlineView.delegate = dataSource
         outlineView.setDraggingSourceOperationMask([.move], forLocal: true)
         outlineView.registerForDraggedTypes([BookmarkPasteboardWriter.bookmarkUTIInternalType,
                                              FolderPasteboardWriter.folderUTIInternalType])
 
         dataSource.$selectedFolders.sink { [weak self] selectedFolders in
-            guard let self = self else { return }
-
-            switch selectedFolders.count {
-            case 0:
+            guard let self else { return }
+            guard let selectedFolder = selectedFolders.first else {
                 if self.outlineView.selectedPseudoFolders == [PseudoFolder.favorites] {
-                    self.delegate?.bookmarkManagementSidebarViewController(self, enteredState: .favorites)
+                    self.delegate?.sidebarSelectionStateDidChange(.favorites)
                 } else {
-                    self.delegate?.bookmarkManagementSidebarViewController(self, enteredState: .empty)
+                    self.delegate?.sidebarSelectionStateDidChange(.empty)
                 }
-
-            case 1:
-                self.delegate?.bookmarkManagementSidebarViewController(self, enteredState: .folder(selectedFolders[0]))
-
-            default:
-                assertionFailure("\(#file): Multi-select is not yet supported")
-                self.delegate?.bookmarkManagementSidebarViewController(self, enteredState: .empty)
+                return
             }
+
+            self.delegate?.sidebarSelectionStateDidChange(.folder(selectedFolder))
+
         }.store(in: &cancellables)
 
         bookmarkManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
@@ -235,8 +170,6 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         reloadData()
-
-        tabSwitcherButton.select(tabType: .bookmarks)
 
         bookmarkManager.requestSync()
     }
@@ -254,6 +187,25 @@ final class BookmarkManagementSidebarViewController: NSViewController {
         outlineView.reloadData()
 
         expandAndRestore(selectedNodes: selectedNodes)
+    }
+
+    // MARK: Actions
+
+    @objc func selectedTabContentDidChange(_ sender: NSPopUpButton) {
+        guard let content = sender.selectedItem?.representedObject as? Tab.TabContent else {
+            assertionFailure("Expected TabContent representedObject")
+            return
+        }
+        delegate?.sidebarSelectedTabContentDidChange(content)
+    }
+
+    @objc func onDoubleClick(_ sender: NSOutlineView) {
+        guard let item = sender.item(atRow: sender.clickedRow) else { return }
+        if sender.isItemExpanded(item) {
+            sender.animator().collapseItem(item)
+        } else {
+            sender.animator().expandItem(item)
+        }
     }
 
     // MARK: NSOutlineView Configuration
@@ -376,27 +328,45 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
 }
 
 #if DEBUG
+private let previewSize = NSSize(width: 400, height: 660)
 @available(macOS 14.0, *)
-#Preview {
+#Preview(traits: .fixedLayout(width: previewSize.width, height: previewSize.height)) { {
 
-    return BookmarkManagementSidebarViewController(bookmarkManager: {
+    let vc = BookmarkManagementSidebarViewController(bookmarkManager: {
         let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
-            BookmarkFolder(id: "1", title: "Folder 1", children: [
+            BookmarkFolder(id: "1", title: "Folder with a reasonably long name that would be clipped", children: [
                 BookmarkFolder(id: "2", title: "Nested Folder", children: [
                 ])
             ]),
             BookmarkFolder(id: "3", title: "Another Folder", children: [
                 BookmarkFolder(id: "4", title: "Nested Folder", children: [
                     BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
+                        BookmarkFolder(id: "a", title: "Another Nested Folder", children: [
+                            BookmarkFolder(id: "b", title: "Another Nested Folder", children: [
+                                BookmarkFolder(id: "c", title: "Another Nested Folder", children: [
+                                    BookmarkFolder(id: "d", title: "Another Nested Folder", children: [
+                                        Bookmark(id: "z1", url: "a:b", title: "a", isFavorite: false),
+                                        Bookmark(id: "z2", url: "a:b", title: "a", isFavorite: false),
+                                        Bookmark(id: "z3", url: "a:b", title: "a", isFavorite: false),
+                                    ])
+                                ])
+                            ])
+                        ])
                     ])
                 ])
-            ])
+            ]),
+            BookmarkFolder(id: "6", title: "Third Folder", children: []),
+            BookmarkFolder(id: "7", title: "Forth Folder", children: []),
+            BookmarkFolder(id: "8", title: "Fifth Folder", children: []),
+            Bookmark(id: "z", url: "a:b", title: "a", isFavorite: false)
         ]))
         bkman.loadBookmarks()
         customAssertionFailure = { _, _, _ in }
 
         return bkman
     }())
+    vc.preferredContentSize = previewSize
+    return vc
 
-}
+}()}
 #endif

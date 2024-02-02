@@ -41,7 +41,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     init(
         contentMode: ContentMode,
-        bookmarkManager: BookmarkManager = LocalBookmarkManager.shared,
+        bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
@@ -117,11 +117,12 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
     }
 
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
-        guard let node = item as? BookmarkNode,
-              let cell = outlineView.makeView(withIdentifier: BookmarkOutlineViewCell.identifier, owner: self) as? BookmarkOutlineViewCell else {
-            assertionFailure("\(#file): Failed to create BookmarkOutlineViewCell or cast item to Node")
+        guard let node = item as? BookmarkNode else {
+            assertionFailure("\(#file): Failed to create BookmarkOutlineCellView or cast item to Node")
             return nil
         }
+        let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
+            ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
 
         if let bookmark = node.representedObject as? Bookmark {
             cell.update(from: bookmark)

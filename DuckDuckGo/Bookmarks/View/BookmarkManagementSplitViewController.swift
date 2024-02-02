@@ -17,16 +17,17 @@
 //
 
 import AppKit
-import Combine
 
 final class BookmarkManagementSplitViewController: NSSplitViewController {
 
+    private let bookmarkManager: BookmarkManager
     weak var delegate: BrowserTabSelectionDelegate?
 
-    lazy var sidebarViewController: BookmarkManagementSidebarViewController = BookmarkManagementSidebarViewController()
-    lazy var detailViewController: BookmarkManagementDetailViewController = BookmarkManagementDetailViewController()
+    lazy var sidebarViewController: BookmarkManagementSidebarViewController = BookmarkManagementSidebarViewController(bookmarkManager: bookmarkManager)
+    lazy var detailViewController: BookmarkManagementDetailViewController = BookmarkManagementDetailViewController(bookmarkManager: bookmarkManager)
 
-    init() {
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        self.bookmarkManager = bookmarkManager
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -42,7 +43,9 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
         splitView.setValue(NSColor.divider, forKey: #keyPath(NSSplitView.dividerColor))
 
         let sidebarViewItem = NSSplitViewItem(contentListWithViewController: sidebarViewController)
-        sidebarViewItem.holdingPriority = .init(rawValue: 255)
+        sidebarViewItem.minimumThickness = 256
+        sidebarViewItem.maximumThickness = 256
+
         addSplitViewItem(sidebarViewItem)
 
         let detailViewItem = NSSplitViewItem(viewController: detailViewController)
@@ -51,27 +54,23 @@ final class BookmarkManagementSplitViewController: NSSplitViewController {
         view = splitView
     }
 
-    private var selectedTabCancellable: AnyCancellable?
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
         sidebarViewController.delegate = self
         detailViewController.delegate = self
-        sidebarViewController.tabSwitcherButton.displayBrowserTabButtons(withSelectedTab: .bookmarks)
-
-        selectedTabCancellable = sidebarViewController.tabSwitcherButton.selectionPublisher.dropFirst().sink { [weak self] index in
-            self?.delegate?.selectedTab(at: index)
-        }
     }
 
 }
 
 extension BookmarkManagementSplitViewController: BookmarkManagementSidebarViewControllerDelegate {
 
-    func bookmarkManagementSidebarViewController(_ sidebarViewController: BookmarkManagementSidebarViewController,
-                                                 enteredState state: BookmarkManagementSidebarViewController.SelectionState) {
+    func sidebarSelectionStateDidChange(_ state: BookmarkManagementSidebarViewController.SelectionState) {
         detailViewController.update(selectionState: state)
+    }
+
+    func sidebarSelectedTabContentDidChange(_ content: Tab.TabContent) {
+        delegate?.selectedTabContent(content)
     }
 
 }
@@ -83,3 +82,37 @@ extension BookmarkManagementSplitViewController: BookmarkManagementDetailViewCon
     }
 
 }
+
+#if DEBUG
+private let previewSize = NSSize(width: 700, height: 660)
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: previewSize.width, height: previewSize.height)) { {
+
+    let vc = BookmarkManagementSplitViewController(bookmarkManager: {
+        let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
+            BookmarkFolder(id: "1", title: "Folder 1", children: [
+                BookmarkFolder(id: "2", title: "Nested Folder", children: [
+                    Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")
+                ])
+            ]),
+            BookmarkFolder(id: "3", title: "Another Folder", children: [
+                BookmarkFolder(id: "4", title: "Nested Folder", children: [
+                    BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
+                        Bookmark(id: "b2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "5")
+                    ])
+                ])
+            ]),
+            Bookmark(id: "b3", url: URL.duckDuckGo.absoluteString, title: "Bookmark 1", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b4", url: URL.duckDuckGo.absoluteString, title: "Bookmark 2", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b5", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "")
+        ]))
+        bkman.loadBookmarks()
+        customAssertionFailure = { _, _, _ in }
+
+        return bkman
+    }())
+    vc.preferredContentSize = previewSize
+    return vc
+
+}() }
+#endif

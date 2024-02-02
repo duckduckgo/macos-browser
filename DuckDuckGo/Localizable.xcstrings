@@ -1500,6 +1500,30 @@
         }
       }
     },
+    "bookmarks.empty.state.message" : {
+      "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If your bookmarks are saved in another browser, you can import them into DuckDuckGo."
+          }
+        }
+      }
+    },
+    "bookmarks.empty.state.title" : {
+      "comment" : "Title displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No bookmarks yet"
+          }
+        }
+      }
+    },
     "bookmarks.import.button.title" : {
       "comment" : "Button text to open bookmark import dialog",
       "extractionState" : "extracted_with_value",

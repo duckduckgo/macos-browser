@@ -435,12 +435,6 @@ final class BrowserTabViewController: NSViewController {
 
     // MARK: - Browser Tabs
 
-    private func show(displayableTabAtIndex index: Int) {
-        // The tab switcher only displays displayable tab types.
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
-    }
-
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
         transientTabContentViewController?.removeCompletely()
@@ -916,8 +910,9 @@ extension BrowserTabViewController: TabDownloadsDelegate {
 
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
-    func selectedTab(at index: Int) {
-        show(displayableTabAtIndex: index)
+    func selectedTabContent(_ content: Tab.TabContent) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(content)
+        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
