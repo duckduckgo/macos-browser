@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if NETWORK_PROTECTION
+
 import Foundation
 import NetworkProtection
 import NetworkProtectionIPC
@@ -66,3 +68,5 @@ final class NetworkProtectionIPCTunnelController: TunnelController {
         loginItemsManager.enableLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
     }
 }
+
+#endif

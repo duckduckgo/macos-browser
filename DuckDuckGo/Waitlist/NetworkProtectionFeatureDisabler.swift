@@ -104,7 +104,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     }
 
     func removeSystemExtension() async throws {
+#if NETP_SYSTEM_EXTENSION
         try await ipcClient.debugCommand(.removeSystemExtension)
+#endif
     }
 
     private func unpinNetworkProtection() {
