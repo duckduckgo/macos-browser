@@ -24,24 +24,4 @@ extension Data {
         return String(data: self, encoding: .utf8)
     }
 
-    /**
-        Writes this data to the specified URL as though it was a file showing progress.  Primarily this is used to show a bounce if the file is in a location on the user's dock (e.g. Downloads).
-     */
-    func writeFileWithProgress(to url: URL) throws {
-        let progress = Progress(totalUnitCount: 1,
-                                fileOperationKind: .downloading,
-                                kind: .file,
-                                isPausable: false,
-                                isCancellable: false,
-                                fileURL: url)
-
-        progress.publish()
-        defer {
-            progress.unpublish()
-        }
-
-        try self.write(to: url)
-        progress.completedUnitCount = progress.totalUnitCount
-    }
-
 }
