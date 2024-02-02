@@ -24,7 +24,9 @@ import SwiftUI
 import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
+    @IBOutlet var errorView: NSView!
     @IBOutlet var homePageView: NSView!
+    @IBOutlet var errorMessageLabel: NSTextField!
     @IBOutlet var hoverLabel: NSTextField!
     @IBOutlet var hoverLabelContainer: NSView!
     private weak var webView: WebView?
@@ -38,6 +40,7 @@ final class BrowserTabViewController: NSViewController {
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
     private var activeUserDialogCancellable: Cancellable?
+    private var errorViewStateCancellable: AnyCancellable?
     private var hoverLinkCancellable: AnyCancellable?
     private var pinnedTabsDelegatesCancellable: AnyCancellable?
     private var keyWindowSelectedTabCancellable: AnyCancellable?
@@ -75,6 +78,7 @@ final class BrowserTabViewController: NSViewController {
         hoverLabelContainer.alphaValue = 0
         subscribeToTabs()
         subscribeToSelectedTabViewModel()
+        subscribeToErrorViewState()
 
         view.registerForDraggedTypes([.URL, .fileURL])
     }
@@ -212,6 +216,7 @@ final class BrowserTabViewController: NSViewController {
                 guard let self = self else { return }
                 self.tabViewModel = selectedTabViewModel
                 self.showTabContent(of: selectedTabViewModel)
+                self.subscribeToErrorViewState()
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
@@ -362,6 +367,15 @@ final class BrowserTabViewController: NSViewController {
         }
     }
 
+    private func subscribeToErrorViewState() {
+        errorViewStateCancellable = tabViewModel?.$errorViewState.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.displayErrorView(
+                self?.tabViewModel?.errorViewState.isVisible ?? false,
+                message: self?.tabViewModel?.errorViewState.message ?? UserText.unknownErrorMessage
+            )
+        }
+    }
+
     func subscribeToHoveredLink(of tabViewModel: TabViewModel?) {
         hoverLinkCancellable = tabViewModel?.tab.hoveredLinkPublisher.sink { [weak self] in
             self?.scheduleHoverLabelUpdatesForUrl($0)
@@ -391,6 +405,13 @@ final class BrowserTabViewController: NSViewController {
         DispatchQueue.main.async { [weak self] in
             self?.makeWebViewFirstResponder()
         }
+    }
+
+    private func displayErrorView(_ shown: Bool, message: String) {
+        errorMessageLabel.stringValue = message
+        errorView.isHidden = !shown
+        webView?.isHidden = shown
+        homePageView.isHidden = shown
     }
 
     func openNewTab(with content: Tab.TabContent) {
