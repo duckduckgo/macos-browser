@@ -94,6 +94,7 @@ jobs:
     outputs:
       app-version: ${{ steps.set-outputs.outputs.app-version }}
       app-name: ${{ steps.set-outputs.outputs.app-name }}
+      upload-to: ${{ steps.is-official-release.outputs.upload-to }}
 
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
@@ -106,6 +107,20 @@ jobs:
       with:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Check if this is an official release build
+      id: is-official-release
+      env:
+        is-official-release: ${{ env.release-type == 'release' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
+      run: |
+        upload_to=
+        if [[ "${{ env.is-official-release }}" == "true" ]]; then
+          upload_to=s3
+        else if [[ "${{ env.asana-task-url }}" ]]; then
+          upload_to=asana
+        fi
+        echo "upload-to=${upload_to}" >> $GITHUB_OUTPUT
+        echo "upload-to=${upload_to}" >> $GITHUB_ENV
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles
@@ -123,11 +138,6 @@ jobs:
         NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_AGENT_REVIEW_PROVISION_PROFILE_BASE64_V2 }}
         NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_RELEASE_PROVISION_PROFILE_BASE64 }}
         NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64: ${{ secrets.NETP_NOTIFICATIONS_REVIEW_PROVISION_PROFILE_BASE64 }}
-
-    - name: Install xcbeautify
-      if: runner.debug != '1'
-      continue-on-error: true
-      run: brew install xcbeautify
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
@@ -170,13 +180,13 @@ jobs:
 
     - name: Extract Asana Task ID
       id: task-id
-      if: env.asana-task-url
+      if: ${{ env.upload-to == 'asana' }}
       uses: ./.github/actions/asana-extract-task-id
       with:
         task-url: ${{ env.asana-task-url }}
 
     - name: Upload dSYMs to Asana
-      if: env.asana-task-url
+      if: ${{ env.upload-to == 'asana' }}
       uses: ./.github/actions/asana-upload
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -184,7 +194,7 @@ jobs:
         task-id: ${{ steps.task-id.outputs.task-id }}
 
     - name: Upload dSYMs to S3
-      if: ${{ env.release-type == 'release' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
+      if: ${{ env.upload-to == 's3' }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -209,6 +219,7 @@ jobs:
       app-version: ${{ needs.export-notarized-app.outputs.app-version }}
       app-name: ${{ needs.export-notarized-app.outputs.app-name }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      upload-to: ${{ needs.export-notarized-app.outputs.upload-to }}
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
 
     steps:
@@ -248,8 +259,21 @@ jobs:
         name: DuckDuckGo-${{ env.release-type }}-${{ env.app-version }}.dmg
         path: ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg
 
+    - name: Upload DMG to S3
+      if: ${{ env.upload-to == 's3' }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        RELEASE_BUCKET_NAME: ${{ vars.RELEASE_BUCKET_NAME }}
+        RELEASE_BUCKET_PREFIX: ${{ vars.RELEASE_BUCKET_PREFIX }}
+      run: |
+        aws s3 cp \
+          ${{ github.workspace }}/duckduckgo*-${{ env.app-version }}.dmg \
+          s3://${{ env.RELEASE_BUCKET_NAME }}/${{ env.RELEASE_BUCKET_PREFIX }}/
+
     - name: Fetch Asana actions
-      if: env.asana-task-url
+      if: ${{ env.upload-to == 'asana' }}
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
@@ -263,13 +287,13 @@ jobs:
 
     - name: Extract Asana Task ID
       id: task-id
-      if: env.asana-task-url
+      if: ${{ env.upload-to == 'asana' }}
       uses: ./.github/actions/asana-extract-task-id
       with:
         task-url: ${{ env.asana-task-url }}
 
     - name: Upload DMG to Asana
-      if: env.asana-task-url
+      if: ${{ env.upload-to == 'asana' }}
       uses: ./.github/actions/asana-upload
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}

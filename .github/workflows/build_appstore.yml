@@ -40,6 +40,10 @@ on:
         required: true
       APPLE_API_KEY_ISSUER:
         required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
       MATCH_PASSWORD:
         required: true
       ASANA_ACCESS_TOKEN:
@@ -83,15 +87,25 @@ jobs:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
 
+    - name: Check if this is an official release build
+      id: is-official-release
+      env:
+        is-official-release: ${{ env.destination == 'appstore' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
+      run: |
+        upload_to=
+        if [[ "${{ env.is-official-release }}" == "true" ]]; then
+          upload_to=s3
+        else if [[ "${{ env.asana-task-url }}" ]]; then
+          upload_to=asana
+        fi
+        echo "upload-to=${upload_to}" >> $GITHUB_OUTPUT
+        echo "upload-to=${upload_to}" >> $GITHUB_ENV
+
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Prepare fastlane
       run: bundle install
-
-    - name: Install xcbeautify
-      continue-on-error: true
-      run: brew install xcbeautify
 
     - name: Archive and Upload the App
       env:
@@ -114,24 +128,18 @@ jobs:
         name: DuckDuckGo-${{ env.destination }}-dSYM-${{ env.app_version }}
         path: ${{ env.dsyms_path }}
 
-    - name: Get Asana Task ID
-      id: get-task-id
-      if: env.asana-task-url
-      uses: ./.github/actions/asana-extract-task-id
-      with:
-        task-url: ${{ env.asana-task-url }}
-
-    - name: Upload debug symbols to Asana
-      if: env.asana-task-url
+    - name: Upload dSYMs to S3
+      if: ${{ env.upload-to == 's3' }}
       env:
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        DSYM_BUCKET_NAME: ${{ vars.DSYM_BUCKET_NAME }}
+        DSYM_BUCKET_PREFIX: ${{ vars.DSYM_BUCKET_PREFIX }}
       run: |
-        asana_dsyms_path="${{ github.workspace }}/DuckDuckGo-AppStore-${{ env.app_version }}-dSYM.zip"
-        mv -f "${{ env.dsyms_path }}" "$asana_dsyms_path"
-
-        curl -s "https://app.asana.com/api/1.0/tasks/${{ steps.get-task-id.outputs.task-id }}/attachments" \
-          -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
-          --form "file=@${asana_dsyms_path};type=application/zip"
+        aws s3 cp \
+          ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip \
+          s3://${{ env.DSYM_BUCKET_NAME }}/${{ env.DSYM_BUCKET_PREFIX }}/
 
     - name: Send Mattermost message
       env:
