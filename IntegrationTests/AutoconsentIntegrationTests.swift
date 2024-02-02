@@ -43,7 +43,8 @@ class AutoconsentIntegrationTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: Tab(content: .none))
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window.close()
         window = nil
 
