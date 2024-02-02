@@ -110,6 +110,19 @@ extension Bundle {
         return appGroup
     }
 
+    var isInApplicationsDirectory: Bool {
+        let directoryPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
+
+        guard let applicationsPath = directoryPaths.first else {
+            // Default to true to be safe. In theory this should always return a valid path and the else branch will never be run, but some app logic
+            // depends on this check in order to allow users to proceed, so we should avoid blocking them in case this assumption is ever wrong.
+            return true
+        }
+
+        let path = self.bundlePath
+        return path.hasPrefix(applicationsPath)
+    }
+
 }
 
 enum BundleGroup {

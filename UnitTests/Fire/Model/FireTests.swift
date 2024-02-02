@@ -44,7 +44,7 @@ final class FireTests: XCTestCase {
         _ = WindowsManager.openNewWindow(with: tabCollectionViewModel, lazyLoadTabs: true)
 
         XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.count, 3)
-        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .homePage)
+        XCTAssertEqual(tabCollectionViewModel.tabCollection.tabs.first?.content, .newtab)
 
         let burningExpectation = expectation(description: "Burning")
 

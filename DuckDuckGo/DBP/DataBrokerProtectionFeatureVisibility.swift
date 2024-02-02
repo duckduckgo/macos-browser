@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import BrowserServicesKit
 import Common
@@ -49,6 +51,10 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
             regionCode = Locale.current.region?.identifier
         } else {
             regionCode = Locale.current.regionCode
+        }
+
+        if isInternalUser {
+            regionCode = "US"
         }
 
         #if DEBUG // Always assume US for debug builds
@@ -106,3 +112,5 @@ struct DefaultDataBrokerProtectionFeatureVisibility: DataBrokerProtectionFeature
         }
     }
 }
+
+#endif

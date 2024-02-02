@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import LoginItems
 import Common
@@ -40,9 +42,17 @@ struct DataBrokerProtectionAppEvents {
 
         Task {
             try? await DataBrokerProtectionWaitlist().redeemDataBrokerProtectionInviteCodeIfAvailable()
+
+            // If we don't have profileQueries it means there's no user profile saved in our DB
+            // In this case, let's disable the agent and delete any left-over data because there's nothing for it to do
+            let profileQueries = await DataBrokerProtectionManager.shared.dataManager.fetchBrokerProfileQueryData(ignoresCache: true)
+            if profileQueries.count > 0 {
+                restartBackgroundAgent(loginItemsManager: loginItemsManager)
+            } else {
+                featureVisibility.disableAndDeleteForWaitlistUsers()
+            }
         }
 
-        restartBackgroundAgent(loginItemsManager: loginItemsManager)
     }
 
     func applicationDidBecomeActive() {
@@ -90,3 +100,5 @@ struct DataBrokerProtectionAppEvents {
         // restartLoginItems doesn't work when we change the agent name
     }
 }
+
+#endif

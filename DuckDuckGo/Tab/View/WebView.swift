@@ -36,8 +36,10 @@ final class WebView: WKWebView {
         }
     }
 
-    func stopAllMediaAndLoading() {
-        stopLoading()
+    func stopAllMedia(shouldStopLoading: Bool) {
+        if shouldStopLoading {
+            stopLoading()
+        }
         stopMediaCapture()
         stopAllMediaPlayback()
         if isInFullScreenMode {

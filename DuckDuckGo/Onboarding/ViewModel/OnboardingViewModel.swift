@@ -53,14 +53,12 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     @UserDefaultsWrapper(key: .onboardingFinished, defaultValue: false)
-    private(set) var onboardingFinished: Bool
+    private(set) static var isOnboardingFinished: Bool
 
     weak var delegate: OnboardingDelegate?
 
-    init(
-        delegate: OnboardingDelegate? = nil) {
+    init(delegate: OnboardingDelegate? = nil) {
         self.delegate = delegate
-        self.state = onboardingFinished ? .startBrowsing : .startFlow
     }
 
     func onSplashFinished() {
@@ -84,14 +82,14 @@ final class OnboardingViewModel: ObservableObject {
     func onSetDefaultPressed() {
         delegate?.onboardingDidRequestSetDefault { [weak self] in
             self?.state = .startBrowsing
-            self?.onboardingFinished = true
+            Self.isOnboardingFinished = true
             self?.delegate?.onboardingHasFinished()
         }
     }
 
     func onSetDefaultSkipped() {
         state = .startBrowsing
-        onboardingFinished = true
+        Self.isOnboardingFinished = true
         delegate?.onboardingHasFinished()
     }
 
@@ -100,17 +98,12 @@ final class OnboardingViewModel: ObservableObject {
     }
 
     func onboardingReshown() {
-        if onboardingFinished {
+        if Self.isOnboardingFinished {
             typingDisabled = true
             delegate?.onboardingHasFinished()
         } else {
             state = .startFlow
         }
-    }
-
-    func restart() {
-        onboardingFinished = false
-        state = .startFlow
     }
 
 }

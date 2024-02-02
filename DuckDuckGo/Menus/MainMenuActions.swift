@@ -85,7 +85,7 @@ extension AppDelegate {
     }
 
     @objc func clearAllHistory(_ sender: NSMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -95,7 +95,7 @@ extension AppDelegate {
     }
 
     @objc func clearThisHistory(_ sender: ClearThisHistoryMenuItem) {
-        guard let window = WindowsManager.openNewWindow(with: Tab(content: .homePage)),
+        guard let window = WindowsManager.openNewWindow(with: Tab(content: .newtab)),
               let windowController = window.windowController as? MainWindowController else {
             assertionFailure("No reference to main window controller")
             return
@@ -116,6 +116,30 @@ extension AppDelegate {
 
     @objc func openFeedback(_ sender: Any?) {
         FeedbackPresenter.presentFeedbackForm()
+    }
+
+    @objc func openReportBrokenSite(_ sender: Any?) {
+        let storyboard = NSStoryboard(name: "PrivacyDashboard", bundle: nil)
+        let privacyDashboardViewController = storyboard.instantiateController(identifier: "PrivacyDashboardViewController") { coder in
+            PrivacyDashboardViewController(coder: coder, initMode: .reportBrokenSite)
+        }
+
+        privacyDashboardViewController.sizeDelegate = self
+
+        let window = NSWindow(contentViewController: privacyDashboardViewController)
+        window.styleMask.remove(.resizable)
+        window.setFrame(NSRect(x: 0, y: 0, width: PrivacyDashboardViewController.Constants.initialContentWidth,
+                               height: PrivacyDashboardViewController.Constants.reportBrokenSiteInitialContentHeight),
+                        display: true)
+        privacyDashboardWindow = window
+
+        guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController,
+              let tabModel = parentWindowController.mainViewController.tabCollectionViewModel.selectedTabViewModel else {
+            assertionFailure("AppDelegate: Failed to present PrivacyDashboard")
+            return
+        }
+        privacyDashboardViewController.updateTabViewModel(tabModel)
+        parentWindowController.window?.beginSheet(window) { _ in }
     }
 
     #endif
@@ -144,7 +168,7 @@ extension AppDelegate {
     }
 
     @objc func openPreferences(_ sender: Any?) {
-        let tabCollection = TabCollection(tabs: [Tab(content: .anyPreferencePane)])
+        let tabCollection = TabCollection(tabs: [Tab(content: .anySettingsPane)])
         let tabCollectionViewModel = TabCollectionViewModel(tabCollection: tabCollection)
         WindowsManager.openNewWindow(with: tabCollectionViewModel)
     }
@@ -266,14 +290,14 @@ extension MainViewController {
 
     @objc func openPreferences(_ sender: Any?) {
         makeKeyIfNeeded()
-        browserTabViewController.openNewTab(with: .anyPreferencePane)
+        browserTabViewController.openNewTab(with: .anySettingsPane)
     }
 
     // MARK: - File
 
     @objc func newTab(_ sender: Any?) {
         makeKeyIfNeeded()
-        browserTabViewController.openNewTab(with: .homePage)
+        browserTabViewController.openNewTab(with: .newtab)
     }
 
     @objc func openLocation(_ sender: Any?) {
@@ -342,7 +366,7 @@ extension MainViewController {
             if let vc = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController.navigationBarViewController {
                 navigationBarViewController = vc
             } else {
-                WindowsManager.openNewWindow(with: Tab(content: .homePage))
+                WindowsManager.openNewWindow(with: Tab(content: .newtab))
                 guard let wc = WindowControllersManager.shared.mainWindowControllers.first(where: { $0.window?.isPopUpWindow == false }) else {
                     return
                 }
@@ -401,7 +425,7 @@ extension MainViewController {
         guard view.window?.isPopUpWindow == false,
             let (tab, _) = getActiveTabAndIndex(), tab === tabCollectionViewModel.selectedTab else {
 
-            browserTabViewController.openNewTab(with: .homePage)
+            browserTabViewController.openNewTab(with: .newtab)
             return
         }
         makeKeyIfNeeded()
@@ -932,6 +956,9 @@ extension AppDelegate: NSMenuItemValidation {
         case #selector(AppDelegate.openExportLogins(_:)):
             return areTherePasswords
 
+        case #selector(AppDelegate.openReportBrokenSite(_:)):
+            return WindowControllersManager.shared.selectedTab?.canReload ?? false
+
         default:
             return true
         }
@@ -981,4 +1008,11 @@ extension MainViewController: FindInPageDelegate {
         activeTabViewModel?.closeFindInPage()
     }
 
+}
+
+extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
+
+    func privacyDashboardViewControllerDidChange(size: NSSize) {
+        privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
+    }
 }

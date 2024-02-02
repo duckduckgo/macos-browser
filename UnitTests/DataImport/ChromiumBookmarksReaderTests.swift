@@ -31,8 +31,8 @@ class ChromiumBookmarksReaderTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar.type, "folder")
-        XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks.type, "folder")
+        XCTAssertEqual(bookmarks.topLevelFolders.bookmarkBar?.type, .folder)
+        XCTAssertEqual(bookmarks.topLevelFolders.otherBookmarks?.type, .folder)
     }
 
     private func resourceURL() -> URL {

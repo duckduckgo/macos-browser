@@ -267,7 +267,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
                 openURLHandler: { url in
                     WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
                 }, goToSyncPreferences: {
-                    WindowControllersManager.shared.show(url: URL(string: "about:preferences/sync")!, source: .ui, newTab: true)
+                    WindowControllersManager.shared.show(url: .settingsPane(.sync), source: .ui, newTab: true)
                 })
 
             let vc = SubscriptionAccessViewController(actionHandlers: actionHandlers)
