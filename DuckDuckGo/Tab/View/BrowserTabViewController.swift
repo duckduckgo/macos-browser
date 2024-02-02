@@ -345,7 +345,21 @@ final class BrowserTabViewController: NSViewController {
                 }
                 return old == new
             })
-            .asVoid()
+            .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                guard let tabViewModel, tabContent.isUrl else {
+                    return Just(()).eraseToAnyPublisher()
+                }
+
+                return Publishers.Merge4(
+                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
+                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
+                    tabViewModel.tab.webViewDidFailNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
+                )
+                .prefix(1)
+                .eraseToAnyPublisher()
+            }
+            .switchToLatest()
             .receive(on: DispatchQueue.main)
             .sink { [weak self, weak tabViewModel] in
                 guard let tabViewModel else { return }
