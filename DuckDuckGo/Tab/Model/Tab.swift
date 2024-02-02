@@ -576,6 +576,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     // MARK: - Event Publishers
 
+    let webViewDidStartNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
     let webViewDidReceiveRedirectPublisher = PassthroughSubject<Void, Never>()
     let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
@@ -1169,6 +1170,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didStart(_ navigation: Navigation) {
+        webViewDidStartNavigationPublisher.send()
         delegate?.tabDidStartNavigation(self)
         userInteractionDialog = nil
 

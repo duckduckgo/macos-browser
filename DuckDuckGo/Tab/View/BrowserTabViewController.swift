@@ -350,7 +350,8 @@ final class BrowserTabViewController: NSViewController {
                     return Just(()).eraseToAnyPublisher()
                 }
 
-                return Publishers.Merge4(
+                return Publishers.Merge5(
+                    tabViewModel.tab.webViewDidStartNavigationPublisher,
                     tabViewModel.tab.webViewDidReceiveRedirectPublisher,
                     tabViewModel.tab.webViewDidCommitNavigationPublisher,
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
