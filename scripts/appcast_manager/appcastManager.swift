@@ -11,9 +11,10 @@ signal(SIGINT) { _ in
     exit(1)
 }
 
-let appcastURLString = "https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml"
+let isCI = ProcessInfo.processInfo.environment["CI"] != nil
+let appcastURLString = "https://staticcdn.kapusta.cc/macos-desktop-browser/appcast2.xml"
 let appcastURL = URL(string: appcastURLString)!
-let tmpDir = NSString(string: "~/Developer").expandingTildeInPath
+let tmpDir = isCI ? "." : NSString(string: "~/Developer").expandingTildeInPath
 let tmpDirURL = URL(fileURLWithPath: tmpDir, isDirectory: true)
 let specificDir = tmpDirURL.appendingPathComponent("sparkle-updates")
 let appcastFilePath = specificDir.appendingPathComponent("appcast2.xml")
@@ -779,8 +780,10 @@ func runGenerateAppcast(with versionNumber: String, channel: String? = nil, roll
     moveFiles(from: specificDir.appendingPathComponent("old_updates"), to: specificDir)
     print("Old update files moved back to \(specificDir.path)")
 
-    // Open specific directory in Finder
-    shell("open", specificDir.path)
+    if !isCI {
+        // Open specific directory in Finder
+        shell("open", specificDir.path)
+    }
 }
 
 func moveFiles(from sourceDir: URL, to destinationDir: URL) {
