@@ -20,6 +20,13 @@ import Foundation
 import NetworkExtension
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 
+enum RemoteConnectionError: Error {
+    case complete
+    case cancelled
+    case couldNotEstablishConnection(_ error: Error)
+    case unhandledError(_ error: Error)
+}
+
 final class TCPFlowManager {
     private let flow: NEAppProxyTCPFlow
     private var connectionTask: Task<Void, Error>?
@@ -138,13 +145,6 @@ final class TCPFlowManager {
                  }
             }
         }
-    }
-
-    enum RemoteConnectionError: Error {
-        case complete
-        case cancelled
-        case couldNotEstablishConnection(_ error: Error)
-        case unhandledError(_ error: Error)
     }
 
     @MainActor

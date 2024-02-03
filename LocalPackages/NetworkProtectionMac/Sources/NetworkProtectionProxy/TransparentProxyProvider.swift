@@ -22,12 +22,13 @@ import NetworkProtection
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import SystemConfiguration
 
-extension OSLogPrivacy {
-#if DEBUG || REVIEW
-    static let logPrivacy: OSLogPrivacy = .public
-#else
-    static let logPrivacy: OSLogPrivacy = .auto
-#endif
+/// A private global actor to handle UDP flows management
+///
+@globalActor
+struct UDPFlowActor {
+    actor ActorType { }
+
+    static let shared: ActorType = ActorType()
 }
 
 open class TransparentProxyProvider: NETransparentProxyProvider {
@@ -39,6 +40,8 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     public typealias LoadOptionsCallback = (_ options: [String: Any]?) throws -> Void
 
     var tcpFlowManagers = Set<TCPFlowManager>()
+
+    @UDPFlowActor
     var udpFlowManagers = Set<UDPFlowManager>()
 
     private let monitor = nw_path_monitor_create()
@@ -270,11 +273,11 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
         flow.networkInterface = directInterface
 
-        Task { @MainActor in
+        Task { @UDPFlowActor in
             let flowManager = UDPFlowManager(flow: flow)
             udpFlowManagers.insert(flowManager)
 
-            await flowManager.start(interface: interface, initialRemoteEndpoint: remoteEndpoint)
+            try? await flowManager.start(interface: interface)
             udpFlowManagers.remove(flowManager)
         }
 
