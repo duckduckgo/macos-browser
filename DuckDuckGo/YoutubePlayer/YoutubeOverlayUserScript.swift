@@ -122,7 +122,7 @@ extension YoutubeOverlayUserScript {
             return nil
         }
         if pixelName == "play.use" {
-            PixelExperiment.fireWatchInDuckPlayerPixel()
+            Pixel.fire(.watchInDuckPlayerInitial, limitTo: .initial)
         }
         return nil
     }

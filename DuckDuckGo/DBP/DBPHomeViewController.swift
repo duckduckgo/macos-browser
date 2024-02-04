@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import DataBrokerProtection
 import AppKit
@@ -199,3 +201,5 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         fatalError("Use init()")
     }
 }
+
+#endif

@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import BrowserServicesKit
 import DataBrokerProtection
@@ -80,3 +82,5 @@ extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
         scheduler.stopScheduler()
     }
 }
+
+#endif

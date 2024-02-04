@@ -26,10 +26,13 @@ import NetworkExtension
 import NetworkProtection
 import NetworkProtectionProxy
 import NetworkProtectionUI
-import SystemExtensionManager
-import SystemExtensions
 import Networking
 import PixelKit
+
+#if NETP_SYSTEM_EXTENSION
+import SystemExtensionManager
+import SystemExtensions
+#endif
 
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void

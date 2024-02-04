@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1706033634940,
+    "version": 1706704064294,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1056,7 +1056,16 @@
         "customUserAgent": {
             "settings": {
                 "defaultPolicy": "brand",
-                "defaultSites": [],
+                "defaultSites": [
+                    {
+                        "domain": "chase.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/988"
+                    },
+                    {
+                        "domain": "web.whatsapp.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1780"
+                    }
+                ],
                 "webViewDefault": [
                     {
                         "domain": "accounts.google.com",
@@ -1078,7 +1087,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "005f62f0e37756cedcc2acfcb4216966"
+            "hash": "492b7a86e347eae43cf3d6f633a184ff"
         },
         "dbp": {
             "state": "enabled",
@@ -1098,8 +1107,8 @@
                 }
             },
             "exceptions": [],
-            "minSupportedVersion": "1.68.0",
-            "hash": "04f130fe1e3e088c7859ef6aa4a64e5c"
+            "minSupportedVersion": "1.70.0",
+            "hash": "c90b300b1e5ab20c29a726c8de9fd2da"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -4533,6 +4542,11 @@
             "state": "disabled",
             "hash": "841fa92b9728c9754f050662678f82c7"
         },
+        "notificationPermissions": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "privacyDashboard": {
             "exceptions": [],
             "features": {
@@ -5502,6 +5516,12 @@
                                 ]
                             },
                             {
+                                "rule": "doubleclick.net/pixel",
+                                "domains": [
+                                    "sbs.com.au"
+                                ]
+                            },
+                            {
                                 "rule": "doubleclick.net",
                                 "domains": [
                                     "rocketnews24.com"
@@ -5603,6 +5623,12 @@
                                 "rule": "ezodn.com/cmp",
                                 "domains": [
                                     "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "ezodn.com",
+                                "domains": [
+                                    "reisezoom.com"
                                 ]
                             }
                         ]
@@ -5937,7 +5963,8 @@
                                     "pandora.com",
                                     "paper-io.com",
                                     "rawstory.com",
-                                    "usatoday.com"
+                                    "usatoday.com",
+                                    "washingtonpost.com"
                                 ]
                             }
                         ]
@@ -6467,6 +6494,16 @@
                                 "domains": [
                                     "shein.co.uk",
                                     "shein.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "mailerlite.com": {
+                        "rules": [
+                            {
+                                "rule": "mailerlite.com",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -7312,6 +7349,16 @@
                             }
                         ]
                     },
+                    "tremorhub.com": {
+                        "rules": [
+                            {
+                                "rule": "tremorhub.com/getTVID",
+                                "domains": [
+                                    "sbs.com.au"
+                                ]
+                            }
+                        ]
+                    },
                     "trustpilot.com": {
                         "rules": [
                             {
@@ -7626,7 +7673,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "382d31e2e646df92c16cc183b57dc969"
+            "hash": "c9ea7e3d491209cc42758decdbbb8143"
         },
         "trackingCookies1p": {
             "settings": {
