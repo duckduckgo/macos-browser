@@ -111,13 +111,9 @@ extension IPCServiceManager: IPCServerInterface {
         scheduler.runAllOperations(showWebView: showWebView)
     }
 
-#if DEBUG || REVIEW
-
     func openBrowser(domain: String) {
         Task { @MainActor in
             browserWindowManager.show(domain: domain)
         }
     }
-
-#endif
 }
