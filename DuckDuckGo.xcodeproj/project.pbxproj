@@ -65,6 +65,9 @@
 		1DA6D0FE2A1FF9A100540406 /* HTTPCookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */; };
 		1DA6D1022A1FFA3700540406 /* HTTPCookieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FF2A1FF9DC00540406 /* HTTPCookieTests.swift */; };
 		1DA6D1032A1FFA3B00540406 /* HTTPCookieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DA6D0FF2A1FF9DC00540406 /* HTTPCookieTests.swift */; };
+		1DB67F292B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB67F282B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift */; };
+		1DB67F2A2B6FEB17003DF243 /* WebViewSnapshotRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB67F282B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift */; };
+		1DB67F2B2B6FEB19003DF243 /* WebViewSnapshotRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB67F282B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift */; };
 		1DB9617A29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */; };
 		1DB9617B29F1D06D00CF5568 /* InternalUserDeciderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */; };
 		1DB9618229F67F6100CF5568 /* FaviconNullStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */; };
@@ -3290,6 +3293,7 @@
 		1D9A4E592B43213B00F449E2 /* TabSnapshotExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSnapshotExtension.swift; sourceTree = "<group>"; };
 		1DA6D0FC2A1FF9A100540406 /* HTTPCookie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPCookie.swift; sourceTree = "<group>"; };
 		1DA6D0FF2A1FF9DC00540406 /* HTTPCookieTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPCookieTests.swift; sourceTree = "<group>"; };
+		1DB67F282B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewSnapshotRenderer.swift; sourceTree = "<group>"; };
 		1DB9617929F1D06D00CF5568 /* InternalUserDeciderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderMock.swift; sourceTree = "<group>"; };
 		1DB9617F29F67F3E00CF5568 /* FaviconNullStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconNullStore.swift; sourceTree = "<group>"; };
 		1DC6696F2B6CF0D700AA0645 /* TabPreviewPersistanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPreviewPersistanceService.swift; sourceTree = "<group>"; };
@@ -4799,6 +4803,14 @@
 				1D8057C72A83CAEE00F4FED6 /* SupportedOsChecker.swift */,
 			);
 			path = OsVersion;
+			sourceTree = "<group>";
+		};
+		1DB67F272B6FE21D003DF243 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				1DB67F282B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		1DC6696E2B6CF08200AA0645 /* Services */ = {
@@ -7611,6 +7623,7 @@
 				AAE8B101258A41C000E81239 /* TabPreview.storyboard */,
 				AAC82C5F258B6CB5009B6B42 /* TabPreviewWindowController.swift */,
 				AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */,
+				1DB67F272B6FE21D003DF243 /* Model */,
 				1DC6696E2B6CF08200AA0645 /* Services */,
 			);
 			path = TabPreview;
@@ -9645,6 +9658,7 @@
 				B6AFE6BC29A5D3F8002FF962 /* PrivacyDashboardTabExtension.swift in Sources */,
 				3706FB32293F65D500E42796 /* FirefoxBookmarksReader.swift in Sources */,
 				3706FB33293F65D500E42796 /* DeviceIdleStateDetector.swift in Sources */,
+				1DB67F2A2B6FEB17003DF243 /* WebViewSnapshotRenderer.swift in Sources */,
 				3706FB35293F65D500E42796 /* FlatButton.swift in Sources */,
 				3706FB36293F65D500E42796 /* PinnedTabView.swift in Sources */,
 				3706FB37293F65D500E42796 /* DataEncryption.swift in Sources */,
@@ -11163,6 +11177,7 @@
 				4B957B5C2AC7AE700062CA31 /* PinnedTabsViewModel.swift in Sources */,
 				4B957B5D2AC7AE700062CA31 /* BookmarkList.swift in Sources */,
 				4B957B5E2AC7AE700062CA31 /* NEOnDemandRuleExtension.swift in Sources */,
+				1DB67F2B2B6FEB19003DF243 /* WebViewSnapshotRenderer.swift in Sources */,
 				4B957B5F2AC7AE700062CA31 /* BookmarkTableRowView.swift in Sources */,
 				4B957B602AC7AE700062CA31 /* FavoritesView.swift in Sources */,
 				3158B1522B0BF75400AF130C /* DataBrokerProtectionLoginItemScheduler.swift in Sources */,
@@ -11688,6 +11703,7 @@
 				B68C2FB227706E6A00BF2C7D /* ProcessExtension.swift in Sources */,
 				B6106BA726A7BECC0013B453 /* PermissionAuthorizationQuery.swift in Sources */,
 				3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */,
+				1DB67F292B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift in Sources */,
 				4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */,
 				B6BCC53B2AFD15DF002C5499 /* DataImportProfilePicker.swift in Sources */,
 				3158B1562B0BF75D00AF130C /* DataBrokerProtectionFeatureVisibility.swift in Sources */,
