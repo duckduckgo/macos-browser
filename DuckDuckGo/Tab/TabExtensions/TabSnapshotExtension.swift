@@ -73,8 +73,6 @@ final class TabSnapshotExtension {
         contentPublisher.sink { [weak self] tabContent in
             self?.tabContent = tabContent
         }.store(in: &cancellables)
-
-        generateSnapshotAfterLoad = true
     }
 
     deinit {
@@ -237,6 +235,7 @@ extension TabSnapshotExtension: NSCodingExtension {
               let identifier = UUID(uuidString: uuidString as String) else {
             os_log("Snapshot id restoration failed", log: .tabSnapshots)
             self.identifier = UUID()
+            generateSnapshotAfterLoad = true
             return
         }
 
