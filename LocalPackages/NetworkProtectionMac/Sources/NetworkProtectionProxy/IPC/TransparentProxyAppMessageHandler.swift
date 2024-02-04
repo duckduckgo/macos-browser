@@ -77,8 +77,6 @@ final class TransparentProxyAppMessageHandler {
             settings.appRoutingRules = routingRules
         case .dryMode(let newValue):
             settings.dryMode = newValue
-        case .excludeDBP(let newValue):
-            settings.excludeDBP = newValue
         case .excludedDomains(let excludedDomains):
             settings.excludedDomains = excludedDomains
         }

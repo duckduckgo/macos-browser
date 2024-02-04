@@ -23,7 +23,6 @@ public final class TransparentProxySettings {
     public enum Change: Codable {
         case appRoutingRules(_ routingRules: VPNAppRoutingRules)
         case dryMode(_ value: Bool)
-        case excludeDBP(_ value: Bool)
         case excludedDomains(_ excludedDomains: [String])
     }
 
@@ -42,12 +41,6 @@ public final class TransparentProxySettings {
                 .removeDuplicates()
                 .map { value in
                     Change.dryMode(value)
-                }.eraseToAnyPublisher(),
-            defaults.vpnProxyExcludeDBPPublisher
-                .dropFirst()
-                .removeDuplicates()
-                .map { value in
-                    Change.excludeDBP(value)
                 }.eraseToAnyPublisher(),
             defaults.vpnProxyExcludedDomainsPublisher
                 .dropFirst()
@@ -84,16 +77,6 @@ public final class TransparentProxySettings {
         }
     }
 
-    public var excludeDBP: Bool {
-        get {
-            defaults.vpnProxyExcludeDBP
-        }
-
-        set {
-            defaults.vpnProxyExcludeDBP = newValue
-        }
-    }
-
     public var excludedDomains: [String] {
         get {
             defaults.vpnProxyExcludedDomains
@@ -109,7 +92,6 @@ public final class TransparentProxySettings {
     public func resetAll() {
         defaults.resetVPNProxyAppRoutingRules()
         defaults.resetVPNProxyDryMode()
-        defaults.resetVPNProxyExcludeDBP()
         defaults.resetVPNProxyExcludedDomains()
     }
 
@@ -142,13 +124,12 @@ public final class TransparentProxySettings {
     // MARK: - Snapshot support
 
     public func snapshot() -> TransparentProxySettingsSnapshot {
-        .init(appRoutingRules: appRoutingRules, dryMode: dryMode, excludeDBP: excludeDBP, excludedDomains: excludedDomains)
+        .init(appRoutingRules: appRoutingRules, dryMode: dryMode, excludedDomains: excludedDomains)
     }
 
     public func apply(_ snapshot: TransparentProxySettingsSnapshot) {
         appRoutingRules = snapshot.appRoutingRules
         dryMode = snapshot.dryMode
-        excludeDBP = snapshot.excludeDBP
         excludedDomains = snapshot.excludedDomains
     }
 }
@@ -158,6 +139,5 @@ public struct TransparentProxySettingsSnapshot: Codable {
 
     public let appRoutingRules: VPNAppRoutingRules
     public let dryMode: Bool
-    public let excludeDBP: Bool
     public let excludedDomains: [String]
 }

@@ -54,7 +54,6 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
         }()
 
         let configuration = TransparentProxyProvider.Configuration(
-            dbpAgentBundleID: Bundle.main.dbpBackgroundAgentBundleId,
             loadSettingsFromProviderConfiguration: loadSettingsFromStartupOptions)
 
         super.init(settings: settings,

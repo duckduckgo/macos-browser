@@ -25,10 +25,6 @@ extension TransparentProxyProvider {
     /// This should not be passed in the startup options dictionary.
     ///
     public struct Configuration {
-        /// The DBP Agent bundleID for excluding DBP traffic.
-        ///
-        let dbpAgentBundleID: String
-
         /// Whether the proxy settings should be loaded from the provider configuration in the startup options.
         ///
         /// We recommend setting this to true if the provider is running in a System Extension and can't access
@@ -37,8 +33,7 @@ extension TransparentProxyProvider {
         ///
         let loadSettingsFromProviderConfiguration: Bool
 
-        public init(dbpAgentBundleID: String, loadSettingsFromProviderConfiguration: Bool) {
-            self.dbpAgentBundleID = dbpAgentBundleID
+        public init(loadSettingsFromProviderConfiguration: Bool) {
             self.loadSettingsFromProviderConfiguration = loadSettingsFromProviderConfiguration
         }
     }
