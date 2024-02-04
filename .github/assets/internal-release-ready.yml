@@ -1,0 +1,7 @@
+data:
+  html_text: |
+    <body><h2>Internal release build ${tag} ready</h2><ul>
+    <li>Repository is tagged with <code>${tag}</code> tag.</li>
+    <li><code>${branch}</code> branch has been successfully merged to <code>${base_branch}</code>.</li>
+    <li>GitHub release is created at <a href='${release_url}'>${release_url}</a>.</li></ul>
+    Workflow URL: <a href='${workflow_url}'>${workflow_url}</a>.</body>
