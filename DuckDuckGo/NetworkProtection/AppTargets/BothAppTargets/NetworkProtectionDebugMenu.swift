@@ -627,7 +627,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     // MARK: - Exclusions
 
-    private let ddgBrowserAppIdentifier = AppIdentifier(bundleID: Bundle.main.bundleIdentifier!)
+    private let ddgBrowserAppIdentifier = VPNRoutingAppIdentifier(bundleID: Bundle.main.bundleIdentifier!)
 
     private func updateExclusionsMenu() {
         excludeDBPTrafficFromVPN.state = transparentProxySettings.excludeDBP ? .on : .off

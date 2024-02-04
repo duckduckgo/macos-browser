@@ -213,15 +213,22 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         }
 
         switch path(for: flow) {
-        case .throughVPN:
-            return false
-        case .excludedFromVPN(let reason):
+        case .block(let reason):
             switch reason {
-            case .appIsExcluded(let bundleID):
-                logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Proxying traffic due to app exclusion")
-            case .domainIsExcluded(let domain):
-                logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Proxying traffic due to domain exclusion")
+            case .appRule:
+                logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Blocking traffic due to app rule")
+            case .domainRule:
+                logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Blocking traffic due to domain rule")
             }
+        case .excludeFromVPN(let reason):
+            switch reason {
+            case .appRule:
+                logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Excluding traffic due to app rule")
+            case .domainRule:
+                logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Excluding traffic due to domain rule")
+            }
+        case .routeThroughVPN:
+            return false
         }
 
         flow.networkInterface = directInterface
@@ -260,15 +267,22 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         }
 
         switch path(for: flow) {
-        case .throughVPN:
-            return false
-        case .excludedFromVPN(let reason):
+        case .block(let reason):
             switch reason {
-            case .appIsExcluded(let bundleID):
-                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Proxying traffic due to app exclusion")
-            case .domainIsExcluded(let domain):
-                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Proxying traffic due to domain exclusion")
+            case .appRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Blocking traffic due to app rule")
+            case .domainRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Blocking traffic due to domain rule")
             }
+        case .excludeFromVPN(let reason):
+            switch reason {
+            case .appRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Excluding traffic due to app rule")
+            case .domainRule:
+                logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Excluding traffic due to domain rule")
+            }
+        case .routeThroughVPN:
+            return false
         }
 
         flow.networkInterface = directInterface
@@ -326,39 +340,34 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     // MARK: - VPN exclusions logic
 
     private enum FlowPath {
-        case throughVPN
-        case excludedFromVPN(reason: ExclusionReason)
+        case block(dueTo: Reason)
+        case excludeFromVPN(dueTo: Reason)
+        case routeThroughVPN
 
-        enum ExclusionReason {
-            case appIsExcluded(bundleID: String)
-            case domainIsExcluded(_ domain: String)
+        enum Reason {
+            case appRule
+            case domainRule
         }
     }
 
     private func path(for flow: NEAppProxyFlow) -> FlowPath {
-        guard !isFromExcludedApp(flow) else {
-            return .excludedFromVPN(reason: .appIsExcluded(bundleID: flow.metaData.sourceAppSigningIdentifier))
+        let appIdentifier = VPNRoutingAppIdentifier(bundleID: flow.metaData.sourceAppSigningIdentifier)
+
+        switch settings.appRoutingRules[appIdentifier] {
+        case .none:
+            if let hostname = flow.remoteHostname,
+               isExcludedDomain(hostname) {
+                return .excludeFromVPN(dueTo: .domainRule)
+            }
+
+            return .routeThroughVPN
+        case .block:
+            return .block(dueTo: .appRule)
+        case .exclude:
+            return .excludeFromVPN(dueTo: .domainRule)
         }
 
-        if let hostname = flow.remoteHostname,
-           isExcludedDomain(hostname) {
-            return .excludedFromVPN(reason: .domainIsExcluded(hostname))
-        }
-
-        return .throughVPN
-    }
-
-    private func isFromExcludedApp(_ flow: NEAppProxyFlow) -> Bool {
-        if settings.excludeDBP
-            && flow.metaData.sourceAppSigningIdentifier == configuration.dbpAgentBundleID {
-            return true
-        }
-
-        for app in settings.excludedApps where flow.metaData.sourceAppSigningIdentifier == app.bundleID {
-            return true
-        }
-
-        return false
+        return .routeThroughVPN
     }
 
     private func isExcludedDomain(_ hostname: String) -> Bool {

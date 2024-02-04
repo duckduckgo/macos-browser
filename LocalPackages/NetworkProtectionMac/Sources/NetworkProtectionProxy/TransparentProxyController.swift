@@ -220,7 +220,7 @@ public final class TransparentProxyController {
     // MARK: - Start & stop the proxy
 
     public var isRequiredForActiveFeatures: Bool {
-        settings.excludeDBP || settings.excludedApps.count > 0 || settings.excludedDomains.count > 0
+        settings.excludeDBP || settings.appRoutingRules.count > 0 || settings.excludedDomains.count > 0
     }
 
     public func start() async throws {

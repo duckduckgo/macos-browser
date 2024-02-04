@@ -73,12 +73,12 @@ final class TransparentProxyAppMessageHandler {
     ///
     private func handle(_ settingChange: TransparentProxySettings.Change) {
         switch settingChange {
+        case .appRoutingRules(let routingRules):
+            settings.appRoutingRules = routingRules
         case .dryMode(let newValue):
             settings.dryMode = newValue
         case .excludeDBP(let newValue):
             settings.excludeDBP = newValue
-        case .excludedApps(let excludedApps):
-            settings.excludedApps = excludedApps
         case .excludedDomains(let excludedDomains):
             settings.excludedDomains = excludedDomains
         }

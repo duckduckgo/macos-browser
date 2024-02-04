@@ -20,60 +20,60 @@ import Combine
 import Foundation
 
 extension UserDefaults {
-    private var vpnProxyExcludedAppsDataKey: String {
-        "vpnProxyExcludedAppsData"
+    private var vpnProxyAppRoutingRulesDataKey: String {
+        "vpnProxyAppRoutingRulesData"
     }
 
     @objc
-    dynamic var vpnProxyExcludedAppsData: Data? {
+    dynamic var vpnProxyAppRoutingRulesData: Data? {
         get {
-            object(forKey: vpnProxyExcludedAppsDataKey) as? Data
+            object(forKey: vpnProxyAppRoutingRulesDataKey) as? Data
         }
 
         set {
             guard let newValue,
                newValue.count > 0 else {
 
-                removeObject(forKey: vpnProxyExcludedAppsDataKey)
+                removeObject(forKey: vpnProxyAppRoutingRulesDataKey)
                 return
             }
 
-            set(newValue, forKey: vpnProxyExcludedAppsDataKey)
+            set(newValue, forKey: vpnProxyAppRoutingRulesDataKey)
         }
     }
 
-    var vpnProxyExcludedApps: [AppIdentifier] {
+    var vpnProxyAppRoutingRules: VPNAppRoutingRules {
         get {
-            guard let data = vpnProxyExcludedAppsData,
-                  let excludedApps = try? JSONDecoder().decode([AppIdentifier].self, from: data) else {
-                return []
+            guard let data = vpnProxyAppRoutingRulesData,
+                  let routingRules = try? JSONDecoder().decode(VPNAppRoutingRules.self, from: data) else {
+                return [:]
             }
 
-            return excludedApps
+            return routingRules
         }
 
         set {
             if newValue.isEmpty {
-                vpnProxyExcludedAppsData = nil
+                vpnProxyAppRoutingRulesData = nil
                 return
             }
 
             guard let data = try? JSONEncoder().encode(newValue) else {
-                vpnProxyExcludedAppsData = nil
+                vpnProxyAppRoutingRulesData = nil
                 return
             }
 
-            vpnProxyExcludedAppsData = data
+            vpnProxyAppRoutingRulesData = data
         }
     }
 
-    var vpnProxyExcludedAppsPublisher: AnyPublisher<[AppIdentifier], Never> {
-        publisher(for: \.vpnProxyExcludedAppsData).map { [weak self] _ in
-            self?.vpnProxyExcludedApps ?? []
+    var vpnProxyAppRoutingRulesPublisher: AnyPublisher<VPNAppRoutingRules, Never> {
+        publisher(for: \.vpnProxyAppRoutingRulesData).map { [weak self] _ in
+            self?.vpnProxyAppRoutingRules ?? [:]
         }.eraseToAnyPublisher()
     }
 
-    func resetVPNProxyExcludedApps() {
-        removeObject(forKey: vpnProxyExcludedAppsDataKey)
+    func resetVPNProxyAppRoutingRules() {
+        removeObject(forKey: vpnProxyAppRoutingRulesDataKey)
     }
 }
