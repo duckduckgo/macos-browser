@@ -134,9 +134,9 @@ jobs:
 
     - name: Upload variant DMG
       env:
-        TEST_AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-        TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
-        TEST_AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+        AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
       run: |
         aws s3 cp duckduckgo.dmg \
           s3://${{ vars.TEST_RELEASE_BUCKET_NAME }}/${{ vars.TEST_RELEASE_BUCKET_PREFIX }}/${{ matrix.variant }}/duckduckgo.dmg \

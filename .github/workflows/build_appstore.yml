@@ -92,10 +92,9 @@ jobs:
       env:
         is-official-release: ${{ env.destination == 'appstore' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
       run: |
-        upload_to=
         if [[ "${{ env.is-official-release }}" == "true" ]]; then
           upload_to=s3
-        else if [[ "${{ env.asana-task-url }}" ]]; then
+        elif [[ -n "${{ env.asana-task-url }}" ]]; then
           upload_to=asana
         fi
         echo "upload-to=${upload_to}" >> $GITHUB_OUTPUT
@@ -115,31 +114,39 @@ jobs:
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
         bundle exec fastlane release_${{ env.destination }}
-        dsyms_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
-        mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsyms_path}"
+        dsym_path="${{ github.workspace }}/DuckDuckGo-AppStore.app.dSYM.zip"
+        mv -f "${{ github.workspace }}/DuckDuckGo App Store.app.dSYM.zip" "${dsym_path}"
         version="$(cut -d ' ' -f 3 < Configuration/Version.xcconfig)"
         build_number="$(cut -d ' ' -f 3 < Configuration/BuildNumber.xcconfig)"
-        echo "dsyms_path=${dsyms_path}" >> $GITHUB_ENV
-        echo "app_version=${version}.${build_number}" >> $GITHUB_ENV
+        echo "dsym-path=${dsym_path}" >> $GITHUB_ENV
+        echo "app-version=${version}.${build_number}" >> $GITHUB_ENV
 
     - name: Upload dSYMs artifact
       uses: actions/upload-artifact@v4
       with:
-        name: DuckDuckGo-${{ env.destination }}-dSYM-${{ env.app_version }}
-        path: ${{ env.dsyms_path }}
+        name: DuckDuckGo-${{ env.destination }}-dSYM-${{ env.app-version }}
+        path: ${{ env.dsym-path }}
 
     - name: Upload dSYMs to S3
+      id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}
       env:
-        TEST_AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-        TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-        TEST_AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
-        TEST_DSYM_BUCKET_NAME: ${{ vars.TEST_DSYM_BUCKET_NAME }}
-        TEST_DSYM_BUCKET_PREFIX: ${{ vars.TEST_DSYM_BUCKET_PREFIX }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        DSYM_S3_PATH: s3://${{ vars.TEST_DSYM_BUCKET_NAME }}/${{ vars.TEST_DSYM_BUCKET_PREFIX_APPSTORE }}/DuckDuckGo-${{ env.app-version }}-dSYM.zip
       run: |
-        aws s3 cp \
-          ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip \
-          s3://${{ env.TEST_DSYM_BUCKET_NAME }}/${{ env.TEST_DSYM_BUCKET_PREFIX }}/
+        echo "dsym-s3-path=${DSYM_S3_PATH}" >> $GITHUB_OUTPUT
+        aws s3 cp ${{ env.dsym-path }} ${{ env.DSYM_S3_PATH }}
+
+    - name: Report success
+      uses: ./.github/actions/asana-log-message
+      env:
+        DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
+      with:
+        task-url: ${{ env.asana-task-url }}
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        comment: "Debug symbols for ${{ env.app-version }} build are uploaded to ${{ env.DSYM_S3_PATH }}."
 
     - name: Send Mattermost message
       env:

@@ -99,6 +99,7 @@ jobs:
     env:
       release-type: ${{ github.event.inputs.release-type || inputs.release-type }}
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      branch: ${{ inputs.branch || github.ref_name }}
 
     steps:
 
@@ -106,21 +107,20 @@ jobs:
       uses: actions/checkout@v3
       with:
         submodules: recursive
-        ref: ${{ inputs.branch || github.ref_name }}
+        ref: ${{ env.branch }}
 
     - name: Check if this is an official release build
       id: is-official-release
       env:
-        is-official-release: ${{ env.release-type == 'release' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
+        is-official-release: ${{ env.release-type == 'release' && (startsWith(env.branch, 'release') || startsWith(env.branch, 'hotfix')) }}
       run: |
-        upload_to=
         if [[ "${{ env.is-official-release }}" == "true" ]]; then
-          upload_to=s3
-        else if [[ "${{ env.asana-task-url }}" ]]; then
-          upload_to=asana
+          echo "upload-to=s3" >> $GITHUB_OUTPUT
+          echo "upload-to=s3" >> $GITHUB_ENV
+        elif [[ -n "${{ env.asana-task-url }}" ]]; then
+          echo "upload-to=asana" >> $GITHUB_OUTPUT
+          echo "upload-to=asana" >> $GITHUB_ENV
         fi
-        echo "upload-to=${upload_to}" >> $GITHUB_OUTPUT
-        echo "upload-to=${upload_to}" >> $GITHUB_ENV
 
     - name: Install Apple Developer ID Application certificate
       uses: ./.github/actions/install-certs-and-profiles
@@ -165,6 +165,7 @@ jobs:
       run: |
         echo "app-version=${{ env.app-version }}" >> $GITHUB_OUTPUT
         echo "app-name=${{ env.app-name }}" >> $GITHUB_OUTPUT
+        echo "dsym-name=DuckDuckGo-${{ env.app-version }}-dSYM.zip" >> $GITHUB_OUTPUT
 
     - name: Upload app artifact
       uses: actions/upload-artifact@v4
@@ -176,7 +177,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: DuckDuckGo-${{ env.release-type }}-dSYM-${{ env.app-version }}
-        path: ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip
+        path: ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }}
 
     - name: Extract Asana Task ID
       id: task-id
@@ -194,17 +195,25 @@ jobs:
         task-id: ${{ steps.task-id.outputs.task-id }}
 
     - name: Upload dSYMs to S3
+      id: upload-dsyms-to-s3
       if: ${{ env.upload-to == 's3' }}
       env:
-        TEST_AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-        TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-        TEST_AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
-        TEST_DSYM_BUCKET_NAME: ${{ vars.TEST_DSYM_BUCKET_NAME }}
-        TEST_DSYM_BUCKET_PREFIX: ${{ vars.TEST_DSYM_BUCKET_PREFIX }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        DSYM_S3_PATH: s3://${{ vars.TEST_DSYM_BUCKET_NAME }}/${{ vars.TEST_DSYM_BUCKET_PREFIX }}/${{ steps.set-outputs.outputs.dsym-name }}
       run: |
-        aws s3 cp \
-          ${{ github.workspace }}/release/DuckDuckGo-${{ env.app-version }}-dSYM.zip \
-          s3://${{ env.TEST_DSYM_BUCKET_NAME }}/${{ env.TEST_DSYM_BUCKET_PREFIX }}/
+        echo "dsym-s3-path=${DSYM_S3_PATH}" >> $GITHUB_OUTPUT
+        aws s3 cp ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }} ${{ env.DSYM_S3_PATH }}
+
+    - name: Report success
+      uses: ./.github/actions/asana-log-message
+      env:
+        DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
+      with:
+        task-url: ${{ env.asana-task-url }}
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        comment: "Debug symbols for ${{ env.app-version }} build are uploaded to ${{ env.DSYM_S3_PATH }}."
 
   create-dmg:
 
@@ -272,9 +281,9 @@ jobs:
     - name: Upload DMG to S3
       if: ${{ env.upload-to == 's3' }}
       env:
-        TEST_AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-        TEST_AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-        TEST_AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
         TEST_RELEASE_BUCKET_NAME: ${{ vars.TEST_RELEASE_BUCKET_NAME }}
         TEST_RELEASE_BUCKET_PREFIX: ${{ vars.TEST_RELEASE_BUCKET_PREFIX }}
       run: |
@@ -287,7 +296,7 @@ jobs:
       with:
         task-url: ${{ env.asana-task-url }}
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        comment: "DMG for ${{ env.app-version }} is available at ${{ vars.TEST_DMG_URL_ROOT }}/${{ steps.create-dmg.outputs.dmg }}."
+        comment: "DMG for ${{ env.app-version }} is available at ${{ vars.TEST_DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}."
 
     - name: Extract Asana Task ID
       id: task-id
