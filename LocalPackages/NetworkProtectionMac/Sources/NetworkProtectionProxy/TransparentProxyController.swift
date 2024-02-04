@@ -38,6 +38,8 @@ public final class TransparentProxyController {
     ///
     public let setup: ManagerSetupCallback
 
+    private var internalManager: NETransparentProxyManager?
+
     /// Whether the proxy settings should be stored in the provider configuration.
     ///
     /// We recommend setting this to true if the provider is running in a System Extension and can't access
@@ -45,9 +47,8 @@ public final class TransparentProxyController {
     /// use a shared `TransparentProxySettings` and set this to false.
     ///
     private let storeSettingsInProviderConfiguration: Bool
-
     private let settings: TransparentProxySettings
-
+    private let notificationCenter: NotificationCenter
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initializers
@@ -65,17 +66,35 @@ public final class TransparentProxyController {
     public init(extensionID: String,
                 storeSettingsInProviderConfiguration: Bool,
                 settings: TransparentProxySettings,
+                notificationCenter: NotificationCenter = .default,
                 setup: @escaping ManagerSetupCallback) {
 
         self.extensionID = extensionID
+        self.notificationCenter = notificationCenter
         self.settings = settings
         self.setup = setup
         self.storeSettingsInProviderConfiguration = storeSettingsInProviderConfiguration
 
+        subscribeToProviderConfigurationChanges()
         subscribeToSettingsChanges()
     }
 
     // MARK: - Relay Settings Changes
+
+    private func subscribeToProviderConfigurationChanges() {
+        notificationCenter.publisher(for: .NEVPNConfigurationChange)
+            .receive(on: DispatchQueue.main)
+            .sink { notification in
+                self.reloadProviderConfiguration()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func reloadProviderConfiguration() {
+        Task { @MainActor in
+            try? await self.manager?.loadFromPreferences()
+        }
+    }
 
     private func subscribeToSettingsChanges() {
         settings.changePublisher
@@ -86,18 +105,20 @@ public final class TransparentProxyController {
 
     private func relay(_ change: TransparentProxySettings.Change) {
         Task { @MainActor in
-            guard await isConnected, let activeSession = await activeSession() else {
+            guard let session = await session else {
                 return
             }
 
-            do {
-                try TransparentProxySession(activeSession).send(.changeSetting(change, responseHandler: {
-                    // no-op
-                }))
-            } catch {
-                // throw error?
-                os_log("🤌 Setting change relay: Some error! %{public}@", String(describing: error))
+            switch session.status {
+            case .connected, .connecting, .reasserting:
+                break
+            default:
+                return
             }
+
+            try TransparentProxySession(session).send(.changeSetting(change, responseHandler: {
+                // no-op
+            }))
         }
     }
 
@@ -105,9 +126,17 @@ public final class TransparentProxyController {
 
     /// Loads the configuration matching our ``extensionID``.
     ///
-    public func loadExisting() async -> NETransparentProxyManager? {
-        try? await NETransparentProxyManager.loadAllFromPreferences().first { manager in
-            (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == extensionID
+    public var manager: NETransparentProxyManager? {
+        get async {
+            if let internalManager {
+                return internalManager
+            }
+
+            let manager = try? await NETransparentProxyManager.loadAllFromPreferences().first { manager in
+                (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == extensionID
+            }
+            internalManager = manager
+            return manager
         }
     }
 
@@ -116,7 +145,11 @@ public final class TransparentProxyController {
     /// - Returns a properly configured `NETransparentProxyManager`.
     ///
     public func loadOrCreateConfiguration() async throws -> NETransparentProxyManager {
-        let manager = await loadExisting() ?? NETransparentProxyManager()
+        let manager = await manager ?? {
+            let manager = NETransparentProxyManager()
+            internalManager = manager
+            return manager
+        }()
 
         await setup(manager)
         setupAdditionalProviderConfiguration(manager)
@@ -155,50 +188,51 @@ public final class TransparentProxyController {
 
     }
 
-    // MARK: - Session
+    // MARK: - Connection & Session
 
-    public func activeSession() async -> NETunnelProviderSession? {
-        guard let manager = await loadExisting(),
-              let session = manager.connection as? NETunnelProviderSession else {
-
-            // The active connection is not running, so there's no session, this is acceptable
-            return nil
+    public var connection: NEVPNConnection? {
+        get async {
+            await manager?.connection
         }
+    }
 
-        return session
+    public var session: NETunnelProviderSession? {
+        get async {
+            guard let manager = await manager,
+                  let session = manager.connection as? NETunnelProviderSession else {
+
+                // The active connection is not running, so there's no session, this is acceptable
+                return nil
+            }
+
+            return session
+        }
     }
 
     // MARK: - Connection
 
-    /// Queries Network Protection to know if its VPN is connected.
-    ///
-    /// - Returns: `true` if the VPN is connected, connecting or reasserting, and `false` otherwise.
-    ///
-    public var isConnected: Bool {
+    public var status: NEVPNStatus {
         get async {
-            guard let manager = await loadExisting() else {
-                return false
-            }
-
-            switch manager.connection.status {
-            case .connected, .connecting, .reasserting:
-                return true
-            default:
-                return false
-            }
+            await connection?.status ?? .disconnected
         }
     }
 
+    // MARK: - Start & stop the proxy
+
+    public var canStart: Bool {
+        settings.excludeDBP || settings.excludedApps.count > 0 || settings.excludedDomains.count > 0
+    }
+
     public func start() async throws {
+        guard canStart else {
+            return
+        }
+
         let manager = try await loadOrCreateConfiguration()
         try manager.connection.startVPNTunnel(options: [:])
     }
 
     public func stop() async {
-        guard let manager = await loadExisting() else {
-            return
-        }
-
-        manager.connection.stopVPNTunnel()
+        await connection?.stopVPNTunnel()
     }
 }

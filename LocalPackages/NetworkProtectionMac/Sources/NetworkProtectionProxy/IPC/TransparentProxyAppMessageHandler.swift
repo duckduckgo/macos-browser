@@ -34,7 +34,6 @@ final class TransparentProxyAppMessageHandler {
             let message = try JSONDecoder().decode(TransparentProxyMessage.self, from: data)
             return await handle(message)
         } catch {
-            os_log("🤌 Error handling app message")
             return nil
         }
     }
@@ -73,8 +72,6 @@ final class TransparentProxyAppMessageHandler {
     /// Handles a settings change.
     ///
     private func handle(_ settingChange: TransparentProxySettings.Change) {
-        os_log("🤌 Setting changed: %{public}@", String(describing: settingChange))
-
         switch settingChange {
         case .dryMode(let newValue):
             settings.dryMode = newValue

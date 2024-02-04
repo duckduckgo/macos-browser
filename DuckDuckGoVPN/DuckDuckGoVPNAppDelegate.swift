@@ -80,6 +80,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
 
     @MainActor
+    private lazy var vpnController = VPNController(
+        tunnelController: tunnelController,
+        proxyController: proxyController)
+
+    @MainActor
     private lazy var proxyController = TransparentProxyController(
         extensionID: networkExtensionBundleID,
         storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
@@ -102,10 +107,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             protocolConfiguration.disconnectOnSleep = false
 
             // kill switch
-            //protocolConfiguration.enforceRoutes = false
+            // protocolConfiguration.enforceRoutes = false
 
             // this setting breaks Connection Tester
-            //protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
+            // protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 
             // This is intentionally not used but left here for documentation purposes.
             // The reason for this is that we want to have full control of the routes that
@@ -121,8 +126,6 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var tunnelController = NetworkProtectionTunnelController(
         networkExtensionBundleID: networkExtensionBundleID,
         networkExtensionController: networkExtensionController,
-        proxyController: proxyController,
-        statusObserver: statusObserver,
         settings: tunnelSettings)
 
     /// An IPC server that provides access to the tunnel controller.
@@ -227,6 +230,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         // Initialize the IPC server
         _ = tunnelControllerIPCService
+        _ = vpnController
 
         let dryRun: Bool
 

@@ -36,9 +36,9 @@ typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
 
-    // MARK: - Proxy Controller
+    // MARK: - VPN Status
 
-    private let proxyController: TransparentProxyController
+    private(set) var status: NEVPNStatus = .invalid
 
     // MARK: - Settings
 
@@ -64,6 +64,8 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
+    private let notificationCenter: NotificationCenter
+
     // MARK: - VPN Tunnel & Configuration
 
     /// Auth token store
@@ -86,10 +88,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @UserDefaultsWrapper(key: .networkProtectionOnboardingStatusRawValue, defaultValue: OnboardingStatus.default.rawValue, defaults: .netP)
     private(set) var onboardingStatusRawValue: OnboardingStatus.RawValue
 
-    // MARK: - Status Observer
-
-    let statusObserver: ConnectionStatusObserver
-
     // MARK: - Tunnel Manager
 
     /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
@@ -98,8 +96,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     @MainActor
     private func loadTunnelManager() async -> NETunnelProviderManager? {
-        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-        return tunnels?.first {
+        try? await NETunnelProviderManager.loadAllFromPreferences().first {
             ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == networkExtensionBundleID
         }
     }
@@ -129,22 +126,35 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
-         proxyController: TransparentProxyController,
-         statusObserver: ConnectionStatusObserver,
          settings: VPNSettings,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
+         notificationCenter: NotificationCenter = .default,
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
-        self.proxyController = proxyController
-        self.statusObserver = statusObserver
+        self.notificationCenter = notificationCenter
         self.settings = settings
         self.tokenStore = tokenStore
 
+        subscribeToProviderStatusChanges()
         subscribeToSettingsChanges()
-        subscribeToStatusChanges()
+    }
+
+    // MARK: - VPN Status Changes
+
+    private func subscribeToProviderStatusChanges() {
+        notificationCenter.publisher(for: .NEVPNStatusDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                guard let session = ConnectionSessionUtilities.session(from: notification) else {
+                    return
+                }
+
+                self?.status = session.status
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Tunnel Settings
@@ -230,23 +240,6 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }
     }
 
-    // MARK: - Status Changes
-
-    private func subscribeToStatusChanges() {
-        statusObserver.publisher.sink { status in
-            Task {
-                switch status {
-                case .connected:
-                    try? await self.proxyController.start()
-                case .disconnected:
-                    await self.proxyController.stop()
-                default:
-                    break
-                }
-            }
-        }.store(in: &cancellables)
-    }
-
     // MARK: - Tunnel Configuration
 
     /// Setups the tunnel manager if it's not set up already.
@@ -297,11 +290,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     var isConnected: Bool {
         get async {
-            guard let tunnelManager = await loadTunnelManager() else {
-                return false
-            }
-
-            switch tunnelManager.connection.status {
+            switch status {
             case .connected, .connecting, .reasserting:
                 return true
             default:

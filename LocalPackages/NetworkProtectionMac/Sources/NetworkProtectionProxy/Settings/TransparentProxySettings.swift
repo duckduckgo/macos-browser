@@ -72,6 +72,8 @@ public final class TransparentProxySettings {
         self.defaults = defaults
     }
 
+    // MARK: - Settings
+
     public var dryMode: Bool {
         get {
             defaults.vpnProxyDryMode
@@ -111,8 +113,6 @@ public final class TransparentProxySettings {
             defaults.vpnProxyExcludedDomains = newValue
         }
     }
-
-    // MARK: - App Exclusions Support
 
     public func isExcluding(_ appIdentifier: AppIdentifier) -> Bool {
         excludedApps.contains(appIdentifier)
