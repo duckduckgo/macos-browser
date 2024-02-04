@@ -6,8 +6,6 @@
 	<string>$(DISTRIBUTED_NOTIFICATIONS_PREFIX)</string>
 	<key>NETP_APP_GROUP</key>
 	<string>$(NETP_APP_GROUP)</string>
-	<key>DBP_BACKGROUND_AGENT_BUNDLE_ID</key>
-	<string>$(DBP_BACKGROUND_AGENT_BUNDLE_ID)</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
