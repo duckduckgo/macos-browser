@@ -151,8 +151,6 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
         })
     }
 
-#if DEBUG || REVIEW
-
     public func openBrowser(domain: String) {
         self.pixelHandler.fire(.ipcServerRunAllOperations)
         xpc.execute(call: { server in
@@ -163,8 +161,6 @@ extension DataBrokerProtectionIPCClient: IPCServerInterface {
             // If you add a completion block, please remember to call it here too!
         })
     }
-
-#endif
 }
 
 // MARK: - Incoming communication from the server

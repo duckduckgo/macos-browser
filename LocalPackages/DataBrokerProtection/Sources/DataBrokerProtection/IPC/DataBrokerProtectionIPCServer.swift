@@ -43,15 +43,11 @@ public protocol IPCServerInterface: AnyObject {
     func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void))
     func runAllOperations(showWebView: Bool)
 
-#if DEBUG || REVIEW
-
     // MARK: - Debugging Features
 
     /// Opens a browser window with the specified domain
     ///
     func openBrowser(domain: String)
-
-#endif
 }
 
 /// This protocol describes the server-side XPC interface.
@@ -82,15 +78,11 @@ protocol XPCServerInterface {
     func runQueuedOperations(showWebView: Bool, completion: @escaping ((Error?) -> Void))
     func runAllOperations(showWebView: Bool)
 
-#if DEBUG || REVIEW
-
     // MARK: - Debugging Features
 
     /// Opens a browser window with the specified domain
     ///
     func openBrowser(domain: String)
-
-#endif
 }
 
 public final class DataBrokerProtectionIPCServer {
@@ -167,9 +159,7 @@ extension DataBrokerProtectionIPCServer: XPCServerInterface {
         serverDelegate?.runAllOperations(showWebView: showWebView)
     }
 
-#if DEBUG || REVIEW
     func openBrowser(domain: String) {
         serverDelegate?.openBrowser(domain: domain)
     }
-#endif
 }
