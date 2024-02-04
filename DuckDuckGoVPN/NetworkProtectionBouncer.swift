@@ -34,7 +34,12 @@ final class NetworkProtectionBouncer {
 
         guard keychainStore.isFeatureActivated else {
             os_log(.error, log: .networkProtection, "🔴 Stopping: Network Protection not authorized.")
-            exit(EXIT_FAILURE)
+
+            // EXIT_SUCCESS ensures the login item won't relaunch
+            // Ref: https://developer.apple.com/documentation/servicemanagement/smappservice/register()
+            // See where it mentions:
+            //      "If the helper crashes or exits with a non-zero status, the system relaunches it"
+            exit(EXIT_SUCCESS)
         }
     }
 }
