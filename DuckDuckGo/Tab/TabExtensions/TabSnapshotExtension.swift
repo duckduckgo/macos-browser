@@ -47,7 +47,7 @@ final class TabSnapshotExtension {
         }
     }
     private var generateSnapshotAfterLoad = false
-    private var userDidScroll = false
+    private var userDidInteractWithWebsite = false
 
     var snapshot: NSImage? {
         return snapshotData?.image
@@ -67,7 +67,7 @@ final class TabSnapshotExtension {
 
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView as? WebView
-            self?.webView?.scrollEventDelegate = self
+            self?.webView?.interactionEventsDelegate = self
         }.store(in: &cancellables)
 
         contentPublisher.sink { [weak self] tabContent in
@@ -94,6 +94,20 @@ final class TabSnapshotExtension {
             return
         }
 
+        guard !webView.isLoading else {
+            generateSnapshotAfterLoad = true
+            return
+        }
+
+        // Avoid unnecessary generations
+        if let snapshotData,
+           !userDidInteractWithWebsite,
+           snapshotData.webviewBoundsSize == webView.bounds.size,
+           snapshotData.url == url {
+            os_log("Skipping snapshot rendering, it is already generated. url: \(url)", log: .tabSnapshots)
+            return
+        }
+
         os_log("Preview rendering started", log: .tabSnapshots)
         let configuration = WKSnapshotConfiguration.makeConfiguration()
 
@@ -102,7 +116,10 @@ final class TabSnapshotExtension {
                 os_log("Failed to create a snapshot of webView", log: .tabSnapshots, type: .error)
                 return
             }
-            self?.generateSnapshotAfterLoad = false
+
+            self?.generateSnapshotAfterLoad = webView.isLoading
+            self?.userDidInteractWithWebsite = false
+
             self?.snapshotData = SnapshotData(url: url,
                                             image: image,
                                             webviewBoundsSize: webView.bounds.size,
@@ -193,14 +210,18 @@ final class TabSnapshotExtension {
 
 }
 
-extension TabSnapshotExtension: WebViewScrollEventDelegate {
+extension TabSnapshotExtension: WebViewInteractionEventsDelegate {
 
-    func webView(_ webView: WebView, didScrollWheel event: NSEvent) {
-        userDidScroll = true
+    func webView(_ webView: WebView, mouseDown event: NSEvent) {
+        userDidInteractWithWebsite = true
     }
 
-    func webView(_ webView: WebView, didScrollKey event: NSEvent) {
-        userDidScroll = true
+    func webView(_ webView: WebView, keyDown event: NSEvent) {
+        userDidInteractWithWebsite = true
+    }
+
+    func webView(_ webView: WebView, scrollWheel event: NSEvent) {
+        userDidInteractWithWebsite = true
     }
 
 }
@@ -253,7 +274,7 @@ extension TabSnapshotExtension: NavigationResponder {
             clearSnapshot()
         }
 
-        userDidScroll = false
+        userDidInteractWithWebsite = false
     }
 
     @MainActor

@@ -24,15 +24,16 @@ protocol WebViewContextMenuDelegate: AnyObject {
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?)
 }
 
-protocol WebViewScrollEventDelegate: AnyObject {
-    func webView(_ webView: WebView, didScrollWheel event: NSEvent)
-    func webView(_ webView: WebView, didScrollKey event: NSEvent)
+protocol WebViewInteractionEventsDelegate: AnyObject {
+    func webView(_ webView: WebView, mouseDown event: NSEvent)
+    func webView(_ webView: WebView, keyDown event: NSEvent)
+    func webView(_ webView: WebView, scrollWheel event: NSEvent)
 }
 
 final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
-    weak var scrollEventDelegate: WebViewScrollEventDelegate?
+    weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
 
     override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
@@ -111,25 +112,21 @@ final class WebView: WKWebView {
         contextMenuDelegate?.webView(self, didCloseContextMenu: menu, with: event)
     }
 
-    // MARK: - Scroll events
+    // MARK: - Events
 
-    override func scrollWheel(with event: NSEvent) {
-        super.scrollWheel(with: event)
-        scrollEventDelegate?.webView(self, didScrollWheel: event)
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        interactionEventsDelegate?.webView(self, mouseDown: event)
     }
-
-    static let scrollKeyCodes: Set<UInt16> = [126, // arrow up
-                                              125, // arrow down
-                                              49,  // space
-                                              116, // page up
-                                              121] // page down
 
     override func keyDown(with event: NSEvent) {
         super.keyDown(with: event)
+        interactionEventsDelegate?.webView(self, keyDown: event)
+    }
 
-        if Self.scrollKeyCodes.contains(event.keyCode) {
-            scrollEventDelegate?.webView(self, didScrollKey: event)
-        }
+    override func scrollWheel(with event: NSEvent) {
+        super.scrollWheel(with: event)
+        interactionEventsDelegate?.webView(self, scrollWheel: event)
     }
 
     // MARK: - Developer Tools
