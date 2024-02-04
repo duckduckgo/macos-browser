@@ -112,8 +112,12 @@ extension IPCServiceManager: IPCServerInterface {
     }
 
     func openBrowser(domain: String) {
+#if DEBUG || REVIEW
         Task { @MainActor in
             browserWindowManager.show(domain: domain)
         }
+#else
+        // Intentional no-op: this is a debug feature only
+#endif
     }
 }

@@ -243,7 +243,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     }
 
     @objc private func showAgentIPAddress() {
+#if DEBUG || REVIEW
         DataBrokerProtectionManager.shared.showAgentIPAddress()
+#else
+        // Intentional no-op: we don't want this in release builds
+#endif
     }
 
     @objc private func resetWaitlistState() {
