@@ -18,7 +18,6 @@
 
 import Combine
 import Foundation
-import BrowserServicesKit
 import NetworkExtension
 import NetworkProtectionProxy
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
