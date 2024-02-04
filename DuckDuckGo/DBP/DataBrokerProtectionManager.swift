@@ -60,14 +60,11 @@ public final class DataBrokerProtectionManager {
         redeemUseCase.shouldAskForInviteCode()
     }
 
-#if DEBUG || REVIEW
-
     // MARK: - Debugging Features
 
     public func showAgentIPAddress() {
         ipcClient.openBrowser(domain: "https://www.whatismyip.com")
     }
-#endif
 }
 
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {

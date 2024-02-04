@@ -20,8 +20,6 @@ import AppKit
 import Foundation
 import WebKit
 
-#if DEBUG || REVIEW
-
 /// A class that offers functionality to quickly show an interactive browser window.
 ///
 /// This class is meant to aid with debugging and should not be included in release builds.
@@ -64,5 +62,3 @@ extension BrowserWindowManager: NSWindowDelegate {
         interactiveBrowserWindow = nil
     }
 }
-
-#endif

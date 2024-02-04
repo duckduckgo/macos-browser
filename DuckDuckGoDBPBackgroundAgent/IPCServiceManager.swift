@@ -28,14 +28,11 @@ import PixelKit
 /// demand interaction with.
 ///
 final class IPCServiceManager {
+    private var browserWindowManager: BrowserWindowManager
     private let ipcServer: DataBrokerProtectionIPCServer
     private let scheduler: DataBrokerProtectionScheduler
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
     private var cancellables = Set<AnyCancellable>()
-
-#if DEBUG || REVIEW
-    private var browserWindowManager: BrowserWindowManager
-#endif
 
     init(ipcServer: DataBrokerProtectionIPCServer = .init(machServiceName: Bundle.main.bundleIdentifier!),
          scheduler: DataBrokerProtectionScheduler,
@@ -45,9 +42,7 @@ final class IPCServiceManager {
         self.scheduler = scheduler
         self.pixelHandler = pixelHandler
 
-#if DEBUG || REVIEW
         browserWindowManager = BrowserWindowManager()
-#endif
 
         ipcServer.serverDelegate = self
         ipcServer.activate()
@@ -112,12 +107,8 @@ extension IPCServiceManager: IPCServerInterface {
     }
 
     func openBrowser(domain: String) {
-#if DEBUG || REVIEW
         Task { @MainActor in
             browserWindowManager.show(domain: domain)
         }
-#else
-        // Intentional no-op: this is a debug feature only
-#endif
     }
 }
