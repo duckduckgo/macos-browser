@@ -263,22 +263,5 @@ extension NetworkProtectionStatusView {
                 }
             }
         }
-
-        // - VPN Benefits
-
-        var vpnBenefitsEnabled = true
-
-        var showVPNBenefitsView: Bool {
-            guard vpnBenefitsEnabled else {
-                return false
-            }
-
-            switch connectionStatus {
-            case .connected:
-                return true
-            default:
-                return false
-            }
-        }
     }
 }

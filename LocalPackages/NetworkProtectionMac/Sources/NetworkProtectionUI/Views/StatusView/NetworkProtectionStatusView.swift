@@ -73,16 +73,6 @@ public struct NetworkProtectionStatusView: View {
             }
 
             bottomMenuView()
-/*
-            if model.showVPNBenefitsView {
-                VStack(spacing: 0) {
-                    Divider()
-                        .padding(EdgeInsets(top: 5, leading: 9, bottom: 5, trailing: 9))
-
-                    VPNBenefitsView()
-                }
-                .transition(.slide)
-            }*/
         }
         .padding(5)
         .frame(maxWidth: 350, alignment: .top)
