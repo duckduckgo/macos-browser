@@ -2148,7 +2148,7 @@
 		7B00997F2B6508C200FE7C31 /* NetworkProtectionProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 7B00997E2B6508C200FE7C31 /* NetworkProtectionProxy */; };
 		7B0099812B65C6B300FE7C31 /* MacTransparentProxyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */; };
 		7B0099822B65C6B300FE7C31 /* MacTransparentProxyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */; };
-		7B0694982B6E980F00FA4DBA /* VPNController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0694972B6E980F00FA4DBA /* VPNController.swift */; };
+		7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */; };
 		7B1E819E27C8874900FF0E60 /* ContentOverlayPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */; };
 		7B1E819F27C8874900FF0E60 /* ContentOverlay.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */; };
 		7B1E81A027C8874900FF0E60 /* ContentOverlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */; };
@@ -3696,7 +3696,7 @@
 		7B0099782B65013800FE7C31 /* InteractiveBrowserWindowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveBrowserWindowManager.swift; sourceTree = "<group>"; };
 		7B0099802B65C6B300FE7C31 /* MacTransparentProxyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacTransparentProxyProvider.swift; sourceTree = "<group>"; };
 		7B05829D2A812AC000AC3F7C /* NetworkProtectionOnboardingMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionOnboardingMenu.swift; sourceTree = "<group>"; };
-		7B0694972B6E980F00FA4DBA /* VPNController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNController.swift; sourceTree = "<group>"; };
+		7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNProxyLauncher.swift; sourceTree = "<group>"; };
 		7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayPopover.swift; sourceTree = "<group>"; };
 		7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ContentOverlay.storyboard; sourceTree = "<group>"; };
 		7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentOverlayViewController.swift; sourceTree = "<group>"; };
@@ -6042,10 +6042,10 @@
 				7BA7CC132AD11DC80042E5CE /* AppLauncher+DefaultInitializer.swift */,
 				7BA7CC0F2AD11DC80042E5CE /* Bundle+Configuration.swift */,
 				7BA7CC0E2AD11DC80042E5CE /* DuckDuckGoVPNAppDelegate.swift */,
-				7B0694972B6E980F00FA4DBA /* VPNController.swift */,
 				7BD1688D2AD4A4C400D24876 /* NetworkExtensionController.swift */,
 				7BA7CC152AD11DC80042E5CE /* NetworkProtectionBouncer.swift */,
 				7B8DB3192B504D7500EC16DA /* VPNAppEventsHandler.swift */,
+				7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */,
 				7BA7CC112AD11DC80042E5CE /* TunnelControllerIPCService.swift */,
 				7BA7CC172AD11DC80042E5CE /* UserText.swift */,
 				7BA7CC122AD11DC80042E5CE /* Assets.xcassets */,
@@ -10388,7 +10388,7 @@
 				7BD1688E2AD4A4C400D24876 /* NetworkExtensionController.swift in Sources */,
 				7BA7CC3E2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
 				7BA7CC402AD11E3D0042E5CE /* AppLauncher+DefaultInitializer.swift in Sources */,
-				7B0694982B6E980F00FA4DBA /* VPNController.swift in Sources */,
+				7B0694982B6E980F00FA4DBA /* VPNProxyLauncher.swift in Sources */,
 				EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */,
 				B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				4BF0E5072AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,

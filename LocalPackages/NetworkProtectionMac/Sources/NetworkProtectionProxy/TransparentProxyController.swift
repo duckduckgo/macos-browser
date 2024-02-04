@@ -47,7 +47,7 @@ public final class TransparentProxyController {
     /// use a shared `TransparentProxySettings` and set this to false.
     ///
     private let storeSettingsInProviderConfiguration: Bool
-    private let settings: TransparentProxySettings
+    public let settings: TransparentProxySettings
     private let notificationCenter: NotificationCenter
     private var cancellables = Set<AnyCancellable>()
 
@@ -219,12 +219,12 @@ public final class TransparentProxyController {
 
     // MARK: - Start & stop the proxy
 
-    public var canStart: Bool {
+    public var isRequiredForActiveFeatures: Bool {
         settings.excludeDBP || settings.excludedApps.count > 0 || settings.excludedDomains.count > 0
     }
 
     public func start() async throws {
-        guard canStart else {
+        guard isRequiredForActiveFeatures else {
             return
         }
 

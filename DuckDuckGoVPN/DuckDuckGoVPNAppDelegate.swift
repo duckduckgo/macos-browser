@@ -80,7 +80,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     private lazy var proxySettings = TransparentProxySettings(defaults: .netP)
 
     @MainActor
-    private lazy var vpnController = VPNController(
+    private lazy var vpnProxyLauncher = VPNProxyLauncher(
         tunnelController: tunnelController,
         proxyController: proxyController)
 
@@ -228,9 +228,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
         bouncer.requireAuthTokenOrKillApp()
 
-        // Initialize the IPC server
+        // Initialize lazy properties
         _ = tunnelControllerIPCService
-        _ = vpnController
+        _ = vpnProxyLauncher
 
         let dryRun: Bool
 

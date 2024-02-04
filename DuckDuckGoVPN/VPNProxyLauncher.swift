@@ -20,14 +20,13 @@ import Combine
 import Foundation
 import NetworkProtectionProxy
 
-/// This is the master controller for the VPN components.
+/// Starts and stops the VPN proxy component.
 ///
-/// This class provides a location where all components of the VPN can be monitored.
-/// This class takes care of monitoring and operating components that need to be enabled or disabled
-/// based on special conditions.
+/// This class looks at the tunnel and the proxy components and their status and settings, and decides based on
+/// a number of conditions whether to start the proxy, stop it, or just leave it be.
 ///
 @MainActor
-final class VPNController {
+final class VPNProxyLauncher {
     private let tunnelController: NetworkProtectionTunnelController
     private let proxyController: TransparentProxyController
     private let notificationCenter: NotificationCenter
@@ -42,6 +41,7 @@ final class VPNController {
         self.tunnelController = tunnelController
 
         subscribeToStatusChanges()
+        subscribeToProxySettingChanges()
     }
 
     // MARK: - Status Changes
@@ -59,9 +59,23 @@ final class VPNController {
         }
     }
 
+    // MARK: - Proxy Settings Changes
+
+    private func subscribeToProxySettingChanges() {
+        proxyController.settings.changePublisher
+            .sink(receiveValue: proxySettingChanged(_:))
+            .store(in: &cancellables)
+    }
+
+    private func proxySettingChanged(_ change: TransparentProxySettings.Change) {
+        Task { @MainActor in
+            try await startOrStopProxyIfNeeded()
+        }
+    }
+
     // MARK: - Auto starting & stopping the proxy component
 
-    var isControllingProxy = false
+    private var isControllingProxy = false
 
     private func startOrStopProxyIfNeeded() async throws {
         if await shouldStartProxy {
@@ -85,25 +99,22 @@ final class VPNController {
 
     private var shouldStartProxy: Bool {
         get async {
-            guard tunnelController.status == .connected else {
-                return false
-            }
-
-            guard await proxyController.status == .disconnected else {
-                return false
-            }
-
-            return proxyController.canStart
+            // Starting the proxy only when it's required for active features
+            // is a product decision.  It may change once we decide the proxy
+            // is stable enough to be running at all times.
+            await proxyController.status == .disconnected
+            && tunnelController.status == .connected
+            && proxyController.isRequiredForActiveFeatures
         }
     }
 
     private var shouldStopProxy: Bool {
         get async {
-            guard tunnelController.status == .disconnected else {
-                return false
-            }
-
-            return await proxyController.status == .connected
+            // Stopping the proxy when it's not required for active features
+            // is a product decision.  It may change once we decide the proxy
+            // is stable enough to be running at all times.
+            await proxyController.status == .connected
+            && (tunnelController.status == .disconnected || !proxyController.isRequiredForActiveFeatures)
         }
     }
 }
