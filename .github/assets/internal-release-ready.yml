@@ -1,7 +1,14 @@
 data:
+  # yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g'
   html_text: |
-    <body><h2>Internal release build ${tag} ready</h2><ul>
-    <li>Repository is tagged with <code>${tag}</code> tag.</li>
-    <li><code>${branch}</code> branch has been successfully merged to <code>${base_branch}</code>.</li>
-    <li>GitHub release is created at <a href='${release_url}'>${release_url}</a>.</li></ul>
-    Workflow URL: <a href='${workflow_url}'>${workflow_url}</a>.</body>
+    <body>
+      <h2>Internal release build ${tag} ready ✅</h2>
+      <ul>
+        <li>🏷️ Repository is tagged with <code>${tag}</code> tag.</li>
+        <li>🔱 <code>${branch}</code> branch has been successfully merged to <code>${base_branch}</code>.</li>
+        <li>🚢 GitHub <a href='${release_url}'>${tag} pre-release</a> is created.</li>
+        <li>📥 DMG is available from <a href='${dmg_url}'>${dmg_url}</a>.</li>
+      </ul>
+
+      🔗 Workflow URL: <a href='${workflow_url}'>${workflow_url}</a>.
+    </body>
