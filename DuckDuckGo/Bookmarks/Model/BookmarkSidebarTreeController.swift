@@ -26,7 +26,7 @@ final class BookmarkSidebarTreeController: BookmarkTreeControllerDataSource {
 
     private let bookmarkManager: BookmarkManager
 
-    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(bookmarkManager: BookmarkManager) {
         self.bookmarkManager = bookmarkManager
     }
 

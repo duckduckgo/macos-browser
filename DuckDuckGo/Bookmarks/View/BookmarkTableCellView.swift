@@ -27,7 +27,7 @@ import Foundation
 
 }
 
-final class BookmarkTableCellView: NSTableCellView, NibLoadable {
+final class BookmarkTableCellView: NSTableCellView {
 
     private lazy var faviconImageView = NSImageView(image: .bookmark)
 
