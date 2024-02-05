@@ -118,7 +118,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
         guard let node = item as? BookmarkNode else {
-            assertionFailure("\(#file): Failed to create BookmarkOutlineCellView or cast item to Node")
+            assertionFailure("\(#file): Failed to cast item to Node")
             return nil
         }
         let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
