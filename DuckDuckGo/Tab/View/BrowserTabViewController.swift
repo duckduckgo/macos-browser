@@ -543,19 +543,25 @@ final class BrowserTabViewController: NSViewController {
     }
 
     func generateNativePreviewIfNeeded() {
-        let tabViewModel = tabViewModel
-        switch tabViewModel?.tab.content {
-        case .bookmarks, .settings, .onboarding, .newtab, .dataBrokerProtection:
-            guard let hostingView = view.findNSHostingSubview() else {
-                assertionFailure("Didn't find NSHostingView")
-                return
-            }
-
-            Task {
-                await tabViewModel?.tab.tabSnapshots?.renderSnapshot(from: hostingView)
-            }
-        default:
+        guard let tabViewModel = tabViewModel, !tabViewModel.tab.content.isUrl else {
             return
+        }
+
+        var containsHostingView: Bool
+        switch tabViewModel.tab.content {
+        case .newtab, .settings, .onboarding:
+            containsHostingView = true
+        default:
+            containsHostingView = false
+        }
+
+        guard let viewForRendering = view.findContentSubview(containsHostingView: containsHostingView) else {
+            assertionFailure("No view for rendering of the snapshot")
+            return
+        }
+
+        Task {
+            await tabViewModel.tab.tabSnapshots?.renderSnapshot(from: viewForRendering)
         }
     }
 
@@ -1083,14 +1089,15 @@ extension BrowserTabViewController {
 
 fileprivate extension NSView {
 
-    // Function returns subview for the generation of preview
-    func findNSHostingSubview() -> NSView? {
-        guard let hostingSubview = subviews.last?.subviews.first as? NSView else {
-            assertionFailure("Couldn't find NSHostingView")
-            return nil
+    // Returns correct subview for the rendering of snapshots
+    func findContentSubview(containsHostingView: Bool) -> NSView? {
+        var subview = subviews.last
+
+        if containsHostingView {
+            subview = subview?.subviews.first
         }
 
-        return hostingSubview
+        return subview
     }
 
 }

@@ -95,7 +95,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     // swiftlint:disable:next function_body_length
     override func loadView() {
-        view = ColorView(frame: .zero, backgroundColor: .interfaceBackgroundColor)
+        view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(separator)
