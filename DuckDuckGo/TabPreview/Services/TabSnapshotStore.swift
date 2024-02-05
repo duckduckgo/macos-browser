@@ -1,5 +1,5 @@
 //
-//  TabPreviewPersistanceService.swift
+//  TabSnapshotStore.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,15 @@
 import Cocoa
 import Common
 
-final class TabSnapshotPersistenceService {
+protocol TabSnapshotStoring {
+
+    func persistSnapshot(_ snapshot: NSImage, id: UUID)
+    func clearSnapshot(tabID: UUID)
+    func loadSnapshot(for tabID: UUID, completion: @escaping (NSImage?) -> Void)
+
+}
+
+final class TabSnapshotStore: TabSnapshotStoring {
 
     static let directoryName: String = "tabSnapshots"
 
@@ -88,7 +96,7 @@ final class TabSnapshotPersistenceService {
 fileprivate extension URL {
 
     static func persistenceLocation(for id: UUID) -> URL {
-        let fileName = "\(TabSnapshotPersistenceService.directoryName)/\(id.uuidString)"
+        let fileName = "\(TabSnapshotStore.directoryName)/\(id.uuidString)"
         return URL.persistenceLocation(for: fileName)
     }
 

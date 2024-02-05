@@ -27,22 +27,22 @@ final class TabSnapshotExtension {
 
     private var identifier: UUID?
 
-    private var renderSnapshotAfterLoad = false
+    private var renderSnapshotAfterLoad = true
     private var userDidInteractWithWebsite = false
 
-    private var cancellables = Set<AnyCancellable>()
     private weak var webView: WebView?
     private var tabContent: Tab.TabContent?
+    private var cancellables = Set<AnyCancellable>()
 
-    private let tabSnapshotPersistanceService: TabSnapshotPersistenceService
+    private let store: TabSnapshotStoring
 
-    init(fileStore: FileStore = NSApplication.shared.delegateTyped.fileStore,
+    init(store: TabSnapshotStoring = TabSnapshotStore(fileStore: NSApplication.shared.delegateTyped.fileStore),
          webViewSnapshotRenderer: WebViewSnapshotRendering = WebViewSnapshotRenderer(),
          viewSnapshotRenderer: ViewSnapshotRendering = ViewSnapshotRenderer(),
          webViewPublisher: some Publisher<WKWebView, Never>,
          contentPublisher: some Publisher<Tab.TabContent, Never>) {
 
-        tabSnapshotPersistanceService = TabSnapshotPersistenceService(fileStore: fileStore)
+        self.store = store
         self.webViewSnapshotRenderer = webViewSnapshotRenderer
         self.viewSnapshotRenderer = viewSnapshotRenderer
 
@@ -58,7 +58,33 @@ final class TabSnapshotExtension {
 
     deinit {
         if let identifier {
-            tabSnapshotPersistanceService.clearSnapshot(tabID: identifier)
+            store.clearSnapshot(tabID: identifier)
+        }
+    }
+
+    @MainActor
+    func setIdentifier(_ identifier: UUID?) async {
+        guard let identifier else {
+            // Create new identifier and render snapshot right after the first load
+            self.identifier = UUID()
+            renderSnapshotAfterLoad = true
+            return
+        }
+
+        // Identifier exists, restore the snapshot
+        self.identifier = identifier
+        store.loadSnapshot(for: identifier) { [weak self] image in
+            guard let image else {
+                os_log("No snapshot restored", log: .tabSnapshots)
+                return
+            }
+            self?.snapshotData = SnapshotData(url: nil,
+                                              image: image,
+                                              webviewBoundsSize: NSSize.zero,
+                                              isRestored: true)
+            os_log("Snapshot restored", log: .tabSnapshots)
+
+            self?.renderSnapshotAfterLoad = false
         }
     }
 
@@ -78,8 +104,7 @@ final class TabSnapshotExtension {
     private var snapshotData: SnapshotData? {
         didSet {
             if let snapshotData, let identifier {
-                tabSnapshotPersistanceService.persistSnapshot(snapshotData.image,
-                                                              id: identifier)
+                store.persistSnapshot(snapshotData.image, id: identifier)
             }
         }
     }
@@ -98,7 +123,7 @@ final class TabSnapshotExtension {
     private let webViewSnapshotRenderer: WebViewSnapshotRendering
 
     @MainActor
-    func renderWebViewSnapshot() {
+    func renderWebViewSnapshot() async {
         guard let webView, let tabContent, let url = tabContent.url else {
             // Previews of native views are rendered in renderNativePreview()
             return
@@ -118,16 +143,14 @@ final class TabSnapshotExtension {
             return
         }
 
-        Task {
-            if let snapshot = await webViewSnapshotRenderer.renderSnapshot(webView: webView) {
-                renderSnapshotAfterLoad = webView.isLoading
-                userDidInteractWithWebsite = false
+        if let snapshot = await webViewSnapshotRenderer.renderSnapshot(webView: webView) {
+            renderSnapshotAfterLoad = webView.isLoading
+            userDidInteractWithWebsite = false
 
-                snapshotData = SnapshotData(url: url,
-                                            image: snapshot,
-                                            webviewBoundsSize: webView.bounds.size,
-                                            isRestored: false)
-            }
+            snapshotData = SnapshotData(url: url,
+                                        image: snapshot,
+                                        webviewBoundsSize: webView.bounds.size,
+                                        isRestored: false)
         }
     }
 
@@ -136,21 +159,14 @@ final class TabSnapshotExtension {
     private let viewSnapshotRenderer: ViewSnapshotRendering
 
     @MainActor
-    func renderSnapshot(from view: NSView) {
-        guard let tabContent, !tabContent.isUrl else {
-            // Snapshots of web views are rendered in renderWebViewSnapshot()
+    func renderSnapshot(from view: NSView) async {
+        guard let snapshot = await viewSnapshotRenderer.renderSnapshot(view: view) else {
+            clearSnapshot()
             return
         }
 
-        Task {
-            guard let snapshot = await viewSnapshotRenderer.renderSnapshot(view: view) else {
-                clearSnapshot()
-                return
-            }
-
-            snapshotData = SnapshotData.snapshotDataForRegularView(from: snapshot)
-            os_log("Snapshot of native page rendered", log: .tabSnapshots)
-        }
+        snapshotData = SnapshotData.snapshotDataForRegularView(from: snapshot)
+        os_log("Snapshot of native page rendered", log: .tabSnapshots)
     }
 
 }
@@ -182,26 +198,16 @@ extension TabSnapshotExtension: NSCodingExtension {
 
         guard let uuidString = decoder.decodeObject(of: NSString.self, forKey: NSSecureCodingKeys.tabSnapshotIdentifier),
               let identifier = UUID(uuidString: uuidString as String) else {
-            os_log("Snapshot id restoration failed", log: .tabSnapshots)
-            self.identifier = UUID()
-            renderSnapshotAfterLoad = true
+            os_log("Snapshot not available in the session state", log: .tabSnapshots)
+
+            Task {
+                await setIdentifier(nil)
+            }
             return
         }
 
-        self.identifier = identifier
-
-        tabSnapshotPersistanceService.loadSnapshot(for: identifier) { [weak self] image in
-            guard let image else {
-                os_log("No snapshot restored", log: .tabSnapshots)
-                return
-            }
-            self?.snapshotData = SnapshotData(url: nil,
-                                              image: image,
-                                              webviewBoundsSize: NSSize.zero,
-                                              isRestored: true)
-            os_log("Snapshot restored", log: .tabSnapshots)
-
-            self?.renderSnapshotAfterLoad = false
+        Task {
+            await setIdentifier(identifier)
         }
     }
 
@@ -228,7 +234,9 @@ extension TabSnapshotExtension: NavigationResponder {
     @MainActor
     func didFinishLoad(with request: URLRequest, in frame: WKFrameInfo) {
         if renderSnapshotAfterLoad {
-            renderWebViewSnapshot()
+            Task {
+                await renderWebViewSnapshot()
+            }
         }
     }
 
@@ -238,8 +246,9 @@ protocol TabSnapshotExtensionProtocol: AnyObject, NavigationResponder {
 
     var snapshot: NSImage? { get }
 
-    func renderWebViewSnapshot()
-    func renderSnapshot(from view: NSView)
+    func setIdentifier(_ identifier: UUID?) async
+    func renderWebViewSnapshot() async
+    func renderSnapshot(from view: NSView) async
 
 }
 
@@ -263,7 +272,9 @@ extension Tab {
 
     // Called from the outside of extension when a tab is unselected
     func renderTabSnapshot() {
-        self.tabSnapshots?.renderWebViewSnapshot()
+        Task {
+            await self.tabSnapshots?.renderWebViewSnapshot()
+        }
     }
 
 }

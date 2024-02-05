@@ -530,6 +530,7 @@ final class BrowserTabViewController: NSViewController {
     }
 
     func generateNativePreviewIfNeeded() {
+        let tabViewModel = tabViewModel
         switch tabViewModel?.tab.content {
         case .bookmarks, .settings, .onboarding, .newtab, .dataBrokerProtection:
             guard let hostingView = view.findNSHostingSubview() else {
@@ -537,7 +538,9 @@ final class BrowserTabViewController: NSViewController {
                 return
             }
 
-            tabViewModel?.tab.tabSnapshots?.renderSnapshot(from: hostingView)
+            Task {
+                await tabViewModel?.tab.tabSnapshots?.renderSnapshot(from: hostingView)
+            }
         default:
             return
         }
