@@ -44,6 +44,12 @@ final class FeedbackViewController: NSViewController {
             }
         }
     }
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var okButton: NSButton!
+    @IBOutlet weak var thankYouLabel: NSTextField!
+    @IBOutlet weak var feedbackLabel: NSView!
+    @IBOutlet weak var cancelButton: NSButton!
+    
 
     @IBOutlet weak var optionPopUpButton: NSPopUpButton!
     @IBOutlet weak var pickOptionMenuItem: NSMenuItem!
@@ -150,6 +156,16 @@ final class FeedbackViewController: NSViewController {
     private func setupTextViews() {
         browserFeedbackTextView.delegate = self
         browserFeedbackTextView.font = NSFont.systemFont(ofSize: 12)
+        titleLabel.stringValue = "Help Improve the DuckDuckGo Browser"
+        let categories = [
+            "Report a problem",
+            "Request a feature",
+            "General feedback"
+        ]
+        optionPopUpButton.title = "Select a category"
+        optionPopUpButton.removeAllItems()
+        optionPopUpButton.addItems(withTitles: categories)
+
     }
 
     private var selectedFormOption: FormOption? {

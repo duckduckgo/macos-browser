@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -42,7 +42,7 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="B4Q-yT-nKT" customClass="ColorView" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="700" width="360" height="69"/>
                                 <subviews>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7KM-rJ-r28">
                                         <rect key="frame" x="18" y="25" width="324" height="19"/>
                                         <textFieldCell key="cell" alignment="center" title="Help Improve the DuckDuckGo Browser" id="M7g-24-ECG">
                                             <font key="font" metaFont="systemSemibold" size="15"/>
@@ -107,7 +107,7 @@ DQ
                                         </constraints>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="ThankYou" id="Ykf-at-KNR"/>
                                     </imageView>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pad-Pc-j6d">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Pad-Pc-j6d">
                                         <rect key="frame" x="137" y="557" width="87" height="19"/>
                                         <textFieldCell key="cell" alignment="center" title="Thank you!" id="NFA-fu-2EM">
                                             <font key="font" metaFont="systemSemibold" size="15"/>
@@ -115,7 +115,7 @@ DQ
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syf-sE-uUM">
+                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="syf-sE-uUM">
                                         <rect key="frame" x="18" y="521" width="324" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="NhF-KV-8Fz"/>
@@ -169,7 +169,7 @@ DQ
                                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8Xi-CY-jyt" userLabel="Browser Feedback View">
                                         <rect key="frame" x="0.0" y="357" width="360" height="290"/>
                                         <subviews>
-                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Obm-Wr-qrD">
                                                 <rect key="frame" x="18" y="263" width="324" height="15"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="320" id="Y8O-Rh-baf"/>
@@ -183,15 +183,15 @@ DQ
                                             <scrollView focusRingType="exterior" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heN-iP-EsM">
                                                 <rect key="frame" x="20" y="158" width="320" height="97"/>
                                                 <clipView key="contentView" drawsBackground="NO" id="PTf-L1-DK2">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
-                                                            <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                            <size key="minSize" width="320" height="97"/>
+                                                            <size key="minSize" width="305" height="97"/>
                                                             <size key="maxSize" width="320" height="10000000"/>
                                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                         </textView>
@@ -206,11 +206,11 @@ DQ
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MIn-YA-XiI">
-                                                    <rect key="frame" x="304" y="0.0" width="16" height="97"/>
+                                                    <rect key="frame" x="305" y="0.0" width="15" height="97"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                             </scrollView>
-                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nm3-pj-w2B">
                                                 <rect key="frame" x="18" y="63" width="324" height="75"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="320" id="46H-7M-bu2"/>
@@ -340,12 +340,17 @@ Gw
                         <outlet property="browserFeedbackTextView" destination="F3N-ft-DgV" id="amf-uR-AYI"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
                         <outlet property="browserFeedbackViewTopConstraint" destination="rcx-DQ-kn9" id="vZz-Yt-Lko"/>
+                        <outlet property="cancelButton" destination="G99-8X-64H" id="q0P-4V-Jl1"/>
                         <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
                         <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
+                        <outlet property="feedbackLabel" destination="8xr-ho-IDj" id="h1Z-A1-mH7"/>
+                        <outlet property="okButton" destination="3nf-Bg-7k2" id="7Et-6j-Qji"/>
                         <outlet property="optionPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
                         <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
-                        <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
+                        <outlet property="submitButton" destination="Gy6-KF-A15" id="qQs-il-hFn"/>
+                        <outlet property="thankYouLabel" destination="Pad-Pc-j6d" id="8xC-oh-4mB"/>
                         <outlet property="thankYouView" destination="C8j-UX-ywh" id="EQo-2a-mhp"/>
+                        <outlet property="titleLabel" destination="7KM-rJ-r28" id="Vhn-Q4-NAI"/>
                         <outlet property="unsupportedOsView" destination="8xr-ho-IDj" id="3HW-mc-78M"/>
                     </connections>
                 </viewController>
