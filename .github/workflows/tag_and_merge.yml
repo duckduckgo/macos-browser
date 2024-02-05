@@ -44,8 +44,8 @@ jobs:
 
     env:
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
-      base-branch: ${{ inputs.base-branch || 'main' }}
-      branch: ${{ inputs.branch || github.ref_name }}
+      BASE_BRANCH: ${{ inputs.base-branch || 'main' }}
+      BRANCH: ${{ inputs.branch || github.ref_name }}
 
     outputs:
       tag: ${{ steps.create-tag.outputs.tag }}
@@ -53,80 +53,54 @@ jobs:
     steps:
 
     - name: Check out the code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
-        ref: ${{ inputs.branch || github.ref_name }}
+        ref: ${{ env.BRANCH }}
 
     - name: Create Tag and GitHub Release
       id: create-tag
-      run: |
-        echo "tag=0.41.0-201" >> $GITHUB_OUTPUT
-        exit 1
-      # uses: ./.github/actions/create-tag-and-github-release
-      # with:
-      #   prerelease: true
-      #   github-token: ${{ github.token }}
-
-    # - name: Merge to base branch
-    #   id: merge
-    #   uses: actions/github-script@v7
-    #   with:
-    #     github-token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
-    #     script: |
-    #       github.rest.repos.merge({
-    #         owner: context.repo.owner,
-    #         repo: context.repo.repo,
-    #         base: "${{ env.base-branch }}",
-    #         head: "${{ env.branch }}"
-    #       })
-
-    - name: Get Asana automation subtask
-      id: get-automation-subtask
-      if: always()
-      uses: ./.github/actions/asana-get-release-automation-subtask-id
+      uses: ./.github/actions/create-tag-and-github-release
       with:
-        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        task-url: ${{ env.asana-task-url }}
+        prerelease: true
+        github-token: ${{ github.token }}
+
+    - name: Merge to base branch
+      id: merge
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+        script: |
+          github.rest.repos.merge({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            base: "${{ env.BASE_BRANCH }}",
+            head: "${{ env.BRANCH }}"
+          })
+
+    - name: Set common environment variables
+      if: always()
+      run: |
+        echo "TAG=${{ steps.create-tag.outputs.tag }}" >> $GITHUB_ENV
+        echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+        echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${{ steps.create-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
+        echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}" >> $GITHUB_ENV
 
     - name: Create Asana task on failed merge
       id: create-task-on-failed-merge
       if: failure()
-      env:
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
-        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        TASK_NAME: "Merging ${{ env.branch }} to ${{ env.base-branch }} failed"
-        TASK_BODY: "The ${{ steps.create-tag.outputs.tag }} release has been successfully tagged and published in GitHub releases,
-          but merging to ${{ env.base-branch }} failed. Please resolve conflicts and merge ${{ env.branch }} to ${{ env.base-branch }} manually."
-        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      run: |
-        new_task_id=$(set -o pipefail && curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/subtasks?opt_fields=gid" \
-          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-          -H 'content-type: application/json' \
-          -d "{
-                \"data\": {
-                  \"name\": \"${TASK_NAME}\",
-                  \"resource_subtype\": \"default_task\",
-                  \"notes\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\",
-                  \"assignee\": \"${ASSIGNEE_ID}\"
-                }
-              }
-          " | jq -r .data.gid)
-        echo "new-task-id=$new_task_id" >> $GITHUB_OUTPUT
+      uses: ./.github/actions/asana-create-action-item
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        release-task-url: ${{ env.asana-task-url }}
+        template-name: merge-failed
 
     - name: Report failure
       if: failure()
       uses: ./.github/actions/asana-log-message
       env:
-        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
-        BRANCH: ${{ env.branch }}
-        BASE_BRANCH: ${{ env.base-branch }}
-        DMG_URL: ${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${{ steps.create-tag.outputs.tag }}.dmg
-        RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}
-        TAG: ${{ steps.create-tag.outputs.tag }}
+        ASSIGNEE_ID: ${{ steps.create-task-on-failed-merge.outputs.assignee-id }}
         TASK_ID: ${{ steps.create-task-on-failed-merge.outputs.new-task-id }}
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-url: ${{ env.asana-task-url }}
@@ -135,13 +109,6 @@ jobs:
     - name: Report success
       if: success()
       uses: ./.github/actions/asana-log-message
-      env:
-        BRANCH: ${{ env.branch }}
-        BASE_BRANCH: ${{ env.base-branch }}
-        DMG_URL: ${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${{ steps.create-tag.outputs.tag }}.dmg
-        RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}
-        TAG: ${{ steps.create-tag.outputs.tag }}
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-url: ${{ env.asana-task-url }}

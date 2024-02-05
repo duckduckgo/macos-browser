@@ -2,7 +2,7 @@ data:
   # yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g'
   html_text: |
     <body>
-      <h2>Internal release build ${TAG} ready ✅</h2>
+      <h2>[ACTION NEEDED] Internal release build ${TAG} ready</h2>
       <ul>
         <li>📥 DMG is available from <a href='${DMG_URL}'>${DMG_URL}</a>.</li>
         <li>🏷️ Repository is tagged with <code>${TAG}</code> tag.</li>

@@ -1,0 +1,24 @@
+data:
+  name: Merging ${BRANCH} to ${BASE_BRANCH} failed
+  assignee: "${ASSIGNEE_ID}"
+  html_notes: |
+    <body>
+      The <code>${TAG}</code> release has been successfully tagged and published in GitHub releases, 
+      but merging to <code>${BASE_BRANCH}</code> failed. Please resolve conflicts and merge <code>${BRANCH}</code> to <code>${BASE_BRANCH}</code> manually.
+
+
+      Issue the following git commands:
+      <ul>
+        <li><code>git fetch origin</code></li>
+        <li><code>git checkout ${BRANCH}</code></li>
+        <li><code>git pull origin ${BRANCH}</code></li>
+        <li><code>git checkout ${BASE_BRANCH}</code></li>
+        <li><code>git pull origin ${BASE_BRANCH}</code></li>
+        <li><code>git merge ${BRANCH}</code> (resolve conflicts as needed)</li>
+        <li><code>git push origin ${BASE_BRANCH}</code></li>
+      </ul>
+      Complete this task when ready and proceed with testing the build.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>
