@@ -56,9 +56,9 @@ runs:
           exit 1
         fi
 
-        # Process the template file with envsubst
-        payload="$(envsubst < $TEMPLATE_PATH | yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g')"
-        echo "payload=$payload" >> $GITHUB_OUTPUT
+        # Process the template file with envsubst and turn into JSON
+        payload="$(envsubst < $TEMPLATE_PATH | yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g' | jq -c)"
+        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
 
     - id: process-comment-payload
       if: ${{ inputs.comment }}
@@ -67,23 +67,24 @@ runs:
         COMMENT: ${{ inputs.comment}}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
-
         payload="{ \"data\": { \"text\": \"${COMMENT}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }"
-        echo "payload=$payload" >> $GITHUB_OUTPUT
+        payload_base64="$(base64 <<< $payload)"
+        echo $payload_base64
+        echo "payload-base64=$payload_base64" >> $GITHUB_OUTPUT
 
     - id: add-comment
       shell: bash
       env:
         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-        TASK_BODY: ${{ steps.process-template-payload.outputs.payload || steps.process-comment-payload.outputs.payload }}
+        TASK_BODY_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
       run: |
         return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
           -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
           -H 'content-type: application/json' \
           --write-out '%{http_code}' \
           --output /dev/null \
-          -d "$payload")
+          -d "$(base64 -d <<< $TASK_BODY_BASE64)")
 
         if [ $return_code -ne 201 ]; then
           echo "::error::Failed to add a comment to the Asana task"
