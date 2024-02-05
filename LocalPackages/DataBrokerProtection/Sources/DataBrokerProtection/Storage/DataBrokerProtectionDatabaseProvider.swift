@@ -263,18 +263,12 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 
     static func migrateV2(database: Database) throws {
-        do {
-            if try database.tableExists(BrokerDB.databaseTableName) {
-                try database.alter(table: BrokerDB.databaseTableName) {
-                    $0.add(column: BrokerDB.Columns.url.name, .text)
-                }
-                try database.execute(sql: """
+        try database.alter(table: BrokerDB.databaseTableName) {
+            $0.add(column: BrokerDB.Columns.url.name, .text)
+        }
+        try database.execute(sql: """
                 UPDATE \(BrokerDB.databaseTableName) SET \(BrokerDB.Columns.url.name) = \(BrokerDB.Columns.name.name)
             """)
-            }
-        } catch {
-            throw error
-        }
     }
 
     // swiftlint:enable function_body_length
