@@ -1,5 +1,5 @@
-name: Add a Log Message to Asana Task
-description: Adds a comment to an Asana task
+name: Add a Message to Asana Release Automation Task
+description: Adds a comment about release progress to the Asana release task's "Automation" subtask
 inputs:
   access-token:
     description: "Asana access token"
@@ -56,7 +56,7 @@ runs:
           exit 1
         fi
 
-        # Process the template file with envsubst and turn into JSON
+        # Process the template file with envsubst, turn into JSON, remove newlines from non-empty lines, and compact the JSON
         payload="$(envsubst < $TEMPLATE_PATH | yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g' | jq -c)"
         echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
 
@@ -68,9 +68,7 @@ runs:
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
         payload="{ \"data\": { \"text\": \"${COMMENT}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }"
-        payload_base64="$(base64 <<< $payload)"
-        echo $payload_base64
-        echo "payload-base64=$payload_base64" >> $GITHUB_OUTPUT
+        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
 
     - id: add-comment
       shell: bash
@@ -90,66 +88,3 @@ runs:
           echo "::error::Failed to add a comment to the Asana task"
           exit 1
         fi
-
-# name: Add a Log Message to Asana Task
-# description: Adds a comment to an Asana task
-# inputs:
-#   access-token:
-#     description: "Asana access token"
-#     required: true
-#     type: string
-#   task-url:
-#     description: "Asana release task URL"
-#     required: false
-#     type: string
-#   comment:
-#     description: "Comment to add to the Asana task"
-#     required: true
-#     type: string
-# runs:
-#   using: "composite"
-#   steps:
-#     - id: get-automation-subtask
-#       uses: ./.github/actions/asana-get-release-automation-subtask-id
-#       with:
-#         access-token: ${{ inputs.access-token }}
-#         task-url: ${{ inputs.task-url }}
-
-#     - id: add-colaborator
-#       shell: bash
-#       env:
-#         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-#         ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
-#         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-#       run: |
-#         return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/addFollowers" \
-#           -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-#           -H 'content-type: application/json' \
-#           --write-out '%{http_code}' \
-#           --output /dev/null \
-#           -d "{ \"data\": { \"followers\": [ \"${ASSIGNEE_ID}\" ] } }")
-
-#         if [ $return_code -ne 200 ]; then
-#           echo "::error::Failed to add a collaborator to the Asana task"
-#           exit 1
-#         fi
-
-#     - id: add-comment
-#       shell: bash
-#       env:
-#         ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-#         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-#         TASK_BODY: ${{ inputs.comment }}
-#         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-#       run: |
-#         return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
-#           -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-#           -H 'content-type: application/json' \
-#           --write-out '%{http_code}' \
-#           --output /dev/null \
-#           -d "{ \"data\": { \"text\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }")
-
-#         if [ $return_code -ne 201 ]; then
-#           echo "::error::Failed to add a comment to the Asana task"
-#           exit 1
-#         fi
