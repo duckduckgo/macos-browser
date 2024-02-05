@@ -91,7 +91,6 @@ final class BookmarkManagementSidebarViewController: NSViewController {
                 NSMenuItem(title: content.title!, representedObject: content)
             }
         }
-        tabSwitcherButton.select(tabSwitcherButton.itemArray.first(where: { $0.representedObject as? Tab.TabContent == .bookmarks }))
 
         scrollView.borderType = .noBorder
         scrollView.drawsBackground = false
@@ -169,6 +168,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
 
     override func viewWillAppear() {
         super.viewWillAppear()
+        tabSwitcherButton.select(tabSwitcherButton.itemArray.first(where: { $0.representedObject as? Tab.TabContent == .bookmarks }))
         reloadData()
 
         bookmarkManager.requestSync()
