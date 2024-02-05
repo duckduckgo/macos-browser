@@ -26,6 +26,20 @@ final class BrokerJSONCodableTests: XCTestCase {
                  "url": "verecor.com",
                  "version": "0.1.0",
                  "addedDatetime": 1677128400000,
+                 "mirrorSites": [
+                   {
+                     "name": "Potato",
+                     "url": "potato.com",
+                     "addedAt": 1705599286529,
+                     "removedAt": null
+                   },
+                   {
+                     "name": "Tomato",
+                     "url": "tomato.com",
+                     "addedAt": 1705599286529,
+                     "removedAt": null
+                   }
+                 ],
                  "steps": [
                    {
                      "stepType": "scan",
@@ -162,6 +176,18 @@ final class BrokerJSONCodableTests: XCTestCase {
                  "name": "verecor.com",
                  "version": "0.1.0",
                  "addedDatetime": 1677128400000,
+                 "mirrorSites": [
+                   {
+                     "name": "tomato.com",
+                     "addedAt": 1705599286529,
+                     "removedAt": null
+                   },
+                   {
+                     "name": "potato.com",
+                     "addedAt": 1705599286529,
+                     "removedAt": null
+                   }
+                 ],
                  "steps": [
                    {
                      "stepType": "scan",
@@ -298,6 +324,9 @@ final class BrokerJSONCodableTests: XCTestCase {
         do {
             let broker = try JSONDecoder().decode(DataBroker.self, from: verecorNoURLJSONString.data(using: .utf8)!)
             XCTAssertEqual(broker.url, broker.name)
+            for mirror in broker.mirrorSites {
+                XCTAssertEqual(mirror.url, mirror.name)
+            }
         } catch {
             XCTFail("JSON string should be parsed correctly.")
         }
@@ -308,6 +337,10 @@ final class BrokerJSONCodableTests: XCTestCase {
             let broker = try JSONDecoder().decode(DataBroker.self, from: verecorWithURLJSONString.data(using: .utf8)!)
             XCTAssertEqual(broker.url, "verecor.com")
             XCTAssertEqual(broker.name, "Verecor")
+
+            for mirror in broker.mirrorSites {
+                XCTAssertNotEqual(mirror.url, mirror.name)
+            }
         } catch {
             XCTFail("JSON string should be parsed correctly.")
         }
