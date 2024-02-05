@@ -14,6 +14,12 @@ outputs:
   tag:
     description: "Tag that has been added"
     value: ${{ steps.compute-tag.outputs.tag }}
+  tag-created:
+    description: "Whether the tag has been created"
+    value: ${{ steps.tag-repo.conclusion == 'success' }}
+  release-created:
+    description: "Whether the release has been created"
+    value: ${{ steps.create-github-release.conclusion == 'success' }}
 runs:
   using: "composite"
   steps:

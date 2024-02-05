@@ -210,10 +210,12 @@ jobs:
       uses: ./.github/actions/asana-log-message
       env:
         DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
+        TAG: ${{ env.app-version }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       with:
         task-url: ${{ env.asana-task-url }}
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        comment: "Debug symbols for ${{ env.app-version }} build are uploaded to ${{ env.DSYM_S3_PATH }}."
+        template-name: dsyms-uploaded
 
   create-dmg:
 
@@ -293,10 +295,13 @@ jobs:
 
     - name: Report success
       uses: ./.github/actions/asana-log-message
+      env:
+        DMG_URL: ${{ vars.TEST_DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       with:
         task-url: ${{ env.asana-task-url }}
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        comment: "DMG for ${{ env.app-version }} is available at ${{ vars.TEST_DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}."
+        template-name: dmg-uploaded
 
     - name: Extract Asana Task ID
       id: task-id
