@@ -345,7 +345,26 @@ final class BrowserTabViewController: NSViewController {
                 }
                 return old == new
             })
-            .asVoid()
+            .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                // For non-URL tabs, just emit an event
+                guard let tabViewModel, tabContent.isUrl else {
+                    return Just(()).eraseToAnyPublisher()
+                }
+
+                // For URL tabs, we only want to show tab content (webView) when webView starts
+                // navigation or when another navigation-related event happens.
+                // We take the first such event and move forward.
+                return Publishers.Merge5(
+                    tabViewModel.tab.webViewDidStartNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
+                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
+                    tabViewModel.tab.webViewDidFailNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
+                )
+                .prefix(1)
+                .eraseToAnyPublisher()
+            }
+            .switchToLatest()
             .receive(on: DispatchQueue.main)
             .sink { [weak self, weak tabViewModel] in
                 guard let tabViewModel else { return }
