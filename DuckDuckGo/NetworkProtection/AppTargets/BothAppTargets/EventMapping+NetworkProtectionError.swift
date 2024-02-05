@@ -53,6 +53,9 @@ extension EventMapping where Event == NetworkProtectionError {
         case .keychainWriteError(field: let field, status: let status):
             domainEvent = .networkProtectionKeychainWriteError(field: field, status: status)
             frequency = .standard
+        case .keychainUpdateError(field: let field, status: let status):
+            domainEvent = .networkProtectionKeychainUpdateError(field: field, status: status)
+            frequency = .standard
         case .keychainDeleteError(status: let status):
             domainEvent = .networkProtectionKeychainDeleteError(status: status)
             frequency = .standard

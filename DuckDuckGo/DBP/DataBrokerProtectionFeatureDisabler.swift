@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import DataBrokerProtection
 
@@ -49,3 +51,5 @@ struct DataBrokerProtectionFeatureDisabler: DataBrokerProtectionFeatureDisabling
         }
     }
 }
+
+#endif

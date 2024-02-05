@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1706192562672,
+    "version": 1707143571719,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1056,7 +1056,16 @@
         "customUserAgent": {
             "settings": {
                 "defaultPolicy": "brand",
-                "defaultSites": [],
+                "defaultSites": [
+                    {
+                        "domain": "chase.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/988"
+                    },
+                    {
+                        "domain": "web.whatsapp.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1780"
+                    }
+                ],
                 "webViewDefault": [
                     {
                         "domain": "accounts.google.com",
@@ -1078,7 +1087,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "005f62f0e37756cedcc2acfcb4216966"
+            "hash": "492b7a86e347eae43cf3d6f633a184ff"
         },
         "dbp": {
             "state": "enabled",
@@ -4533,6 +4542,11 @@
             "state": "disabled",
             "hash": "841fa92b9728c9754f050662678f82c7"
         },
+        "notificationPermissions": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
+        },
         "privacyDashboard": {
             "exceptions": [],
             "features": {
@@ -5610,6 +5624,12 @@
                                 "domains": [
                                     "<all>"
                                 ]
+                            },
+                            {
+                                "rule": "ezodn.com",
+                                "domains": [
+                                    "reisezoom.com"
+                                ]
                             }
                         ]
                     },
@@ -5943,7 +5963,8 @@
                                     "pandora.com",
                                     "paper-io.com",
                                     "rawstory.com",
-                                    "usatoday.com"
+                                    "usatoday.com",
+                                    "washingtonpost.com"
                                 ]
                             }
                         ]
@@ -6473,6 +6494,16 @@
                                 "domains": [
                                     "shein.co.uk",
                                     "shein.com"
+                                ]
+                            }
+                        ]
+                    },
+                    "mailerlite.com": {
+                        "rules": [
+                            {
+                                "rule": "mailerlite.com",
+                                "domains": [
+                                    "<all>"
                                 ]
                             }
                         ]
@@ -7642,7 +7673,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "82ea04107975fb96d073fcf8816c7228"
+            "hash": "c9ea7e3d491209cc42758decdbbb8143"
         },
         "trackingCookies1p": {
             "settings": {

@@ -18,8 +18,11 @@
 
 import Foundation
 import NetworkProtectionUI
+
+#if NETP_SYSTEM_EXTENSION
 import SystemExtensionManager
 import SystemExtensions
+#endif
 
 /// Network Protection's network extension session object.
 ///
@@ -27,22 +30,31 @@ import SystemExtensions
 ///
 final class NetworkExtensionController {
 
+#if NETP_SYSTEM_EXTENSION
     private let systemExtensionManager: SystemExtensionManager
+#endif
 
     init(extensionBundleID: String) {
+#if NETP_SYSTEM_EXTENSION
         systemExtensionManager = SystemExtensionManager(extensionBundleID: extensionBundleID)
+#endif
     }
+
 }
 
 extension NetworkExtensionController {
+
     func activateSystemExtension(waitingForUserApproval: @escaping () -> Void) async throws {
+#if NETP_SYSTEM_EXTENSION
         try await systemExtensionManager.activate(
             waitingForUserApproval: waitingForUserApproval)
 
         try? await Task.sleep(nanoseconds: 300 * NSEC_PER_MSEC)
+#endif
     }
 
     func deactivateSystemExtension() async throws {
+#if NETP_SYSTEM_EXTENSION
         do {
             try await systemExtensionManager.deactivate()
         } catch OSSystemExtensionError.extensionNotFound {
@@ -51,5 +63,7 @@ extension NetworkExtensionController {
         } catch {
             throw error
         }
+#endif
     }
+
 }

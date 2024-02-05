@@ -539,7 +539,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                   let location = panel.url else { return }
 
             do {
-                try data.writeFileWithProgress(to: location)
+                try Progress.withPublishedProgress(url: location) {
+                    try data.write(to: location)
+                }
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableCreateRecoveryPDF, description: error.localizedDescription)
                 firePixelIfNeeded(event: .debug(event: .syncCannotCreateRecoveryPDF, error: nil))
