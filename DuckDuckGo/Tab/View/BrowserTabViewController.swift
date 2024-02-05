@@ -16,12 +16,12 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Cocoa
-import WebKit
 import Combine
 import Common
 import SwiftUI
-import BrowserServicesKit
+import WebKit
 
 final class BrowserTabViewController: NSViewController {
     @IBOutlet var errorView: NSView!
@@ -412,7 +412,25 @@ final class BrowserTabViewController: NSViewController {
 
     private var setFirstResponderAfterAdding = false
 
+    private var shouldMakeWebViewFirstResponder: Bool {
+        if !(view.window?.firstResponder is NSText) {
+            return true
+        } else if case .url(_, _, source: let source) = tabViewModel?.tab.content {
+            switch source {
+            case .pendingStateRestoration, .loadedByStateRestoration, .webViewUpdated:
+                // prevent Address Bar deactivation when the WebView is restoring state or updates url on redirect
+                return false
+            case .userEntered, .historyEntry, .bookmark, .ui, .link, .appOpenUrl, .reload:
+                return true
+            }
+        } else {
+            return true
+        }
+    }
+
     private func setFirstResponderIfNeeded() {
+
+        guard shouldMakeWebViewFirstResponder else { return }
         guard let webView else {
             setFirstResponderAfterAdding = true
             return
@@ -422,7 +440,8 @@ final class BrowserTabViewController: NSViewController {
         }
 
         DispatchQueue.main.async { [weak self] in
-            self?.makeWebViewFirstResponder()
+            guard let self, shouldMakeWebViewFirstResponder else { return }
+            self.makeWebViewFirstResponder()
         }
     }
 

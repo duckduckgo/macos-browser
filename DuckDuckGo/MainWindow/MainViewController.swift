@@ -141,6 +141,7 @@ final class MainViewController: NSViewController {
         }
 
         updateDividerColor()
+        adjustFirstResponder()
     }
 
     override func viewDidLayout() {
