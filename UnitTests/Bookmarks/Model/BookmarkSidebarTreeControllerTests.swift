@@ -23,7 +23,7 @@ import XCTest
 class BookmarkSidebarTreeControllerTests: XCTestCase {
 
     func testWhenBookmarkStoreHasNoFolders_ThenOnlyDefaultNodesAreReturned() {
-        let dataSource = BookmarkSidebarTreeController()
+        let dataSource = BookmarkSidebarTreeController(bookmarkManager: LocalBookmarkManager())
         let treeController = BookmarkTreeController(dataSource: dataSource)
         let defaultNodes = treeController.rootNode.childNodes
         let representedObjects = defaultNodes.representedObjects()

@@ -33,20 +33,25 @@ private struct EditedBookmarkMetadata {
 final class BookmarkManagementDetailViewController: NSViewController, NSMenuItemValidation {
 
     fileprivate enum Constants {
-        static let bookmarkCellIdentifier = NSUserInterfaceItemIdentifier(rawValue: "BookmarksCellIdentifier")
         static let animationSpeed: TimeInterval = 0.3
     }
 
-    @IBOutlet var tableView: NSTableView!
-    @IBOutlet var colorView: ColorView!
-    @IBOutlet var contextMenu: NSMenu!
-    @IBOutlet var emptyState: NSView!
-    @IBOutlet var emptyStateTitle: NSTextField!
-    @IBOutlet var emptyStateMessage: NSTextField!
+    private lazy var newBookmarkButton = MouseOverButton(title: "  " + UserText.newBookmark, target: self, action: #selector(presentAddBookmarkModal))
+    private lazy var newFolderButton = MouseOverButton(title: "  " + UserText.newFolder, target: self, action: #selector(presentAddFolderModal))
+
+    private lazy var separator = NSBox()
+    private lazy var scrollView = NSScrollView()
+    private lazy var tableView = NSTableView()
+
+    private lazy var emptyState = NSView()
+    private lazy var emptyStateImageView = NSImageView(image: .bookmarksEmpty)
+    private lazy var emptyStateTitle = NSTextField()
+    private lazy var emptyStateMessage = NSTextField()
+    private lazy var importButton = NSButton(title: UserText.importBookmarksButtonTitle, target: self, action: #selector(onImportClicked))
 
     weak var delegate: BookmarkManagementDetailViewControllerDelegate?
 
-    private var bookmarkManager: BookmarkManager = LocalBookmarkManager.shared
+    private let bookmarkManager: BookmarkManager
     private var selectionState: BookmarkManagementSidebarViewController.SelectionState = .empty {
         didSet {
             editingBookmarkIndex = nil
@@ -66,9 +71,9 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
                 NSAppearance.withAppAppearance {
                     if editingBookmarkIndex != nil {
-                        colorView.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
                     } else {
-                        colorView.animator().layer?.backgroundColor = NSColor.bookmarkPageBackground.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.bookmarkPageBackground.cgColor
                     }
                 }
             }
@@ -79,6 +84,175 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         self.selectionState = selectionState
     }
 
+    init(bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+        self.bookmarkManager = bookmarkManager
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("\(type(of: self)): Bad initializer")
+    }
+
+    // swiftlint:disable:next function_body_length
+    override func loadView() {
+        view = ColorView(frame: .zero, backgroundColor: .interfaceBackgroundColor)
+        view.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(separator)
+        view.addSubview(scrollView)
+        view.addSubview(emptyState)
+        view.addSubview(newBookmarkButton)
+        view.addSubview(newFolderButton)
+
+        newBookmarkButton.bezelStyle = .shadowlessSquare
+        newBookmarkButton.cornerRadius = 4
+        newBookmarkButton.normalTintColor = .button
+        newBookmarkButton.mouseDownColor = .buttonMouseDownColor
+        newBookmarkButton.mouseOverColor = .buttonMouseOverColor
+        newBookmarkButton.imageHugsTitle = true
+        newBookmarkButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        newBookmarkButton.translatesAutoresizingMaskIntoConstraints = false
+        newBookmarkButton.alignment = .center
+        newBookmarkButton.font = .systemFont(ofSize: 13)
+        newBookmarkButton.image = .addBookmark
+        newBookmarkButton.imagePosition = .imageLeading
+
+        newFolderButton.bezelStyle = .shadowlessSquare
+        newFolderButton.cornerRadius = 4
+        newFolderButton.normalTintColor = .button
+        newFolderButton.mouseDownColor = .buttonMouseDownColor
+        newFolderButton.mouseOverColor = .buttonMouseOverColor
+        newFolderButton.imageHugsTitle = true
+        newFolderButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        newFolderButton.translatesAutoresizingMaskIntoConstraints = false
+        newFolderButton.alignment = .center
+        newFolderButton.font = .systemFont(ofSize: 13)
+        newFolderButton.image = .addFolder
+        newFolderButton.imagePosition = .imageLeading
+
+        emptyState.addSubview(emptyStateImageView)
+        emptyState.addSubview(emptyStateTitle)
+        emptyState.addSubview(emptyStateMessage)
+        emptyState.addSubview(importButton)
+
+        emptyState.isHidden = true
+        emptyState.translatesAutoresizingMaskIntoConstraints = false
+
+        emptyStateTitle.isEditable = false
+        emptyStateTitle.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        emptyStateTitle.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        emptyStateTitle.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateTitle.alignment = .center
+        emptyStateTitle.drawsBackground = false
+        emptyStateTitle.isBordered = false
+        emptyStateTitle.font = .systemFont(ofSize: 15, weight: .semibold)
+        emptyStateTitle.textColor = .labelColor
+        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateTitle,
+                                                                        lineHeight: 1.14,
+                                                                        kern: -0.23)
+
+        emptyStateMessage.isEditable = false
+        emptyStateMessage.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        emptyStateMessage.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        emptyStateMessage.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateMessage.alignment = .center
+        emptyStateMessage.drawsBackground = false
+        emptyStateMessage.isBordered = false
+        emptyStateMessage.font = .systemFont(ofSize: 13)
+        emptyStateMessage.textColor = .labelColor
+        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateMessage,
+                                                                          lineHeight: 1.05,
+                                                                          kern: -0.08)
+
+        emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
+        emptyStateImageView.translatesAutoresizingMaskIntoConstraints = false
+        emptyStateImageView.imageScaling = .scaleProportionallyDown
+
+        scrollView.autohidesScrollers = true
+        scrollView.borderType = .noBorder
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.usesPredominantAxisScrolling = false
+        scrollView.automaticallyAdjustsContentInsets = false
+        scrollView.contentInsets = NSEdgeInsets(top: 22, left: 0, bottom: 22, right: 0)
+        scrollView.menu = NSMenu()
+        scrollView.menu!.delegate = self
+
+        let clipView = NSClipView()
+        clipView.documentView = tableView
+
+        clipView.autoresizingMask = [.width, .height]
+        clipView.backgroundColor = .clear
+        clipView.drawsBackground = false
+        clipView.frame = CGRect(x: 0, y: 0, width: 640, height: 601)
+
+        tableView.addTableColumn(NSTableColumn())
+
+        tableView.headerView = nil
+        tableView.backgroundColor = .clear
+        tableView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        tableView.style = .plain
+        tableView.selectionHighlightStyle = .none
+        tableView.usesAutomaticRowHeights = true
+        tableView.action = #selector(handleClick)
+        tableView.doubleAction = #selector(handleDoubleClick)
+        tableView.delegate = self
+        tableView.dataSource = self
+
+        scrollView.contentView = clipView
+
+        separator.boxType = .separator
+        separator.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        setupLayout()
+    }
+
+    private func setupLayout() {
+        newBookmarkButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48).isActive = true
+        view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 48).isActive = true
+        separator.topAnchor.constraint(equalTo: newBookmarkButton.bottomAnchor, constant: 24).isActive = true
+        emptyState.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20).isActive = true
+        scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor).isActive = true
+
+        view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        view.trailingAnchor.constraint(greaterThanOrEqualTo: newFolderButton.trailingAnchor, constant: 20).isActive = true
+        view.trailingAnchor.constraint(equalTo: separator.trailingAnchor, constant: 58).isActive = true
+        newFolderButton.leadingAnchor.constraint(equalTo: newBookmarkButton.trailingAnchor, constant: 16).isActive = true
+        emptyState.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        newFolderButton.centerYAnchor.constraint(equalTo: newBookmarkButton.centerYAnchor).isActive = true
+        separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58).isActive = true
+        newBookmarkButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
+        emptyState.topAnchor.constraint(greaterThanOrEqualTo: separator.bottomAnchor, constant: 8).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48).isActive = true
+        emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor).isActive = true
+
+        newBookmarkButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        newBookmarkButton.widthAnchor.constraint(equalToConstant: 130).isActive = true
+
+        newFolderButton.widthAnchor.constraint(equalToConstant: 110).isActive = true
+        newFolderButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
+
+        emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+
+        importButton.translatesAutoresizingMaskIntoConstraints = false
+        importButton.topAnchor.constraint(equalTo: emptyStateMessage.bottomAnchor, constant: 8).isActive = true
+        emptyState.heightAnchor.constraint(equalToConstant: 218).isActive = true
+        emptyStateMessage.topAnchor.constraint(equalTo: emptyStateTitle.bottomAnchor, constant: 8).isActive = true
+        importButton.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+        emptyStateImageView.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+        emptyState.widthAnchor.constraint(equalToConstant: 224).isActive = true
+        emptyStateImageView.topAnchor.constraint(equalTo: emptyState.topAnchor).isActive = true
+        emptyStateTitle.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
+        emptyStateTitle.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 8).isActive = true
+
+        emptyStateMessage.widthAnchor.constraint(equalToConstant: 192).isActive = true
+
+        emptyStateTitle.widthAnchor.constraint(equalToConstant: 192).isActive = true
+
+        emptyStateImageView.widthAnchor.constraint(equalToConstant: 128).isActive = true
+        emptyStateImageView.heightAnchor.constraint(equalToConstant: 96).isActive = true
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -87,11 +261,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                                            FolderPasteboardWriter.folderUTIInternalType])
 
         reloadData()
-        self.tableView.selectionHighlightStyle = .none
-
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(emptyStateTitle.stringValue, lineHeight: 1.14, kern: -0.23)
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(emptyStateMessage.stringValue, lineHeight: 1.05, kern: -0.08)
-   }
+    }
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
@@ -122,11 +292,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         tableView.scroll(scrollPosition)
     }
 
-    @IBAction func onImportClicked(_ sender: NSButton) {
+    @objc func onImportClicked(_ sender: NSButton) {
         DataImportView().show()
     }
 
-    @IBAction func handleDoubleClick(_ sender: NSTableView) {
+    @objc func handleDoubleClick(_ sender: NSTableView) {
         if sender.selectedRowIndexes.count > 1 {
             let entities = sender.selectedRowIndexes.map { fetchEntity(at: $0) }
             let bookmarks = entities.compactMap { $0 as? Bookmark }
@@ -155,7 +325,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }
     }
 
-    @IBAction func handleClick(_ sender: NSTableView) {
+    @objc func handleClick(_ sender: NSTableView) {
         let index = sender.clickedRow
 
         if index != editingBookmarkIndex?.index {
@@ -163,17 +333,17 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         }
     }
 
-    @IBAction func presentAddBookmarkModal(_ sender: Any) {
+    @objc func presentAddBookmarkModal(_ sender: Any) {
         AddBookmarkModalView(model: AddBookmarkModalViewModel(parent: selectionState.folder))
             .show(in: view.window)
     }
 
-    @IBAction func presentAddFolderModal(_ sender: Any) {
+    @objc func presentAddFolderModal(_ sender: Any) {
         AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(parent: selectionState.folder))
             .show(in: view.window)
     }
 
-    @IBAction func delete(_ sender: AnyObject) {
+    @objc func delete(_ sender: AnyObject) {
         deleteSelectedItems()
     }
 
@@ -235,11 +405,11 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     private func totalRows() -> Int {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.list?.topLevelEntities.count ?? 0
+            return bookmarkManager.list?.topLevelEntities.count ?? 0
         case .folder(let folder):
             return folder.children.count
         case .favorites:
-            return LocalBookmarkManager.shared.list?.favoriteBookmarks.count ?? 0
+            return bookmarkManager.list?.favoriteBookmarks.count ?? 0
         }
     }
 
@@ -287,8 +457,8 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         guard let entity = fetchEntity(at: row) else { return nil }
 
-        let cell = tableView.makeView(withIdentifier: Constants.bookmarkCellIdentifier, owner: nil) as? BookmarkTableCellView
-            ?? BookmarkTableCellView(identifier: Constants.bookmarkCellIdentifier)
+        let cell = tableView.makeView(withIdentifier: .init(BookmarkTableCellView.className()), owner: nil) as? BookmarkTableCellView
+            ?? BookmarkTableCellView(identifier: .init(BookmarkTableCellView.className()))
 
         cell.delegate = self
 
@@ -374,20 +544,20 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
 
         if let parent = fetchEntity(at: row) as? BookmarkFolder, dropOperation == .on {
-            LocalBookmarkManager.shared.add(objectsWithUUIDs: draggedItemIdentifiers, to: parent) { _ in }
+            bookmarkManager.add(objectsWithUUIDs: draggedItemIdentifiers, to: parent) { _ in }
             return true
         } else if let currentFolderUUID = selectionState.selectedFolderUUID {
-            LocalBookmarkManager.shared.move(objectUUIDs: draggedItemIdentifiers,
-                                             toIndex: row,
-                                             withinParentFolder: .parent(uuid: currentFolderUUID)) { _ in }
+            bookmarkManager.move(objectUUIDs: draggedItemIdentifiers,
+                                 toIndex: row,
+                                 withinParentFolder: .parent(uuid: currentFolderUUID)) { _ in }
             return true
         } else {
             if selectionState == .favorites {
-                LocalBookmarkManager.shared.moveFavorites(with: draggedItemIdentifiers, toIndex: row) { _ in }
+                bookmarkManager.moveFavorites(with: draggedItemIdentifiers, toIndex: row) { _ in }
             } else {
-                LocalBookmarkManager.shared.move(objectUUIDs: draggedItemIdentifiers,
-                                                 toIndex: row,
-                                                 withinParentFolder: .root) { _ in }
+                bookmarkManager.move(objectUUIDs: draggedItemIdentifiers,
+                                     toIndex: row,
+                                     withinParentFolder: .root) { _ in }
             }
             return true
         }
@@ -396,22 +566,22 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     private func fetchEntity(at row: Int) -> BaseBookmarkEntity? {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.list?.topLevelEntities[safe: row]
+            return bookmarkManager.list?.topLevelEntities[safe: row]
         case .folder(let folder):
             return folder.children[safe: row]
         case .favorites:
-            return LocalBookmarkManager.shared.list?.favoriteBookmarks[safe: row]
+            return bookmarkManager.list?.favoriteBookmarks[safe: row]
         }
     }
 
     private func index(for entity: Bookmark) -> Int? {
         switch selectionState {
         case .empty:
-            return LocalBookmarkManager.shared.list?.topLevelEntities.firstIndex(of: entity)
+            return bookmarkManager.list?.topLevelEntities.firstIndex(of: entity)
         case .folder(let folder):
             return folder.children.firstIndex(of: entity)
         case .favorites:
-            return LocalBookmarkManager.shared.list?.favoriteBookmarks.firstIndex(of: entity)
+            return bookmarkManager.list?.favoriteBookmarks.firstIndex(of: entity)
         }
     }
 
@@ -497,7 +667,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         }
 
         bookmark.isFavorite.toggle()
-        LocalBookmarkManager.shared.update(bookmark: bookmark)
+        bookmarkManager.update(bookmark: bookmark)
     }
 
     func bookmarkTableCellView(_ cell: BookmarkTableCellView, updatedBookmarkWithUUID uuid: String, newTitle: String, newUrl: String) {
@@ -585,7 +755,7 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(folder: folder)
+        bookmarkManager.remove(folder: folder)
     }
 
     func openInNewTabs(_ sender: NSMenuItem) {
@@ -626,7 +796,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     func toggleBookmarkAsFavorite(_ sender: NSMenuItem) {
         if let bookmark = sender.representedObject as? Bookmark {
             bookmark.isFavorite.toggle()
-            LocalBookmarkManager.shared.update(bookmark: bookmark)
+            bookmarkManager.update(bookmark: bookmark)
         } else if let bookmarks = sender.representedObject as? [Bookmark] {
             let bookmarkIdentifiers = bookmarks.map(\.id)
             bookmarkManager.update(objectsWithUUIDs: bookmarkIdentifiers, update: { entity in
@@ -661,7 +831,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(bookmark: bookmark)
+        bookmarkManager.remove(bookmark: bookmark)
     }
 
     func deleteEntities(_ sender: NSMenuItem) {
@@ -676,7 +846,38 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
             return
         }
 
-        LocalBookmarkManager.shared.remove(objectsWithUUIDs: uuids)
+        bookmarkManager.remove(objectsWithUUIDs: uuids)
     }
 
 }
+
+#if DEBUG
+@available(macOS 14.0, *)
+#Preview(traits: .fixedLayout(width: 700, height: 660)) {
+
+    return BookmarkManagementDetailViewController(bookmarkManager: {
+        let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
+            BookmarkFolder(id: "1", title: "Folder 1", children: [
+                BookmarkFolder(id: "2", title: "Nested Folder", children: [
+                    Bookmark(id: "b1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "2")
+                ])
+            ]),
+            BookmarkFolder(id: "3", title: "Another Folder", children: [
+                BookmarkFolder(id: "4", title: "Nested Folder", children: [
+                    BookmarkFolder(id: "5", title: "Another Nested Folder", children: [
+                        Bookmark(id: "b2", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "5")
+                    ])
+                ])
+            ]),
+            Bookmark(id: "b3", url: URL.duckDuckGo.absoluteString, title: "Bookmark 1", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b4", url: URL.duckDuckGo.absoluteString, title: "Bookmark 2", isFavorite: false, parentFolderUUID: ""),
+            Bookmark(id: "b5", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "")
+        ]))
+        bkman.loadBookmarks()
+        customAssertionFailure = { _, _, _ in }
+
+        return bkman
+    }())
+
+}
+#endif
