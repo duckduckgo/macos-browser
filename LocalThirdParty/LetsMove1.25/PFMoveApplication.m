@@ -49,7 +49,7 @@ static NSString *AlertSuppressKey = @"moveToApplicationsFolderAlertSuppress";
 static BOOL MoveInProgress = NO;
 
 // Helper functions
-static NSString *PreferredInstallLocation(BOOL *isUserDirectory);
+static NSString *PreferredInstallLocation(void);
 static BOOL IsInApplicationsFolder(NSString *path);
 static BOOL IsInDownloadsFolder(NSString *path);
 static BOOL IsApplicationAtPathRunning(NSString *path);
@@ -97,8 +97,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 	NSString *diskImageDevice = ContainingDiskImageDevice(bundlePath);
 
 	// Since we are good to go, get the preferred installation directory.
-	BOOL installToUserApplications = NO;
-	NSString *applicationsDirectory = PreferredInstallLocation(&installToUserApplications);
+	NSString *applicationsDirectory = PreferredInstallLocation();
 	NSString *bundleName = [bundlePath lastPathComponent];
 	NSString *destinationPath = [applicationsDirectory stringByAppendingPathComponent:bundleName];
 
@@ -113,7 +112,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 	{
 		NSString *informativeText = nil;
 
-		[alert setMessageText:(installToUserApplications ? kStrMoveApplicationQuestionTitleHome : kStrMoveApplicationQuestionTitle)];
+		[alert setMessageText:kStrMoveApplicationQuestionTitle];
 
 		informativeText = kStrMoveApplicationQuestionMessage;
 
@@ -239,24 +238,21 @@ BOOL PFMoveIsInProgress(void) {
 #pragma mark -
 #pragma mark Helper Functions
 
-static NSString *PreferredInstallLocation(BOOL *isUserDirectory) {
+static NSString *PreferredInstallLocation(void) {
 	// Return the preferred install location.
 	// Assume that if the user has a ~/Applications folder, they'd prefer their
 	// applications to go there.
 
-	return [[NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES) lastObject] stringByResolvingSymlinksInPath];
+    return [[NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES) lastObject] stringByResolvingSymlinksInPath];
 }
 
 static BOOL IsInApplicationsFolder(NSString *path) {
 	// Check all the normal Application directories
-	NSArray *applicationDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSAllDomainsMask, YES);
+	NSArray *applicationDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
 	for (NSString *appDir in applicationDirs) {
-		if ([path hasPrefix:appDir]) return YES;
+        NSURL *appDirFileURL = [[NSURL alloc] initFileURLWithPath:appDir isDirectory:YES];
+		if ([path hasPrefix:appDirFileURL.absoluteString]) return YES;
 	}
-
-	// Also, handle the case that the user has some other Application directory (perhaps on a separate data partition).
-	if ([[path pathComponents] containsObject:@"Applications"]) return YES;
-
 	return NO;
 }
 

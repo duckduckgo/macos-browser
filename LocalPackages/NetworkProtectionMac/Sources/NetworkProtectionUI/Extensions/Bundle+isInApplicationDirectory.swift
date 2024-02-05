@@ -20,15 +20,17 @@ import Foundation
 
 extension Bundle {
     var isInApplicationDirectory: Bool {
-        let appPath = bundleURL.deletingLastPathComponent()
-        let dirPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .allDomainsMask, true)
+        guard let appPath = resourceURL?.deletingLastPathComponent() else { return false }
+        let dirPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
         var applicationIsAtCorrectPath = false
-        for path in dirPaths where appPath.absoluteString.hasPrefix(path) {
-            applicationIsAtCorrectPath = true
-        }
-
-        if appPath.pathComponents.contains("Applications") {
-            applicationIsAtCorrectPath = true
+        for path in dirPaths {
+            let filePath: URL
+            if #available(macOS 13.0, *) {
+                filePath = URL(filePath: path)
+            } else {
+                filePath = URL(fileURLWithPath: path)
+            }
+            applicationIsAtCorrectPath = appPath.absoluteString.hasPrefix(filePath.absoluteString)
         }
         return applicationIsAtCorrectPath
     }
