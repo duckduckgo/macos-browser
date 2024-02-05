@@ -77,7 +77,7 @@ public final class DefaultDataBrokerProtectionScheduler: DataBrokerProtectionSch
 
     /// Ensures that only one scheduler operation is executed at the same time.
     ///
-    private let schedulerDispatchQueue = DispatchQueue(label: "schedulerDispatchQueue", qos: .default)
+    private let schedulerDispatchQueue = DispatchQueue(label: "schedulerDispatchQueue", qos: .background)
 
     @Published public var status: DataBrokerProtectionSchedulerStatus = .stopped
 
