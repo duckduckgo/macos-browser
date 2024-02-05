@@ -146,7 +146,7 @@ final class URLEventHandler {
         case AppLaunchCommand.moveAppToApplications.launchURL:
 #if !APPSTORE
             // this should be run after NSApplication.shared is set
-            PFMoveToApplicationsFolderIfNecessary()
+            PFMoveToApplicationsFolderIfNecessary(false)
 #endif
         default:
             return

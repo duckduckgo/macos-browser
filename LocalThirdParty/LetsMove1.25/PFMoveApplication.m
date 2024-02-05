@@ -63,19 +63,19 @@ static NSString *ShellQuotedString(NSString *string);
 static void Relaunch(NSString *destinationPath);
 
 // Main worker function
-void PFMoveToApplicationsFolderIfNecessary(void) {
+void PFMoveToApplicationsFolderIfNecessary(BOOL allowAlertSilencing) {
 
 	// Make sure to do our work on the main thread.
 	// Apparently Electron apps need this for things to work properly.
 	if (![NSThread isMainThread]) {
 		dispatch_async(dispatch_get_main_queue(), ^{
-			PFMoveToApplicationsFolderIfNecessary();
+			PFMoveToApplicationsFolderIfNecessary(allowAlertSilencing);
 		});
 		return;
 	}
 	
 	// Skip if user suppressed the alert before
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return;
+	if (!allowAlertSilencing && [[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return;
 
 	// Path of the bundle
 	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -136,7 +136,7 @@ void PFMoveToApplicationsFolderIfNecessary(void) {
 		[cancelButton setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // Escape key
 
 		// Setup suppression button
-		[alert setShowsSuppressionButton:YES];
+		[alert setShowsSuppressionButton:allowAlertSilencing];
 
 		if (PFUseSmallAlertSuppressCheckbox) {
 			NSCell *cell = [[alert suppressionButton] cell];
