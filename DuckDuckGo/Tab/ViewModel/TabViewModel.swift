@@ -282,6 +282,8 @@ final class TabViewModel {
         switch tab.content {
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
+        case .subscription:
+            title = UserText.tabSubscriptionTitle
         case .settings:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
@@ -315,6 +317,9 @@ final class TabViewModel {
         switch tab.content {
         case .dataBrokerProtection:
             favicon = Favicon.dataBrokerProtection
+            return
+        case .subscription:
+            favicon = Favicon.home
             return
         case .newtab:
             if tab.burnerMode.isBurner {

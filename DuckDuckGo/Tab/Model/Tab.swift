@@ -24,6 +24,7 @@ import Foundation
 import Navigation
 import UserScript
 import WebKit
+import Subscription
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -57,6 +58,7 @@ protocol NewWindowPolicyDecisionMaker {
         case onboarding
         case none
         case dataBrokerProtection
+        case subscription
 
         enum URLSource: Equatable {
             case pendingStateRestoration
@@ -126,6 +128,8 @@ protocol NewWindowPolicyDecisionMaker {
                     return .newtab
                 }
                 return .url(customURL, source: source)
+            case URL.purchaseSubscription, URL.purchaseSubscription.deletingLastPathComponent():
+                return .subscription
             default: break
             }
 
@@ -184,6 +188,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
             case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
+            case .subscription: return UserText.tabSubscriptionTitle
             }
         }
 
@@ -215,6 +220,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .welcome
             case .dataBrokerProtection:
                 return .dataBrokerProtection
+            case .subscription:
+                return .purchaseSubscription
             case .none:
                 return nil
             }
@@ -222,7 +229,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUrl: Bool {
             switch self {
-            case .url:
+            case .url, .subscription:
                 return true
             default:
                 return false

@@ -424,6 +424,8 @@ final class MainViewController: NSViewController {
             shouldAdjustFirstResponderOnContentChange = true
         case .dataBrokerProtection:
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
+        default:
+            break
         }
     }
 

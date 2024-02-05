@@ -67,6 +67,9 @@ private extension NSMenuItem {
         case .dataBrokerProtection:
             image = TabViewModel.Favicon.dataBrokerProtection
             title = UserText.tabDataBrokerProtectionTitle
+        case .subscription:
+            image = TabViewModel.Favicon.home
+            title = UserText.tabSubscriptionTitle
         case .newtab:
             image = TabViewModel.Favicon.home
             title = UserText.tabHomeTitle

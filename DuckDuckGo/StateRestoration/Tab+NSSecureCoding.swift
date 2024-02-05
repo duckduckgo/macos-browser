@@ -92,6 +92,7 @@ private extension Tab.TabContent {
         case onboarding = 4
         case duckPlayer = 5
         case dataBrokerProtection = 6
+        case subscription = 7
     }
 
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
@@ -112,6 +113,8 @@ private extension Tab.TabContent {
             self = .url(.duckPlayer(videoID, timestamp: timestamp), source: .pendingStateRestoration)
         case .dataBrokerProtection:
             self = .dataBrokerProtection
+        case .subscription:
+            self = .subscription
         }
     }
 
@@ -124,6 +127,7 @@ private extension Tab.TabContent {
         case .onboarding: return .onboarding
         case .none: return .newtab
         case .dataBrokerProtection: return .dataBrokerProtection
+        case .subscription: return .subscription
         }
     }
 
