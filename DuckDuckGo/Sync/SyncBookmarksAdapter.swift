@@ -44,7 +44,7 @@ final class SyncBookmarksAdapter {
     @Published
     var isFaviconsFetchingEnabled: Bool = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false).wrappedValue {
         didSet {
-            var udWrapper = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false)
+            let udWrapper = UserDefaultsWrapper(key: .syncIsFaviconsFetcherEnabled, defaultValue: false)
             udWrapper.wrappedValue = isFaviconsFetchingEnabled
             if isFaviconsFetchingEnabled {
                 faviconsFetcher?.initializeFetcherState()

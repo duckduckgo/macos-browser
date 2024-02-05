@@ -31,6 +31,14 @@ Fetches and updates certificates and provisioning profiles for App Store distrib
 
 Makes App Store release build and uploads it to TestFlight
 
+### mac release_testflight_review
+
+```sh
+[bundle exec] fastlane mac release_testflight_review
+```
+
+Makes App Store release build and uploads it to TestFlight
+
 ### mac release_appstore
 
 ```sh
