@@ -215,7 +215,7 @@ jobs:
       with:
         task-url: ${{ env.asana-task-url }}
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        template-name: dsyms-uploaded
+        template-name: debug-symbols-uploaded
 
   create-dmg:
 
