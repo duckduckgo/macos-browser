@@ -1282,7 +1282,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     private func loadErrorHTML(_ error: WKError, header: String, forUnreachableURL url: URL, alternate: Bool) {
-        let html = ErrorPageHTMLTemplate(error: error, title: UserText.tabErrorTitle, header: header).makeHTMLFromTemplate()
+        let html = ErrorPageHTMLTemplate(error: error, header: header).makeHTMLFromTemplate()
         if alternate {
             webView.loadAlternateHTML(html, baseURL: .error, forUnreachableURL: url)
         } else {

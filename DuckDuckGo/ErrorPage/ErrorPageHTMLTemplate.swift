@@ -31,7 +31,6 @@ struct ErrorPageHTMLTemplate {
     }
 
     let error: WKError
-    let title: String
     let header: String
 
     func makeHTMLFromTemplate() -> String {
@@ -41,7 +40,6 @@ struct ErrorPageHTMLTemplate {
         }
         return html.replacingOccurrences(of: "$ERROR_CODE$", with: String(error.errorCode), options: .literal)
             .replacingOccurrences(of: "$ERROR_DESCRIPTION$", with: error.localizedDescription, options: .literal)
-            .replacingOccurrences(of: "$TITLE$", with: title, options: .literal)
             .replacingOccurrences(of: "$HEADER$", with: header, options: .literal)
     }
 
