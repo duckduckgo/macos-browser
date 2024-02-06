@@ -274,6 +274,10 @@ extension DateFormatter {
 // MARK: - Verification of the signing keys
 
 func verifySigningKeys() -> Bool {
+    if isCI {
+        print("Running in CI mode. Skipping verification of signing keys.")
+        return true
+    }
     let publicKeyOutput = shell("generate_keys", "-p").trimmingCharacters(in: .whitespacesAndNewlines)
     let desiredPublicKey = "ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo="
 
