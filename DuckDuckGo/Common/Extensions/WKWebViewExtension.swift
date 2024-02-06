@@ -251,7 +251,7 @@ extension WKWebView {
     }
 
     func setDocumentHtml(_ html: String) {
-        self.evaluateJavaScript("document.open; document.write('\(html.escapedJavaScriptString())'); document.close()", in: nil, in: .defaultClient)
+        self.evaluateJavaScript("document.open(); document.write('\(html.escapedJavaScriptString())'); document.close()", in: nil, in: .defaultClient)
     }
 
     @MainActor
