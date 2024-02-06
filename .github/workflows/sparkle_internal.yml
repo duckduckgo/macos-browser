@@ -88,8 +88,8 @@ jobs:
           TASK_ID: ${{ steps.task-id.outputs.task-id }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
-          curl -fLSs 'https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes' \
-            -H 'Authorization: Bearer ${ASANA_ACCESS_TOKEN}' \
+          curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
+            -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
             | jq -r .data.notes \
             | ./scripts/extract_release_notes.sh > release_notes.txt
 
