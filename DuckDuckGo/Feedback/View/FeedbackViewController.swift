@@ -47,9 +47,8 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var titleLabel: NSTextField!
     @IBOutlet weak var okButton: NSButton!
     @IBOutlet weak var thankYouLabel: NSTextField!
-    @IBOutlet weak var feedbackLabel: NSView!
     @IBOutlet weak var cancelButton: NSButton!
-    
+    @IBOutlet weak var feedbackHelpsLabel: NSTextField!
 
     @IBOutlet weak var optionPopUpButton: NSPopUpButton!
     @IBOutlet weak var pickOptionMenuItem: NSMenuItem!
@@ -70,6 +69,11 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var thankYouView: NSView!
     private var cancellables = Set<AnyCancellable>()
 
+    @IBOutlet weak var generalFeedbackItem: NSMenuItem!
+    @IBOutlet weak var requestFeatureItem: NSMenuItem!
+    @IBOutlet weak var reportProblemITem: NSMenuItem!
+    @IBOutlet weak var selectCategoryItem: NSMenuItem!
+
     var currentTab: Tab?
     var currentTabUrl: URL? {
         guard let url = currentTab?.content.url else {
@@ -84,6 +88,7 @@ final class FeedbackViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         setContentViewHeight(Constants.defaultContentHeight, animated: false)
         setupTextViews()
     }
@@ -156,16 +161,16 @@ final class FeedbackViewController: NSViewController {
     private func setupTextViews() {
         browserFeedbackTextView.delegate = self
         browserFeedbackTextView.font = NSFont.systemFont(ofSize: 12)
-        titleLabel.stringValue = "Help Improve the DuckDuckGo Browser"
-        let categories = [
-            "Report a problem",
-            "Request a feature",
-            "General feedback"
-        ]
-        optionPopUpButton.title = "Select a category"
-        optionPopUpButton.removeAllItems()
-        optionPopUpButton.addItems(withTitles: categories)
-
+        titleLabel.stringValue = UserText.browserFeedbackTitle
+        okButton.title = UserText.ok
+        thankYouLabel.stringValue = UserText.browserFeedbackThankYou
+        feedbackHelpsLabel.stringValue = UserText.browserFeedbackFeedbackHelps
+        cancelButton.title = UserText.cancel
+        submitButton.title = UserText.submit
+        generalFeedbackItem.title = UserText.browserFeedbackGeneralFeedback
+        requestFeatureItem.title = UserText.browserFeedbackRequestFeature
+        reportProblemITem.title = UserText.browserFeedbackReportProblem
+        selectCategoryItem.title = UserText.browserFeedbackSelectCategory
     }
 
     private var selectedFormOption: FormOption? {

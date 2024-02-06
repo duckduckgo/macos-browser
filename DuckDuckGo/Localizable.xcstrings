@@ -6407,6 +6407,42 @@
         }
       }
     },
+    "permission.popup.allow.button" : {
+      "comment" : "Button that the user can use to authorise a web site to for, for example access location or camera and microphone etc.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow"
+          }
+        }
+      }
+    },
+    "permission.popup.blocked.popover" : {
+      "comment" : "Text of popver warning the user that the a pop-up as been blocked",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pop-up Blocked"
+          }
+        }
+      }
+    },
+    "permission.popup.learn-more.link" : {
+      "comment" : "Text of link that leads to web page with more informations about location services.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn more about location services"
+          }
+        }
+      }
+    },
     "permission.popup.open.format" : {
       "comment" : "Open %@ URL Pop-up",
       "extractionState" : "extracted_with_value",
@@ -8293,6 +8329,90 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Send Browser Feedback"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.feedback-helps" : {
+      "comment" : "Text shown to the user when they provide feedback.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your feedback will help us improve the DuckDuckGo app."
+          }
+        }
+      }
+    },
+    "send.browser.feedback.general-feedback" : {
+      "comment" : "Name of the option the user can chose to give general browser feedback",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "General feedback"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.report-problem" : {
+      "comment" : "Name of the option the user can chose to give browser feedback about a problem they enountered",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Report a problem"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.request-feature" : {
+      "comment" : "Name of the option the user can chose to give browser feedback about a feature they would like",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Request a feature"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.select-category" : {
+      "comment" : "Title of the picker where the user can chose the category of the feedback they want ot send.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a category"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.thankyou" : {
+      "comment" : "Thanks the user for sending feedback",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Thank you!"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.title" : {
+      "comment" : "Title of the interface to send feedback on the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Help Improve the DuckDuckGo Browser"
           }
         }
       }
