@@ -152,12 +152,11 @@ class ErrorPageTests: XCTestCase {
 
         XCTAssertEqual(error.errorCode, NSError.hostNotFound.code)
         XCTAssertEqual(error.localizedDescription, NSError.hostNotFound.localizedDescription)
-        let titleText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('title')[0].innerText")
         let headerText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-header')[0].innerText")
         let errorDescr: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-description')[0].innerText")
 
-        XCTAssertEqual(tab.title, UserText.tabErrorTitle)
-        XCTAssertEqual(titleText?.trimmingWhitespace(), tab.title)
+        XCTAssertNil(tab.title)
+        XCTAssertEqual(tabViewModel.title, UserText.tabErrorTitle)
         XCTAssertEqual(headerText?.trimmingWhitespace(), UserText.errorPageHeader)
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.hostNotFound.localizedDescription)
         XCTAssertTrue(tab.canGoBack)
@@ -166,6 +165,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertFalse(viewModel.tabViewModel(at: 0)!.canSaveContent)
         XCTAssertEqual(tab.backHistoryItems.count, 1)
         XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
+        XCTAssertNil(tab.currentHistoryItem?.title)
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
         XCTAssertEqual(tab.content.userEditableUrl, .test)
     }
@@ -224,8 +224,10 @@ class ErrorPageTests: XCTestCase {
 
         // wait for error page to open
         let eNavigationFailed = tab1.$error.compactMap { $0 }.timeout(5).first().promise()
+        let eNavigationFinished = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
         _=try await eNavigationFailed.value
+        _=try await eNavigationFinished.value
 
         // switch to tab 2
         tabsViewModel.select(at: .unpinned(1))
@@ -239,13 +241,11 @@ class ErrorPageTests: XCTestCase {
         let eNavigationFailed2 = tab1.$error.compactMap { $0 }.filter {
             $0.errorCode == NSError.noConnection.code
         }.timeout(5).first().promise()
-        let eNavigationFinished2 = tab1.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
 
         tabsViewModel.select(at: .unpinned(0))
 
         await fulfillment(of: [eServerQueried], timeout: 1)
         let error = try await eNavigationFailed2.value
-        _=try await eNavigationFinished2.value
 
         let c = tab1.$isLoading.dropFirst().sink { isLoading in
             XCTFail("Failing tab shouldn‘t reload again (isLoading: \(isLoading))")
@@ -253,11 +253,10 @@ class ErrorPageTests: XCTestCase {
 
         XCTAssertEqual(error.errorCode, NSError.noConnection.code)
         XCTAssertEqual(error.localizedDescription, NSError.noConnection.localizedDescription)
-        let titleText: String? = try await tab1.webView.evaluateJavaScript("document.getElementsByTagName('title')[0].innerText")
         let headerText: String? = try await tab1.webView.evaluateJavaScript("document.getElementsByClassName('error-header')[0].innerText")
         let errorDescr: String? = try await tab1.webView.evaluateJavaScript("document.getElementsByClassName('error-description')[0].innerText")
-        XCTAssertEqual(tab1.title, UserText.tabErrorTitle)
-        XCTAssertEqual(titleText?.trimmingWhitespace(), tab1.title)
+        XCTAssertNil(tab1.title)
+        XCTAssertEqual(tabsViewModel.tabViewModel(at: 0)?.title, UserText.tabErrorTitle)
         XCTAssertEqual(headerText?.trimmingWhitespace(), UserText.errorPageHeader)
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.noConnection.localizedDescription)
 
@@ -384,16 +383,15 @@ class ErrorPageTests: XCTestCase {
         _=try await eNavigationFailed2.value
         _=try await eBackPageLoaded.value
 
-        let titleText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('title')[0].innerText")
         let headerText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-header')[0].innerText")
         let errorDescr: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-description')[0].innerText")
-        XCTAssertEqual(tab.title, UserText.tabErrorTitle)
-        XCTAssertEqual(titleText?.trimmingWhitespace(), tab.title)
+        XCTAssertNil(tab.title)
+        XCTAssertEqual(tabViewModel.title, UserText.tabErrorTitle)
         XCTAssertEqual(headerText?.trimmingWhitespace(), UserText.errorPageHeader)
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.noConnection.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
-        XCTAssertEqual(tab.currentHistoryItem?.title, UserText.tabErrorTitle)
+        XCTAssertNil(tab.currentHistoryItem?.title)
 
         XCTAssertEqual(tab.backHistoryItems.count, 0)
         XCTAssertFalse(tab.canGoBack)
@@ -460,16 +458,15 @@ class ErrorPageTests: XCTestCase {
         _=try await eNavigationFailed2.value
         await fulfillment(of: [eServerQueried])
 
-        let titleText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('title')[0].innerText")
         let headerText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-header')[0].innerText")
         let errorDescr: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-description')[0].innerText")
-        XCTAssertEqual(tab.title, UserText.tabErrorTitle)
-        XCTAssertEqual(titleText?.trimmingWhitespace(), tab.title)
+        XCTAssertNil(tab.title)
+        XCTAssertEqual(tabViewModel.title, UserText.tabErrorTitle)
         XCTAssertEqual(headerText?.trimmingWhitespace(), UserText.errorPageHeader)
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.connectionLost.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
-        XCTAssertEqual(tab.currentHistoryItem?.title, UserText.tabErrorTitle)
+        XCTAssertEqual(tab.currentHistoryItem?.title, Self.pageTitle)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
         XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
@@ -603,16 +600,15 @@ class ErrorPageTests: XCTestCase {
         _=try await eNavigationFailed2.value
         await fulfillment(of: [eServerQueried])
 
-        let titleText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('title')[0].innerText")
         let headerText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-header')[0].innerText")
         let errorDescr: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-description')[0].innerText")
-        XCTAssertEqual(tab.title, UserText.tabErrorTitle)
-        XCTAssertEqual(titleText?.trimmingWhitespace(), tab.title)
+        XCTAssertNil(tab.title)
+        XCTAssertEqual(tabViewModel.title, UserText.tabErrorTitle)
         XCTAssertEqual(headerText?.trimmingWhitespace(), UserText.errorPageHeader)
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.connectionLost.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
-        XCTAssertEqual(tab.currentHistoryItem?.title, UserText.tabErrorTitle)
+        XCTAssertEqual(tab.currentHistoryItem?.title, Self.pageTitle)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
         XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
@@ -679,22 +675,21 @@ class ErrorPageTests: XCTestCase {
         _=try await eNavigationFailed2.value
         await fulfillment(of: [eServerQueried])
 
-        let titleText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByTagName('title')[0].innerText")
         let headerText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-header')[0].innerText")
         let errorDescr: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-description')[0].innerText")
-        XCTAssertEqual(tab.title, UserText.tabErrorTitle)
-        XCTAssertEqual(titleText?.trimmingWhitespace(), tab.title)
+        XCTAssertNil(tab.title)
+        XCTAssertEqual(tabViewModel.title, UserText.tabErrorTitle)
         XCTAssertEqual(headerText?.trimmingWhitespace(), UserText.errorPageHeader)
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.connectionLost.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .alternative)
-        XCTAssertEqual(tab.currentHistoryItem?.title, UserText.tabErrorTitle)
+        XCTAssertNil(tab.currentHistoryItem?.title)
 
         XCTAssertEqual(tab.backHistoryItems.count, 2)
         XCTAssertEqual(tab.backHistoryItems[safe: 0]?.url, .newtab)
         XCTAssertNil(tab.backHistoryItems[safe: 0]?.title)
         XCTAssertEqual(tab.backHistoryItems[safe: 1]?.url, .test)
-        XCTAssertEqual(tab.backHistoryItems[safe: 1]?.title, UserText.tabErrorTitle)
+        XCTAssertEqual(tab.backHistoryItems[safe: 1]?.title, Self.pageTitle)
         XCTAssertTrue(tab.canGoBack)
 
         XCTAssertEqual(tab.forwardHistoryItems.count, 0)
@@ -763,7 +758,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(tab.backHistoryItems[safe: 0]?.url, .newtab)
         XCTAssertNil(tab.backHistoryItems[safe: 0]?.title)
         XCTAssertEqual(tab.backHistoryItems[safe: 1]?.url, .test)
-        XCTAssertEqual(tab.backHistoryItems[safe: 1]?.title, UserText.tabErrorTitle)
+        XCTAssertEqual(tab.backHistoryItems[safe: 1]?.title, Self.pageTitle)
         XCTAssertTrue(tab.canGoBack)
 
         XCTAssertEqual(tab.forwardHistoryItems.count, 0)
