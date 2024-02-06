@@ -33,6 +33,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "104.1.1"),
         .package(path: "../XPCHelper"),
+        .package(path: "../PixelKit"),
         .package(path: "../SwiftUIExtensions")
     ],
     targets: [
@@ -55,10 +56,20 @@ let package = Package(
         .target(
             name: "NetworkProtectionProxy",
             dependencies: [
-                .product(name: "NetworkProtection", package: "BrowserServicesKit")
+                .product(name: "NetworkProtection", package: "BrowserServicesKit"),
+                .product(name: "PixelKit", package: "PixelKit")
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
+        .testTarget(
+            name: "NetworkProtectionProxyTests",
+            dependencies: [
+                "NetworkProtectionProxy",
+                .product(name: "PixelKit", package: "PixelKit"),
+                .product(name: "PixelKitTestingUtilities", package: "PixelKit")
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),

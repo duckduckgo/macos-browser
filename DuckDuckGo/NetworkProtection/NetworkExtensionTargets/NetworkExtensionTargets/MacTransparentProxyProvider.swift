@@ -21,6 +21,7 @@ import Foundation
 import NetworkExtension
 import NetworkProtectionProxy
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
+import PixelKit
 
 final class MacTransparentProxyProvider: TransparentProxyProvider {
 
@@ -60,6 +61,8 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
                    configuration: configuration,
                    logger: Self.vpnProxyLogger)
 
+        eventHandler = eventHandler(_:)
+
         Task { @MainActor in
             self.tunnelConfiguration = extensionSharedMemory.tunnelConfiguration
             subscribeToDNSChanges()
@@ -76,5 +79,9 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
                 try? await self.updateNetworkSettings()
             }
         }.store(in: &cancellables)
+    }
+
+    private func eventHandler(_ event: TransparentProxyProvider.Event) {
+        PixelKit.fire(event)
     }
 }

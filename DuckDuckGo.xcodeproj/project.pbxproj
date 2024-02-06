@@ -2237,6 +2237,7 @@
 		7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD3AF5C2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift */; };
 		7BE146072A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
 		7BE146082A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE146062A6A83C700C313B8 /* NetworkProtectionDebugMenu.swift */; };
+		7BEC0BA42B71141D00C7F5F2 /* VPNProxyLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0694972B6E980F00FA4DBA /* VPNProxyLauncher.swift */; };
 		7BEC182F2AD5D8DC00D30536 /* SystemExtensionManager in Frameworks */ = {isa = PBXBuildFile; productRef = 7BEC182E2AD5D8DC00D30536 /* SystemExtensionManager */; };
 		7BEC20422B0F505F00243D3E /* AddBookmarkPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */; };
 		7BEC20432B0F505F00243D3E /* AddBookmarkPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */; };
@@ -10520,6 +10521,7 @@
 				B6F92BA32A691583002ABA6B /* UserDefaultsWrapper.swift in Sources */,
 				4BA7C4DB2B3F63AE00AFE511 /* NetworkExtensionController.swift in Sources */,
 				4B2D067C2A13340900DE1F49 /* Logging.swift in Sources */,
+				7BEC0BA42B71141D00C7F5F2 /* VPNProxyLauncher.swift in Sources */,
 				B6F92BAD2A6937B5002ABA6B /* OptionalExtension.swift in Sources */,
 				4BA7C4D92B3F61FB00AFE511 /* BundleExtension.swift in Sources */,
 				7BA7CC5A2AD120640042E5CE /* NetworkProtection+ConvenienceInitializers.swift in Sources */,
