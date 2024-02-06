@@ -1,0 +1,95 @@
+name: Publish Internal Release to Sparkle
+
+on:
+  workflow_dispatch:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+
+jobs:
+
+  publish-to-sparkle:
+
+    name: Publish internal release to Sparkle
+
+    runs-on: macos-13-xlarge
+    timeout-minutes: 10
+
+    steps:
+
+      # - name: Assert main branch
+      #   run: |
+      #     if [ "${{ github.ref_name }}" != "main" ]; then
+      #       echo "👎 Not the main branch"
+      #       exit 1
+      #     fi
+
+      - name: Check out the code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          sparse-checkout: |
+            .github
+            scripts
+    
+      - name: Set up Sparkle tools
+        env:
+          SPARKLE_URL: https://github.com/sparkle-project/Sparkle/releases/download/${{ vars.SPARKLE_VERSION }}/Sparkle-${{ vars.SPARKLE_VERSION }}.tar.xz
+        run: |
+          curl -fLSs $SPARKLE_URL | tar xJ bin
+          echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+
+      - name: Import Sparkle private key
+        run: |
+          echo "${{ secrets.SPARKLE_PRIVATE_KEY }}" > $HOME/sparkle_private_key.pem
+          chmod 600 $HOME/sparkle_private_key.pem
+
+          # create temporary keychain
+          KEYCHAIN_PATH=$RUNNER_TEMP/sparkle.keychain-db
+          security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
+
+          generate_keys -f $HOME/sparkle_private_key.pem
+
+      - name: Find latest tag
+        id: latest-tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0)
+          echo "latest-tag=$latest_tag" >> $GITHUB_OUTPUT
+
+      - name: Fetch DMG
+        id: fetch-dmg
+        env:
+          DMG_NAME: duckduckgo-${{ steps.latest-tag.outputs.latest-tag }}.dmg
+        run: |
+          DMG_URL="${{ vars.TEST_DMG_URL_ROOT }}${DMG_NAME}"
+          curl -fLSs -o "$DMG_NAME" "$DMG_URL"
+          echo "dmg-path=$DMG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Extract Asana Task ID
+        id: task-id
+        uses: ./.github/actions/asana-extract-task-id
+        with:
+          task-url: ${{ github.event.inputs.asana-task-url }}
+
+      - name: Fetch release notes
+        env:
+          TASK_ID: ${{ steps.task-id.outputs.task-id }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        run: |
+          curl -fLSs 'https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes' \
+            -H 'Authorization: Bearer ${ASANA_ACCESS_TOKEN}' \
+            | jq -r .data.notes \
+            | ./scripts/extract_release_notes.sh > release_notes.txt
+
+      - name: Generate appcast
+        env:
+          DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
+        run: |
+          ./scripts/appcast_manager/appcastManager.swift \
+            --release-to-internal-channel \
+            --dmg ${DMG_PATH} \
+            --release-notes release-notes.txt
