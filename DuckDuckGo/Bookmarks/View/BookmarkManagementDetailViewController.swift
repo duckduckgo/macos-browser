@@ -193,6 +193,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         tableView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         tableView.style = .plain
         tableView.selectionHighlightStyle = .none
+        tableView.allowsMultipleSelection = true
         tableView.usesAutomaticRowHeights = true
         tableView.action = #selector(handleClick)
         tableView.doubleAction = #selector(handleDoubleClick)
