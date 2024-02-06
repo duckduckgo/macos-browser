@@ -66,7 +66,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func learnMoreAction() {
-        actionHandler.openURL(.purchaseSubscription)
+        actionHandler.openURL(.subscriptionPurchase)
     }
 
     @MainActor

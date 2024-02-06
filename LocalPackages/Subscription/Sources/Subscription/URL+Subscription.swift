@@ -20,7 +20,11 @@ import Foundation
 
 public extension URL {
 
-    static var purchaseSubscription: URL {
+    static var subscriptionPurchase: URL {
+        URL(string: "https://abrown.duckduckgo.com/subscriptions")!
+    }
+
+    static var subscriptionWelcome: URL {
         URL(string: "https://abrown.duckduckgo.com/subscriptions/welcome")!
     }
 

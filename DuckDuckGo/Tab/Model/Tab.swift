@@ -128,7 +128,7 @@ protocol NewWindowPolicyDecisionMaker {
                     return .newtab
                 }
                 return .url(customURL, source: source)
-            case URL.purchaseSubscription, URL.purchaseSubscription.deletingLastPathComponent():
+            case URL.subscriptionPurchase, URL.subscriptionWelcome:
                 return .subscription
             default: break
             }
@@ -221,7 +221,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .dataBrokerProtection:
                 return .dataBrokerProtection
             case .subscription:
-                return .purchaseSubscription
+                return .subscriptionPurchase
             case .none:
                 return nil
             }
