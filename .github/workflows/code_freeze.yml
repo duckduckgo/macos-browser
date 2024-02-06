@@ -26,7 +26,7 @@ jobs:
           fi
 
       - name: Check out the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -95,7 +95,7 @@ jobs:
     steps:
 
       - name: Check out the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           ref: ${{ needs.create_release_branch.outputs.release_branch_name }}
