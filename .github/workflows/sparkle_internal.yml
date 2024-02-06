@@ -93,6 +93,9 @@ jobs:
             | jq -r .data.notes \
             | ./scripts/extract_release_notes.sh > release_notes.txt
 
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
+
       - name: Generate appcast
         env:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
@@ -100,4 +103,4 @@ jobs:
           ./scripts/appcast_manager/appcastManager.swift \
             --release-to-internal-channel \
             --dmg ${DMG_PATH} \
-            --release-notes release-notes.txt
+            --release-notes release_notes.txt
