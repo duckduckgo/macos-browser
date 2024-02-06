@@ -7,6 +7,10 @@ on:
         description: "Asana release task URL"
         required: true
         type: string
+      tag:
+        description: "Tag to publish"
+        required: true
+        type: string
 
 jobs:
 
@@ -25,6 +29,19 @@ jobs:
       #       echo "👎 Not the main branch"
       #       exit 1
       #     fi
+
+      - name: Verify the tag
+        id: verify-tag
+        env:
+          tag: ${{ github.event.inputs.tag }}
+        run: |
+          tag_regex='^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$'
+
+          if [[ ! "$tag" =~ $tag_regex ]]; then
+            echo "::error::The provided tag ($tag) has incorrect format (attempted to match ${tag_regex})."
+            exit 1
+          fi
+          echo "tag=$(tr '-' '.' <<< $tag)" >> $GITHUB_OUTPUT
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -51,16 +68,10 @@ jobs:
 
           generate_keys -f $HOME/sparkle_private_key.pem
 
-      - name: Find latest tag
-        id: latest-tag
-        run: |
-          latest_tag=$(git describe --tags --abbrev=0)
-          echo "latest-tag=$latest_tag" >> $GITHUB_OUTPUT
-
       - name: Fetch DMG
         id: fetch-dmg
         env:
-          DMG_NAME: duckduckgo-${{ steps.latest-tag.outputs.latest-tag }}.dmg
+          DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.tag }}.dmg
         run: |
           DMG_URL="${{ vars.TEST_DMG_URL_ROOT }}${DMG_NAME}"
           curl -fLSs -o "$DMG_NAME" "$DMG_URL"
@@ -77,8 +88,8 @@ jobs:
           TASK_ID: ${{ steps.task-id.outputs.task-id }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         run: |
-          curl -fLSs 'https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes' \
-            -H 'Authorization: Bearer ${ASANA_ACCESS_TOKEN}' \
+          curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}?opt_fields=notes" \
+            -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
             | jq -r .data.notes \
             | ./scripts/extract_release_notes.sh > release_notes.txt
 
