@@ -57,14 +57,14 @@ final class FileResources: ResourcesRepository {
 
 protocol BrokerUpdaterRepository {
 
-    func saveLastRunDate(date: Date)
-    func getLastRunDate() -> Date?
+    func saveLatestAppVersionCheck(version: String)
+    func getLastCheckedVersion() -> String?
 }
 
 final class BrokerUpdaterUserDefaults: BrokerUpdaterRepository {
 
     struct Consts {
-        static let shouldCheckForUpdatesKey = "macos.browser.data-broker-protection.ShouldCheckForNewBrokers"
+        static let shouldCheckForUpdatesKey = "macos.browser.data-broker-protection.LastLocalVersionChecked"
     }
 
     private let userDefaults: UserDefaults
@@ -73,48 +73,55 @@ final class BrokerUpdaterUserDefaults: BrokerUpdaterRepository {
         self.userDefaults = userDefaults
     }
 
-    func saveLastRunDate(date: Date) {
-        UserDefaults.standard.set(date, forKey: Consts.shouldCheckForUpdatesKey)
+    func saveLatestAppVersionCheck(version: String) {
+        UserDefaults.standard.set(version, forKey: Consts.shouldCheckForUpdatesKey)
     }
 
-    func getLastRunDate() -> Date? {
-        guard let lastRunDateData = UserDefaults.standard.object(forKey: Consts.shouldCheckForUpdatesKey) as? Date else { return nil }
-
-        return lastRunDateData
+    func getLastCheckedVersion() -> String? {
+        UserDefaults.standard.string(forKey: Consts.shouldCheckForUpdatesKey)
     }
+}
+
+protocol AppVersionNumberProvider {
+    var versionNumber: String { get }
+}
+
+final class AppVersionNumber: AppVersionNumberProvider {
+
+    var versionNumber: String = AppVersion.shared.versionNumber
 }
 
 struct DataBrokerProtectionBrokerUpdater {
 
-    struct Consts {
-        static let updateWindow: Double = 24
-    }
-
     private let repository: BrokerUpdaterRepository
     private let resources: ResourcesRepository
     private let vault: any DataBrokerProtectionSecureVault
+    private let appVersion: AppVersionNumberProvider
 
     init(repository: BrokerUpdaterRepository = BrokerUpdaterUserDefaults(),
          resources: ResourcesRepository = FileResources(),
-         vault: any DataBrokerProtectionSecureVault) {
+         vault: any DataBrokerProtectionSecureVault,
+         appVersion: AppVersionNumberProvider = AppVersionNumber()) {
         self.repository = repository
         self.resources = resources
         self.vault = vault
+        self.appVersion = appVersion
     }
 
     func checkForUpdatesInBrokerJSONFiles() {
-        if let lastRunDate = repository.getLastRunDate() {
-            if hasHoursPassed(hours: Consts.updateWindow, from: lastRunDate, to: Date()) {
+        if let lastCheckedVersion = repository.getLastCheckedVersion() {
+            if shouldUpdate(incoming: appVersion.versionNumber, storedVersion: lastCheckedVersion) {
                 updateBrokers()
             }
         } else {
-            // Last run date is nil. Probably it was not set yet, so we need to check for updates.
+            // There was not a last checked version. Probably new builds or ones without this new implementation
+            // or user deleted user defaults.
             updateBrokers()
         }
     }
 
     private func updateBrokers() {
-        repository.saveLastRunDate(date: Date())
+        repository.saveLatestAppVersionCheck(version: appVersion.versionNumber)
         guard let brokers = resources.fetchBrokerFromResourceFiles() else { return }
 
         for broker in brokers {
@@ -138,7 +145,7 @@ struct DataBrokerProtectionBrokerUpdater {
             return
         }
 
-        if shouldUpdate(incomingBrokerVersion: broker.version, storedVersion: savedBroker.version) {
+        if shouldUpdate(incoming: broker.version, storedVersion: savedBroker.version) {
             guard let savedBrokerId = savedBroker.id else { return }
 
             try vault.update(broker, with: savedBrokerId)
@@ -158,17 +165,10 @@ struct DataBrokerProtectionBrokerUpdater {
         }
     }
 
-    private func shouldUpdate(incomingBrokerVersion: String, storedVersion: String) -> Bool {
-        let result = incomingBrokerVersion.compare(storedVersion, options: .numeric)
+    private func shouldUpdate(incoming: String, storedVersion: String) -> Bool {
+        let result = incoming.compare(storedVersion, options: .numeric)
 
         return result == .orderedDescending
-    }
-
-    private func hasHoursPassed(hours: Double, from startDate: Date, to endDate: Date) -> Bool {
-        let timeInterval = endDate.timeIntervalSince(startDate)
-        let hoursPassed = timeInterval / 3600  // 3600 seconds in an hour
-
-        return hoursPassed >= hours
     }
 }
 
