@@ -205,7 +205,7 @@ final class BrowserTabViewController: NSViewController {
             self.previouslySelectedTab = nil
         }
 
-        openNewTab(with: .preferences(pane: .subscription))
+        openNewTab(with: .settings(pane: .subscription))
     }
 #endif
 
@@ -346,11 +346,17 @@ final class BrowserTabViewController: NSViewController {
                 return old == new
             })
             .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                // For non-URL tabs, just emit an event
                 guard let tabViewModel, tabContent.isUrl else {
                     return Just(()).eraseToAnyPublisher()
                 }
 
-                return Publishers.Merge3(
+                // For URL tabs, we only want to show tab content (webView) when webView starts
+                // navigation or when another navigation-related event happens.
+                // We take the first such event and move forward.
+                return Publishers.Merge5(
+                    tabViewModel.tab.webViewDidStartNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
                     tabViewModel.tab.webViewDidCommitNavigationPublisher,
                     tabViewModel.tab.webViewDidFailNavigationPublisher,
                     tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
@@ -407,7 +413,11 @@ final class BrowserTabViewController: NSViewController {
     private var setFirstResponderAfterAdding = false
 
     private func setFirstResponderIfNeeded() {
-        guard webView?.url != nil else {
+        guard let webView else {
+            setFirstResponderAfterAdding = true
+            return
+        }
+        guard webView.url != nil else {
             return
         }
 
@@ -443,12 +453,6 @@ final class BrowserTabViewController: NSViewController {
     }
 
     // MARK: - Browser Tabs
-
-    private func show(displayableTabAtIndex index: Int) {
-        // The tab switcher only displays displayable tab types.
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
-    }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
@@ -486,7 +490,7 @@ final class BrowserTabViewController: NSViewController {
             removeAllTabContent()
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
-        case let .preferences(pane):
+        case let .settings(pane):
             removeAllTabContent()
             let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
@@ -496,7 +500,7 @@ final class BrowserTabViewController: NSViewController {
 
         case .onboarding:
             removeAllTabContent()
-            if !OnboardingViewModel().onboardingFinished {
+            if !OnboardingViewModel.isOnboardingFinished {
                 requestDisableUI()
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
@@ -507,7 +511,7 @@ final class BrowserTabViewController: NSViewController {
                 changeWebView(tabViewModel: tabViewModel)
             }
 
-        case .homePage:
+        case .newtab:
             removeAllTabContent()
             view.addAndLayout(homePageView)
 
@@ -570,7 +574,7 @@ final class BrowserTabViewController: NSViewController {
     var bookmarksViewController: BookmarkManagementSplitViewController?
     private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
         return bookmarksViewController ?? {
-            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            let bookmarksViewController = BookmarkManagementSplitViewController()
             bookmarksViewController.delegate = self
             self.bookmarksViewController = bookmarksViewController
             return bookmarksViewController
@@ -872,6 +876,7 @@ extension BrowserTabViewController: TabDelegate {
         let context = PrintContext(request: request)
         let contextInfo = Unmanaged<PrintContext>.passRetained(context).toOpaque()
 
+        printOperation.printPanel.options.formUnion([.showsPaperSize, .showsOrientation, .showsScaling])
         printOperation.runModal(for: window, delegate: self, didRun: didRunSelector, contextInfo: contextInfo)
 
         // get the Print Panel that (hopefully) was added to the window.sheets
@@ -924,8 +929,9 @@ extension BrowserTabViewController: TabDownloadsDelegate {
 
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
-    func selectedTab(at index: Int) {
-        show(displayableTabAtIndex: index)
+    func selectedTabContent(_ content: Tab.TabContent) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(content)
+        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
@@ -933,8 +939,8 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
             return
         }
 
-        if case .preferences = selectedTab.content {
-            selectedTab.setContent(.preferences(pane: identifier))
+        if case .settings = selectedTab.content {
+            selectedTab.setContent(.settings(pane: identifier))
         }
     }
 
@@ -943,7 +949,7 @@ extension BrowserTabViewController: BrowserTabSelectionDelegate {
 extension BrowserTabViewController: OnboardingDelegate {
 
     func onboardingDidRequestImportData(completion: @escaping () -> Void) {
-        DataImportView.show(completion: completion)
+        DataImportView().show(completion: completion)
     }
 
     func onboardingDidRequestSetDefault(completion: @escaping () -> Void) {

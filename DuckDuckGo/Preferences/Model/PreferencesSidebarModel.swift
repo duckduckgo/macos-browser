@@ -29,6 +29,10 @@ final class PreferencesSidebarModel: ObservableObject {
     @Published var selectedTabIndex: Int = 0
     @Published private(set) var selectedPane: PreferencePaneIdentifier = .general
 
+    var selectedTabContent: AnyPublisher<Tab.TabContent, Never> {
+        $selectedTabIndex.map { [tabSwitcherTabs] in tabSwitcherTabs[$0] }.eraseToAnyPublisher()
+    }
+
     // MARK: - Initializers
 
     init(
@@ -128,7 +132,7 @@ final class PreferencesSidebarModel: ObservableObject {
     }
 
     func resetTabSelectionIfNeeded() {
-        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .anyPreferencePane) {
+        if let preferencesTabIndex = tabSwitcherTabs.firstIndex(of: .anySettingsPane) {
             if preferencesTabIndex != selectedTabIndex {
                 selectedTabIndex = preferencesTabIndex
             }

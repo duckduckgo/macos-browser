@@ -68,7 +68,7 @@ struct DataImportViewModel {
         case moreInfo
         case getReadPermission(URL)
         case fileImport(dataType: DataType, summary: Set<DataType> = [])
-        case summary(Set<DataType>)
+        case summary(Set<DataType>, isFileImport: Bool = false)
         case feedback
 
         var isFileImport: Bool {
@@ -215,7 +215,7 @@ struct DataImportViewModel {
 
     /// Called with data import task result to update the state by merging the summary with an existing summary
     @MainActor
-    private mutating func mergeImportSummary(with summary: DataImportSummary) {
+    private mutating func mergeImportSummary(with summary: DataImportSummary) { // swiftlint:disable:this cyclomatic_complexity
         self.importTask = nil
 
         log("merging summary \(summary)")
@@ -261,12 +261,15 @@ struct DataImportViewModel {
             log("mergeImportSummary: feedback")
             // after last failed datatype show feedback
             self.screen = .feedback
+        } else if self.screen.isFileImport, let dataType = self.screen.fileImportDataType {
+            log("mergeImportSummary: file import summary(\(dataType))")
+            self.screen = .summary([dataType], isFileImport: true)
         } else if screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: summary.keys.contains)) == nil { // no next data type manual import screen
             let allKeys = self.summary.reduce(into: Set()) { $0.insert($1.dataType) }
             log("mergeImportSummary: final summary(\(Set(allKeys)))")
             self.screen = .summary(allKeys)
         } else {
-            log("mergeImportSummary: final summary(\(Set(summary.keys)))")
+            log("mergeImportSummary: intermediary summary(\(Set(summary.keys)))")
             self.screen = .summary(Set(summary.keys))
         }
 
@@ -305,7 +308,10 @@ struct DataImportViewModel {
                     break
                 }
                 log("file read no permission for \(url.path)")
-                Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
+
+                if url != selectedProfile?.profileURL.appendingPathComponent(SafariDataImporter.bookmarksFileName) {
+                    Pixel.fire(.dataImportFailed(source: importSource, sourceVersion: importSource.installedAppsMajorVersionDescription(selectedProfile: selectedProfile), error: importError))
+                }
                 screen = .getReadPermission(url)
                 return true
 
@@ -612,7 +618,7 @@ extension DataImportViewModel {
         case .fileImport:
             return .skip
 
-        case .summary(let dataTypes):
+        case .summary(let dataTypes, isFileImport: _):
             if let screen = screenForNextDataTypeRemainingToImport(after: DataType.allCases.last(where: dataTypes.contains)) {
                 return .next(screen)
             } else {

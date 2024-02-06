@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import BrowserServicesKit
 import DataBrokerProtection
@@ -31,6 +33,7 @@ public final class DataBrokerProtectionManager {
     private let authenticationService: DataBrokerProtectionAuthenticationService = AuthenticationService()
     private let redeemUseCase: DataBrokerProtectionRedeemUseCase
     private let fakeBrokerFlag: DataBrokerDebugFlag = DataBrokerDebugFlagFakeBroker()
+    private let dataBrokerProtectionWaitlistDataSource: WaitlistActivationDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
 
     lazy var dataManager: DataBrokerProtectionDataManager = {
         let dataManager = DataBrokerProtectionDataManager(fakeBrokerFlag: fakeBrokerFlag)
@@ -59,9 +62,14 @@ public final class DataBrokerProtectionManager {
 extension DataBrokerProtectionManager: DataBrokerProtectionDataManagerDelegate {
     public func dataBrokerProtectionDataManagerDidUpdateData() {
         scheduler.startScheduler()
+
+        let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+        dbpDateStore.setActivationDateIfNecessary()
     }
 
     public func dataBrokerProtectionDataManagerDidDeleteData() {
         scheduler.stopScheduler()
     }
 }
+
+#endif

@@ -17,7 +17,7 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
+import PreferencesViews
 
 struct SyncWarningMessage: View {
     let title: String
@@ -33,20 +33,22 @@ struct SyncWarningMessage: View {
     }
 
     var body: some View {
-        PreferencePaneSection(verticalPadding: 16) {
-            HStack(alignment: .top, spacing: 8) {
-                Text("⚠️")
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(title).bold()
-                    Text(message)
-                    if let buttonTitle, let buttonAction {
-                        Button(buttonTitle, action: buttonAction)
-                            .padding(.top, 8)
-                    }
+        HStack(alignment: .top, spacing: 16) {
+            Image("Alert-Color-16")
+                .frame(width: 16)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title).bold()
+                Text(message)
+                if let buttonTitle, let buttonAction {
+                    Button(buttonTitle, action: buttonAction)
+                        .padding(.top, 8)
                 }
             }
         }
-        .frame(width: 512, alignment: .leading)
+        .padding(.leading, -12)
+        .frame(maxWidth: .infinity)
+        .padding()
         .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("AlertBubbleBackground")))
+        .padding(.top, 16)
     }
 }

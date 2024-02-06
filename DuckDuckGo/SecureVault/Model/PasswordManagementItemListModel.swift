@@ -247,6 +247,7 @@ final class PasswordManagementItemListModel: ObservableObject {
                 return
             }
 
+            clearSelection()
             updateFilteredData()
 
             // Select first item if no previous selection was provided
@@ -274,15 +275,18 @@ final class PasswordManagementItemListModel: ObservableObject {
     @Published var canChangeCategory: Bool = true
 
     private var onItemSelected: (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void
+    private var onAddItemSelected: (_ category: SecureVaultSorting.Category) -> Void
     private let tld: TLD
     private let urlMatcher: AutofillDomainNameUrlMatcher
     private static let randomColorsCount = 15
 
     init(passwordManagerCoordinator: PasswordManagerCoordinating,
-         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
          urlMatcher: AutofillDomainNameUrlMatcher = AutofillDomainNameUrlMatcher(),
-         tld: TLD = ContentBlocking.shared.tld) {
+         tld: TLD = ContentBlocking.shared.tld,
+         onItemSelected: @escaping (_ old: SecureVaultItem?, _ new: SecureVaultItem?) -> Void,
+         onAddItemSelected: @escaping (_ category: SecureVaultSorting.Category) -> Void) {
         self.onItemSelected = onItemSelected
+        self.onAddItemSelected = onAddItemSelected
         self.passwordManagerCoordinator = passwordManagerCoordinator
         self.urlMatcher = urlMatcher
         self.tld = tld
@@ -323,11 +327,19 @@ final class PasswordManagementItemListModel: ObservableObject {
     func selectLoginWithDomainOrFirst(domain: String, notify: Bool = true) {
         let websiteAccounts = items
             .compactMap { $0.websiteAccount }
-        let bestMatch = websiteAccounts.sortedForDomain(domain, tld: ContentBlocking.shared.tld, removeDuplicates: true)
 
-        // If the best match does not include the TLD, just pick the first item in the list
-        if let match = bestMatch.first,
-           tld.eTLDplus1(domain) == tld.eTLDplus1(match.domain) {
+        let matchingAccounts = websiteAccounts.filter { account in
+            return urlMatcher.isMatchingForAutofill(
+                currentSite: domain,
+                savedSite: account.domain ?? "",
+                tld: tld
+            )
+        }
+
+        let bestMatch = matchingAccounts.sortedForDomain(domain, tld: tld, removeDuplicates: true)
+
+        // If there are no matches for autofill, just pick the first item in the list
+        if let match = bestMatch.first {
 
             for section in displayedItems {
                 if let account = section.items.first(where: {
@@ -375,8 +387,6 @@ final class PasswordManagementItemListModel: ObservableObject {
         if !filter.isEmpty {
             itemsByCategory = itemsByCategory.filter { $0.item(matches: filter) }
         }
-
-        clearSelection()
 
         if displayedItems.isEmpty && items.isEmpty {
             return
@@ -470,6 +480,10 @@ final class PasswordManagementItemListModel: ObservableObject {
         let name = account.name(tld: tld, autofillDomainNameUrlMatcher: urlMatcher)
         let title = (account.title?.isEmpty == false) ? account.title! : "#"
         return tld.eTLDplus1(name) ?? title
+    }
+
+    func onAddItemClickedFor(_ category: SecureVaultSorting.Category) {
+        onAddItemSelected(category)
     }
 
 }

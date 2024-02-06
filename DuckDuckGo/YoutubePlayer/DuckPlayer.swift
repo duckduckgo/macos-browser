@@ -70,14 +70,7 @@ final class DuckPlayer {
         }
     }()
 
-    static let duckPlayerHost: String = {
-        if usesSimulatedRequests {
-            return "www.youtube-nocookie.com"
-        } else {
-            return "player"
-        }
-    }()
-    static let duckPlayerScheme = "duck"
+    static let duckPlayerHost: String = "player"
     static let commonName = UserText.duckPlayer
 
     static let shared = DuckPlayer()
@@ -188,7 +181,7 @@ extension DuckPlayer {
     func image(for bookmark: Bookmark) -> NSImage? {
         // Bookmarks to Duck Player pages retain duck:// URL even when Duck Player is disabled,
         // so we keep the Duck Player favicon even if Duck Player is currently disabled
-        return (bookmark.urlObject?.isDuckPlayerScheme ?? false) ? .duckPlayer : nil
+        return (bookmark.urlObject?.isDuckPlayer ?? false) ? .duckPlayer : nil
     }
 
     func domainForRecentlyVisitedSite(with url: URL) -> String? {
@@ -200,7 +193,7 @@ extension DuckPlayer {
     }
 
     func sharingData(for title: String, url: URL) -> (title: String, url: URL)? {
-        guard isAvailable, mode != .disabled, url.isDuckPlayerScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
+        guard isAvailable, mode != .disabled, url.isDuckURLScheme, let (videoID, timestamp) = url.youtubeVideoParams else {
             return nil
         }
 
@@ -215,7 +208,7 @@ extension DuckPlayer {
             return nil
         }
 
-        guard page.url.isDuckPlayer || page.url.isDuckPlayerScheme else {
+        guard page.url.isDuckPlayer else {
             return nil
         }
 

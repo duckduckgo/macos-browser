@@ -44,7 +44,8 @@ class HistoryIntegrationTests: XCTestCase {
         }
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window?.close()
         window = nil
         PrivacySecurityPreferences.shared.gpcEnabled = true
@@ -54,7 +55,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenPageTitleIsUpdated_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -98,7 +99,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenSameDocumentNavigation_historyEntryTitleUpdated() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let html = """
@@ -142,7 +143,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingToSamePage_visitIsAdded() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
@@ -162,7 +163,7 @@ class HistoryIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigatingBack_visitIsNotAdded() async throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let urls = [
@@ -185,7 +186,7 @@ class HistoryIntegrationTests: XCTestCase {
     func testWhenScriptTrackerLoaded_trackerAddedToHistory() async throws {
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-via-script.html")!
@@ -213,7 +214,7 @@ class HistoryIntegrationTests: XCTestCase {
     func testWhenSurrogateTrackerLoaded_trackerAddedToHistory() async throws {
         PrivacySecurityPreferences.shared.gpcEnabled = false
 
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         window = WindowsManager.openNewWindow(with: tab)!
 
         let url = URL(string: "http://privacy-test-pages.site/tracker-reporting/1major-with-surrogate.html")!

@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "f2b6a76e4ed0ce3147cdf0cba94cf0d1b928d687",
-        "version" : "100.0.3"
+        "revision" : "3b10ff8d5d433a4eb45a1d4d25a348033f5102c1",
+        "version" : "104.1.1"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
-        "revision" : "bb027f14bec7fbb1a85d308139e7a66686da160e",
-        "version" : "4.59.0"
+        "revision" : "38ee7284bac7fa12d822fcaf0677ea3969d15fb1",
+        "version" : "4.59.2"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/duckduckgo-autofill.git",
       "state" : {
-        "revision" : "5597bc17709c8acf454ecaad4f4082007986242a",
-        "version" : "10.0.2"
+        "revision" : "03d3e3a959dd75afbe8c59b5a203ea676d37555d",
+        "version" : "10.1.0"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/GRDB.swift.git",
       "state" : {
-        "revision" : "77d9a83191a74e319a5cfa27b0e3145d15607573",
-        "version" : "2.2.0"
+        "revision" : "9f049d7b97b1e68ffd86744b500660d34a9e79b8",
+        "version" : "2.3.0"
       }
     },
     {
@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/privacy-dashboard",
       "state" : {
-        "revision" : "38336a574e13090764ba09a6b877d15ee514e371",
-        "version" : "3.1.1"
+        "revision" : "c67d268bf234760f49034a0fe7a6137a1b216b05",
+        "version" : "3.2.0"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
-        "revision" : "43c802fb7f96e090dde015344a94b5e85779eff1",
-        "version" : "509.1.0"
+        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
+        "version" : "509.1.1"
       }
     },
     {

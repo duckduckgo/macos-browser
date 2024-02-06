@@ -131,12 +131,11 @@ extension Pixel {
         case debug(event: Debug, error: Error? = nil)
 
         // Activation Points
-        case newTabInitial(cohort: String? = nil)
-        case emailEnabledInitial(cohort: String? = nil)
-
-        case watchInDuckPlayerInitial(cohort: String? = nil)
-        case setAsDefaultInitial(cohort: String? = nil)
-        case importDataInitial(cohort: String? = nil)
+        case newTabInitial
+        case emailEnabledInitial
+        case watchInDuckPlayerInitial
+        case setAsDefaultInitial
+        case importDataInitial
 
         // New Tab section removed
         case favoriteSectionHidden
@@ -178,6 +177,10 @@ extension Pixel {
         case networkProtectionRemoteMessageDismissed(messageID: String)
         case networkProtectionRemoteMessageOpened(messageID: String)
         case networkProtectionEnabledOnSearch
+        case networkProtectionGeoswitchingOpened
+        case networkProtectionGeoswitchingSetNearest
+        case networkProtectionGeoswitchingSetCustom
+        case networkProtectionGeoswitchingNoLocations
 
         // Sync
         case syncSignupDirect
@@ -201,14 +204,12 @@ extension Pixel {
         case dataBrokerProtectionWaitlistCardUITapped
         case dataBrokerProtectionWaitlistTermsAndConditionsDisplayed
         case dataBrokerProtectionWaitlistTermsAndConditionsAccepted
+        case dataBrokerProtectionRemoteMessageDisplayed(messageID: String)
+        case dataBrokerProtectionRemoteMessageDismissed(messageID: String)
+        case dataBrokerProtectionRemoteMessageOpened(messageID: String)
 
         // DataBrokerProtection Other
         case dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn
-
-        // 28-day Home Button
-        case homeButtonHidden
-        case homeButtonLeft
-        case homeButtonRight
 
         case dailyPixel(Event, isFirst: Bool)
 
@@ -336,6 +337,14 @@ extension Pixel {
             case syncCredentialsFailed
             case syncSettingsFailed
             case syncSettingsMetadataUpdateFailed
+            case syncSignupError
+            case syncLoginError
+            case syncLogoutError
+            case syncUpdateDeviceError
+            case syncRemoveDeviceError
+            case syncDeleteAccountError
+            case syncLoginExistingAccountError
+            case syncCannotCreateRecoveryPDF
 
             case bookmarksCleanupFailed
             case bookmarksCleanupAttemptedWhileSyncWasEnabled
@@ -352,6 +361,8 @@ extension Pixel {
 
             case networkProtectionRemoteMessageFetchingFailed
             case networkProtectionRemoteMessageStorageFailed
+            case dataBrokerProtectionRemoteMessageFetchingFailed
+            case dataBrokerProtectionRemoteMessageStorageFailed
 
             case loginItemUpdateError(loginItemBundleID: String, action: String, buildType: String, osVersion: String)
         }
@@ -557,17 +568,23 @@ extension Pixel.Event {
             return "m_mac_dbp_ev_terms_accepted"
         case .dataBrokerProtectionErrorWhenFetchingSubscriptionAuthTokenAfterSignIn:
             return "m_mac_dbp_error_when_fetching_subscription_auth_token_after_sign_in"
-
-            // 28-day Home Button
-        case .homeButtonHidden:
-            return "m_mac_home_button_hidden"
-        case .homeButtonLeft:
-            return "m_mac_home_button_left"
-        case .homeButtonRight:
-            return "m_mac_home_button_right"
+        case .dataBrokerProtectionRemoteMessageDisplayed(let messageID):
+            return "m_mac_dbp_remote_message_displayed_\(messageID)"
+        case .dataBrokerProtectionRemoteMessageDismissed(let messageID):
+            return "m_mac_dbp_remote_message_dismissed_\(messageID)"
+        case .dataBrokerProtectionRemoteMessageOpened(let messageID):
+            return "m_mac_dbp_remote_message_opened_\(messageID)"
 
         case .dailyPixel(let pixel, isFirst: let isFirst):
             return pixel.name + (isFirst ? "_d" : "_c")
+        case .networkProtectionGeoswitchingOpened:
+            return "m_mac_netp_imp_geoswitching_c"
+        case .networkProtectionGeoswitchingSetNearest:
+            return "m_mac_netp_ev_geoswitching_set_nearest"
+        case .networkProtectionGeoswitchingSetCustom:
+            return "m_mac_netp_ev_geoswitching_set_custom"
+        case .networkProtectionGeoswitchingNoLocations:
+            return "m_mac_netp_ev_geoswitching_no_locations"
         }
     }
 }
@@ -791,6 +808,14 @@ extension Pixel.Event.Debug {
         case .syncCredentialsFailed: return "sync_credentials_failed"
         case .syncSettingsFailed: return "sync_settings_failed"
         case .syncSettingsMetadataUpdateFailed: return "sync_settings_metadata_update_failed"
+        case .syncSignupError: return "sync_signup_error"
+        case .syncLoginError: return "sync_login_error"
+        case .syncLogoutError: return "sync_logout_error"
+        case .syncUpdateDeviceError: return "sync_update_device_error"
+        case .syncRemoveDeviceError: return "sync_remove_device_error"
+        case .syncDeleteAccountError: return "sync_delete_account_error"
+        case .syncLoginExistingAccountError: return "sync_login_existing_account_error"
+        case .syncCannotCreateRecoveryPDF: return "sync_cannot_create_recovery_pdf"
 
         case .bookmarksCleanupFailed: return "bookmarks_cleanup_failed"
         case .bookmarksCleanupAttemptedWhileSyncWasEnabled: return "bookmarks_cleanup_attempted_while_sync_was_enabled"
@@ -807,6 +832,9 @@ extension Pixel.Event.Debug {
 
         case .networkProtectionRemoteMessageFetchingFailed: return "netp_remote_message_fetching_failed"
         case .networkProtectionRemoteMessageStorageFailed: return "netp_remote_message_storage_failed"
+
+        case .dataBrokerProtectionRemoteMessageFetchingFailed: return "dbp_remote_message_fetching_failed"
+        case .dataBrokerProtectionRemoteMessageStorageFailed: return "dbp_remote_message_storage_failed"
 
         case .loginItemUpdateError: return "login-item_update-error"
         }

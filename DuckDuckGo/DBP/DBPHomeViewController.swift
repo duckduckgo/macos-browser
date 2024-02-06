@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import DataBrokerProtection
 import AppKit
@@ -79,6 +81,11 @@ final class DBPHomeViewController: NSViewController {
 
         if !dataBrokerProtectionManager.shouldAskForInviteCode() {
             attachDataBrokerContainerView()
+        }
+
+        if dataBrokerProtectionManager.dataManager.fetchProfile() != nil {
+            let dbpDateStore = DefaultWaitlistActivationDateStore(source: .dbp)
+            dbpDateStore.updateLastActiveDate()
         }
     }
 
@@ -194,3 +201,5 @@ public class DataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectio
         fatalError("Use init()")
     }
 }
+
+#endif

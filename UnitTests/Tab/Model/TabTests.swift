@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Navigation
 import XCTest
 
@@ -42,6 +43,7 @@ final class TabTests: XCTestCase {
 
     var webViewConfiguration: WKWebViewConfiguration!
     var schemeHandler: TestSchemeHandler!
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         contentBlockingMock = ContentBlockingMock()
@@ -57,6 +59,7 @@ final class TabTests: XCTestCase {
         webViewConfiguration = WKWebViewConfiguration()
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
+        cancellables = []
     }
 
     override func tearDown() {
@@ -66,13 +69,14 @@ final class TabTests: XCTestCase {
         webViewConfiguration = nil
         schemeHandler = nil
         WKWebView.customHandlerSchemes = []
+        cancellables = nil
     }
 
     // MARK: - Tab Content
 
     func testWhenSettingURLThenTabTypeChangesToStandard() {
-        let tab = Tab(content: .preferences(pane: .autofill))
-        XCTAssertEqual(tab.content, .preferences(pane: .autofill))
+        let tab = Tab(content: .settings(pane: .autofill))
+        XCTAssertEqual(tab.content, .settings(pane: .autofill))
 
         tab.url = URL.duckDuckGo
         XCTAssertEqual(tab.content, .url(.duckDuckGo, source: .link))
@@ -110,13 +114,22 @@ final class TabTests: XCTestCase {
     }
 
     func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
-        let tab = Tab()
+        // GIVEN
+        let tab = Tab(content: .none, extensionsBuilder: TestTabExtensionsBuilder(load: [DownloadsTabExtension.self]))
         tab.url = .duckDuckGo
         DownloadsPreferences().alwaysRequestDownloadLocation = true
         tab.webView(WebViewMock(), saveDataToFile: Data(), suggestedFilename: "anything", mimeType: "application/pdf", originatingURL: .duckDuckGo)
-        XCTAssertNotNil(tab.userInteractionDialog)
+        var expectedDialog: Tab.UserDialog?
+        tab.downloads?.savePanelDialogPublisher.sink(receiveValue: { userDialog in
+            expectedDialog = userDialog
+        }).store(in: &cancellables)
+        XCTAssertNotNil(expectedDialog)
+
+        // WHEN
         tab.url = .duckDuckGoMorePrivacyInfo
-        XCTAssertNotNil(tab.userInteractionDialog)
+
+        // THEN
+        XCTAssertNotNil(expectedDialog)
     }
 
     // MARK: - Back/Forward navigation
@@ -339,10 +352,10 @@ final class TabTests: XCTestCase {
 
     @MainActor
     func testIfTabIsBurner_ThenFaviconManagerIsInMemory() throws {
-        let tab = Tab(content: .homePage)
+        let tab = Tab(content: .newtab)
         XCTAssertTrue(tab.faviconManagement === FaviconManager.shared)
 
-        let burnerTab = Tab(content: .homePage, burnerMode: BurnerMode(isBurner: true))
+        let burnerTab = Tab(content: .newtab, burnerMode: BurnerMode(isBurner: true))
         XCTAssertTrue(burnerTab.faviconManagement !== FaviconManager.shared)
     }
 
@@ -354,7 +367,7 @@ extension Tab {
             content.url
         }
         set {
-            setContent(newValue.map { TabContent.url($0, source: .link) } ?? .homePage)
+            setContent(newValue.map { TabContent.url($0, source: .link) } ?? .newtab)
         }
     }
 }

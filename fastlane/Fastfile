@@ -57,6 +57,25 @@ platform :mac do
     upload_to_testflight(options.merge({api_key: get_api_key}))
   end
 
+  # Makes App Store Review build and uploads it to TestFlight without managing App Store listing.
+  #
+  # @option [String] username (default: nil) Your DDG Apple ID. Pass it to not be asked
+  #         for it a couple of times during the process.
+  #
+  desc 'Makes App Store release build and uploads it to TestFlight'
+  lane :release_testflight_review do |options|
+    build_review(options)
+
+    upload_to_testflight(
+      options.merge(
+        {
+          api_key: get_api_key,
+          app_identifier: "com.duckduckgo.mobile.ios.review"
+        }
+      )
+    )
+  end
+
   # Makes App Store release build, uploads it to TestFlight, and prepares App Store listing for submission.
   #
   # - it first uploads just the build, and only then attempts uploading metadata.
@@ -331,6 +350,19 @@ platform :mac do
       scheme: "DuckDuckGo Privacy Browser App Store",
       export_options: "scripts/assets/AppStoreExportOptions.plist",
       xcargs: "-skipPackagePluginValidation RELEASE_PRODUCT_NAME_OVERRIDE=DuckDuckGo"
+    )
+  end
+
+  # Builds the App Store review version of the app.
+  #
+  private_lane :build_review do |options|
+    sync_signing(options)
+
+    build_app(
+      export_method: "app-store",
+      scheme: "Product Review Release App Store",
+      export_options: "scripts/assets/AppStoreExportOptions.plist",
+      xcargs: "-skipPackagePluginValidation"
     )
   end
 

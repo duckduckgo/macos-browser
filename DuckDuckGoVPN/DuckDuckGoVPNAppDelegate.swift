@@ -64,7 +64,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         Bundle.main.networkExtensionBundleID
     }
 
-#if NETP_SYSTEM_EXTENSION
+#if NETWORK_PROTECTION
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
 #endif
 
@@ -110,6 +110,10 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         )
     }()
 
+    private lazy var vpnAppEventsHandler = {
+        VPNAppEventsHandler(tunnelController: tunnelController)
+    }()
+
     /// The status bar NetworkProtection menu
     ///
     /// For some reason the App will crash if this is initialized right away, which is why it was changed to be lazy.
@@ -140,7 +144,11 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             onboardingStatusPublisher: onboardingStatusPublisher,
             statusReporter: statusReporter,
             controller: tunnelController,
-            iconProvider: iconProvider) {
+            iconProvider: iconProvider,
+            showLocationsAction: { [weak self] in
+                await self?.appLauncher.launchApp(withCommand: .showVPNLocations)
+            }
+        ) {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showSettings)
@@ -176,9 +184,17 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         dryRun = false
 #endif
 
+        let pixelSource: String
+
+#if NETP_SYSTEM_EXTENSION
+        pixelSource = "vpnAgent"
+#else
+        pixelSource = "vpnAgentAppStore"
+#endif
+
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
-                       source: "vpnAgent",
+                       source: pixelSource,
                        defaultHeaders: [:],
                        log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
@@ -192,6 +208,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 onComplete(error == nil, error)
             }
         }
+
+        vpnAppEventsHandler.appDidFinishLaunching()
 
         let launchInformation = LoginItemLaunchInformation(agentBundleID: Bundle.main.bundleIdentifier!, defaults: .netP)
         let launchedOnStartup = launchInformation.wasLaunchedByStartup

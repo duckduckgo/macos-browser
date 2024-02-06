@@ -86,7 +86,7 @@ final class YoutubeOverlayUserScript: NSObject, Subfeature {
         guard let dict = params as? [String: Any],
               let href = dict["href"] as? String,
               let url = href.url,
-              url.isDuckPlayerScheme,
+              url.isDuckURLScheme,
               let webView = message.messageWebView
         else {
             assertionFailure("YoutubeOverlayUserScript: expected duck:// URL")
@@ -122,7 +122,7 @@ extension YoutubeOverlayUserScript {
             return nil
         }
         if pixelName == "play.use" {
-            PixelExperiment.fireWatchInDuckPlayerPixel()
+            Pixel.fire(.watchInDuckPlayerInitial, limitTo: .initial)
         }
         return nil
     }

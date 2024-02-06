@@ -40,6 +40,26 @@ final class MockNetworkProtectionRemoteMessaging: NetworkProtectionRemoteMessagi
 
 #endif
 
+#if DBP
+
+final class MockDataBrokerProtectionRemoteMessaging: DataBrokerProtectionRemoteMessaging {
+
+    var messages: [DataBrokerProtectionRemoteMessage] = []
+
+    func fetchRemoteMessages(completion fetchCompletion: (() -> Void)? = nil) {
+        fetchCompletion?()
+    }
+
+    func presentableRemoteMessages() -> [DataBrokerProtectionRemoteMessage] {
+        messages
+    }
+
+    func dismiss(message: DataBrokerProtectionRemoteMessage) {}
+
+}
+
+#endif
+
 final class ContinueSetUpModelTests: XCTestCase {
 
     var vm: HomePage.Models.ContinueSetUpModel!
@@ -72,29 +92,35 @@ final class ContinueSetUpModelTests: XCTestCase {
         ] as! [String: String]
         privacyConfigManager.privacyConfig = config
 
-#if NETWORK_PROTECTION
-        vm = HomePage.Models.ContinueSetUpModel(
-            defaultBrowserProvider: capturingDefaultBrowserProvider,
-            dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
-            emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
-            duckPlayerPreferences: duckPlayerPreferences,
+#if NETWORK_PROTECTION && DBP
+        let messaging = HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            appGroupUserDefaults: userDefaults,
-            privacyConfigurationManager: privacyConfigManager
+            networkProtectionUserDefaults: userDefaults,
+            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
+            dataBrokerProtectionUserDefaults: userDefaults
         )
-#else
-        vm = HomePage.Models.ContinueSetUpModel(
-            defaultBrowserProvider: capturingDefaultBrowserProvider,
-            dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
-            emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
-            duckPlayerPreferences: duckPlayerPreferences,
-            privacyConfigurationManager: privacyConfigManager
+#elseif NETWORK_PROTECTION
+        let messaging = HomePageRemoteMessaging(
+            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: userDefaults
+        )
+#elseif DBP
+        let messaging =  HomePageRemoteMessaging(
+            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
+            dataBrokerProtectionUserDefaults: userDefaults
         )
 #endif
+
+        vm = HomePage.Models.ContinueSetUpModel(
+            defaultBrowserProvider: capturingDefaultBrowserProvider,
+            dataImportProvider: capturingDataImportProvider,
+            tabCollectionViewModel: tabCollectionVM,
+            emailManager: emailManager,
+            privacyPreferences: privacyPreferences,
+            duckPlayerPreferences: duckPlayerPreferences,
+            homePageRemoteMessaging: messaging,
+            privacyConfigurationManager: privacyConfigManager
+        )
     }
 
     override func tearDown() {
@@ -130,7 +156,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         duckPlayerPreferences.youtubeOverlayAnyButtonPressed = true
         privacyPreferences.autoconsentEnabled = true
 
-#if NETWORK_PROTECTION
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dataImportProvider: capturingDataImportProvider,
@@ -138,19 +163,8 @@ final class ContinueSetUpModelTests: XCTestCase {
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            appGroupUserDefaults: userDefaults
+            homePageRemoteMessaging: createMessaging()
         )
-#else
-        vm = HomePage.Models.ContinueSetUpModel(
-            defaultBrowserProvider: capturingDefaultBrowserProvider,
-            dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
-            emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
-            duckPlayerPreferences: duckPlayerPreferences
-        )
-#endif
 
         XCTAssertFalse(vm.isMoreOrLessButtonNeeded)
     }
@@ -443,7 +457,6 @@ final class ContinueSetUpModelTests: XCTestCase {
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowSurveyDay0.rawValue)
         userDefaults.set(false, forKey: UserDefaultsWrapper<Date>.Key.homePageShowSurveyDay7.rawValue)
 
-#if NETWORK_PROTECTION
         vm = HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: capturingDefaultBrowserProvider,
             dataImportProvider: capturingDataImportProvider,
@@ -451,19 +464,8 @@ final class ContinueSetUpModelTests: XCTestCase {
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
-            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            appGroupUserDefaults: userDefaults
+            homePageRemoteMessaging: createMessaging()
         )
-#else
-        vm = HomePage.Models.ContinueSetUpModel(
-            defaultBrowserProvider: capturingDefaultBrowserProvider,
-            dataImportProvider: capturingDataImportProvider,
-            tabCollectionViewModel: tabCollectionVM,
-            emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
-            duckPlayerPreferences: duckPlayerPreferences
-        )
-#endif
 
         XCTAssertEqual(vm.visibleFeaturesMatrix, [[]])
     }
@@ -523,6 +525,27 @@ final class ContinueSetUpModelTests: XCTestCase {
         return features.chunked(into: HomePage.featuresPerRow)
     }
 
+    private func createMessaging() -> HomePageRemoteMessaging {
+#if NETWORK_PROTECTION && DBP
+        return HomePageRemoteMessaging(
+            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: userDefaults,
+            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
+            dataBrokerProtectionUserDefaults: userDefaults
+        )
+#elseif NETWORK_PROTECTION
+        return HomePageRemoteMessaging(
+            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: userDefaults
+        )
+#elseif DBP
+        return HomePageRemoteMessaging(
+            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
+            dataBrokerProtectionUserDefaults: userDefaults
+        )
+#endif
+    }
+
     enum SurveyDay {
         case day0
         case day7
@@ -547,18 +570,25 @@ extension HomePage.Models.ContinueSetUpModel {
         let manager = MockPrivacyConfigurationManager()
         manager.privacyConfig = privacyConfig
 
-#if NETWORK_PROTECTION
-        return HomePage.Models.ContinueSetUpModel(
-            defaultBrowserProvider: defaultBrowserProvider,
-            dataImportProvider: dataImportProvider,
-            tabCollectionViewModel: TabCollectionViewModel(),
-            emailManager: emailManager,
-            privacyPreferences: privacyPreferences,
-            duckPlayerPreferences: duckPlayerPreferences,
+#if NETWORK_PROTECTION && DBP
+        let messaging = HomePageRemoteMessaging(
             networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
-            appGroupUserDefaults: appGroupUserDefaults,
-            privacyConfigurationManager: manager)
-#else
+            networkProtectionUserDefaults: appGroupUserDefaults,
+            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
+            dataBrokerProtectionUserDefaults: appGroupUserDefaults
+        )
+#elseif NETWORK_PROTECTION
+        let messaging = HomePageRemoteMessaging(
+            networkProtectionRemoteMessaging: MockNetworkProtectionRemoteMessaging(),
+            networkProtectionUserDefaults: appGroupUserDefaults
+        )
+#elseif DBP
+        let messaging = HomePageRemoteMessaging(
+            dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
+            dataBrokerProtectionUserDefaults: appGroupUserDefaults
+        )
+#endif
+
         return HomePage.Models.ContinueSetUpModel(
             defaultBrowserProvider: defaultBrowserProvider,
             dataImportProvider: dataImportProvider,
@@ -566,7 +596,7 @@ extension HomePage.Models.ContinueSetUpModel {
             emailManager: emailManager,
             privacyPreferences: privacyPreferences,
             duckPlayerPreferences: duckPlayerPreferences,
+            homePageRemoteMessaging: messaging,
             privacyConfigurationManager: manager)
-#endif
     }
 }

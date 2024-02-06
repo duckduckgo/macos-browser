@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 
@@ -36,19 +37,16 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(UserText.sync)
-                    .font(.system(size: 17))
-                    .bold()
+        PreferencePane {
+            TextMenuItemHeader(UserText.sync)
+                .padding(.bottom, -22)
 
-                if model.isSyncEnabled {
-                    SyncEnabledView<ViewModel>()
-                        .environmentObject(model)
-                } else {
-                    SyncSetupView<ViewModel>()
-                        .environmentObject(model)
-                }
+            if model.isSyncEnabled {
+                SyncEnabledView<ViewModel>()
+                    .environmentObject(model)
+            } else {
+                SyncSetupView<ViewModel>()
+                    .environmentObject(model)
             }
         }
     }

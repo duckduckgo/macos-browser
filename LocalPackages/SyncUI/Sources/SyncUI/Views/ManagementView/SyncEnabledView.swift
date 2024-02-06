@@ -17,7 +17,7 @@
 //
 
 import SwiftUI
-import SwiftUIExtensions
+import PreferencesViews
 
 struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
     @EnvironmentObject var model: ViewModel
@@ -35,57 +35,32 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Sync Enabled
-        PreferencePaneSection(verticalPadding: 8) {
+        PreferencePaneSection {
             SyncStatusView<ViewModel>()
                 .environmentObject(model)
         }
 
         // Synced Devices
-        PreferencePaneSection(verticalPadding: 8) {
-            Text(UserText.syncedDevices)
-                .font(Const.Fonts.preferencePaneSectionHeader)
+        PreferencePaneSection(UserText.syncedDevices) {
             SyncedDevicesView<ViewModel>()
                 .environmentObject(model)
         }
 
         // Options
-        PreferencePaneSection(verticalPadding: 8) {
-            Text(UserText.optionsSectionTitle)
-                .font(Const.Fonts.preferencePaneSectionHeader)
-            Toggle(isOn: $model.isFaviconsFetchingEnabled) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(UserText.fetchFaviconsOptionTitle)
-                        Text(UserText.fetchFaviconsOptionCaption)
-                            .font(Const.Fonts.preferencePaneCaption)
-                            .foregroundColor(Color("BlackWhite60"))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .multilineTextAlignment(.leading)
-                    }
-                    Spacer()
-                }
+        PreferencePaneSection(UserText.optionsSectionTitle) {
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.fetchFaviconsOptionTitle, isOn: $model.isFaviconsFetchingEnabled)
+                TextMenuItemCaption(UserText.fetchFaviconsOptionCaption)
             }
-            .frame(alignment: .topLeading)
-            Toggle(isOn: $model.isUnifiedFavoritesEnabled) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(UserText.shareFavoritesOptionTitle)
-                        Text(UserText.shareFavoritesOptionCaption)
-                            .font(Const.Fonts.preferencePaneCaption)
-                            .foregroundColor(Color("BlackWhite60"))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .multilineTextAlignment(.leading)
-                    }
-                    Spacer()
-                }
+
+            PreferencePaneSubSection {
+                ToggleMenuItem(UserText.shareFavoritesOptionTitle, isOn: $model.isUnifiedFavoritesEnabled)
+                TextMenuItemCaption(UserText.shareFavoritesOptionCaption)
             }
-            .frame(alignment: .topLeading)
         }
 
         // Recovery
-        PreferencePaneSection(verticalPadding: 8) {
-            Text(UserText.recovery)
-                .font(Const.Fonts.preferencePaneSectionHeader)
+        PreferencePaneSection(UserText.recovery) {
             HStack(alignment: .top, spacing: 12) {
                 Text(UserText.recoveryInstructions)
                     .fixMultilineScrollableText()
@@ -97,7 +72,7 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         }
 
         // Turn Off and Delete Data
-        PreferencePaneSection(verticalPadding: 8) {
+        PreferencePaneSection {
             Button(UserText.turnOffAndDeleteServerData) {
                 model.presentDeleteAccount()
             }
@@ -137,7 +112,11 @@ struct SyncEnabledView<ViewModel>: View where ViewModel: ManagementViewModel {
         if model.isDataSyncingAvailable {
             EmptyView()
         } else {
-            SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            if model.isAppVersionNotSupported {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessageUpgradeRequired)
+            } else {
+                SyncWarningMessage(title: UserText.syncPausedTitle, message: UserText.syncUnavailableMessage)
+            }
         }
     }
 

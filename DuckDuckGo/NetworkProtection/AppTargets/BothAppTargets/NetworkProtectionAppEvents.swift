@@ -115,45 +115,20 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
-        defer {
-            versionStore.lastVersionRun = currentVersion
-        }
 
-#if DEBUG
-        // For debug builds we always want to restart the VPN and VPN menu app to ensure
-        // the latest is loaded
-        restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
-#else
         // should‘ve been run at least once with NetP enabled
-        guard let lastVersionRun = versionStore.lastVersionRun else {
+        guard versionStore.lastVersionRun != nil else {
             os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
             return
         }
 
-        if lastVersionRun != currentVersion {
-            os_log(.info, log: .networkProtection, "App updated from %{public}s to %{public}s: updating login items", lastVersionRun, currentVersion)
-            restartNetworkProtectionTunnelAndMenu(using: loginItemsManager)
-        }
-#endif
+        // We want to restart the VPN menu app to make sure it's always on the latest.
+        restartNetworkProtectionMenu(using: loginItemsManager)
     }
 
-    private func restartNetworkProtectionTunnelAndMenu(using loginItemsManager: LoginItemsManager) {
-
+    private func restartNetworkProtectionMenu(using loginItemsManager: LoginItemsManager) {
         loginItemsManager.restartLoginItems(LoginItemsManager.networkProtectionLoginItems, log: .networkProtection)
-
-        Task {
-            let machServiceName = Bundle.main.vpnMenuAgentBundleId
-            let ipcClient = TunnelControllerIPCClient(machServiceName: machServiceName)
-            let controller = NetworkProtectionIPCTunnelController(ipcClient: ipcClient)
-
-            // Restart NetP SysEx on app update
-            if controller.isConnected {
-                await controller.stop()
-                await controller.start()
-            }
-        }
     }
 
     /// Fetches a new list of Network Protection servers, and updates the existing set.
@@ -175,6 +150,7 @@ final class NetworkProtectionAppEvents {
     // MARK: - Legacy Login Item and Extension
 
     private func removeLegacyLoginItemAndVPNConfiguration() async {
+#if NETP_SYSTEM_EXTENSION
         LoginItem(bundleId: legacyAgentBundleID, defaults: .netP).forceStop()
 
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
@@ -189,6 +165,7 @@ final class NetworkProtectionAppEvents {
         UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 
         try? await tunnel.removeFromPreferences()
+#endif
     }
 }
 

@@ -25,8 +25,8 @@ struct DataImportSummaryView: View {
 
     let model: DataImportSummaryViewModel
 
-    init(_ importViewModel: DataImportViewModel, dataTypes: Set<DataType>? = nil) {
-        self.init(model: .init(source: importViewModel.importSource, results: importViewModel.summary, dataTypes: dataTypes))
+    init(_ importViewModel: DataImportViewModel, dataTypes: Set<DataType>? = nil, isFileImport: Bool = false) {
+        self.init(model: .init(source: importViewModel.importSource, isFileImport: isFileImport, results: importViewModel.summary, dataTypes: dataTypes))
     }
 
     init(model: DataImportSummaryViewModel) {

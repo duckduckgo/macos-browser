@@ -238,6 +238,11 @@ struct DataBrokerProfileQueryOperationManager: OperationsManager {
 
     private func sendProfileRemovedNotificationIfNecessary(userNotificationService: DataBrokerProtectionUserNotificationService, database: DataBrokerProtectionRepository) {
         let savedExtractedProfiles = database.fetchAllBrokerProfileQueryData().flatMap { $0.extractedProfiles }
+
+        guard savedExtractedProfiles.count > 0 else {
+            return
+        }
+
         if savedExtractedProfiles.count == 1 {
             userNotificationService.sendAllInfoRemovedNotificationIfPossible()
         } else {
