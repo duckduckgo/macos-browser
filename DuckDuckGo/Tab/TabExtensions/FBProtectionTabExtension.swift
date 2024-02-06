@@ -90,16 +90,15 @@ extension FBProtectionTabExtension {
 
 extension FBProtectionTabExtension: ClickToLoadUserScriptDelegate {
 
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void) {
+    func clickToLoadUserScriptAllowFB() -> Bool {
         guard self.fbBlockingEnabled else {
-            replyHandler(true)
-            return
+            return true
         }
 
         if setFBProtection(enabled: false) {
-            replyHandler(true)
+            return true
         } else {
-            replyHandler(false)
+            return false
         }
     }
 }

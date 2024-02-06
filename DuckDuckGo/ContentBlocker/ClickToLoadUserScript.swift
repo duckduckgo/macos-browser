@@ -17,77 +17,83 @@
 //
 
 import WebKit
+import Common
 import UserScript
-import BrowserServicesKit
 
 protocol ClickToLoadUserScriptDelegate: AnyObject {
 
-    func clickToLoadUserScriptAllowFB(_ script: UserScript, replyHandler: @escaping (Bool) -> Void)
+    func clickToLoadUserScriptAllowFB() -> Bool
 }
 
-final class ClickToLoadUserScript: NSObject, UserScript, WKScriptMessageHandlerWithReply {
+final class ClickToLoadUserScript: NSObject, Subfeature {
 
-    var injectionTime: WKUserScriptInjectionTime { .atDocumentEnd }
-    var forMainFrameOnly: Bool { false }
-    var messageNames: [String] { ["getImage", "enableFacebook", "initClickToLoad" ] }
-    let source: String
+    weak var broker: UserScriptMessageBroker?
+    weak var webView: WKWebView?
 
-    init(scriptSourceProvider: ScriptSourceProviding) {
-        self.source = scriptSourceProvider.clickToLoadSource
-    }
+    var devMode = false
 
     weak var delegate: ClickToLoadUserScriptDelegate?
 
-    @MainActor
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage,
-                               replyHandler: @escaping (Any?, String?) -> Void) {
-        if message.name == "initClickToLoad" {
-            let host = message.body as? String
-            let controller = userContentController as? UserContentController
-            let privacyConfigurationManager = controller!.privacyConfigurationManager
-            let privacyConfiguration = privacyConfigurationManager.privacyConfig
+    // this isn't an issue to be set to 'all' because the page
+    public let messageOriginPolicy: MessageOriginPolicy = .all
+    public let featureName: String = "clickToLoad"
 
-            let locallyProtected = privacyConfiguration.isProtected(domain: host)
-            let featureEnabled = privacyConfiguration.isFeature(.clickToPlay, enabledForDomain: host)
-            if locallyProtected && featureEnabled {
-                replyHandler(true, nil)
-            } else {
-                replyHandler(false, nil)
-            }
-            return
-        }
-        if message.name == "enableFacebook" {
-            guard let delegate = delegate else { return }
-            delegate.clickToLoadUserScriptAllowFB(self) { _ in
-                guard let isLogin = message.body as? Bool else {
-                    replyHandler(nil, nil)
-                    return
-                }
+    // MARK: - Subfeature
 
-                replyHandler(isLogin, nil)
-            }
-
-            return
-        }
-
-        var image: String
-
-        guard let arg = message.body as? String else {
-            replyHandler(nil, nil)
-            return
-        }
-        if message.name == "getImage" {
-            image = ClickToLoadModel.getImage[arg]!
-        } else {
-            assertionFailure("Uknown message type")
-            replyHandler(nil, nil)
-            return
-        }
-        replyHandler(image, nil)
+    public func with(broker: UserScriptMessageBroker) {
+        self.broker = broker
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        assertionFailure("SHOULDN'T BE HERE!")
+    // MARK: - MessageNames
+
+    enum MessageNames: String, CaseIterable {
+        case getClickToLoadState
+        case displayClickToLoadPlaceholders
+        case unblockClickToLoadContent
+        case updateFacebookCTLBreakageFlags
+        case addDebugFlag
     }
 
+    public func handler(forMethodNamed methodName: String) -> Handler? {
+        switch MessageNames(rawValue: methodName) {
+        case .getClickToLoadState:
+            return handleGetClickToLoadState
+        case .unblockClickToLoadContent:
+            return handleUnblockClickToLoadContent
+        case .updateFacebookCTLBreakageFlags:
+            return nil
+        case .addDebugFlag:
+            return nil
+        default:
+            assertionFailure("ClickToLoadUserScript: Failed to parse User Script message: \(methodName)")
+            return nil
+        }
+    }
+
+    private func handleGetClickToLoadState(params: Any, message: UserScriptMessage) -> Encodable? {
+        return [
+            "devMode": devMode,
+            "youtubePreviewsEnabled": false
+        ]
+    }
+
+    private func handleUnblockClickToLoadContent(params: Any, message: UserScriptMessage) -> Encodable? {
+        struct UnblockMessage: Decodable {
+            let action: String
+            let isLogin: Bool
+            let isSurrogateLogin: Bool
+            let entity: String
+        }
+
+        guard let delegate = delegate else { return false }
+
+        // only worry about CTL FB for now
+        return delegate.clickToLoadUserScriptAllowFB()
+    }
+
+    public func displayClickToLoadPlaceholders() {
+        if let webView = webView {
+            broker?.push(method: MessageNames.displayClickToLoadPlaceholders.rawValue, params: ["ruleAction": ["block"]], for: self, into: webView)
+        }
+    }
 }

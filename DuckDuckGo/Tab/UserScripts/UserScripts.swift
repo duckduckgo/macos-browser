@@ -47,7 +47,7 @@ final class UserScripts: UserScriptsProvider {
     let sslErrorPageUserScript: SSLErrorPageUserScript?
 
     init(with sourceProvider: ScriptSourceProviding) {
-        clickToLoadScript = ClickToLoadUserScript(scriptSourceProvider: sourceProvider)
+        clickToLoadScript = ClickToLoadUserScript()
         contentBlockerRulesScript = ContentBlockerRulesUserScript(configuration: sourceProvider.contentBlockerRulesConfig!)
         surrogatesScript = SurrogatesUserScript(configuration: sourceProvider.surrogatesConfig!)
         let isGPCEnabled = WebTrackingProtectionPreferences.shared.isGPCEnabled
@@ -76,6 +76,8 @@ final class UserScripts: UserScriptsProvider {
         }
 
         userScripts.append(autoconsentUserScript)
+
+        contentScopeUserScript.registerSubfeature(delegate: clickToLoadScript)
 
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
@@ -109,7 +111,6 @@ final class UserScripts: UserScriptsProvider {
         pageObserverScript,
         printingUserScript,
         hoverUserScript,
-        clickToLoadScript,
         contentScopeUserScript,
         contentScopeUserScriptIsolated,
         autofillScript
