@@ -886,7 +886,7 @@ protocol NewWindowPolicyDecisionMaker {
         // In the case of an error only reload web URLs to prevent uxss attacks via redirecting to javascript://
         if let error = error, let failingUrl = error.failingUrl ?? content.urlForWebView, failingUrl.isHttp || failingUrl.isHttps {
             // navigate in-place to preserve back-forward history
-            webView.replaceLocation(with: failingUrl)
+            try? webView.replaceLocation(with: failingUrl)
             return nil
         }
 
