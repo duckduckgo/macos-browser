@@ -45,7 +45,8 @@ final class FireproofInfoViewController: NSViewController {
             separator.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.1).cgColor
         }
     }
-
+    @IBOutlet weak var removeFireproofingButton: NSButton!
+    @IBOutlet weak var descriptionLabel: NSTextField!
     private var domain: String
 
     init?(coder: NSCoder, domain: String) {
@@ -60,6 +61,9 @@ final class FireproofInfoViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.titleLabel.stringValue = UserText.domainIsFireproof(domain: domain)
+        self.doneButton.title = UserText.done
+        self.removeFireproofingButton.title = UserText.fireproofingRemoveFireproofing
+        self.descriptionLabel.stringValue = UserText.fireproofingDescription
     }
 
     @IBAction func removeFireproofing(_ sender: AnyObject) {

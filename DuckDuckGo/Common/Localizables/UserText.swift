@@ -259,6 +259,9 @@ struct UserText {
     static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites…", comment: "Fireproof settings button caption")
 
+    static let fireproofingRemoveFireproofing = NSLocalizedString("fireproofing.remove-button", value: "Remove Fireproofing", comment: "Button to allow the user the remove the fireproofing from a website")
+    static let fireproofingDescription = NSLocalizedString("fireproofing.description", value: "Websites rely on cookies to keep you signed in. When you fireproof a site, cookies won’t be erased, and you’ll stay signed in, even after using the Fire button. We still block third-party trackers found on Fireproof websites.", comment: "Description of dialog when the user can decide to fireproof or not a website")
+
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof sites won't be cleared", comment: "Category of domains in fire button dialog")
     static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Selected sites will be cleared", comment: "Category of domains in fire button dialog")
     static let allData = NSLocalizedString("fire.all-sites", value: "All sites", comment: "Configuration option for fire button")

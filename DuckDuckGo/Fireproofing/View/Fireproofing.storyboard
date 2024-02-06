@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -43,7 +42,7 @@ DQ
                                     <action selector="removeFireproofing:" target="jqq-GQ-sK6" id="7nL-ti-Wrk"/>
                                 </connections>
                             </button>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ueg-qL-Rvw">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ueg-qL-Rvw">
                                 <rect key="frame" x="18" y="173" width="304" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="This Website is Fireproof" id="A96-Lb-yAP">
                                     <font key="font" textStyle="headline" name=".SFNS-Bold"/>
@@ -51,7 +50,7 @@ DQ
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="m1Z-dg-G6t">
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="m1Z-dg-G6t">
                                 <rect key="frame" x="18" y="85" width="304" height="80"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="300" id="ket-cH-6Xl"/>
@@ -83,7 +82,9 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="descriptionLabel" destination="m1Z-dg-G6t" id="oE3-AZ-UxE"/>
                         <outlet property="doneButton" destination="8qv-q0-b9t" id="QBX-QU-rsF"/>
+                        <outlet property="removeFireproofingButton" destination="j0P-C2-eOh" id="cxm-bA-DUN"/>
                         <outlet property="separator" destination="vuA-8C-6AZ" id="RHe-L0-idI"/>
                         <outlet property="titleLabel" destination="ueg-qL-Rvw" id="mdS-j0-YBP"/>
                     </connections>

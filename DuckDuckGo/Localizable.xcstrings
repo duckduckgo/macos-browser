@@ -3296,6 +3296,30 @@
         }
       }
     },
+    "fireproofing.description" : {
+      "comment" : "Description of dialog when the user can decide to fireproof or not a website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Websites rely on cookies to keep you signed in. When you fireproof a site, cookies won’t be erased, and you’ll stay signed in, even after using the Fire button. We still block third-party trackers found on Fireproof websites."
+          }
+        }
+      }
+    },
+    "fireproofing.remove-button" : {
+      "comment" : "Button to allow the user the remove the fireproofing from a website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove Fireproofing"
+          }
+        }
+      }
+    },
     "folder.dialog.add" : {
       "comment" : "Button to confim a bookmark folder creation",
       "extractionState" : "extracted_with_value",
