@@ -7277,11 +7277,11 @@
 		AAC5E4C125D6A6C3007F5990 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */,
 				7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */,
+				4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */,
 				AAC5E4C425D6A6E8007F5990 /* AddBookmarkPopover.swift */,
 				7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */,
-				4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */,
-				4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */,
 				B69A14F92B4D705D00B9417D /* BookmarkFolderPicker.swift */,
 				4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */,
 				4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */,
