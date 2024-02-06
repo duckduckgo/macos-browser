@@ -47,7 +47,6 @@ final class PasswordManagementViewController: NSViewController {
 
     @IBOutlet weak var lockMenuItem: NSMenuItem!
     @IBOutlet weak var importPasswordMenuItem: NSMenuItem!
-    @IBOutlet weak var exportLoginsMenuItem: NSMenuItem!
     @IBOutlet weak var settingsMenuItem: NSMenuItem!
 
     @IBOutlet weak var unlockYourAutofillLabel: FlatButton!
