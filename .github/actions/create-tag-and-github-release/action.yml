@@ -17,9 +17,6 @@ outputs:
   tag-created:
     description: "Whether the tag has been created"
     value: ${{ steps.tag-repo.conclusion == 'success' }}
-  release-created:
-    description: "Whether the release has been created"
-    value: ${{ steps.create-github-release.conclusion == 'success' }}
 runs:
   using: "composite"
   steps:
