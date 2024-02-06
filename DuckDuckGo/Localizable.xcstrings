@@ -2984,6 +2984,18 @@
     "Find Previous" : {
       "comment" : "Main Menu Edit-Find item"
     },
+    "find-in-page.text-field.placeholder" : {
+      "comment" : "Placeholder text for the text field where the user inputs strings to searcg in the web page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find in page"
+          }
+        }
+      }
+    },
     "find.in.page" : {
       "comment" : "Find in page status (e.g. 1 of 99)",
       "extractionState" : "extracted_with_value",
