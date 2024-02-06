@@ -103,4 +103,4 @@ jobs:
           ./scripts/appcast_manager/appcastManager.swift \
             --release-to-internal-channel \
             --dmg ${DMG_PATH} \
-            --release-notes release-notes.txt
+            --release-notes release_notes.txt
