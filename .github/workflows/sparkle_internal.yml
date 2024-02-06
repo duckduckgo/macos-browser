@@ -86,12 +86,13 @@ jobs:
       - name: Generate appcast
         env:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.SPARKLE_PRIVATE_KEY }}" > sparkle_private_key.pem
-          chmod 600 sparkle_private_key.pem
+          echo -n "$SPARKLE_PRIVATE_KEY" > sparkle_private_key
+          chmod 600 sparkle_private_key
 
           ./scripts/appcast_manager/appcastManager.swift \
             --release-to-internal-channel \
             --dmg ${DMG_PATH} \
             --release-notes release_notes.txt \
-            --key sparkle_private_key.pem \
+            --key sparkle_private_key
