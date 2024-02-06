@@ -55,19 +55,6 @@ jobs:
           curl -fLSs $SPARKLE_URL | tar xJ bin
           echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
 
-      - name: Import Sparkle private key
-        run: |
-          echo "${{ secrets.SPARKLE_PRIVATE_KEY }}" > $HOME/sparkle_private_key.pem
-          chmod 600 $HOME/sparkle_private_key.pem
-
-          # create temporary keychain
-          KEYCHAIN_PATH=$RUNNER_TEMP/sparkle.keychain-db
-          security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" $KEYCHAIN_PATH
-
-          generate_keys -f $HOME/sparkle_private_key.pem
-
       - name: Fetch DMG
         id: fetch-dmg
         env:
@@ -100,7 +87,11 @@ jobs:
         env:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
         run: |
+          echo "${{ secrets.SPARKLE_PRIVATE_KEY }}" > sparkle_private_key.pem
+          chmod 600 sparkle_private_key.pem
+
           ./scripts/appcast_manager/appcastManager.swift \
             --release-to-internal-channel \
             --dmg ${DMG_PATH} \
-            --release-notes release_notes.txt
+            --release-notes release_notes.txt \
+            --key sparkle_private_key.pem \
