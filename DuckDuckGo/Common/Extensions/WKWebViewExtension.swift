@@ -232,13 +232,6 @@ extension WKWebView {
         self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
     }
 
-    func replaceLocation(with url: URL, in frame: WKFrameInfo? = nil) throws {
-        guard [.http, .https, .duck].contains(url.navigationalScheme) else {
-            throw URLError(URLError.Code.unsupportedURL, userInfo: [NSURLErrorKey: url as NSURL])
-        }
-        self.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: frame, in: .defaultClient)
-    }
-
     func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL) {
         guard responds(to: Selector.loadAlternateHTMLString) else {
             if #available(macOS 12.0, *) {
