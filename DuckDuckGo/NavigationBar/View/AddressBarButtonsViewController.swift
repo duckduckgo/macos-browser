@@ -759,6 +759,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
         // Image button
         switch controllerMode {
+        case .browsing where selectedTabViewModel.isShowingErrorPage:
+            imageButton.image = Self.webImage
         case .browsing:
             imageButton.image = selectedTabViewModel.favicon
         case .editing(isUrl: true):

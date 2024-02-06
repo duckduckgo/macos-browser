@@ -285,7 +285,7 @@ final class TabViewModel {
 
     private func updateFavicon() {
         guard !isShowingErrorPage else {
-            favicon = nil
+            favicon = .alertCircleColor16
             return
         }
 

@@ -651,6 +651,10 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var title: String?
 
     private func updateTitle() {
+        guard error == nil else {
+            self.title = nil
+            return
+        }
         var title = webView.title?.trimmingWhitespace()
         if title?.isEmpty ?? true {
             title = webView.url?.host?.droppingWwwPrefix()
@@ -1090,7 +1094,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @MainActor(unsafe)
     private func handleFavicon(oldValue: TabContent? = nil) {
-        guard content.isUrl, let url = content.urlForWebView else {
+        guard content.isUrl, let url = content.urlForWebView, error == nil else {
             favicon = nil
             return
         }
@@ -1143,6 +1147,7 @@ extension Tab: FaviconUserScriptDelegate {
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {
+        guard documentUrl != .error else { return }
         faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
             guard documentUrl == self.content.url, let favicon = favicon else {
                 return
