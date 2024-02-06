@@ -29,6 +29,7 @@ final class TabSnapshotExtension {
 
     private var renderSnapshotAfterLoad = true
     private var userDidInteractWithWebsite = false
+    private var didRestoreSnapshot = false
 
     private weak var webView: WebView?
     private var tabContent: Tab.TabContent?
@@ -54,6 +55,10 @@ final class TabSnapshotExtension {
         contentPublisher.sink { [weak self] tabContent in
             self?.tabContent = tabContent
         }.store(in: &cancellables)
+
+        Task {
+            await setIdentifier()
+        }
     }
 
     deinit {
@@ -63,7 +68,11 @@ final class TabSnapshotExtension {
     }
 
     @MainActor
-    func setIdentifier(_ identifier: UUID?) async {
+    func setIdentifier(_ identifier: UUID? = nil) async {
+        if let originalIdentifier = self.identifier {
+            store.clearSnapshot(tabID: originalIdentifier)
+        }
+
         guard let identifier else {
             // Create new identifier and render snapshot right after the first load
             self.identifier = UUID()
@@ -194,17 +203,15 @@ extension TabSnapshotExtension: NSCodingExtension {
     }
 
     func awakeAfter(using decoder: NSCoder) {
-        guard identifier == nil else { return }
+        guard !didRestoreSnapshot else { return }
 
         guard let uuidString = decoder.decodeObject(of: NSString.self, forKey: NSSecureCodingKeys.tabSnapshotIdentifier),
               let identifier = UUID(uuidString: uuidString as String) else {
             os_log("Snapshot not available in the session state", log: .tabSnapshots)
-
-            Task {
-                await setIdentifier(nil)
-            }
             return
         }
+
+        didRestoreSnapshot = true
 
         Task {
             await setIdentifier(identifier)
