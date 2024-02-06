@@ -297,6 +297,7 @@ jobs:
       uses: ./.github/actions/asana-log-message
       env:
         DMG_URL: ${{ vars.TEST_DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}
+        TAG: ${{ env.app-version }}
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       with:
         task-url: ${{ env.asana-task-url }}

@@ -143,10 +143,12 @@ jobs:
       uses: ./.github/actions/asana-log-message
       env:
         DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
+        TAG: ${{ env.app-version }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       with:
         task-url: ${{ env.asana-task-url }}
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-        comment: "Debug symbols for ${{ env.app-version }} build are uploaded to ${{ env.DSYM_S3_PATH }}."
+        template-name: debug-symbols-uploaded
 
     - name: Send Mattermost message
       env:
