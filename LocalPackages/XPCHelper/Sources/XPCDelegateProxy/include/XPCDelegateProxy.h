@@ -1,7 +1,7 @@
 //
-//  WebsiteBreakageSender.swift
+//  XPCDelegateProxy.h
 //
-//  Copyright © 2022 DuckDuckGo. All rights reserved.
+//  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,12 @@
 //  limitations under the License.
 //
 
-import Foundation
+@import Foundation;
 
-final class WebsiteBreakageSender {
+@interface XPCDelegateProxy: NSProxy
 
-    static let allowedQueryReservedCharacters =  CharacterSet(charactersIn: ",")
+@property (nonatomic, weak, nullable) id delegate;
 
-    func sendWebsiteBreakage(_ websiteBreakage: WebsiteBreakage) {
-        Pixel.fire(
-            .brokenSiteReport,
-            withAdditionalParameters: websiteBreakage.requestParameters,
-            allowedQueryReservedCharacters: Self.allowedQueryReservedCharacters
-        )
-    }
-}
+- (instancetype _Nonnull )initWithDelegate:(id _Nullable )delegate;
+
+@end

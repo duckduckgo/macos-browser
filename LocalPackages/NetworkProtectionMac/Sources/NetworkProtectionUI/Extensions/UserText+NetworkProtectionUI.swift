@@ -57,5 +57,9 @@ final class UserText {
     // MARK: - Connection Information
 
     static let networkProtectionServerAddressUnknown = NSLocalizedString("network.protection.server.address.unknown", value: "Unknown", comment: "When we can't tell the user the IP of the NetP server is")
-    static let networkProtectionServerLocationUnknown = NSLocalizedString("network.protection.server.location.unknown", value: "Unknown", comment: "When we can't tell the user the location of the NetP server")
+    static let networkProtectionServerLocationUnknown = NSLocalizedString("network.protection.server.location.unknown", value: "Unknown...", comment: "When we can't tell the user the location of the NetP server")
+    static func networkProtectionFormattedServerLocation(_ location: String) -> String {
+        let localized = NSLocalizedString("network.protection.server.location.link", value: "%@...", comment: "Clickable text linking to the server location picker screen")
+        return String(format: localized, location)
+    }
 }

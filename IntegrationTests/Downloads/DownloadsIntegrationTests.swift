@@ -30,17 +30,18 @@ class DownloadsIntegrationTests: XCTestCase {
     }
 
     let data = DataSource()
-    static var window: NSWindow!
+    var window: NSWindow!
     var tabViewModel: TabViewModel {
-        (Self.window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
+        (window.contentViewController as! MainViewController).browserTabViewController.tabViewModel!
     }
 
     @MainActor
-    override class func setUp() {
-        window = WindowsManager.openNewWindow(with: .none)!
+    override func setUp() {
+        window = WindowsManager.openNewWindow(with: Tab(content: .none))!
     }
 
-    override class func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window.close()
         window = nil
     }
@@ -50,7 +51,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenShouldDownloadResponse_downloadStarts() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let downloadTaskFuture = FileDownloadManager.shared.downloadsPublisher.timeout(5).first().promise()
@@ -72,7 +73,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsData_downloadStarts() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let tab = tabViewModel.tab
@@ -104,7 +105,7 @@ class DownloadsIntegrationTests: XCTestCase {
 
     @MainActor
     func testWhenNavigationActionIsBlob_downloadStarts() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let tab = tabViewModel.tab

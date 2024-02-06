@@ -45,7 +45,8 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
         await ConfigurationManager.shared.refreshIfNeeded()?.value
     }
 
-    override func tearDown() {
+    @MainActor
+    override func tearDown() async throws {
         window.close()
         window = nil
 
@@ -56,7 +57,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
 
     @MainActor
     func testHttpsUpgrade() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-upgrades/")!
@@ -116,7 +117,7 @@ class HTTPSUpgradeIntegrationTests: XCTestCase {
 
     @MainActor
     func testHttpsLoopProtection() async throws {
-        var persistor = DownloadsPreferencesUserDefaultsPersistor()
+        let persistor = DownloadsPreferencesUserDefaultsPersistor()
         persistor.selectedDownloadLocation = FileManager.default.temporaryDirectory.absoluteString
 
         let url = URL(string: "http://privacy-test-pages.site/privacy-protections/https-loop-protection/")!

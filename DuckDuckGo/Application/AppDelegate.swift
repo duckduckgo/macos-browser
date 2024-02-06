@@ -29,6 +29,7 @@ import DDGSync
 import ServiceManagement
 import SyncDataProviders
 import UserNotifications
+import PixelKit
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -77,6 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var screenLockedCancellable: AnyCancellable?
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
+    var privacyDashboardWindow: NSWindow?
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
     private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
@@ -102,14 +104,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
             fileStore = EncryptedFileStore()
         }
 
+        // keep this on top!
+        // disable onboarding for existing users
+        let isOnboardingFinished = UserDefaultsWrapper<Bool>(key: .onboardingFinished, defaultValue: false)
+        if !isOnboardingFinished.wrappedValue,
+           FileManager.default.fileExists(atPath: URL.sandboxApplicationSupportURL.path) {
+            isOnboardingFinished.wrappedValue = true
+        }
+
         let internalUserDeciderStore = InternalUserDeciderStore(fileStore: fileStore)
         internalUserDecider = DefaultInternalUserDecider(store: internalUserDeciderStore)
 
         if NSApplication.runType.requiresEnvironment {
 #if DEBUG
             Pixel.setUp(dryRun: true)
+            Self.setUpPixelKit(dryRun: true)
 #else
             Pixel.setUp()
+            Self.setUpPixelKit(dryRun: false)
 #endif
 
             Database.shared.loadStore { _, error in
@@ -217,7 +229,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         if LocalStatisticsStore().atb == nil {
             Pixel.firstLaunchDate = Date()
             // MARK: Enable pixel experiments here
-            PixelExperiment.install()
         }
         AtbAndVariantCleanup.cleanup()
         DefaultVariantManager().assignVariantIfNeeded { _ in
@@ -352,6 +363,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         appearancePreferences.updateUserInterfaceStyle()
     }
 
+    private static func setUpPixelKit(dryRun: Bool) {
+#if NETWORK_PROTECTION
+#if APPSTORE
+        let source = "browser-appstore"
+#else
+        let source = "browser-dmg"
+#endif
+
+        PixelKit.setUp(dryRun: dryRun,
+                       appVersion: AppVersion.shared.versionNumber,
+                       source: source,
+                       defaultHeaders: [:],
+                       log: .networkProtectionPixel,
+                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+
+            let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+            let request = APIRequest(configuration: configuration)
+
+            request.fetch { _, error in
+                onComplete(error == nil, error)
+            }
+        }
+#endif
+    }
+
     // MARK: - Sync
 
     private func startupSync() {
@@ -481,7 +519,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private func emailDidSignInNotification(_ notification: Notification) {
         Pixel.fire(.emailEnabled)
         if Pixel.isNewUser {
-            PixelExperiment.fireEmailProtectionEnabledPixel()
+            Pixel.fire(.emailEnabledInitial, limitTo: .initial)
         }
 
         if let object = notification.object as? EmailManager, let emailManager = syncDataProviders.settingsAdapter.emailManager, object !== emailManager {
@@ -498,7 +536,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
 
     @objc private func dataImportCompleteNotification(_ notification: Notification) {
         if Pixel.isNewUser {
-            PixelExperiment.fireImportDataInitialPixel()
+            Pixel.fire(.importDataInitial, limitTo: .initial)
         }
     }
 

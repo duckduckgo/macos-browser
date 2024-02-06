@@ -115,14 +115,10 @@ final class NetworkProtectionAppEvents {
     }
 
     private func restartNetworkProtectionIfVersionChanged(using loginItemsManager: LoginItemsManager) {
-        let currentVersion = AppVersion.shared.versionAndBuildNumber
         let versionStore = NetworkProtectionLastVersionRunStore()
-        defer {
-            versionStore.lastVersionRun = currentVersion
-        }
 
         // should‘ve been run at least once with NetP enabled
-        guard let lastVersionRun = versionStore.lastVersionRun else {
+        guard versionStore.lastVersionRun != nil else {
             os_log(.info, log: .networkProtection, "No last version found for the NetP login items, skipping update")
             return
         }
@@ -154,6 +150,7 @@ final class NetworkProtectionAppEvents {
     // MARK: - Legacy Login Item and Extension
 
     private func removeLegacyLoginItemAndVPNConfiguration() async {
+#if NETP_SYSTEM_EXTENSION
         LoginItem(bundleId: legacyAgentBundleID, defaults: .netP).forceStop()
 
         let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
@@ -168,6 +165,7 @@ final class NetworkProtectionAppEvents {
         UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
 
         try? await tunnel.removeFromPreferences()
+#endif
     }
 }
 

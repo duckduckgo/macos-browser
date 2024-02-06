@@ -72,6 +72,14 @@ struct PasswordManagementItemListView: View {
                         }
                 }
             }
+
+            Spacer(minLength: 0)
+
+            Divider()
+
+            PasswordManagementAddButton()
+                .padding()
+
         }
     }
 
@@ -131,6 +139,7 @@ struct PasswordManagementItemListCategoryView: View {
                 PasswordManagementSortButton(imageName: "SortDescending")
             }
         }
+        .padding(.vertical, -4)
 
     }
 }
@@ -211,7 +220,7 @@ private struct PasswordManagerItemView: View {
 
     var body: some View {
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
-        let font = Font.custom("SFProText-Regular", size: 13)
+        let font = Font.system(size: 13)
 
         Button(action: action, label: {
             HStack(spacing: 3) {
@@ -264,7 +273,7 @@ private struct ItemView: View {
 
         let selected = model.selected == item
         let textColor = selected ? .white : Color(NSColor.controlTextColor)
-        let font = Font.custom("SFProText-Regular", size: 13)
+        let font = Font.system(size: 13)
 
         Button(action: action, label: {
             HStack(spacing: 2) {
@@ -388,6 +397,78 @@ struct PasswordManagementSortButton: View {
             return "✓ \(string)"
         } else {
             return "    \(string)"
+        }
+    }
+
+}
+
+private struct PasswordManagementAddButton: View {
+
+    @EnvironmentObject var model: PasswordManagementItemListModel
+
+    var body: some View {
+
+        switch model.sortDescriptor.category {
+        case .allItems:
+            ZStack {
+                // Setting Menu label to empty string and overlaying with this as Menu will not allow the image + text to be centered
+                Text(UserText.pmAddItem)
+
+                Menu {
+                    createMenuItem(imageName: "LoginGlyph", text: UserText.pmNewLogin, category: .logins)
+                    createMenuItem(imageName: "IdentityGlyph", text: UserText.pmNewIdentity, category: .identities)
+                    createMenuItem(imageName: "CreditCardGlyph", text: UserText.pmNewCard, category: .cards)
+               } label: {
+                    Text("")
+                }
+                .modifier(HideMenuIndicatorModifier())
+            }
+            .padding(.vertical, -4)
+        case .logins:
+            createButton(text: UserText.pmAddLogin, category: model.sortDescriptor.category)
+        case .identities:
+            createButton(text: UserText.pmAddIdentity, category: model.sortDescriptor.category)
+        case .cards:
+            createButton(text: UserText.pmAddCard, category: model.sortDescriptor.category)
+        }
+
+    }
+
+    private func createMenuItem(imageName: String, text: String, category: SecureVaultSorting.Category) -> some View {
+
+        Button {
+            model.onAddItemClickedFor(category)
+        } label: {
+            HStack {
+                Image(imageName)
+                Text(text)
+            }
+        }
+
+    }
+
+    private func createButton(text: String, category: SecureVaultSorting.Category) -> some View {
+
+        Button {
+            model.onAddItemClickedFor(category)
+        } label: {
+            Text(text)
+                .frame(maxWidth: .infinity)
+                .offset(y: 1)
+        }
+        .padding(.vertical, -4)
+
+    }
+}
+
+private struct HideMenuIndicatorModifier: ViewModifier {
+
+    func body(content: Content) -> some View {
+        if #available(macOS 12, *) {
+            content
+                .menuIndicator(.hidden)
+        } else {
+            content
         }
     }
 

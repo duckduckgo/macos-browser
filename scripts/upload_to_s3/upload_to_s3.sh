@@ -148,8 +148,13 @@ for FILENAME in $FILES_TO_UPLOAD; do
     fi
 done
 
-# Add appcast2.xml for upload last
-MISSING_FILES+=("appcast2.xml")
+# Create a copy of appcast2.xml called testing-appcast2.xml
+# https://app.asana.com/0/0/1206349575147845/f
+cp "$DIRECTORY/appcast2.xml" "$DIRECTORY/testing-appcast2.xml"
+echo "Created a copy of appcast2.xml as testing-appcast2.xml"
+
+# Add appcast files for upload
+MISSING_FILES+=("appcast2.xml" "testing-appcast2.xml")
 
 # Notify the user about files to be uploaded
 if [[ ${#MISSING_FILES[@]} -gt 0 ]] || [[ -n "$OVERWRITE_DMG_VERSION" ]]; then

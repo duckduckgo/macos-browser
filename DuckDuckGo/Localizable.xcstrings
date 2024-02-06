@@ -1500,6 +1500,42 @@
         }
       }
     },
+    "bookmarks.empty.state.message" : {
+      "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If your bookmarks are saved in another browser, you can import them into DuckDuckGo."
+          }
+        }
+      }
+    },
+    "bookmarks.empty.state.title" : {
+      "comment" : "Title displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No bookmarks yet"
+          }
+        }
+      }
+    },
+    "bookmarks.import.button.title" : {
+      "comment" : "Button text to open bookmark import dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import"
+          }
+        }
+      }
+    },
     "bookmarks.imported.from.folder" : {
       "comment" : "Name of the folder the imported bookmarks are saved into",
       "extractionState" : "extracted_with_value",
@@ -1508,6 +1544,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Imported from"
+          }
+        }
+      }
+    },
+    "bookmarks.imported.mobile.folder.title" : {
+      "comment" : "Name of the \"Mobile bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mobile bookmarks"
+          }
+        }
+      }
+    },
+    "bookmarks.imported.other.folder.title" : {
+      "comment" : "Name of the \"Other bookmarks\" folder imported from other browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Other bookmarks"
           }
         }
       }
@@ -1816,6 +1876,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Copy"
+          }
+        }
+      }
+    },
+    "copy.email.address" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Email Address"
+          }
+        }
+      }
+    },
+    "copy.email.addresses" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Email Addresses"
           }
         }
       }
@@ -2872,18 +2956,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Favorites"
-          }
-        }
-      }
-    },
-    "feedback.breakage.disclaimer" : {
-      "comment" : "Disclaimer in breakage form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Reports sent to DuckDuckGo are 100% anonymous and only include your selection above, your optional message, the URL, a list of trackers we found on the site, the DuckDuckGo app version, and your macOS version."
           }
         }
       }
@@ -5149,13 +5221,13 @@
       }
     },
     "network.protection.navbar.status.view.share.feedback" : {
-      "comment" : "Menu item for 'Send Feedback' in the Network Protection status view that's shown in the navigation bar",
+      "comment" : "Menu item for 'Send VPN Feedback' in the Network Protection status view that's shown in the navigation bar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Send Feedback…"
+            "value" : "Send VPN Feedback…"
           }
         }
       }
@@ -6479,18 +6551,6 @@
         }
       }
     },
-    "pinning.hide-home-shortcut" : {
-      "comment" : "Menu item for hiding the Home shortcut",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Hide Home Button"
-          }
-        }
-      }
-    },
     "pinning.hide-netp-shortcut" : {
       "comment" : "Menu item for hiding the NetP shortcut",
       "extractionState" : "extracted_with_value",
@@ -6539,18 +6599,6 @@
         }
       }
     },
-    "pinning.show-home-shortcut" : {
-      "comment" : "Menu item for showing the Home shortcut",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Home Button"
-          }
-        }
-      }
-    },
     "pinning.show-netp-shortcut" : {
       "comment" : "Menu item for showing the NetP shortcut",
       "extractionState" : "extracted_with_value",
@@ -6586,6 +6634,54 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Reactivate Duck Address"
+          }
+        }
+      }
+    },
+    "pm.add.card" : {
+      "comment" : "Add New Credit Card button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Credit Card"
+          }
+        }
+      }
+    },
+    "pm.add.identity" : {
+      "comment" : "Add New Identity button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Identity"
+          }
+        }
+      }
+    },
+    "pm.add.login" : {
+      "comment" : "Add New Login button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Password"
+          }
+        }
+      }
+    },
+    "pm.add.new" : {
+      "comment" : "Add New item button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add New"
           }
         }
       }
@@ -8073,6 +8169,18 @@
         }
       }
     },
+    "report.broken.site" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Report Broken Site"
+          }
+        }
+      }
+    },
     "restart.bitwarden" : {
       "comment" : "Button to restart Bitwarden application",
       "extractionState" : "extracted_with_value",
@@ -8189,6 +8297,18 @@
         }
       }
     },
+    "send.browser.feedback" : {
+      "comment" : "Menu with feedback commands",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send Browser Feedback"
+          }
+        }
+      }
+    },
     "Services" : {
       "comment" : "Main Menu DuckDuckGo item"
     },
@@ -8200,18 +8320,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Settings"
-          }
-        }
-      }
-    },
-    "settings.hide-home-shortcut" : {
-      "comment" : "Settings Optionm to set Home Button visibility",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Home Button in Toolbar"
           }
         }
       }
@@ -9212,7 +9320,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Nearest Available"
+            "value" : "Nearest available"
           }
         }
       }
