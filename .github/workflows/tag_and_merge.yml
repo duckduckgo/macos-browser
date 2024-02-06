@@ -85,7 +85,7 @@ jobs:
       run: |
         echo "TAG=${{ steps.create-tag.outputs.tag }}" >> $GITHUB_ENV
         echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
-        echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${{ steps.create-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
+        echo "DMG_URL=${{ vars.DMG_URL_ROOT }}duckduckgo-${{ steps.create-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
         echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}" >> $GITHUB_ENV
         if [[ ${{ steps.create-tag.outputs.tag-created }} == "false" ]]; then
           last_release_tag=$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')
