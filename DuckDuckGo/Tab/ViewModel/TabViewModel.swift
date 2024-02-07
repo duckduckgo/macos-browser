@@ -253,7 +253,8 @@ final class TabViewModel {
     private func updateTitle() { // swiftlint:disable:this cyclomatic_complexity
         let title: String
         switch tab.content {
-        case _ where isShowingErrorPage:
+        // keep an old tab title for web page terminated page, display "Failed to open page" for loading errors
+        case _ where isShowingErrorPage && (tab.error?.code != .webContentProcessTerminated || tab.title == nil):
             title = UserText.tabErrorTitle
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle

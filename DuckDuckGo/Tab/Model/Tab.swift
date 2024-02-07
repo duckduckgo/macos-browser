@@ -651,8 +651,10 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var title: String?
 
     private func updateTitle() {
-        guard error == nil else {
-            self.title = nil
+        if let error {
+            if error.code != .webContentProcessTerminated {
+                self.title = nil
+            }
             return
         }
         var title = webView.title?.trimmingWhitespace()
