@@ -51,6 +51,8 @@ protocol BookmarkManager: AnyObject {
     var listPublisher: Published<BookmarkList?>.Publisher { get }
     var list: BookmarkList? { get }
 
+    func requestSync()
+
 }
 
 final class LocalBookmarkManager: BookmarkManager {

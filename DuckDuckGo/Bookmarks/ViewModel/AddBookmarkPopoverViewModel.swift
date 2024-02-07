@@ -100,7 +100,7 @@ final class AddBookmarkPopoverViewModel: ObservableObject {
 
     @Published var bookmarkTitle: String {
         didSet {
-            bookmark.title = bookmarkTitle
+            bookmark.title = bookmarkTitle.trimmingWhitespace()
 
             bookmarkManager.update(bookmark: bookmark)
         }
