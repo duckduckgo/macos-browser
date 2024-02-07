@@ -1922,6 +1922,66 @@
     "Country" : {
 
     },
+    "crash-report.description" : {
+      "comment" : "Description of the dialog where the user can send a crash report (please leave escaping caracters)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Click \"Send to DuckDuckGo\" to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report."
+          }
+        }
+      }
+    },
+    "crash-report.dont-send-button" : {
+      "comment" : "Button the user can press to not send the crash report",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don’t Send"
+          }
+        }
+      }
+    },
+    "crash-report.send-button" : {
+      "comment" : "Button the user can press to send the crash report to DuckDuckGo",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send to DuckDuckGo"
+          }
+        }
+      }
+    },
+    "crash-report.textfield.title" : {
+      "comment" : "Title of the text field where the problems that caused the crashed are detailed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Problem Details"
+          }
+        }
+      }
+    },
+    "crash-report.title" : {
+      "comment" : "Title of the dialog where the user can send a crash report",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo Privacy Browser quit unexpectedly."
+          }
+        }
+      }
+    },
     "Cut" : {
       "comment" : "Main Menu Edit item"
     },
