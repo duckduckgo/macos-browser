@@ -1031,13 +1031,13 @@ extension WKProcessTerminationReason {
     var localizedDescription: String {
         switch self {
         case .exceededMemoryLimit:
-            "Memory limit exceeded."
+            NSLocalizedString("page.term.reason.memory", value: "Memory limit exceeded.", comment: "Web Page crash reason description")
         case .exceededCPULimit:
-            "CPU limit exceeded."
+            NSLocalizedString("page.term.reason.cpu", value: "CPU limit exceeded.", comment: "Web Page crash reason description")
         case .requestedByClient:
-            "Requested by client."
+            NSLocalizedString("page.term.reason.client", value: "Requested by client.", comment: "Web Page crash reason description when user terminated the process")
         case .crash:
-            "Web Process has crashed."
+            NSLocalizedString("page.term.reason.crash", value: "Web Process has crashed.", comment: "Web Page crash reason description (Web Process Crash)")
         }
     }
 
