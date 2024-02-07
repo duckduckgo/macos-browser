@@ -1058,8 +1058,6 @@ struct UserText {
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
     static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites…", comment: "Fireproof settings button caption")
-    static let fireproofingRemoveFireproofing = NSLocalizedString("fireproofing.remove-button", value: "Remove Fireproofing", comment: "Button to allow the user the remove the fireproofing from a website")
-    static let fireproofingDescription = NSLocalizedString("fireproofing.description", value: "Websites rely on cookies to keep you signed in. When you fireproof a site, cookies won’t be erased, and you’ll stay signed in, even after using the Fire button. We still block third-party trackers found on Fireproof websites.", comment: "Description of dialog when the user can decide to fireproof or not a website")
 
     // MARK: Crash Report
     static let crashReportTitle = NSLocalizedString("crash-report.title", value: "DuckDuckGo Privacy Browser quit unexpectedly.", comment: "Title of the dialog where the user can send a crash report")
