@@ -2586,6 +2586,42 @@
         }
       }
     },
+    "downloads.clear-all.item" : {
+      "comment" : "Contextual menu item in downloads manager to clear all downloaded items from the list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear All"
+          }
+        }
+      }
+    },
+    "downloads.copy-link.item" : {
+      "comment" : "Contextual menu item in downloads manager to copy the downloaded link",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Download Link"
+          }
+        }
+      }
+    },
+    "downloads.dialog.title" : {
+      "comment" : "Title of the dialog that manages the Downloads in the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Downloads"
+          }
+        }
+      }
+    },
     "downloads.error.canceled" : {
       "comment" : "Short error description when downloaded file download was canceled",
       "extractionState" : "extracted_with_value",
@@ -2642,6 +2678,102 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Location"
+          }
+        }
+      }
+    },
+    "downloads.no-recent-downloads" : {
+      "comment" : "Label in the downloads manager that shows that there are no recently downloaded items",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No recent downloads"
+          }
+        }
+      }
+    },
+    "downloads.open-downloads-folder" : {
+      "comment" : "Button in the downloads manager that allows the user to open the downloads folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Downloads Folder"
+          }
+        }
+      }
+    },
+    "downloads.open-website.item" : {
+      "comment" : "Contextual menu item in downloads manager to open the downloaded file originating website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Originating Website"
+          }
+        }
+      }
+    },
+    "downloads.open.item" : {
+      "comment" : "Contextual menu item in downloads manager to open the downloaded file",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "downloads.remove-from-list.item" : {
+      "comment" : "Contextual menu item in downloads manager to remove the given downloaded from the list of downloaded files",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove from List"
+          }
+        }
+      }
+    },
+    "downloads.restart.item" : {
+      "comment" : "Contextual menu item in downloads manager to restart the download",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
+    "downloads.show-in-finder.item" : {
+      "comment" : "Contextual menu item in downloads manager to show the downloaded file in Finder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "downloads.stop.item" : {
+      "comment" : "Contextual menu item in downloads manager to stop the download",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stop"
           }
         }
       }
