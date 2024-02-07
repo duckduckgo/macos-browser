@@ -282,8 +282,8 @@ final class TabViewModel {
         switch tab.content {
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
-        case .subscription:
-            title = UserText.tabSubscriptionTitle
+//        case .subscription:
+//            title = UserText.tabSubscriptionTitle
         case .settings:
             title = UserText.tabPreferencesTitle
         case .bookmarks:
@@ -296,7 +296,7 @@ final class TabViewModel {
             }
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none:
+        case .url, .none, .subscription:
             if let title = tab.title?.trimmingWhitespace(),
                !title.isEmpty {
                 self.title = title
@@ -318,9 +318,6 @@ final class TabViewModel {
         case .dataBrokerProtection:
             favicon = Favicon.dataBrokerProtection
             return
-        case .subscription:
-            favicon = Favicon.home
-            return
         case .newtab:
             if tab.burnerMode.isBurner {
                 favicon = Favicon.burnerHome
@@ -334,7 +331,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none: break
+        case .url, .onboarding, .none, .subscription: break
         }
 
         if let favicon = tab.favicon {

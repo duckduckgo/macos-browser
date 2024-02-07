@@ -329,8 +329,7 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         case .personalInformationRemoval:
             NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
         case .identityTheftRestoration:
-//            NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
-            await WindowControllersManager.shared.show(url: .identityTheftRestoration, source: .ui, newTab: true)
+            await WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
         }
 
         return nil

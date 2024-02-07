@@ -58,7 +58,7 @@ protocol NewWindowPolicyDecisionMaker {
         case onboarding
         case none
         case dataBrokerProtection
-        case subscription
+        case subscription(URL)
 
         enum URLSource: Equatable {
             case pendingStateRestoration
@@ -128,9 +128,14 @@ protocol NewWindowPolicyDecisionMaker {
                     return .newtab
                 }
                 return .url(customURL, source: source)
-            case URL.subscriptionPurchase, URL.subscriptionWelcome:
-                return .subscription
             default: break
+            }
+
+            if let url {
+                let stringURL = url.absoluteString 
+                if stringURL.hasPrefix(URL.subscriptionBaseURL.absoluteString) || stringURL.hasPrefix(URL.identityTheftRestoration.absoluteString) {
+                    return .subscription(url)
+                }
             }
 
             if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
@@ -188,7 +193,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
             case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
-            case .subscription: return UserText.tabSubscriptionTitle
+            case .subscription: return nil
             }
         }
 
@@ -220,8 +225,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .welcome
             case .dataBrokerProtection:
                 return .dataBrokerProtection
-            case .subscription:
-                return .subscriptionPurchase
+            case .subscription(let url):
+                return url
             case .none:
                 return nil
             }

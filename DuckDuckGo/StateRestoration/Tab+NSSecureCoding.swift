@@ -114,7 +114,8 @@ private extension Tab.TabContent {
         case .dataBrokerProtection:
             self = .dataBrokerProtection
         case .subscription:
-            self = .subscription
+            guard let url = url else { return nil }
+            self = .subscription(url)
         }
     }
 

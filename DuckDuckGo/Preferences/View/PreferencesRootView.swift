@@ -108,14 +108,13 @@ enum Preferences {
             }, openPersonalInformationRemoval: {
                 NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
             }, openIdentityTheftRestoration: {
-//                NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
-                WindowControllersManager.shared.show(url: .identityTheftRestoration, source: .ui, newTab: true)
+                WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
             })
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
                 self.restorePurchases()
             }, openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+                WindowControllersManager.shared.showTab(with: .subscription(url))
             }, goToSyncPreferences: {
                 self.model.selectPane(.sync)
             })

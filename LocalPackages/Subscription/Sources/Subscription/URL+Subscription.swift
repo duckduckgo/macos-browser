@@ -20,12 +20,12 @@ import Foundation
 
 public extension URL {
 
-    static var subscriptionPurchase: URL {
+    static var subscriptionBaseURL: URL {
         URL(string: "https://abrown.duckduckgo.com/subscriptions")!
     }
 
-    static var subscriptionWelcome: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/welcome")!
+    static var subscriptionPurchase: URL {
+        subscriptionBaseURL.appendingPathComponent("welcome")
     }
 
     static var subscriptionFAQ: URL {
@@ -34,15 +34,15 @@ public extension URL {
 
     // MARK: - Subscription Email
     static var activateSubscriptionViaEmail: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!
+        subscriptionBaseURL.appendingPathComponent("activate")
     }
 
     static var addEmailToSubscription: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!
+        subscriptionBaseURL.appendingPathComponent("add-email")
     }
 
     static var manageSubscriptionEmail: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/manage")!
+        subscriptionBaseURL.appendingPathComponent("manage")
     }
 
     // MARK: - App Store app manage subscription URL
