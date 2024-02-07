@@ -423,6 +423,7 @@ protocol NewWindowPolicyDecisionMaker {
                           isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
                           isTabBurner: burnerMode.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
+                          setContent: { tabGetter()?.setContent($0) },
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
@@ -678,6 +679,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @PublishedAfter var error: WKError? {
         didSet {
+            updateTitle()
         }
     }
     let permissions: PermissionModel
@@ -1285,8 +1287,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         invalidateInteractionStateData()
 
-        if navigation.isCurrent, !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-            let url = error.failingUrl ?? navigation.url
+        let url = error.failingUrl ?? navigation.url
+        if navigation.isCurrent,
+           !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
+           // don‘t show an error page if the error was already handled
+           // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
+           self.content.urlForWebView == url {
+
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error

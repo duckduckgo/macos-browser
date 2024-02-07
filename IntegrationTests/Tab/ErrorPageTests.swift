@@ -466,7 +466,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.connectionLost.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
-        XCTAssertEqual(tab.currentHistoryItem?.title, Self.pageTitle)
+        XCTAssertEqual(tab.currentHistoryItem?.title, URL.test.host)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
         XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
@@ -608,7 +608,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.connectionLost.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
-        XCTAssertEqual(tab.currentHistoryItem?.title, Self.pageTitle)
+        XCTAssertEqual(tab.currentHistoryItem?.title, URL.test.host)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
         XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
