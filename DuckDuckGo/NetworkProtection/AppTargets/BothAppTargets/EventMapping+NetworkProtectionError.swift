@@ -98,6 +98,9 @@ extension EventMapping where Event == NetworkProtectionError {
             domainEvent = .networkProtectionUnhandledError(function: function, line: line, error: error)
             frequency = .standard
             return
+        case .vpnAccessRevoked:
+            // todo
+            return
         }
 
         let debugEvent = DebugEvent(eventType: .custom(domainEvent))
