@@ -38,8 +38,8 @@ struct ErrorPageHTMLTemplate {
             assertionFailure("Should be able to load template")
             return ""
         }
-        return html.replacingOccurrences(of: "$ERROR_DESCRIPTION$", with: error.localizedDescription, options: .literal)
-            .replacingOccurrences(of: "$HEADER$", with: header, options: .literal)
+        return html.replacingOccurrences(of: "$ERROR_DESCRIPTION$", with: error.localizedDescription.escapedUnicodeHtmlString(), options: .literal)
+            .replacingOccurrences(of: "$HEADER$", with: header.escapedUnicodeHtmlString(), options: .literal)
     }
 
 }

@@ -34,7 +34,7 @@ struct BookmarksExporter {
         for entity in entities {
             if let bookmark = entity as? Bookmark {
                 content.append(Template.bookmark(level: level,
-                                                 title: bookmark.title.escapedHtmlString(),
+                                                 title: bookmark.title.escapedUnicodeHtmlString(),
                                                  url: bookmark.url,
                                                  isFavorite: bookmark.isFavorite))
             }

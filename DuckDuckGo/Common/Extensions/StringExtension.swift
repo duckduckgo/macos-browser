@@ -36,13 +36,39 @@ extension String {
             .replacingOccurrences(of: "\n", with: "\\n")
     }
 
-    func escapedHtmlString() -> String {
-        do {
-            return try NSAttributedString(string: self).htmlString()
-        } catch {
-            os_log(.error, "could not produce html-escaped string: \(error)")
-            return self
+    private static let unicodeHtmlCharactersMapping: [Character: String] = [
+        "&": "&amp;",
+        "\"": "&quot;",
+        "'": "&apos;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "/": "&#x2F;",
+        "!": "&excl;",
+        "$": "&#36;",
+        "%": "&percnt;",
+        "=": "&#61;",
+        "#": "&#35;",
+        "@": "&#64;",
+        "[": "&#91;",
+        "\\": "&#92;",
+        "]": "&#93;",
+        "^": "&#94;",
+        "`": "&#97;",
+        "{": "&#123;",
+        "}": "&#125;",
+    ]
+    func escapedUnicodeHtmlString() -> String {
+        var result = ""
+
+        for character in self {
+            if let mapped = Self.unicodeHtmlCharactersMapping[character] {
+                result.append(mapped)
+            } else {
+                result.append(character)
+            }
         }
+
+        return result
     }
 
     init(_ staticString: StaticString) {

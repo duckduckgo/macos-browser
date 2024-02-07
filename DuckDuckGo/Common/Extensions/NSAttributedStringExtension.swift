@@ -31,16 +31,6 @@ extension NSAttributedString {
         ])
     }
 
-    func htmlString() throws -> String {
-        let data = try self.data(from: NSRange(location: 0, length: self.length),
-                                 documentAttributes: [
-                                    .documentType: NSAttributedString.DocumentType.html,
-                                    .characterEncoding: String.Encoding.utf8.rawValue,
-                                    .excludedElements: ["DOCTYPE", "xml", "html", "head", "body", "p", "font", "span"]
-                                 ])
-        return try data.utf8String()?.dropping(suffix: "\n") ?? { throw CocoaError(CocoaError.Code.fileReadCorruptFile) }()
-    }
-
 }
 
 extension NSMutableAttributedString {
