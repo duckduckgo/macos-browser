@@ -2349,6 +2349,18 @@
         }
       }
     },
+    "details" : {
+      "comment" : "details button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Details"
+          }
+        }
+      }
+    },
     "Developer" : {
       "comment" : "Main Menu "
     },
@@ -3176,6 +3188,30 @@
         }
       }
     },
+    "fire.dialog.close-burner-window" : {
+      "comment" : "Button that allows the user to close and burn the browser burner window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close and Burn This Window"
+          }
+        }
+      }
+    },
+    "fire.dialog.deliting.data" : {
+      "comment" : "Text shown in dialog while removing browsing data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Deleting browsing data…"
+          }
+        }
+      }
+    },
     "fire.dialog.details" : {
       "comment" : "Button to show more details",
       "extractionState" : "extracted_with_value",
@@ -3184,6 +3220,42 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Details"
+          }
+        }
+      }
+    },
+    "fire.dialog.fire-window.close-tabs" : {
+      "comment" : "Title of the dialog where the user can close browser tabs and clear data.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close Tabs and Clear Data"
+          }
+        }
+      }
+    },
+    "fire.dialog.fire-window.description" : {
+      "comment" : "Explanation of what a fire window is.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "An isolated window that doesn’t save any data"
+          }
+        }
+      }
+    },
+    "fire.dialog.fire-window.title" : {
+      "comment" : "Title of the part of the dialog where the user can open a fire window.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open New Fire Window"
           }
         }
       }
@@ -3232,6 +3304,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Current window will close"
+          }
+        }
+      }
+    },
+    "fire.info.dialog.description" : {
+      "comment" : "Description in the dialog that explains the Fire feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Data, browsing history, and cookies can build up in your browser over time. Use the Fire Button to clear it all away."
+          }
+        }
+      }
+    },
+    "fire.info.dialog.title" : {
+      "comment" : "Title of the dialog that explains the Fire feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Leave No Trace"
           }
         }
       }
@@ -3448,6 +3544,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Remove"
+          }
+        }
+      }
+    },
+    "got.it" : {
+      "comment" : "Got it button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Got It!"
           }
         }
       }
