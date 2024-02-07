@@ -103,7 +103,7 @@ final class FirePopoverViewController: NSViewController {
             adjustViewForBurnerWindow()
             return
         }
-        
+
         setUpStrings()
         updateClearButtonAppearance()
         setupOptionsButton()
