@@ -118,7 +118,7 @@ public struct DataBrokerProtectionBrokerUpdater {
     }
 
     public func updateBrokers() {
-        guard let brokers = resources.fetchBrokerFromResourceFiles() e  lse { return }
+        guard let brokers = resources.fetchBrokerFromResourceFiles() else { return }
 
         for broker in brokers {
             do {

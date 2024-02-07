@@ -366,7 +366,7 @@ final class BrokerUpdaterRepositoryMock: BrokerUpdaterRepository {
     func saveLatestAppVersionCheck(version: String) {
         wasSaveLatestAppVersionCheckCalled = true
     }
-    
+
     func getLastCheckedVersion() -> String? {
         return lastCheckedVersion
     }
