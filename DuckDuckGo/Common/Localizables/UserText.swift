@@ -204,7 +204,7 @@ struct UserText {
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Settings", comment: "Tab preferences title")
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Welcome", comment: "Tab onboarding title")
-    static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
+    static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Failed to open page", comment: "Tab error title")
     static let errorPageHeader = NSLocalizedString("page.error.header", value: "DuckDuckGo can’t load this page.", comment: "Error page heading text")
     static let webProcessCrashPageHeader = NSLocalizedString("page.crash.header", value: "Web Process did terminate 😢", comment: "Error page heading text shown when a Web Page process had crashed")
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")

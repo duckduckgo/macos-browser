@@ -423,6 +423,7 @@ protocol NewWindowPolicyDecisionMaker {
                           isTabPinned: { tabGetter().map { tab in pinnedTabsManager.isTabPinned(tab) } ?? false },
                           isTabBurner: burnerMode.isBurner,
                           contentPublisher: _content.projectedValue.eraseToAnyPublisher(),
+                          setContent: { tabGetter()?.setContent($0) },
                           titlePublisher: _title.projectedValue.eraseToAnyPublisher(),
                           userScriptsPublisher: userScriptsPublisher,
                           inheritedAttribution: parentTab?.adClickAttribution?.currentAttributionState,
@@ -655,6 +656,12 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var title: String?
 
     private func updateTitle() {
+        if let error {
+            if error.code != .webContentProcessTerminated {
+                self.title = nil
+            }
+            return
+        }
         var title = webView.title?.trimmingWhitespace()
         if title?.isEmpty ?? true {
             title = webView.url?.host?.droppingWwwPrefix()
@@ -672,6 +679,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @PublishedAfter var error: WKError? {
         didSet {
+            updateTitle()
         }
     }
     let permissions: PermissionModel
@@ -1100,7 +1108,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @MainActor(unsafe)
     private func handleFavicon(oldValue: TabContent? = nil) {
-        guard content.isUrl, let url = content.urlForWebView else {
+        guard content.isUrl, let url = content.urlForWebView, error == nil else {
             favicon = nil
             return
         }
@@ -1153,6 +1161,7 @@ extension Tab: FaviconUserScriptDelegate {
     func faviconUserScript(_ faviconUserScript: FaviconUserScript,
                            didFindFaviconLinks faviconLinks: [FaviconUserScript.FaviconLink],
                            for documentUrl: URL) {
+        guard documentUrl != .error else { return }
         faviconManagement.handleFaviconLinks(faviconLinks, documentUrl: documentUrl) { favicon in
             guard documentUrl == self.content.url, let favicon = favicon else {
                 return
@@ -1278,8 +1287,13 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func navigation(_ navigation: Navigation, didFailWith error: WKError) {
         invalidateInteractionStateData()
 
-        if navigation.isCurrent, !error.isFrameLoadInterrupted, !error.isNavigationCancelled {
-            let url = error.failingUrl ?? navigation.url
+        let url = error.failingUrl ?? navigation.url
+        if navigation.isCurrent,
+           !error.isFrameLoadInterrupted, !error.isNavigationCancelled,
+           // don‘t show an error page if the error was already handled
+           // (by SearchNonexistentDomainNavigationResponder) or another navigation was triggered by `setContent`
+           self.content.urlForWebView == url {
+
             self.error = error
             // when already displaying the error page and reload navigation fails again: don‘t navigate, just update page HTML
             let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error

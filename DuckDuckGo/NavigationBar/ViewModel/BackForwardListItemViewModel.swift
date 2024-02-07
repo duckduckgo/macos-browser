@@ -62,7 +62,7 @@ final class BackForwardListItemViewModel {
     @MainActor(unsafe)
     var image: NSImage? {
         if backForwardListItem.url == .newtab {
-            return NSImage(named: "HomeFavicon")
+            return .homeFavicon
         }
 
         if backForwardListItem.url?.isDuckPlayer == true {
@@ -75,7 +75,7 @@ final class BackForwardListItemViewModel {
             return image
         }
 
-        return NSImage(named: "DefaultFavicon")
+        return .defaultFavicon
     }
 
     var state: NSControl.StateValue {
