@@ -108,6 +108,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 self?.actionHandler.changePlanOrBilling(.stripe)
             }
         default:
+            assertionFailure("Missing or unknown subscriptionPlatform")
             return .navigateToManageSubscription { }
         }
     }
