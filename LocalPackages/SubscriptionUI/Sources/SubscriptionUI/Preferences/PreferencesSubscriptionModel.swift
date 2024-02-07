@@ -87,7 +87,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     enum ChangePlanOrBillingAction {
         case presentSheet(ManageSubscriptionSheet)
-        case navigateToManageSubscription(()->Void)
+        case navigateToManageSubscription(() -> Void)
     }
 
     @MainActor
