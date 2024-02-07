@@ -112,8 +112,6 @@ extension TunnelControllerIPCService: IPCServerInterface {
     }
 
     func debugCommand(_ command: DebugCommand) async throws {
-        _ = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: Bundle.main.networkExtensionBundleID)
-
         switch command {
         case .removeSystemExtension:
 #if NETP_SYSTEM_EXTENSION

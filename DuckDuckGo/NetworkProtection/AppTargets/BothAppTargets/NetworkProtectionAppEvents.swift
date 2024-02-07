@@ -58,9 +58,6 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task {
-            await removeLegacyLoginItemAndVPNConfiguration()
-            migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
-
             guard featureVisibility.isNetworkProtectionVisible() else {
                 featureVisibility.disableForAllUsers()
                 return
@@ -77,40 +74,6 @@ final class NetworkProtectionAppEvents {
         guard featureVisibility.isNetworkProtectionVisible() else {
             featureVisibility.disableForAllUsers()
             return
-        }
-    }
-
-    /// If necessary, this method migrates the auth token from an unspecified data protection keychain (our previous
-    /// storage location), to the new shared keychain, which is where apps in our app group will try to access the NetP
-    /// auth token.
-    ///
-    /// This method bails out on any error condition - the user will probably have to re-enter their auth token if we can't
-    /// migrate this, and that's ok.  This migration only affects internal users so it's not worth pixeling, and it's not worth
-    /// alerting the user to an error since they'll see Network Protection disable and eventually re-enable it.
-    ///
-    private func migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary() {
-        let sharedKeychainStore = NetworkProtectionKeychainTokenStore()
-
-        guard !sharedKeychainStore.isFeatureActivated else {
-            // We only migrate if the auth token is missing from our new shared keychain.
-            return
-        }
-
-        let legacyServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
-        let legacyKeychainStore = NetworkProtectionKeychainTokenStore(keychainType: .dataProtection(.unspecified),
-                                                                      serviceName: legacyServiceName,
-                                                                      errorEvents: nil)
-
-        guard let token = try? legacyKeychainStore.fetchToken() else {
-            // If fetching the token fails, we just assume we can't migrate anything and the user
-            // will need to re-enable NetP.
-            return
-        }
-
-        do {
-            try sharedKeychainStore.store(token)
-        } catch {
-            print(String(describing: error))
         }
     }
 
@@ -145,27 +108,6 @@ final class NetworkProtectionAppEvents {
 
             os_log("Successfully updated Network Protection servers; total server count = %{public}d", log: .networkProtection, serverCount)
         }
-    }
-
-    // MARK: - Legacy Login Item and Extension
-
-    private func removeLegacyLoginItemAndVPNConfiguration() async {
-#if NETP_SYSTEM_EXTENSION
-        LoginItem(bundleId: legacyAgentBundleID, defaults: .netP).forceStop()
-
-        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-        let tunnel = tunnels?.first {
-            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == legacySystemExtensionBundleID
-        }
-
-        guard let tunnel else {
-            return
-        }
-
-        UserDefaults.netP.networkProtectionOnboardingStatusRawValue = OnboardingStatus.default.rawValue
-
-        try? await tunnel.removeFromPreferences()
-#endif
     }
 }
 
