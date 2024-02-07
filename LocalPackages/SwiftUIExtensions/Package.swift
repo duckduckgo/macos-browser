@@ -11,7 +11,8 @@ let package = Package(
         .library(name: "PreferencesViews", targets: ["PreferencesViews"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "104.2.2"),    ],
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "104.2.2"),
+    ],
     targets: [
         .target(
             name: "SwiftUIExtensions",

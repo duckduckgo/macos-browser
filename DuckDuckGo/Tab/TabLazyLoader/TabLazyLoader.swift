@@ -259,7 +259,7 @@ final class TabLazyLoader<DataSource: TabLazyLoaderDataSource> {
         }
 
         tab.isLazyLoadingInProgress = true
-        _=tab.reload()
+        tab.reload()
         numberOfTabsRemaining -= 1
         numberOfTabsInProgress.value += 1
     }
