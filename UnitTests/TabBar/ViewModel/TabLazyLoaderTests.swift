@@ -33,6 +33,7 @@ private final class TabMock: LazyLoadable {
     lazy var loadingFinishedPublisher: AnyPublisher<TabMock, Never> = loadingFinishedSubject.eraseToAnyPublisher()
 
     func isNewer(than other: TabMock) -> Bool { isNewerClosure(other) }
+    @discardableResult
     func reload() -> ExpectedNavigation? { reloadClosure(self); return nil }
 
     var isNewerClosure: (TabMock) -> Bool = { _ in true }

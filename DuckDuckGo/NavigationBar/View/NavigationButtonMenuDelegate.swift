@@ -87,7 +87,7 @@ extension NavigationButtonMenuDelegate: NSMenuDelegate {
         }
         guard let currentItem = selectedTabViewModel.tab.currentHistoryItem else { return [] }
 
-        var list = [currentItem] + (buttonType == .back
+        let list = [currentItem] + (buttonType == .back
                                     ? selectedTabViewModel.tab.backHistoryItems.reversed()
                                     : selectedTabViewModel.tab.forwardHistoryItems)
 
