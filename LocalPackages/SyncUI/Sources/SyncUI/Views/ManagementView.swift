@@ -38,18 +38,6 @@ public struct ManagementView<ViewModel>: View where ViewModel: ManagementViewMod
 
     public var body: some View {
         PreferencePane {
-            HStack(alignment: .top, spacing: 16) {
-                Image("Info")
-                    .foregroundColor(Color("LinkBlueColor"))
-                    .frame(width: 16)
-                    .background(Circle().foregroundColor(Color(.white)))
-                Text(UserText.syncRollOutBannerDescription)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("InfoBannerColour")))
-            .padding(.bottom, 10)
-
             TextMenuItemHeader(UserText.sync)
                 .padding(.bottom, -22)
 

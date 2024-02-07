@@ -1500,6 +1500,42 @@
         }
       }
     },
+    "bookmarks.empty.state.message" : {
+      "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If your bookmarks are saved in another browser, you can import them into DuckDuckGo."
+          }
+        }
+      }
+    },
+    "bookmarks.empty.state.title" : {
+      "comment" : "Title displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No bookmarks yet"
+          }
+        }
+      }
+    },
+    "bookmarks.import.button.title" : {
+      "comment" : "Button text to open bookmark import dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import"
+          }
+        }
+      }
+    },
     "bookmarks.imported.from.folder" : {
       "comment" : "Name of the folder the imported bookmarks are saved into",
       "extractionState" : "extracted_with_value",
@@ -2366,6 +2402,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Don’t Quit"
+          }
+        }
+      }
+    },
+    "dont.save" : {
+      "comment" : "Don't Save button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don't Save"
+          }
+        }
+      }
+    },
+    "dont.update" : {
+      "comment" : "Don't Update button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don't Update"
           }
         }
       }
@@ -3260,6 +3320,18 @@
         }
       }
     },
+    "fireproof.domains.remove.all" : {
+      "comment" : "Label of a button that allows the user to remove all the websites from the fireproofed list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove All"
+          }
+        }
+      }
+    },
     "fireproof.explanation" : {
       "comment" : "Fireproofing mechanism explanation",
       "extractionState" : "extracted_with_value",
@@ -3364,6 +3436,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Rename Folder"
+          }
+        }
+      }
+    },
+    "generic.remove.button" : {
+      "comment" : "Label of a button that allows the user to remove an item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove"
           }
         }
       }
@@ -3629,6 +3713,9 @@
     },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
       "comment" : "Warning that Chromium data import would require entering system passwords."
+    },
+    "Import" : {
+      "comment" : "Menu item"
     },
     "Import Bookmarks" : {
 
@@ -6182,6 +6269,90 @@
         }
       }
     },
+    "passsword.management.save.address" : {
+      "comment" : "Title of dialog that allows the user to save an address method",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Address?"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.account.label" : {
+      "comment" : "In the password manager dialog, label that specifies the password manager vault we are connected with",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connected to %@"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.fireproof.checkbox.description" : {
+      "comment" : "In the password manager dialog, description of the section that allows the user to fireproof a website via a checkbox",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keeps you signed in after using the Fire Button"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.fireproof.checkbox.title" : {
+      "comment" : "In the password manager dialog, title of the section that allows the user to fireproof a website via a checkbox",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Fireproof?"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.password.manager.title" : {
+      "comment" : "Title of the passwored manager section of dialog that allows the user to save credentials",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Login to Bitwarden?"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.unlock.password.manager" : {
+      "comment" : "In the password manager dialog, alerts the user that they need to unlock Bitworden before being able to save the credential",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unlock Bitwarden to Save"
+          }
+        }
+      }
+    },
+    "passsword.management.save.payment" : {
+      "comment" : "Title of dialog that allows the user to save a payment method",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Payment Method?"
+          }
+        }
+      }
+    },
     "passsword.management.unlock" : {
       "comment" : "Unlock Logins Vault menu",
       "extractionState" : "extracted_with_value",
@@ -6190,6 +6361,42 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Unlock"
+          }
+        }
+      }
+    },
+    "passsword.manager.empty.state.message" : {
+      "comment" : "In the password manager message when there are no items",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If your logins are saved in another browser, you can import them into DuckDuckGo."
+          }
+        }
+      }
+    },
+    "passsword.manager.empty.state.title" : {
+      "comment" : "In the password manager title when there are no items",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No logins or credit card info yet"
+          }
+        }
+      }
+    },
+    "passsword.manager.unlock.autofill" : {
+      "comment" : "In the password manager text of button to unlock autofill info",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unlock your Autofill info"
           }
         }
       }
@@ -6587,18 +6794,6 @@
         }
       }
     },
-    "pinning.hide-home-shortcut" : {
-      "comment" : "Menu item for hiding the Home shortcut",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Hide Home Button"
-          }
-        }
-      }
-    },
     "pinning.hide-netp-shortcut" : {
       "comment" : "Menu item for hiding the NetP shortcut",
       "extractionState" : "extracted_with_value",
@@ -6643,18 +6838,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Show Downloads Shortcut"
-          }
-        }
-      }
-    },
-    "pinning.show-home-shortcut" : {
-      "comment" : "Menu item for showing the Home shortcut",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Home Button"
           }
         }
       }
@@ -8468,17 +8651,8 @@
         }
       }
     },
-    "settings.hide-home-shortcut" : {
-      "comment" : "Settings Optionm to set Home Button visibility",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Home Button in Toolbar"
-          }
-        }
-      }
+    "Settings…" : {
+      "comment" : "Menu item"
     },
     "share.menu.item" : {
       "comment" : "Menu item title",
@@ -9114,6 +9288,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Your version of macOS is no longer supported."
+          }
+        }
+      }
+    },
+    "update" : {
+      "comment" : "Update button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update"
           }
         }
       }

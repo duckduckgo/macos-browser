@@ -31,7 +31,7 @@ final class PreferencesViewController: NSViewController {
     weak var delegate: BrowserTabSelectionDelegate?
 
     let model: PreferencesSidebarModel
-    private var selectedTabIndexCancellable: AnyCancellable?
+    private var selectedTabContentCancellable: AnyCancellable?
     private var selectedPreferencePaneCancellable: AnyCancellable?
 
     private var bitwardenManager: BWManagement = BWManager.shared
@@ -64,10 +64,10 @@ final class PreferencesViewController: NSViewController {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        selectedTabIndexCancellable = model.$selectedTabIndex
+        selectedTabContentCancellable = model.selectedTabContent
             .dropFirst()
-            .sink { [weak self] index in
-                self?.delegate?.selectedTab(at: index)
+            .sink { [weak self] in
+                self?.delegate?.selectedTabContent($0)
             }
 
         selectedPreferencePaneCancellable = model.$selectedPane
@@ -79,9 +79,7 @@ final class PreferencesViewController: NSViewController {
 
     override func viewWillDisappear() {
         super.viewWillDisappear()
-        selectedTabIndexCancellable?.cancel()
-        selectedTabIndexCancellable = nil
-        selectedPreferencePaneCancellable?.cancel()
+        selectedTabContentCancellable = nil
         selectedPreferencePaneCancellable = nil
     }
 }
