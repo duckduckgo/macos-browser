@@ -26,17 +26,23 @@ struct SerpHeadersNavigationResponder: NavigationResponder {
     ]
 
     func decidePolicy(for navigationAction: NavigationAction, preferences: inout NavigationPreferences) async -> NavigationActionPolicy? {
+        // add X-DuckDuckGo-Client header for main-frame SERP navigations
         guard navigationAction.isForMainFrame,
               navigationAction.url.isDuckDuckGo,
               Self.headers.contains(where: { navigationAction.request.value(forHTTPHeaderField: $0.key) == nil }) else {
             return .next
         }
 
+        // do we support WKWebPagePreferences headers modification?
         if NavigationPreferences.customHeadersSupported,
            let customHeaders = CustomHeaderFields(fields: Self.headers) {
             preferences.customHeaders = [customHeaders]
+            // ok, proceed
             return .next
         }
+
+        // no WKWebPagePreferences custom headers:
+        // make sure we‘re not erasing forward history and redirect the request with modified headers
         guard !navigationAction.navigationType.isBackForward else { return .next }
 
         var request = navigationAction.request
