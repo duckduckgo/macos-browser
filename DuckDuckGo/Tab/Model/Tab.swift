@@ -132,8 +132,7 @@ protocol NewWindowPolicyDecisionMaker {
             }
 
             if let url {
-                let stringURL = url.absoluteString 
-                if stringURL.hasPrefix(URL.subscriptionBaseURL.absoluteString) || stringURL.hasPrefix(URL.identityTheftRestoration.absoluteString) {
+                if url.isChild(of: URL.subscriptionBaseURL) || url.isChild(of: URL.identityTheftRestoration) {
                     return .subscription(url)
                 }
             }
