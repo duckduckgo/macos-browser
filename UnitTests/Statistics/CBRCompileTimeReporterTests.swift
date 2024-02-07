@@ -40,7 +40,7 @@ class CBRCompileTimeReporterTests: XCTestCase {
     }
 
     func initReporter(onboardingFinished: Bool) -> Reporter {
-        var udWrapper = UserDefaultsWrapper(key: .onboardingFinished, defaultValue: true)
+        let udWrapper = UserDefaultsWrapper(key: .onboardingFinished, defaultValue: true)
         udWrapper.wrappedValue = onboardingFinished
 
         let reporter = Reporter()

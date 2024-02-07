@@ -8498,18 +8498,6 @@
     "Settings…" : {
       "comment" : "Menu item"
     },
-    "settings.hide-home-shortcut" : {
-      "comment" : "Settings Optionm to set Home Button visibility",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Home Button in Toolbar"
-          }
-        }
-      }
-    },
     "share.menu.item" : {
       "comment" : "Menu item title",
       "extractionState" : "extracted_with_value",
