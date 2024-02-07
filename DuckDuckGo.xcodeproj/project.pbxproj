@@ -4168,8 +4168,6 @@
 		B68C92C32750EF76002AC6B0 /* PixelDataRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixelDataRecord.swift; sourceTree = "<group>"; };
 		B690152B2ACBF4DA00AD0BAB /* MenuPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuPreview.swift; sourceTree = "<group>"; };
 		B693766D2B6B5F26005BD9D4 /* ErrorPageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorPageTests.swift; sourceTree = "<group>"; };
-		B69376722B6B7EF5005BD9D4 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
-		B69376732B6B7EF5005BD9D4 /* content-scope-scripts */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "content-scope-scripts"; path = "../content-scope-scripts"; sourceTree = "<group>"; };
 		B693953C26F04BE70015B914 /* NibLoadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
 		B693953D26F04BE70015B914 /* MouseOverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MouseOverView.swift; sourceTree = "<group>"; };
 		B693953E26F04BE70015B914 /* FocusRingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusRingView.swift; sourceTree = "<group>"; };
@@ -6516,8 +6514,6 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
-				B69376722B6B7EF5005BD9D4 /* BrowserServicesKit */,
-				B69376732B6B7EF5005BD9D4 /* content-scope-scripts */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -13155,7 +13151,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = revision;
-				revision = f3522fcc3d58287076de8a427fd65be5903bc794;
+				revision = 4fc6bc7cecbc46c18d6a6e5abe03dbda55d994d7;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
