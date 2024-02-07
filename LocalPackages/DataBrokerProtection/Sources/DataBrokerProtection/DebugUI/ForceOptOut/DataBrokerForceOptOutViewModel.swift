@@ -47,7 +47,6 @@ final class DataBrokerForceOptOutViewModel: ObservableObject {
     func forceOptOut(_ data: OptOutViewData) {
         guard let extractedProfileID = data.extractedProfileID else { return }
         dataManager.setAsRemoved(extractedProfileID)
-        
         loadNotRemovedOptOutData()
     }
 }
