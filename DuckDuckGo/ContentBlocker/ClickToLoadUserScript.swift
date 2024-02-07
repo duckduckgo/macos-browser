@@ -25,7 +25,7 @@ protocol ClickToLoadUserScriptDelegate: AnyObject {
     func clickToLoadUserScriptAllowFB() -> Bool
 }
 
-final class ClickToLoadUserScript: NSObject, Subfeature {
+final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
 
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
@@ -48,7 +48,6 @@ final class ClickToLoadUserScript: NSObject, Subfeature {
 
     enum MessageNames: String, CaseIterable {
         case getClickToLoadState
-        case displayClickToLoadPlaceholders
         case unblockClickToLoadContent
         case updateFacebookCTLBreakageFlags
         case addDebugFlag
@@ -71,6 +70,9 @@ final class ClickToLoadUserScript: NSObject, Subfeature {
     }
 
     private func handleGetClickToLoadState(params: Any, message: UserScriptMessage) -> Encodable? {
+        webView = message.messageWebView
+        webView?.navigationDelegate = self as WKNavigationDelegate
+
         return [
             "devMode": devMode,
             "youtubePreviewsEnabled": false
@@ -91,9 +93,13 @@ final class ClickToLoadUserScript: NSObject, Subfeature {
         return delegate.clickToLoadUserScriptAllowFB()
     }
 
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        displayClickToLoadPlaceholders()
+    }
+
     public func displayClickToLoadPlaceholders() {
         if let webView = webView {
-            broker?.push(method: MessageNames.displayClickToLoadPlaceholders.rawValue, params: ["ruleAction": ["block"]], for: self, into: webView)
+            broker?.push(method: "displayClickToLoadPlaceholders", params: ["ruleAction": ["block"]], for: self, into: webView)
         }
     }
 }
