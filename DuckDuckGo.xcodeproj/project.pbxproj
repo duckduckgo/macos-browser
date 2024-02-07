@@ -12521,7 +12521,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = Debug;
 		};
@@ -12529,7 +12528,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = CI;
 		};
@@ -12537,7 +12535,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = Release;
 		};
@@ -12545,7 +12542,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 37E75734296F4F0500E1C162 /* IntegrationTestsAppStore.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = Review;
 		};
@@ -12581,7 +12577,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = Debug;
 		};
@@ -12589,7 +12584,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = Release;
 		};
@@ -12618,7 +12612,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = CI;
 		};
@@ -12962,7 +12955,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B58C8295CF9A7002C0CC0 /* IntegrationTests.xcconfig */;
 			buildSettings = {
-				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/IntegrationTests/Common/IntegrationTestsBridging.h";
 			};
 			name = Review;
 		};
