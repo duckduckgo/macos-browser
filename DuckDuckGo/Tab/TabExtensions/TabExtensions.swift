@@ -157,7 +157,7 @@ extension TabExtensionsBuilder {
         }
         add {
             TabSnapshotExtension(webViewPublisher: args.webViewFuture,
-                                contentPublisher: args.contentPublisher)
+                                 contentPublisher: args.contentPublisher)
         }
         add {
             SearchNonexistentDomainNavigationResponder(tld: dependencies.privacyFeatures.contentBlocking.tld, contentPublisher: args.contentPublisher)
