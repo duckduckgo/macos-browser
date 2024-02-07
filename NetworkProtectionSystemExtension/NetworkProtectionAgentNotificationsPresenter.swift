@@ -51,7 +51,7 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
     func showTestNotification() {
         notificationCenter.post(.showTestNotification)
     }
-    
+
     func showExpiredEntitlementNotification() {
         // todo
     }
