@@ -51,19 +51,19 @@ final class AddBookmarkFolderPopoverViewModel: ObservableObject {
     }
 
     func addFolder() {
-        guard !folderName.isEmpty else {
+        guard !folderName.trimmingWhitespace().isEmpty else {
             assertionFailure("folderName is empty, button should be disabled")
             return
         }
 
         isDisabled = true
-        bookmarkManager.makeFolder(for: folderName, parent: parent) { [completionHandler] result in
+        bookmarkManager.makeFolder(for: folderName.trimmingWhitespace(), parent: parent) { [completionHandler] result in
             completionHandler(result)
         }
     }
 
     var isAddFolderButtonDisabled: Bool {
-        folderName.isEmpty
+        folderName.trimmingWhitespace().isEmpty
     }
 
 }

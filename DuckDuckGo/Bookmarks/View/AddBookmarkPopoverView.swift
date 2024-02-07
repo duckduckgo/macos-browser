@@ -116,7 +116,7 @@ struct AddBookmarkPopoverView: View {
 #Preview { {
     let bkm = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "1")
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
-        BookmarkFolder(id: "1", title: "Folder 1", children: [
+        BookmarkFolder(id: "1", title: "Folder with a name that shouldn‘t fit into the picker", children: [
             bkm,
             BookmarkFolder(id: "2", title: "Nested Folder", children: [
                 ])
