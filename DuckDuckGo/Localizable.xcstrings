@@ -6074,6 +6074,54 @@
         }
       }
     },
+    "page.term.reason.client" : {
+      "comment" : "Web Page crash reason description when user terminated the process",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Requested by client."
+          }
+        }
+      }
+    },
+    "page.term.reason.cpu" : {
+      "comment" : "Web Page crash reason description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "CPU limit exceeded."
+          }
+        }
+      }
+    },
+    "page.term.reason.crash" : {
+      "comment" : "Web Page crash reason description (Web Process Crash)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Web Process has crashed."
+          }
+        }
+      }
+    },
+    "page.term.reason.memory" : {
+      "comment" : "Web Page crash reason description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Memory limit exceeded."
+          }
+        }
+      }
+    },
     "passsword.management" : {
       "comment" : "Used as title for password management user interface",
       "extractionState" : "extracted_with_value",
