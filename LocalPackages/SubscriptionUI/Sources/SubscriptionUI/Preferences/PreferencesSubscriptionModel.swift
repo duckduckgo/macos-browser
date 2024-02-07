@@ -123,7 +123,6 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                       case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
                 guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
 
-//                WindowControllersManager.shared.show(url: customerPortalURL, source: .ui, newTab: true)
                 openURLHandler(customerPortalURL)
             }
         }
