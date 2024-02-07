@@ -7,14 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7B8B374D2B72E9FF00182393 /* DuckDuckGoVPN_tvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B374C2B72E9FF00182393 /* DuckDuckGoVPN_tvOSApp.swift */; };
-		7B8B374F2B72E9FF00182393 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B374E2B72E9FF00182393 /* ContentView.swift */; };
-		7B8B37512B72E9FF00182393 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B37502B72E9FF00182393 /* Item.swift */; };
-		7B8B37532B72E9FF00182393 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B8B37522B72E9FF00182393 /* Assets.xcassets */; };
-		7B8B37562B72E9FF00182393 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B8B37552B72E9FF00182393 /* Preview Assets.xcassets */; };
+		7B5562D12B73910800FCB13F /* VPNtvOS in Frameworks */ = {isa = PBXBuildFile; productRef = 7B5562D02B73910800FCB13F /* VPNtvOS */; };
+		7B5562D32B7393D600FCB13F /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7B5562D22B7393D600FCB13F /* BrowserServicesKit */; };
 		7B8B37622B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B37612B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests.swift */; };
 		7B8B376C2B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B376B2B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITests.swift */; };
 		7B8B376E2B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B376D2B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITestsLaunchTests.swift */; };
+		7B8B37862B73882300182393 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B8B37812B73882300182393 /* Assets.xcassets */; };
+		7B8B37872B73882300182393 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B8B37832B73882300182393 /* Preview Assets.xcassets */; };
+		7B8B378D2B73883800182393 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B378A2B73883800182393 /* Item.swift */; };
+		7B8B378E2B73883800182393 /* DuckDuckGoVPN_tvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B378B2B73883800182393 /* DuckDuckGoVPN_tvOSApp.swift */; };
+		7B8B378F2B73883800182393 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8B378C2B73883800182393 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,19 +37,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7B8B37492B72E9FF00182393 /* DuckDuckGoVPN_tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckDuckGoVPN_tvOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7B8B374C2B72E9FF00182393 /* DuckDuckGoVPN_tvOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoVPN_tvOSApp.swift; sourceTree = "<group>"; };
-		7B8B374E2B72E9FF00182393 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		7B8B37502B72E9FF00182393 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
-		7B8B37522B72E9FF00182393 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7B8B37552B72E9FF00182393 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		7B8B37572B72E9FF00182393 /* DuckDuckGoVPN_tvOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPN_tvOS.entitlements; sourceTree = "<group>"; };
-		7B8B37582B72E9FF00182393 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B8B37492B72E9FF00182393 /* DuckDuckGo VPN Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DuckDuckGo VPN Debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8B375D2B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuckDuckGoVPN_tvOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8B37612B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoVPN_tvOSTests.swift; sourceTree = "<group>"; };
 		7B8B37672B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuckDuckGoVPN_tvOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8B376B2B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoVPN_tvOSUITests.swift; sourceTree = "<group>"; };
 		7B8B376D2B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuckDuckGoVPN_tvOSUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		7B8B377F2B73870B00182393 /* VPNtvOS */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = VPNtvOS; sourceTree = "<group>"; };
+		7B8B37812B73882300182393 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7B8B37832B73882300182393 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7B8B378A2B73883800182393 /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		7B8B378B2B73883800182393 /* DuckDuckGoVPN_tvOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuckDuckGoVPN_tvOSApp.swift; sourceTree = "<group>"; };
+		7B8B378C2B73883800182393 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		7B8B37982B7389B700182393 /* DuckDuckGoVPN.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DuckDuckGoVPN.xcconfig; sourceTree = "<group>"; };
+		7B8B379A2B738A8F00182393 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7B8B379C2B738A8F00182393 /* DuckDuckGoVPN_tvOS.release.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPN_tvOS.release.entitlements; sourceTree = "<group>"; };
+		7B8B379D2B738A8F00182393 /* DuckDuckGoVPN_tvOS.debug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = DuckDuckGoVPN_tvOS.debug.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +60,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B5562D32B7393D600FCB13F /* BrowserServicesKit in Frameworks */,
+				7B5562D12B73910800FCB13F /* VPNtvOS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +82,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7B5562CF2B73910800FCB13F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		7B8B37402B72E9FE00182393 = {
 			isa = PBXGroup;
 			children = (
@@ -82,13 +96,14 @@
 				7B8B37602B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests */,
 				7B8B376A2B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITests */,
 				7B8B374A2B72E9FF00182393 /* Products */,
+				7B5562CF2B73910800FCB13F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		7B8B374A2B72E9FF00182393 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7B8B37492B72E9FF00182393 /* DuckDuckGoVPN_tvOS.app */,
+				7B8B37492B72E9FF00182393 /* DuckDuckGo VPN Debug.app */,
 				7B8B375D2B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests.xctest */,
 				7B8B37672B72E9FF00182393 /* DuckDuckGoVPN_tvOSUITests.xctest */,
 			);
@@ -98,23 +113,12 @@
 		7B8B374B2B72E9FF00182393 /* DuckDuckGoVPN_tvOS */ = {
 			isa = PBXGroup;
 			children = (
-				7B8B374C2B72E9FF00182393 /* DuckDuckGoVPN_tvOSApp.swift */,
-				7B8B374E2B72E9FF00182393 /* ContentView.swift */,
-				7B8B37502B72E9FF00182393 /* Item.swift */,
-				7B8B37522B72E9FF00182393 /* Assets.xcassets */,
-				7B8B37572B72E9FF00182393 /* DuckDuckGoVPN_tvOS.entitlements */,
-				7B8B37582B72E9FF00182393 /* Info.plist */,
-				7B8B37542B72E9FF00182393 /* Preview Content */,
+				7B8B37942B73891000182393 /* Configuration */,
+				7B8B377A2B72EAAE00182393 /* LocalPackages */,
+				7B8B37802B73882300182393 /* Resources */,
+				7B8B37892B73883800182393 /* Sources */,
 			);
 			path = DuckDuckGoVPN_tvOS;
-			sourceTree = "<group>";
-		};
-		7B8B37542B72E9FF00182393 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				7B8B37552B72E9FF00182393 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		7B8B37602B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests */ = {
@@ -134,6 +138,68 @@
 			path = DuckDuckGoVPN_tvOSUITests;
 			sourceTree = "<group>";
 		};
+		7B8B377A2B72EAAE00182393 /* LocalPackages */ = {
+			isa = PBXGroup;
+			children = (
+				7B8B377F2B73870B00182393 /* VPNtvOS */,
+			);
+			path = LocalPackages;
+			sourceTree = "<group>";
+		};
+		7B8B37802B73882300182393 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7B8B37812B73882300182393 /* Assets.xcassets */,
+				7B8B37822B73882300182393 /* PreviewContent */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		7B8B37822B73882300182393 /* PreviewContent */ = {
+			isa = PBXGroup;
+			children = (
+				7B8B37832B73882300182393 /* Preview Assets.xcassets */,
+			);
+			path = PreviewContent;
+			sourceTree = "<group>";
+		};
+		7B8B37892B73883800182393 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				7B8B378A2B73883800182393 /* Item.swift */,
+				7B8B378B2B73883800182393 /* DuckDuckGoVPN_tvOSApp.swift */,
+				7B8B378C2B73883800182393 /* ContentView.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		7B8B37942B73891000182393 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				7B8B379B2B738A8F00182393 /* Entitlements */,
+				7B8B37992B738A8F00182393 /* InfoPlist */,
+				7B8B37982B7389B700182393 /* DuckDuckGoVPN.xcconfig */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		7B8B37992B738A8F00182393 /* InfoPlist */ = {
+			isa = PBXGroup;
+			children = (
+				7B8B379A2B738A8F00182393 /* Info.plist */,
+			);
+			path = InfoPlist;
+			sourceTree = "<group>";
+		};
+		7B8B379B2B738A8F00182393 /* Entitlements */ = {
+			isa = PBXGroup;
+			children = (
+				7B8B379C2B738A8F00182393 /* DuckDuckGoVPN_tvOS.release.entitlements */,
+				7B8B379D2B738A8F00182393 /* DuckDuckGoVPN_tvOS.debug.entitlements */,
+			);
+			path = Entitlements;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -150,8 +216,12 @@
 			dependencies = (
 			);
 			name = DuckDuckGoVPN_tvOS;
+			packageProductDependencies = (
+				7B5562D02B73910800FCB13F /* VPNtvOS */,
+				7B5562D22B7393D600FCB13F /* BrowserServicesKit */,
+			);
 			productName = DuckDuckGoVPN_tvOS;
-			productReference = 7B8B37492B72E9FF00182393 /* DuckDuckGoVPN_tvOS.app */;
+			productReference = 7B8B37492B72E9FF00182393 /* DuckDuckGo VPN Debug.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7B8B375C2B72E9FF00182393 /* DuckDuckGoVPN_tvOSTests */ = {
@@ -222,6 +292,9 @@
 				Base,
 			);
 			mainGroup = 7B8B37402B72E9FE00182393;
+			packageReferences = (
+				7B8B377E2B73866200182393 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */,
+			);
 			productRefGroup = 7B8B374A2B72E9FF00182393 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -238,8 +311,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B8B37562B72E9FF00182393 /* Preview Assets.xcassets in Resources */,
-				7B8B37532B72E9FF00182393 /* Assets.xcassets in Resources */,
+				7B8B37872B73882300182393 /* Preview Assets.xcassets in Resources */,
+				7B8B37862B73882300182393 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,9 +337,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7B8B374F2B72E9FF00182393 /* ContentView.swift in Sources */,
-				7B8B37512B72E9FF00182393 /* Item.swift in Sources */,
-				7B8B374D2B72E9FF00182393 /* DuckDuckGoVPN_tvOSApp.swift in Sources */,
+				7B8B378D2B73883800182393 /* Item.swift in Sources */,
+				7B8B378F2B73883800182393 /* ContentView.swift in Sources */,
+				7B8B378E2B73883800182393 /* DuckDuckGoVPN_tvOSApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,17 +497,15 @@
 		};
 		7B8B37722B72E9FF00182393 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B8B37982B7389B700182393 /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPN_tvOS/DuckDuckGoVPN_tvOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"DuckDuckGoVPN_tvOS/Preview Content\"";
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = DuckDuckGoVPN_tvOS/Info.plist;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -442,8 +513,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.tvos.vpn.DuckDuckGoVPN-tvOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -452,17 +521,15 @@
 		};
 		7B8B37732B72E9FF00182393 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B8B37982B7389B700182393 /* DuckDuckGoVPN.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = DuckDuckGoVPN_tvOS/DuckDuckGoVPN_tvOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"DuckDuckGoVPN_tvOS/Preview Content\"";
 				DEVELOPMENT_TEAM = HKE973VLUW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = DuckDuckGoVPN_tvOS/Info.plist;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -470,8 +537,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.duckduckgo.tvos.vpn.DuckDuckGoVPN-tvOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -594,6 +659,29 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7B8B377E2B73866200182393 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
+			requirement = {
+				kind = exactVersion;
+				version = 104.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7B5562D02B73910800FCB13F /* VPNtvOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VPNtvOS;
+		};
+		7B5562D22B7393D600FCB13F /* BrowserServicesKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7B8B377E2B73866200182393 /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = BrowserServicesKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7B8B37412B72E9FE00182393 /* Project object */;
 }

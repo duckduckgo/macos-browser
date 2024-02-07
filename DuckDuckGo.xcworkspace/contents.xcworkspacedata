@@ -4,4 +4,7 @@
    <FileRef
       location = "group:DuckDuckGo.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:DuckDuckGoVPN_tvOS/DuckDuckGoVPN_tvOS.xcodeproj">
+   </FileRef>
 </Workspace>

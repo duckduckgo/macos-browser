@@ -7,3 +7,31 @@
 
 // Configuration settings file format documentation can be found at:
 // https://help.apple.com/xcode/#/dev745c5c974
+
+// Useful Directories
+
+CONFIGURATIONS_DIR = $(SRCROOT)/DuckDuckGoVPN_tvOS/Configuration
+ENTITLEMENTS_DIR = $(CONFIGURATIONS_DIR)/Entitlements
+PLISTS_DIR = $(CONFIGURATIONS_DIR)/InfoPlist
+RESOURCES_DIR = $(SRCROOT)/DuckDuckGoVPN_tvOS/Resources
+
+// Build Settings
+
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=*] = $(ENTITLEMENTS_DIR)/DuckDuckGoVPN_tvOS.debug.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=*] = $(ENTITLEMENTS_DIR)/DuckDuckGoVPN_tvOS.release.entitlements
+
+DEVELOPMENT_ASSET_PATHS = $(RESOURCES_DIR)/PreviewContent
+
+INFOPLIST_FILE = $(PLISTS_DIR)/Info.plist
+
+PRODUCT_BUNDLE_IDENTIFIER_BASE = com.duckduckgo.tvos.vpn
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(PRODUCT_BUNDLE_IDENTIFIER_BASE).debug
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(PRODUCT_BUNDLE_IDENTIFIER_BASE).vpn
+
+PRODUCT_NAME[config=Debug][sdk=*] = DuckDuckGo VPN Debug
+PRODUCT_NAME[config=Release][sdk=*] = DuckDuckGo VPN
+
+
+
+
+
