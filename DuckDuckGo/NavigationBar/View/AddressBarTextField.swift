@@ -110,9 +110,11 @@ final class AddressBarTextField: NSTextField {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel
             .compactMap { $0 }
             .sink { [weak self] selectedTabViewModel in
-                self?.restoreValueIfPossible(newSelectedTabViewModel: selectedTabViewModel)
-                self?.subscribeToAddressBarString(selectedTabViewModel: selectedTabViewModel)
-                self?.subscribeToContentType(selectedTabViewModel: selectedTabViewModel)
+                guard let self else { return }
+                hideSuggestionWindow()
+                restoreValueIfPossible(newSelectedTabViewModel: selectedTabViewModel)
+                subscribeToAddressBarString(selectedTabViewModel: selectedTabViewModel)
+                subscribeToContentType(selectedTabViewModel: selectedTabViewModel)
             }
     }
 
@@ -254,7 +256,7 @@ final class AddressBarTextField: NSTextField {
             case .suggestion(let suggestionViewModel):
                 switch suggestionViewModel.suggestion {
                 case .phrase, .website, .bookmark, .historyEntry: return false
-                case .unknown(let value): return true
+                case .unknown: return true
                 }
             case .text(_, userTyped: true), .url(_, _, userTyped: true): return false
             case .text, .url: return true
