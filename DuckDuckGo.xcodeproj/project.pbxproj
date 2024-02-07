@@ -78,11 +78,11 @@
 		1E0068AD2B1673BB00BBF43B /* SubscriptionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1E0068AC2B1673BB00BBF43B /* SubscriptionUI */; };
 		1E0C72062ABC63BD00802009 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */; };
 		1E0C72072ABC63BD00802009 /* SubscriptionPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E0C72052ABC63BD00802009 /* SubscriptionPagesUserScript.swift */; };
+		1E21F8E32B73E48600FB272E /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 1E21F8E22B73E48600FB272E /* Subscription */; };
 		1E2AE4C72ACB215900684E0A /* NetworkProtectionRemoteMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D62ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift */; };
 		1E2AE4C82ACB216B00684E0A /* HoverTrackingArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B140872ABDBCC1004F8E85 /* HoverTrackingArea.swift */; };
 		1E2AE4CA2ACB21A000684E0A /* NetworkProtectionRemoteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCF15D82ABB8A7F0083F6DF /* NetworkProtectionRemoteMessage.swift */; };
 		1E2AE4CB2ACB21C800684E0A /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B9579202AC687170062CA31 /* HardwareModel.swift */; };
-		1E519E802B73DCCB00598223 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 1E519E7F2B73DCCB00598223 /* Subscription */; };
 		1E7E2E9029029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E8F29029A2A00C01B54 /* ContentBlockingRulesUpdateObserver.swift */; };
 		1E7E2E942902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */; };
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
@@ -4535,7 +4535,7 @@
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
 				373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */,
 				4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */,
-				1E519E802B73DCCB00598223 /* Subscription in Frameworks */,
+				1E21F8E32B73E48600FB272E /* Subscription in Frameworks */,
 				4B957BE42AC7AE700062CA31 /* DDGSync in Frameworks */,
 				4B957BE52AC7AE700062CA31 /* OpenSSL in Frameworks */,
 				4B957BE62AC7AE700062CA31 /* PrivacyDashboard in Frameworks */,
@@ -8454,7 +8454,7 @@
 				37269F022B332FD8005E8E46 /* Common */,
 				372217832B33380E00B8E9C2 /* TestUtils */,
 				373FB4B42B4D6C57004C88D6 /* PreferencesViews */,
-				1E519E7F2B73DCCB00598223 /* Subscription */,
+				1E21F8E22B73E48600FB272E /* Subscription */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -13256,8 +13256,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 104.2.1;
+				branch = "michal/subs-in-bsk";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
@@ -13299,8 +13299,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = SubscriptionUI;
 		};
-		1E519E7F2B73DCCB00598223 /* Subscription */ = {
+		1E21F8E22B73E48600FB272E /* Subscription */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = Subscription;
 		};
 		1E950E3E2912A10D0051A99B /* ContentBlocking */ = {
