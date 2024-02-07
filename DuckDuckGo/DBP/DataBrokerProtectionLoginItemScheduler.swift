@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if DBP
+
 import Foundation
 import DataBrokerProtection
 import Common
@@ -81,3 +83,5 @@ extension DataBrokerProtectionLoginItemScheduler: DataBrokerProtectionScheduler 
         ipcScheduler.runQueuedOperations(showWebView: showWebView, completion: completion)
     }
 }
+
+#endif

@@ -372,7 +372,25 @@ final class BrowserTabViewController: NSViewController {
                 }
                 return old == new
             })
-            .asVoid()
+            .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                // For non-URL tabs, just emit an event
+                guard let tabViewModel, tabContent.isUrl else {
+                    return Just(()).eraseToAnyPublisher()
+                }
+
+                // For URL tabs, we only want to show tab content (webView) when webView starts
+                // navigation or when another navigation-related event happens.
+                // We take the first such event and move forward.
+                return Publishers.Merge4(
+                    tabViewModel.tab.webViewDidStartNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
+                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
+                )
+                .prefix(1)
+                .eraseToAnyPublisher()
+            }
+            .switchToLatest()
             .receive(on: DispatchQueue.main)
             .sink { [weak self, weak tabViewModel] in
                 guard let tabViewModel else { return }
@@ -450,12 +468,6 @@ final class BrowserTabViewController: NSViewController {
     }
 
     // MARK: - Browser Tabs
-
-    private func show(displayableTabAtIndex index: Int) {
-        // The tab switcher only displays displayable tab types.
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
-    }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
@@ -577,7 +589,7 @@ final class BrowserTabViewController: NSViewController {
     var bookmarksViewController: BookmarkManagementSplitViewController?
     private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
         return bookmarksViewController ?? {
-            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            let bookmarksViewController = BookmarkManagementSplitViewController()
             bookmarksViewController.delegate = self
             self.bookmarksViewController = bookmarksViewController
             return bookmarksViewController
@@ -932,8 +944,9 @@ extension BrowserTabViewController: TabDownloadsDelegate {
 
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
-    func selectedTab(at index: Int) {
-        show(displayableTabAtIndex: index)
+    func selectedTabContent(_ content: Tab.TabContent) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(content)
+        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
