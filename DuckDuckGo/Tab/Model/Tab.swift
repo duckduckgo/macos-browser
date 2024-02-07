@@ -576,6 +576,10 @@ protocol NewWindowPolicyDecisionMaker {
 
     // MARK: - Event Publishers
 
+    let webViewDidStartNavigationPublisher = PassthroughSubject<Void, Never>()
+    let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
+    let webViewDidReceiveRedirectPublisher = PassthroughSubject<Void, Never>()
+    let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
 
     // MARK: - Properties
@@ -1172,6 +1176,9 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic else { return nil }
 
+        // send this event only when we're interrupting loading and showing extra UI to the user
+        webViewDidReceiveUserInteractiveChallengePublisher.send()
+
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if case .url(let url, credential: .some(let credential), source: let source) = content,
            url.matches(challenge.protectionSpace),
@@ -1193,6 +1200,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         } catch {
             return .cancel
         }
+    }
+
+    func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
+        webViewDidReceiveRedirectPublisher.send()
+    }
+
+    @MainActor
+    func didCommit(_ navigation: Navigation) {
+        webViewDidCommitNavigationPublisher.send()
     }
 
     @MainActor
@@ -1239,6 +1255,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didStart(_ navigation: Navigation) {
+        webViewDidStartNavigationPublisher.send()
         delegate?.tabDidStartNavigation(self)
         userInteractionDialog = nil
 

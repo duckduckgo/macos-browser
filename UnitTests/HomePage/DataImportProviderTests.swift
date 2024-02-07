@@ -108,7 +108,7 @@ final class DataImportProviderTests: XCTestCase {
     }
 
     func testWhenNoPasswordsAndNoBookmarksDetectableAndSuccessImportThenDidImportIsTrue() {
-        var model = DataImportViewModel()
+        let model = DataImportViewModel()
         model.successfulImportHappened = true
 
         XCTAssertTrue(provider.didImport)

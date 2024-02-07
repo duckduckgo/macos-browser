@@ -10,6 +10,7 @@ on:
         type: choice
         options:
         - testflight
+        - testflight_review
         - appstore
       asana-task-url:
         description: "Asana release task URL"
@@ -116,13 +117,9 @@ jobs:
     - name: Get Asana Task ID
       id: get-task-id
       if: env.asana-task-url
-      run: |
-        task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
-        if [[ "${{ env.asana-task-url }}" =~ ${task_url_regex} ]]; then
-          echo "task_id=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
-        else
-          echo "::error::Asana Task URL has incorrect format (attempted to match ${task_url_regex})."
-        fi
+      uses: ./.github/actions/asana-extract-task-id
+      with:
+        task-url: ${{ env.asana-task-url }}
 
     - name: Upload debug symbols to Asana
       if: env.asana-task-url
@@ -132,7 +129,7 @@ jobs:
         asana_dsyms_path="${{ github.workspace }}/DuckDuckGo-AppStore-${{ env.app_version }}-dSYM.zip"
         mv -f "${{ env.dsyms_path }}" "$asana_dsyms_path"
 
-        curl -s "https://app.asana.com/api/1.0/tasks/${{ steps.get-task-id.outputs.task_id }}/attachments" \
+        curl -s "https://app.asana.com/api/1.0/tasks/${{ steps.get-task-id.outputs.task-id }}/attachments" \
           -H "Authorization: Bearer ${{ env.ASANA_ACCESS_TOKEN }}" \
           --form "file=@${asana_dsyms_path};type=application/zip"
 

@@ -24,9 +24,11 @@ import SwiftUI
 import BrowserServicesKit
 
 final class BrowserTabViewController: NSViewController {
-    @IBOutlet var homePageView: NSView!
-    @IBOutlet var hoverLabel: NSTextField!
-    @IBOutlet var hoverLabelContainer: NSView!
+
+    private lazy var homePageView = NSView()
+    private lazy var hoverLabel = NSTextField(string: URL.duckDuckGo.absoluteString)
+    private lazy var hoverLabelContainer = ColorView(frame: .zero, backgroundColor: .browserTabBackground, borderWidth: 0)
+
     private weak var webView: WebView?
     private weak var webViewContainer: NSView?
     private weak var webViewSnapshot: NSView?
@@ -34,6 +36,7 @@ final class BrowserTabViewController: NSViewController {
     var tabViewModel: TabViewModel?
 
     private let tabCollectionViewModel: TabCollectionViewModel
+    private let bookmarkManager: BookmarkManager
 
     private var tabContentCancellable: AnyCancellable?
     private var userDialogsCancellable: AnyCancellable?
@@ -50,27 +53,58 @@ final class BrowserTabViewController: NSViewController {
 
     private var transientTabContentViewController: NSViewController?
 
-    static func create(tabCollectionViewModel: TabCollectionViewModel) -> BrowserTabViewController {
-        NSStoryboard(name: "BrowserTab", bundle: nil).instantiateInitialController { coder in
-            self.init(coder: coder, tabCollectionViewModel: tabCollectionViewModel)
-        }!
-    }
-
     required init?(coder: NSCoder) {
         fatalError("BrowserTabViewController: Bad initializer")
     }
 
-    init?(coder: NSCoder, tabCollectionViewModel: TabCollectionViewModel) {
+    init(tabCollectionViewModel: TabCollectionViewModel, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.tabCollectionViewModel = tabCollectionViewModel
+        self.bookmarkManager = bookmarkManager
 
-        super.init(coder: coder)
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    override func loadView() {
+        view = BrowserTabView(frame: .zero, backgroundColor: .browserTabBackground)
+
+        homePageView.translatesAutoresizingMaskIntoConstraints = false
+        view.addAndLayout(homePageView)
+
+        hoverLabelContainer.cornerRadius = 4
+        view.addSubview(hoverLabelContainer)
+
+        hoverLabel.focusRingType = .none
+        hoverLabel.translatesAutoresizingMaskIntoConstraints = false
+        hoverLabel.font = .systemFont(ofSize: 13)
+        hoverLabel.drawsBackground = false
+        hoverLabel.isEditable = false
+        hoverLabel.isBordered = false
+        hoverLabel.lineBreakMode = .byClipping
+        hoverLabel.textColor = .labelColor
+        hoverLabelContainer.addSubview(hoverLabel)
+
+        setupLayout()
+
+        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
+        self.addAndLayoutChild(homePageViewController, into: homePageView)
+    }
+
+    private func setupLayout() {
+        hoverLabelContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -2).isActive = true
+        view.bottomAnchor.constraint(equalTo: hoverLabelContainer.bottomAnchor, constant: -4).isActive = true
+
+        hoverLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        hoverLabel.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        hoverLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        hoverLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        hoverLabelContainer.bottomAnchor.constraint(equalTo: hoverLabel.bottomAnchor, constant: 10).isActive = true
+        hoverLabel.leadingAnchor.constraint(equalTo: hoverLabelContainer.leadingAnchor, constant: 12).isActive = true
+        hoverLabelContainer.trailingAnchor.constraint(equalTo: hoverLabel.trailingAnchor, constant: 8).isActive = true
+        hoverLabel.topAnchor.constraint(equalTo: hoverLabelContainer.topAnchor, constant: 6).isActive = true
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let homePageViewController = HomePageViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: LocalBookmarkManager.shared)
-        self.addAndLayoutChild(homePageViewController, into: homePageView)
 
         hoverLabelContainer.alphaValue = 0
         subscribeToTabs()
@@ -288,10 +322,8 @@ final class BrowserTabViewController: NSViewController {
     private func addWebViewToViewHierarchy(_ webView: WebView, tab: Tab) {
         let container = WebViewContainerView(tab: tab, webView: webView, frame: view.bounds)
         self.webViewContainer = container
-        view.addSubview(container)
-
         // Make sure link preview (tooltip shown in the bottom-left) is on top
-        view.addSubview(hoverLabelContainer)
+        view.addSubview(container, positioned: .below, relativeTo: hoverLabelContainer)
     }
 
     private func changeWebView(tabViewModel: TabViewModel?) {
@@ -340,7 +372,25 @@ final class BrowserTabViewController: NSViewController {
                 }
                 return old == new
             })
-            .asVoid()
+            .map { [weak tabViewModel] tabContent -> AnyPublisher<Void, Never> in
+                // For non-URL tabs, just emit an event
+                guard let tabViewModel, tabContent.isUrl else {
+                    return Just(()).eraseToAnyPublisher()
+                }
+
+                // For URL tabs, we only want to show tab content (webView) when webView starts
+                // navigation or when another navigation-related event happens.
+                // We take the first such event and move forward.
+                return Publishers.Merge4(
+                    tabViewModel.tab.webViewDidStartNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveRedirectPublisher,
+                    tabViewModel.tab.webViewDidCommitNavigationPublisher,
+                    tabViewModel.tab.webViewDidReceiveUserInteractiveChallengePublisher
+                )
+                .prefix(1)
+                .eraseToAnyPublisher()
+            }
+            .switchToLatest()
             .receive(on: DispatchQueue.main)
             .sink { [weak self, weak tabViewModel] in
                 guard let tabViewModel else { return }
@@ -366,6 +416,11 @@ final class BrowserTabViewController: NSViewController {
         hoverLinkCancellable = tabViewModel?.tab.hoveredLinkPublisher.sink { [weak self] in
             self?.scheduleHoverLabelUpdatesForUrl($0)
         }
+#if DEBUG
+        if case .xcPreviews = NSApp.runType {
+            self.scheduleHoverLabelUpdatesForUrl(.duckDuckGo)
+        }
+#endif
     }
 
     func makeWebViewFirstResponder() {
@@ -413,12 +468,6 @@ final class BrowserTabViewController: NSViewController {
     }
 
     // MARK: - Browser Tabs
-
-    private func show(displayableTabAtIndex index: Int) {
-        // The tab switcher only displays displayable tab types.
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(Tab.TabContent.displayableTabTypes[index])
-        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
-    }
 
     private func removeAllTabContent(includingWebView: Bool = true) {
         self.homePageView.removeFromSuperview()
@@ -540,7 +589,7 @@ final class BrowserTabViewController: NSViewController {
     var bookmarksViewController: BookmarkManagementSplitViewController?
     private func bookmarksViewControllerCreatingIfNeeded() -> BookmarkManagementSplitViewController {
         return bookmarksViewController ?? {
-            let bookmarksViewController = BookmarkManagementSplitViewController.create()
+            let bookmarksViewController = BookmarkManagementSplitViewController()
             bookmarksViewController.delegate = self
             self.bookmarksViewController = bookmarksViewController
             return bookmarksViewController
@@ -895,8 +944,9 @@ extension BrowserTabViewController: TabDownloadsDelegate {
 
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
-    func selectedTab(at index: Int) {
-        show(displayableTabAtIndex: index)
+    func selectedTabContent(_ content: Tab.TabContent) {
+        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(content)
+        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
@@ -1026,4 +1076,9 @@ extension BrowserTabViewController {
             }
         }
     }
+}
+
+@available(macOS 14.0, *)
+#Preview {
+    BrowserTabViewController(tabCollectionViewModel: TabCollectionViewModel(tabCollection: TabCollection(tabs: [.init(content: .url(.duckDuckGo, source: .ui))])))
 }
