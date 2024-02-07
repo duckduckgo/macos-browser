@@ -19,6 +19,7 @@
 	<true/>
 	<key>com.apple.security.temporary-exception.mach-register.global-name</key>
 	<array>
+		<string>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.review</string>
 		<string>HKE973VLUW.com.duckduckgo.macos.browser.network-protection.debug</string>
 	</array>
 	<key>keychain-access-groups</key>
