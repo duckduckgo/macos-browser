@@ -849,6 +849,52 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(viewModel.tabs.count, 1)
     }
 
+    func testWhenPageFailsToLoadAfterRedirect_errorPageShown() async throws {
+        // open Tab with newtab page
+        let tab = Tab(content: .newtab, webViewConfiguration: webViewConfiguration)
+        let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: [tab]))
+        window = WindowsManager.openNewWindow(with: viewModel)!
+        let eNewtabPageLoaded = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+        try await eNewtabPageLoaded.value
+
+        // navigate to alt url, redirect to test url, fail with error
+        schemeHandler.middleware = [{ request in
+            .init { task in
+                let response = URLResponse(url: request.url!, mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
+                let newRequest = URLRequest(url: .test)
+                task._didPerformRedirection(response, newRequest: newRequest)
+
+                task.didFailWithError(NSError.hostNotFound)
+            }
+        }]
+        tab.setContent(.url(.test, source: .userEntered(URL.alternative.absoluteString)))
+
+        let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
+        let eNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
+
+        let error = try await eNavigationFailed.value
+        _=try await eNavigationFinished.value
+
+        XCTAssertEqual(error.errorCode, NSError.hostNotFound.code)
+        XCTAssertEqual(error.localizedDescription, NSError.hostNotFound.localizedDescription)
+        let headerText: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-header')[0].innerText")
+        let errorDescr: String? = try await tab.webView.evaluateJavaScript("document.getElementsByClassName('error-description')[0].innerText")
+
+        XCTAssertNil(tab.title)
+        XCTAssertEqual(tabViewModel.title, UserText.tabErrorTitle)
+        XCTAssertEqual(headerText?.trimmingWhitespace(), UserText.errorPageHeader)
+        XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.hostNotFound.localizedDescription)
+        XCTAssertTrue(tab.canGoBack)
+        XCTAssertFalse(tab.canGoForward)
+        XCTAssertTrue(tab.canReload)
+        XCTAssertFalse(viewModel.tabViewModel(at: 0)!.canSaveContent)
+        XCTAssertEqual(tab.backHistoryItems.count, 1)
+        XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
+        XCTAssertNil(tab.currentHistoryItem?.title)
+        XCTAssertEqual(tab.currentHistoryItem?.url, .test)
+        XCTAssertEqual(tab.content.userEditableUrl, .test)
+    }
+
 }
 
 private extension URL {
