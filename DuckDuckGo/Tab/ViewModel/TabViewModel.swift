@@ -70,6 +70,7 @@ final class TabViewModel {
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
+    @Published private(set) var emoji: String?
     var findInPage: FindInPageModel? { tab.findInPage?.model }
 
     @Published private(set) var usedPermissions = Permissions()
@@ -91,6 +92,7 @@ final class TabViewModel {
         subscribeToCanGoBackForwardAndReload()
         subscribeToTitle()
         subscribeToFavicon()
+        subscribeToEmoji()
         subscribeToTabError()
         subscribeToPermissions()
         subscribeToAppearancePreferences()
@@ -165,6 +167,16 @@ final class TabViewModel {
             .sink { [weak self] _ in
                 self?.updateFavicon()
             }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToEmoji() {
+        tab.$emoji
+            .filter { [weak self] _ in
+                self?.tab.isLazyLoadingInProgress == false
+            }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.emoji, onWeaklyHeld: self)
             .store(in: &cancellables)
     }
 

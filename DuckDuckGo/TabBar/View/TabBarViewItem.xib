@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22154" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -35,6 +35,14 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW">
                     <rect key="frame" x="8" y="5" width="24" height="24"/>
                     <subviews>
+                        <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MZE-HK-CdS" userLabel="Emoji Text Field">
+                            <rect key="frame" x="-2" y="4" width="28" height="16"/>
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" usesSingleLineMode="YES" id="kVh-oJ-SGJ">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Kky-kZ-lU9" userLabel="Favicon Image View">
                             <rect key="frame" x="4" y="4" width="16" height="16"/>
                             <constraints>
@@ -46,9 +54,12 @@
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="height" constant="24" id="JIG-o6-vrA"/>
+                        <constraint firstItem="MZE-HK-CdS" firstAttribute="leading" secondItem="A6g-eG-dOW" secondAttribute="leading" id="PzQ-O1-al6"/>
                         <constraint firstAttribute="width" constant="24" id="b6u-P2-tfb"/>
+                        <constraint firstItem="MZE-HK-CdS" firstAttribute="centerY" secondItem="A6g-eG-dOW" secondAttribute="centerY" id="bfA-UF-aju"/>
                         <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerY" secondItem="A6g-eG-dOW" secondAttribute="centerY" id="q7W-XH-qud"/>
                         <constraint firstItem="Kky-kZ-lU9" firstAttribute="centerX" secondItem="A6g-eG-dOW" secondAttribute="centerX" id="sh1-7s-uE8"/>
+                        <constraint firstAttribute="trailing" secondItem="MZE-HK-CdS" secondAttribute="trailing" id="tUr-Pm-dJi"/>
                     </constraints>
                 </customView>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="XdB-Qn-iD9" userLabel="Active Permission" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
@@ -153,6 +164,7 @@
             <connections>
                 <outlet property="closeButton" destination="vuD-rY-Vzl" id="JGv-Ac-mRi"/>
                 <outlet property="closeButtonTrailingConstraint" destination="web-9k-BYT" id="UkK-vj-qp9"/>
+                <outlet property="emojiTextField" destination="MZE-HK-CdS" id="cee-3r-bg0"/>
                 <outlet property="faviconImageView" destination="Kky-kZ-lU9" id="96Z-4T-ONB"/>
                 <outlet property="faviconWrapperView" destination="A6g-eG-dOW" id="5ol-jq-QwE"/>
                 <outlet property="faviconWrapperViewCenterConstraint" destination="PF1-mZ-U4m" id="5KT-Cu-bbm"/>

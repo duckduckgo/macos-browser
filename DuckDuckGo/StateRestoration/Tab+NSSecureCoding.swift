@@ -26,6 +26,7 @@ extension Tab: NSSecureCoding {
         static let videoID = "videoID"
         static let videoTimestamp = "videoTimestamp"
         static let title = "title"
+        static let emoji = "emoji"
         static let sessionStateData = "ssdata" // Used for session restoration on macOS 10.15 – 11
         static let interactionStateData = "interactionStateData" // Used for session restoration on macOS 12+
         static let favicon = "icon"
@@ -54,6 +55,7 @@ extension Tab: NSSecureCoding {
         self.init(content: content,
                   title: decoder.decodeIfPresent(at: NSSecureCodingKeys.title),
                   favicon: decoder.decodeIfPresent(at: NSSecureCodingKeys.favicon),
+                  emoji: decoder.decodeIfPresent(at: NSSecureCodingKeys.emoji),
                   interactionStateData: interactionStateData,
                   shouldLoadInBackground: false,
                   lastSelectedAt: decoder.decodeIfPresent(at: NSSecureCodingKeys.lastSelectedAt))
@@ -67,6 +69,7 @@ extension Tab: NSSecureCoding {
         content.urlForWebView.map(coder.encode(forKey: NSSecureCodingKeys.url))
         title.map(coder.encode(forKey: NSSecureCodingKeys.title))
         favicon.map(coder.encode(forKey: NSSecureCodingKeys.favicon))
+        emoji.map(coder.encode(forKey: NSSecureCodingKeys.emoji))
 
         getActualInteractionStateData().map(coder.encode(forKey: NSSecureCodingKeys.interactionStateData))
 

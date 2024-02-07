@@ -93,6 +93,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var permissionButton: NSButton!
 
     @IBOutlet weak var titleTextField: NSTextField!
+    @IBOutlet weak var emojiTextField: NSTextField!
     @IBOutlet weak var titleTextFieldLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
@@ -238,9 +239,11 @@ final class TabBarViewItem: NSCollectionViewItem {
             self?.titleTextField.stringValue = title
         }.store(in: &cancellables)
 
-        tabViewModel.$favicon.sink { [weak self] favicon in
-            self?.updateFavicon(favicon)
-        }.store(in: &cancellables)
+        Publishers.CombineLatest(tabViewModel.$favicon, tabViewModel.$emoji)
+            .sink { [weak self] favicon, emoji in
+                self?.updateFavicon(favicon, emoji: emoji)
+            }
+            .store(in: &cancellables)
 
         tabViewModel.tab.$content.sink { [weak self] content in
             self?.currentURL = content.url
@@ -412,10 +415,22 @@ final class TabBarViewItem: NSCollectionViewItem {
         titleTextField.gradient(width: TextFieldMaskGradientSize.width, trailingPadding: gradientPadding)
     }
 
-    private func updateFavicon(_ favicon: NSImage?) {
-        faviconWrapperView.isHidden = favicon == nil
+    private func updateFavicon(_ favicon: NSImage?, emoji: String?) {
+        guard let faviconImageView, let emojiTextField else {
+            return
+        }
+        faviconWrapperView.isHidden = favicon == nil && emoji == nil
         titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
         faviconImageView.image = favicon
+        emojiTextField.stringValue = emoji ?? ""
+
+        if emoji != nil {
+            faviconImageView.isHidden = true
+            emojiTextField.isHidden = false
+        } else {
+            faviconImageView.isHidden = false
+            emojiTextField.isHidden = true
+        }
     }
 
 }
