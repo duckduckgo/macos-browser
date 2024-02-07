@@ -91,7 +91,7 @@ final class AppVersionNumber: AppVersionNumberProvider {
     var versionNumber: String = AppVersion.shared.versionNumber
 }
 
-struct DataBrokerProtectionBrokerUpdater {
+public struct DataBrokerProtectionBrokerUpdater {
 
     private let repository: BrokerUpdaterRepository
     private let resources: ResourcesRepository
@@ -108,21 +108,17 @@ struct DataBrokerProtectionBrokerUpdater {
         self.appVersion = appVersion
     }
 
-    func checkForUpdatesInBrokerJSONFiles() {
-        if let lastCheckedVersion = repository.getLastCheckedVersion() {
-            if shouldUpdate(incoming: appVersion.versionNumber, storedVersion: lastCheckedVersion) {
-                updateBrokers()
-            }
-        } else {
-            // There was not a last checked version. Probably new builds or ones without this new implementation
-            // or user deleted user defaults.
-            updateBrokers()
+    public static func provide() -> DataBrokerProtectionBrokerUpdater? {
+        if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
+            return DataBrokerProtectionBrokerUpdater(vault: vault)
         }
+
+        os_log("Error when trying to create vault for data broker protection updater debug menu item", log: .dataBrokerProtection)
+        return nil
     }
 
-    private func updateBrokers() {
-        repository.saveLatestAppVersionCheck(version: appVersion.versionNumber)
-        guard let brokers = resources.fetchBrokerFromResourceFiles() else { return }
+    public func updateBrokers() {
+        guard let brokers = resources.fetchBrokerFromResourceFiles() e  lse { return }
 
         for broker in brokers {
             do {
@@ -131,6 +127,23 @@ struct DataBrokerProtectionBrokerUpdater {
                 os_log("Error updating broker: %{public}@, with version: %{public}@", log: .dataBrokerProtection, broker.name, broker.version)
             }
         }
+    }
+
+    func checkForUpdatesInBrokerJSONFiles() {
+        if let lastCheckedVersion = repository.getLastCheckedVersion() {
+            if shouldUpdate(incoming: appVersion.versionNumber, storedVersion: lastCheckedVersion) {
+                updateBrokersAndSaveLatestVersion()
+            }
+        } else {
+            // There was not a last checked version. Probably new builds or ones without this new implementation
+            // or user deleted user defaults.
+            updateBrokersAndSaveLatestVersion()
+        }
+    }
+
+    private func updateBrokersAndSaveLatestVersion() {
+        repository.saveLatestAppVersionCheck(version: appVersion.versionNumber)
+        updateBrokers()
     }
 
     // Here we check if we need to update broker files
