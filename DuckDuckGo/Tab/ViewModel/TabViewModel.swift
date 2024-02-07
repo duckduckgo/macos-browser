@@ -70,7 +70,13 @@ final class TabViewModel {
 
     @Published private(set) var title: String = UserText.tabHomeTitle
     @Published private(set) var favicon: NSImage?
-    @Published private(set) var emoji: String?
+    @Published var emoji: String? {
+        didSet {
+            if tab.emoji != emoji {
+                tab.emoji = emoji
+            }
+        }
+    }
     var findInPage: FindInPageModel? { tab.findInPage?.model }
 
     @Published private(set) var usedPermissions = Permissions()

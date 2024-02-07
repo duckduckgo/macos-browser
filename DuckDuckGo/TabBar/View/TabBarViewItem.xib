@@ -35,9 +35,9 @@
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="A6g-eG-dOW">
                     <rect key="frame" x="8" y="5" width="24" height="24"/>
                     <subviews>
-                        <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MZE-HK-CdS" userLabel="Emoji Text Field">
+                        <textField wantsLayer="YES" focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MZE-HK-CdS" userLabel="Emoji Text Field" customClass="EmojiPickerTextField" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                             <rect key="frame" x="-2" y="4" width="28" height="16"/>
-                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" refusesFirstResponder="YES" alignment="center" usesSingleLineMode="YES" id="kVh-oJ-SGJ">
+                            <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" usesSingleLineMode="YES" id="kVh-oJ-SGJ">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
