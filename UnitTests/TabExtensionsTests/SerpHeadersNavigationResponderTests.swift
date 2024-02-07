@@ -122,7 +122,7 @@ class SerpHeadersNavigationResponderTests: XCTestCase {
 
             schemeHandler.middleware = [{ request in
                 XCTAssertEqual(request.url, url)
-                for (key, value) in SerpHeadersNavigationResponder.headers {
+                for (key, _) in SerpHeadersNavigationResponder.headers {
                     XCTAssertNil(request.value(forHTTPHeaderField: key), "for " + url.absoluteString)
                 }
 

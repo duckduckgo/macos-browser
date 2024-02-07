@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Combine
 import Navigation
 import XCTest
 
@@ -42,6 +43,7 @@ final class TabTests: XCTestCase {
 
     var webViewConfiguration: WKWebViewConfiguration!
     var schemeHandler: TestSchemeHandler!
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         contentBlockingMock = ContentBlockingMock()
@@ -57,6 +59,7 @@ final class TabTests: XCTestCase {
         webViewConfiguration = WKWebViewConfiguration()
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.http.rawValue)
         webViewConfiguration.setURLSchemeHandler(schemeHandler, forURLScheme: URL.NavigationalScheme.https.rawValue)
+        cancellables = []
     }
 
     override func tearDown() {
@@ -66,6 +69,7 @@ final class TabTests: XCTestCase {
         webViewConfiguration = nil
         schemeHandler = nil
         WKWebView.customHandlerSchemes = []
+        cancellables = nil
     }
 
     // MARK: - Tab Content
@@ -110,13 +114,22 @@ final class TabTests: XCTestCase {
     }
 
     func testWhenDownloadDialogIsShowingChangingURLDoesNOTClearDialog() {
-        let tab = Tab()
+        // GIVEN
+        let tab = Tab(content: .none, extensionsBuilder: TestTabExtensionsBuilder(load: [DownloadsTabExtension.self]))
         tab.url = .duckDuckGo
         DownloadsPreferences().alwaysRequestDownloadLocation = true
         tab.webView(WebViewMock(), saveDataToFile: Data(), suggestedFilename: "anything", mimeType: "application/pdf", originatingURL: .duckDuckGo)
-        XCTAssertNotNil(tab.userInteractionDialog)
+        var expectedDialog: Tab.UserDialog?
+        tab.downloads?.savePanelDialogPublisher.sink(receiveValue: { userDialog in
+            expectedDialog = userDialog
+        }).store(in: &cancellables)
+        XCTAssertNotNil(expectedDialog)
+
+        // WHEN
         tab.url = .duckDuckGoMorePrivacyInfo
-        XCTAssertNotNil(tab.userInteractionDialog)
+
+        // THEN
+        XCTAssertNotNil(expectedDialog)
     }
 
     // MARK: - Back/Forward navigation

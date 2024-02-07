@@ -1,0 +1,159 @@
+name: Tag and Merge
+
+on:
+  workflow_dispatch:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      base-branch:
+        description: "Base branch name"
+        required: false
+        type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+      base-branch:
+        description: "Base branch name"
+        required: false
+        type: string
+      branch:
+        description: "Branch name"
+        required: false
+        type: string
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
+      GHA_ELEVATED_PERMISSIONS_TOKEN:
+        required: true
+
+jobs:
+  tag-and-merge:
+
+    name: Tag and Merge
+
+    runs-on: ubuntu-latest
+
+    env:
+      asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
+      base-branch: ${{ inputs.base-branch || 'main' }}
+      branch: ${{ inputs.branch || github.ref_name }}
+
+    outputs:
+      tag: ${{ steps.create-tag.outputs.tag }}
+
+    steps:
+
+    - name: Check out the code
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+        ref: ${{ inputs.branch || github.ref_name }}
+
+    - name: Create Tag and GitHub Release
+      id: create-tag
+      uses: ./.github/actions/create-tag-and-github-release
+      with:
+        prerelease: true
+        github-token: ${{ github.token }}
+
+    - name: Merge to base branch
+      id: merge
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+        script: |
+          github.rest.repos.merge({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            base: "${{ env.base-branch }}",
+            head: "${{ env.branch }}"
+          })
+
+    - name: Get Asana automation subtask
+      id: get-automation-subtask
+      if: always()
+      uses: ./.github/actions/asana-get-release-automation-subtask-id
+      with:
+        access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        task-url: ${{ env.asana-task-url }}
+
+    - name: Create Asana task on failed merge
+      if: failure()
+      env:
+        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        TASK_NAME: "Merging ${{ env.branch }} to ${{ env.base-branch }} failed"
+        TASK_BODY: "The ${{ steps.create-tag.outputs.tag }} release has been successfully tagged and published in GitHub releases,
+          but merging to ${{ env.base-branch }} failed. Please resolve conflicts and merge ${{ env.branch }} to ${{ env.base-branch }} manually."
+        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/subtasks" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+          -d "{
+                \"data\": {
+                  \"name\": \"${TASK_NAME}\",
+                  \"resource_subtype\": \"default_task\",
+                  \"notes\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\",
+                  \"assignee\": \"${ASSIGNEE_ID}\"
+                }
+              }
+          ")
+
+        if [ $return_code -ne 201 ]; then
+          echo "::error::Failed to create Asana task"
+          exit 1
+        fi
+
+    - name: Re-add release task owner to Automation task
+      if: success()
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        ASSIGNEE_ID: ${{ steps.get-automation-subtask.outputs.assignee-id }}
+        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+      run: |
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/addFollowers" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+          -d "{ \"data\": { \"followers\": [ \"${ASSIGNEE_ID}\" ] } }")
+
+        if [ $return_code -ne 200 ]; then
+          echo "::error::Failed to add a collaborator to the Asana task"
+          exit 1
+        fi
+
+    - name: Report success
+      if: success()
+      env:
+        ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        TASK_BODY: "New internal build is ready. Repository is tagged with ${{ steps.create-tag.outputs.tag }} tag.
+          ${{ env.branch }} branch has been sucessfully merged to ${{ env.base-branch }} and GitHub release
+          is created at https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}."
+        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
+          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+          -H 'content-type: application/json' \
+          --write-out '%{http_code}' \
+          --output /dev/null \
+          -d "{ \"data\": { \"text\": \"${TASK_BODY}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }")
+
+        if [ $return_code -ne 201 ]; then
+          echo "::error::Failed to add a comment to the Asana task"
+          exit 1
+        fi
