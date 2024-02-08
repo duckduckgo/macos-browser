@@ -38,6 +38,7 @@ final class TabSnapshotExtension {
     private weak var webView: WebView?
     private var tabContent: Tab.TabContent?
     private var cancellables = Set<AnyCancellable>()
+    private var isBurner: Bool
 
     private let store: TabSnapshotStoring
     private let webViewSnapshotRenderer: WebViewSnapshotRendering
@@ -47,11 +48,13 @@ final class TabSnapshotExtension {
          webViewSnapshotRenderer: WebViewSnapshotRendering = WebViewSnapshotRenderer(),
          viewSnapshotRenderer: ViewSnapshotRendering = ViewSnapshotRenderer(),
          webViewPublisher: some Publisher<WKWebView, Never>,
-         contentPublisher: some Publisher<Tab.TabContent, Never>) {
+         contentPublisher: some Publisher<Tab.TabContent, Never>,
+         isBurner: Bool) {
 
         self.store = store
         self.webViewSnapshotRenderer = webViewSnapshotRenderer
         self.viewSnapshotRenderer = viewSnapshotRenderer
+        self.isBurner = isBurner
 
         webViewPublisher.sink { [weak self] webView in
             self?.webView = webView as? WebView
@@ -119,7 +122,7 @@ final class TabSnapshotExtension {
     private var snapshotData: SnapshotData? {
         didSet {
             if let snapshotData, let identifier {
-                store.persistSnapshot(snapshotData.image, id: identifier)
+                storeSnapshot(snapshotData.image, identifier: identifier)
             }
         }
     }
@@ -127,6 +130,14 @@ final class TabSnapshotExtension {
     @MainActor
     private func clearSnapshot() {
         snapshotData = nil
+    }
+
+    private func storeSnapshot(_ snapshot: NSImage, identifier: UUID) {
+        guard !isBurner else {
+            return
+        }
+
+        store.persistSnapshot(snapshot, id: identifier)
     }
 
     var snapshot: NSImage? {
@@ -214,8 +225,6 @@ extension TabSnapshotExtension: NSCodingExtension {
             os_log("Snapshot not available in the session state", log: .tabSnapshots)
             return
         }
-
-        didRestoreSnapshot = true
 
         Task {
             await setIdentifier(identifier)

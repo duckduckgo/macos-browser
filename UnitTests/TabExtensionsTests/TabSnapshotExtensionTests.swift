@@ -45,8 +45,8 @@ class TabSnapshotExtensionTests: XCTestCase {
             webViewSnapshotRenderer: mockWebViewSnapshotRenderer,
             viewSnapshotRenderer: mockViewSnapshotRenderer,
             webViewPublisher: mockWebViewPublisher.eraseToAnyPublisher(),
-            contentPublisher: mockContentPublisher.eraseToAnyPublisher()
-        )
+            contentPublisher: mockContentPublisher.eraseToAnyPublisher(),
+            isBurner: false)
     }
 
     override func tearDown() {
@@ -184,6 +184,33 @@ class TabSnapshotExtensionTests: XCTestCase {
         await tabSnapshotExtension.renderWebViewSnapshot()
 
         XCTAssert(mockTabSnapshotStore.persistedSnapshotIDs.count > 0)
+    }
+
+    @MainActor
+    func testWhenSnapshotIsRenderedInBurnerTab_ThenItIsNotPersisted() async {
+        tabSnapshotExtension = TabSnapshotExtension(
+            store: mockTabSnapshotStore,
+            webViewSnapshotRenderer: mockWebViewSnapshotRenderer,
+            viewSnapshotRenderer: mockViewSnapshotRenderer,
+            webViewPublisher: mockWebViewPublisher.eraseToAnyPublisher(),
+            contentPublisher: mockContentPublisher.eraseToAnyPublisher(),
+            isBurner: true)
+
+        await tabSnapshotExtension.setIdentifier(nil)
+
+        let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
+        mockWebViewPublisher.send(webView)
+
+        let content = Tab.TabContent.contentFromURL(URL.aURL, source: .ui)
+        mockContentPublisher.send(content)
+
+        let snapshot = NSImage()
+        mockWebViewSnapshotRenderer.nextSnapshot = snapshot
+
+        // Simulate user unselected the tab and make sure the snapshot rendering is avoided
+        await tabSnapshotExtension.renderWebViewSnapshot()
+
+        XCTAssert(mockTabSnapshotStore.persistedSnapshotIDs.count == 0)
     }
 
 }

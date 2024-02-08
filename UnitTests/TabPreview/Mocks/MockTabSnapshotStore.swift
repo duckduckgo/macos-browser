@@ -20,7 +20,6 @@ import AppKit
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockTabSnapshotStore: TabSnapshotStoring {
-
     // Use dictionaries to mock storing and loading snapshots by tab ID
     var snapshots = [UUID: NSImage]()
 
@@ -39,9 +38,9 @@ class MockTabSnapshotStore: TabSnapshotStoring {
         clearedSnapshotIDs.append(tabID)
     }
 
-    func loadSnapshot(for tabID: UUID, completion: @escaping (NSImage?) -> Void) {
+    func loadSnapshot(for tabID: UUID) async -> DuckDuckGo_Privacy_Browser.NSImageSendable? {
         let snapshot = snapshots[tabID]
         loadedSnapshotIDs.append(tabID)
-        completion(snapshot)
+        return snapshot as? DuckDuckGo_Privacy_Browser.NSImageSendable
     }
 }
