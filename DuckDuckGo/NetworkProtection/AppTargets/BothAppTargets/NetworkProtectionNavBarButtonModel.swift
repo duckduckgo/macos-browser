@@ -130,11 +130,11 @@ final class NetworkProtectionNavBarButtonModel: NSObject, ObservableObject {
         let hasAuthToken = NetworkProtectionKeychainTokenStore().isFeatureActivated
 
         if !isWaitlistUser && !hasAuthToken {
-            return NSImage(named: "NetworkProtectionAvailableButton")!
+            return .networkProtectionAvailableButton
         }
 
         if NetworkProtectionWaitlist().readyToAcceptTermsAndConditions {
-            return NSImage(named: "NetworkProtectionAvailableButton")!
+            return .networkProtectionAvailableButton
         }
 
         if NetworkProtectionKeychainTokenStore().isFeatureActivated {

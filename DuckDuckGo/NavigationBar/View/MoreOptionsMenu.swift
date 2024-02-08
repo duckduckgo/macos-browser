@@ -115,7 +115,7 @@ final class MoreOptionsMenu: NSMenu {
 #if FEEDBACK
         let feedbackMenuItem = NSMenuItem(title: UserText.sendFeedback, action: nil, keyEquivalent: "")
 #if !APPSTORE
-            .withImage(NSImage(named: "BetaLabel"))
+            .withImage(.betaLabel)
 #endif // !APPSTORE
         feedbackMenuItem.submenu = FeedbackSubMenu(targetting: self, tabCollectionViewModel: tabCollectionViewModel)
         addItem(feedbackMenuItem)
@@ -134,7 +134,7 @@ final class MoreOptionsMenu: NSMenu {
         addUtilityItems()
 
         addItem(withTitle: UserText.emailOptionsMenuItem, action: nil, keyEquivalent: "")
-            .withImage(NSImage(named: "OptionsButtonMenuEmail"))
+            .withImage(.optionsButtonMenuEmail)
             .withSubmenu(EmailOptionsButtonSubMenu(tabCollectionViewModel: tabCollectionViewModel, emailManager: emailManager))
 
         addItem(NSMenuItem.separator())
@@ -145,7 +145,7 @@ final class MoreOptionsMenu: NSMenu {
 
         let preferencesItem = NSMenuItem(title: UserText.settings, action: #selector(openPreferences(_:)), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Preferences"))
+            .withImage(.preferences)
         addItem(preferencesItem)
     }
 
@@ -258,12 +258,12 @@ final class MoreOptionsMenu: NSMenu {
         // New Tab
         addItem(withTitle: UserText.plusButtonNewTabMenuItem, action: #selector(newTab(_:)), keyEquivalent: "t")
             .targetting(self)
-            .withImage(NSImage(named: "Add"))
+            .withImage(.add)
 
         // New Window
         addItem(withTitle: UserText.newWindowMenuItem, action: #selector(newWindow(_:)), keyEquivalent: "n")
             .targetting(self)
-            .withImage(NSImage(named: "NewWindow"))
+            .withImage(.newWindow)
 
         // New Burner Window
         let burnerWindowItem = NSMenuItem(title: UserText.newBurnerWindowMenuItem,
@@ -271,7 +271,7 @@ final class MoreOptionsMenu: NSMenu {
                                           target: self)
         burnerWindowItem.keyEquivalent = "n"
         burnerWindowItem.keyEquivalentModifierMask = [.command, .shift]
-        burnerWindowItem.image = NSImage(named: "NewBurnerWindow")
+        burnerWindowItem.image = .newBurnerWindow
         addItem(burnerWindowItem)
 
         addItem(NSMenuItem.separator())
@@ -282,19 +282,19 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(withTitle: UserText.bookmarks, action: #selector(openBookmarks), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Bookmarks"))
+            .withImage(.bookmarks)
             .withSubmenu(bookmarksSubMenu)
 
         addItem(withTitle: UserText.downloads, action: #selector(openDownloads), keyEquivalent: "j")
             .targetting(self)
-            .withImage(NSImage(named: "Downloads"))
+            .withImage(.downloads)
 
         let loginsSubMenu = LoginsSubMenu(targetting: self,
                                           passwordManagerCoordinator: passwordManagerCoordinator)
 
         addItem(withTitle: UserText.passwordManagement, action: #selector(openAutofillWithAllItems), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "PasswordManagement"))
+            .withImage(.passwordManagement)
             .withSubmenu(loginsSubMenu)
 
         addItem(NSMenuItem.separator())
@@ -347,7 +347,7 @@ final class MoreOptionsMenu: NSMenu {
                                                       action: #selector(openDataBrokerProtection),
                                                       keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "DBP-Icon"))
+                .withImage(.dbpIcon)
             items.append(dataBrokerProtectionItem)
 
             DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistEntryPointMenuItemDisplayed, frequency: .dailyAndCount)
@@ -367,13 +367,13 @@ final class MoreOptionsMenu: NSMenu {
                                         action: #selector(openSubscriptionPurchasePage(_:)),
                                         keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "SubscriptionIcon"))
+            .withImage(.subscriptionIcon)
 
         let attributedText = NSMutableAttributedString(string: UserText.subscriptionOptionsMenuItem)
         attributedText.append(NSAttributedString(string: "  "))
 
         let imageAttachment = NSTextAttachment()
-        imageAttachment.image = NSImage(named: "NewLabel")
+        imageAttachment.image = .newLabel
         imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
 
         attributedText.append(NSAttributedString(attachment: imageAttachment))
@@ -391,7 +391,7 @@ final class MoreOptionsMenu: NSMenu {
 
             let isFireproof = FireproofDomains.shared.isFireproof(fireproofDomain: host)
             let title = isFireproof ? UserText.removeFireproofing : UserText.fireproofSite
-            let image = isFireproof ? NSImage(named: "Burn") : NSImage(named: "Fireproof")
+            let image: NSImage = isFireproof ? .burn : .fireproof
 
             addItem(withTitle: title, action: #selector(toggleFireproofing(_:)), keyEquivalent: "")
                 .targetting(self)
@@ -401,16 +401,16 @@ final class MoreOptionsMenu: NSMenu {
 
         addItem(withTitle: UserText.findInPageMenuItem, action: #selector(findInPage(_:)), keyEquivalent: "f")
             .targetting(self)
-            .withImage(NSImage(named: "Find-Search"))
+            .withImage(.findSearch)
 
         addItem(withTitle: UserText.shareMenuItem, action: nil, keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Share"))
+            .withImage(.share)
             .withSubmenu(sharingMenu)
 
         addItem(withTitle: UserText.printMenuItem, action: #selector(doPrint(_:)), keyEquivalent: "")
             .targetting(self)
-            .withImage(NSImage(named: "Print"))
+            .withImage(.print)
 
         addItem(NSMenuItem.separator())
 
@@ -427,7 +427,7 @@ final class MoreOptionsMenu: NSMenu {
             attributedText.append(NSAttributedString(string: "  "))
 
             let imageAttachment = NSTextAttachment()
-            imageAttachment.image = NSImage(named: "NewLabel")
+            imageAttachment.image = .newLabel
             imageAttachment.setImageHeight(height: 16, offset: .init(x: 0, y: -4))
 
             attributedText.append(NSAttributedString(attachment: imageAttachment))
@@ -477,22 +477,22 @@ final class EmailOptionsButtonSubMenu: NSMenu {
         if emailManager.isSignedIn {
             addItem(withTitle: UserText.emailOptionsMenuCreateAddressSubItem, action: #selector(createAddressAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmailGenerateAddress"))
+                .withImage(.optionsButtonMenuEmailGenerateAddress)
 
             addItem(withTitle: UserText.emailOptionsMenuManageAccountSubItem, action: #selector(manageAccountAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "Identity-16"))
+                .withImage(.identity16)
 
             addItem(.separator())
 
             addItem(withTitle: UserText.emailOptionsMenuTurnOffSubItem, action: #selector(turnOffEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "Email-Disabled-16"))
+                .withImage(.emailDisabled16)
 
         } else {
             addItem(withTitle: UserText.emailOptionsMenuTurnOnSubItem, action: #selector(turnOnEmailAction(_:)), keyEquivalent: "")
                 .targetting(self)
-                .withImage(NSImage(named: "OptionsButtonMenuEmail"))
+                .withImage(.optionsButtonMenuEmail)
 
         }
     }
@@ -554,13 +554,13 @@ final class FeedbackSubMenu: NSMenu {
         let reportBrokenSiteItem = NSMenuItem(title: UserText.reportBrokenSite,
                                               action: #selector(AppDelegate.openReportBrokenSite(_:)),
                                               keyEquivalent: "")
-            .withImage(NSImage(named: "Exclamation"))
+            .withImage(.exclamation)
         addItem(reportBrokenSiteItem)
 
         let browserFeedbackItem = NSMenuItem(title: UserText.browserFeedback,
                                              action: #selector(AppDelegate.openFeedback(_:)),
                                              keyEquivalent: "")
-            .withImage(NSImage(named: "Feedback"))
+            .withImage(.feedback)
         addItem(browserFeedbackItem)
     }
 }
@@ -640,7 +640,7 @@ final class BookmarksSubMenu: NSMenu {
 
             let favoritesItem = addItem(withTitle: UserText.favorites, action: nil, keyEquivalent: "")
             favoritesItem.submenu = NSMenu(items: favoriteMenuItems)
-            favoritesItem.image = NSImage(named: "Favorite")
+            favoritesItem.image = .favorite
 
             addItem(NSMenuItem.separator())
         }
@@ -731,15 +731,15 @@ final class LoginsSubMenu: NSMenu {
 
         addItem(withTitle: autofillTitle, action: autofillSelector, keyEquivalent: "")
             .targetting(target)
-            .withImage(NSImage(named: "LoginGlyph"))
+            .withImage(.loginGlyph)
 
         addItem(withTitle: UserText.passwordManagementIdentities, action: #selector(MoreOptionsMenu.openAutofillWithIdentities), keyEquivalent: "")
             .targetting(target)
-            .withImage(NSImage(named: "IdentityGlyph"))
+            .withImage(.identityGlyph)
 
         addItem(withTitle: UserText.passwordManagementCreditCards, action: #selector(MoreOptionsMenu.openAutofillWithCreditCards), keyEquivalent: "")
             .targetting(target)
-            .withImage(NSImage(named: "CreditCardGlyph"))
+            .withImage(.creditCardGlyph)
     }
 
 }

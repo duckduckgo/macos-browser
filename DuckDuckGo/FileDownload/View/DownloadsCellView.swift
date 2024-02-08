@@ -46,9 +46,6 @@ final class DownloadsCellView: NSTableCellView {
     @IBOutlet var restartButton: MouseOverButton!
     @IBOutlet var separator: NSBox!
 
-    static let highlightedReloadImage = NSImage(named: "RestartDownloadHighlighted")!
-    static let normalReloadImage = NSImage(named: "RestartDownload")!
-
     private var buttonOverCancellables = Set<AnyCancellable>()
     private var cancellables = Set<AnyCancellable>()
     private var progressCancellable: AnyCancellable?

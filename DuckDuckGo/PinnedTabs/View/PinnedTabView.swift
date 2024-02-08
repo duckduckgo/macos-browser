@@ -71,10 +71,10 @@ struct PinnedTabView: View {
 
     private var foregroundColor: Color {
         if isSelected {
-            return Color("InterfaceBackgroundColor")
+            return .interfaceBackground
         }
         let isHovered = collectionModel.hoveredItem == model
-        return showsHover && isHovered ? Color("TabMouseOverColor") : Color.clear
+        return showsHover && isHovered ? .tabMouseOver : Color.clear
     }
 
     @ViewBuilder
@@ -125,11 +125,11 @@ private struct BorderView: View {
     let size: CGFloat
 
     private var borderColor: Color {
-        isSelected ? Color(TabShadowConfig.colorName) : .clear
+        isSelected ? .tabShadowLine : .clear
     }
 
     private var bottomLineColor: Color {
-        isSelected ? Color("InterfaceBackgroundColor") : Color(TabShadowConfig.colorName)
+        isSelected ? .interfaceBackground : .tabShadowLine
     }
 
     private var cornerPixelsColor: Color {
@@ -173,7 +173,7 @@ struct PinnedTabInnerView: View {
             if drawSeparator {
                 GeometryReader { proxy in
                     Rectangle()
-                        .foregroundColor(Color("SeparatorColor"))
+                        .foregroundColor(.separator)
                         .frame(width: 1, height: 20)
                         .offset(x: proxy.size.width-1, y: 6)
                 }
@@ -202,7 +202,7 @@ struct PinnedTabInnerView: View {
             }
             .cornerRadius(4.0)
         } else {
-            Image(nsImage: #imageLiteral(resourceName: "Web"))
+            Image(nsImage: .web)
                 .resizable()
         }
     }

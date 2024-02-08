@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import AppKit
 import BrowserServicesKit
 import Cocoa
 import Combine
@@ -30,14 +31,6 @@ protocol AddressBarButtonsViewControllerDelegate: AnyObject {
 
 // swiftlint:disable:next type_body_length
 final class AddressBarButtonsViewController: NSViewController {
-
-    static let homeFaviconImage = NSImage(named: "Search")
-    static let searchImage = NSImage(named: "Search")
-    static let webImage = NSImage(named: "Web")
-    static let bookmarkImage = NSImage(named: "Bookmark")
-    static let bookmarkFilledImage = NSImage(named: "BookmarkFilled")
-    static let shieldImage = NSImage(named: "Shield")
-    static let shieldDotImage = NSImage(named: "ShieldDot")
 
     weak var delegate: AddressBarButtonsViewControllerDelegate?
 
@@ -528,7 +521,7 @@ final class AddressBarButtonsViewController: NSViewController {
             privacyEntryPointButton.position = .left
         }
 
-        privacyEntryPointButton.contentTintColor = .privacyEnabledColor
+        privacyEntryPointButton.contentTintColor = .privacyEnabled
         privacyEntryPointButton.sendAction(on: .leftMouseUp)
 
         imageButton.applyFaviconStyle()
@@ -581,7 +574,7 @@ final class AddressBarButtonsViewController: NSViewController {
             return newAnimationView
         }
 
-        let isAquaMode = NSApp.effectiveAppearance.name == NSAppearance.Name.aqua
+        let isAquaMode = NSApp.effectiveAppearance.name == .aqua
 
         trackerAnimationView1 = addAndLayoutAnimationViewIfNeeded(animationView: trackerAnimationView1,
                                                                   animationName: isAquaMode ? "trackers-1" : "dark-trackers-1")
@@ -734,12 +727,12 @@ final class AddressBarButtonsViewController: NSViewController {
     private func updateBookmarkButtonImage(isUrlBookmarked: Bool = false) {
         if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
            isUrlBookmarked || bookmarkManager.isUrlBookmarked(url: url) {
-            bookmarkButton.image = Self.bookmarkFilledImage
+            bookmarkButton.image = .bookmarkFilled
             bookmarkButton.mouseOverTintColor = NSColor.bookmarkFilledTint
             bookmarkButton.toolTip = UserText.editBookmarkTooltip
         } else {
             bookmarkButton.mouseOverTintColor = nil
-            bookmarkButton.image = Self.bookmarkImage
+            bookmarkButton.image = .bookmark
             bookmarkButton.contentTintColor = nil
             bookmarkButton.toolTip = UserText.addBookmarkTooltip
         }
@@ -753,9 +746,9 @@ final class AddressBarButtonsViewController: NSViewController {
         case .browsing:
             imageButton.image = selectedTabViewModel.favicon
         case .editing(isUrl: true):
-            imageButton.image = Self.webImage
+            imageButton.image = .web
         case .editing(isUrl: false):
-            imageButton.image = Self.homeFaviconImage
+            imageButton.image = .search
         default:
             imageButton.image = nil
         }
@@ -808,7 +801,7 @@ final class AddressBarButtonsViewController: NSViewController {
 
             let isShieldDotVisible = isNotSecure || isUnprotected
 
-            privacyEntryPointButton.image = isShieldDotVisible ? Self.shieldDotImage : Self.shieldImage
+            privacyEntryPointButton.image = isShieldDotVisible ? .shieldDot : .shield
 
             let shieldDotMouseOverAnimationNames = MouseOverAnimationButton.AnimationNames(aqua: "shield-dot-mouse-over",
                                                                                            dark: "dark-shield-dot-mouse-over")

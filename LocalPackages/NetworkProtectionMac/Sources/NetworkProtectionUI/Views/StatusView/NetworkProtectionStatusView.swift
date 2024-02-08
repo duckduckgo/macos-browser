@@ -80,7 +80,7 @@ public struct NetworkProtectionStatusView: View {
     private func connectionHealthWarningView(message: String) -> some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 12) {
-                Image("WarningColored", bundle: Bundle.module)
+                Image(.warningColored)
 
                 /// Text elements in SwiftUI don't expand horizontally more than needed, so we're adding an "optional" spacer at the end so that
                 /// the alert bubble won't shrink if there's not enough text.

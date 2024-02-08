@@ -31,7 +31,7 @@ public struct FaviconsFetcherOnboardingView: View {
         SyncDialog(spacing: 20.0) {
 
             VStack(alignment: .center, spacing: 20) {
-                Image("SyncFetchFavicons")
+                Image(.syncFetchFavicons)
 
                 Text(UserText.fetchFaviconsOnboardingTitle)
                     .font(.system(size: 17, weight: .bold))

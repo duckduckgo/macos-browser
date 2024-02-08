@@ -312,7 +312,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     private func updateBorderLayerColor() {
         NSAppearance.withAppAppearance {
             withoutAnimation {
-                borderLayer.borderColor = NSColor(named: TabShadowConfig.colorName)?.cgColor
+                borderLayer.borderColor = NSColor.tabShadowLine.cgColor
             }
         }
     }
@@ -331,9 +331,9 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func updateSubviews() {
         NSAppearance.withAppAppearance {
-            let backgroundColor = isSelected || isDragged ? NSColor.interfaceBackgroundColor : NSColor.clear
+            let backgroundColor: NSColor = isSelected || isDragged ? .interfaceBackground : .clear
             view.layer?.backgroundColor = backgroundColor.cgColor
-            mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
+            mouseOverView.mouseOverColor = isSelected || isDragged ? .clear : .tabMouseOver
         }
 
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
@@ -369,13 +369,13 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
     private func updateUsedPermissions() {
         if usedPermissions.camera.isActive {
-            permissionButton.image = .cameraActiveImage
+            permissionButton.image = .cameraTabActive
         } else if usedPermissions.microphone.isActive {
-            permissionButton.image = .micActiveImage
+            permissionButton.image = .microphoneActive
         } else if usedPermissions.camera.isPaused {
-            permissionButton.image = .cameraBlockedImage
+            permissionButton.image = .cameraTabBlocked
         } else if usedPermissions.microphone.isPaused {
-            permissionButton.image = .micBlockedImage
+            permissionButton.image = .microphoneIcon
         } else {
             permissionButton.isHidden = true
             tabLoadingPermissionLeadingConstraint.isActive = false
@@ -581,12 +581,4 @@ private extension TabBarViewItem {
         static let trailingSpaceWithButton: CGFloat = 20
         static let trailingSpaceWithPermissionAndButton: CGFloat = 40
     }
-}
-
-private extension NSImage {
-    static let cameraActiveImage = NSImage(named: "Camera-Tab-Active")
-    static let cameraBlockedImage = NSImage(named: "Camera-Tab-Blocked")
-
-    static let micActiveImage = NSImage(named: "Microphone-Active")
-    static let micBlockedImage = NSImage(named: "Microphone-Icon")
 }

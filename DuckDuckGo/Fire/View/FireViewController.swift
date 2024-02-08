@@ -116,7 +116,7 @@ final class FireViewController: NSViewController {
         animationView.animationSpeed = fireAnimationSpeed
 
         fakeFireButton.wantsLayer = true
-        fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDownColor.cgColor
+        fakeFireButton.layer?.backgroundColor = NSColor.buttonMouseDown.cgColor
 
         subscribeToIsBurning()
     }

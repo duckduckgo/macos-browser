@@ -75,8 +75,8 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
 
         var colors = [CGColor]()
         for _ in 0...6 {
-            colors.append(NSColor.progressBarGradientDarkColor.cgColor)
-            colors.append(NSColor.progressBarGradientLightColor.cgColor)
+            colors.append(NSColor.progressBarGradientDark.cgColor)
+            colors.append(NSColor.progressBarGradientLight.cgColor)
         }
 
         progressLayer.colors = colors
@@ -256,7 +256,7 @@ final class LoadingProgressView: NSView, CAAnimationDelegate {
 
     // MARK: IB
     override func prepareForInterfaceBuilder() {
-        layer!.backgroundColor = NSColor.progressBarGradientDarkColor.cgColor
+        layer!.backgroundColor = NSColor.progressBarGradientDark.cgColor
     }
 
 }

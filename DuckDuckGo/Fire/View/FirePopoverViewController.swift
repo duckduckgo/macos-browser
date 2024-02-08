@@ -199,7 +199,7 @@ final class FirePopoverViewController: NSViewController {
         let range = NSRange(location: 0, length: button.title.count)
 
         attrTitle.addAttributes([
-            .foregroundColor: NSColor.redButtonTintColor,
+            .foregroundColor: NSColor.redButtonTint,
             .font: NSFont.systemFont(ofSize: NSFont.systemFontSize)],
             range: range)
 

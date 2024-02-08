@@ -79,9 +79,9 @@ struct VPNLocationView: View {
                     await model.onNearestItemSelection()
                 }
             }, label: {
-                Image("Location-16-Solid")
+                Image(.location16Solid)
                     .padding(4)
-                    .foregroundColor(Color("BlackWhite100").opacity(0.9))
+                    .foregroundColor(Color(.blackWhite100).opacity(0.9))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(UserText.vpnLocationNearestAvailable)
                         .font(.system(size: 13))
@@ -124,7 +124,7 @@ struct VPNLocationView: View {
             ForEach(countries) { country in
                 if !country.isFirstItem {
                     Rectangle()
-                        .fill(Color("BlackWhite10"))
+                        .fill(Color(.blackWhite10))
                         .frame(height: 1)
                         .padding(.init(top: 0, leading: 10, bottom: 0, trailing: 10))
                 }
@@ -183,7 +183,7 @@ private struct CountryItem: View {
             }
         )
         .frame(idealWidth: .infinity, maxWidth: .infinity)
-        .background(Color("BlackWhite1"))
+        .background(Color(.blackWhite1))
     }
 
     @ViewBuilder
@@ -254,7 +254,7 @@ private struct VPNLocationViewButtons: View {
     var body: some View {
         VStack(spacing: 0) {
             Rectangle()
-                .fill(Color("BlackWhite10"))
+                .fill(Color(.blackWhite10))
                 .frame(height: 1)
             HStack {
                 Spacer()
@@ -268,7 +268,7 @@ private struct VPNLocationViewButtons: View {
             }
             .padding(.vertical, 16)
             .padding(.horizontal, 20)
-            .background(Color("BlackWhite1"))
+            .background(Color.blackWhite1)
         }
     }
 

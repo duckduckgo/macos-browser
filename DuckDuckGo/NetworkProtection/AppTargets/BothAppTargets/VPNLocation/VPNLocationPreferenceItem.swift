@@ -30,8 +30,8 @@ struct VPNLocationPreferenceItem: View {
             HStack(spacing: 10) {
                 switch model.icon {
                 case .defaultIcon:
-                    Image("Location-16-Solid")
-                        .foregroundColor(Color("BlackWhite100").opacity(0.9))
+                    Image(.location16Solid)
+                        .foregroundColor(Color(.blackWhite100).opacity(0.9))
                 case .emoji(let string):
                     Text(string).font(.system(size: 16))
                 }
@@ -58,7 +58,7 @@ struct VPNLocationPreferenceItem: View {
         .frame(idealWidth: .infinity, maxWidth: .infinity, alignment: .topLeading)
         .frame(height: 52)
         .padding(.horizontal, 10)
-        .background(Color("BlackWhite1"))
+        .background(Color.blackWhite1)
         .animation(.default)
         .roundedBorder()
     }

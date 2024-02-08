@@ -94,7 +94,7 @@ enum Preferences {
                 .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color("InterfaceBackgroundColor"))
+            .background(Color(.interfaceBackground))
         }
 
 #if SUBSCRIPTION

@@ -38,10 +38,10 @@ extension Preferences {
                     PreferencePaneSubSection {
                         HStack {
                             if defaultBrowserModel.isDefault {
-                                Image("SolidCheckmark")
+                                Image(.solidCheckmark)
                                 Text(UserText.isDefaultBrowser)
                             } else {
-                                Image("Warning").foregroundColor(Color("LinkBlueColor"))
+                                Image(.warning).foregroundColor(Color(.linkBlue))
                                 Text(UserText.isNotDefaultBrowser)
                                 Button(UserText.makeDefaultBrowser) {
                                     defaultBrowserModel.becomeDefault()

@@ -296,7 +296,7 @@ final class AddressBarViewController: NSViewController {
     }
 
     var accentColor: NSColor {
-        return isBurner ? NSColor.burnerAccentColor : NSColor.controlAccentColor
+        return isBurner ? NSColor.burnerAccent : NSColor.controlAccentColor
     }
 
     private func updateView() {
@@ -331,7 +331,7 @@ final class AddressBarViewController: NSViewController {
 
     private func updateShadowView(_ isSuggestionsWindowVisible: Bool) {
         shadowView.shadowSides = isSuggestionsWindowVisible ? [.left, .top, .right] : []
-        shadowView.shadowColor = isSuggestionsWindowVisible ? .suggestionsShadowColor : .clear
+        shadowView.shadowColor = isSuggestionsWindowVisible ? .suggestionsShadow : .clear
         shadowView.shadowRadius = isSuggestionsWindowVisible ? 8.0 : 0.0
 
         activeOuterBorderView.isHidden = isSuggestionsWindowVisible
@@ -369,7 +369,7 @@ final class AddressBarViewController: NSViewController {
             if window.isKeyWindow {
                 activeBackgroundView.layer?.borderWidth = 2.0
                 activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.6).cgColor
-                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackgroundColor.cgColor
+                activeBackgroundView.layer?.backgroundColor = NSColor.addressBarBackground.cgColor
 
                 activeOuterBorderView.isHidden = !isHomePage
             } else {
