@@ -20,7 +20,6 @@ import Combine
 import Common
 import Foundation
 import Navigation
-import SwiftUI
 import WebKit
 
 final class TabSnapshotExtension {
