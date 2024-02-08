@@ -152,15 +152,17 @@ final class TabSnapshotExtension {
             return
         }
 
-        if let snapshot = await webViewSnapshotRenderer.renderSnapshot(webView: webView) {
-            renderSnapshotAfterLoad = webView.isLoading
-            userDidInteractWithWebsite = false
-
-            snapshotData = SnapshotData(url: url,
-                                        image: snapshot,
-                                        webviewBoundsSize: webView.bounds.size,
-                                        isRestored: false)
+        guard let snapshot = await webViewSnapshotRenderer.renderSnapshot(webView: webView) else {
+            return
         }
+
+        renderSnapshotAfterLoad = webView.isLoading
+        userDidInteractWithWebsite = false
+
+        snapshotData = SnapshotData(url: url,
+                                    image: snapshot,
+                                    webviewBoundsSize: webView.bounds.size,
+                                    isRestored: false)
     }
 
     // MARK: - Snapshots rendered from regular views
