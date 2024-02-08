@@ -5,12 +5,13 @@ S3_PATH="s3://ddgstaticcdn/macos-desktop-browser/"
 
 # Defaults
 if [[ -n "$CI" ]]; then
+    AWS="aws"
     DIRECTORY="sparkle-updates"
 else
+    AWS="aws --profile ddg-macos"
     DIRECTORY="$HOME/Developer/sparkle-updates"
 fi
 
-PROFILE="tfc-dev"
 DEBUG=0
 OVERWRITE_DMG_VERSION=""
 RUN_COMMAND=0
@@ -71,13 +72,11 @@ function check_aws_installed() {
 
 # Check if there‘s a valid token
 function check_and_login_aws_sso() {
-    SSO_ACCOUNT_PROFILE=$(aws sts get-caller-identity --query "Account" --profile $PROFILE)
-
-    if [ ${#SSO_ACCOUNT_PROFILE} -eq 14 ]; then
+    if $AWS sts get-caller-identity --query "Account" >/dev/null 2>&1; then
         echo "Session is still valid"
     else
         echo "Session has expired"
-        aws sso login --profile $PROFILE
+        $AWS sso login
     fi
 }
 
@@ -148,9 +147,9 @@ for FILENAME in $FILES_TO_UPLOAD; do
     fi
 
     # Check if the file exists on S3
-    AWS_CMD="aws --profile $PROFILE s3 ls ${S3_PATH}${FILENAME}"
+    AWS_CMD="$AWS s3 ls ${S3_PATH}${FILENAME}"
     echo "Checking S3 for ${S3_PATH}${FILENAME}..."
-    if ! aws --profile "$PROFILE" s3 ls "${S3_PATH}${FILENAME}" > /dev/null 2>&1; then
+    if ! $AWS s3 ls "${S3_PATH}${FILENAME}" > /dev/null 2>&1; then
         echo "$FILENAME not found on S3. Marking for upload."
         MISSING_FILES+=("$FILENAME")
     else
@@ -190,13 +189,13 @@ fi
 
 # Upload each missing file
 for FILE in "${MISSING_FILES[@]}"; do
-    AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/${FILE}\" ${S3_PATH}${FILE} --acl public-read"
+    AWS_CMD="$AWS s3 cp \"${DIRECTORY}/${FILE}\" ${S3_PATH}${FILE} --acl public-read"
     execute_aws "$AWS_CMD" || exit 1
 done
 
 # If the overwrite flag was set, overwrite the primary dmg
 if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
-    AWS_CMD="aws --profile $PROFILE s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
+    AWS_CMD="$AWS s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
     execute_aws "$AWS_CMD" || exit 1
 fi
 
