@@ -27,8 +27,13 @@ final class TabSnapshotExtension {
 
     private var identifier: UUID?
 
+    // Flag triggers rendering of snapshot after webview finishes loading
     private var renderSnapshotAfterLoad = true
+
+    // Flag representes user interaction with the webview was detected
     private var userDidInteractWithWebsite = false
+
+    // Flag is true if the extension restored the snapshot from storage
     private var didRestoreSnapshot = false
 
     private weak var webView: WebView?
