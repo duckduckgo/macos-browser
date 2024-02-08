@@ -24,7 +24,7 @@ import WebKit
 
 final class TabSnapshotExtension {
 
-    private var identifier: UUID?
+    private(set) var identifier: UUID?
 
     // Flag triggers rendering of snapshot after webview finishes loading
     private var renderSnapshotAfterLoad = true
@@ -265,6 +265,7 @@ extension TabSnapshotExtension: NavigationResponder {
 protocol TabSnapshotExtensionProtocol: AnyObject, NavigationResponder {
 
     var snapshot: NSImage? { get }
+    var identifier: UUID? { get }
 
     func setIdentifier(_ identifier: UUID?) async
     func renderWebViewSnapshot() async
@@ -288,6 +289,10 @@ extension Tab {
 
     var tabSnapshot: NSImage? {
         return self.tabSnapshots?.snapshot
+    }
+
+    var tabSnapshotIdentifier: UUID? {
+        return self.tabSnapshots?.identifier
     }
 
     // Called from the outside of extension when a tab is unselected

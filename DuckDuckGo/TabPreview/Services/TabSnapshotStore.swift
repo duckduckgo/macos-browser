@@ -24,6 +24,7 @@ protocol TabSnapshotStoring {
     func persistSnapshot(_ snapshot: NSImage, id: UUID)
     func clearSnapshot(tabID: UUID)
     func loadSnapshot(for tabID: UUID) async -> NSImageSendable?
+    func loadAllStoredSnapshotIds() async -> [UUID]
 
 }
 
@@ -84,6 +85,27 @@ final class TabSnapshotStore: TabSnapshotStoring {
                 fatalError("Failed to create directory at \(directoryURL.path)")
             }
         }
+    }
+
+    func loadAllStoredSnapshotIds() async -> [UUID] {
+        var uuids: [UUID] = []
+
+        let directoryURL = URL.persistenceLocation(for: Self.directoryName)
+        do {
+            let fileURLs = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
+            for fileURL in fileURLs {
+                guard let uuid = UUID(uuidString: fileURL.deletingPathExtension().lastPathComponent) else {
+                    assertionFailure("Unknown file name format")
+                    continue
+                }
+
+                uuids.append(uuid)
+            }
+        } catch {
+            os_log("Failed to load stored snapshot ids: %@", type: .error, error.localizedDescription)
+        }
+
+        return uuids
     }
 
 }
