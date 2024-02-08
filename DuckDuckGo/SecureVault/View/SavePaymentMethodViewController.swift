@@ -42,14 +42,22 @@ final class SavePaymentMethodViewController: NSViewController {
         return controller
     }
 
-    @IBOutlet var cardDetailsLabel: NSTextField!
-    @IBOutlet var cardExpirationLabel: NSTextField!
+    @IBOutlet weak var cardDetailsLabel: NSTextField!
+    @IBOutlet weak var cardExpirationLabel: NSTextField!
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var saveButton: NSButton!
+    @IBOutlet weak var notNowButton: NSButton!
 
     weak var delegate: SavePaymentMethodDelegate?
 
     private var paymentMethod: SecureVaultModels.CreditCard?
 
     // MARK: - Public
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpStrings()
+    }
 
     func savePaymentMethod(_ paymentMethod: SecureVaultModels.CreditCard) {
         self.paymentMethod = paymentMethod
@@ -95,4 +103,9 @@ final class SavePaymentMethodViewController: NSViewController {
         self.delegate?.shouldCloseSavePaymentMethodViewController(self)
     }
 
+    private func setUpStrings() {
+        titleLabel.stringValue = UserText.passwordManagementSavePayment
+        notNowButton.title = UserText.notNow
+        saveButton.title = UserText.save
+    }
 }

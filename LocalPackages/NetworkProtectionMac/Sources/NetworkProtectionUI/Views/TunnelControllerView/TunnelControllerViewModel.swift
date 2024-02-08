@@ -47,7 +47,7 @@ public final class TunnelControllerViewModel: ObservableObject {
     ///
     private let statusReporter: NetworkProtectionStatusReporter
 
-    private let showLocationsAction: () async -> Void
+    private let appLauncher: AppLaunching
 
     // MARK: - Misc
 
@@ -85,13 +85,13 @@ public final class TunnelControllerViewModel: ObservableObject {
                 onboardingStatusPublisher: OnboardingStatusPublisher,
                 statusReporter: NetworkProtectionStatusReporter,
                 runLoopMode: RunLoop.Mode? = nil,
-                showLocationsAction: @escaping () async -> Void) {
+                appLauncher: AppLaunching) {
 
         self.tunnelController = controller
         self.onboardingStatusPublisher = onboardingStatusPublisher
         self.statusReporter = statusReporter
         self.runLoopMode = runLoopMode
-        self.showLocationsAction = showLocationsAction
+        self.appLauncher = appLauncher
 
         connectionStatus = statusReporter.statusObserver.recentValue
         internalServerAddress = statusReporter.serverInfoObserver.recentValue.serverAddress
@@ -468,7 +468,13 @@ public final class TunnelControllerViewModel: ObservableObject {
 
     func showLocationSettings() {
         Task { @MainActor in
-            await showLocationsAction()
+            await appLauncher.launchApp(withCommand: .showVPNLocations)
+        }
+    }
+
+    func moveToApplications() {
+        Task { @MainActor in
+            await appLauncher.launchApp(withCommand: .moveAppToApplications)
         }
     }
 }
