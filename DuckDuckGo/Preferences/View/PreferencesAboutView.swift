@@ -53,7 +53,6 @@ extension Preferences {
                             Text(UserText.privacySimplified).font(.privacySimplified)
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
-                                .makeSelectable()
                                 .onTapGesture(count: 12) {
 #if NETWORK_PROTECTION && !SUBSCRIPTION
                                     model.displayNetPInvite()
