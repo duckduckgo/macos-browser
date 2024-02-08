@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import Common
+import Foundation
+import Macros
 
 public struct SubscriptionService: APIService {
 
@@ -25,7 +26,7 @@ public struct SubscriptionService: APIService {
         let configuration = URLSessionConfiguration.ephemeral
         return URLSession(configuration: configuration)
     }()
-    public static let baseURL = URL(string: "https://subscriptions-dev.duckduckgo.com/api")!
+    public static let baseURL = #URL("https://subscriptions-dev.duckduckgo.com/api")
 
     // MARK: -
 

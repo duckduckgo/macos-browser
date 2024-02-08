@@ -20,20 +20,26 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "104.2.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "bab38045b1b750733f44311a0cfb018d9650cd12"),
     ],
     targets: [
         .target(
             name: "PixelKit",
-            dependencies: [],
+            dependencies: [
+                .product(name: "Macros", package: "BrowserServicesKit"),
+            ],
             swiftSettings: [
-                .define("DEBUG", .when(configuration: .debug))
+                .define("DEBUG", .when(configuration: .debug)),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),
         .testTarget(
             name: "PixelKitTests",
-            dependencies: ["PixelKit", "PixelKitTestingUtilities"],
+            dependencies: [
+                "PixelKit",
+                "PixelKitTestingUtilities",
+                .product(name: "Macros", package: "BrowserServicesKit"),
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
@@ -41,7 +47,10 @@ let package = Package(
         ),
         .target(
             name: "PixelKitTestingUtilities",
-            dependencies: ["PixelKit"],
+            dependencies: [
+                "PixelKit",
+                .product(name: "Macros", package: "BrowserServicesKit"),
+            ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         )
     ]

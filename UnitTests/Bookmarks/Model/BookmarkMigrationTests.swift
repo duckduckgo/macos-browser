@@ -16,10 +16,12 @@
 //  limitations under the License.
 //
 
-import XCTest
-import CoreData
 import Bookmarks
+import CoreData
+import Macros
 import Persistence
+import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 class MockBookmarksDatabase {
@@ -68,7 +70,7 @@ class BookmarksMigrationTests: XCTestCase {
     }
 
     private func url(for title: String) -> URL {
-        URL(string: "https://\(title).com")!
+        #URL("https://\(title).com")
     }
 
     func makeBookmark(title: String,

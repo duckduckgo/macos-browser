@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Macros
 import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
@@ -91,7 +92,7 @@ extension Preferences {
 
     struct UnsupportedDeviceInfoBox: View {
 
-        static let softwareUpdateURL = URL(string: "x-apple.systempreferences:com.apple.preferences.softwareupdate")!
+        static let softwareUpdateURL = #URL("x-apple.systempreferences:com.apple.preferences.softwareupdate")
 
         var wide: Bool
 

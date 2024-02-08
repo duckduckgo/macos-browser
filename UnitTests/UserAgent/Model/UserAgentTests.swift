@@ -16,22 +16,24 @@
 //  limitations under the License.
 //
 
+import Macros
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class UserAgentTests: XCTestCase {
 
     func test_default_user_agent_is_safari() {
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "localhost")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "http://example.com")!))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("localhost")))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("http://example.com")))
     }
 
     func test_when_domain_is_google_docs_then_user_agent_is_chrome() {
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://google.com")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://accounts.google.com")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://docs.google.com")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://docs.google.com/spreadsheets/a/document")!))
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(URL(string: "https://a.docs.google.com")!))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("https://google.com")))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("https://accounts.google.com")))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("https://docs.google.com")))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("https://docs.google.com/spreadsheets/a/document")))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("https://a.docs.google.com")))
     }
 
     func testWhenDomainIsDuckDuckGo_ThenUserAgentDoesntIncludeChromeOrSafari() {

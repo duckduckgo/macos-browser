@@ -17,33 +17,34 @@
 //
 
 import Foundation
+import Macros
 
 public extension URL {
 
     static var purchaseSubscription: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/welcome")!
+        #URL("https://abrown.duckduckgo.com/subscriptions/welcome")
     }
 
     static var subscriptionFAQ: URL {
-        URL(string: "https://duckduckgo.com/about")!
+        #URL("https://duckduckgo.com/about")
     }
 
     // MARK: - Subscription Email
     static var activateSubscriptionViaEmail: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!
+        #URL("https://abrown.duckduckgo.com/subscriptions/activate")
     }
 
     static var addEmailToSubscription: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!
+        #URL("https://abrown.duckduckgo.com/subscriptions/add-email")
     }
 
     static var manageSubscriptionEmail: URL {
-        URL(string: "https://abrown.duckduckgo.com/subscriptions/manage")!
+        #URL("https://abrown.duckduckgo.com/subscriptions/manage")
     }
 
     // MARK: - App Store app manage subscription URL
 
     static var manageSubscriptionsInAppStoreAppURL: URL {
-        URL(string: "macappstores://apps.apple.com/account/subscriptions")!
+        #URL("macappstores://apps.apple.com/account/subscriptions")
     }
 }

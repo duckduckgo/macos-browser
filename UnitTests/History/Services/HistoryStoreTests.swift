@@ -16,10 +16,12 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import DuckDuckGo_Privacy_Browser
-import Combine
 import class Persistence.CoreDataDatabase
+import Combine
+import Macros
+import XCTest
+
+@testable import DuckDuckGo_Privacy_Browser
 
 final class HistoryStoreTests: XCTestCase {
 
@@ -75,7 +77,7 @@ final class HistoryStoreTests: XCTestCase {
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
         let toBeKeptIdentifier = UUID()
         let newHistoryEntry = HistoryEntry(identifier: toBeKeptIdentifier,
-                                           url: URL(string: "wikipedia.org")!,
+                                           url: #URL("wikipedia.org"),
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date(),
@@ -89,7 +91,7 @@ final class HistoryStoreTests: XCTestCase {
             let visitDate = Date(timeIntervalSince1970: 1000.0 * Double(i))
             let visit = Visit(date: visitDate)
             let toRemoveHistoryEntry = HistoryEntry(identifier: identifier,
-                                                    url: URL(string: "wikipedia.org/\(identifier)")!,
+                                                    url: #URL("wikipedia.org/\(identifier)"),
                                                     title: nil,
                                                     numberOfVisits: 1,
                                                     lastVisit: visitDate,
@@ -117,7 +119,7 @@ final class HistoryStoreTests: XCTestCase {
             let visitDate = Date()
             let visit = Visit(date: visitDate)
             let toRemoveHistoryEntry = HistoryEntry(identifier: identifier,
-                                                    url: URL(string: "wikipedia.org/\(identifier)")!,
+                                                    url: #URL("wikipedia.org/\(identifier)"),
                                                     title: nil,
                                                     numberOfVisits: 1,
                                                     lastVisit: visitDate,

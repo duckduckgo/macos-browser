@@ -17,7 +17,9 @@
 //
 
 import Foundation
+import Macros
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 final class DownloadListStoreTests: XCTestCase {
@@ -68,7 +70,7 @@ final class DownloadListStoreTests: XCTestCase {
         let oldItem = DownloadListItem(identifier: UUID(),
                                        added: Date.daysAgo(30),
                                        modified: Date.daysAgo(3),
-                                       url: URL(string: "https://duckduckgo.com")!,
+                                       url: #URL("https://duckduckgo.com"),
                                        websiteURL: nil,
                                        progress: nil,
                                        isBurner: false,
@@ -138,7 +140,7 @@ extension DownloadListItem {
     static let testItem = DownloadListItem(identifier: UUID(),
                                            added: Date(),
                                            modified: Date(),
-                                           url: URL(string: "https://duckduckgo.com/testdload")!,
+                                           url: #URL("https://duckduckgo.com/testdload"),
                                            websiteURL: URL(string: "https://duckduckgo.com"),
                                            progress: nil,
                                            isBurner: false,
@@ -149,7 +151,7 @@ extension DownloadListItem {
     static let olderItem = DownloadListItem(identifier: UUID(),
                                             added: Date.daysAgo(30),
                                             modified: Date.daysAgo(1),
-                                            url: URL(string: "https://testdownload.com")!,
+                                            url: #URL("https://testdownload.com"),
                                             websiteURL: nil,
                                             progress: nil,
                                             isBurner: false,

@@ -17,12 +17,14 @@
 //
 
 import Foundation
+import Macros
 import XCTest
+
 @testable import DuckDuckGo_Privacy_Browser
 
 class BrowserProfileTests: XCTestCase {
 
-    let mockURL = URL(string: "/Users/Dax/Library/ApplicationSupport/BrowserCompany/Browser/")!
+    let mockURL = #URL("/Users/Dax/Library/ApplicationSupport/BrowserCompany/Browser/")
 
     func testWhenBrowserProfileHasURLWithNoLoginData_ThenHasLoginDataIsFalse() {
         let profileURL = profile(named: "Profile")

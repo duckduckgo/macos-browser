@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
+import BrowserServicesKit
 import Common
 import Foundation
-import BrowserServicesKit
+import Macros
 
 extension URL.NavigationalScheme {
 
@@ -124,34 +125,34 @@ extension URL {
         return url
     }
 
-    static let blankPage = URL(string: "about:blank")!
+    static let blankPage = #URL("about:blank")
 
-    static let newtab = URL(string: "duck://newtab")!
-    static let welcome = URL(string: "duck://welcome")!
-    static let settings = URL(string: "duck://settings")!
-    static let bookmarks = URL(string: "duck://bookmarks")!
+    static let newtab = #URL("duck://newtab")
+    static let welcome = #URL("duck://welcome")
+    static let settings = #URL("duck://settings")
+    static let bookmarks = #URL("duck://bookmarks")
 
-    static let dataBrokerProtection = URL(string: "duck://dbp")!
+    static let dataBrokerProtection = #URL("duck://dbp")
 
     static func settingsPane(_ pane: PreferencePaneIdentifier) -> URL {
         return settings.appendingPathComponent(pane.rawValue)
     }
 
     enum Invalid {
-        static let aboutNewtab = URL(string: "about:newtab")!
-        static let duckHome = URL(string: "duck://home")!
+        static let aboutNewtab = #URL("about:newtab")
+        static let duckHome = #URL("duck://home")
 
-        static let aboutWelcome = URL(string: "about:welcome")!
+        static let aboutWelcome = #URL("about:welcome")
 
-        static let aboutHome = URL(string: "about:home")!
+        static let aboutHome = #URL("about:home")
 
-        static let aboutSettings = URL(string: "about:settings")!
-        static let aboutPreferences = URL(string: "about:preferences")!
-        static let duckPreferences = URL(string: "duck://preferences")!
-        static let aboutConfig = URL(string: "about:config")!
-        static let duckConfig = URL(string: "duck://config")!
+        static let aboutSettings = #URL("about:settings")
+        static let aboutPreferences = #URL("about:preferences")
+        static let duckPreferences = #URL("duck://preferences")
+        static let aboutConfig = #URL("about:config")
+        static let duckConfig = #URL("duck://config")
 
-        static let aboutBookmarks = URL(string: "about:bookmarks")!
+        static let aboutBookmarks = #URL("about:bookmarks")
     }
 
     var isHypertextURL: Bool {
@@ -329,37 +330,37 @@ extension URL {
     }
 
     static var aboutDuckDuckGo: URL {
-        return URL(string: "https://duckduckgo.com/about")!
+        return #URL("https://duckduckgo.com/about")
     }
 
     static var webTrackingProtection: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")!
+        return #URL("https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/")
     }
 
     static var cookieConsentPopUpManagement: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")!
+        return #URL("https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#cookie-consent-pop-up-management")
     }
 
     static var gpcLearnMore: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
+        return #URL("https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")
     }
 
     static var ddgLearnMore: URL {
-        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/get-duckduckgo/get-duckduckgo-browser-on-mac/")!
+        return #URL("https://duckduckgo.com/duckduckgo-help-pages/get-duckduckgo/get-duckduckgo-browser-on-mac/")
     }
 
     static var theFireButton: URL {
-        return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#the-fire-button")!
+        return #URL("https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#the-fire-button")
     }
 
     static var privacyPolicy: URL {
-        return URL(string: "https://duckduckgo.com/privacy")!
+        return #URL("https://duckduckgo.com/privacy")
     }
 
-    static var duckDuckGoEmail = URL(string: "https://duckduckgo.com/email-protection")!
-    static var duckDuckGoEmailLogin = URL(string: "https://duckduckgo.com/email")!
+    static var duckDuckGoEmail = #URL("https://duckduckgo.com/email-protection")
+    static var duckDuckGoEmailLogin = #URL("https://duckduckgo.com/email")
 
-    static var duckDuckGoMorePrivacyInfo = URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")!
+    static var duckDuckGoMorePrivacyInfo = #URL("https://help.duckduckgo.com/duckduckgo-help-pages/privacy/atb/")
 
     var isDuckDuckGo: Bool {
         absoluteString.starts(with: Self.duckDuckGo.absoluteString)

@@ -16,9 +16,10 @@
 //  limitations under the License.
 //
 
-import Foundation
-import Combine
 import AppKit
+import Combine
+import Foundation
+import Macros
 
 protocol ConnectBitwardenViewModelDelegate: AnyObject {
 
@@ -76,7 +77,7 @@ final class ConnectBitwardenViewModel: ObservableObject {
     }
 
     private enum Constants {
-        static let bitwardenAppStoreURL = URL(string: "macappstores://apps.apple.com/app/bitwarden/id1352778147")!
+        static let bitwardenAppStoreURL = #URL("macappstores://apps.apple.com/app/bitwarden/id1352778147")
     }
 
     weak var delegate: ConnectBitwardenViewModelDelegate?
