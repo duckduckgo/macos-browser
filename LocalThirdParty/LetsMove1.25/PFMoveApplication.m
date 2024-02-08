@@ -75,7 +75,7 @@ void PFMoveToApplicationsFolderIfNecessary(BOOL allowAlertSilencing) {
 	}
 	
 	// Skip if user suppressed the alert before
-	if (!allowAlertSilencing && [[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return;
+	if (allowAlertSilencing && [[NSUserDefaults standardUserDefaults] boolForKey:AlertSuppressKey]) return;
 
 	// Path of the bundle
 	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
