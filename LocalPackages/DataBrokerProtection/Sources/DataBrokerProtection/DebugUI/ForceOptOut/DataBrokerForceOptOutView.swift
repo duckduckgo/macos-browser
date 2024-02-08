@@ -34,7 +34,7 @@ struct DataBrokerForceOptOutView: View {
                     Button(action: {
                         viewModel.forceOptOut(data)
                     }, label: {
-                        Text("Force Opt-out")
+                        Text("Force Removal")
                     }).padding(.horizontal)
                 }
             }
