@@ -75,7 +75,7 @@ final class BackForwardListItemViewModel {
             return image
         }
 
-        return .defaultFavicon
+        return .globeMulticolor16
     }
 
     var state: NSControl.StateValue {
