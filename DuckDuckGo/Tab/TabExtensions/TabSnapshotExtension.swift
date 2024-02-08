@@ -82,19 +82,19 @@ final class TabSnapshotExtension {
 
         // Identifier exists, restore the snapshot
         self.identifier = identifier
-        store.loadSnapshot(for: identifier) { [weak self] image in
-            guard let image else {
-                os_log("No snapshot restored", log: .tabSnapshots)
-                return
-            }
-            self?.snapshotData = SnapshotData(url: nil,
-                                              image: image,
-                                              webviewBoundsSize: NSSize.zero,
-                                              isRestored: true)
-            os_log("Snapshot restored", log: .tabSnapshots)
 
-            self?.renderSnapshotAfterLoad = false
+        guard let image = await store.loadSnapshot(for: identifier) as? NSImage else {
+            os_log("No snapshot restored", log: .tabSnapshots)
+            return
         }
+
+        snapshotData = SnapshotData(url: nil,
+                                    image: image,
+                                    webviewBoundsSize: NSSize.zero,
+                                    isRestored: true)
+        os_log("Snapshot restored", log: .tabSnapshots)
+
+        renderSnapshotAfterLoad = false
     }
 
     // MARK: - Snapshot

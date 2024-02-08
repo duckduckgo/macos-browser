@@ -23,7 +23,7 @@ protocol TabSnapshotStoring {
 
     func persistSnapshot(_ snapshot: NSImage, id: UUID)
     func clearSnapshot(tabID: UUID)
-    func loadSnapshot(for tabID: UUID, completion: @escaping (NSImage?) -> Void)
+    func loadSnapshot(for tabID: UUID) async -> NSImageSendable?
 
 }
 
@@ -60,20 +60,15 @@ final class TabSnapshotStore: TabSnapshotStoring {
         }
     }
 
-    func loadSnapshot(for tabID: UUID, completion: @escaping (NSImage?) -> Void) {
-        Task {
-            let url = URL.persistenceLocation(for: tabID)
-            if let data = fileStore.loadData(at: url) {
-                DispatchQueue.main.async {
-                    let image = NSImage(data: data)
-                    completion(image)
-                }
-            } else {
-                os_log("TabSnapshotPersistenceService: Loading of snapshot failed", type: .error)
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
-            }
+    func loadSnapshot(for tabID: UUID) async -> NSImageSendable? {
+        let url = URL.persistenceLocation(for: tabID)
+
+        if let data = fileStore.loadData(at: url),
+           let image = NSImage(data: data) {
+            return image as NSImageSendable
+        } else {
+            os_log("TabSnapshotPersistenceService: Loading of snapshot failed", type: .error)
+            return nil
         }
     }
 
