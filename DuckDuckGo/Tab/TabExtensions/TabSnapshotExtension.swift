@@ -36,6 +36,8 @@ final class TabSnapshotExtension {
     private var cancellables = Set<AnyCancellable>()
 
     private let store: TabSnapshotStoring
+    private let webViewSnapshotRenderer: WebViewSnapshotRendering
+    private let viewSnapshotRenderer: ViewSnapshotRendering
 
     init(store: TabSnapshotStoring = TabSnapshotStore(fileStore: NSApplication.shared.delegateTyped.fileStore),
          webViewSnapshotRenderer: WebViewSnapshotRendering = WebViewSnapshotRenderer(),
@@ -129,8 +131,6 @@ final class TabSnapshotExtension {
 
     // MARK: - Snapshot rendered from web views
 
-    private let webViewSnapshotRenderer: WebViewSnapshotRendering
-
     @MainActor
     func renderWebViewSnapshot() async {
         guard let webView, let tabContent, let url = tabContent.url else {
@@ -164,8 +164,6 @@ final class TabSnapshotExtension {
     }
 
     // MARK: - Snapshots rendered from regular views
-
-    private let viewSnapshotRenderer: ViewSnapshotRendering
 
     @MainActor
     func renderSnapshot(from view: NSView) async {
