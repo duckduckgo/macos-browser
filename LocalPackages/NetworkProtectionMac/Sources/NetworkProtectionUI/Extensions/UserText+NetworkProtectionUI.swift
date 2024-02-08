@@ -44,7 +44,7 @@ final class UserText {
 
     static let networkProtectionOnboardingMoveToApplicationsTitle = NSLocalizedString("network.protection.onboarding.move.to.applications.title", value: "Move DuckDuckGo App", comment: "Title for the onboarding move-app-to-applications step")
     static let networkProtectionOnboardingMoveToApplicationsDesc = NSLocalizedString("network.protection.onboarding.move.to.applications.desc", value: "To use the VPN, the DuckDuckGo app needs to be in the Applications folder on your Mac. Click the button below to move the app and restart the browser.", comment: "Description for the onboarding move-app-to-applications step")
-    static let networkProtectionOnboardingMoveToApplicationsAction = NSLocalizedString("network.protection.onboarding.move.to.applications.action", value: "Move App for Me and Restart...", comment: "Action buttn title for the onboarding move-app-to-applications step")
+    static let networkProtectionOnboardingMoveToApplicationsAction = NSLocalizedString("network.protection.onboarding.move.to.applications.action", value: "Move App for Me and Restart…", comment: "Action button title for the onboarding move-app-to-applications step")
 
     // MARK: - Connection Status
 
