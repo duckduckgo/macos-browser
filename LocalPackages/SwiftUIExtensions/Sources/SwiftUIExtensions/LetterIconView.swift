@@ -54,6 +54,6 @@ public struct LetterIconView: View {
                 .minimumScaleFactor(0.01)
                 .font(.system(size: size, weight: .semibold))
         }
-        .padding(.leading, 8)
+//        .padding(.leading, 8)
     }
 }
