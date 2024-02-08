@@ -72,7 +72,6 @@ final class FeedbackViewController: NSViewController {
     @IBOutlet weak var generalFeedbackItem: NSMenuItem!
     @IBOutlet weak var requestFeatureItem: NSMenuItem!
     @IBOutlet weak var reportProblemITem: NSMenuItem!
-    @IBOutlet weak var selectCategoryItem: NSMenuItem!
 
     var currentTab: Tab?
     var currentTabUrl: URL? {
@@ -170,7 +169,7 @@ final class FeedbackViewController: NSViewController {
         generalFeedbackItem.title = UserText.browserFeedbackGeneralFeedback
         requestFeatureItem.title = UserText.browserFeedbackRequestFeature
         reportProblemITem.title = UserText.browserFeedbackReportProblem
-        selectCategoryItem.title = UserText.browserFeedbackSelectCategory
+        pickOptionMenuItem.title = UserText.browserFeedbackSelectCategory
     }
 
     private var selectedFormOption: FormOption? {

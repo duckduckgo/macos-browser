@@ -296,13 +296,7 @@ extension DownloadsViewController: NSTableViewDataSource, NSTableViewDelegate {
         if identifier == .downloadCell {
             cell?.menu = contextMenu
         }
-        if let noDownloadCell = cell as? NoDownloadViewCell {
-            noDownloadCell.titleLabel.stringValue = UserText.downloadsNoRecentDownload
-            noDownloadCell.openFolderButton.title = UserText.downloadsOpenDownloadsFolder
-        }
-        if let openDownloadViewCell = cell as? OpenDownloadViewCell {
-            openDownloadViewCell.openFolderButton.title = UserText.downloadsOpenDownloadsFolder
-        }
+
         return cell
     }
 
@@ -357,8 +351,18 @@ private extension NSUserInterfaceItemIdentifier {
 final class NoDownloadViewCell: NSTableCellView {
     @IBOutlet weak var openFolderButton: LinkButton!
     @IBOutlet weak var titleLabel: NSTextField!
+
+    override func awakeFromNib() {
+        titleLabel.stringValue = UserText.downloadsNoRecentDownload
+        openFolderButton.title = UserText.downloadsOpenDownloadsFolder
+    }
 }
 
 final class OpenDownloadViewCell: NSTableCellView {
     @IBOutlet weak var openFolderButton: LinkButton!
+
+    override func awakeFromNib() {
+        openFolderButton.title = UserText.downloadsOpenDownloadsFolder
+    }
+
 }

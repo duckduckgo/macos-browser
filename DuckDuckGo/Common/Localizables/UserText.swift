@@ -1061,7 +1061,7 @@ struct UserText {
 
     // MARK: Crash Report
     static let crashReportTitle = NSLocalizedString("crash-report.title", value: "DuckDuckGo Privacy Browser quit unexpectedly.", comment: "Title of the dialog where the user can send a crash report")
-    static let crashReportDescription = NSLocalizedString("crash-report.description", value: "Click \"Send to DuckDuckGo\" to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report.", comment: "Description of the dialog where the user can send a crash report (please leave escaping caracters)")
+    static let crashReportDescription = NSLocalizedString("crash-report.description", value: "Click “Send to DuckDuckGo“ to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report.", comment: "Description of the dialog where the user can send a crash report")
     static let crashReportTextFieldTitle = NSLocalizedString("crash-report.textfield.title", value: "Problem Details", comment: "Title of the text field where the problems that caused the crashed are detailed")
     static let crashReportSendButton = NSLocalizedString("crash-report.send-button", value: "Send to DuckDuckGo", comment: "Button the user can press to send the crash report to DuckDuckGo")
     static let crashReportDontSendButton = NSLocalizedString("crash-report.dont-send-button", value: "Don’t Send", comment: "Button the user can press to not send the crash report")

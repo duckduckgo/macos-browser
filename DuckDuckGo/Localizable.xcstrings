@@ -1923,13 +1923,13 @@
 
     },
     "crash-report.description" : {
-      "comment" : "Description of the dialog where the user can send a crash report (please leave escaping caracters)",
+      "comment" : "Description of the dialog where the user can send a crash report",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Click \"Send to DuckDuckGo\" to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report."
+            "value" : "Click “Send to DuckDuckGo“ to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report."
           }
         }
       }
