@@ -57,7 +57,7 @@ extension TabPreviewViewController {
             urlTextField.stringValue = ""
         }
 
-        if !isSelected, let snapshot = tabViewModel.tab.tabSnapshot {
+        if !isSelected, !tabViewModel.errorViewState.isVisible, let snapshot = tabViewModel.tab.tabSnapshot {
             snapshotImageView.image = snapshot
             snapshotImageViewHeightConstraint.constant = getHeight(for: tabViewModel.tab.tabSnapshot)
         } else {
