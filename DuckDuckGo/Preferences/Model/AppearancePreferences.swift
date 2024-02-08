@@ -23,6 +23,7 @@ import Common
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
+    var showBookmarkTitleInTab: Bool { get set }
     var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
     var defaultPageZoom: CGFloat { get set }
@@ -38,6 +39,9 @@ protocol AppearancePreferencesPersistor {
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
     @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
     var showFullURL: Bool
+
+    @UserDefaultsWrapper(key: .showBookmarkTitleInTab, defaultValue: true)
+    var showBookmarkTitleInTab: Bool
 
     @UserDefaultsWrapper(key: .showAutocompleteSuggestions, defaultValue: true)
     var showAutocompleteSuggestions: Bool
@@ -181,6 +185,12 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
+    @Published var showBookmarkTitleInTab: Bool {
+        didSet {
+            persistor.showBookmarkTitleInTab = showBookmarkTitleInTab
+        }
+    }
+
     @Published var showAutocompleteSuggestions: Bool {
         didSet {
             persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
@@ -269,6 +279,7 @@ final class AppearancePreferences: ObservableObject {
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition
+        showBookmarkTitleInTab = persistor.showBookmarkTitleInTab
     }
 
     private var persistor: AppearancePreferencesPersistor

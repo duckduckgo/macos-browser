@@ -265,6 +265,8 @@ protocol NewWindowPolicyDecisionMaker {
 
     private let statisticsLoader: StatisticsLoader?
     private let internalUserDecider: InternalUserDecider?
+    private let bookmarksManager: BookmarkManager = LocalBookmarkManager.shared
+    private let appearancePreferences = AppearancePreferences.shared
     let pinnedTabsManager: PinnedTabsManager
 
 #if NETWORK_PROTECTION
@@ -449,6 +451,14 @@ protocol NewWindowPolicyDecisionMaker {
         if favicon == nil {
             handleFavicon()
         }
+
+        bookmarksManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
+            self?.updateTitle()
+        }.store(in: &bookmarkManagerCancellables)
+
+        appearancePreferences.$showBookmarkTitleInTab.sink { [weak self] _ in
+            self?.updateTitle()
+        }.store(in: &bookmarkManagerCancellables)
 
         emailDidSignOutCancellable = NotificationCenter.default.publisher(for: .emailDidSignOut)
             .receive(on: DispatchQueue.main)
@@ -664,6 +674,11 @@ protocol NewWindowPolicyDecisionMaker {
 
         if title != self.title {
             self.title = title
+        }
+
+        guard appearancePreferences.showBookmarkTitleInTab else { return }
+        if let url = webView.url, let bookmark = bookmarksManager.getBookmark(for: url) {
+            self.title = bookmark.title
         }
     }
 
@@ -939,6 +954,7 @@ protocol NewWindowPolicyDecisionMaker {
         _ = FireproofDomains.shared.toggle(domain: host)
     }
 
+    private var bookmarkManagerCancellables = Set<AnyCancellable>()
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
 

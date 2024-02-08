@@ -81,6 +81,7 @@ public struct UserDefaultsWrapper<T> {
         case customHomePageURL = "preferences.startup.customHomePageURL"
         case currentThemeName = "com.duckduckgo.macos.currentThemeNameKey"
         case showFullURL = "preferences.appearance.show-full-url"
+        case showBookmarkTitleInTab = "preferences.appearance.show-bookmark-title-in-tab"
         case showAutocompleteSuggestions = "preferences.appearance.show-autocomplete-suggestions"
         case defaultPageZoom = "preferences.appearance.default-page-zoom"
         case bookmarksBarAppearance = "preferences.appearance.bookmarks-bar"

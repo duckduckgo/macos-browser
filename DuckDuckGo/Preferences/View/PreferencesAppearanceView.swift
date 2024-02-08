@@ -90,9 +90,12 @@ extension Preferences {
 
                 // SECTION 1: Theme
                 PreferencePaneSection(UserText.theme) {
-
                     ThemePicker()
                         .environmentObject(model)
+                }
+
+                PreferencePaneSection("Tabs") {
+                    ToggleMenuItem("Show Bookmark Titles in Tabs", isOn: $model.showBookmarkTitleInTab)
                 }
 
                 // SECTION 2: Address Bar
