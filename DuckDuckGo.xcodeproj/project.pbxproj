@@ -7277,11 +7277,11 @@
 		AAC5E4C125D6A6C3007F5990 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */,
 				7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */,
+				4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */,
 				AAC5E4C425D6A6E8007F5990 /* AddBookmarkPopover.swift */,
 				7BEC20402B0F505F00243D3E /* AddBookmarkPopoverView.swift */,
-				4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */,
-				4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */,
 				B69A14F92B4D705D00B9417D /* BookmarkFolderPicker.swift */,
 				4B9292CC2667123700AD2C21 /* BookmarkListViewController.swift */,
 				4B9292CD2667123700AD2C21 /* BookmarkManagementDetailViewController.swift */,
@@ -9247,7 +9247,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Embeds login items for the App Store build.\n\n# Skip login item embedding for release builds until they're ready to go live.\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    echo \"Skipping login item embedding for release build.\"\n    exit 0\n    \n    VPN_AGENT_NAME=\"${AGENT_RELEASE_PRODUCT_NAME}\"\n    PIR_AGENT_NAME=\"${DBP_BACKGROUND_AGENT_RELEASE_PRODUCT_NAME}\"\nelse\n    VPN_AGENT_NAME=\"${AGENT_PRODUCT_NAME}\"\n    PIR_AGENT_NAME=\"${DBP_BACKGROUND_AGENT_PRODUCT_NAME}\"\nfi\n\nVPN_AGENT_ORIGIN=\"${CONFIGURATION_BUILD_DIR}/${VPN_AGENT_NAME}.app\"\nPIR_AGENT_ORIGIN=\"${CONFIGURATION_BUILD_DIR}/${PIR_AGENT_NAME}.app\"\nAGENT_DESTINATION=\"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Library/LoginItems\"\n    \n# Make sure that Library/LoginItems exists before copying\nmkdir -p \"$AGENT_DESTINATION\"\n    \necho \"Copying VPN agent from $VPN_AGENT_ORIGIN to $AGENT_DESTINATION\"\nrsync -r \"$VPN_AGENT_ORIGIN\" \"$AGENT_DESTINATION\"\n    \necho \"Copying Personal Information Removal agent from $PIR_AGENT_ORIGIN to $AGENT_DESTINATION\"\nrsync -r \"$PIR_AGENT_ORIGIN\" \"$AGENT_DESTINATION\"\n";
+			shellScript = "# Embeds login items for the App Store build.\n\n# Skip login item embedding for release builds until they're ready to go live.\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    echo \"Skipping login item embedding for release build.\"\n    exit 0\n    \n    VPN_AGENT_NAME=\"${AGENT_RELEASE_PRODUCT_NAME}\"\n    PIR_AGENT_NAME=\"${DBP_BACKGROUND_AGENT_RELEASE_PRODUCT_NAME}\"\nelse\n    VPN_AGENT_NAME=\"${AGENT_PRODUCT_NAME}\"\n    PIR_AGENT_NAME=\"${DBP_BACKGROUND_AGENT_PRODUCT_NAME}\"\nfi\n\nVPN_AGENT_ORIGIN=$(readlink -f \"${CONFIGURATION_BUILD_DIR}/${VPN_AGENT_NAME}.app\")\nPIR_AGENT_ORIGIN=$(readlink -f \"${CONFIGURATION_BUILD_DIR}/${PIR_AGENT_NAME}.app\")\nAGENT_DESTINATION=\"${CONFIGURATION_BUILD_DIR}/${CONTENTS_FOLDER_PATH}/Library/LoginItems\"\n    \n# Make sure that Library/LoginItems exists before copying\nmkdir -p \"$AGENT_DESTINATION\"\n    \necho \"Copying VPN agent from $VPN_AGENT_ORIGIN to $AGENT_DESTINATION\"\nrsync -r --links \"$VPN_AGENT_ORIGIN\" \"$AGENT_DESTINATION\"\n    \necho \"Copying Personal Information Removal agent from $PIR_AGENT_ORIGIN to $AGENT_DESTINATION\"\nrsync -r --links \"$PIR_AGENT_ORIGIN\" \"$AGENT_DESTINATION\"\n";
 		};
 		7B31FD922AD126C40086AA24 /* Embed System Network Extension */ = {
 			isa = PBXShellScriptBuildPhase;
