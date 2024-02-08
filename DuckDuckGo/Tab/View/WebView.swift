@@ -71,6 +71,10 @@ final class WebView: WKWebView {
         window != nil && zoomLevel != defaultZoomValue && !self.isInFullScreenMode
     }
 
+    var canResetMagnification: Bool {
+        window != nil && magnification != 1
+    }
+
     var canZoomIn: Bool {
         window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1 && !self.isInFullScreenMode
     }
@@ -80,6 +84,7 @@ final class WebView: WKWebView {
     }
 
     func resetZoomLevel() {
+        magnification = 1
         zoomLevel = defaultZoomValue
     }
 
