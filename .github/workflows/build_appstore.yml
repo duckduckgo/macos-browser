@@ -150,6 +150,7 @@ jobs:
 
     - name: Send Mattermost message
       env:
+        if: ${{ success() || failure() }} # Don't execute when cancelled
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         DESTINATION: ${{ env.destination }}
       run: |
@@ -158,8 +159,7 @@ jobs:
         if [[ -z "${MM_USER_HANDLE}" ]]; then
             echo "Mattermost user handle not known for ${{ github.actor }}, skipping sending message"
         else
-
             curl -s -H 'Content-type: application/json' \
-                -d "$(envsubst < ./scripts/assets/appstore-release-mm-template.json)" \
+                -d "$(envsubst < ./scripts/assets/appstore-release-mm-template.json | jq ".${{ job.status }}")" \
                 ${{ secrets.MM_WEBHOOK_URL }}
         fi
