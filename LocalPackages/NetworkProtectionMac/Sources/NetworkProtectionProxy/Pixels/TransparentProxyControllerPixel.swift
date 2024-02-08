@@ -19,16 +19,6 @@
 import Foundation
 import PixelKit
 
-extension PixelKit {
-    static func fire(_ pixel: TransparentProxyController.Event) {
-        fire(pixel, withError: pixel.error)
-    }
-
-    func fire(_ pixel: TransparentProxyController.Event) {
-        fire(pixel, withError: pixel.error)
-    }
-}
-
 extension TransparentProxyController.StartError: PixelKitEventErrorDetails {
     public var underlyingError: Error? {
         switch self {
