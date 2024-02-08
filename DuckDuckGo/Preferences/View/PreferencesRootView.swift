@@ -82,6 +82,8 @@ enum Preferences {
 #else
                                 AboutView(model: AboutModel())
 #endif
+                            case .chat:
+                                AIChatView()
                             }
                         }
                         .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)
@@ -190,6 +192,36 @@ struct SyncView: View {
             }
             os_log(.debug, log: OSLog.sync, "Requesting sync if enabled")
             syncService.scheduler.notifyDataChanged()
+        }
+    }
+}
+
+final class DuckChatStatusBarViewModel: ObservableObject {
+    @Published var menuItemEnabled: Bool {
+        didSet {
+            DuckChatStatusBar.shared.menuItemEnabled = menuItemEnabled
+        }
+    }
+
+    init() {
+        self.menuItemEnabled = DuckChatStatusBar.shared.menuItemEnabled
+    }
+}
+
+extension Preferences {
+
+    struct AIChatView: View {
+        @StateObject var viewModel = DuckChatStatusBarViewModel()
+
+        var body: some View {
+            PreferencePane {
+                PreferencePane("AI Chat") {
+
+                    PreferencePaneSection("Menu Bar") {
+                        Toggle("Show AI Chat in Menu Bar", isOn: $viewModel.menuItemEnabled)
+                    }
+                }
+            }
         }
     }
 }

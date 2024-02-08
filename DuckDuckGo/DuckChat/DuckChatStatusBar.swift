@@ -20,39 +20,66 @@ import Foundation
 import AppKit
 
 public final class DuckChatStatusBar: NSObject {
-    var statusBarItem: NSStatusItem!
-    var popover: NSPopover!
+    public static let shared = DuckChatStatusBar()
 
-    func loadStatusBar () {
+    private var statusBarItem: NSStatusItem?
+    private var popover: NSPopover?
 
+    @UserDefaultsWrapper(key: .AIChatMenuItemEnabled, defaultValue: false)
+    var menuItemEnabled: Bool {
+        didSet {
+            if menuItemEnabled {
+                showStatusBarItem()
+            } else {
+                hideStatusBarItem()
+            }
+        }
+    }
+
+    override init() {
+        super.init()
+        if menuItemEnabled {
+            loadStatusBar()
+        }
+    }
+
+    private func loadStatusBar () {
+        guard statusBarItem == nil, statusBarItem == nil else { return }
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let image = NSImage(systemSymbolName: "bubble.left.and.text.bubble.right", accessibilityDescription: nil) {
-            statusBarItem.button?.image = image
+            statusBarItem?.button?.image = image
         }
 
         let contentView = ContentView()
 
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 500, height: 700)
-        popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: contentView)
+        popover?.contentSize = NSSize(width: 500, height: 700)
+        popover?.behavior = .transient
+        popover?.contentViewController = NSHostingController(rootView: contentView)
 
-        statusBarItem.button?.target = self
-        statusBarItem.button?.action = #selector(togglePopover(_:))
+        statusBarItem?.button?.target = self
+        statusBarItem?.button?.action = #selector(togglePopover(_:))
+    }
+
+    private func showStatusBarItem() {
+        loadStatusBar()
+        statusBarItem?.isVisible = true
+    }
+
+    private func hideStatusBarItem() {
+        statusBarItem?.isVisible = false
+        statusBarItem = nil
     }
 
     @objc func togglePopover(_ sender: AnyObject) {
+        guard let popover = popover else { return }
         if popover.isShown {
             popover.performClose(sender)
         } else {
-            if let button = statusBarItem.button {
+            if let button = statusBarItem?.button {
                 popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
             }
         }
-    }
-
-    deinit {
-        print("BAH")
     }
 }
 
@@ -77,8 +104,7 @@ struct WebViewWrapper: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: WKWebView, context: Context) {
-        var request = URLRequest(url: url)
-        //        var request = URLRequest.defaultRequest(with: url)
+        let request = URLRequest(url: url)
         nsView.load(request)
     }
 
@@ -114,7 +140,13 @@ struct WebViewWrapper: NSViewRepresentable {
             }
             return .allow
         }
+
+        deinit {
+            print("Web deinit")
+        }
     }
+
+
 }
 
 struct ContentView: View {

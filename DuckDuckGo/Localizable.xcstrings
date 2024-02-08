@@ -265,6 +265,9 @@
         }
       }
     },
+    "AI Chat" : {
+
+    },
     "alert.sync-bookmarks-paused-description" : {
       "comment" : "Description for alert shown when sync bookmarks paused for too many items",
       "extractionState" : "extracted_with_value",
@@ -8533,6 +8536,9 @@
           }
         }
       }
+    },
+    "Show AI Chat in Menu Bar" : {
+
     },
     "Show All" : {
       "comment" : "Main Menu DuckDuckGo item"

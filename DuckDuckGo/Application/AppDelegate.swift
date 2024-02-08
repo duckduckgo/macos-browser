@@ -79,7 +79,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private var emailCancellables = Set<AnyCancellable>()
     let bookmarksManager = LocalBookmarkManager.shared
     var privacyDashboardWindow: NSWindow?
-    private var duckChatMenu = DuckChatStatusBar()
 
 #if NETWORK_PROTECTION && SUBSCRIPTION
     private let networkProtectionSubscriptionEventHandler = NetworkProtectionSubscriptionEventHandler()
@@ -291,7 +290,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
         }
 #endif
 
-        duckChatMenu.loadStatusBar()
+        _ = DuckChatStatusBar.shared
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {

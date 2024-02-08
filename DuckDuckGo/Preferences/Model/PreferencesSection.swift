@@ -61,6 +61,8 @@ struct PreferencesSection: Hashable, Identifiable {
             }
 #endif
 
+            panes.append(.chat)
+
             return panes
         }()
 
@@ -91,6 +93,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case downloads
     case duckPlayer = "duckplayer"
     case about
+    case chat
 
     var id: Self {
         self
@@ -143,6 +146,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.duckPlayer
         case .about:
             return UserText.about
+        case .chat:
+            return "AI Chat"
         }
     }
 
@@ -172,6 +177,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "DuckPlayerSettings"
         case .about:
             return "About"
+        case .chat:
+            return "AIChatIcon"
         }
     }
 }
