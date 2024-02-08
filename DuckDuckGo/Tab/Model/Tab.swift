@@ -86,24 +86,24 @@ protocol NewWindowPolicyDecisionMaker {
             var navigationType: NavigationType {
                 switch self {
                 case .userEntered:
-                    .custom(.userEnteredUrl)
+                        .custom(.userEnteredUrl)
                 case .pendingStateRestoration:
-                    .sessionRestoration
+                        .sessionRestoration
                 case .loadedByStateRestoration, .appOpenUrl, .historyEntry, .bookmark, .ui, .link, .webViewUpdated:
-                    .custom(.tabContentUpdate)
+                        .custom(.tabContentUpdate)
                 case .reload:
-                    .reload
+                        .reload
                 }
             }
 
             var cachePolicy: URLRequest.CachePolicy {
                 switch self {
                 case .pendingStateRestoration, .historyEntry:
-                    .returnCacheDataElseLoad
+                        .returnCacheDataElseLoad
                 case .reload, .loadedByStateRestoration:
-                    .reloadIgnoringCacheData
+                        .reloadIgnoringCacheData
                 case .userEntered, .bookmark, .ui, .link, .appOpenUrl, .webViewUpdated:
-                    .useProtocolCachePolicy
+                        .useProtocolCachePolicy
                 }
             }
 
@@ -316,9 +316,9 @@ protocol NewWindowPolicyDecisionMaker {
     ) {
 
         let duckPlayer = duckPlayer
-            ?? (NSApp.runType.requiresEnvironment ? DuckPlayer.shared : DuckPlayer.mock(withMode: .enabled))
+        ?? (NSApp.runType.requiresEnvironment ? DuckPlayer.shared : DuckPlayer.mock(withMode: .enabled))
         let statisticsLoader = statisticsLoader
-            ?? (NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil)
+        ?? (NSApp.runType.requiresEnvironment ? StatisticsLoader.shared : nil)
         let privacyFeatures = privacyFeatures ?? PrivacyFeatures
         let internalUserDecider = NSApp.delegateTyped.internalUserDecider
         var faviconManager = faviconManagement
@@ -453,12 +453,14 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         bookmarksManager.listPublisher.receive(on: RunLoop.main).sink { [weak self] _ in
-            self?.updateTitle()
+            guard let self else { return }
+            self.updateTitle()
         }.store(in: &bookmarkManagerCancellables)
 
-        appearancePreferences.$showBookmarkTitleInTab.sink { [weak self] _ in
-            self?.updateTitle()
-        }.store(in: &bookmarkManagerCancellables)
+        appearancePreferences.$showBookmarkTitleInTab.sink { [weak self] newValue in
+            guard let self else { return }
+            self.updateTitle(shouldShowBookmarkTitle: newValue)
+        }.store(in: &appearancePreferencesCancellables)
 
         emailDidSignOutCancellable = NotificationCenter.default.publisher(for: .emailDidSignOut)
             .receive(on: DispatchQueue.main)
@@ -530,7 +532,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     func openChild(with url: URL, of kind: NewWindowPolicy) {
         self.onNewWindow = { _ in
-            .allow(kind)
+                .allow(kind)
         }
         webView.loadInNewWindow(url)
     }
@@ -666,7 +668,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     @Published var title: String?
 
-    private func updateTitle() {
+    private func updateTitle(shouldShowBookmarkTitle: Bool? = nil) {
         var title = webView.title?.trimmingWhitespace()
         if title?.isEmpty ?? true {
             title = webView.url?.host?.droppingWwwPrefix()
@@ -676,7 +678,14 @@ protocol NewWindowPolicyDecisionMaker {
             self.title = title
         }
 
-        guard appearancePreferences.showBookmarkTitleInTab else { return }
+        let showBookmark = shouldShowBookmarkTitle ?? self.appearancePreferences.showBookmarkTitleInTab
+
+        if showBookmark {
+            useBookmarkTitle()
+        }
+    }
+
+    private func useBookmarkTitle() {
         if let url = webView.url, let bookmark = bookmarksManager.getBookmark(for: url) {
             self.title = bookmark.title
         }
@@ -955,6 +964,7 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     private var bookmarkManagerCancellables = Set<AnyCancellable>()
+    private var appearancePreferencesCancellables = Set<AnyCancellable>()
     private var webViewCancellables = Set<AnyCancellable>()
     private var emailDidSignOutCancellable: AnyCancellable?
 
