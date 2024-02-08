@@ -549,7 +549,7 @@ final class BrowserTabViewController: NSViewController {
 
         var containsHostingView: Bool
         switch tabViewModel.tab.content {
-        case .newtab, .settings, .onboarding:
+        case .newtab, .settings:
             containsHostingView = true
         default:
             containsHostingView = false
@@ -1091,13 +1091,15 @@ fileprivate extension NSView {
 
     // Returns correct subview for the rendering of snapshots
     func findContentSubview(containsHostingView: Bool) -> NSView? {
-        var subview = subviews.last
+        var content = subviews.last
 
         if containsHostingView {
-            subview = subview?.subviews.first
+            content = content?.subviews.first
+
+            assert(content?.className.contains("NSHostingView") == true)
         }
 
-        return subview
+        return content
     }
 
 }
