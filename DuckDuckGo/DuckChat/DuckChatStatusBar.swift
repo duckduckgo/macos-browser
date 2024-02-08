@@ -65,10 +65,14 @@ struct WebViewWrapper: NSViewRepresentable {
     let headerValue = "macOS"
 
     func makeNSView(context: Context) -> WKWebView {
-        let webView = WKWebView()
+        let configuration = WKWebViewConfiguration()
+        configuration.preferences.setValue(true, forKey: "developerExtrasEnabled")
+
+        let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.autoresizingMask = [.width, .height]
-        webView.customUserAgent = UserAgent.duckDuckGoUserAgent()
+        webView.customUserAgent = UserAgent.safari
+
         return webView
     }
 
@@ -82,6 +86,7 @@ struct WebViewWrapper: NSViewRepresentable {
         Coordinator(self)
     }
 
+    @MainActor
     final class Coordinator: NSObject, WKNavigationDelegate {
         var parent: WebViewWrapper
 
@@ -91,6 +96,8 @@ struct WebViewWrapper: NSViewRepresentable {
 
         func webView(_ webView: WKWebView, decidePolicyFor
                      navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+            try? await webView.evaluateJavaScript("navigator.duckduckgo = {platform: 'macos'}")
+
             var request = navigationAction.request
 
             guard let url = request.url else { return .allow }
@@ -107,19 +114,11 @@ struct WebViewWrapper: NSViewRepresentable {
             }
             return .allow
         }
-
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            print("FINISH")
-        }
-
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print("ERROR \(error)")
-        }
     }
 }
 
 struct ContentView: View {
-    let customURL = URL(string: "https://duckduckgo.com/")!
+    let customURL = URL(string: "https://use-devcpu1.duckduckgo.com/?ia=chat")!
     var body: some View {
             WebViewWrapper(url: customURL)
     }
