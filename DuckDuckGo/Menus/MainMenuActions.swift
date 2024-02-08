@@ -861,7 +861,8 @@ extension MainViewController: NSMenuItemValidation {
         case #selector(MainViewController.zoomOut(_:)):
             return getActiveTabAndIndex()?.tab.webView.canZoomOut == true
         case #selector(MainViewController.actualSize(_:)):
-            return getActiveTabAndIndex()?.tab.webView.canZoomToActualSize == true
+            return getActiveTabAndIndex()?.tab.webView.canZoomToActualSize == true ||
+            getActiveTabAndIndex()?.tab.webView.canResetMagnification == true
 
         // Bookmarks
         case #selector(MainViewController.bookmarkThisPage(_:)),
