@@ -600,7 +600,7 @@ final class TabBarViewController: NSViewController {
         }
 
         var point = view.bounds.origin
-        point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
+        point.y -= TabPreviewWindowController.padding
         point.x += xPosition
         let pointInWindow = view.convert(point, to: nil)
         tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)

@@ -60,7 +60,7 @@ final class ViewSnapshotRenderer: ViewSnapshotRendering {
 
     private func createResizedImage(from view: NSView, with bounds: CGRect) -> NSImage? {
         let originalSize = bounds.size
-        let targetWidth = CGFloat(TabPreviewWindowController.Size.width.rawValue)
+        let targetWidth = CGFloat(TabPreviewWindowController.width)
         let targetHeight = originalSize.height * (targetWidth / originalSize.width)
 
         guard let bitmapRep = createBitmapRepresentation(size: originalSize) else { return nil }

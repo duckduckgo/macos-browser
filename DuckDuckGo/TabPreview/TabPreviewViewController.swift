@@ -70,7 +70,7 @@ extension TabPreviewViewController {
         guard let image else { return 0 }
 
         let aspectRatio = image.size.width / image.size.height
-        let width = TabPreviewWindowController.Size.width.rawValue
+        let width = TabPreviewWindowController.width
         let height = width / aspectRatio
         return height
     }

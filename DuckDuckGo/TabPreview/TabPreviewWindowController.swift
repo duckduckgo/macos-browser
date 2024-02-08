@@ -21,17 +21,9 @@ import Common
 
 final class TabPreviewWindowController: NSWindowController {
 
-    enum Size: CGFloat {
-        case width = 280
-    }
-
-    enum VerticalSpace: CGFloat {
-        case padding = 2
-    }
-
-    enum Delay: Double {
-        case standard = 1
-    }
+    static let width: CGFloat = 280
+    static let padding: CGFloat = 2
+    static let delay: CGFloat = 1
 
     private var previewTimer: Timer?
     private var hideTimer: Timer?
@@ -80,13 +72,13 @@ final class TabPreviewWindowController: NSWindowController {
         }
 
         // Check time elapsed since last hide
-        if let lastHide = lastHideTime, Date().timeIntervalSince(lastHide) < Delay.standard.rawValue {
+        if let lastHide = lastHideTime, Date().timeIntervalSince(lastHide) < Self.delay {
             // Show immediately if less than 1.5 seconds have passed
             presentPreview(tabPreviewWindow: tabPreviewWindow)
         } else {
             // Set up a new timer for normal delayed presentation
             previewTimer?.invalidate()
-            previewTimer = Timer.scheduledTimer(withTimeInterval: Delay.standard.rawValue, repeats: false) { _ in
+            previewTimer = Timer.scheduledTimer(withTimeInterval: Self.delay, repeats: false) { _ in
                 presentPreview(tabPreviewWindow: tabPreviewWindow)
             }
         }
