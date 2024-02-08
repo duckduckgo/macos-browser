@@ -124,8 +124,10 @@ if [[ $RUN_COMMAND -eq 0 ]]; then
     exit 0
 fi
 
-# Perform AWS login if needed
-check_and_login_aws_sso
+if [[ -z "$CI" ]]; then
+    # When not in CI, perform AWS login if needed
+    check_and_login_aws_sso
+fi
 
 # Ensure appcast2.xml exists
 if [[ ! -f "$DIRECTORY/appcast2.xml" ]]; then
@@ -197,6 +199,22 @@ done
 if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
     AWS_CMD="$AWS s3 cp \"${DIRECTORY}/duckduckgo-$OVERWRITE_DMG_VERSION.dmg\" ${S3_PATH}duckduckgo.dmg --acl public-read"
     execute_aws "$AWS_CMD" || exit 1
+fi
+
+if [[ -n "$CI" ]]; then
+    # Store the list of uploaded files in a file
+    TMP_FILE="$(mktemp)"
+    for FILE in "${MISSING_FILES[@]}"; do
+        echo "$FILE" >> "$TMP_FILE"
+    done
+    if [[ -n "$OVERWRITE_DMG_VERSION" ]]; then
+        echo "duckduckgo.dmg" >> "$TMP_FILE"
+    fi
+
+    FILES_LIST_FILE="${DIRECTORY}/uploaded_files_list.txt"
+    rm -f "$FILES_LIST_FILE"
+    sort -f < "$TMP_FILE" > "$FILES_LIST_FILE"
+    rm -f "$TMP_FILE"
 fi
 
 echo "Upload complete!"

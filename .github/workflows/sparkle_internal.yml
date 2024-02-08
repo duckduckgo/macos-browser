@@ -77,6 +77,7 @@ jobs:
         run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
       - name: Generate appcast
+        id: appcast
         env:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
@@ -89,3 +90,65 @@ jobs:
             --dmg ${DMG_PATH} \
             --release-notes release_notes.txt \
             --key sparkle_private_key
+
+      - name: Upload appcast diff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: appcast2-${{ steps.verify-tag.outputs.tag }}.patch
+          path: ${{ github.workspace }}/sparkle-updates/appcast_diff.txt
+
+      - name: Upload to S3
+        id: upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
+        run: |
+          # Back up existing appcast2.xml
+          wget -q -O appcast2_old.xml ${{ vars.DMG_URL_ROOT }}appcast2.xml
+
+          # Upload files to S3
+          ./scripts/upload_to_s3/upload_to_s3.sh --run --force
+
+      # - name: Set up Asana templates
+      #   if: always()
+      #   id: asana-templates
+      #   run: |
+      #     if [[ ${{ steps.upload.outcome }} == "success" ]]; then
+      #       echo "task-template=s3-upload-success" >> $GITHUB_OUTPUT
+      #       echo "comment-template=internal-release-ready-merge-failed" >> $GITHUB_OUTPUT
+      #     elif [[ ${{ steps.appcast.outcome }} == "success" ]]; then
+      #       echo "task-template=s3-upload-success" >> $GITHUB_OUTPUT
+      #       echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "task-template=s3-upload-failed" >> $GITHUB_OUTPUT
+      #       echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
+      #     fi
+
+      # - name: Create Asana task on failure
+      #   id: create-task-on-failure
+      #   if: failure()
+      #   uses: ./.github/actions/asana-create-action-item
+      #   with:
+      #     access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      #     release-task-url: ${{ env.asana-task-url }}
+      #     template-name: ${{ steps.asana-templates.outputs.task-template }}
+
+      # - name: Report failure
+      #   if: failure()
+      #   uses: ./.github/actions/asana-log-message
+      #   env:
+      #     ASSIGNEE_ID: ${{ steps.create-task-on-failure.outputs.assignee-id }}
+      #     TASK_ID: ${{ steps.create-task-on-failure.outputs.new-task-id }}
+      #   with:
+      #     access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      #     task-url: ${{ env.asana-task-url }}
+      #     template-name: ${{ steps.asana-templates.outputs.comment-template }}
+
+      # - name: Report success
+      #   if: success()
+      #   uses: ./.github/actions/asana-log-message
+      #   with:
+      #     access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      #     task-url: ${{ env.asana-task-url }}
+      #     template-name: internal-release-ready
