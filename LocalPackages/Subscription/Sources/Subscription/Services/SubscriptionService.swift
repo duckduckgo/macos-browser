@@ -46,11 +46,20 @@ public struct SubscriptionService: APIService {
         public let productId: String
         public let startedAt: Date
         public let expiresOrRenewsAt: Date
-        public let platform: String
+        public let platform: Platform
         public let status: String
 
         public var isSubscriptionActive: Bool {
             status.lowercased() != "expired" && status.lowercased() != "inactive"
+        }
+
+        public enum Platform: String, Codable {
+            case apple, google, stripe
+            case unknown
+
+            public init(from decoder: Decoder) throws {
+                self = try Self(rawValue: decoder.singleValueContainer().decode(RawValue.self)) ?? .unknown
+            }
         }
     }
 
