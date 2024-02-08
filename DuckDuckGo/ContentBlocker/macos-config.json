@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1707153316617,
+    "version": 1707319951290,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1064,6 +1064,10 @@
                     {
                         "domain": "web.whatsapp.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1780"
+                    },
+                    {
+                        "domain": "zalando.fr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
                     }
                 ],
                 "webViewDefault": [
@@ -1087,7 +1091,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "492b7a86e347eae43cf3d6f633a184ff"
+            "hash": "96ca986dfe68dbb73a36dd7f3adbb53e"
         },
         "dbp": {
             "state": "enabled",
