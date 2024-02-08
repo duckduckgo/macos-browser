@@ -69,7 +69,8 @@ final class ViewSnapshotRenderer: ViewSnapshotRendering {
         let originalImage = NSImage(size: originalSize)
         originalImage.addRepresentation(bitmapRep)
 
-        return resizeImage(originalImage, to: NSSize(width: targetWidth, height: targetHeight))
+        let resizedImage = originalImage.resized(to: NSSize(width: targetWidth, height: targetHeight))
+        return resizedImage
     }
 
     private func createBitmapRepresentation(size: CGSize) -> NSBitmapImageRep? {
@@ -99,14 +100,6 @@ final class ViewSnapshotRenderer: ViewSnapshotRendering {
                 view.layer?.render(in: context.cgContext)
             }
         }
-    }
-
-    private func resizeImage(_ image: NSImage, to size: NSSize) -> NSImage {
-        let resizedImage = NSImage(size: size)
-        resizedImage.lockFocus()
-        defer { resizedImage.unlockFocus() }
-        image.draw(in: NSRect(x: 0, y: 0, width: size.width, height: size.height), from: NSRect.zero, operation: .copy, fraction: 1.0)
-        return resizedImage
     }
 
 }
