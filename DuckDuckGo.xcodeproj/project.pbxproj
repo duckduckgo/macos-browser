@@ -2636,6 +2636,7 @@
 		B610F2EB27AA8E4500FCEBE9 /* ContentBlockingUpdatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B610F2E527AA388100FCEBE9 /* ContentBlockingUpdatingTests.swift */; };
 		B61E2CD5294346C000773D8A /* Tab+Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E2CD4294346C000773D8A /* Tab+Navigation.swift */; };
 		B61EF3EC266F91E700B4D78F /* WKWebView+Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EF3EB266F91E700B4D78F /* WKWebView+Download.swift */; };
+		B62539FA2B768D0400033E06 /* Macros in Frameworks */ = {isa = PBXBuildFile; productRef = B62539F92B768D0400033E06 /* Macros */; };
 		B626A7552991413000053070 /* SerpHeadersNavigationResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF5D922947199A006742B1 /* SerpHeadersNavigationResponder.swift */; };
 		B626A75A29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */; };
 		B626A75B29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B626A75929921FAA00053070 /* NavigationActionPolicyExtension.swift */; };
@@ -4588,6 +4589,7 @@
 				7B31FD902AD1257B0086AA24 /* NetworkProtectionIPC in Frameworks */,
 				4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */,
 				4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */,
+				B62539FA2B768D0400033E06 /* Macros in Frameworks */,
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
 				373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */,
 				4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */,
@@ -8561,6 +8563,7 @@
 				37269F022B332FD8005E8E46 /* Common */,
 				372217832B33380E00B8E9C2 /* TestUtils */,
 				373FB4B42B4D6C57004C88D6 /* PreferencesViews */,
+				B62539F92B768D0400033E06 /* Macros */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -13934,6 +13937,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = "plugin:SwiftLintPlugin";
+		};
+		B62539F92B768D0400033E06 /* Macros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Macros;
 		};
 		B65CD8CA2B316DF100A595BB /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
