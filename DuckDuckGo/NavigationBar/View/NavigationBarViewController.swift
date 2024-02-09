@@ -328,8 +328,6 @@ final class NavigationBarViewController: NSViewController {
                       webViewSize: view.frame.size)
 
         tabCollectionViewModel.append(tab: tab, selected: true)
-
-        print("HI")
     }
 
 #if NETWORK_PROTECTION
