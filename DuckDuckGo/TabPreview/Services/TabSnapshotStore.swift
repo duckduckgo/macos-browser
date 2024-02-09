@@ -95,7 +95,6 @@ final class TabSnapshotStore: TabSnapshotStoring {
             let fileURLs = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
             for fileURL in fileURLs {
                 guard let uuid = UUID(uuidString: fileURL.deletingPathExtension().lastPathComponent) else {
-                    assertionFailure("Unknown file name format")
                     continue
                 }
 
