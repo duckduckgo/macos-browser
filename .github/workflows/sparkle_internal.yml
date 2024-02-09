@@ -75,7 +75,7 @@ jobs:
             -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
             | jq -r .data.notes \
             | ./scripts/extract_release_notes.sh > release_notes.txt
-          echo "RELEASE_NOTES=$(cat release_notes.txt)" >> $GITHUB_ENV
+          echo "RELEASE_NOTES_FILE=release_notes.txt" >> $GITHUB_ENV
 
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
@@ -177,7 +177,16 @@ jobs:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           file-name: ${{ env.OLD_APPCAST_NAME }}
           task-id: ${{ steps.create-task.outputs.new-task-id }}
-      
+  
+      - name: Upload release notes to the Asana task
+        id: upload-release-notes
+        if: success()
+        uses: ./.github/actions/asana-upload
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          file-name: ${{ env.RELEASE_NOTES_FILE }}
+          task-id: ${{ steps.create-task.outputs.new-task-id }}
+        
       - name: Report status
         if: always()
         uses: ./.github/actions/asana-log-message
