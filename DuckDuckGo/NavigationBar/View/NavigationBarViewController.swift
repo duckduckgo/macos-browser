@@ -320,9 +320,8 @@ final class NavigationBarViewController: NSViewController {
     }
 
     @IBAction func openDuckChat(_ sender: NSButton) {
-        let url = URL(string: "https://ffaccin.duckduckgo.com/aichat/")!
 
-        let content: Tab.TabContent = .contentFromURL(url, source: .appOpenUrl)
+        let content: Tab.TabContent = .contentFromURL(DuckChatStatusBar.duckChatURL, source: .appOpenUrl)
         let tab = Tab(content: content,
                       shouldLoadInBackground: true,
                       burnerMode: tabCollectionViewModel.burnerMode,

@@ -21,6 +21,7 @@ import AppKit
 
 public final class DuckChatStatusBar: NSObject {
     public static let shared = DuckChatStatusBar()
+    public static let duckChatURL = URL(string: "https://ffaccin.duckduckgo.com/aichat/")!
 
     private var statusBarItem: NSStatusItem?
     private var popover: NSPopover?
@@ -135,21 +136,15 @@ struct WebViewWrapper: NSViewRepresentable {
 
             if request.value(forHTTPHeaderField: parent.header) == nil {
                 request.setValue(parent.headerValue, forHTTPHeaderField: parent.header)
-                print("SET HEADER")
                 webView.load(request)
             }
             return .allow
-        }
-
-        deinit {
-            print("Web deinit")
         }
     }
 }
 
 struct ContentView: View {
-    let customURL = URL(string: "https://ffaccin.duckduckgo.com/aichat/")!
     var body: some View {
-            WebViewWrapper(url: customURL)
+            WebViewWrapper(url: DuckChatStatusBar.duckChatURL)
     }
 }
