@@ -92,7 +92,7 @@ final class TabSnapshotExtension {
         // Identifier exists, restore the snapshot
         self.identifier = identifier
 
-        guard let image = await store.loadSnapshot(for: identifier) as? NSImage else {
+        guard let image = await store.loadSnapshot(for: identifier) as NSImage? else {
             os_log("No snapshot restored", log: .tabSnapshots)
             return
         }
