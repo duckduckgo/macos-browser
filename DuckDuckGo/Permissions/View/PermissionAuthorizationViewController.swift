@@ -63,6 +63,8 @@ final class PermissionAuthorizationViewController: NSViewController {
     @IBOutlet var denyButton: NSButton!
     @IBOutlet var buttonsBottomConstraint: NSLayoutConstraint!
     @IBOutlet var learnMoreBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var linkButton: LinkButton!
+    @IBOutlet weak var allowButton: NSButton!
 
     weak var query: PermissionAuthorizationQuery? {
         didSet {
@@ -112,6 +114,8 @@ final class PermissionAuthorizationViewController: NSViewController {
         learnMoreStackView.isHidden = !query.permissions.contains(.geolocation)
         learnMoreBottomConstraint.isActive = !learnMoreStackView.isHidden
         buttonsBottomConstraint.isActive = !learnMoreBottomConstraint.isActive
+        linkButton.title = UserText.permissionPopupLearnMoreLink
+        allowButton.title = UserText.permissionPopupAllowButton
     }
 
     @IBAction func alwaysAllowLabelClick(_ sender: Any) {
