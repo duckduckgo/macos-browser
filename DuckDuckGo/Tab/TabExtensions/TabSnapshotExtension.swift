@@ -24,16 +24,16 @@ import WebKit
 
 final class TabSnapshotExtension {
 
-    private(set) var identifier = UUID()
+    @MainActor private(set) var identifier = UUID()
 
     // Flag triggers rendering of snapshot after webview finishes loading
-    private var renderSnapshotAfterLoad = true
+    @MainActor private var renderSnapshotAfterLoad = true
 
     // Flag representes user interaction with the webview was detected
-    private var userDidInteractWithWebsite = false
+    @MainActor private var userDidInteractWithWebsite = false
 
     // Flag is true if the extension restored the snapshot from storage
-    private var didRestoreSnapshot = false
+    @MainActor private var didRestoreSnapshot = false
 
     private weak var webView: WebView?
     private var tabContent: Tab.TabContent?
@@ -112,6 +112,7 @@ final class TabSnapshotExtension {
         }
     }
 
+    @MainActor
     private var snapshotData: SnapshotData? {
         didSet {
             if let snapshotData, !snapshotData.isRestored {
@@ -133,6 +134,7 @@ final class TabSnapshotExtension {
         store.persistSnapshot(snapshot, id: identifier)
     }
 
+    @MainActor
     var snapshot: NSImage? {
         return snapshotData?.image
     }
@@ -228,6 +230,7 @@ extension TabSnapshotExtension: NSCodingExtension {
         setIdentifier(identifier)
     }
 
+    @MainActor
     func encode(using coder: NSCoder) {
         coder.encode(identifier.uuidString,
                      forKey: NSSecureCodingKeys.tabSnapshotIdentifier)
