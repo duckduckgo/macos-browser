@@ -114,7 +114,7 @@ final class TabSnapshotExtension {
 
     private var snapshotData: SnapshotData? {
         didSet {
-            if let snapshotData {
+            if let snapshotData, !snapshotData.isRestored {
                 storeSnapshot(snapshotData.image, identifier: identifier)
             }
         }
