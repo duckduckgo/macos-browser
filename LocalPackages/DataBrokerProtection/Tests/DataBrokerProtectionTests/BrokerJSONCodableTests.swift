@@ -345,4 +345,76 @@ final class BrokerJSONCodableTests: XCTestCase {
             XCTFail("JSON string should be parsed correctly.")
         }
     }
+
+    func testParentSelector_isCorrectlyParsed() {
+        let json  = """
+            {
+              "name": "BeenVerified",
+              "url": "beenverified.com",
+              "version": "0.1.4",
+              "addedDatetime": 1677110400000,
+              "steps": [
+                {
+                  "stepType": "optOut",
+                  "optOutType": "formOptOut",
+                  "actions": [
+                    {
+                      "actionType": "navigate",
+                      "id": "f64d27f1-abf8-4469-a8b1-6ee8d03c107b",
+                      "url": "https://www.beenverified.com/app/search/person?age=${age}&city=${city}&fname=${firstName}&ln=${lastName}&mn=${middleName}&optout=true&state=${state}"
+                    },
+                    {
+                      "actionType": "click",
+                      "id": "51d52217-de3b-4a6b-a055-13af9b613034",
+                      "elements": [
+                        {
+                          "type": "button",
+                          "selector": ".",
+                          "parent": {
+                            "profileMatch": {
+                              "selector": ".person-search-result-card",
+                              "profile": {
+                                "name": {
+                                  "selector": ".person-name",
+                                  "beforeText": ", "
+                                },
+                                "alternativeNamesList": {
+                                  "selector": ".person-aliases",
+                                  "findElements": true
+                                },
+                                "age": {
+                                  "selector": ".person-name",
+                                  "afterText": ", "
+                                },
+                                "addressCityState": {
+                                  "selector": ".person-city"
+                                },
+                                "addressCityStateList": {
+                                  "selector": ".person-locations"
+                                },
+                                "relativesList": {
+                                  "selector": ".person-relatives"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "schedulingConfig": {
+                "retryError": 48,
+                "confirmOptOutScan": 72,
+                "maintenanceScan": 240
+              }
+            }
+            """
+        do {
+            _ = try JSONDecoder().decode(DataBroker.self, from: json.data(using: .utf8)!)
+        } catch {
+            XCTFail("JSON string should be parsed correctly.")
+        }
+    }
 }
