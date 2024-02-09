@@ -115,7 +115,7 @@ final class BookmarkListTests: XCTestCase {
     func testWhenBookmarkUrlIsUpdatedToAlreadyBookmarkedUrl_ThenUpdatingMustFail() {
         var bookmarkList = BookmarkList()
 
-        let firstUrl = #URL("wikipedia.org")
+        let firstUrl = #URL("http://wikipedia.org")
         let bookmarks = [
             Bookmark(id: UUID().uuidString, url: firstUrl.absoluteString, title: "Title", isFavorite: true),
             Bookmark(id: UUID().uuidString, url: URL.duckDuckGo.absoluteString, title: "Title", isFavorite: true)

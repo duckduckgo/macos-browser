@@ -24,7 +24,7 @@ import XCTest
 final class UserAgentTests: XCTestCase {
 
     func test_default_user_agent_is_safari() {
-        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("localhost")))
+        XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("http://localhost")))
         XCTAssertEqual(UserAgent.safari, UserAgent.for(#URL("http://example.com")))
     }
 

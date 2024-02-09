@@ -24,7 +24,7 @@ import XCTest
 
 class BrowserProfileTests: XCTestCase {
 
-    let mockURL = #URL("/Users/Dax/Library/ApplicationSupport/BrowserCompany/Browser/")
+    let mockURL = URL(fileURLWithPath: "/Users/Dax/Library/ApplicationSupport/BrowserCompany/Browser/")
 
     func testWhenBrowserProfileHasURLWithNoLoginData_ThenHasLoginDataIsFalse() {
         let profileURL = profile(named: "Profile")

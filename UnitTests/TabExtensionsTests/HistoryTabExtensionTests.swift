@@ -38,7 +38,7 @@ class HistoryTabExtensionTests: XCTestCase {
 
         let navigationIdentity = NavigationIdentity(nil)
         let responderChain = ResponderChain(responderRefs: [])
-        let urlRequest = URLRequest(url: #URL("duckduckgo.com"))
+        let urlRequest = URLRequest(url: .duckDuckGo)
         let frameInfo = FrameInfo(frame: WKFrameInfo())
         let navigationAction = NavigationAction(request: urlRequest, navigationType: .reload, currentHistoryItemIdentity: nil, redirectHistory: [], isUserInitiated: false, sourceFrame: frameInfo, targetFrame: nil, shouldDownload: false, mainFrameNavigation: nil)
         let navigation = Navigation(identity: navigationIdentity, responders: responderChain, state: .started, redirectHistory: [navigationAction], isCurrent: true, isCommitted: false)

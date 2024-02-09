@@ -53,7 +53,7 @@ extension URL {
             url = url.appendingParameter(name: "reason", value: reason)
         }
         if let headers {
-            let value = #URL("/").appendingParameters(headers).query!
+            let value = URL(string: "/")!.appendingParameters(headers).query!
             url = url.appendingParameter(name: "headers", value: value)
         }
         if let dataStr = data?.utf8String() {

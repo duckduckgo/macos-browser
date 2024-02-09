@@ -77,7 +77,7 @@ final class HistoryStoreTests: XCTestCase {
     func testWhenCleanOldIsCalled_ThenOlderEntriesThanDateAreCleaned() {
         let toBeKeptIdentifier = UUID()
         let newHistoryEntry = HistoryEntry(identifier: toBeKeptIdentifier,
-                                           url: #URL("wikipedia.org"),
+                                           url: #URL("http://wikipedia.org"),
                                            title: nil,
                                            numberOfVisits: 1,
                                            lastVisit: Date(),
