@@ -305,6 +305,7 @@ protocol NewWindowPolicyDecisionMaker {
                      extensionsBuilder: TabExtensionsBuilderProtocol = TabExtensionsBuilder.default,
                      title: String? = nil,
                      favicon: NSImage? = nil,
+                     emoji: String? = nil,
                      interactionStateData: Data? = nil,
                      parentTab: Tab? = nil,
                      shouldLoadInBackground: Bool = false,
@@ -344,6 +345,7 @@ protocol NewWindowPolicyDecisionMaker {
                   internalUserDecider: internalUserDecider,
                   title: title,
                   favicon: favicon,
+                  emoji: emoji,
                   interactionStateData: interactionStateData,
                   parentTab: parentTab,
                   shouldLoadInBackground: shouldLoadInBackground,
@@ -374,6 +376,7 @@ protocol NewWindowPolicyDecisionMaker {
          internalUserDecider: InternalUserDecider?,
          title: String?,
          favicon: NSImage?,
+         emoji: String?,
          interactionStateData: Data?,
          parentTab: Tab?,
          shouldLoadInBackground: Bool,
@@ -391,6 +394,7 @@ protocol NewWindowPolicyDecisionMaker {
         self.internalUserDecider = internalUserDecider
         self.title = title
         self.favicon = favicon
+        self.emoji = emoji
         self.parentTab = parentTab
         self.burnerMode = burnerMode
         self._canBeClosedWithBack = canBeClosedWithBack
@@ -667,6 +671,7 @@ protocol NewWindowPolicyDecisionMaker {
     var lastSelectedAt: Date?
 
     @Published var title: String?
+    @Published var emoji: String?
 
     private func updateTitle(shouldShowBookmarkTitle: Bool? = nil) {
         var title = webView.title?.trimmingWhitespace()

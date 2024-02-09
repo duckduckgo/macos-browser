@@ -934,6 +934,9 @@
 		373FB4B12B4D6C42004C88D6 /* PreferencesViews in Frameworks */ = {isa = PBXBuildFile; productRef = 373FB4B02B4D6C42004C88D6 /* PreferencesViews */; };
 		373FB4B32B4D6C4B004C88D6 /* PreferencesViews in Frameworks */ = {isa = PBXBuildFile; productRef = 373FB4B22B4D6C4B004C88D6 /* PreferencesViews */; };
 		373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */ = {isa = PBXBuildFile; productRef = 373FB4B42B4D6C57004C88D6 /* PreferencesViews */; };
+		3741FBCF2B738231000CE158 /* EmojiPickerTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741FBCE2B738231000CE158 /* EmojiPickerTextField.swift */; };
+		3741FBD02B738231000CE158 /* EmojiPickerTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741FBCE2B738231000CE158 /* EmojiPickerTextField.swift */; };
+		3741FBD12B738231000CE158 /* EmojiPickerTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3741FBCE2B738231000CE158 /* EmojiPickerTextField.swift */; };
 		37445F992A1566420029F789 /* SyncDataProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F982A1566420029F789 /* SyncDataProviders.swift */; };
 		37445F9A2A1566420029F789 /* SyncDataProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F982A1566420029F789 /* SyncDataProviders.swift */; };
 		37445F9C2A1569F00029F789 /* SyncBookmarksAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */; };
@@ -3339,6 +3342,7 @@
 		373A1AB128451ED400586521 /* BookmarksHTMLImporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksHTMLImporterTests.swift; sourceTree = "<group>"; };
 		373A26962964CF0B0043FC57 /* TestsTargetsBase.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = TestsTargetsBase.xcconfig; sourceTree = "<group>"; };
 		373D9B4729EEAC1B00381FDD /* SyncMetadataDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncMetadataDatabase.swift; sourceTree = "<group>"; };
+		3741FBCE2B738231000CE158 /* EmojiPickerTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPickerTextField.swift; sourceTree = "<group>"; };
 		37445F982A1566420029F789 /* SyncDataProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncDataProviders.swift; sourceTree = "<group>"; };
 		37445F9B2A1569F00029F789 /* SyncBookmarksAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncBookmarksAdapter.swift; sourceTree = "<group>"; };
 		37479F142891BC8300302FE2 /* TabCollectionViewModelTests+WithoutPinnedTabsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TabCollectionViewModelTests+WithoutPinnedTabsManager.swift"; sourceTree = "<group>"; };
@@ -6965,6 +6969,7 @@
 				AA9E9A5D25A4867200D1959D /* TabDragAndDropManager.swift */,
 				3154FD1328E6011A00909769 /* TabShadowView.swift */,
 				311B262628E73E0A00FD181A /* TabShadowConfig.swift */,
+				3741FBCE2B738231000CE158 /* EmojiPickerTextField.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -9725,6 +9730,7 @@
 				B66260E129AC6EBD00E9E3EE /* HistoryTabExtension.swift in Sources */,
 				3706FB8E293F65D500E42796 /* FirefoxEncryptionKeyReader.swift in Sources */,
 				3706FB8F293F65D500E42796 /* BookmarkManagementSplitViewController.swift in Sources */,
+				3741FBD02B738231000CE158 /* EmojiPickerTextField.swift in Sources */,
 				3706FB90293F65D500E42796 /* CookieManagedNotificationContainerView.swift in Sources */,
 				3706FB91293F65D500E42796 /* FileManagerExtension.swift in Sources */,
 				3706FB92293F65D500E42796 /* PermissionModel.swift in Sources */,
@@ -11187,6 +11193,7 @@
 				4B957B9E2AC7AE700062CA31 /* WaitlistKeychainStorage.swift in Sources */,
 				B69A14F82B4D701F00B9417D /* AddBookmarkPopoverViewModel.swift in Sources */,
 				4B957B9F2AC7AE700062CA31 /* PasswordManagementViewController.swift in Sources */,
+				3741FBD12B738231000CE158 /* EmojiPickerTextField.swift in Sources */,
 				4B957BA02AC7AE700062CA31 /* ImportedBookmarks.swift in Sources */,
 				4B957BA12AC7AE700062CA31 /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				4B957BA22AC7AE700062CA31 /* NavigationActionPolicyExtension.swift in Sources */,
@@ -11426,6 +11433,7 @@
 				B688B4DF27420D290087BEAF /* PDFSearchTextMenuItemHandler.swift in Sources */,
 				AA7E919728746BCC00AB6B62 /* HistoryMenu.swift in Sources */,
 				F4A6198C283CFFBB007F2080 /* ContentScopeFeatureFlagging.swift in Sources */,
+				3741FBCF2B738231000CE158 /* EmojiPickerTextField.swift in Sources */,
 				85707F24276A332A00DC0649 /* OnboardingButtonStyles.swift in Sources */,
 				4B8A4E0127C8447E005F40E8 /* SaveIdentityPopover.swift in Sources */,
 				B637273B26CBC8AF00C8CB02 /* AuthenticationAlert.swift in Sources */,

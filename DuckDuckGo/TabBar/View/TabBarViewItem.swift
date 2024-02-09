@@ -93,6 +93,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet weak var permissionButton: NSButton!
 
     @IBOutlet weak var titleTextField: NSTextField!
+    @IBOutlet weak var emojiTextField: NSTextField!
     @IBOutlet weak var titleTextFieldLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
@@ -121,6 +122,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         setupMenu()
         updateTitleTextFieldMask()
         closeButton.isHidden = true
+        emojiTextField.delegate = self
     }
 
     override func viewDidLayout() {
@@ -211,6 +213,22 @@ final class TabBarViewItem: NSCollectionViewItem {
         delegate?.tabBarViewItemCloseAction(self)
     }
 
+    @objc func changeIconAction(_ sender: NSMenuItem) {
+        faviconImageView.isHidden = true
+        emojiTextField.isHidden = false
+        emojiTextField.isEditable = true
+        emojiTextField.makeMeFirstResponder()
+        DispatchQueue.main.async {
+            NSApp.orderFrontCharacterPalette(nil)
+        }
+    }
+
+    @objc func resetIconAction(_ sender: NSMenuItem) {
+        faviconImageView.isHidden = false
+        emojiTextField.isHidden = true
+        emoji = nil
+    }
+
     @IBAction func permissionButtonAction(_ sender: NSButton) {
         delegate?.tabBarViewItemTogglePermissionAction(self)
     }
@@ -238,9 +256,18 @@ final class TabBarViewItem: NSCollectionViewItem {
             self?.titleTextField.stringValue = title
         }.store(in: &cancellables)
 
-        tabViewModel.$favicon.sink { [weak self] favicon in
-            self?.updateFavicon(favicon)
-        }.store(in: &cancellables)
+        $emoji
+            .removeDuplicates()
+            .filter { $0 != tabViewModel.emoji }
+            .assign(to: \.emoji, on: tabViewModel)
+            .store(in: &cancellables)
+
+        Publishers.CombineLatest(tabViewModel.$favicon, tabViewModel.$emoji)
+            .sink { [weak self] favicon, emoji in
+                self?.emoji = emoji
+                self?.updateFavicon(favicon, emoji: emoji)
+            }
+            .store(in: &cancellables)
 
         tabViewModel.tab.$content.sink { [weak self] content in
             self?.currentURL = content.url
@@ -248,6 +275,8 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         tabViewModel.$usedPermissions.assign(to: \.usedPermissions, onWeaklyHeld: self).store(in: &cancellables)
     }
+
+    @Published fileprivate var emoji: String?
 
     func clear() {
         clearSubscriptions()
@@ -412,10 +441,22 @@ final class TabBarViewItem: NSCollectionViewItem {
         titleTextField.gradient(width: TextFieldMaskGradientSize.width, trailingPadding: gradientPadding)
     }
 
-    private func updateFavicon(_ favicon: NSImage?) {
-        faviconWrapperView.isHidden = favicon == nil
+    private func updateFavicon(_ favicon: NSImage?, emoji: String?) {
+        guard let faviconImageView, let emojiTextField else {
+            return
+        }
+        faviconWrapperView.isHidden = favicon == nil && emoji == nil
         titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
         faviconImageView.image = favicon
+        emojiTextField.stringValue = emoji ?? ""
+
+        if emoji != nil {
+            faviconImageView.isHidden = true
+            emojiTextField.isHidden = false
+        } else {
+            faviconImageView.isHidden = false
+            emojiTextField.isHidden = true
+        }
     }
 
 }
@@ -441,6 +482,11 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(NSMenuItem.separator())
 
         // Section 3
+        addEmojiMenuItem(to: menu)
+        addResetEmojiMenuItem(to: menu)
+        menu.addItem(NSMenuItem.separator())
+
+        // Section 4
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
@@ -477,6 +523,23 @@ extension TabBarViewItem: NSMenuDelegate {
                 menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
             }
             menuItem.isEnabled = true
+        }
+        menuItem.target = self
+        menu.addItem(menuItem)
+    }
+
+    private func addEmojiMenuItem(to menu: NSMenu) {
+        let menuItem = NSMenuItem(title: "Change Icon", action: #selector(changeIconAction(_:)), keyEquivalent: "")
+        menuItem.target = self
+        menu.addItem(menuItem)
+    }
+
+    private func addResetEmojiMenuItem(to menu: NSMenu) {
+        let menuItem = NSMenuItem(title: "Reset Custom Icon", action: #selector(resetIconAction(_:)), keyEquivalent: "")
+        if let emoji {
+            menuItem.isEnabled = !emoji.isEmpty
+        } else {
+            menuItem.isEnabled = false
         }
         menuItem.target = self
         menu.addItem(menuItem)
@@ -589,4 +652,60 @@ private extension NSImage {
 
     static let micActiveImage = NSImage(named: "Microphone-Active")
     static let micBlockedImage = NSImage(named: "Microphone-Icon")
+}
+
+extension TabBarViewItem: NSTextFieldDelegate, NSControlTextEditingDelegate {
+
+    func controlTextDidChange(_ obj: Notification) {
+        guard let textField = obj.object as? NSTextField else {
+            return
+        }
+
+        // Only allow emoji
+        let validCharacterSet = CharacterSet.emoji
+        let newString = String(textField.stringValue.unicodeScalars.filter { validCharacterSet.contains($0)})
+        if !newString.isEmpty {
+            textField.stringValue = String(newString.suffix(1))
+            emoji = textField.stringValue
+        } else {
+            textField.stringValue = emoji ?? ""
+        }
+
+        textField.window?.makeFirstResponder(nil)
+        updateFavicon(faviconImageView.image, emoji: textField.stringValue)
+    }
+
+    func controlTextDidEndEditing(_ obj: Notification) {
+        guard let textField = obj.object as? NSTextField else {
+            return
+        }
+
+        textField.isEditable = false
+    }
+}
+
+extension CharacterSet {
+    static let emoji: CharacterSet = {
+        var emojiCharacterSet: CharacterSet = CharacterSet()
+
+        // update "ranges" with actual unicode ranges for all categories of emojis
+        let ranges = [
+            (0x1F600...0x1F64F),     // Emoticons
+            (0x1F300...0x1F5FF),     // Misc Symbols and Pictographs
+            (0x1F680...0x1F6FF),     // Transport and Map
+            (0x2600...0x26FF),       // Misc symbols
+            (0x2700...0x27BF),       // Dingbats
+            (0x1F1E6...0x1F1FF),     // Flags
+            (0x1F900...0x1F9FF)      // Supplemental Symbols and Pictographs
+        ]
+
+        for range in ranges {
+            for i in range {
+                if let unicodeScalar = UnicodeScalar(i) {
+                    emojiCharacterSet.insert(unicodeScalar)
+                }
+            }
+        }
+        return emojiCharacterSet
+    }()
 }
