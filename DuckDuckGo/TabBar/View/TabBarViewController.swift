@@ -281,7 +281,7 @@ final class TabBarViewController: NSViewController {
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 if self.view.isMouseLocationInsideBounds() == false {
-                    self.hideTabPreview()
+                    self.hideTabPreview(allowQuickRedisplay: true)
                 }
             }
         }
@@ -506,7 +506,7 @@ final class TabBarViewController: NSViewController {
                 guard let self = self else { return }
                 self.updateLayout()
                 self.enableScrollButtons()
-                self.hideTabPreview()
+                self.hideTabPreview(allowQuickRedisplay: true)
             })
         }
     }
@@ -524,7 +524,7 @@ final class TabBarViewController: NSViewController {
 
     @objc private func scrollViewBoundsDidChange(_ sender: Any) {
         enableScrollButtons()
-        hideTabPreview()
+        hideTabPreview(allowQuickRedisplay: true)
     }
 
     private func enableScrollButtons() {
@@ -574,7 +574,7 @@ final class TabBarViewController: NSViewController {
         }
 
         let position = scrollView.frame.minX + tabBarViewItem.view.frame.minX - clipView.bounds.origin.x
-        showTabPreview(for: tabViewModel, from: position, after: .init(from: tabBarViewItem.widthStage))
+        showTabPreview(for: tabViewModel, from: position)
     }
 
     private func showPinnedTabPreview(at index: Int) {
@@ -584,15 +584,15 @@ final class TabBarViewController: NSViewController {
         }
 
         let position = pinnedTabsContainerView.frame.minX + PinnedTabView.Const.dimension * CGFloat(index)
-        showTabPreview(for: tabViewModel, from: position, after: .init(from: .withoutTitle))
+        showTabPreview(for: tabViewModel, from: position)
     }
 
     private func showTabPreview(
         for tabViewModel: TabViewModel,
-        from xPosition: CGFloat,
-        after interval: TabPreviewWindowController.TimerInterval
-    ) {
-        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel)
+        from xPosition: CGFloat) {
+        let isSelected = tabCollectionViewModel.selectedTabViewModel === tabViewModel
+        tabPreviewWindowController.tabPreviewViewController.display(tabViewModel: tabViewModel,
+                                                                    isSelected: isSelected)
 
         guard let window = view.window else {
             os_log("TabBarViewController: Showing tab preview window failed", type: .error)
@@ -600,14 +600,14 @@ final class TabBarViewController: NSViewController {
         }
 
         var point = view.bounds.origin
-        point.y -= TabPreviewWindowController.VerticalSpace.padding.rawValue
+        point.y -= TabPreviewWindowController.padding
         point.x += xPosition
         let pointInWindow = view.convert(point, to: nil)
-        tabPreviewWindowController.scheduleShowing(parentWindow: window, timerInterval: interval, topLeftPointInWindow: pointInWindow)
+        tabPreviewWindowController.show(parentWindow: window, topLeftPointInWindow: pointInWindow)
     }
 
-    func hideTabPreview() {
-        tabPreviewWindowController.hide()
+    func hideTabPreview(allowQuickRedisplay: Bool = false) {
+        tabPreviewWindowController.hide(allowQuickRedisplay: allowQuickRedisplay)
     }
 
 }
@@ -989,7 +989,7 @@ extension TabBarViewController: TabBarViewItemDelegate {
                 showTabPreview(for: tabBarViewItem)
             }
         } else {
-            tabPreviewWindowController.scheduleHiding()
+            tabPreviewWindowController.hide(allowQuickRedisplay: true, withDelay: true)
         }
     }
 
