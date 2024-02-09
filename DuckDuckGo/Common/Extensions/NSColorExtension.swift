@@ -19,7 +19,7 @@
 import Cocoa
 
 extension NSColor {
-    
+
     // MARK: Aliases
 
     static let detailAccentColor = NSColor(catalogName: "System", colorName: "detailAccentColor") ?? .controlAccentColor
