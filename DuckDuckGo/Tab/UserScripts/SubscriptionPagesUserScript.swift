@@ -260,31 +260,8 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
         Task { @MainActor in
             let actionHandlers = SubscriptionAccessActionHandlers(
                 restorePurchases: {
-                    if #available(macOS 12.0, *) {
-                        Task {
-                            let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                            let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
-
-                            defer { mainViewController?.dismiss(progressViewController) }
-
-                            mainViewController?.presentAsSheet(progressViewController)
-
-                            guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
-
-                            switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                            case .success:
-                                message.webView?.reload()
-                            case .failure(let error):
-                                switch error {
-                                case .missingAccountOrTransactions:
-                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
-                                case .subscriptionExpired:
-                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
-                                default:
-                                    WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
-                                }
-                            }
-                        }
+                    SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow {
+                        message.webView?.reload()
                     }
                 },
                 openURLHandler: { url in
@@ -363,6 +340,38 @@ final class SubscriptionPagesUseSubscriptionFeature: Subfeature {
     }
 }
 
+extension SubscriptionPagesUseSubscriptionFeature {
+
+    static func startAppStoreRestoreFlow(onSuccessHandler: @escaping () -> Void = {}) {
+        if #available(macOS 12.0, *) {
+            Task { @MainActor in
+                let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
+                let progressViewController = ProgressViewController(title: UserText.restoringSubscriptionTitle)
+
+                defer { mainViewController?.dismiss(progressViewController) }
+
+                mainViewController?.presentAsSheet(progressViewController)
+
+                guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
+
+                switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
+                case .success:
+                    onSuccessHandler()
+                case .failure(let error):
+                    switch error {
+                    case .missingAccountOrTransactions:
+                        WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
+                    case .subscriptionExpired:
+                        WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
+                    default:
+                        WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
+                    }
+                }
+            }
+        }
+    }
+}
+
 extension MainWindowController {
 
     @MainActor
@@ -375,7 +384,6 @@ extension MainWindowController {
         case .stripe:
             window.show(.somethingWentWrongStripeAlert())
         }
-
     }
 
     @MainActor

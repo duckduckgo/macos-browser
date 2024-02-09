@@ -53,12 +53,16 @@ extension Preferences {
                             Text(UserText.privacySimplified).font(.privacySimplified)
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
-                                .makeSelectable()
                                 .onTapGesture(count: 12) {
 #if NETWORK_PROTECTION && !SUBSCRIPTION
                                     model.displayNetPInvite()
 #endif
                                 }
+                                .contextMenu(ContextMenu(menuItems: {
+                                    Button(UserText.copy, action: {
+                                        model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                                    })
+                                }))
                         }
                     }
                     .padding(.bottom, 8)
