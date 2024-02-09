@@ -549,6 +549,8 @@ final class BrowserTabViewController: NSViewController {
 
         var containsHostingView: Bool
         switch tabViewModel.tab.content {
+        case .onboarding:
+            return
         case .newtab, .settings:
             containsHostingView = true
         default:
