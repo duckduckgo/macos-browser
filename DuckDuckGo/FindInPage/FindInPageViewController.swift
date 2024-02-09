@@ -50,6 +50,7 @@ final class FindInPageViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         focusRingView.strokedBackgroundColor = NSColor.findInPageFocusedBackgroundColor
+        textField.placeholderString = UserText.findInPageTextFieldPlaceholder
         textField.delegate = self
         listenForTextFieldResponderNotifications()
         subscribeToModelChanges()

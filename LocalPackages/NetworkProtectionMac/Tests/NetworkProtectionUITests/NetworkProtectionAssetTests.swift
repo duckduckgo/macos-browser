@@ -35,6 +35,8 @@ final class NetworkProtectionAssetTests: XCTestCase {
             .vpnIcon: "VPN-16",
             .appleVaultIcon: "apple-vault-icon",
             .appleVPNIcon: "apple-vpn-icon",
+            .appleSystemSettingsIcon: "apple-system-settings-icon",
+            .appleApplicationsIcon: "apple-applications-icon",
             .appVPNOnIcon: "app-vpn-on",
             .appVPNOffIcon: "app-vpn-off",
             .appVPNIssueIcon: "app-vpn-issue",

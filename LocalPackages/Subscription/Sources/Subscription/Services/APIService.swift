@@ -51,13 +51,16 @@ public extension APIService {
                 if let decodedResponse = decode(T.self, from: data) {
                     return .success(decodedResponse)
                 } else {
+                    os_log(.error, log: .subscription, "Service error: APIServiceError.decodingError")
                     return .failure(.decodingError)
                 }
             } else {
                 if let decodedResponse = decode(ErrorResponse.self, from: data) {
                     let errorDescription = "[\(endpoint)] \(urlResponse.httpStatusCodeAsString ?? ""): \(decodedResponse.error)"
+                    os_log(.error, log: .subscription, "Service error: %{public}@", errorDescription)
                     return .failure(.serverError(description: errorDescription))
                 } else {
+                    os_log(.error, log: .subscription, "Service error: APIServiceError.unknownServerError")
                     return .failure(.unknownServerError)
                 }
             }

@@ -24,9 +24,16 @@ protocol WebViewContextMenuDelegate: AnyObject {
     func webView(_ webView: WebView, didCloseContextMenu menu: NSMenu, with event: NSEvent?)
 }
 
+protocol WebViewInteractionEventsDelegate: AnyObject {
+    func webView(_ webView: WebView, mouseDown event: NSEvent)
+    func webView(_ webView: WebView, keyDown event: NSEvent)
+    func webView(_ webView: WebView, scrollWheel event: NSEvent)
+}
+
 final class WebView: WKWebView {
 
     weak var contextMenuDelegate: WebViewContextMenuDelegate?
+    weak var interactionEventsDelegate: WebViewInteractionEventsDelegate?
 
     override var isInFullScreenMode: Bool {
         if #available(macOS 13.0, *) {
@@ -71,6 +78,10 @@ final class WebView: WKWebView {
         window != nil && zoomLevel != defaultZoomValue && !self.isInFullScreenMode
     }
 
+    var canResetMagnification: Bool {
+        window != nil && magnification != 1
+    }
+
     var canZoomIn: Bool {
         window != nil && zoomLevel.index < DefaultZoomValue.allCases.count - 1 && !self.isInFullScreenMode
     }
@@ -80,6 +91,7 @@ final class WebView: WKWebView {
     }
 
     func resetZoomLevel() {
+        magnification = 1
         zoomLevel = defaultZoomValue
     }
 
@@ -103,6 +115,23 @@ final class WebView: WKWebView {
     override func didCloseMenu(_ menu: NSMenu, with event: NSEvent?) {
         super.didCloseMenu(menu, with: event)
         contextMenuDelegate?.webView(self, didCloseContextMenu: menu, with: event)
+    }
+
+    // MARK: - Events
+
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        interactionEventsDelegate?.webView(self, mouseDown: event)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        super.keyDown(with: event)
+        interactionEventsDelegate?.webView(self, keyDown: event)
+    }
+
+    override func scrollWheel(with event: NSEvent) {
+        super.scrollWheel(with: event)
+        interactionEventsDelegate?.webView(self, scrollWheel: event)
     }
 
     // MARK: - Developer Tools

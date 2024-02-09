@@ -73,7 +73,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                     if editingBookmarkIndex != nil {
                         view.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
                     } else {
-                        view.animator().layer?.backgroundColor = NSColor.interfaceBackgroundColor.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.bookmarkPageBackground.cgColor
                     }
                 }
             }
@@ -95,7 +95,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     // swiftlint:disable:next function_body_length
     override func loadView() {
-        view = ColorView(frame: .zero, backgroundColor: .interfaceBackgroundColor)
+        view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(separator)
@@ -683,7 +683,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         if let url = newUrl.url, url.absoluteString != bookmark.url {
             bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
         }
-        let bookmarkTitle = newTitle.isEmpty ? bookmark.title : newTitle
+        let bookmarkTitle = (newTitle.isEmpty ? bookmark.title : newTitle).trimmingWhitespace()
         if bookmark.title != bookmarkTitle {
             bookmark.title = bookmarkTitle
             bookmarkManager.update(bookmark: bookmark)
