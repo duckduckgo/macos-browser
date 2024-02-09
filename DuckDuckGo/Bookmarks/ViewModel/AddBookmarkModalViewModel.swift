@@ -37,7 +37,7 @@ struct AddBookmarkModalViewModel {
     private var hasValidInput: Bool {
         guard let url = bookmarkAddress.url else { return false }
 
-        return !bookmarkTitle.isEmpty && url.isValid
+        return !bookmarkTitle.trimmingWhitespace().isEmpty && url.isValid
     }
 
     var isAddButtonDisabled: Bool { !hasValidInput }
@@ -54,6 +54,7 @@ struct AddBookmarkModalViewModel {
         }
 
         var result: Bookmark?
+        let bookmarkTitle = bookmarkTitle.trimmingWhitespace()
         if var bookmark = originalBookmark ?? bookmarkManager.getBookmark(for: url) {
 
             if url.absoluteString != bookmark.url {

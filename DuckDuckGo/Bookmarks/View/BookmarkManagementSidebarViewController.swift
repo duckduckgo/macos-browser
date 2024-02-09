@@ -75,7 +75,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     }
 
     override func loadView() {
-        view = ColorView(frame: .zero, backgroundColor: .interfaceBackground)
+        view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
 
         view.addSubview(tabSwitcherButton)
         view.addSubview(scrollView)

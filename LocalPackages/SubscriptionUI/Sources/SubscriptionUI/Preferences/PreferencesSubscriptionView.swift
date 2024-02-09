@@ -25,6 +25,8 @@ public struct PreferencesSubscriptionView: View {
     @State private var showingSheet = false
     @State private var showingRemoveConfirmationDialog = false
 
+    @State private var manageSubscriptionSheet: ManageSubscriptionSheet?
+
     public init(model: PreferencesSubscriptionModel) {
         self.model = model
     }
@@ -37,18 +39,10 @@ public struct PreferencesSubscriptionView: View {
                     SubscriptionAccessView(model: model.sheetModel)
                 }
                 .sheet(isPresented: $showingRemoveConfirmationDialog) {
-                    Dialog(spacing: 20) {
-                        Image("Placeholder-96x64", bundle: .module)
-                        Text(UserText.removeSubscriptionDialogTitle)
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(Color("TextPrimary", bundle: .module))
-                        Text(UserText.removeSubscriptionDialogDescription)
-                            .font(.body)
-                            .multilineTextAlignment(.center)
-                            .fixMultilineScrollableText()
-                            .foregroundColor(Color("TextPrimary", bundle: .module))
-                    } buttons: {
+                    SubscriptionDialog(imageName: "Placeholder-96x64",
+                                       title: UserText.removeSubscriptionDialogTitle,
+                                       description: UserText.removeSubscriptionDialogDescription,
+                                       buttons: {
                         Button(UserText.removeSubscriptionDialogCancel) { showingRemoveConfirmationDialog = false }
                         Button(action: {
                             showingRemoveConfirmationDialog = false
@@ -57,8 +51,30 @@ public struct PreferencesSubscriptionView: View {
                             Text(UserText.removeSubscriptionDialogConfirm)
                                 .foregroundColor(.red)
                         })
-                    }
+                    })
                     .frame(width: 320)
+                }
+                .sheet(item: $manageSubscriptionSheet) { sheet in
+                    switch sheet {
+                    case .apple:
+                        SubscriptionDialog(imageName: "app-store",
+                                           title: UserText.changeSubscriptionDialogTitle,
+                                           description: UserText.changeSubscriptionAppleDialogDescription,
+                                           buttons: {
+                            Button(UserText.changeSubscriptionDialogDone) { manageSubscriptionSheet = nil }
+                                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                        })
+                        .frame(width: 360)
+                    case .google:
+                        SubscriptionDialog(imageName: "google-play",
+                                           title: UserText.changeSubscriptionDialogTitle,
+                                           description: UserText.changeSubscriptionGoogleDialogDescription,
+                                           buttons: {
+                            Button(UserText.changeSubscriptionDialogDone) { manageSubscriptionSheet = nil }
+                                .buttonStyle(DefaultActionButtonStyle(enabled: true))
+                        })
+                        .frame(width: 360)
+                    }
                 }
 
             Spacer()
@@ -76,7 +92,16 @@ public struct PreferencesSubscriptionView: View {
                         Button(UserText.addToAnotherDeviceButton) { showingSheet.toggle() }
 
                         Menu {
-                            Button(UserText.changePlanOrBillingButton, action: { model.changePlanOrBillingAction() })
+                            Button(UserText.changePlanOrBillingButton, action: {
+                                Task {
+                                    switch await model.changePlanOrBillingAction() {
+                                    case .presentSheet(let sheet):
+                                        manageSubscriptionSheet = sheet
+                                    case .navigateToManageSubscription(let navigationAction):
+                                        navigationAction()
+                                    }
+                                }
+                            })
                             Button(UserText.removeFromThisDeviceButton, action: {
                                 showingRemoveConfirmationDialog.toggle()
                             })
@@ -227,5 +252,30 @@ public struct SectionView: View {
         .padding(.vertical, 7)
         .disabled(!enabled)
         .opacity(enabled ? 1.0 : 0.6)
+    }
+}
+
+private struct SubscriptionDialog<Buttons>: View where Buttons: View {
+    public var imageName: String
+    public var title: String
+    public var description: String
+
+    @ViewBuilder let buttons: () -> Buttons
+
+    public var body: some View {
+        Dialog(spacing: 20) {
+            Image(imageName, bundle: .module)
+            Text(title)
+                .font(.title2)
+                .bold()
+                .foregroundColor(Color("TextPrimary", bundle: .module))
+            Text(description)
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .fixMultilineScrollableText()
+                .foregroundColor(Color("TextPrimary", bundle: .module))
+        } buttons: {
+            buttons()
+        }
     }
 }

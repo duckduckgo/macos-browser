@@ -78,7 +78,7 @@ struct AddBookmarkFolderPopoverView: ModalView {
 #Preview {
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
         BookmarkFolder(id: "1", title: "Folder 1", children: [
-            BookmarkFolder(id: "2", title: "Nested Folder", children: [
+            BookmarkFolder(id: "2", title: "Nested Folder with a name that in theory won‘t fit into the picker", children: [
             ])
         ]),
         BookmarkFolder(id: "3", title: "Another Folder", children: [

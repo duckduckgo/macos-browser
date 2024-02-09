@@ -26,7 +26,17 @@ protocol FireInfoViewControllerDelegate: AnyObject {
 
 final class FireInfoViewController: NSViewController {
 
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var descriptionLabel: NSTextField!
+    @IBOutlet weak var gotItButton: NSButton!
+
     weak var delegate: FireInfoViewControllerDelegate?
+
+    override func viewDidLoad() {
+        titleLabel.stringValue = UserText.fireInfoDialogTitle
+        descriptionLabel.stringValue = UserText.fireInfoDialogDescription
+        gotItButton.title = UserText.gotIt
+    }
 
     override func mouseDown(with event: NSEvent) {}
 
