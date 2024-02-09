@@ -1,5 +1,5 @@
 //
-//  OnboardingStepView.swift
+//  PromptActionView.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -61,19 +61,13 @@ fileprivate extension View {
     }
 }
 
-struct OnboardingStepView: View {
+struct PromptActionView: View {
 
     @Environment(\.colorScheme) var colorScheme
 
     // MARK: - Model
 
-    private let model: Model
-
-    // MARK: - Initializers
-
-    public init(model: Model) {
-        self.model = model
-    }
+    let model: Model
 
     // MARK: - View
 

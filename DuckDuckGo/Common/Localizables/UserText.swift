@@ -28,6 +28,7 @@ struct UserText {
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
     static let remove = NSLocalizedString("generic.remove.button", value: "Remove", comment: "Label of a button that allows the user to remove an item")
+    static let discard = NSLocalizedString("generic.discard.button", value: "Discard", comment: "Label of a button that allows the user discard an action/change")
     static let neverForThisSite = NSLocalizedString("never.for.this.site", value: "Never Ask for This Site", comment: "Never ask to save login credentials for this site button")
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
@@ -35,10 +36,12 @@ struct UserText {
     static let update = NSLocalizedString("update", value: "Update", comment: "Update button")
     static let dontUpdate = NSLocalizedString("dont.update", value: "Don't Update", comment: "Don't Update button")
     static let copy = NSLocalizedString("copy", value: "Copy", comment: "Copy button")
+    static let details = NSLocalizedString("details", value: "Details", comment: "details button")
     static let submit = NSLocalizedString("submit", value: "Submit", comment: "Submit button")
     static let submitReport = NSLocalizedString("submit.report", value: "Submit Report", comment: "Submit Report button")
     static let pasteFromClipboard = NSLocalizedString("paste-from-clipboard", value: "Paste from Clipboard", comment: "Paste button")
     static let edit = NSLocalizedString("edit", value: "Edit", comment: "Edit button")
+    static let gotIt = NSLocalizedString("got.it", value: "Got It!", comment: "Got it button")
     static let copySelection = NSLocalizedString("copy-selection", value: "Copy", comment: "Copy selection menu item")
     static let deleteBookmark = NSLocalizedString("delete-bookmark", value: "Delete Bookmark", comment: "Delete Bookmark button")
     static let removeFavorite = NSLocalizedString("remove-favorite", value: "Remove Favorite", comment: "Remove Favorite button")
@@ -260,6 +263,13 @@ struct UserText {
 
     static let fireDialogFireproofSites = NSLocalizedString("fire.dialog.fireproof.sites", value: "Fireproof sites won't be cleared", comment: "Category of domains in fire button dialog")
     static let fireDialogClearSites = NSLocalizedString("fire.dialog.clear.sites", value: "Selected sites will be cleared", comment: "Category of domains in fire button dialog")
+    static let fireDialogDelitingData = NSLocalizedString("fire.dialog.deliting.data", value: "Deleting browsing data…", comment: "Text shown in dialog while removing browsing data")
+    static let fireInfoDialogTitle = NSLocalizedString("fire.info.dialog.title", value: "Leave No Trace", comment: "Title of the dialog that explains the Fire feature.")
+    static let fireInfoDialogDescription = NSLocalizedString("fire.info.dialog.description", value: "Data, browsing history, and cookies can build up in your browser over time. Use the Fire Button to clear it all away.", comment: "Description in the dialog that explains the Fire feature.")
+    static let fireDialogFireWindowTitle = NSLocalizedString("fire.dialog.fire-window.title", value: "Open New Fire Window", comment: "Title of the part of the dialog where the user can open a fire window.")
+    static let fireDialogFireWindowDescription = NSLocalizedString("fire.dialog.fire-window.description", value: "An isolated window that doesn’t save any data", comment: "Explanation of what a fire window is.")
+    static let fireDialogCloseTabs = NSLocalizedString("fire.dialog.fire-window.close-tabs", value: "Close Tabs and Clear Data", comment: "Title of the dialog where the user can close browser tabs and clear data.")
+    static let fireDialogBurnWindowButton = NSLocalizedString("fire.dialog.close-burner-window", value: "Close and Burn This Window", comment: "Button that allows the user to close and burn the browser burner window")
     static let allData = NSLocalizedString("fire.all-sites", value: "All sites", comment: "Configuration option for fire button")
     static let currentTab = NSLocalizedString("fire.currentTab", value: "All sites visited in current tab", comment: "Configuration option for fire button")
     static let currentWindow = NSLocalizedString("fire.currentWindow", value: "All sites visited in current window", comment: "Configuration option for fire button")
@@ -417,7 +427,6 @@ struct UserText {
     static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock autofill", comment: "Autofill auto-lock setting")
     static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "If not locked, anyone with access to your device will be able to use and modify your autofill data. For security purposes, credit card form fill always requires authentication.", comment: "Autofill disabled auto-lock warning")
     static let autolockLocksFormFill = NSLocalizedString("autofill.autolock-locks-form-filling", value: "Also lock password form fill", comment: "Lock form filling when auto-lock is active text")
-
     
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
@@ -429,6 +438,7 @@ struct UserText {
     static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Passwords", comment: "Used as title for the Autofill Logins option")
     static let passwordManagementIdentities = NSLocalizedString("passsword.management.identities", value: "Identities", comment: "Used as title for the Autofill Identities option")
     static let passwordManagementCreditCards = NSLocalizedString("passsword.management.credit-cards", value: "Credit Cards", comment: "Used as title for the Autofill Credit Cards option")
+    static let passwordManagementCreditCardsUnknownCard = NSLocalizedString("autofill.management.credit-cards.unknown.card", value: "Card", comment: "Used as placeholder when user iserts a credit card of unknown type (e.g. not Visa, Mastercard)")
     static let passwordManagementNotes = NSLocalizedString("passsword.management.notes", value: "Notes", comment: "Used as title for the Autofill Notes option")
     static let passwordManagementLock = NSLocalizedString("passsword.management.lock", value: "Lock", comment: "Lock Logins Vault menu")
     static let passwordManagementUnlock = NSLocalizedString("passsword.management.unlock", value: "Unlock", comment: "Unlock Logins Vault menu")
@@ -447,7 +457,15 @@ struct UserText {
     static let passwordManagerEmptyStateTitle = NSLocalizedString("passsword.manager.empty.state.title", value: "No logins or credit card info yet", comment: "In the password manager title when there are no items")
     static let passwordManagerEmptyStateMessage = NSLocalizedString("passsword.manager.empty.state.message", value: "If your logins are saved in another browser, you can import them into DuckDuckGo.", comment: "In the password manager message when there are no items")
     static let importData = NSLocalizedString("Import", comment: "Menu item")
-
+    static let passwordManagerAlertRemovePasswordConfirmation = NSLocalizedString("passsword.manager.alert.remove-password.confirmation", value: "Are you sure you want to delete this saved password", comment: "Text of the alert that asks the user to confirm they want to delete a password")
+    static let passwordManagerAlertSaveChanges = NSLocalizedString("passsword.manager.alert.save-changes", value: "Save the changes you made?", comment: "Text of the alert that asks the user if the want to save the changes made")
+    static let passwordManagerAlertDuplicatePassword = NSLocalizedString("passsword.manager.alert.duplicate.password", value: "Duplicate Password", comment: "Title of the alert that the password inserted already exists")
+    static let passwordManagerAlertDuplicatePasswordDescription = NSLocalizedString("passsword.manager.alert.duplicate.password.description", value: "You already have a password saved for this username and website.", comment: "Text of the alert that explains the password inserted already exists for a given website")
+    static let thisActionCannotBeUndone = NSLocalizedString("action-cannot-be-undone", value: "This action cannot be undone.", comment: "Text used in alerts to warn user that a given action cannot be undone")
+    static let passwordManagerAlerDeleteButton = NSLocalizedString("passsword.manager.alert.delete", value: "Delete", comment: "Button of the alert that asks the user to confirm they want to delete an password, login or credential to actually delete")
+    static let passwordManagerAlertRemoveCardConfirmation = NSLocalizedString("passsword.manager.alert.remove-card.confirmation", value: "Are you sure you want to delete this saved credit card?", comment: "Text of the alert that asks the user to confirm they want to delete a credit card")
+    static let passwordManagerAlertRemoveIdentityConfirmation = NSLocalizedString("passsword.manager.alert.remove-identity.confirmation", value: "Are you sure you want to delete this saved autofill info?", comment: "Text of the alert that asks the user to confirm they want to delete an identity")
+    static let passwordManagerAlertRemoveNoteConfirmation = NSLocalizedString("passsword.manager.alert.remove-note.confirmation", value: "Are you sure you want to delete this note?", comment: "Text of the alert that asks the user to confirm they want to delete a note")
 
     static let importBookmarks = NSLocalizedString("import.browser.data.bookmarks", value: "Import Bookmarks…", comment: "Opens Import Browser Data dialog")
     static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
@@ -470,9 +488,17 @@ struct UserText {
     static let bookmarksManageBookmarks = NSLocalizedString("bookmarks.manage-bookmarks", value: "Manage Bookmarks", comment: "Menu item for opening the bookmarks management interface")
     static let bookmarkImportedFromFolder = NSLocalizedString("bookmarks.imported.from.folder", value: "Imported from", comment: "Name of the folder the imported bookmarks are saved into")
 
+    // MARK: Feedback
     static let reportBrokenSite = NSLocalizedString("report.broken.site", value: "Report Broken Site", comment: "Menu with feedback commands")
     static let browserFeedback = NSLocalizedString("send.browser.feedback", value: "Send Browser Feedback", comment: "Menu with feedback commands")
-    
+    static let browserFeedbackTitle = NSLocalizedString("send.browser.feedback.title", value: "Help Improve the DuckDuckGo Browser", comment: "Title of the interface to send feedback on the browser")
+    static let browserFeedbackReportProblem = NSLocalizedString("send.browser.feedback.report-problem", value: "Report a problem", comment: "Name of the option the user can chose to give browser feedback about a problem they enountered")
+    static let browserFeedbackRequestFeature = NSLocalizedString("send.browser.feedback.request-feature", value: "Request a feature", comment: "Name of the option the user can chose to give browser feedback about a feature they would like")
+    static let browserFeedbackGeneralFeedback = NSLocalizedString("send.browser.feedback.general-feedback", value: "General feedback", comment: "Name of the option the user can chose to give general browser feedback")
+    static let browserFeedbackSelectCategory = NSLocalizedString("send.browser.feedback.select-category", value: "Select a category", comment: "Title of the picker where the user can chose the category of the feedback they want ot send.")
+    static let browserFeedbackThankYou = NSLocalizedString("send.browser.feedback.thankyou", value: "Thank you!", comment: "Thanks the user for sending feedback")
+    static let browserFeedbackFeedbackHelps = NSLocalizedString("send.browser.feedback.feedback-helps", value: "Your feedback will help us improve the DuckDuckGo app.", comment: "Text shown to the user when they provide feedback.")
+
     static let otherBookmarksImportedFolderTitle = NSLocalizedString("bookmarks.imported.other.folder.title", value: "Other bookmarks", comment: "Name of the \"Other bookmarks\" folder imported from other browser")
     static let mobileBookmarksImportedFolderTitle = NSLocalizedString("bookmarks.imported.mobile.folder.title", value: "Mobile bookmarks", comment: "Name of the \"Mobile bookmarks\" folder imported from other browser")
 
@@ -495,6 +521,7 @@ struct UserText {
 
     static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
 
+    // MARK: Permission
     static let devicePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
                                                                        value: "Allow “%@“ to use your %@?",
                                                                        comment: "Popover asking for domain %@ to use camera/mic/location (%@)")
@@ -533,6 +560,9 @@ struct UserText {
     static let permissionPopupOpenFormat = NSLocalizedString("permission.popup.open.format", value: "%@", comment: "Open %@ URL Pop-up")
 
     static let permissionExternalSchemeOpenFormat = NSLocalizedString("permission.externalScheme.open.format", value: "Open %@", comment: "Open %@ App Name")
+    static let permissionPopupBlockedPopover = NSLocalizedString("permission.popup.blocked.popover", value: "Pop-up Blocked", comment: "Text of popver warning the user that the a pop-up as been blocked")
+    static let permissionPopupLearnMoreLink = NSLocalizedString("permission.popup.learn-more.link", value: "Learn more about location services", comment: "Text of link that leads to web page with more informations about location services.")
+    static let permissionPopupAllowButton = NSLocalizedString("permission.popup.allow.button", value: "Allow", comment: "Button that the user can use to authorise a web site to for, for example access location or camera and microphone etc.")
 
     static let privacyDashboardPermissionAsk = NSLocalizedString("dashboard.permission.ask", value: "Ask every time", comment: "Privacy Dashboard: Website should always Ask for permission for input media device access")
     static let privacyDashboardPermissionAlwaysAllow = NSLocalizedString("dashboard.permission.allow", value: "Always allow", comment: "Privacy Dashboard: Website can always access input media device")
@@ -588,6 +618,9 @@ struct UserText {
     }
 
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
+    static let themeLight = NSLocalizedString("preferences.appearance.theme.light", value: "Light", comment: "In the preferences for themes, the option to select for activating light mode in the app.")
+    static let themeDark = NSLocalizedString("preferences.appearance.theme.dark", value: "Dark", comment: "In the preferences for themes, the option to select for activating dark mode in the app.")
+    static let themeSystem = NSLocalizedString("preferences.appearance.theme.system", value: "System", comment: "In the preferences for themes, the option to select for use the change the mode based on the system preferences.")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")
     static let showAutocompleteSuggestions = NSLocalizedString("preferences.appearance.show-autocomplete-suggestions", value: "Autocomplete suggestions", comment: "Option to show autocomplete suggestions in the address bar")
@@ -911,6 +944,7 @@ struct UserText {
     static let findInPageCloseTooltip = NSLocalizedString("tooltip.find-in-page.close", value: "Close find bar", comment: "Tooltip for the Find In Page bar's Close button")
     static let findInPageNextTooltip = NSLocalizedString("tooltip.find-in-page.next", value: "Next result", comment: "Tooltip for the Find In Page bar's Next button")
     static let findInPagePreviousTooltip = NSLocalizedString("tooltip.find-in-page.previous", value: "Previous result", comment: "Tooltip for the Find In Page bar's Previous button")
+    static let findInPageTextFieldPlaceholder = NSLocalizedString("find-in-page.text-field.placeholder", value: "Find in page", comment: "Placeholder text for the text field where the user inputs strings to searcg in the web page")
 
     static let copyUsernameTooltip = NSLocalizedString("autofill.copy-username", value: "Copy username", comment: "Tooltip for the Autofill panel's Copy Username button")
     static let copyPasswordTooltip = NSLocalizedString("autofill.copy-password", value: "Copy password", comment: "Tooltip for the Autofill panel's Copy Password button")
@@ -1036,6 +1070,27 @@ struct UserText {
     static let fireproofCheckboxTitle = NSLocalizedString("fireproof.checkbox.title", value: "Ask to Fireproof websites when signing in", comment: "Fireproof settings checkbox title")
     static let fireproofExplanation = NSLocalizedString("fireproof.explanation", value: "When you Fireproof a site, cookies won't be erased and you'll stay signed in, even after using the Fire Button.", comment: "Fireproofing mechanism explanation")
     static let manageFireproofSites = NSLocalizedString("fireproof.manage-sites", value: "Manage Fireproof Sites…", comment: "Fireproof settings button caption")
+
+    // MARK: Crash Report
+    static let crashReportTitle = NSLocalizedString("crash-report.title", value: "DuckDuckGo Privacy Browser quit unexpectedly.", comment: "Title of the dialog where the user can send a crash report")
+    static let crashReportDescription = NSLocalizedString("crash-report.description", value: "Click “Send to DuckDuckGo“ to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report.", comment: "Description of the dialog where the user can send a crash report")
+    static let crashReportTextFieldTitle = NSLocalizedString("crash-report.textfield.title", value: "Problem Details", comment: "Title of the text field where the problems that caused the crashed are detailed")
+    static let crashReportSendButton = NSLocalizedString("crash-report.send-button", value: "Send to DuckDuckGo", comment: "Button the user can press to send the crash report to DuckDuckGo")
+    static let crashReportDontSendButton = NSLocalizedString("crash-report.dont-send-button", value: "Don’t Send", comment: "Button the user can press to not send the crash report")
+
+    // MARK: Downloads
+    static let downloadsDialogTitle = NSLocalizedString("downloads.dialog.title", value: "Downloads", comment: "Title of the dialog that manages the Downloads in the browser")
+    static let downloadsOpenItem = NSLocalizedString("downloads.open.item", value: "Open", comment: "Contextual menu item in downloads manager to open the downloaded file")
+    static let downloadsShowInFinderItem = NSLocalizedString("downloads.show-in-finder.item", value: "Show in Finder", comment: "Contextual menu item in downloads manager to show the downloaded file in Finder")
+    static let downloadsCopyLinkItem = NSLocalizedString("downloads.copy-link.item", value: "Copy Download Link", comment: "Contextual menu item in downloads manager to copy the downloaded link")
+    static let downloadsOpenWebsiteItem = NSLocalizedString("downloads.open-website.item", value: "Open Originating Website", comment: "Contextual menu item in downloads manager to open the downloaded file originating website")
+    static let downloadsRemoveFromListItem = NSLocalizedString("downloads.remove-from-list.item", value: "Remove from List", comment: "Contextual menu item in downloads manager to remove the given downloaded from the list of downloaded files")
+    static let downloadsStopItem = NSLocalizedString("downloads.stop.item", value: "Stop", comment: "Contextual menu item in downloads manager to stop the download")
+    static let downloadsRestartItem = NSLocalizedString("downloads.restart.item", value: "Stop", comment: "Contextual menu item in downloads manager to restart the download")
+    static let downloadsClearAllItem = NSLocalizedString("downloads.clear-all.item", value: "Clear All", comment: "Contextual menu item in downloads manager to clear all downloaded items from the list")
+    static let downloadsNoRecentDownload = NSLocalizedString("downloads.no-recent-downloads", value: "No recent downloads", comment: "Label in the downloads manager that shows that there are no recently downloaded items")
+    static let downloadsOpenDownloadsFolder = NSLocalizedString("downloads.open-downloads-folder", value: "Open Downloads Folder", comment: "Button in the downloads manager that allows the user to open the downloads folder")
+
 
 
 #if SUBSCRIPTION
