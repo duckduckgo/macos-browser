@@ -47,35 +47,10 @@ runs:
           exit 1
         fi
 
-    - id: process-template-payload
-      if: ${{ inputs.template-name }}
-      shell: bash
-      env:
-        TEMPLATE_PATH: ${{ github.action_path }}/templates/${{ inputs.template-name }}.yml
-      run: |
-        if [ ! -f $TEMPLATE_PATH ]; then
-          echo "::error::Template file not found at $TEMPLATE_PATH"
-          exit 1
-        fi
-
-        # Process the template file with envsubst, turn into JSON, remove leading spaces and newlines on non-empty lines, and compact the JSON
-        payload="$(envsubst < $TEMPLATE_PATH | yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g' | jq -c)"
-        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
-
-    - id: process-comment-payload
-      if: ${{ inputs.comment }}
-      shell: bash
-      env:
-        COMMENT: ${{ inputs.comment }}
-        WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      run: |
-        payload="{ \"data\": { \"text\": \"${COMMENT}\n\nWorkflow URL: ${WORKFLOW_URL}\" } }"
-        echo "payload-base64=$(base64 <<< $payload)" >> $GITHUB_OUTPUT
-
     - id: add-comment
-      shell: bash
       uses: ./.github/actions/asana-add-comment
       with:
         access-token: ${{ inputs.access-token }}
         task-id: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-        payload: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
+        comment: ${{ inputs.comment }}
+        template-name: ${{ inputs.template-name }}

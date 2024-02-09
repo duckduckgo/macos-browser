@@ -7,7 +7,7 @@ data:
       Please verify that "Check for Updates" works correctly:
       <ol>
         <li>Launch a debug version of the app with an old version number.</li>
-        <li>Identify as an internal user in the App.</li>
+        <li>Identify as an internal user in the app.</li>
         <li>Go to Main Menu → DuckDuckGo → Check for Updates...</li>
         <li>Verify that you're being offered to update to ${TAG}.</li>
         <li>Verify that the update works.</li>

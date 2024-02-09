@@ -189,10 +189,10 @@ jobs:
           task-url: ${{ github.event.inputs.asana-task-url }}
           template-name: ${{ steps.asana-templates.outputs.comment-template }}
 
-      # - name: Report success
-      #   if: success()
-      #   uses: ./.github/actions/asana-log-message
-      #   with:
-      #     access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
-      #     task-url: ${{ env.asana-task-url }}
-      #     template-name: internal-release-ready
+      - name: Add a comment to the release task
+        if: success()
+        uses: ./.github/actions/asana-add-comment
+        with:
+          access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          task-url: ${{ github.event.inputs.asana-task-url }}
+          template-name: internal-release-complete
