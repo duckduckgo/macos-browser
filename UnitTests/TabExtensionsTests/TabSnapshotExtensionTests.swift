@@ -63,17 +63,9 @@ class TabSnapshotExtensionTests: XCTestCase {
         let snapshot = NSImage()
         mockTabSnapshotStore.snapshots[uuid] = snapshot
 
-        let expectation = XCTestExpectation(description: "Expect snapshot to be restored")
-
         tabSnapshotExtension.setIdentifier(uuid)
 
-        Task {
-            try? await Task.sleep(nanoseconds: 300.asNanos)
-
-            expectation.fulfill()
-        }
-
-        await fulfillment(of: [expectation], timeout: 4)
+        await Task.yield()
 
         let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
         mockWebViewPublisher.send(webView)
@@ -84,7 +76,11 @@ class TabSnapshotExtensionTests: XCTestCase {
         let snapshot2 = NSImage()
         mockWebViewSnapshotRenderer.nextSnapshot = snapshot2
 
+        await Task.yield()
+
         tabSnapshotExtension.didFinishLoad(with: URLRequest(url: URL.aURL), in: WKFrameInfo())
+
+        await Task.yield()
 
         XCTAssertEqual(tabSnapshotExtension.snapshot, snapshot)
         XCTAssertNotEqual(tabSnapshotExtension.snapshot, snapshot2)
@@ -105,17 +101,9 @@ class TabSnapshotExtensionTests: XCTestCase {
         let snapshot2 = NSImage()
         mockWebViewSnapshotRenderer.nextSnapshot = snapshot2
 
-        let expectation = XCTestExpectation(description: "Expect snapshot to be rendered and assigned")
-
         tabSnapshotExtension.didFinishLoad(with: URLRequest(url: URL.aURL), in: WKFrameInfo())
 
-        Task {
-            try? await Task.sleep(nanoseconds: 300.asNanos)
-
-            expectation.fulfill()
-        }
-
-        await fulfillment(of: [expectation], timeout: 4)
+        await Task.yield()
 
         XCTAssertEqual(tabSnapshotExtension.snapshot, snapshot2)
         XCTAssertNotEqual(tabSnapshotExtension.snapshot, snapshot)
