@@ -674,6 +674,7 @@ protocol NewWindowPolicyDecisionMaker {
     @Published var emoji: String?
 
     private func updateTitle(shouldShowBookmarkTitle: Bool? = nil) {
+        emoji = nil
         var title = webView.title?.trimmingWhitespace()
         if title?.isEmpty ?? true {
             title = webView.url?.host?.droppingWwwPrefix()
@@ -692,7 +693,12 @@ protocol NewWindowPolicyDecisionMaker {
 
     private func useBookmarkTitle() {
         if let url = webView.url, let bookmark = bookmarksManager.getBookmark(for: url) {
-            self.title = bookmark.title
+            if bookmark.title.first?.unicodeScalars.first?.properties.isEmoji ?? false {
+                emoji = String(bookmark.title.first!)
+                title = String(bookmark.title.dropFirst())
+            } else {
+                self.title = bookmark.title
+            }
         }
     }
 

@@ -122,7 +122,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         setupMenu()
         updateTitleTextFieldMask()
         closeButton.isHidden = true
-        emojiTextField.delegate = self
     }
 
     override func viewDidLayout() {
@@ -211,22 +210,6 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         self.lastKnownIndexPath = indexPath
         delegate?.tabBarViewItemCloseAction(self)
-    }
-
-    @objc func changeIconAction(_ sender: NSMenuItem) {
-        faviconImageView.isHidden = true
-        emojiTextField.isHidden = false
-        emojiTextField.isEditable = true
-        emojiTextField.makeMeFirstResponder()
-        DispatchQueue.main.async {
-            NSApp.orderFrontCharacterPalette(nil)
-        }
-    }
-
-    @objc func resetIconAction(_ sender: NSMenuItem) {
-        faviconImageView.isHidden = false
-        emojiTextField.isHidden = true
-        emoji = nil
     }
 
     @IBAction func permissionButtonAction(_ sender: NSButton) {
@@ -482,11 +465,6 @@ extension TabBarViewItem: NSMenuDelegate {
         menu.addItem(NSMenuItem.separator())
 
         // Section 3
-        addEmojiMenuItem(to: menu)
-        addResetEmojiMenuItem(to: menu)
-        menu.addItem(NSMenuItem.separator())
-
-        // Section 4
         addCloseMenuItem(to: menu)
         addCloseOtherMenuItem(to: menu, areThereOtherTabs: areThereOtherTabs)
         addCloseTabsToTheRightMenuItem(to: menu, areThereTabsToTheRight: otherItemsState.hasItemsToTheRight)
@@ -523,23 +501,6 @@ extension TabBarViewItem: NSMenuDelegate {
                 menuItem = NSMenuItem(title: UserText.removeFireproofing, action: #selector(removeFireproofingAction(_:)), keyEquivalent: "")
             }
             menuItem.isEnabled = true
-        }
-        menuItem.target = self
-        menu.addItem(menuItem)
-    }
-
-    private func addEmojiMenuItem(to menu: NSMenu) {
-        let menuItem = NSMenuItem(title: "Change Icon", action: #selector(changeIconAction(_:)), keyEquivalent: "")
-        menuItem.target = self
-        menu.addItem(menuItem)
-    }
-
-    private func addResetEmojiMenuItem(to menu: NSMenu) {
-        let menuItem = NSMenuItem(title: "Reset Custom Icon", action: #selector(resetIconAction(_:)), keyEquivalent: "")
-        if let emoji {
-            menuItem.isEnabled = !emoji.isEmpty
-        } else {
-            menuItem.isEnabled = false
         }
         menuItem.target = self
         menu.addItem(menuItem)
@@ -652,60 +613,4 @@ private extension NSImage {
 
     static let micActiveImage = NSImage(named: "Microphone-Active")
     static let micBlockedImage = NSImage(named: "Microphone-Icon")
-}
-
-extension TabBarViewItem: NSTextFieldDelegate, NSControlTextEditingDelegate {
-
-    func controlTextDidChange(_ obj: Notification) {
-        guard let textField = obj.object as? NSTextField else {
-            return
-        }
-
-        // Only allow emoji
-        let validCharacterSet = CharacterSet.emoji
-        let newString = String(textField.stringValue.unicodeScalars.filter { validCharacterSet.contains($0)})
-        if !newString.isEmpty {
-            textField.stringValue = String(newString.suffix(1))
-            emoji = textField.stringValue
-        } else {
-            textField.stringValue = emoji ?? ""
-        }
-
-        textField.window?.makeFirstResponder(nil)
-        updateFavicon(faviconImageView.image, emoji: textField.stringValue)
-    }
-
-    func controlTextDidEndEditing(_ obj: Notification) {
-        guard let textField = obj.object as? NSTextField else {
-            return
-        }
-
-        textField.isEditable = false
-    }
-}
-
-extension CharacterSet {
-    static let emoji: CharacterSet = {
-        var emojiCharacterSet: CharacterSet = CharacterSet()
-
-        // update "ranges" with actual unicode ranges for all categories of emojis
-        let ranges = [
-            (0x1F600...0x1F64F),     // Emoticons
-            (0x1F300...0x1F5FF),     // Misc Symbols and Pictographs
-            (0x1F680...0x1F6FF),     // Transport and Map
-            (0x2600...0x26FF),       // Misc symbols
-            (0x2700...0x27BF),       // Dingbats
-            (0x1F1E6...0x1F1FF),     // Flags
-            (0x1F900...0x1F9FF)      // Supplemental Symbols and Pictographs
-        ]
-
-        for range in ranges {
-            for i in range {
-                if let unicodeScalar = UnicodeScalar(i) {
-                    emojiCharacterSet.insert(unicodeScalar)
-                }
-            }
-        }
-        return emojiCharacterSet
-    }()
 }

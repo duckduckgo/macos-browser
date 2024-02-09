@@ -42,7 +42,7 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
             faviconView.setCornerRadius(3.0)
         }
     }
-
+    @IBOutlet weak var emojiLabel: NSTextField!
     @IBOutlet private var titleLabel: NSTextField!
 
     private enum EntityType {
@@ -69,6 +69,8 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
 
     func updateItem(from entity: BaseBookmarkEntity) {
         self.title = entity.title
+        faviconView.isHidden = false
+        emojiLabel.isHidden = true
 
         if let bookmark = entity as? Bookmark {
             let favicon = bookmark.favicon(.small)?.copy() as? NSImage
@@ -94,6 +96,12 @@ final class BookmarksBarCollectionViewItem: NSCollectionViewItem {
         switch entityType {
         case .bookmark(_, let url, let storedFavicon, _):
             let host = URL(string: url)?.host ?? ""
+            if (entity.title.first?.unicodeScalars.first?.properties.isEmoji) ?? false {
+                faviconView.isHidden = true
+                emojiLabel.isHidden = false
+                emojiLabel.stringValue = String(entity.title.first!)
+                titleLabel.stringValue = String(entity.title.dropFirst())
+            }
             let favicon = storedFavicon ?? FaviconManager.shared.getCachedFavicon(for: host, sizeCategory: .small)?.image
             faviconView.image = favicon ?? NSImage(named: "Bookmark")
         case .folder:

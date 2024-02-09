@@ -22,7 +22,7 @@ import Combine
 extension Tab {
     var stateChanged: AnyPublisher<Void, Never> {
         $content.asVoid()
-            .merge(with: $favicon.asVoid(), $emoji.asVoid())
+            .merge(with: $favicon.asVoid())
             .eraseToAnyPublisher()
     }
 }
