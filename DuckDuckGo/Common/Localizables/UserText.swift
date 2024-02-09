@@ -28,6 +28,7 @@ struct UserText {
     static let cancel = NSLocalizedString("cancel", value: "Cancel", comment: "Cancel button")
     static let notNow = NSLocalizedString("notnow", value: "Not Now", comment: "Not Now button")
     static let remove = NSLocalizedString("generic.remove.button", value: "Remove", comment: "Label of a button that allows the user to remove an item")
+    static let discard = NSLocalizedString("generic.discard.button", value: "Discard", comment: "Label of a button that allows the user discard an action/change")
     static let neverForThisSite = NSLocalizedString("never.for.this.site", value: "Never Ask for This Site", comment: "Never ask to save login credentials for this site button")
     static let open = NSLocalizedString("open", value: "Open", comment: "Open button")
     static let save = NSLocalizedString("save", value: "Save", comment: "Save button")
@@ -426,7 +427,6 @@ struct UserText {
     static let autofillNeverLock = NSLocalizedString("autofill.never-lock", value: "Never lock autofill", comment: "Autofill auto-lock setting")
     static let autofillNeverLockWarning = NSLocalizedString("autofill.never-lock-warning", value: "If not locked, anyone with access to your device will be able to use and modify your autofill data. For security purposes, credit card form fill always requires authentication.", comment: "Autofill disabled auto-lock warning")
     static let autolockLocksFormFill = NSLocalizedString("autofill.autolock-locks-form-filling", value: "Also lock password form fill", comment: "Lock form filling when auto-lock is active text")
-
     
     static let downloadsLocation = NSLocalizedString("downloads.location", value: "Location", comment: "Downloads directory location")
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
@@ -438,6 +438,7 @@ struct UserText {
     static let passwordManagementLogins = NSLocalizedString("passsword.management.logins", value: "Passwords", comment: "Used as title for the Autofill Logins option")
     static let passwordManagementIdentities = NSLocalizedString("passsword.management.identities", value: "Identities", comment: "Used as title for the Autofill Identities option")
     static let passwordManagementCreditCards = NSLocalizedString("passsword.management.credit-cards", value: "Credit Cards", comment: "Used as title for the Autofill Credit Cards option")
+    static let passwordManagementCreditCardsUnknownCard = NSLocalizedString("autofill.management.credit-cards.unknown.card", value: "Card", comment: "Used as placeholder when user iserts a credit card of unknown type (e.g. not Visa, Mastercard)")
     static let passwordManagementNotes = NSLocalizedString("passsword.management.notes", value: "Notes", comment: "Used as title for the Autofill Notes option")
     static let passwordManagementLock = NSLocalizedString("passsword.management.lock", value: "Lock", comment: "Lock Logins Vault menu")
     static let passwordManagementUnlock = NSLocalizedString("passsword.management.unlock", value: "Unlock", comment: "Unlock Logins Vault menu")
@@ -456,7 +457,15 @@ struct UserText {
     static let passwordManagerEmptyStateTitle = NSLocalizedString("passsword.manager.empty.state.title", value: "No logins or credit card info yet", comment: "In the password manager title when there are no items")
     static let passwordManagerEmptyStateMessage = NSLocalizedString("passsword.manager.empty.state.message", value: "If your logins are saved in another browser, you can import them into DuckDuckGo.", comment: "In the password manager message when there are no items")
     static let importData = NSLocalizedString("Import", comment: "Menu item")
-
+    static let passwordManagerAlertRemovePasswordConfirmation = NSLocalizedString("passsword.manager.alert.remove-password.confirmation", value: "Are you sure you want to delete this saved password", comment: "Text of the alert that asks the user to confirm they want to delete a password")
+    static let passwordManagerAlertSaveChanges = NSLocalizedString("passsword.manager.alert.save-changes", value: "Save the changes you made?", comment: "Text of the alert that asks the user if the want to save the changes made")
+    static let passwordManagerAlertDuplicatePassword = NSLocalizedString("passsword.manager.alert.duplicate.password", value: "Duplicate Password", comment: "Title of the alert that the password inserted already exists")
+    static let passwordManagerAlertDuplicatePasswordDescription = NSLocalizedString("passsword.manager.alert.duplicate.password.description", value: "You already have a password saved for this username and website.", comment: "Text of the alert that explains the password inserted already exists for a given website")
+    static let thisActionCannotBeUndone = NSLocalizedString("action-cannot-be-undone", value: "This action cannot be undone.", comment: "Text used in alerts to warn user that a given action cannot be undone")
+    static let passwordManagerAlerDeleteButton = NSLocalizedString("passsword.manager.alert.delete", value: "Delete", comment: "Button of the alert that asks the user to confirm they want to delete an password, login or credential to actually delete")
+    static let passwordManagerAlertRemoveCardConfirmation = NSLocalizedString("passsword.manager.alert.remove-card.confirmation", value: "Are you sure you want to delete this saved credit card?", comment: "Text of the alert that asks the user to confirm they want to delete a credit card")
+    static let passwordManagerAlertRemoveIdentityConfirmation = NSLocalizedString("passsword.manager.alert.remove-identity.confirmation", value: "Are you sure you want to delete this saved autofill info?", comment: "Text of the alert that asks the user to confirm they want to delete an identity")
+    static let passwordManagerAlertRemoveNoteConfirmation = NSLocalizedString("passsword.manager.alert.remove-note.confirmation", value: "Are you sure you want to delete this note?", comment: "Text of the alert that asks the user to confirm they want to delete a note")
 
     static let importBookmarks = NSLocalizedString("import.browser.data.bookmarks", value: "Import Bookmarks…", comment: "Opens Import Browser Data dialog")
     static let importPasswords = NSLocalizedString("import.browser.data.passwords", value: "Import Passwords…", comment: "Opens Import Browser Data dialog")
@@ -609,6 +618,9 @@ struct UserText {
     }
 
     static let theme = NSLocalizedString("preferences.appearance.theme", value: "Theme", comment: "Theme preferences")
+    static let themeLight = NSLocalizedString("preferences.appearance.theme.light", value: "Light", comment: "In the preferences for themes, the option to select for activating light mode in the app.")
+    static let themeDark = NSLocalizedString("preferences.appearance.theme.dark", value: "Dark", comment: "In the preferences for themes, the option to select for activating dark mode in the app.")
+    static let themeSystem = NSLocalizedString("preferences.appearance.theme.system", value: "System", comment: "In the preferences for themes, the option to select for use the change the mode based on the system preferences.")
     static let addressBar = NSLocalizedString("preferences.appearance.address-bar", value: "Address Bar", comment: "Theme preferences")
     static let showFullWebsiteAddress = NSLocalizedString("preferences.appearance.show-full-url", value: "Full website address", comment: "Option to show full URL in the address bar")
     static let showAutocompleteSuggestions = NSLocalizedString("preferences.appearance.show-autocomplete-suggestions", value: "Autocomplete suggestions", comment: "Option to show autocomplete suggestions in the address bar")
