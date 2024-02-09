@@ -62,7 +62,18 @@ class TabSnapshotExtensionTests: XCTestCase {
         let uuid = UUID()
         let snapshot = NSImage()
         mockTabSnapshotStore.snapshots[uuid] = snapshot
-        await tabSnapshotExtension.setIdentifier(uuid)
+
+        let expectation = XCTestExpectation(description: "Expect snapshot to be restored")
+
+        tabSnapshotExtension.setIdentifier(uuid)
+
+        Task {
+            try? await Task.sleep(nanoseconds: 300.asNanos)
+
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 4)
 
         let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
         mockWebViewPublisher.send(webView)
@@ -84,8 +95,6 @@ class TabSnapshotExtensionTests: XCTestCase {
         let uuid = UUID()
         let snapshot = NSImage()
         mockTabSnapshotStore.snapshots[uuid] = snapshot
-
-        await tabSnapshotExtension.setIdentifier(nil)
 
         let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
         mockWebViewPublisher.send(webView)
@@ -114,8 +123,6 @@ class TabSnapshotExtensionTests: XCTestCase {
 
     @MainActor
     func testWhenUserInteractsAndWebViewIsNotLoading_ThenSnapshotRenderingIsTriggered() async {
-        await tabSnapshotExtension.setIdentifier(nil)
-
         let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
         mockWebViewPublisher.send(webView)
 
@@ -137,8 +144,6 @@ class TabSnapshotExtensionTests: XCTestCase {
 
     @MainActor
     func testWhenSnapshotDataUnchangedAndNoNewUserInteraction_ThenRedundantRenderingIsAvoided() async {
-        await tabSnapshotExtension.setIdentifier(nil)
-
         let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
         mockWebViewPublisher.send(webView)
 
@@ -169,8 +174,6 @@ class TabSnapshotExtensionTests: XCTestCase {
 
     @MainActor
     func testWhenSnapshotIsRendered_ThenItIsPersistedCorrectly() async {
-        await tabSnapshotExtension.setIdentifier(nil)
-
         let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
         mockWebViewPublisher.send(webView)
 
@@ -195,9 +198,6 @@ class TabSnapshotExtensionTests: XCTestCase {
             webViewPublisher: mockWebViewPublisher.eraseToAnyPublisher(),
             contentPublisher: mockContentPublisher.eraseToAnyPublisher(),
             isBurner: true)
-
-        await tabSnapshotExtension.setIdentifier(nil)
-
         let webView = WebView(frame: .zero, configuration: WKWebViewConfiguration())
         mockWebViewPublisher.send(webView)
 

@@ -24,7 +24,7 @@ import WebKit
 
 final class TabSnapshotExtension {
 
-    private(set) var identifier: UUID?
+    private(set) var identifier = UUID()
 
     // Flag triggers rendering of snapshot after webview finishes loading
     private var renderSnapshotAfterLoad = true
@@ -64,46 +64,39 @@ final class TabSnapshotExtension {
         contentPublisher.sink { [weak self] tabContent in
             self?.tabContent = tabContent
         }.store(in: &cancellables)
-
-        Task {
-            await setIdentifier()
-        }
     }
 
     deinit {
-        if let identifier {
-            store.clearSnapshot(tabID: identifier)
-        }
+        store.clearSnapshot(tabID: identifier)
     }
 
     @MainActor
-    func setIdentifier(_ identifier: UUID? = nil) async {
-        if let originalIdentifier = self.identifier {
-            store.clearSnapshot(tabID: originalIdentifier)
-        }
+    // Method for changing the identifier in case it was successfully restored
+    func setIdentifier(_ identifier: UUID) {
+        store.clearSnapshot(tabID: self.identifier)
 
-        guard let identifier else {
-            // Create new identifier and render snapshot right after the first load
-            self.identifier = UUID()
-            renderSnapshotAfterLoad = true
-            return
-        }
-
-        // Identifier exists, restore the snapshot
         self.identifier = identifier
 
-        guard let image = await store.loadSnapshot(for: identifier) as NSImage? else {
-            os_log("No snapshot restored", log: .tabSnapshots)
-            return
+        // Restore the snapshot
+        Task {
+            guard let image = await store.loadSnapshot(for: identifier) as NSImage? else {
+                os_log("No snapshot restored", log: .tabSnapshots)
+                return
+            }
+
+            guard snapshotData == nil else {
+                // Snapshot has been rendered in the meantime
+                return
+            }
+
+            snapshotData = SnapshotData(url: nil,
+                                        image: image,
+                                        webviewBoundsSize: NSSize.zero,
+                                        isRestored: true)
+            os_log("Snapshot restored", log: .tabSnapshots)
+
+            renderSnapshotAfterLoad = false
         }
-
-        snapshotData = SnapshotData(url: nil,
-                                    image: image,
-                                    webviewBoundsSize: NSSize.zero,
-                                    isRestored: true)
-        os_log("Snapshot restored", log: .tabSnapshots)
-
-        renderSnapshotAfterLoad = false
     }
 
     // MARK: - Snapshot
@@ -121,7 +114,7 @@ final class TabSnapshotExtension {
 
     private var snapshotData: SnapshotData? {
         didSet {
-            if let snapshotData, let identifier {
+            if let snapshotData {
                 storeSnapshot(snapshotData.image, identifier: identifier)
             }
         }
@@ -217,6 +210,7 @@ extension TabSnapshotExtension: NSCodingExtension {
         static let tabSnapshotIdentifier = "TabSnapshotIdentifier"
     }
 
+    @MainActor
     func awakeAfter(using decoder: NSCoder) {
         guard !didRestoreSnapshot else { return }
 
@@ -228,16 +222,12 @@ extension TabSnapshotExtension: NSCodingExtension {
 
         didRestoreSnapshot = true
 
-        Task {
-            await setIdentifier(identifier)
-        }
+        setIdentifier(identifier)
     }
 
     func encode(using coder: NSCoder) {
-        if let identifier {
-            coder.encode(identifier.uuidString,
-                         forKey: NSSecureCodingKeys.tabSnapshotIdentifier)
-        }
+        coder.encode(identifier.uuidString,
+                     forKey: NSSecureCodingKeys.tabSnapshotIdentifier)
     }
 
 }
@@ -267,9 +257,9 @@ extension TabSnapshotExtension: NavigationResponder {
 protocol TabSnapshotExtensionProtocol: AnyObject, NavigationResponder {
 
     var snapshot: NSImage? { get }
-    var identifier: UUID? { get }
+    var identifier: UUID { get }
 
-    func setIdentifier(_ identifier: UUID?) async
+    func setIdentifier(_ identifier: UUID)
     func renderWebViewSnapshot() async
     func renderSnapshot(from view: NSView) async
 
