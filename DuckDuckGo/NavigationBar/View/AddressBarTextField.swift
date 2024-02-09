@@ -229,10 +229,8 @@ final class AddressBarTextField: NSTextField {
             switch suggestion {
             case .website, .bookmark, .historyEntry:
                 restoreValue(Value(stringValue: suggestionViewModel.autocompletionString, userTyped: true))
-            case .phrase(phrase: let phase):
+            case .phrase(phrase: let phase, imageUrl: _):
                 restoreValue(Value.text(phase))
-            default:
-                updateValue()
             }
         case .url(urlString: let urlString, url: _, userTyped: true):
             restoreValue(Value(stringValue: urlString, userTyped: true))
@@ -369,8 +367,7 @@ final class AddressBarTextField: NSTextField {
              .website(url: let url):
             finalUrl = url
             userEnteredValue = url.absoluteString
-        case .phrase(phrase: let phrase),
-             .unknown(value: let phrase):
+        case .phrase(phrase: let phrase, imageUrl: _):
             finalUrl = URL.makeSearchUrl(from: phrase)
             userEnteredValue = phrase
         case .none:
@@ -760,9 +757,6 @@ extension AddressBarTextField {
                 } else {
                     self = .url(url)
                 }
-
-            case .unknown:
-                self = Suffix.search
             }
         }
 
@@ -828,6 +822,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
         // don't blink and keep the Suggestion displayed
         if case .userAppendingTextToTheEnd = currentTextDidChangeEvent,
             let suggestion = autocompleteSuggestionBeingTypedOverByUser(with: stringValueWithoutSuffix) {
+
             self.value = .suggestion(SuggestionViewModel(isHomePage: isHomePage, suggestion: suggestion.suggestion, userStringValue: stringValueWithoutSuffix))
 
         } else {

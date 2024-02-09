@@ -46,6 +46,8 @@ final class SuggestionTableCellView: NSTableCellView {
     var isBurner: Bool = false
 
     func display(_ suggestionViewModel: SuggestionViewModel) {
+        suggestionViewModel.delegate = self
+
         attributedString = suggestionViewModel.tableCellViewAttributedString
         iconImageView.image = suggestionViewModel.icon
         suffixTextField.stringValue = suggestionViewModel.suffix
@@ -77,6 +79,15 @@ final class SuggestionTableCellView: NSTableCellView {
 
     private func updateIconImageView() {
         iconImageView.contentTintColor = isSelected ? Self.selectedTintColor : Self.iconColor
+    }
+
+}
+
+extension SuggestionTableCellView: SuggestionViewModelDelegate {
+
+    func suggestionViewModelDidLoadNewIcon(_ suggestionViewModel: SuggestionViewModel) {
+//        display(suggestionViewModel)
+        iconImageView.image = suggestionViewModel.icon
     }
 
 }

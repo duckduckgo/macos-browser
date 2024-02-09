@@ -19,16 +19,51 @@
 import Cocoa
 import BrowserServicesKit
 
-struct SuggestionViewModel: Equatable {
+protocol SuggestionViewModelDelegate: AnyObject {
+
+    func suggestionViewModelDidLoadNewIcon(_ suggestionViewModel: SuggestionViewModel)
+
+}
+
+final class SuggestionViewModel {
 
     let isHomePage: Bool
     let suggestion: Suggestion
-    let userStringValue: String
+    var userStringValue: String
+
+    weak var delegate: SuggestionViewModelDelegate?
 
     init(isHomePage: Bool, suggestion: Suggestion, userStringValue: String) {
         self.isHomePage = isHomePage
         self.suggestion = suggestion
         self.userStringValue = userStringValue
+
+        loadImageIfNeeded()
+    }
+
+    private var loadedImage: NSImage?
+
+    var imageLoadingTask: URLSessionDataTask?
+
+    func loadImageIfNeeded() {
+        guard let imageUrl = suggestion.imageUrl else {
+            return
+        }
+
+        imageLoadingTask?.cancel()
+        imageLoadingTask = URLSession.shared.dataTask(with: imageUrl) { [weak self] data, _, error in
+            guard let self = self else { return }
+            guard let data = data, error == nil else {
+                self.loadedImage = nil
+                return
+            }
+            let image = NSImage(data: data)
+            self.loadedImage = image
+            DispatchQueue.main.async {
+                self.delegate?.suggestionViewModelDidLoadNewIcon(self)
+            }
+        }
+        imageLoadingTask?.resume()
     }
 
     // MARK: - Attributed Strings
@@ -41,22 +76,22 @@ struct SuggestionViewModel: Equatable {
 
     private static let homePageTableRowViewStandardAttributes: [NSAttributedString.Key: Any] = [
         .font: NSFont.systemFont(ofSize: 15, weight: .regular),
-        .paragraphStyle: Self.paragraphStyle
+        .paragraphStyle: paragraphStyle
     ]
 
     private static let regularTableRowViewStandardAttributes: [NSAttributedString.Key: Any] = [
         .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-        .paragraphStyle: Self.paragraphStyle
+        .paragraphStyle: paragraphStyle
     ]
 
     private static let homePageTableRowViewBoldAttributes: [NSAttributedString.Key: Any] = [
         NSAttributedString.Key.font: NSFont.systemFont(ofSize: 15, weight: .bold),
-        .paragraphStyle: Self.paragraphStyle
+        .paragraphStyle: paragraphStyle
     ]
 
     private static let regularTableRowViewBoldAttributes: [NSAttributedString.Key: Any] = [
         NSAttributedString.Key.font: NSFont.systemFont(ofSize: 13, weight: .bold),
-        .paragraphStyle: Self.paragraphStyle
+        .paragraphStyle: paragraphStyle
     ]
 
     var tableRowViewStandardAttributes: [NSAttributedString.Key: Any] {
@@ -84,7 +119,7 @@ struct SuggestionViewModel: Equatable {
 
     var string: String {
         switch suggestion {
-        case .phrase(phrase: let phrase):
+        case .phrase(phrase: let phrase, imageUrl: _):
             return phrase
         case .website(url: let url):
             return url.toString(forUserInput: userStringValue)
@@ -96,16 +131,12 @@ struct SuggestionViewModel: Equatable {
             }
         case .bookmark(title: let title, url: _, isFavorite: _, allowedInTopHits: _):
             return title
-        case .unknown(value: let value):
-            return value
         }
     }
 
     var title: String? {
         switch suggestion {
-        case .phrase,
-             .website,
-             .unknown:
+        case .phrase, .website:
             return nil
         case .historyEntry(title: let title, url: let url, allowedInTopHits: _):
             if url.isDuckDuckGoSearch {
@@ -144,7 +175,7 @@ struct SuggestionViewModel: Equatable {
         case .website(url: let url) where url.toString(forUserInput: userStringValue, decodePunycode: false) != self.string:
             return " – " + url.toString(decodePunycode: false, dropScheme: true, dropTrailingSlash: true)
 
-        case .phrase, .unknown, .website:
+        case .phrase, .website:
             return ""
         case .historyEntry(title: _, url: let url, allowedInTopHits: _),
              .bookmark(title: _, url: let url, isFavorite: _, allowedInTopHits: _):
@@ -168,8 +199,12 @@ struct SuggestionViewModel: Equatable {
 
     var icon: NSImage? {
         switch suggestion {
-        case .phrase:
-            return Self.searchImage
+        case .phrase(phrase: _, imageUrl: _):
+            if let image = loadedImage {
+                return image
+            } else {
+                return Self.searchImage
+            }
         case .website:
             return Self.webImage
         case .historyEntry:
@@ -178,9 +213,15 @@ struct SuggestionViewModel: Equatable {
             return Self.bookmarkImage
         case .bookmark(title: _, url: _, isFavorite: true, allowedInTopHits: _):
             return Self.favoriteImage
-        case .unknown:
-            return Self.webImage
         }
+    }
+
+}
+
+extension SuggestionViewModel: Equatable {
+
+    static func == (lhs: SuggestionViewModel, rhs: SuggestionViewModel) -> Bool {
+        lhs === rhs
     }
 
 }

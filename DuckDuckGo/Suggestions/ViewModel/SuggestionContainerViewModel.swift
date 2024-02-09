@@ -26,12 +26,15 @@ final class SuggestionContainerViewModel {
     var isHomePage: Bool
     let isBurner: Bool
     let suggestionContainer: SuggestionContainer
+    var suggestionViewModels: [SuggestionViewModel]
     private var suggestionResultCancellable: AnyCancellable?
 
     init(isHomePage: Bool, isBurner: Bool, suggestionContainer: SuggestionContainer) {
         self.isHomePage = isHomePage
         self.isBurner = isBurner
+         self.suggestionViewModels = suggestionContainer.result?.all.map { SuggestionViewModel(isHomePage: isHomePage, suggestion: $0, userStringValue: "") } ?? []
         self.suggestionContainer = suggestionContainer
+
         subscribeToSuggestionResult()
     }
 
@@ -66,11 +69,13 @@ final class SuggestionContainerViewModel {
     private func subscribeToSuggestionResult() {
         suggestionResultCancellable = suggestionContainer.$result.receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            guard let self = self,
-                  self.shouldSelectTopSuggestion
-            else { return }
+                guard let self = self else { return }
 
-            self.select(at: 0)
+                self.suggestionViewModels = self.suggestionContainer.result?.all.map { SuggestionViewModel(isHomePage: self.isHomePage, suggestion: $0, userStringValue: self.userStringValue ?? "") } ?? []
+
+                guard self.shouldSelectTopSuggestion else { return }
+
+                self.select(at: 0)
         }
     }
 
@@ -81,6 +86,9 @@ final class SuggestionContainerViewModel {
 
         let oldValue = self.userStringValue
         self.userStringValue = userStringValue
+        self.suggestionViewModels.forEach {
+            $0.userStringValue = userStringValue
+        }
 
         guard !userStringValue.isEmpty else {
             suggestionContainer.stopGettingSuggestions()
@@ -107,14 +115,12 @@ final class SuggestionContainerViewModel {
     }
 
     func suggestionViewModel(at index: Int) -> SuggestionViewModel? {
-        let items = suggestionContainer.result?.all ?? []
-
-        guard index < items.count else {
+        guard index < suggestionViewModels.count else {
             os_log("SuggestionContainerViewModel: Absolute index is out of bounds", type: .error)
             return nil
         }
 
-        return SuggestionViewModel(isHomePage: isHomePage, suggestion: items[index], userStringValue: userStringValue ?? "")
+        return suggestionViewModels[index]
     }
 
     func select(at index: Int) {
@@ -124,7 +130,7 @@ final class SuggestionContainerViewModel {
             return
         }
 
-        if suggestionViewModel(at: index) != self.selectedSuggestionViewModel {
+        if suggestionViewModel(at: index) !== self.selectedSuggestionViewModel {
             selectionIndex = index
         }
     }
