@@ -245,7 +245,7 @@ extension SuggestionViewController: NSTableViewDelegate {
         }
 
         guard let suggestionViewModel = suggestionContainerViewModel.suggestionViewModel(at: row) else {
-            assertionFailure("SuggestionViewController: Failed to get suggestion")
+//            assertionFailure("SuggestionViewController: Failed to get suggestion")
             return nil
         }
 
