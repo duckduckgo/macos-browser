@@ -38,6 +38,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
     private let customURLMenuItem = NSMenuItem(title: "Use Custom URL", action: #selector(DataBrokerProtectionDebugMenu.useWebUICustomURL))
 
     private var databaseBrowserWindowController: NSWindowController?
+    private var dataBrokerForceOptOutWindowController: NSWindowController?
     private let customURLLabelMenuItem = NSMenuItem(title: "")
 
     private let webUISettings = DataBrokerProtectionWebUIURLSettings(.dbp)
@@ -130,6 +131,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
             NSMenuItem.separator()
 
             NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
+                .targetting(self)
+            NSMenuItem(title: "Force Profile Removal", action: #selector(DataBrokerProtectionDebugMenu.showForceOptOutWindow))
                 .targetting(self)
         }
     }
@@ -236,6 +239,21 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         window.delegate = self
     }
 
+    @objc private func showForceOptOutWindow() {
+        let viewController = DataBrokerForceOptOutViewController()
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+                              styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                              backing: .buffered,
+                              defer: false)
+
+        window.contentViewController = viewController
+        window.minSize = NSSize(width: 500, height: 400)
+        window.center()
+        dataBrokerForceOptOutWindowController = NSWindowController(window: window)
+        dataBrokerForceOptOutWindowController?.showWindow(nil)
+        window.delegate = self
+    }
+
     @objc private func resetWaitlistState() {
         DataBrokerProtectionWaitlist().waitlistStorage.deleteWaitlistState()
         KeychainAuthenticationData().reset()
@@ -324,6 +342,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 extension DataBrokerProtectionDebugMenu: NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
         databaseBrowserWindowController = nil
+        dataBrokerForceOptOutWindowController = nil
     }
 }
 
