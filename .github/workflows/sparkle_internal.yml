@@ -85,6 +85,7 @@ jobs:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
+          exit 1
           echo -n "$SPARKLE_PRIVATE_KEY" > sparkle_private_key
           chmod 600 sparkle_private_key
 
@@ -129,6 +130,7 @@ jobs:
         if: always()
         run: |
           echo "APPCAST_PATCH_NAME=${{ steps.appcast.outputs.appcast-patch-name }}" >> $GITHUB_ENV
+          echo "DMG_NAME=duckduckgo-${{ steps.verify-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
           echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${{ steps.verify-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_NAME=${{ vars.TEST_RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.TEST_RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
@@ -143,12 +145,9 @@ jobs:
             echo "task-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
             echo "comment-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
             echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
-          elif [[ ${{ steps.appcast.outcome }} == "success" ]]; then
-            echo "task-template=s3-upload-success" >> $GITHUB_OUTPUT
-            echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
           else
-            echo "task-template=s3-upload-failed" >> $GITHUB_OUTPUT
-            echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
+            echo "task-template=appcast-failed" >> $GITHUB_OUTPUT
+            echo "comment-template=appcast-failed" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Asana task
