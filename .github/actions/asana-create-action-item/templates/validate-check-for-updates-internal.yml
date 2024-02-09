@@ -29,7 +29,9 @@ data:
       <hr>
       <h1>Summary of automated changes</h1>
       <h2>Changes to appcast2.xml</h2>
-      See the attached ${APPCAST_PATCH_NAME} file.
+      See the attached <em>${APPCAST_PATCH_NAME}</em> file.
+      <h2>Release notes</h2>
+      See the attached <em>${RELEASE_NOTES_FILE}</em> file for release notes extracted automatically from <a data-asana-gid='${RELEASE_TASK_ID}' data-asana-dynamic='false'>the release task</a> description.
       <h2>List of files uploaded to S3</h2>
       <ol>
         ${FILES_UPLOADED}
