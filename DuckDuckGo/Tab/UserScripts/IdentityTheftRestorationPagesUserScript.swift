@@ -92,40 +92,11 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
         }
     }
 
-//    struct Subscription: Encodable {
-//        let token: String
-//    }
-//
-//    /// Values that the Frontend can use to determine the current state.
-//    struct SubscriptionValues: Codable {
-//        enum CodingKeys: String, CodingKey {
-//            case token
-//        }
-//        let token: String
-//    }
-
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         if let accessToken = AccountManager().accessToken {
-//            return Subscription(token: accessToken)
             return ["token" : accessToken]
         } else {
             return [String: String]()
         }
     }
-
-//    // MARK: Push actions
-//
-//    enum SubscribeActionName: String {
-//        case onPurchaseUpdate
-//    }
-//
-//    @MainActor
-//    func pushPurchaseUpdate(originalMessage: WKScriptMessage, purchaseUpdate: PurchaseUpdate) async {
-//        pushAction(method: .onPurchaseUpdate, webView: originalMessage.webView!, params: purchaseUpdate)
-//    }
-//
-//    func pushAction(method: SubscribeActionName, webView: WKWebView, params: Encodable) {
-//        let broker = UserScriptMessageBroker(context: SubscriptionPagesUserScript.context, requiresRunInPageContentWorld: true )
-//        broker.push(method: method.rawValue, params: params, for: self, into: webView)
-//    }
 }
