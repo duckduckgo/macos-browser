@@ -18,6 +18,7 @@
 
 #if NETWORK_PROTECTION
 
+import Foundation
 import LoginItems
 
 extension LoginItem {
