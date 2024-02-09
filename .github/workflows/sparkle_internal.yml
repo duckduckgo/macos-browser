@@ -129,7 +129,7 @@ jobs:
         if: always()
         run: |
           echo "APPCAST_PATCH_NAME=${{ steps.appcast.outputs.appcast-patch-name }}" >> $GITHUB_ENV
-          echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${{ github.event.inputs.tag }}.dmg" >> $GITHUB_ENV
+          echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}duckduckgo-${{ steps.verify-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_NAME=${{ vars.TEST_RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.TEST_RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
