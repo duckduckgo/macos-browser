@@ -246,8 +246,7 @@ static BOOL IsInApplicationsFolder(NSString *path) {
 	// Check all the normal Application directories
 	NSArray *applicationDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
 	for (NSString *appDir in applicationDirs) {
-        NSURL *appDirFileURL = [[NSURL alloc] initFileURLWithPath:appDir isDirectory:YES];
-		if ([path hasPrefix:appDirFileURL.absoluteString]) return YES;
+		if ([path hasPrefix:appDir]) return YES;
 	}
 	return NO;
 }
