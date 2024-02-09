@@ -74,19 +74,8 @@ runs:
 
     - id: add-comment
       shell: bash
-      env:
-        ASANA_ACCESS_TOKEN: ${{ inputs.access-token }}
-        TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
-        PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
-      run: |
-        return_code=$(curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/stories" \
-          -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-          -H 'content-type: application/json' \
-          --write-out '%{http_code}' \
-          --output /dev/null \
-          -d "$(base64 -d <<< $PAYLOAD_BASE64)")
-
-        if [ $return_code -ne 201 ]; then
-          echo "::error::Failed to add a comment to the Asana task"
-          exit 1
-        fi
+      uses: ./.github/actions/asana-add-comment
+      with:
+        access-token: ${{ inputs.access-token }}
+        task-id: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
+        payload: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}

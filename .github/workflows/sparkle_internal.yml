@@ -95,7 +95,7 @@ jobs:
             --key sparkle_private_key
 
           appcast_patch_name="appcast2-${{ steps.verify-tag.outputs.tag }}.patch"
-          mv -f ${{ env.SPARKLE_DIR }}/appcast_diff.txt ${SPARKLE_DIR}/${appcast_patch_name}
+          mv -f ${{ env.SPARKLE_DIR }}/appcast_diff.txt ${{ env.SPARKLE_DIR }}/${appcast_patch_name}
           echo "appcast-patch-name=${appcast_patch_name}" >> $GITHUB_OUTPUT
           
       - name: Upload appcast diff artifact
