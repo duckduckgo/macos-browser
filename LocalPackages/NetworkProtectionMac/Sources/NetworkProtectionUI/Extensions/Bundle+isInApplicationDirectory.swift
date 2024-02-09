@@ -33,12 +33,6 @@ extension Bundle {
                 return true
             }
         }
-        #if DEBUG
-        // Builds attached to the debugger will be run from Derived Data
-        if appPath.pathComponents.contains("Applications") {
-            return true
-        }
-        #endif
         return false
     }
 }
