@@ -153,7 +153,9 @@ final class FireTests: XCTestCase {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
         let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
-        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        let appStateRestorationManager = AppStateRestorationManager(fileStore: fileStore,
+                                                                    service: service,
+                                                                    shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
         let fire = Fire(stateRestorationManager: appStateRestorationManager,
@@ -168,7 +170,9 @@ final class FireTests: XCTestCase {
         let fileName = "testStateFileForBurningAllData"
         let fileStore = preparePersistedState(withFileName: fileName)
         let service = StatePersistenceService(fileStore: fileStore, fileName: fileName)
-        let appStateRestorationManager = AppStateRestorationManager(service: service, shouldRestorePreviousSession: false)
+        let appStateRestorationManager = AppStateRestorationManager(fileStore: fileStore,
+                                                                    service: service,
+                                                                    shouldRestorePreviousSession: false)
         appStateRestorationManager.applicationDidFinishLaunching()
 
         let fire = Fire(stateRestorationManager: appStateRestorationManager,

@@ -75,6 +75,7 @@ runs:
         TASK_ID: ${{ steps.get-automation-subtask.outputs.automation-task-id }}
         PAYLOAD_BASE64: ${{ steps.process-template-payload.outputs.payload-base64 || steps.process-comment-payload.outputs.payload-base64 }}
       run: |
+        # Create a subtask and retrieve its ID from the response (.data.gid) to return as an output
         new_task_id=$(set -o pipefail && curl -fLSs "https://app.asana.com/api/1.0/tasks/${TASK_ID}/subtasks?opt_fields=gid" \
           -H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
           -H 'content-type: application/json' \

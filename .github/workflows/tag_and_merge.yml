@@ -40,6 +40,8 @@ jobs:
 
     name: Tag and Merge
 
+    # This doesn't need Xcode, so could technically run on Ubuntu, but actions add comments and tasks in Asana
+    # use BSD-specific sed syntax, that doesn't work with GNU sed (available on Linux).
     runs-on: macos-13
 
     env:

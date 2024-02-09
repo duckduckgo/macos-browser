@@ -282,11 +282,13 @@ extension NetworkProtectionStatusView {
         let tunnelControllerViewModel: TunnelControllerViewModel
 
         var promptActionViewModel: PromptActionView.Model? {
+#if !APPSTORE && !DEBUG
             guard Bundle.main.isInApplicationDirectory else {
                 return PromptActionView.Model(presentationData: MoveToApplicationsPromptPresentationData()) { [weak self] in
                     self?.tunnelControllerViewModel.moveToApplications()
                 }
             }
+#endif
 
             guard !loginItemNeedsApproval else {
                 return PromptActionView.Model(presentationData: LoginItemsPromptPresentationData()) { [weak self] in

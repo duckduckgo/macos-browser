@@ -239,10 +239,6 @@ BOOL PFMoveIsInProgress(void) {
 #pragma mark Helper Functions
 
 static NSString *PreferredInstallLocation(void) {
-	// Return the preferred install location.
-	// Assume that if the user has a ~/Applications folder, they'd prefer their
-	// applications to go there.
-
     return [[NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES) lastObject] stringByResolvingSymlinksInPath];
 }
 
@@ -250,8 +246,7 @@ static BOOL IsInApplicationsFolder(NSString *path) {
 	// Check all the normal Application directories
 	NSArray *applicationDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSLocalDomainMask, YES);
 	for (NSString *appDir in applicationDirs) {
-        NSURL *appDirFileURL = [[NSURL alloc] initFileURLWithPath:appDir isDirectory:YES];
-		if ([path hasPrefix:appDirFileURL.absoluteString]) return YES;
+		if ([path hasPrefix:appDir]) return YES;
 	}
 	return NO;
 }

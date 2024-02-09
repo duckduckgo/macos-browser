@@ -144,7 +144,7 @@ final class URLEventHandler {
             WindowControllersManager.shared.showPreferencesTab(withSelectedPane: .vpn)
             WindowControllersManager.shared.showLocationPickerSheet()
         case AppLaunchCommand.moveAppToApplications.launchURL:
-#if !APPSTORE
+#if !APPSTORE && !DEBUG
             // this should be run after NSApplication.shared is set
             PFMoveToApplicationsFolderIfNecessary(false)
 #endif
