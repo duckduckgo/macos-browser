@@ -21,7 +21,7 @@ import AppKit
 
 public final class DuckChatStatusBar: NSObject {
     public static let shared = DuckChatStatusBar()
-    public static let duckChatURL = URL(string: "https://ffaccin.duckduckgo.com/aichat/")!
+    public static let duckChatURL = URL(string: "https://use-devtesting19.duckduckgo.com/aichat/")!
 
     private var statusBarItem: NSStatusItem?
     private var popover: NSPopover?
