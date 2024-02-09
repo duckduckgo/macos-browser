@@ -190,14 +190,17 @@ final class TabSnapshotExtension {
 
 extension TabSnapshotExtension: WebViewInteractionEventsDelegate {
 
+    @MainActor(unsafe)
     func webView(_ webView: WebView, mouseDown event: NSEvent) {
         userDidInteractWithWebsite = true
     }
 
+    @MainActor(unsafe)
     func webView(_ webView: WebView, keyDown event: NSEvent) {
         userDidInteractWithWebsite = true
     }
 
+    @MainActor(unsafe)
     func webView(_ webView: WebView, scrollWheel event: NSEvent) {
         userDidInteractWithWebsite = true
     }
