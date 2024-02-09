@@ -133,6 +133,7 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
             NSMenuItem(title: "Show DB Browser", action: #selector(DataBrokerProtectionDebugMenu.showDatabaseBrowser))
                 .targetting(self)
             NSMenuItem(title: "Force Profile Removal", action: #selector(DataBrokerProtectionDebugMenu.showForceOptOutWindow))
+            NSMenuItem(title: "Force broker JSON files update", action: #selector(DataBrokerProtectionDebugMenu.forceBrokerJSONFilesUpdate))
                 .targetting(self)
         }
     }
@@ -252,6 +253,12 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         dataBrokerForceOptOutWindowController = NSWindowController(window: window)
         dataBrokerForceOptOutWindowController?.showWindow(nil)
         window.delegate = self
+    }
+
+    @objc private func forceBrokerJSONFilesUpdate() {
+        if let updater = DataBrokerProtectionBrokerUpdater.provide() {
+            updater.updateBrokers()
+        }
     }
 
     @objc private func resetWaitlistState() {
