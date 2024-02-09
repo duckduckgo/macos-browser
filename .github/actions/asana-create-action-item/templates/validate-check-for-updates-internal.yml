@@ -4,6 +4,9 @@ data:
   html_notes: |
     <body>
       <h1>Build ${TAG} has been released internally via Sparkle 🎉</h1>
+      <h2>Release Notes</h2>
+      ${RELEASE_NOTES}
+      <h2>Testing instructions</h2>
       Please verify that "Check for Updates" works correctly:
       <ol>
         <li>Launch a debug version of the app with an old version number.</li>
