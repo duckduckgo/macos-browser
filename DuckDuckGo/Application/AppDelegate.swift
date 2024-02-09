@@ -62,7 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, FileDownloadManagerDel
     private let keyStore = EncryptionKeyStore()
 #endif
 
-    private let fileStore: FileStore
+    let fileStore: FileStore
 
     private(set) var stateRestorationManager: AppStateRestorationManager!
     private var grammarFeaturesManager = GrammarFeaturesManager()
