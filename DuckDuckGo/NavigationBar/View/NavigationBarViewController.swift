@@ -58,6 +58,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet weak var addressBarContainer: NSView!
     @IBOutlet weak var daxLogo: NSImageView!
     @IBOutlet weak var addressBarStack: NSStackView!
+    @IBOutlet weak var duckChatButton: MouseOverButton!
 
     @IBOutlet var addressBarLeftToNavButtonsConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarProportionalWidthConstraint: NSLayoutConstraint!
@@ -185,6 +186,7 @@ final class NavigationBarViewController: NSViewController {
         bookmarkListButton.sendAction(on: .leftMouseDown)
         downloadsButton.sendAction(on: .leftMouseDown)
         networkProtectionButton.sendAction(on: .leftMouseDown)
+        duckChatButton.sendAction(on: .leftMouseDown)
         passwordManagementButton.sendAction(on: .leftMouseDown)
 
         optionsButton.toolTip = UserText.applicationMenuTooltip
@@ -204,6 +206,7 @@ final class NavigationBarViewController: NSViewController {
     override func viewWillAppear() {
         updateDownloadsButton()
         updatePasswordManagementButton()
+        updateDuckChatButton()
         updateBookmarksButton()
         updateHomeButton()
 
@@ -314,6 +317,20 @@ final class NavigationBarViewController: NSViewController {
 
     @IBAction func passwordManagementButtonAction(_ sender: NSButton) {
         popovers.passwordManagementButtonPressed(usingView: passwordManagementButton, withDelegate: self)
+    }
+
+    @IBAction func openDuckChat(_ sender: NSButton) {
+        let url = URL(string: "https://ffaccin.duckduckgo.com/aichat/")!
+
+        let content: Tab.TabContent = .contentFromURL(url, source: .appOpenUrl)
+        let tab = Tab(content: content,
+                      shouldLoadInBackground: true,
+                      burnerMode: tabCollectionViewModel.burnerMode,
+                      webViewSize: view.frame.size)
+
+        tabCollectionViewModel.append(tab: tab, selected: true)
+
+        print("HI")
     }
 
 #if NETWORK_PROTECTION
@@ -640,6 +657,14 @@ final class NavigationBarViewController: NSViewController {
         let menu = NSMenu()
         menu.delegate = self
         self.view.menu = menu
+    }
+
+    private func updateDuckChatButton() {
+        let menu = NSMenu()
+        menu.addItem(withTitle: "AI Chat", action: #selector(openDuckChat), keyEquivalent: "")
+        duckChatButton.menu = menu
+        duckChatButton.image = NSImage(systemSymbolName: "bubble.left.and.text.bubble.right", accessibilityDescription: nil)
+        duckChatButton.isHidden = false
     }
 
     private func updatePasswordManagementButton() {

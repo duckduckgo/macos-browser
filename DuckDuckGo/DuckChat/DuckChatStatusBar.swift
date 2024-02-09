@@ -122,7 +122,7 @@ struct WebViewWrapper: NSViewRepresentable {
 
         func webView(_ webView: WKWebView, decidePolicyFor
                      navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-            try? await webView.evaluateJavaScript("navigator.duckduckgo = {platform: 'macos'}")
+            _ = try? await webView.evaluateJavaScript("navigator.duckduckgo = {platform: 'macos'}")
 
             var request = navigationAction.request
 
@@ -136,7 +136,7 @@ struct WebViewWrapper: NSViewRepresentable {
             if request.value(forHTTPHeaderField: parent.header) == nil {
                 request.setValue(parent.headerValue, forHTTPHeaderField: parent.header)
                 print("SET HEADER")
-                await webView.load(request)
+                webView.load(request)
             }
             return .allow
         }
@@ -145,12 +145,10 @@ struct WebViewWrapper: NSViewRepresentable {
             print("Web deinit")
         }
     }
-
-
 }
 
 struct ContentView: View {
-    let customURL = URL(string: "https://use-devcpu1.duckduckgo.com/?ia=chat")!
+    let customURL = URL(string: "https://ffaccin.duckduckgo.com/aichat/")!
     var body: some View {
             WebViewWrapper(url: customURL)
     }
