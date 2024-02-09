@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Constants
-S3_PATH="s3://ddgstaticcdn/macos-desktop-browser/"
+S3_PATH="s3://ddg-staticcdn/macos-desktop-browser/"
 
 # Defaults
 if [[ -n "$CI" ]]; then
