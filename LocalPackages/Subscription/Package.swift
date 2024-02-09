@@ -19,9 +19,11 @@ let package = Package(
             name: "Subscription",
             dependencies: [
                 .product(name: "BrowserServicesKit", package: "BrowserServicesKit"),
+                .product(name: "Macros", package: "BrowserServicesKit"),
             ],
             swiftSettings: [
-                .define("DEBUG", .when(configuration: .debug))
+                .define("DEBUG", .when(configuration: .debug)),
+                .unsafeFlags(["-Xfrontend", "-load-plugin-executable", "-Xfrontend", "${BUILT_PRODUCTS_DIR}/MacrosImplementation#MacrosImplementation"]),
             ],
             plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
         ),
