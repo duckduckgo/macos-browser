@@ -18,7 +18,6 @@
 
 import Bookmarks
 import CoreData
-import Macros
 import Persistence
 import XCTest
 
@@ -70,7 +69,7 @@ class BookmarksMigrationTests: XCTestCase {
     }
 
     private func url(for title: String) -> URL {
-        #URL("https://\(title).com")
+        URL(string: "https://\(title).com")!
     }
 
     func makeBookmark(title: String,

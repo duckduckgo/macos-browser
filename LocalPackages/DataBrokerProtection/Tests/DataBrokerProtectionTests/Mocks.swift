@@ -247,7 +247,7 @@ final class EmailServiceMock: EmailServiceProtocol {
             throw DataBrokerProtectionError.emailError(nil)
         }
 
-        return #URL("https://www.duckduckgo.com")
+        return URL(string: "https://www.duckduckgo.com")!
     }
 
     func reset() {

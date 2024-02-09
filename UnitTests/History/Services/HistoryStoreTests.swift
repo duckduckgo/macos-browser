@@ -91,7 +91,7 @@ final class HistoryStoreTests: XCTestCase {
             let visitDate = Date(timeIntervalSince1970: 1000.0 * Double(i))
             let visit = Visit(date: visitDate)
             let toRemoveHistoryEntry = HistoryEntry(identifier: identifier,
-                                                    url: #URL("wikipedia.org/\(identifier)"),
+                                                    url: URL(string: "wikipedia.org/\(identifier)")!,
                                                     title: nil,
                                                     numberOfVisits: 1,
                                                     lastVisit: visitDate,
@@ -119,7 +119,7 @@ final class HistoryStoreTests: XCTestCase {
             let visitDate = Date()
             let visit = Visit(date: visitDate)
             let toRemoveHistoryEntry = HistoryEntry(identifier: identifier,
-                                                    url: #URL("wikipedia.org/\(identifier)"),
+                                                    url: URL(string: "wikipedia.org/\(identifier)")!,
                                                     title: nil,
                                                     numberOfVisits: 1,
                                                     lastVisit: visitDate,

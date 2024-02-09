@@ -22,29 +22,29 @@ import Macros
 public extension URL {
 
     static var purchaseSubscription: URL {
-        #URL("https://abrown.duckduckgo.com/subscriptions/welcome")
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/welcome")!
     }
 
     static var subscriptionFAQ: URL {
-        #URL("https://duckduckgo.com/about")
+        URL(string: "https://duckduckgo.com/about")!
     }
 
     // MARK: - Subscription Email
     static var activateSubscriptionViaEmail: URL {
-        #URL("https://abrown.duckduckgo.com/subscriptions/activate")
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/activate")!
     }
 
     static var addEmailToSubscription: URL {
-        #URL("https://abrown.duckduckgo.com/subscriptions/add-email")
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/add-email")!
     }
 
     static var manageSubscriptionEmail: URL {
-        #URL("https://abrown.duckduckgo.com/subscriptions/manage")
+        URL(string: "https://abrown.duckduckgo.com/subscriptions/manage")!
     }
 
     // MARK: - App Store app manage subscription URL
 
     static var manageSubscriptionsInAppStoreAppURL: URL {
-        #URL("macappstores://apps.apple.com/account/subscriptions")
+        URL(string: "macappstores://apps.apple.com/account/subscriptions")!
     }
 }

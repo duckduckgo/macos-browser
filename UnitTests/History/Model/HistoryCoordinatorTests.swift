@@ -120,10 +120,10 @@ class HistoryCoordinatorTests: XCTestCase {
         historyCoordinator.addVisit(of: url2)
 
         let fireproofDomain = "wikipedia.org"
-        let url3 = #URL("https://\(fireproofDomain)")
+        let url3 = URL(string: "https://\(fireproofDomain)")!
         historyCoordinator.addVisit(of: url3)
 
-        let url4 = #URL("https://subdomain.\(fireproofDomain)")
+        let url4 = URL(string: "https://subdomain.\(fireproofDomain)")!
         historyCoordinator.addVisit(of: url4)
 
         XCTAssert(historyCoordinator.history!.count == 4)
