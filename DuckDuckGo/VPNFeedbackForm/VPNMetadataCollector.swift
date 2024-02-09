@@ -19,6 +19,7 @@
 #if NETWORK_PROTECTION
 
 import Foundation
+import AppKit
 import Common
 import LoginItems
 import NetworkProtection

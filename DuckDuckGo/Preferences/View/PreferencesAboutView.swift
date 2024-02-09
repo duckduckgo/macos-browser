@@ -52,11 +52,17 @@ extension Preferences {
 #endif
                             Text(UserText.privacySimplified).font(.privacySimplified)
 
-                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber)).onTapGesture(count: 12) {
+                            Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                                .onTapGesture(count: 12) {
 #if NETWORK_PROTECTION && !SUBSCRIPTION
-                                model.displayNetPInvite()
+                                    model.displayNetPInvite()
 #endif
-                            }
+                                }
+                                .contextMenu(ContextMenu(menuItems: {
+                                    Button(UserText.copy, action: {
+                                        model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                                    })
+                                }))
                         }
                     }
                     .padding(.bottom, 8)

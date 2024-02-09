@@ -125,11 +125,11 @@ enum ThemeName: String, Equatable, CaseIterable {
     var displayName: String {
         switch self {
         case .light:
-            return "Light"
+            return UserText.themeLight
         case .dark:
-            return "Dark"
+            return UserText.themeDark
         case .systemDefault:
-            return "System"
+            return UserText.themeSystem
         }
     }
 

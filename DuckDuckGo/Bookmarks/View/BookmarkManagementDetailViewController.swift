@@ -193,6 +193,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         tableView.setContentHuggingPriority(.defaultHigh, for: .vertical)
         tableView.style = .plain
         tableView.selectionHighlightStyle = .none
+        tableView.allowsMultipleSelection = true
         tableView.usesAutomaticRowHeights = true
         tableView.action = #selector(handleClick)
         tableView.doubleAction = #selector(handleDoubleClick)
@@ -682,7 +683,7 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
         if let url = newUrl.url, url.absoluteString != bookmark.url {
             bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
         }
-        let bookmarkTitle = newTitle.isEmpty ? bookmark.title : newTitle
+        let bookmarkTitle = (newTitle.isEmpty ? bookmark.title : newTitle).trimmingWhitespace()
         if bookmark.title != bookmarkTitle {
             bookmark.title = bookmarkTitle
             bookmarkManager.update(bookmark: bookmark)
