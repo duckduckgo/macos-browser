@@ -226,6 +226,8 @@ extension TabSnapshotExtension: NSCodingExtension {
             return
         }
 
+        didRestoreSnapshot = true
+
         Task {
             await setIdentifier(identifier)
         }
