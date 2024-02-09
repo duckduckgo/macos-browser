@@ -1,5 +1,5 @@
 //
-//  AppMain.swift
+//  DataBrokerForceOptOutViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -16,20 +16,17 @@
 //  limitations under the License.
 //
 
-import AppKit
+import Foundation
+import SwiftUI
 
-@main
-struct AppMain {
+public final class DataBrokerForceOptOutViewController: NSViewController {
 
-    static func main() {
-        _=Application.shared
-
-#if !APPSTORE && !DEBUG
-        // this should be run after NSApplication.shared is set
-        PFMoveToApplicationsFolderIfNecessary(true)
-#endif
-
-        Application.shared.run()
+    public override func loadView() {
+        let viewModel = DataBrokerForceOptOutViewModel()
+        let contentView = DataBrokerForceOptOutView(viewModel: viewModel)
+        let hostingController = NSHostingController(rootView: contentView)
+        hostingController.view.autoresizingMask = [.width, .height]
+        self.view = hostingController.view
     }
 
 }
