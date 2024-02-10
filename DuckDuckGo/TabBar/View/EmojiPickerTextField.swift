@@ -20,5 +20,8 @@ import Foundation
 import AppKit
 
 final class EmojiPickerTextField: NSTextField {
-
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.focusRingType = .none
+    }
 }

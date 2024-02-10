@@ -214,11 +214,13 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     @objc func changeIconAction(_ sender: NSMenuItem) {
-        faviconImageView.isHidden = true
         emojiTextField.isHidden = false
         emojiTextField.isEditable = true
-        emojiTextField.makeMeFirstResponder()
+        if emojiTextField.stringValue.isEmpty {
+            emojiTextField.alphaValue = 0
+        }
         DispatchQueue.main.async {
+            self.emojiTextField.makeMeFirstResponder()
             NSApp.orderFrontCharacterPalette(nil)
         }
     }
@@ -226,6 +228,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     @objc func resetIconAction(_ sender: NSMenuItem) {
         faviconImageView.isHidden = false
         emojiTextField.isHidden = true
+        emojiTextField.alphaValue = 1
         emoji = nil
     }
 
@@ -681,6 +684,7 @@ extension TabBarViewItem: NSTextFieldDelegate, NSControlTextEditingDelegate {
         }
 
         textField.isEditable = false
+        textField.alphaValue = 1
     }
 }
 
@@ -690,13 +694,14 @@ extension CharacterSet {
 
         // update "ranges" with actual unicode ranges for all categories of emojis
         let ranges = [
-            (0x1F600...0x1F64F),     // Emoticons
-            (0x1F300...0x1F5FF),     // Misc Symbols and Pictographs
-            (0x1F680...0x1F6FF),     // Transport and Map
-            (0x2600...0x26FF),       // Misc symbols
-            (0x2700...0x27BF),       // Dingbats
-            (0x1F1E6...0x1F1FF),     // Flags
-            (0x1F900...0x1F9FF)      // Supplemental Symbols and Pictographs
+            (0x203C...0x1FFFD)
+//            (0x1F600...0x1F64F),     // Emoticons
+//            (0x1F300...0x1F5FF),     // Misc Symbols and Pictographs
+//            (0x1F680...0x1F6FF),     // Transport and Map
+//            (0x2600...0x26FF),       // Misc symbols
+//            (0x2700...0x27BF),       // Dingbats
+//            (0x1F1E6...0x1F1FF),     // Flags
+//            (0x1F900...0x1F9FF)      // Supplemental Symbols and Pictographs
         ]
 
         for range in ranges {
