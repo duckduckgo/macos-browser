@@ -118,12 +118,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
         appearancePreferences: AppearancePreferences = .shared,
-        managementDialogModel: ManagementDialogModel = ManagementDialogModel()
+        managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
+        self.userAuthenticator = userAuthenticator
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
@@ -352,6 +354,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
+    private let userAuthenticator: UserAuthenticating
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
@@ -532,6 +535,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             .generate(recoveryCode)
 
         Task { @MainActor in
+            let authenticationResult = await userAuthenticator.authenticateUser(reason: .sync)
+            guard authenticationResult.authenticated else {
+                return
+            }
+
             let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "Sync Data Recovery - DuckDuckGo.pdf")
             let response = await panel.begin()
 
@@ -569,28 +577,35 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         startPollingForRecoveryKey(isRecovery: true)
     }
 
-    @MainActor
     func syncWithAnotherDevicePressed() {
-        if isSyncEnabled {
-            presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
-        } else {
-            self.startPollingForRecoveryKey(isRecovery: false)
+        Task { @MainActor in
+            let result = await userAuthenticator.authenticateUser(reason: .sync)
+            if result.authenticated {
+                if isSyncEnabled {
+                    presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
+                } else {
+                    self.startPollingForRecoveryKey(isRecovery: false)
+                }
+            }
         }
     }
 
-    @MainActor
     func syncWithServerPressed() {
-        presentDialog(for: .syncWithServer)
+        Task { @MainActor in
+            let result = await userAuthenticator.authenticateUser(reason: .sync)
+            if result.authenticated {
+                presentDialog(for: .syncWithServer)
+            }
+        }
     }
 
-    @MainActor
     func recoverDataPressed() {
-        presentDialog(for: .recoverSyncedData)
-    }
-
-    @MainActor
-    func downloadDDGPressed() {
-
+        Task { @MainActor in
+            let result = await userAuthenticator.authenticateUser(reason: .sync)
+            if result.authenticated {
+                presentDialog(for: .recoverSyncedData)
+            }
+        }
     }
 
     @MainActor
