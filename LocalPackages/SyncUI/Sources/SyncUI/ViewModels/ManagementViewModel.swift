@@ -49,9 +49,9 @@ public protocol ManagementViewModel: ObservableObject {
     func manageBookmarks()
     func manageLogins()
 
-    func syncWithAnotherDevicePressed()
-    func syncWithServerPressed()
-    func recoverDataPressed()
+    func syncWithAnotherDevicePressed() async
+    func syncWithServerPressed() async
+    func recoverDataPressed() async
     func turnOffSyncPressed()
 }
 
