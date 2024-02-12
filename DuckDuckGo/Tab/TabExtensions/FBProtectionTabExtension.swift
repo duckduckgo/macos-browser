@@ -44,6 +44,10 @@ final class FBProtectionTabExtension {
         }.store(in: &cancellables)
     }
 
+    public func trackerDetected() {
+        print("FB tracker blocked")
+//        clickToLoadUserScriptPublisher.displayClickToLoadPlaceholders()
+    }
 }
 
 extension FBProtectionTabExtension {
@@ -114,6 +118,8 @@ extension FBProtectionTabExtension: NavigationResponder {
 
 protocol FbBlockingEnabledProvider {
     var fbBlockingEnabled: Bool { get }
+    
+    func trackerDetected()
 }
 
 protocol FBProtectionExtensionProtocol: AnyObject, FbBlockingEnabledProvider, NavigationResponder {
