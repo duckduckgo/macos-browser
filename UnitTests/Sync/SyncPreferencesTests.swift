@@ -46,7 +46,7 @@ final class SyncPreferencesTests: XCTestCase {
     var bookmarksDatabase: CoreDataDatabase!
     var location: URL!
 
-    override func setUp() {
+    override func setUp() async throws {
         setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
@@ -62,7 +62,7 @@ final class SyncPreferencesTests: XCTestCase {
         )
     }
 
-    override func tearDown() {
+    override func tearDown() async throws {
         ddgSyncing = nil
         syncPreferences = nil
         tearDownDatabase()
