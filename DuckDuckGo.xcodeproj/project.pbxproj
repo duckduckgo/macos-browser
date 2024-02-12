@@ -4845,13 +4845,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		1ED910CF2B63A90C00936947 /* ITR */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ITR;
-			sourceTree = "<group>";
-		};
 		3171D6DC2889B6700068632A /* CookieManaged */ = {
 			isa = PBXGroup;
 			children = (
@@ -6730,7 +6723,6 @@
 				AA6EF9AE25066F99004754E6 /* Windows */,
 				31F28C4B28C8EE9000119F70 /* YoutubePlayer */,
 				AA585D85248FD31400E9A3E2 /* Assets.xcassets */,
-				1ED910CF2B63A90C00936947 /* ITR */,
 				4B677454255DC18000025BD8 /* Bridging.h */,
 				AAD86E502678D104005C11BE /* DuckDuckGoCI.entitlements */,
 				AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */,
