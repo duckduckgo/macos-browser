@@ -24,7 +24,6 @@ import WebKit
 import Subscription
 import UserScript
 
-
 ///
 /// The user script that will be the broker for all subscription features
 ///
@@ -94,7 +93,7 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
 
     func getAccessToken(params: Any, original: WKScriptMessage) async throws -> Encodable? {
         if let accessToken = AccountManager().accessToken {
-            return ["token" : accessToken]
+            return ["token": accessToken]
         } else {
             return [String: String]()
         }

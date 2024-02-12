@@ -95,6 +95,7 @@ private extension Tab.TabContent {
         case subscription = 7
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     init?(type: ContentType, url: URL?, videoID: String?, timestamp: String?, preferencePane: PreferencePaneIdentifier?) {
         switch type {
         case .newtab:

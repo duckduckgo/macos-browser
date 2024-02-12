@@ -111,6 +111,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         }
 
+        // swiftlint:disable:next cyclomatic_complexity
         static func contentFromURL(_ url: URL?, source: URLSource) -> TabContent {
             switch url {
             case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
