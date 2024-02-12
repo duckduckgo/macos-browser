@@ -24,7 +24,10 @@ import Foundation
 import Navigation
 import UserScript
 import WebKit
+
+#if SUBSCRIPTION
 import Subscription
+#endif
 
 #if NETWORK_PROTECTION
 import NetworkProtection
@@ -132,11 +135,13 @@ protocol NewWindowPolicyDecisionMaker {
             default: break
             }
 
+#if SUBSCRIPTION
             if let url {
                 if url.isChild(of: URL.subscriptionBaseURL) || url.isChild(of: URL.identityTheftRestoration) {
                     return .subscription(url)
                 }
             }
+#endif
 
             if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .settings(pane: settingsPane)

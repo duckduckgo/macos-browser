@@ -16,6 +16,8 @@
 //  limitations under the License.
 //
 
+#if SUBSCRIPTION
+
 import BrowserServicesKit
 import Common
 import Combine
@@ -99,3 +101,5 @@ final class IdentityTheftRestorationPagesFeature: Subfeature {
         }
     }
 }
+
+#endif
