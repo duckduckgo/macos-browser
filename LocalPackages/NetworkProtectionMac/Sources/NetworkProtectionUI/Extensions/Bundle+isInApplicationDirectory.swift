@@ -22,7 +22,6 @@ extension Bundle {
     var isInApplicationDirectory: Bool {
         guard let appPath = resourceURL?.deletingLastPathComponent() else { return false }
         let dirPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory, .localDomainMask, true)
-        var applicationIsAtCorrectPath = false
         for path in dirPaths {
             let filePath: URL
             if #available(macOS 13.0, *) {
@@ -30,8 +29,10 @@ extension Bundle {
             } else {
                 filePath = URL(fileURLWithPath: path)
             }
-            applicationIsAtCorrectPath = appPath.absoluteString.hasPrefix(filePath.absoluteString)
+            if appPath.absoluteString.hasPrefix(filePath.absoluteString) {
+                return true
+            }
         }
-        return applicationIsAtCorrectPath
+        return false
     }
 }
