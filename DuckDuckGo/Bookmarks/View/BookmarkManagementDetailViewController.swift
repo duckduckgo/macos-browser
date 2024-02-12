@@ -73,7 +73,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
                     if editingBookmarkIndex != nil {
                         view.animator().layer?.backgroundColor = NSColor.backgroundSecondaryColor.cgColor
                     } else {
-                        view.animator().layer?.backgroundColor = NSColor.interfaceBackgroundColor.cgColor
+                        view.animator().layer?.backgroundColor = NSColor.bookmarkPageBackground.cgColor
                     }
                 }
             }
@@ -95,7 +95,7 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
 
     // swiftlint:disable:next function_body_length
     override func loadView() {
-        view = ColorView(frame: .zero, backgroundColor: .interfaceBackgroundColor)
+        view = ColorView(frame: .zero, backgroundColor: .bookmarkPageBackground)
         view.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(separator)

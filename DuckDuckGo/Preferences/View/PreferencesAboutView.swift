@@ -58,6 +58,11 @@ extension Preferences {
                                     model.displayNetPInvite()
 #endif
                                 }
+                                .contextMenu(ContextMenu(menuItems: {
+                                    Button(UserText.copy, action: {
+                                        model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                                    })
+                                }))
                         }
                     }
                     .padding(.bottom, 8)
