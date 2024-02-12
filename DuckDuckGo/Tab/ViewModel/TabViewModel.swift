@@ -294,7 +294,7 @@ final class TabViewModel {
             }
         case .onboarding:
             title = UserText.tabOnboardingTitle
-        case .url, .none:
+        case .url, .none, .subscription:
             if let title = tab.title?.trimmingWhitespace(),
                !title.isEmpty {
                 self.title = title
@@ -329,7 +329,7 @@ final class TabViewModel {
         case .bookmarks:
             favicon = Favicon.bookmarks
             return
-        case .url, .onboarding, .none: break
+        case .url, .onboarding, .none, .subscription: break
         }
 
         if let favicon = tab.favicon {
