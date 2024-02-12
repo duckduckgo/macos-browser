@@ -8741,6 +8741,18 @@
         }
       }
     },
+    "preferences.sync.auto-lock-prompt" : {
+      "comment" : "Reason for auth when setting up Sync",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unlock device to setup Sync & Backup"
+          }
+        }
+      }
+    },
     "preferences.vpn" : {
       "comment" : "Show VPN preferences",
       "extractionState" : "extracted_with_value",
