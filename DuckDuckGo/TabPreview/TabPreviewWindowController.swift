@@ -127,14 +127,11 @@ final class TabPreviewWindowController: NSWindowController {
         }
         var topLeftPoint = topLeftPoint
 
-        let defaultFrame = NSRect(x: 0, y: 0, width: 250, height: 58)
-        window.setFrame(defaultFrame, display: true)
-
         // Make sure preview is presented within screen
         if let screenVisibleFrame = window.screen?.visibleFrame {
             topLeftPoint.x = min(topLeftPoint.x, screenVisibleFrame.width - window.frame.width)
 
-            let windowHeight = defaultFrame.size.height + tabPreviewViewController.snapshotImageViewHeightConstraint.constant
+            let windowHeight = window.frame.size.height
             if topLeftPoint.y <= windowHeight + screenVisibleFrame.origin.y {
                 topLeftPoint.y = topLeftPoint.y + windowHeight + Self.bottomPadding
             }
