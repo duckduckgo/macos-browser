@@ -43,6 +43,12 @@ final class PopupBlockedPopover: NSPopover {
 }
 
 final class PopupBlockedViewController: NSViewController {
+    @IBOutlet weak var descriptionLabel: NSTextField!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        descriptionLabel.stringValue = UserText.permissionPopupBlockedPopover
+    }
 
     override func viewDidAppear() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in

@@ -47,6 +47,10 @@ final class AboutModel: ObservableObject {
         FeedbackPresenter.presentFeedbackForm()
     }
 
+    func copy(_ value: String) {
+        NSPasteboard.general.copy(value)
+    }
+
 #if NETWORK_PROTECTION
     func displayNetPInvite() {
         netPInvitePresenter.present()
