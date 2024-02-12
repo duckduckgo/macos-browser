@@ -67,14 +67,6 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     // MARK: - Public
 
-    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
-        await withCheckedContinuation { continuation in
-            authenticateUser(reason: reason) { result in
-                continuation.resume(returning: result)
-            }
-        }
-    }
-
     private(set) var isAuthenticating: Bool {
         get {
             return queue.sync {
@@ -185,6 +177,14 @@ final class DeviceAuthenticator: UserAuthenticating {
             }
 
             result(authenticationResult)
+        }
+    }
+
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
+        await withCheckedContinuation { continuation in
+            authenticateUser(reason: reason) { result in
+                continuation.resume(returning: result)
+            }
         }
     }
 
