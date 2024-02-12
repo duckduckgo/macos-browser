@@ -173,6 +173,7 @@ struct PinnedTabInnerView: View {
     var foregroundColor: Color
     var drawSeparator: Bool = true
 
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: Tab
     @Environment(\.controlActiveState) private var controlActiveState
 
@@ -203,12 +204,14 @@ struct PinnedTabInnerView: View {
         case .muted:
             ZStack {
                 Circle()
-                    .foregroundColor(.black)
-                    .frame(width: 12, height: 12)
-                Image(systemName: "speaker.slash.fill")
+                    .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
+                    .background(Circle().foregroundColor(colorScheme == .dark ? Color.black : Color.white))
+                    .frame(width: 14, height: 14)
+                Image("Audio-Mute")
                     .resizable()
-                    .foregroundColor(.white)
-                    .frame(width: 10, height: 10)
+                    .renderingMode(.template)
+                    .foregroundColor(.gray)
+                    .frame(width: 9, height: 9)
             }.offset(x: 6, y: -2)
         default: EmptyView()
         }
