@@ -577,35 +577,32 @@ extension SyncPreferences: ManagementDialogModelDelegate {
         startPollingForRecoveryKey(isRecovery: true)
     }
 
-    func syncWithAnotherDevicePressed() {
-        Task { @MainActor in
-            let result = await userAuthenticator.authenticateUser(reason: .syncSettings)
-            if result.authenticated {
-                if isSyncEnabled {
-                    presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
-                } else {
-                    self.startPollingForRecoveryKey(isRecovery: false)
-                }
-            }
+    @MainActor
+    func syncWithAnotherDevicePressed() async {
+        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+            return
+        }
+        if isSyncEnabled {
+            presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
+        } else {
+            self.startPollingForRecoveryKey(isRecovery: false)
         }
     }
 
-    func syncWithServerPressed() {
-        Task { @MainActor in
-            let result = await userAuthenticator.authenticateUser(reason: .syncSettings)
-            if result.authenticated {
-                presentDialog(for: .syncWithServer)
-            }
+    @MainActor
+    func syncWithServerPressed() async {
+        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+            return
         }
+        presentDialog(for: .syncWithServer)
     }
 
-    func recoverDataPressed() {
-        Task { @MainActor in
-            let result = await userAuthenticator.authenticateUser(reason: .syncSettings)
-            if result.authenticated {
-                presentDialog(for: .recoverSyncedData)
-            }
+    @MainActor
+    func recoverDataPressed() async {
+        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+            return
         }
+        presentDialog(for: .recoverSyncedData)
     }
 
     @MainActor
