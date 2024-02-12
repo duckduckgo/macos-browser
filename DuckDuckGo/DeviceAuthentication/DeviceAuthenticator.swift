@@ -49,7 +49,7 @@ final class DeviceAuthenticator: UserAuthenticating {
         case changeLoginsSettings
         case unlockLogins
         case exportLogins
-        case sync
+        case syncSettings
 
         var localizedDescription: String {
             switch self {
@@ -57,7 +57,7 @@ final class DeviceAuthenticator: UserAuthenticating {
             case .changeLoginsSettings: return UserText.pmAutoLockPromptChangeLoginsSettings
             case .unlockLogins: return UserText.pmAutoLockPromptUnlockLogins
             case .exportLogins: return UserText.pmAutoLockPromptExportLogins
-            case .sync: return UserText.syncAutoLockPrompt
+            case .syncSettings: return UserText.syncAutoLockPrompt
             }
         }
     }
@@ -163,7 +163,7 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
         let needsAuthenticationForCreditCardsAutofill = reason == .autofillCreditCards && isCreditCardTimeIntervalExpired()
-        let needsAuthenticationForSyncSettings = reason == .sync && isSyncSettingsTimeIntervalExpired()
+        let needsAuthenticationForSyncSettings = reason == .syncSettings && isSyncSettingsTimeIntervalExpired()
         guard needsAuthenticationForCreditCardsAutofill || needsAuthenticationForSyncSettings || requiresAuthentication else {
             result(.success)
             return

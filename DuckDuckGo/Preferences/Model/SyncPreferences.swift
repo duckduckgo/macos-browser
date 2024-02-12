@@ -535,7 +535,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             .generate(recoveryCode)
 
         Task { @MainActor in
-            let authenticationResult = await userAuthenticator.authenticateUser(reason: .sync)
+            let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
             guard authenticationResult.authenticated else {
                 return
             }
@@ -579,7 +579,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func syncWithAnotherDevicePressed() {
         Task { @MainActor in
-            let result = await userAuthenticator.authenticateUser(reason: .sync)
+            let result = await userAuthenticator.authenticateUser(reason: .syncSettings)
             if result.authenticated {
                 if isSyncEnabled {
                     presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
@@ -592,7 +592,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func syncWithServerPressed() {
         Task { @MainActor in
-            let result = await userAuthenticator.authenticateUser(reason: .sync)
+            let result = await userAuthenticator.authenticateUser(reason: .syncSettings)
             if result.authenticated {
                 presentDialog(for: .syncWithServer)
             }
@@ -601,7 +601,7 @@ extension SyncPreferences: ManagementDialogModelDelegate {
 
     func recoverDataPressed() {
         Task { @MainActor in
-            let result = await userAuthenticator.authenticateUser(reason: .sync)
+            let result = await userAuthenticator.authenticateUser(reason: .syncSettings)
             if result.authenticated {
                 presentDialog(for: .recoverSyncedData)
             }
