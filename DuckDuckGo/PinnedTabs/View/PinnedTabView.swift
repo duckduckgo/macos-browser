@@ -205,7 +205,7 @@ struct PinnedTabInnerView: View {
             ZStack {
                 Circle()
                     .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
-                    .background(Circle().foregroundColor(colorScheme == .dark ? Color.black : Color.white))
+                    .background(Circle().foregroundColor(Color("PinnedTabMuteStateCircleColor")))
                     .frame(width: 14, height: 14)
                 Image("Audio-Mute")
                     .resizable()

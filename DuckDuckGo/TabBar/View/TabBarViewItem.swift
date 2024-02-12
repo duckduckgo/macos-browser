@@ -55,8 +55,7 @@ final class TabBarViewItem: NSCollectionViewItem {
     enum Constants {
         static let textFieldPadding: CGFloat = 32
         static let textFieldPaddingNoFavicon: CGFloat = 12
-        static let textFieldTrailingNoMuteIcon: CGFloat = 8
-        static let textFieldTrailingMuteIconPresent: CGFloat = 32
+        static let textFieldPaddingMuteIconPresent: CGFloat = 56
     }
 
     var widthStage: WidthStage {
@@ -98,7 +97,6 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var titleTextFieldLeadingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var titleTextFieldTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -127,7 +125,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         setupMenu()
         updateTitleTextFieldMask()
         closeButton.isHidden = true
-        setupMuteOrUnmutedIcon()
     }
 
     override func viewDidLayout() {
@@ -135,7 +132,6 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         updateSubviews()
         updateTitleTextFieldMask()
-        setupMuteOrUnmutedIcon()
     }
 
     override func viewWillDisappear() {
@@ -349,6 +345,7 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
 
+        setupMuteOrUnmutedIcon()
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
         closeButton.isHidden = !showCloseButton
         updateSeparatorView()
@@ -432,16 +429,32 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func setupMuteOrUnmutedIcon() {
+        setupMutedTabIconVisibility()
+        setupMutedTabIconColor()
+        setupMutedTabIconPosition()
+    }
+
+    private func setupMutedTabIconVisibility() {
         switch delegate?.tabBarViewItemAudioState(self) {
         case .muted:
             mutedTabIcon.isHidden = false
         default:
             mutedTabIcon.isHidden = true
         }
-
-        titleTextFieldTrailingConstraint.constant = mutedTabIcon.isHidden ? Constants.textFieldTrailingNoMuteIcon : Constants.textFieldTrailingMuteIconPresent
     }
 
+    private func setupMutedTabIconColor() {
+        mutedTabIcon.image?.isTemplate = true
+        mutedTabIcon.contentTintColor = NSColor(named: "MutedTabIconColor")
+    }
+
+    private func setupMutedTabIconPosition() {
+        if !mutedTabIcon.isHidden {
+            titleTextFieldLeadingConstraint.constant = Constants.textFieldPaddingMuteIconPresent
+        } else {
+            titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
+        }
+    }
 }
 
 extension TabBarViewItem: NSMenuDelegate {
