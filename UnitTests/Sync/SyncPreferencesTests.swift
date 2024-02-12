@@ -27,7 +27,10 @@ import TestUtils
 @testable import DuckDuckGo_Privacy_Browser
 
 private final class MockUserAuthenticator: UserAuthenticating {
-    func authenticateUser(reason: DuckDuckGo_Privacy_Browser.DeviceAuthenticator.AuthenticationReason, result: @escaping (DuckDuckGo_Privacy_Browser.DeviceAuthenticationResult) -> Void) {
+    func authenticateUser(reason: DuckDuckGo_Privacy_Browser.DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
+        .success
+    }
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
         result(.success)
     }
 }
@@ -46,7 +49,7 @@ final class SyncPreferencesTests: XCTestCase {
     var bookmarksDatabase: CoreDataDatabase!
     var location: URL!
 
-    override func setUp() async throws {
+    override func setUp() {
         setUpDatabase()
         appearancePreferences = AppearancePreferences(persistor: appearancePersistor)
         ddgSyncing = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
@@ -62,7 +65,7 @@ final class SyncPreferencesTests: XCTestCase {
         )
     }
 
-    override func tearDown() async throws {
+    override func tearDown() {
         ddgSyncing = nil
         syncPreferences = nil
         tearDownDatabase()

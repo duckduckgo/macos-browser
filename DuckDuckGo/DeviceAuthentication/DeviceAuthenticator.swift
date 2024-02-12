@@ -28,17 +28,7 @@ extension NSNotification.Name {
 
 protocol UserAuthenticating {
     func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void)
-}
-
-extension UserAuthenticating {
-
-    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
-        await withCheckedContinuation { continuation in
-            authenticateUser(reason: reason) { result in
-                continuation.resume(returning: result)
-            }
-        }
-    }
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult
 }
 
 final class DeviceAuthenticator: UserAuthenticating {
@@ -76,6 +66,14 @@ final class DeviceAuthenticator: UserAuthenticating {
     static let shared = DeviceAuthenticator()
 
     // MARK: - Public
+
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
+        await withCheckedContinuation { continuation in
+            authenticateUser(reason: reason) { result in
+                continuation.resume(returning: result)
+            }
+        }
+    }
 
     private(set) var isAuthenticating: Bool {
         get {
