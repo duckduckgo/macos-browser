@@ -3746,6 +3746,8 @@
 		569277C029DDCBB500B633EF /* HomePageContinueSetUpModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageContinueSetUpModel.swift; sourceTree = "<group>"; };
 		569277C329DEE09D00B633EF /* ContinueSetUpModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinueSetUpModelTests.swift; sourceTree = "<group>"; };
 		56B234BE2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarUrlExtensionsTests.swift; sourceTree = "<group>"; };
+		56CEE9092B7A66C500CF10AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		56CEE90D2B7A6DE100CF10AA /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		56D145E729E6BB6300E3488A /* CapturingDataImportProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturingDataImportProvider.swift; sourceTree = "<group>"; };
 		56D145EA29E6C99B00E3488A /* DataImportStatusProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportStatusProviding.swift; sourceTree = "<group>"; };
 		56D145ED29E6DAD900E3488A /* DataImportProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataImportProviderTests.swift; sourceTree = "<group>"; };
@@ -3950,7 +3952,6 @@
 		AA585D81248FD31100E9A3E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA585D83248FD31100E9A3E2 /* BrowserTabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTabViewController.swift; sourceTree = "<group>"; };
 		AA585D85248FD31400E9A3E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AA585D8A248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA585D8B248FD31400E9A3E2 /* DuckDuckGo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DuckDuckGo.entitlements; sourceTree = "<group>"; };
 		AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA585D96248FD31400E9A3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -6729,7 +6730,8 @@
 				4B4D609C2A0B2C2300BCD287 /* DuckDuckGo_NetP_Release.entitlements */,
 				4B2D06642A132F3A00DE1F49 /* NetworkProtectionAppExtension.entitlements */,
 				4B5F14C42A145D6A0060320F /* NetworkProtectionVPNController.entitlements */,
-				AA585D8A248FD31400E9A3E2 /* Info.plist */,
+				56CEE9092B7A66C500CF10AA /* Info.plist */,
+				56CEE90D2B7A6DE100CF10AA /* InfoPlist.xcstrings */,
 			);
 			path = DuckDuckGo;
 			sourceTree = "<group>";
