@@ -282,8 +282,6 @@ final class TabViewModel {
         switch tab.content {
         case .dataBrokerProtection:
             title = UserText.tabDataBrokerProtectionTitle
-//        case .subscription:
-//            title = UserText.tabSubscriptionTitle
         case .settings:
             title = UserText.tabPreferencesTitle
         case .bookmarks:

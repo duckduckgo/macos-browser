@@ -9350,18 +9350,6 @@
         }
       }
     },
-    "tab.subscription.title" : {
-      "comment" : "Tab subscription title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
-          }
-        }
-      }
-    },
     "Text Replacement" : {
       "comment" : "Main Menu Edit-Substitutions item"
     },
