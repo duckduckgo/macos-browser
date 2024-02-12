@@ -37,7 +37,7 @@ jobs:
             echo "::error::The provided tag ($tag) has incorrect format (attempted to match ${tag_regex})."
             exit 1
           fi
-          echo "tag=$(tr '-' '.' <<< $tag)" >> $GITHUB_OUTPUT
+          echo "tag-in-filename=${tag//-/.}" >> $GITHUB_OUTPUT
 
       - name: Check out the code
         uses: actions/checkout@v4
@@ -54,10 +54,11 @@ jobs:
       - name: Fetch DMG
         id: fetch-dmg
         env:
-          DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.tag }}.dmg
+          DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.tag-in-filename }}.dmg
         run: |
           DMG_URL="${{ vars.DMG_URL_ROOT }}${DMG_NAME}"
           curl -fLSs -o "$DMG_NAME" "$DMG_URL"
+          echo "dmg-name=$DMG_NAME" >> $GITHUB_OUTPUT
           echo "dmg-path=$DMG_NAME" >> $GITHUB_OUTPUT
 
       - name: Extract Asana Task ID
@@ -96,7 +97,7 @@ jobs:
             --release-notes release_notes.txt \
             --key sparkle_private_key
 
-          appcast_patch_name="appcast2-${{ steps.verify-tag.outputs.tag }}.patch"
+          appcast_patch_name="appcast2-${{ steps.verify-tag.outputs.tag-in-filename }}.patch"
           mv -f ${{ env.SPARKLE_DIR }}/appcast_diff.txt ${{ env.SPARKLE_DIR }}/${appcast_patch_name}
           echo "appcast-patch-name=${appcast_patch_name}" >> $GITHUB_OUTPUT
           
@@ -129,10 +130,12 @@ jobs:
 
       - name: Set common environment variables
         if: always()
+        env:
+          DMG_NAME: ${{ steps.fetch-dmg.outputs.dmg-name }}
         run: |
           echo "APPCAST_PATCH_NAME=${{ steps.appcast.outputs.appcast-patch-name }}" >> $GITHUB_ENV
-          echo "DMG_NAME=duckduckgo-${{ steps.verify-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
-          echo "DMG_URL=${{ vars.DMG_URL_ROOT }}duckduckgo-${{ steps.verify-tag.outputs.tag }}.dmg" >> $GITHUB_ENV
+          echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
+          echo "DMG_URL=${{ vars.DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
