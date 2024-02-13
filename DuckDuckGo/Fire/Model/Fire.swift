@@ -181,7 +181,7 @@ final class Fire {
     }
 
     @MainActor
-    func burnAll(completion:(() -> Void)? = nil) {
+    func burnAll(completion: (() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
 
         let group = DispatchGroup()
