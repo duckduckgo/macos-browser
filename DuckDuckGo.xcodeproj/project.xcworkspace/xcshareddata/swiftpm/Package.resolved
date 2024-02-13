@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "3f5e33ec3d75dd2c130cfc6915c0a6e8efeb96f1",
-        "version" : "106.0.1"
+        "branch" : "autofill/anya-debug-script-option",
+        "revision" : "97ace7346d112e918d004b4b1fb00c109e07b65c"
       }
     },
     {

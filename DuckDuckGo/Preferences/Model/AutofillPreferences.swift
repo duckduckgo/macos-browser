@@ -26,6 +26,7 @@ protocol AutofillPreferencesPersistor {
     var askToSavePaymentMethods: Bool { get set }
     var autolockLocksFormFilling: Bool { get set }
     var passwordManager: PasswordManager { get set }
+    var debugScriptEnabled: Bool { get set }
 }
 
 enum PasswordManager: String, CaseIterable {
@@ -67,6 +68,7 @@ enum AutofillAutoLockThreshold: String, CaseIterable {
 extension NSNotification.Name {
     static let autofillAutoLockSettingsDidChange = NSNotification.Name("autofillAutoLockSettingsDidChange")
     static let autofillUserSettingsDidChange = NSNotification.Name("autofillUserSettingsDidChange")
+    static let autofillScriptDebugSettingsDidChange = NSNotification.Name("autofillScriptDebugSettingsDidChange")
 }
 
 final class AutofillPreferences: AutofillPreferencesPersistor {
@@ -131,6 +133,21 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .selectedPasswordManager, defaultValue: PasswordManager.duckduckgo.rawValue)
     private var selectedPasswordManager: String
+
+    @UserDefaultsWrapper(key: .autofillDebugScriptEnabled, defaultValue: false)
+    var debugScriptEnabled: Bool
+
+    var enableDebugScript: Bool {
+        get {
+            return debugScriptEnabled
+        }
+
+        set {
+            if debugScriptEnabled != newValue {
+                debugScriptEnabled = newValue
+            }
+        }
+    }
 
     private var statisticsStore: StatisticsStore {
         return injectedDependencyStore ?? defaultDependencyStore
