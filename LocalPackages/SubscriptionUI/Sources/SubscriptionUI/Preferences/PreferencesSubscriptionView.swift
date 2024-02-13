@@ -164,6 +164,9 @@ public struct PreferencesSubscriptionView: View {
             .padding(10)
             .roundedBorder()
 
+            Spacer()
+                .frame(height: 24)
+
             PreferencePaneSection {
                 TextMenuItemHeader(UserText.preferencesSubscriptionFooterTitle)
                 HStack(alignment: .top, spacing: 6) {

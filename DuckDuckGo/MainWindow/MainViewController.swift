@@ -414,7 +414,7 @@ final class MainViewController: NSViewController {
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .onboarding:
             self.view.makeMeFirstResponder()
-        case .url:
+        case .url, .subscription:
             browserTabViewController.makeWebViewFirstResponder()
         case .settings:
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()
