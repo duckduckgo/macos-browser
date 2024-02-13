@@ -181,7 +181,7 @@ final class Fire {
     }
 
     @MainActor
-    func burnAll(completion: (() -> Void)? = nil) {
+    func burnAll(completion:(() -> Void)? = nil) {
         os_log("Fire started", log: .fire)
 
         let group = DispatchGroup()
@@ -299,6 +299,9 @@ final class Fire {
                 $0.close()
             }
         }
+
+        // If the app is not active, don't retake focus by opening a new window
+        guard NSApp.isActive else { return }
 
         // Open a new window in case there is none
         DispatchQueue.main.async { [weak self] in
