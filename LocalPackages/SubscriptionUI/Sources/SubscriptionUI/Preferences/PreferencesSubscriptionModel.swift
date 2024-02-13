@@ -82,7 +82,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func learnMoreAction() {
-        openURLHandler(.purchaseSubscription)
+        openURLHandler(.subscriptionPurchase)
     }
 
     enum ChangePlanOrBillingAction {
@@ -160,7 +160,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openIdentityTheftRestoration() {
-        NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
+        openURLHandler(.identityTheftRestoration)
     }
 
     @MainActor

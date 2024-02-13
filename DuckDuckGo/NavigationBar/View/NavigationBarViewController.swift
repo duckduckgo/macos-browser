@@ -1031,7 +1031,7 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
 
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
-        WindowControllersManager.shared.show(url: .purchaseSubscription, source: .ui, newTab: true)
+        WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
     }
 #endif
 
