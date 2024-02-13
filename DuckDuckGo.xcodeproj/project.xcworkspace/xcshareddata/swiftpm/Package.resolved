@@ -15,7 +15,7 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
         "branch" : "sam/increase-tunnel-monitor-check-interval",
-        "revision" : "4908e8482b501bca21849073ce40d8deee2d579f"
+        "revision" : "ba55aa7f30bf43e842c5e347463e9cc5fab917cb"
       }
     },
     {
