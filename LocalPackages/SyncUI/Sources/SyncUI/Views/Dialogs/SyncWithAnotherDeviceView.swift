@@ -32,9 +32,16 @@ struct SyncWithAnotherDeviceView: View {
         SyncDialog(spacing: 20.0) {
             Image("Sync-Pair-96")
             SyncUIViews.TextHeader(text: UserText.syncWithAnotherDeviceTitle)
-            Text("\(Text(UserText.syncWithAnotherDeviceSubtitle1)) \(Text(UserText.syncWithAnotherDeviceSubtitle2).bold()) \(Text(UserText.syncWithAnotherDeviceSubtitle3))")
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.center)
+            if #available(macOS 12.0, *) {
+                Text(syncWithAnotherDeviceInstruction)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.center)
+            } else {
+                Text(UserText.syncWithAnotherDeviceSubtitle(syncMenuPath: UserText.syncMenuPath))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.center)
+            }
+
             VStack(spacing: 20) {
                 pickerView()
                 if selectedSegment == 0 {
@@ -59,6 +66,16 @@ struct SyncWithAnotherDeviceView: View {
         }
     }
     .frame(width: 420)
+    }
+
+    @available(macOS 12, *)
+    private var syncWithAnotherDeviceInstruction: AttributedString {
+        let baseString = UserText.syncWithAnotherDeviceSubtitle(syncMenuPath: UserText.syncMenuPath)
+        var instructions = AttributedString(baseString)
+        if let range = instructions.range(of: UserText.syncMenuPath) {
+            instructions[range].font = .system(size: NSFont.systemFontSize, weight: .bold)
+        }
+        return instructions
     }
 
     fileprivate func pickerView() -> some View {
