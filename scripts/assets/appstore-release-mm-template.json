@@ -8,7 +8,7 @@
   "failure": {
     "channel": "${MM_USER_HANDLE}",
     "username": "GitHub Actions",
-    "text": ":warning: **Failed releasing macOS app** | [:github: Workflow run summary](${WORKFLOW_URL})",
+    "text": ":rotating_light: **macOS app ${DESTINATION} workflow failed** | [:github: Workflow run summary](${WORKFLOW_URL})",
     "icon_url": "https://duckduckgo.com/assets/logo_header.v108.svg"
   }
 }
