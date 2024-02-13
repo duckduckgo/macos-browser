@@ -26,6 +26,7 @@ final class FBProtectionTabExtension {
 
     private let privacyConfigurationManager: PrivacyConfigurationManaging
     private weak var userContentController: UserContentControllerProtocol?
+    private weak var clickToLoadUserScript: ClickToLoadUserScript?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -41,12 +42,13 @@ final class FBProtectionTabExtension {
         }.store(in: &cancellables)
         clickToLoadUserScriptPublisher.sink { [weak self] clickToLoadUserScript in
             clickToLoadUserScript?.delegate = self
+            self?.clickToLoadUserScript = clickToLoadUserScript
         }.store(in: &cancellables)
     }
 
     public func trackerDetected() {
         print("FB tracker blocked")
-//        clickToLoadUserScriptPublisher.displayClickToLoadPlaceholders()
+        self.clickToLoadUserScript?.displayClickToLoadPlaceholders()
     }
 }
 
@@ -118,7 +120,6 @@ extension FBProtectionTabExtension: NavigationResponder {
 
 protocol FbBlockingEnabledProvider {
     var fbBlockingEnabled: Bool { get }
-    
     func trackerDetected()
 }
 

@@ -30,9 +30,13 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
     weak var broker: UserScriptMessageBroker?
     weak var webView: WKWebView?
 
-    var devMode = false
-
     weak var delegate: ClickToLoadUserScriptDelegate?
+
+#if DEBUG
+    var devMode: Bool = true
+#else
+    var devMode: Bool = false
+#endif
 
     // this isn't an issue to be set to 'all' because the page
     public let messageOriginPolicy: MessageOriginPolicy = .all
@@ -60,9 +64,9 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
         case .unblockClickToLoadContent:
             return handleUnblockClickToLoadContent
         case .updateFacebookCTLBreakageFlags:
-            return nil
+            return handleDebugFlagsMock
         case .addDebugFlag:
-            return nil
+            return handleDebugFlagsMock
         default:
             assertionFailure("ClickToLoadUserScript: Failed to parse User Script message: \(methodName)")
             return nil
@@ -71,8 +75,6 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
 
     private func handleGetClickToLoadState(params: Any, message: UserScriptMessage) -> Encodable? {
         webView = message.messageWebView
-        webView?.navigationDelegate = self as WKNavigationDelegate
-
         return [
             "devMode": devMode,
             "youtubePreviewsEnabled": false
@@ -93,13 +95,14 @@ final class ClickToLoadUserScript: NSObject, WKNavigationDelegate, Subfeature {
         return delegate.clickToLoadUserScriptAllowFB()
     }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        displayClickToLoadPlaceholders()
+    private func handleDebugFlagsMock(params: Any, message: UserScriptMessage) -> Encodable? {
+        // breakage flags not supported on Mac yet
+        return nil
     }
 
     public func displayClickToLoadPlaceholders() {
         if let webView = webView {
-            broker?.push(method: "displayClickToLoadPlaceholders", params: ["ruleAction": ["block"]], for: self, into: webView)
+            broker?.push(method: "displayClickToLoadPlaceholders", params: nil, for: self, into: webView)
         }
     }
 }

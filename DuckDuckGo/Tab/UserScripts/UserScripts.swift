@@ -77,7 +77,7 @@ final class UserScripts: UserScriptsProvider {
 
         userScripts.append(autoconsentUserScript)
 
-        contentScopeUserScript.registerSubfeature(delegate: clickToLoadScript)
+        contentScopeUserScriptIsolated.registerSubfeature(delegate: clickToLoadScript)
 
         if let youtubeOverlayScript {
             contentScopeUserScriptIsolated.registerSubfeature(delegate: youtubeOverlayScript)
