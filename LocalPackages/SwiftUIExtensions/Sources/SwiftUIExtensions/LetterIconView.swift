@@ -25,6 +25,8 @@ public struct LetterIconView: View {
     public var prefferedFirstCharacters: String?
     public var characterCount: Int
     private var padding: CGFloat = 0.33
+    private var paddingLeading: CGFloat
+    private var font: Font
     private static let wwwPreffix = "www."
 
     private var characters: String {
@@ -35,11 +37,18 @@ public struct LetterIconView: View {
         return String(title.replacingOccurrences(of: Self.wwwPreffix, with: "").prefix(characterCount))
     }
 
-    public init(title: String, size: CGFloat = 32, prefferedFirstCharacters: String? = nil, characterCount: Int = 2) {
+    public init(title: String,
+                size: CGFloat = 32,
+                prefferedFirstCharacters: String? = nil,
+                characterCount: Int = 2,
+                paddingLeading: CGFloat = 0,
+                font: Font = .title) {
         self.title = title
         self.size = size
         self.prefferedFirstCharacters = prefferedFirstCharacters
         self.characterCount = characterCount
+        self.paddingLeading = paddingLeading
+        self.font = font
     }
 
     public var body: some View {
@@ -52,8 +61,8 @@ public struct LetterIconView: View {
                 .frame(width: size - (size * padding), height: size - (size * padding))
                 .foregroundColor(.white)
                 .minimumScaleFactor(0.01)
-                .font(.system(size: size, weight: .semibold))
+                .font(font)
         }
-//        .padding(.leading, 8)
+        .padding(.leading, paddingLeading)
     }
 }

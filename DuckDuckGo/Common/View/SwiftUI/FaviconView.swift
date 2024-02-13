@@ -73,19 +73,7 @@ struct FaviconView: View {
                         timer.upstream.connect().cancel()
                     }
             } else {
-
-//                ZStack {
-//                    let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain
-//                    Rectangle()
-//                        .foregroundColor(Color.forString(eTLDplus1))
-//                    Text()
-//                        .font(.caption)
-//                        .foregroundColor(Color.white)
-//                }
-//                .frame(width: size, height: size)
-//                .cornerRadius(4.0)
                 LetterIconView(title: ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain)
-
             }
         }.onAppear {
             refreshImage()
