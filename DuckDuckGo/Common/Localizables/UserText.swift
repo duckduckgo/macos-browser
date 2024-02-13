@@ -64,55 +64,55 @@ struct UserText {
     }
 
     // MARK: - Main Menu -> DuckDuckGo
-    static let mainMenuAppPreferences = NSLocalizedString("Preferences…", comment: "Main Menu DuckDuckGo item")
-    static let mainMenuAppServices = NSLocalizedString("Services", comment: "Main Menu DuckDuckGo item")
-    static let mainMenuAppCheckforUpdates = NSLocalizedString("Check for Updates…", comment: "Main Menu DuckDuckGo item")
-    static let mainMenuAppHideDuckDuckGo = NSLocalizedString("Hide DuckDuckGo", comment: "Main Menu DuckDuckGo item")
-    static let mainMenuAppHideOthers = NSLocalizedString("Hide Others", comment: "Main Menu DuckDuckGo item")
-    static let mainMenuAppShowAll = NSLocalizedString("Show All", comment: "Main Menu DuckDuckGo item")
-    static let mainMenuAppQuitDuckDuckGo = NSLocalizedString("Quit DuckDuckGo", comment: "Main Menu DuckDuckGo item")
+    static let mainMenuAppPreferences = NSLocalizedString("main-menu.app.preferences" ,value:"Preferences…", comment: "Main Menu DuckDuckGo item")
+    static let mainMenuAppServices = NSLocalizedString("main-menu.app.services", value:"Services", comment: "Main Menu DuckDuckGo item")
+    static let mainMenuAppCheckforUpdates = NSLocalizedString("main-menu.app.check-for-updates", value:"Check for Updates…", comment: "Main Menu DuckDuckGo item")
+    static let mainMenuAppHideDuckDuckGo = NSLocalizedString("main-menu.app.hide-duck-duck-go", value:"Hide DuckDuckGo", comment: "Main Menu DuckDuckGo item")
+    static let mainMenuAppHideOthers = NSLocalizedString("main-menu.app.hide-others", value:"Hide Others", comment: "Main Menu DuckDuckGo item")
+    static let mainMenuAppShowAll = NSLocalizedString("main-menu.app.show-all", value:"Show All", comment: "Main Menu DuckDuckGo item")
+    static let mainMenuAppQuitDuckDuckGo = NSLocalizedString("main-menu.app.quit-duck-duck-go", value:"Quit DuckDuckGo", comment: "Main Menu DuckDuckGo item")
 
     // MARK: - Main Menu -> -File
-    static let mainMenuFile = NSLocalizedString("File", comment: "Main Menu File")
-    static let mainMenuFileNewTab = NSLocalizedString("New Tab", comment: "Main Menu File item")
-    static let mainMenuFileOpenLocation = NSLocalizedString("Open Location…", comment: "Main Menu File item")
-    static let mainMenuFileCloseWindow = NSLocalizedString("Close Window", comment: "Main Menu File item")
-    static let mainMenuFileCloseAllWindows = NSLocalizedString("Close All Windows", comment: "Main Menu File item")
-    static let mainMenuFileSaveAs = NSLocalizedString("Save As…", comment: "Main Menu File item")
-    static let mainMenuFileImportBookmarksandPasswords = NSLocalizedString("Import Bookmarks and Passwords…", comment: "Main Menu File item")
-    static let mainMenuFileExport = NSLocalizedString("Export", comment: "Main Menu File item")
-    static let mainMenuFileExportPasswords = NSLocalizedString("Passwords…", comment: "Main Menu File-Export item")
-    static let mainMenuFileExportBookmarks = NSLocalizedString("Bookmarks…", comment: "Main Menu File-Export item")
+    static let mainMenuFile = NSLocalizedString("main-menu.file", value:"File", comment: "Main Menu File")
+    static let mainMenuFileNewTab = NSLocalizedString("main-menu.file.new-tab", value:"New Tab", comment: "Main Menu File item")
+    static let mainMenuFileOpenLocation = NSLocalizedString("main-menu.file.open-location", value:"Open Location…", comment: "Main Menu File item")
+    static let mainMenuFileCloseWindow = NSLocalizedString("main-menu.file.close-window", value:"Close Window", comment: "Main Menu File item")
+    static let mainMenuFileCloseAllWindows = NSLocalizedString("main-menu.file.close-all-windows", value:"Close All Windows", comment: "Main Menu File item")
+    static let mainMenuFileSaveAs = NSLocalizedString("main-menu.file.save-as", value:"Save As…", comment: "Main Menu File item")
+    static let mainMenuFileImportBookmarksandPasswords = NSLocalizedString("main-menu.file.import-bookmarks-and-passwords", value:"Import Bookmarks and Passwords…", comment: "Main Menu File item")
+    static let mainMenuFileExport = NSLocalizedString("main-menu.file.export", value:"Export", comment: "Main Menu File item")
+    static let mainMenuFileExportPasswords = NSLocalizedString("main-menu.file.export-passwords", value:"Passwords…", comment: "Main Menu File-Export item")
+    static let mainMenuFileExportBookmarks = NSLocalizedString("main-menu.file.export-bookmarks", value:"Bookmarks…", comment: "Main Menu File-Export item")
 
     // MARK: - Main Menu -> Edit
-    static let mainMenuEdit = NSLocalizedString("Edit", comment: "Main Menu Edit")
-    static let mainMenuEditUndo = NSLocalizedString("Undo", comment: "Main Menu Edit item")
-    static let mainMenuEditRedo = NSLocalizedString("Redo", comment: "Main Menu Edit item")
-    static let mainMenuEditCut = NSLocalizedString("Cut", comment: "Main Menu Edit item")
-    static let mainMenuEditCopy = NSLocalizedString("Copy", comment: "Main Menu Edit item")
-    static let mainMenuEditPaste = NSLocalizedString("Paste", comment: "Main Menu Edit item")
-    static let mainMenuEditPasteAndMatchStyle = NSLocalizedString("Paste and Match Style", comment: "Main Menu Edit item")
-    static let mainMenuEditDelete = NSLocalizedString("Delete", comment: "Main Menu Edit item")
-    static let mainMenuEditSelectAll = NSLocalizedString("Select All", comment: "Main Menu Edit item")
+    static let mainMenuEdit = NSLocalizedString("main-menu.edit", value:"Edit", comment: "Main Menu Edit")
+    static let mainMenuEditUndo = NSLocalizedString("main-menu.edit.undo", value:"Undo", comment: "Main Menu Edit item")
+    static let mainMenuEditRedo = NSLocalizedString("main-menu.edit.redo", value:"Redo", comment: "Main Menu Edit item")
+    static let mainMenuEditCut = NSLocalizedString("main-menu.edit.cut", value:"Cut", comment: "Main Menu Edit item")
+    static let mainMenuEditCopy = NSLocalizedString("main-menu.edit.copy", value:"Copy", comment: "Main Menu Edit item")
+    static let mainMenuEditPaste = NSLocalizedString("main-menu.edit.paste", value:"Paste", comment: "Main Menu Edit item")
+    static let mainMenuEditPasteAndMatchStyle = NSLocalizedString("main-menu.edit.paste-and-match-style", value:"Paste and Match Style", comment: "Main Menu Edit item")
+    static let mainMenuEditDelete = NSLocalizedString("main-menu.edit.delete", value:"Delete", comment: "Main Menu Edit item")
+    static let mainMenuEditSelectAll = NSLocalizedString("main-menu.edit.select-all", value:"Select All", comment: "Main Menu Edit item")
 
-    static let mainMenuEditFind = NSLocalizedString("Find", comment: "Main Menu Edit item")
+    static let mainMenuEditFind = NSLocalizedString("main-menu.edit.find", value:"Find", comment: "Main Menu Edit item")
 
     // MARK: Main Menu -> Edit -> Find
-    static let mainMenuEditFindFindNext = NSLocalizedString("Find Next", comment: "Main Menu Edit-Find item")
-    static let mainMenuEditFindFindPrevious = NSLocalizedString("Find Previous", comment: "Main Menu Edit-Find item")
-    static let mainMenuEditFindHideFind = NSLocalizedString("Hide Find", comment: "Main Menu Edit-Find item")
+    static let mainMenuEditFindFindNext = NSLocalizedString("main-menu.edit.find.find-next", value:"Find Next", comment: "Main Menu Edit-Find item")
+    static let mainMenuEditFindFindPrevious = NSLocalizedString("main-menu.edit.find.find-previous", value:"Find Previous", comment: "Main Menu Edit-Find item")
+    static let mainMenuEditFindHideFind = NSLocalizedString("main-menu.edit.find.hide-find", value:"Hide Find", comment: "Main Menu Edit-Find item")
 
-    static let mainMenuEditSpellingandGrammar = NSLocalizedString("Spelling and Grammar", comment: "Main Menu Edit item")
+    static let mainMenuEditSpellingandGrammar = NSLocalizedString("main-menu.edit.edit-spelling-and-grammar", value: "Spelling and Grammar", comment: "Main Menu Edit item")
 
     // MARK: Main Menu -> Edit -> Spellingand
-    static let mainMenuEditSpellingandShowSpellingandGrammar = NSLocalizedString("Show Spelling and Grammar", comment: "Main Menu Edit-Spellingand item")
-    static let mainMenuEditSpellingandCheckDocumentNow = NSLocalizedString("Check Document Now", comment: "Main Menu Edit-Spellingand item")
-    static let mainMenuEditSpellingandCheckSpellingWhileTyping = NSLocalizedString("Check Spelling While Typing", comment: "Main Menu Edit-Spellingand item")
-    static let mainMenuEditSpellingandCheckGrammarWithSpelling = NSLocalizedString("Check Grammar With Spelling", comment: "Main Menu Edit-Spellingand item")
-    static let mainMenuEditSpellingandCorrectSpellingAutomatically = NSLocalizedString("Correct Spelling Automatically", comment: "Main Menu Edit-Spellingand item")
+    static let mainMenuEditSpellingandShowSpellingandGrammar = NSLocalizedString("main-menu.edit.spelling-and.show-spelling-and-grammar", value:"Show Spelling and Grammar", comment: "Main Menu Edit-Spellingand item")
+    static let mainMenuEditSpellingandCheckDocumentNow = NSLocalizedString("main-menu.edit.spelling-and.check-document-now", value:"Check Document Now", comment: "Main Menu Edit-Spellingand item")
+    static let mainMenuEditSpellingandCheckSpellingWhileTyping = NSLocalizedString("main-menu.edit.spelling-and.check-spelling-while-typing", value:"Check Spelling While Typing", comment: "Main Menu Edit-Spellingand item")
+    static let mainMenuEditSpellingandCheckGrammarWithSpelling = NSLocalizedString("main-menu.edit.spelling-and.check-grammar-with-spelling", value:"Check Grammar With Spelling", comment: "Main Menu Edit-Spellingand item")
+    static let mainMenuEditSpellingandCorrectSpellingAutomatically = NSLocalizedString("main-menu.edit.spelling-and.correct-spelling-automatically", value:"Correct Spelling Automatically", comment: "Main Menu Edit-Spellingand item")
 
-    static let mainMenuEditSubstitutions = NSLocalizedString("Substitutions", comment: "Main Menu Edit item")
-
+    static let mainMenuEditSubstitutions = NSLocalizedString("main-menu.edit.subsitutions", value:"Substitutions", comment: "Main Menu Edit item")
+// TODO: Done till here
     // MARK: Main Menu -> Edit -> Substitutions
     static let mainMenuEditSubstitutionsShowSubstitutions = NSLocalizedString("Show Substitutions", comment: "Main Menu Edit-Substitutions item")
     static let mainMenuEditSubstitutionsSmartCopyPaste = NSLocalizedString("Smart Copy/Paste", comment: "Main Menu Edit-Substitutions item")
@@ -575,6 +575,7 @@ struct UserText {
 
     static let general = NSLocalizedString("preferences.general", value: "General", comment: "Show general preferences")
     static let sync = NSLocalizedString("preferences.sync", value: "Sync & Backup", comment: "Show sync preferences")
+    static let syncAutoLockPrompt = NSLocalizedString("preferences.sync.auto-lock-prompt", value:"Unlock device to setup Sync & Backup", comment: "Reason for auth when setting up Sync")
     static let syncBookmarkPausedAlertTitle = NSLocalizedString("alert.sync-bookmarks-paused-title", value: "Bookmarks Sync is Paused", comment: "Title for alert shown when sync bookmarks paused for too many items")
     static let syncBookmarkPausedAlertDescription = NSLocalizedString("alert.sync-bookmarks-paused-description", value: "You have exceeded the bookmarks sync limit. Try deleting some bookmarks. Until this is resolved your bookmarks will not be backed up.", comment: "Description for alert shown when sync bookmarks paused for too many items")
     static let syncCredentialsPausedAlertTitle = NSLocalizedString("alert.sync-credentials-paused-title", value: "Passwords Sync is Paused", comment: "Title for alert shown when sync credentials paused for too many items")
