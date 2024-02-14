@@ -30,6 +30,8 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     public typealias LoadOptionsCallback = (_ options: [String: Any]?) throws -> Void
 
+    static let dnsPort = 53
+
     @TCPFlowActor
     var tcpFlowManagers = Set<TCPFlowManager>()
 
@@ -44,7 +46,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     public let configuration: Configuration
     public let settings: TransparentProxySettings
-    public var tunnelConfiguration: TunnelConfiguration?
 
     private let logger: Logger
 
@@ -105,15 +106,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     private func makeNetworkSettings() -> NETransparentProxyNetworkSettings {
         let networkSettings = NETransparentProxyNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
-
-        if let tunnelConfiguration {
-            let networkRules = tunnelConfiguration.interface.dns.map { dnsServer in
-                logger.log("Adding DNS server: \(dnsServer.stringRepresentation, privacy: .public))")
-                return NENetworkRule(destinationNetwork: .init(hostname: dnsServer.stringRepresentation, port: "0"), prefix: 32, protocol: .any)
-            }
-
-            networkSettings.excludedNetworkRules = networkRules
-        }
 
         networkSettings.includedNetworkRules = [
             NENetworkRule(remoteNetwork: NWHostEndpoint(hostname: "127.0.0.1", port: ""), remotePrefix: 0, localNetwork: nil, localPrefix: 0, protocol: .any, direction: .outbound)
@@ -184,6 +176,11 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             return false
         }
 
+        guard let remoteEndpoint = flow.remoteEndpoint as? NWHostEndpoint,
+              !isDnsServer(remoteEndpoint) else {
+            return false
+        }
+
         let printableRemote = flow.remoteHostname ?? (flow.remoteEndpoint as? NWHostEndpoint)?.hostname ?? "unknown"
 
         logger.debug(
@@ -233,7 +230,12 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     override public func handleNewUDPFlow(_ flow: NEAppProxyUDPFlow, initialRemoteEndpoint remoteEndpoint: NWEndpoint) -> Bool {
 
-        let printableRemote = (remoteEndpoint as? NWHostEndpoint)?.hostname ?? "unknown"
+        guard let remoteEndpoint = remoteEndpoint as? NWHostEndpoint,
+              !isDnsServer(remoteEndpoint) else {
+            return false
+        }
+
+        let printableRemote = remoteEndpoint.hostname
 
         logger.log(
             """
@@ -317,6 +319,12 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     private func stopMonitoringNetworkInterfaces() {
         bMonitor.cancel()
         nw_path_monitor_cancel(monitor)
+    }
+
+    // MARK: - Ignoring DNS flows
+
+    private func isDnsServer(_ endpoint: NWHostEndpoint) -> Bool {
+        Int(endpoint.port) == Self.dnsPort
     }
 
     // MARK: - VPN exclusions logic
