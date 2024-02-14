@@ -26,6 +26,15 @@ import TestUtils
 @testable import DDGSync
 @testable import DuckDuckGo_Privacy_Browser
 
+private final class MockUserAuthenticator: UserAuthenticating {
+    func authenticateUser(reason: DuckDuckGo_Privacy_Browser.DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
+        .success
+    }
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
+        result(.success)
+    }
+}
+
 final class SyncPreferencesTests: XCTestCase {
 
     let scheduler = CapturingScheduler()
@@ -51,7 +60,8 @@ final class SyncPreferencesTests: XCTestCase {
             syncService: ddgSyncing,
             syncBookmarksAdapter: syncBookmarksAdapter,
             appearancePreferences: appearancePreferences,
-            managementDialogModel: managementDialogModel
+            managementDialogModel: managementDialogModel,
+            userAuthenticator: MockUserAuthenticator()
         )
     }
 
@@ -98,14 +108,14 @@ final class SyncPreferencesTests: XCTestCase {
         XCTAssertEqual(syncPreferences.recoveryCode, account.recoveryCode)
     }
 
-    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() {
-        syncPreferences.recoverDataPressed()
+    @MainActor func testOnPresentRecoverSyncAccountDialogThenRecoverAccountDialogShown() async {
+        await syncPreferences.recoverDataPressed()
 
         XCTAssertEqual(managementDialogModel.currentDialog, .recoverSyncedData)
     }
 
-    @MainActor func testOnSyncWithServerPressedThenSyncWithServerDialogShown() {
-        syncPreferences.syncWithServerPressed()
+    @MainActor func testOnSyncWithServerPressedThenSyncWithServerDialogShown() async {
+        await syncPreferences.syncWithServerPressed()
 
         XCTAssertEqual(managementDialogModel.currentDialog, .syncWithServer)
     }

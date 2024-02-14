@@ -116,7 +116,7 @@ public struct LoginItem: Equatable, Hashable {
     /// This call will only enable the login item if it was enabled to begin with.
     ///
     public func restart() throws {
-        guard [.enabled, .requiresApproval].contains(status) else {
+        guard [.enabled].contains(status) else {
             os_log("🟢 restart not needed for login item %{public}@", log: log, self.debugDescription)
             return
         }

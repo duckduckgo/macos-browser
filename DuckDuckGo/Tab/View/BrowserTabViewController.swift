@@ -214,6 +214,7 @@ final class BrowserTabViewController: NSViewController {
             .sink { [weak self] selectedTabViewModel in
 
                 guard let self = self else { return }
+                generateNativePreviewIfNeeded()
                 self.tabViewModel = selectedTabViewModel
                 self.showTabContent(of: selectedTabViewModel)
                 self.subscribeToErrorViewState()
@@ -505,7 +506,7 @@ final class BrowserTabViewController: NSViewController {
             }
             showTransientTabContentController(OnboardingViewController.create(withDelegate: self))
 
-        case .url:
+        case .url, .subscription:
             if shouldReplaceWebView(for: tabViewModel) {
                 removeAllTabContent(includingWebView: true)
                 changeWebView(tabViewModel: tabViewModel)
@@ -539,6 +540,31 @@ final class BrowserTabViewController: NSViewController {
         let isDifferentTabDisplayed = webView != tabViewModel.tab.webView
 
         return isDifferentTabDisplayed || tabIsNotOnScreen || (isPinnedTab && isKeyWindow)
+    }
+
+    func generateNativePreviewIfNeeded() {
+        guard let tabViewModel = tabViewModel, !tabViewModel.tab.content.isUrl, !tabViewModel.errorViewState.isVisible else {
+            return
+        }
+
+        var containsHostingView: Bool
+        switch tabViewModel.tab.content {
+        case .onboarding:
+            return
+        case .newtab, .settings:
+            containsHostingView = true
+        default:
+            containsHostingView = false
+        }
+
+        guard let viewForRendering = view.findContentSubview(containsHostingView: containsHostingView) else {
+            assertionFailure("No view for rendering of the snapshot")
+            return
+        }
+
+        Task {
+            await tabViewModel.tab.tabSnapshots?.renderSnapshot(from: viewForRendering)
+        }
     }
 
 #if DBP
@@ -1061,4 +1087,21 @@ extension BrowserTabViewController {
             }
         }
     }
+}
+
+fileprivate extension NSView {
+
+    // Returns correct subview for the rendering of snapshots
+    func findContentSubview(containsHostingView: Bool) -> NSView? {
+        var content = subviews.last
+
+        if containsHostingView {
+            content = content?.subviews.first
+
+            assert(content?.className.contains("NSHostingView") == true)
+        }
+
+        return content
+    }
+
 }

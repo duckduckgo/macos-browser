@@ -25,7 +25,7 @@
                             <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="16" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalHuggingPriority="752" verticalHuggingPriority="752" horizontalCompressionResistancePriority="249" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DDy-au-YqK">
                                 <rect key="frame" x="16" y="12" width="288" height="108"/>
                                 <subviews>
-                                    <textField focusRingType="none" horizontalHuggingPriority="751" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7nK-UI-YT3">
+                                    <textField horizontalHuggingPriority="751" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7nK-UI-YT3">
                                         <rect key="frame" x="-2" y="76" width="292" height="32"/>
                                         <textFieldCell key="cell" alignment="center" title="Allow “longname.chat.somewebsite.com” to use your Camera and Microphone?" id="z9s-AY-68S">
                                             <font key="font" metaFont="systemBold"/>
@@ -49,7 +49,7 @@
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="PEB-5b-R8e">
                                                 <rect key="frame" x="120" y="0.0" width="168" height="16"/>
                                                 <subviews>
-                                                    <textField focusRingType="none" horizontalHuggingPriority="751" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qnx-0b-4zc">
+                                                    <textField horizontalHuggingPriority="751" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qnx-0b-4zc">
                                                         <rect key="frame" x="-2" y="0.0" width="172" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" relation="lessThanOrEqual" constant="550" id="qpi-AI-9P3"/>
@@ -217,6 +217,7 @@ Gw
                         </connections>
                     </view>
                     <connections>
+                        <outlet property="allowButton" destination="STv-Br-1F5" id="EvA-HP-3cE"/>
                         <outlet property="alwaysAllowCheckbox" destination="4Qg-BR-C50" id="mOB-Cq-IBs"/>
                         <outlet property="alwaysAllowStackView" destination="5JO-km-2KL" id="gfB-hu-D8L"/>
                         <outlet property="buttonsBottomConstraint" destination="JHg-ZD-huo" id="rMx-K0-yVz"/>
@@ -225,6 +226,7 @@ Gw
                         <outlet property="domainNameLabel" destination="Qnx-0b-4zc" id="NxM-TF-b10"/>
                         <outlet property="learnMoreBottomConstraint" destination="jON-5j-XdC" id="5go-VL-qbA"/>
                         <outlet property="learnMoreStackView" destination="ar6-d0-ukR" id="9iC-DA-5VW"/>
+                        <outlet property="linkButton" destination="A53-A7-zYD" id="785-hB-7VJ"/>
                     </connections>
                 </viewController>
                 <customObject id="Pct-h6-WSE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -239,7 +241,7 @@ Gw
                         <rect key="frame" x="0.0" y="0.0" width="143" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yEs-pq-qFy">
+                            <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yEs-pq-qFy">
                                 <rect key="frame" x="18" y="20" width="107" height="16"/>
                                 <textFieldCell key="cell" title="Pop-up Blocked" id="obz-ga-n8s">
                                     <font key="font" metaFont="systemBold"/>
@@ -256,7 +258,7 @@ Gw
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="descriptionLabel" destination="yEs-pq-qFy" id="gdZ-Ku-LPa"/>
+                        <outlet property="descriptionLabel" destination="yEs-pq-qFy" id="d3X-uA-PzU"/>
                     </connections>
                 </viewController>
                 <customObject id="mY3-IC-3w4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

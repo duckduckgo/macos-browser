@@ -20,6 +20,8 @@ import SwiftUI
 import Combine
 import NetworkExtension
 import NetworkProtection
+import LoginItems
+import ServiceManagement
 
 /// This view can be shown from any location where we want the user to be able to interact with NetP.
 /// This view shows status information about Network Protection, and offers a chance to toggle it ON and OFF.
@@ -55,8 +57,12 @@ extension NetworkProtectionStatusView {
         private(set) var onboardingStatus: OnboardingStatus = .completed
 
         var tunnelControllerViewDisabled: Bool {
-            onboardingStatus != .completed
+            onboardingStatus != .completed || loginItemNeedsApproval
         }
+
+        @MainActor
+        @Published
+        var loginItemNeedsApproval = false
 
         /// The NetP onboarding status publisher
         ///
@@ -74,6 +80,8 @@ extension NetworkProtectionStatusView {
         ///
         @Published
         var showDebugInformation: Bool
+
+        public let agentLoginItem: LoginItem?
 
         // MARK: - Extra Menu Items
 
@@ -100,8 +108,9 @@ extension NetworkProtectionStatusView {
                     onboardingStatusPublisher: OnboardingStatusPublisher,
                     statusReporter: NetworkProtectionStatusReporter,
                     debugInformationPublisher: AnyPublisher<Bool, Never>,
-                    showLocationsAction: @escaping () async -> Void,
+                    appLauncher: AppLaunching,
                     menuItems: @escaping () -> [MenuItem],
+                    agentLoginItem: LoginItem?,
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
@@ -109,12 +118,13 @@ extension NetworkProtectionStatusView {
             self.statusReporter = statusReporter
             self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
+            self.agentLoginItem = agentLoginItem
             self.runLoopMode = runLoopMode
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
                                                                   statusReporter: statusReporter,
-                                                                  showLocationsAction: showLocationsAction)
+                                                                  appLauncher: appLauncher)
 
             connectionStatus = statusReporter.statusObserver.recentValue
             isHavingConnectivityIssues = statusReporter.connectivityIssuesObserver.recentValue
@@ -128,6 +138,7 @@ extension NetworkProtectionStatusView {
             subscribeToTunnelErrorMessages()
             subscribeToControllerErrorMessages()
             subscribeToDebugInformationChanges()
+            refreshLoginItemStatus()
 
             onboardingStatusPublisher
                 .receive(on: DispatchQueue.main)
@@ -135,6 +146,23 @@ extension NetworkProtectionStatusView {
                 self?.onboardingStatus = status
             }
             .store(in: &cancellables)
+        }
+
+        func refreshLoginItemStatus() {
+            self.loginItemNeedsApproval = agentLoginItem?.status == .requiresApproval
+        }
+
+        func openLoginItemSettings() {
+            if #available(macOS 13.0, *) {
+                SMAppService.openSystemSettingsLoginItems()
+            } else {
+                guard let loginItemsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") else {
+                    assertionFailure("Can't initialize login items URL")
+                    return
+                }
+
+                NSWorkspace.shared.open(loginItemsURL)
+            }
         }
 
         private func subscribeToStatusChanges() {
@@ -253,14 +281,33 @@ extension NetworkProtectionStatusView {
 
         let tunnelControllerViewModel: TunnelControllerViewModel
 
-        var onboardingStepViewModel: OnboardingStepView.Model? {
+        var promptActionViewModel: PromptActionView.Model? {
+#if !APPSTORE && !DEBUG
+            guard Bundle.main.isInApplicationDirectory else {
+                return PromptActionView.Model(presentationData: MoveToApplicationsPromptPresentationData()) { [weak self] in
+                    self?.tunnelControllerViewModel.moveToApplications()
+                }
+            }
+#endif
+
+            guard !loginItemNeedsApproval else {
+                return PromptActionView.Model(presentationData: LoginItemsPromptPresentationData()) { [weak self] in
+                    self?.openLoginItemSettings()
+                }
+            }
+
             switch onboardingStatus {
             case .completed:
                 return nil
             case .isOnboarding(let step):
-                return OnboardingStepView.Model(step: step) { [weak self] in
-                    self?.tunnelControllerViewModel.startNetworkProtection()
+                switch step {
+
+                case .userNeedsToAllowExtension, .userNeedsToAllowVPNConfiguration:
+                    return PromptActionView.Model(presentationData: step) { [weak self] in
+                        self?.tunnelControllerViewModel.startNetworkProtection()
+                    }
                 }
+
             }
         }
     }
