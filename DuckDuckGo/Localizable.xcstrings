@@ -1890,7 +1890,7 @@
       }
     },
     "Copy" : {
-      "comment" : "Command\nMain Menu Edit item"
+      "comment" : "Command"
     },
     "copy-selection" : {
       "comment" : "Copy selection menu item",
@@ -2419,7 +2419,7 @@
       }
     },
     "Delete" : {
-      "comment" : "Command\nMain Menu Edit item"
+      "comment" : "Command"
     },
     "delete-bookmark" : {
       "comment" : "Delete Bookmark button",
@@ -4691,6 +4691,450 @@
     },
     "macOS version" : {
       "comment" : "Data import failure Report dialog description of a report field providing user‘s macOS version"
+    },
+    "main-menu.app.check-for-updates" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check for Updates…"
+          }
+        }
+      }
+    },
+    "main-menu.app.hide-duck-duck-go" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide DuckDuckGo"
+          }
+        }
+      }
+    },
+    "main-menu.app.hide-others" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide Others"
+          }
+        }
+      }
+    },
+    "main-menu.app.preferences" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Preferences…"
+          }
+        }
+      }
+    },
+    "main-menu.app.quit-duck-duck-go" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quit DuckDuckGo"
+          }
+        }
+      }
+    },
+    "main-menu.app.services" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Services"
+          }
+        }
+      }
+    },
+    "main-menu.app.show-all" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show All"
+          }
+        }
+      }
+    },
+    "main-menu.edit" : {
+      "comment" : "Main Menu Edit",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "main-menu.edit.copy" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "main-menu.edit.cut" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cut"
+          }
+        }
+      }
+    },
+    "main-menu.edit.delete" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "main-menu.edit.edit-spelling-and-grammar" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Spelling and Grammar"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find.find-next" : {
+      "comment" : "Main Menu Edit-Find item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find Next"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find.find-previous" : {
+      "comment" : "Main Menu Edit-Find item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find Previous"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find.hide-find" : {
+      "comment" : "Main Menu Edit-Find item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide Find"
+          }
+        }
+      }
+    },
+    "main-menu.edit.paste" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paste"
+          }
+        }
+      }
+    },
+    "main-menu.edit.paste-and-match-style" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paste and Match Style"
+          }
+        }
+      }
+    },
+    "main-menu.edit.redo" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Redo"
+          }
+        }
+      }
+    },
+    "main-menu.edit.select-all" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.check-document-now" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check Document Now"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.check-grammar-with-spelling" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check Grammar With Spelling"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.check-spelling-while-typing" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check Spelling While Typing"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.correct-spelling-automatically" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Correct Spelling Automatically"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.show-spelling-and-grammar" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Spelling and Grammar"
+          }
+        }
+      }
+    },
+    "main-menu.edit.subsitutions" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Substitutions"
+          }
+        }
+      }
+    },
+    "main-menu.edit.undo" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "main-menu.file" : {
+      "comment" : "Main Menu File",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "File"
+          }
+        }
+      }
+    },
+    "main-menu.file.close-all-windows" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close All Windows"
+          }
+        }
+      }
+    },
+    "main-menu.file.close-window" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close Window"
+          }
+        }
+      }
+    },
+    "main-menu.file.export" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Export"
+          }
+        }
+      }
+    },
+    "main-menu.file.export-bookmarks" : {
+      "comment" : "Main Menu File-Export item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmarks…"
+          }
+        }
+      }
+    },
+    "main-menu.file.export-passwords" : {
+      "comment" : "Main Menu File-Export item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords…"
+          }
+        }
+      }
+    },
+    "main-menu.file.import-bookmarks-and-passwords" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import Bookmarks and Passwords…"
+          }
+        }
+      }
+    },
+    "main-menu.file.new-tab" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Tab"
+          }
+        }
+      }
+    },
+    "main-menu.file.open-location" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Location…"
+          }
+        }
+      }
+    },
+    "main-menu.file.save-as" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save As…"
+          }
+        }
+      }
     },
     "main.menu.close.downloads" : {
       "comment" : "Hide Downloads Popover",
