@@ -129,7 +129,8 @@ final class TabPreviewWindowController: NSWindowController {
 
         // Make sure preview is presented within screen
         if let screenVisibleFrame = window.screen?.visibleFrame {
-            topLeftPoint.x = min(topLeftPoint.x, screenVisibleFrame.width - window.frame.width)
+            topLeftPoint.x = min(topLeftPoint.x, screenVisibleFrame.origin.x + screenVisibleFrame.width - window.frame.width)
+            topLeftPoint.x = max(topLeftPoint.x, screenVisibleFrame.origin.x)
 
             let windowHeight = window.frame.size.height
             if topLeftPoint.y <= windowHeight + screenVisibleFrame.origin.y {

@@ -113,10 +113,7 @@ extension Preferences {
         }
 
         var combinedText: String {
-            return UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part4
+            return UserText.aboutUnsupportedDeviceInfo2(version: versionString)
         }
 
         var versionString: String {
