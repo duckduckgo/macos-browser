@@ -48,6 +48,9 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     public let settings: TransparentProxySettings
     public var tunnelConfiguration: TunnelConfiguration?
 
+    @MainActor
+    public var isRunning = false
+
     public var eventHandler: EventCallback?
     private let logger: Logger
 
@@ -88,21 +91,31 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     @MainActor
     public func updateNetworkSettings() async throws {
+        guard isRunning else {
+            return
+        }
+
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            Task { @MainActor in
+                let networkSettings = makeNetworkSettings()
+                logger.log("Updating network settings: \(String(describing: networkSettings), privacy: .public)")
 
-            let networkSettings = makeNetworkSettings()
-            logger.log("Updating network settings: \(String(describing: networkSettings), privacy: .public)")
-
-            setTunnelNetworkSettings(networkSettings) { [eventHandler, logger] error in
-                if let error {
-                    logger.error("Failed to update network settings: \(String(describing: error), privacy: .public)")
-                    eventHandler?(.failedToUdateNetworkSettings(error))
-                    continuation.resume(throwing: error)
+                guard isRunning else {
+                    continuation.resume()
                     return
                 }
 
-                logger.log("Successfully Updated network settings: \(String(describing: error), privacy: .public))")
-                continuation.resume()
+                setTunnelNetworkSettings(networkSettings) { [eventHandler, logger] error in
+                    if let error {
+                        logger.error("Failed to update network settings: \(String(describing: error), privacy: .public)")
+                        eventHandler?(.failedToUdateNetworkSettings(error))
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    logger.log("Successfully Updated network settings: \(String(describing: error), privacy: .public))")
+                    continuation.resume()
+                }
             }
         }
     }
@@ -139,6 +152,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             """)
 
         do {
+            throw NSError(domain: "testing", code: 1)
             try loadProviderConfiguration()
         } catch {
             logger.error("Failed to load provider configuration, bailing out")
@@ -153,6 +167,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
                 try await updateNetworkSettings()
                 logger.log("Proxy started successfully")
+                isRunning = true
                 eventHandler?(.startSuccess)
                 completionHandler(nil)
             } catch {
@@ -169,6 +184,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
         Task { @MainActor in
             stopMonitoringNetworkInterfaces()
+            isRunning = false
             completionHandler()
         }
     }
