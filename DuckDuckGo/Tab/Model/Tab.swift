@@ -694,6 +694,9 @@ protocol NewWindowPolicyDecisionMaker {
     }
     let permissions: PermissionModel
 
+    @Published private(set) var lastWebError: Error?
+    @Published private(set) var lastHttpStatusCode: Int?
+
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
 
@@ -1173,6 +1176,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
+        if lastWebError != nil { lastWebError = nil }
 
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }
@@ -1181,6 +1185,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
         internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
                                                         response: navigationResponse.response as? HTTPURLResponse)
+
+        lastHttpStatusCode = navigationResponse.httpStatusCode
 
         return .next
     }
@@ -1193,6 +1199,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         // Unnecessary assignment triggers publishing
         if error != nil { error = nil }
+        if lastWebError != nil { lastWebError = nil }
 
         invalidateInteractionStateData()
     }
@@ -1218,6 +1225,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
         invalidateInteractionStateData()
         webViewDidFailNavigationPublisher.send()
+    }
+
+    @MainActor
+    func didFailProvisionalLoad(with request: URLRequest, in frame: WKFrameInfo, with error: Error) {
+        lastWebError = error
     }
 
     func webContentProcessDidTerminate(with reason: WKProcessTerminationReason?) {
