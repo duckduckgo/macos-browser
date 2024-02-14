@@ -316,6 +316,14 @@ final class AddressBarTextField: NSTextField {
         }
 #endif
 
+#if SUBSCRIPTION
+        if providedUrl.isChild(of: URL.subscriptionBaseURL) || providedUrl.isChild(of: URL.identityTheftRestoration) {
+            selectedTabViewModel.updateAddressBarStrings()
+            self.window?.makeFirstResponder(nil)
+            return
+        }
+#endif
+
         selectedTabViewModel.tab.setUrl(providedUrl, source: .userEntered(userEnteredValue))
         selectedTabViewModel.updateAddressBarStrings()
 

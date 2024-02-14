@@ -26,7 +26,11 @@ protocol CrashReportPromptViewControllerDelegate: AnyObject {
 }
 
 final class CrashReportPromptViewController: NSViewController {
-
+    @IBOutlet weak var titleLabel: NSTextField!
+    @IBOutlet weak var dontSendButton: NSButton!
+    @IBOutlet weak var sendButton: NSButton!
+    @IBOutlet weak var textFieldTitle: NSTextField!
+    @IBOutlet weak var descriptionLabel: NSTextField!
     @IBOutlet var textView: NSTextView!
 
     weak var delegate: CrashReportPromptViewControllerDelegate?
@@ -34,6 +38,14 @@ final class CrashReportPromptViewController: NSViewController {
         didSet {
             updateView()
         }
+    }
+
+    override func viewDidLoad() {
+        titleLabel.stringValue = UserText.crashReportTitle
+        descriptionLabel.stringValue = UserText.crashReportDescription
+        sendButton.title = UserText.crashReportSendButton
+        dontSendButton.title = UserText.crashReportDontSendButton
+        textFieldTitle.stringValue = UserText.crashReportTextFieldTitle
     }
 
     private func updateView() {

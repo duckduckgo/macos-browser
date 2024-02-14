@@ -24,9 +24,9 @@ struct AppMain {
     static func main() {
         _=Application.shared
 
-#if !APPSTORE && !DEBUG && !DBP
+#if !APPSTORE && !DEBUG
         // this should be run after NSApplication.shared is set
-        PFMoveToApplicationsFolderIfNecessary()
+        PFMoveToApplicationsFolderIfNecessary(true)
 #endif
 
         Application.shared.run()

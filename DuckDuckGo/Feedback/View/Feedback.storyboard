@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22155"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -183,15 +183,15 @@ DQ
                                             <scrollView focusRingType="exterior" borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="heN-iP-EsM">
                                                 <rect key="frame" x="20" y="158" width="320" height="97"/>
                                                 <clipView key="contentView" drawsBackground="NO" id="PTf-L1-DK2">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" smartInsertDelete="YES" id="F3N-ft-DgV">
-                                                            <rect key="frame" x="0.0" y="0.0" width="320" height="97"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="305" height="97"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                            <size key="minSize" width="320" height="97"/>
+                                                            <size key="minSize" width="305" height="97"/>
                                                             <size key="maxSize" width="320" height="10000000"/>
                                                             <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                         </textView>
@@ -206,7 +206,7 @@ DQ
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="MIn-YA-XiI">
-                                                    <rect key="frame" x="304" y="0.0" width="16" height="97"/>
+                                                    <rect key="frame" x="305" y="0.0" width="15" height="97"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                             </scrollView>
@@ -340,12 +340,20 @@ Gw
                         <outlet property="browserFeedbackTextView" destination="F3N-ft-DgV" id="amf-uR-AYI"/>
                         <outlet property="browserFeedbackView" destination="8Xi-CY-jyt" id="5IL-yu-IWc"/>
                         <outlet property="browserFeedbackViewTopConstraint" destination="rcx-DQ-kn9" id="vZz-Yt-Lko"/>
+                        <outlet property="cancelButton" destination="G99-8X-64H" id="q0P-4V-Jl1"/>
                         <outlet property="contentView" destination="wYB-07-s0m" id="XXQ-Fh-tQF"/>
                         <outlet property="contentViewHeightContraint" destination="0W2-HI-Vs8" id="vY1-me-1T6"/>
+                        <outlet property="feedbackHelpsLabel" destination="syf-sE-uUM" id="Nsv-mx-0kq"/>
+                        <outlet property="generalFeedbackItem" destination="GSM-nJ-01d" id="hND-Sp-ftT"/>
+                        <outlet property="okButton" destination="3nf-Bg-7k2" id="7Et-6j-Qji"/>
                         <outlet property="optionPopUpButton" destination="7Z6-Ji-PH7" id="4aZ-ZE-ym6"/>
                         <outlet property="pickOptionMenuItem" destination="z2T-3Y-jPK" id="6dO-Or-fk2"/>
-                        <outlet property="submitButton" destination="Gy6-KF-A15" id="aBn-VX-sGY"/>
+                        <outlet property="reportProblemITem" destination="Yti-fm-YMV" id="tqf-AM-xvb"/>
+                        <outlet property="requestFeatureItem" destination="I6J-ps-0Vy" id="ph2-dy-aVt"/>
+                        <outlet property="submitButton" destination="Gy6-KF-A15" id="qQs-il-hFn"/>
+                        <outlet property="thankYouLabel" destination="Pad-Pc-j6d" id="8xC-oh-4mB"/>
                         <outlet property="thankYouView" destination="C8j-UX-ywh" id="EQo-2a-mhp"/>
+                        <outlet property="titleLabel" destination="7KM-rJ-r28" id="Vhn-Q4-NAI"/>
                         <outlet property="unsupportedOsView" destination="8xr-ho-IDj" id="3HW-mc-78M"/>
                     </connections>
                 </viewController>

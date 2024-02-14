@@ -30,7 +30,7 @@ struct AddBookmarkFolderModalViewModel {
     var folderName: String = ""
 
     var isAddButtonDisabled: Bool {
-        folderName.isEmpty
+        folderName.trimmingWhitespace().isEmpty
     }
 
     init(folder: BookmarkFolder,
@@ -64,6 +64,7 @@ struct AddBookmarkFolderModalViewModel {
             return
         }
 
+        let folderName = folderName.trimmingWhitespace()
         if let folder = originalFolder {
             folder.title = folderName
             bookmarkManager.update(folder: folder)

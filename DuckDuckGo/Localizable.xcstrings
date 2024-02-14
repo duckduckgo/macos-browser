@@ -148,6 +148,18 @@
         }
       }
     },
+    "action-cannot-be-undone" : {
+      "comment" : "Text used in alerts to warn user that a given action cannot be undone",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This action cannot be undone."
+          }
+        }
+      }
+    },
     "Actual Size" : {
       "comment" : "Main Menu View item"
     },
@@ -735,6 +747,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Lock autofill after computer is idle for"
+          }
+        }
+      }
+    },
+    "autofill.management.credit-cards.unknown.card" : {
+      "comment" : "Used as placeholder when user iserts a credit card of unknown type (e.g. not Visa, Mastercard)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Card"
           }
         }
       }
@@ -1500,6 +1524,42 @@
         }
       }
     },
+    "bookmarks.empty.state.message" : {
+      "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If your bookmarks are saved in another browser, you can import them into DuckDuckGo."
+          }
+        }
+      }
+    },
+    "bookmarks.empty.state.title" : {
+      "comment" : "Title displayed in Bookmark Manager when there is no bookmarks yet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No bookmarks yet"
+          }
+        }
+      }
+    },
+    "bookmarks.import.button.title" : {
+      "comment" : "Button text to open bookmark import dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import"
+          }
+        }
+      }
+    },
     "bookmarks.imported.from.folder" : {
       "comment" : "Name of the folder the imported bookmarks are saved into",
       "extractionState" : "extracted_with_value",
@@ -1830,7 +1890,7 @@
       }
     },
     "Copy" : {
-      "comment" : "Command\nMain Menu Edit item"
+      "comment" : "Command"
     },
     "copy-selection" : {
       "comment" : "Copy selection menu item",
@@ -1885,6 +1945,66 @@
     },
     "Country" : {
 
+    },
+    "crash-report.description" : {
+      "comment" : "Description of the dialog where the user can send a crash report",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Click “Send to DuckDuckGo“ to submit report to DuckDuckGo. Crash reports help DuckDuckGo diagnose issues and improve our products. No personal information is sent with this report."
+          }
+        }
+      }
+    },
+    "crash-report.dont-send-button" : {
+      "comment" : "Button the user can press to not send the crash report",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don’t Send"
+          }
+        }
+      }
+    },
+    "crash-report.send-button" : {
+      "comment" : "Button the user can press to send the crash report to DuckDuckGo",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Send to DuckDuckGo"
+          }
+        }
+      }
+    },
+    "crash-report.textfield.title" : {
+      "comment" : "Title of the text field where the problems that caused the crashed are detailed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Problem Details"
+          }
+        }
+      }
+    },
+    "crash-report.title" : {
+      "comment" : "Title of the dialog where the user can send a crash report",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo Privacy Browser quit unexpectedly."
+          }
+        }
+      }
     },
     "Cut" : {
       "comment" : "Main Menu Edit item"
@@ -2299,7 +2419,7 @@
       }
     },
     "Delete" : {
-      "comment" : "Command\nMain Menu Edit item"
+      "comment" : "Command"
     },
     "delete-bookmark" : {
       "comment" : "Delete Bookmark button",
@@ -2309,6 +2429,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Delete Bookmark"
+          }
+        }
+      }
+    },
+    "details" : {
+      "comment" : "details button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Details"
           }
         }
       }
@@ -2366,6 +2498,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Don’t Quit"
+          }
+        }
+      }
+    },
+    "dont.save" : {
+      "comment" : "Don't Save button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don't Save"
+          }
+        }
+      }
+    },
+    "dont.update" : {
+      "comment" : "Don't Update button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Don't Update"
           }
         }
       }
@@ -2454,6 +2610,42 @@
         }
       }
     },
+    "downloads.clear-all.item" : {
+      "comment" : "Contextual menu item in downloads manager to clear all downloaded items from the list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear All"
+          }
+        }
+      }
+    },
+    "downloads.copy-link.item" : {
+      "comment" : "Contextual menu item in downloads manager to copy the downloaded link",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy Download Link"
+          }
+        }
+      }
+    },
+    "downloads.dialog.title" : {
+      "comment" : "Title of the dialog that manages the Downloads in the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Downloads"
+          }
+        }
+      }
+    },
     "downloads.error.canceled" : {
       "comment" : "Short error description when downloaded file download was canceled",
       "extractionState" : "extracted_with_value",
@@ -2510,6 +2702,102 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Location"
+          }
+        }
+      }
+    },
+    "downloads.no-recent-downloads" : {
+      "comment" : "Label in the downloads manager that shows that there are no recently downloaded items",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No recent downloads"
+          }
+        }
+      }
+    },
+    "downloads.open-downloads-folder" : {
+      "comment" : "Button in the downloads manager that allows the user to open the downloads folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Downloads Folder"
+          }
+        }
+      }
+    },
+    "downloads.open-website.item" : {
+      "comment" : "Contextual menu item in downloads manager to open the downloaded file originating website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Originating Website"
+          }
+        }
+      }
+    },
+    "downloads.open.item" : {
+      "comment" : "Contextual menu item in downloads manager to open the downloaded file",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open"
+          }
+        }
+      }
+    },
+    "downloads.remove-from-list.item" : {
+      "comment" : "Contextual menu item in downloads manager to remove the given downloaded from the list of downloaded files",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove from List"
+          }
+        }
+      }
+    },
+    "downloads.restart.item" : {
+      "comment" : "Contextual menu item in downloads manager to restart the download",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
+    "downloads.show-in-finder.item" : {
+      "comment" : "Contextual menu item in downloads manager to show the downloaded file in Finder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "downloads.stop.item" : {
+      "comment" : "Contextual menu item in downloads manager to stop the download",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stop"
           }
         }
       }
@@ -2984,6 +3272,18 @@
     "Find Previous" : {
       "comment" : "Main Menu Edit-Find item"
     },
+    "find-in-page.text-field.placeholder" : {
+      "comment" : "Placeholder text for the text field where the user inputs strings to searcg in the web page",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find in page"
+          }
+        }
+      }
+    },
     "find.in.page" : {
       "comment" : "Find in page status (e.g. 1 of 99)",
       "extractionState" : "extracted_with_value",
@@ -3104,6 +3404,30 @@
         }
       }
     },
+    "fire.dialog.close-burner-window" : {
+      "comment" : "Button that allows the user to close and burn the browser burner window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close and Burn This Window"
+          }
+        }
+      }
+    },
+    "fire.dialog.deliting.data" : {
+      "comment" : "Text shown in dialog while removing browsing data",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Deleting browsing data…"
+          }
+        }
+      }
+    },
     "fire.dialog.details" : {
       "comment" : "Button to show more details",
       "extractionState" : "extracted_with_value",
@@ -3112,6 +3436,42 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Details"
+          }
+        }
+      }
+    },
+    "fire.dialog.fire-window.close-tabs" : {
+      "comment" : "Title of the dialog where the user can close browser tabs and clear data.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close Tabs and Clear Data"
+          }
+        }
+      }
+    },
+    "fire.dialog.fire-window.description" : {
+      "comment" : "Explanation of what a fire window is.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "An isolated window that doesn’t save any data"
+          }
+        }
+      }
+    },
+    "fire.dialog.fire-window.title" : {
+      "comment" : "Title of the part of the dialog where the user can open a fire window.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open New Fire Window"
           }
         }
       }
@@ -3160,6 +3520,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Current window will close"
+          }
+        }
+      }
+    },
+    "fire.info.dialog.description" : {
+      "comment" : "Description in the dialog that explains the Fire feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Data, browsing history, and cookies can build up in your browser over time. Use the Fire Button to clear it all away."
+          }
+        }
+      }
+    },
+    "fire.info.dialog.title" : {
+      "comment" : "Title of the dialog that explains the Fire feature.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Leave No Trace"
           }
         }
       }
@@ -3248,6 +3632,18 @@
         }
       }
     },
+    "fireproof.domains.remove.all" : {
+      "comment" : "Label of a button that allows the user to remove all the websites from the fireproofed list",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove All"
+          }
+        }
+      }
+    },
     "fireproof.explanation" : {
       "comment" : "Fireproofing mechanism explanation",
       "extractionState" : "extracted_with_value",
@@ -3328,6 +3724,42 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Rename Folder"
+          }
+        }
+      }
+    },
+    "generic.discard.button" : {
+      "comment" : "Label of a button that allows the user discard an action/change",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Discard"
+          }
+        }
+      }
+    },
+    "generic.remove.button" : {
+      "comment" : "Label of a button that allows the user to remove an item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "got.it" : {
+      "comment" : "Got it button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Got It!"
           }
         }
       }
@@ -3593,6 +4025,9 @@
     },
     "If your computer prompts you to enter a password prior to import, DuckDuckGo will not see that password.\n\nImported passwords are stored securely using encryption." : {
       "comment" : "Warning that Chromium data import would require entering system passwords."
+    },
+    "Import" : {
+      "comment" : "Menu item"
     },
     "Import Bookmarks" : {
 
@@ -4256,6 +4691,450 @@
     },
     "macOS version" : {
       "comment" : "Data import failure Report dialog description of a report field providing user‘s macOS version"
+    },
+    "main-menu.app.check-for-updates" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check for Updates…"
+          }
+        }
+      }
+    },
+    "main-menu.app.hide-duck-duck-go" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide DuckDuckGo"
+          }
+        }
+      }
+    },
+    "main-menu.app.hide-others" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide Others"
+          }
+        }
+      }
+    },
+    "main-menu.app.preferences" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Preferences…"
+          }
+        }
+      }
+    },
+    "main-menu.app.quit-duck-duck-go" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quit DuckDuckGo"
+          }
+        }
+      }
+    },
+    "main-menu.app.services" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Services"
+          }
+        }
+      }
+    },
+    "main-menu.app.show-all" : {
+      "comment" : "Main Menu DuckDuckGo item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show All"
+          }
+        }
+      }
+    },
+    "main-menu.edit" : {
+      "comment" : "Main Menu Edit",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "main-menu.edit.copy" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "main-menu.edit.cut" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cut"
+          }
+        }
+      }
+    },
+    "main-menu.edit.delete" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "main-menu.edit.edit-spelling-and-grammar" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Spelling and Grammar"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find.find-next" : {
+      "comment" : "Main Menu Edit-Find item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find Next"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find.find-previous" : {
+      "comment" : "Main Menu Edit-Find item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Find Previous"
+          }
+        }
+      }
+    },
+    "main-menu.edit.find.hide-find" : {
+      "comment" : "Main Menu Edit-Find item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Hide Find"
+          }
+        }
+      }
+    },
+    "main-menu.edit.paste" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paste"
+          }
+        }
+      }
+    },
+    "main-menu.edit.paste-and-match-style" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paste and Match Style"
+          }
+        }
+      }
+    },
+    "main-menu.edit.redo" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Redo"
+          }
+        }
+      }
+    },
+    "main-menu.edit.select-all" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select All"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.check-document-now" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check Document Now"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.check-grammar-with-spelling" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check Grammar With Spelling"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.check-spelling-while-typing" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check Spelling While Typing"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.correct-spelling-automatically" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Correct Spelling Automatically"
+          }
+        }
+      }
+    },
+    "main-menu.edit.spelling-and.show-spelling-and-grammar" : {
+      "comment" : "Main Menu Edit-Spellingand item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Spelling and Grammar"
+          }
+        }
+      }
+    },
+    "main-menu.edit.subsitutions" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Substitutions"
+          }
+        }
+      }
+    },
+    "main-menu.edit.undo" : {
+      "comment" : "Main Menu Edit item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Undo"
+          }
+        }
+      }
+    },
+    "main-menu.file" : {
+      "comment" : "Main Menu File",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "File"
+          }
+        }
+      }
+    },
+    "main-menu.file.close-all-windows" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close All Windows"
+          }
+        }
+      }
+    },
+    "main-menu.file.close-window" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Close Window"
+          }
+        }
+      }
+    },
+    "main-menu.file.export" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Export"
+          }
+        }
+      }
+    },
+    "main-menu.file.export-bookmarks" : {
+      "comment" : "Main Menu File-Export item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmarks…"
+          }
+        }
+      }
+    },
+    "main-menu.file.export-passwords" : {
+      "comment" : "Main Menu File-Export item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Passwords…"
+          }
+        }
+      }
+    },
+    "main-menu.file.import-bookmarks-and-passwords" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import Bookmarks and Passwords…"
+          }
+        }
+      }
+    },
+    "main-menu.file.new-tab" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New Tab"
+          }
+        }
+      }
+    },
+    "main-menu.file.open-location" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open Location…"
+          }
+        }
+      }
+    },
+    "main-menu.file.save-as" : {
+      "comment" : "Main Menu File item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save As…"
+          }
+        }
+      }
     },
     "main.menu.close.downloads" : {
       "comment" : "Hide Downloads Popover",
@@ -6146,6 +7025,90 @@
         }
       }
     },
+    "passsword.management.save.address" : {
+      "comment" : "Title of dialog that allows the user to save an address method",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Address?"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.account.label" : {
+      "comment" : "In the password manager dialog, label that specifies the password manager vault we are connected with",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connected to %@"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.fireproof.checkbox.description" : {
+      "comment" : "In the password manager dialog, description of the section that allows the user to fireproof a website via a checkbox",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keeps you signed in after using the Fire Button"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.fireproof.checkbox.title" : {
+      "comment" : "In the password manager dialog, title of the section that allows the user to fireproof a website via a checkbox",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Fireproof?"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.password.manager.title" : {
+      "comment" : "Title of the passwored manager section of dialog that allows the user to save credentials",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Login to Bitwarden?"
+          }
+        }
+      }
+    },
+    "passsword.management.save.credentials.unlock.password.manager" : {
+      "comment" : "In the password manager dialog, alerts the user that they need to unlock Bitworden before being able to save the credential",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unlock Bitwarden to Save"
+          }
+        }
+      }
+    },
+    "passsword.management.save.payment" : {
+      "comment" : "Title of dialog that allows the user to save a payment method",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save Payment Method?"
+          }
+        }
+      }
+    },
     "passsword.management.unlock" : {
       "comment" : "Unlock Logins Vault menu",
       "extractionState" : "extracted_with_value",
@@ -6154,6 +7117,138 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Unlock"
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.delete" : {
+      "comment" : "Button of the alert that asks the user to confirm they want to delete an password, login or credential to actually delete",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.duplicate.password" : {
+      "comment" : "Title of the alert that the password inserted already exists",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Duplicate Password"
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.duplicate.password.description" : {
+      "comment" : "Text of the alert that explains the password inserted already exists for a given website",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You already have a password saved for this username and website."
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.remove-card.confirmation" : {
+      "comment" : "Text of the alert that asks the user to confirm they want to delete a credit card",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete this saved credit card?"
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.remove-identity.confirmation" : {
+      "comment" : "Text of the alert that asks the user to confirm they want to delete an identity",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete this saved autofill info?"
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.remove-note.confirmation" : {
+      "comment" : "Text of the alert that asks the user to confirm they want to delete a note",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete this note?"
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.remove-password.confirmation" : {
+      "comment" : "Text of the alert that asks the user to confirm they want to delete a password",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete this saved password"
+          }
+        }
+      }
+    },
+    "passsword.manager.alert.save-changes" : {
+      "comment" : "Text of the alert that asks the user if the want to save the changes made",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save the changes you made?"
+          }
+        }
+      }
+    },
+    "passsword.manager.empty.state.message" : {
+      "comment" : "In the password manager message when there are no items",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "If your logins are saved in another browser, you can import them into DuckDuckGo."
+          }
+        }
+      }
+    },
+    "passsword.manager.empty.state.title" : {
+      "comment" : "In the password manager title when there are no items",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No logins or credit card info yet"
+          }
+        }
+      }
+    },
+    "passsword.manager.unlock.autofill" : {
+      "comment" : "In the password manager text of button to unlock autofill info",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unlock your Autofill info"
           }
         }
       }
@@ -6407,6 +7502,42 @@
         }
       }
     },
+    "permission.popup.allow.button" : {
+      "comment" : "Button that the user can use to authorise a web site to for, for example access location or camera and microphone etc.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow"
+          }
+        }
+      }
+    },
+    "permission.popup.blocked.popover" : {
+      "comment" : "Text of popver warning the user that the a pop-up as been blocked",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pop-up Blocked"
+          }
+        }
+      }
+    },
+    "permission.popup.learn-more.link" : {
+      "comment" : "Text of link that leads to web page with more informations about location services.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn more about location services"
+          }
+        }
+      }
+    },
     "permission.popup.open.format" : {
       "comment" : "Open %@ URL Pop-up",
       "extractionState" : "extracted_with_value",
@@ -6515,18 +7646,6 @@
         }
       }
     },
-    "pinning.hide-home-shortcut" : {
-      "comment" : "Menu item for hiding the Home shortcut",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Hide Home Button"
-          }
-        }
-      }
-    },
     "pinning.hide-netp-shortcut" : {
       "comment" : "Menu item for hiding the NetP shortcut",
       "extractionState" : "extracted_with_value",
@@ -6571,18 +7690,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Show Downloads Shortcut"
-          }
-        }
-      }
-    },
-    "pinning.show-home-shortcut" : {
-      "comment" : "Menu item for showing the Home shortcut",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Home Button"
           }
         }
       }
@@ -7851,6 +8958,42 @@
         }
       }
     },
+    "preferences.appearance.theme.dark" : {
+      "comment" : "In the preferences for themes, the option to select for activating dark mode in the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Dark"
+          }
+        }
+      }
+    },
+    "preferences.appearance.theme.light" : {
+      "comment" : "In the preferences for themes, the option to select for activating light mode in the app.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Light"
+          }
+        }
+      }
+    },
+    "preferences.appearance.theme.system" : {
+      "comment" : "In the preferences for themes, the option to select for use the change the mode based on the system preferences.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "System"
+          }
+        }
+      }
+    },
     "preferences.appearance.zoom" : {
       "comment" : "Zoom settings section title",
       "extractionState" : "extracted_with_value",
@@ -8038,6 +9181,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Sync & Backup"
+          }
+        }
+      }
+    },
+    "preferences.sync.auto-lock-prompt" : {
+      "comment" : "Reason for auth when setting up Sync",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unlock device to setup Sync & Backup"
           }
         }
       }
@@ -8297,6 +9452,90 @@
         }
       }
     },
+    "send.browser.feedback.feedback-helps" : {
+      "comment" : "Text shown to the user when they provide feedback.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your feedback will help us improve the DuckDuckGo app."
+          }
+        }
+      }
+    },
+    "send.browser.feedback.general-feedback" : {
+      "comment" : "Name of the option the user can chose to give general browser feedback",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "General feedback"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.report-problem" : {
+      "comment" : "Name of the option the user can chose to give browser feedback about a problem they enountered",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Report a problem"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.request-feature" : {
+      "comment" : "Name of the option the user can chose to give browser feedback about a feature they would like",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Request a feature"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.select-category" : {
+      "comment" : "Title of the picker where the user can chose the category of the feedback they want ot send.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a category"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.thankyou" : {
+      "comment" : "Thanks the user for sending feedback",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Thank you!"
+          }
+        }
+      }
+    },
+    "send.browser.feedback.title" : {
+      "comment" : "Title of the interface to send feedback on the browser",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Help Improve the DuckDuckGo Browser"
+          }
+        }
+      }
+    },
     "Services" : {
       "comment" : "Main Menu DuckDuckGo item"
     },
@@ -8312,17 +9551,8 @@
         }
       }
     },
-    "settings.hide-home-shortcut" : {
-      "comment" : "Settings Optionm to set Home Button visibility",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Show Home Button in Toolbar"
-          }
-        }
-      }
+    "Settings…" : {
+      "comment" : "Menu item"
     },
     "share.menu.item" : {
       "comment" : "Menu item title",
@@ -8958,6 +10188,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Your version of macOS is no longer supported."
+          }
+        }
+      }
+    },
+    "update" : {
+      "comment" : "Update button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update"
           }
         }
       }

@@ -56,6 +56,12 @@ enum UserText {
     static let learnMoreButton = NSLocalizedString("subscription.preferences.learn.more.button", value: "Learn More", comment: "Button to open a page where user can learn more and purchase the subscription")
     static let haveSubscriptionButton = NSLocalizedString("subscription.preferences.i.have.a.subscription.button", value: "I Have a Subscription", comment: "Button enabling user to activate a subscription user bought earlier or on another device")
 
+    // MARK: - Change plan or billing dialogs
+    static let changeSubscriptionDialogTitle = NSLocalizedString("subscription.dialog.change.title", value: "Change Plan or Billing", comment: "Change plan or billing dialog title")
+    static let changeSubscriptionGoogleDialogDescription = NSLocalizedString("subscription.dialog.change.google.description", value: "Your subscription was purchased through the Google Play Store. To change your plan or billing settings, please open Google Play Store subscription settings on a device signed in to the same Google Account used to purchase your subscription.", comment: "Change plan or billing dialog subtitle description for subscription purchased via Google")
+    static let changeSubscriptionAppleDialogDescription = NSLocalizedString("subscription.dialog.change.apple.description", value: "Your subscription was purchased through the Apple App Store. To change your plan or billing settings, please go to Settings > Apple ID > Subscriptions on a device signed in to the same Apple ID used to purchase your subscription.", comment: "Change plan or billing dialog subtitle description for subscription purchased via Apple")
+    static let changeSubscriptionDialogDone = NSLocalizedString("subscription.dialog.change.done.button", value: "Done", comment: "Button to close the change subscription dialog")
+
     // MARK: - Remove from this device dialog
     static let removeSubscriptionDialogTitle = NSLocalizedString("subscription.dialog.remove.title", value: "Remove From This Device?", comment: "Remove subscription from device dialog title")
     static let removeSubscriptionDialogDescription = NSLocalizedString("subscription.dialog.remove.description", value: "You will no longer be able to access your Privacy Pro subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.", comment: "Remove subscription from device dialog subtitle description")
