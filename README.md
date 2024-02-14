@@ -1,4 +1,4 @@
- # DuckDuckGo for macOS
+# DuckDuckGo for macOS
 
 We are excited to engage the community in development!
 
