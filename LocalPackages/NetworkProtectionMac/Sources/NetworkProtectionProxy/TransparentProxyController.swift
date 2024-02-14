@@ -21,6 +21,7 @@ import Foundation
 import NetworkExtension
 import NetworkProtection
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
+import PixelKit
 import SystemExtensions
 
 /// Controller for ``TransparentProxyProvider``
@@ -28,11 +29,31 @@ import SystemExtensions
 @MainActor
 public final class TransparentProxyController {
 
+    public enum StartError: Error {
+        case attemptToStartWithoutBackingActiveFeatures
+        case couldNotRetrieveProtocolConfiguration
+        case couldNotEncodeSettingsSnapshot
+        case failedToLoadConfiguration(_ error: Error)
+        case failedToSaveConfiguration(_ error: Error)
+        case failedToStartProvider(_ error: Error)
+    }
+
+    public typealias EventCallback = (Event) -> Void
     public typealias ManagerSetupCallback = (_ manager: NETransparentProxyManager) async -> Void
+
+    /// Dry mode means this won't really do anything to start or stop the proxy.
+    ///
+    /// This is useful for testing.
+    ///
+    private let dryMode: Bool
 
     /// The bundleID of the extension that contains the ``TransparentProxyProvider``.
     ///
     private let extensionID: String
+
+    /// The event handler
+    ///
+    public var eventHandler: EventCallback?
 
     /// Callback to set up a ``NETransparentProxyManager``.
     ///
@@ -59,7 +80,11 @@ public final class TransparentProxyController {
     ///     - extensionID: the bundleID for the extension that contains the ``TransparentProxyProvider``.
     ///         This class DOES NOT take any responsibility in installing the system extension.  It only uses
     ///         the extensionID to identify the appropriate manager configuration to load / save.
+    ///     - storeSettingsInProviderConfiguration: whether the provider configuration will be used for storing
+    ///         the proxy settings.  Should be `true` when using a System Extension and `false` when using
+    ///         an App Extension.
     ///     - settings: the settings to use for this proxy.
+    ///     - dryMode: whether this class is initialized in dry mode.
     ///     - setup: a callback that will be called whenever a ``NETransparentProxyManager`` needs
     ///         to be setup.
     ///
@@ -67,8 +92,10 @@ public final class TransparentProxyController {
                 storeSettingsInProviderConfiguration: Bool,
                 settings: TransparentProxySettings,
                 notificationCenter: NotificationCenter = .default,
+                dryMode: Bool = false,
                 setup: @escaping ManagerSetupCallback) {
 
+        self.dryMode = dryMode
         self.extensionID = extensionID
         self.notificationCenter = notificationCenter
         self.settings = settings
@@ -152,26 +179,21 @@ public final class TransparentProxyController {
         }()
 
         await setup(manager)
-        setupAdditionalProviderConfiguration(manager)
+        try setupAdditionalProviderConfiguration(manager)
 
-        do {
-            try await manager.saveToPreferences()
-            try await manager.loadFromPreferences()
-        } catch {
-            print(error.localizedDescription)
-        }
+        try await manager.saveToPreferences()
+        try await manager.loadFromPreferences()
 
         return manager
     }
 
-    private func setupAdditionalProviderConfiguration(_ manager: NETransparentProxyManager) {
+    private func setupAdditionalProviderConfiguration(_ manager: NETransparentProxyManager) throws {
         guard storeSettingsInProviderConfiguration else {
             return
         }
 
         guard let providerProtocol = manager.protocolConfiguration as? NETunnelProviderProtocol else {
-            assertionFailure("Could not retrieve providerProtocol. The proxy will fail to start up")
-            return
+            throw StartError.couldNotRetrieveProtocolConfiguration
         }
 
         var providerConfiguration = providerProtocol.providerConfiguration ?? [String: Any]()
@@ -179,8 +201,7 @@ public final class TransparentProxyController {
         guard let encodedSettings = try? JSONEncoder().encode(settings.snapshot()),
               let encodedSettingsString = String(data: encodedSettings, encoding: .utf8) else {
 
-            assertionFailure("Could not encode settings. The proxy will fail to start up")
-            return
+            throw StartError.couldNotEncodeSettingsSnapshot
         }
 
         providerConfiguration[TransparentProxySettingsSnapshot.key] = encodedSettingsString as NSString
@@ -224,12 +245,32 @@ public final class TransparentProxyController {
     }
 
     public func start() async throws {
+        eventHandler?(.startInitiated)
+
         guard isRequiredForActiveFeatures else {
-            return
+            let error = StartError.attemptToStartWithoutBackingActiveFeatures
+            eventHandler?(.startFailure(error))
+            throw error
         }
 
-        let manager = try await loadOrCreateConfiguration()
-        try manager.connection.startVPNTunnel(options: [:])
+        let manager: NETransparentProxyManager
+
+        do {
+            manager = try await loadOrCreateConfiguration()
+        } catch {
+            eventHandler?(.startFailure(error))
+            throw error
+        }
+
+        do {
+            try manager.connection.startVPNTunnel(options: [:])
+        } catch {
+            let error = StartError.failedToStartProvider(error)
+            eventHandler?(.startFailure(error))
+            throw error
+        }
+
+        eventHandler?(.startSuccess)
     }
 
     public func stop() async {
