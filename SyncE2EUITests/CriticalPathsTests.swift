@@ -31,6 +31,8 @@ final class CriticalPathsTests: XCTestCase {
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
 
+        
+
         // Set Internal User
         let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
