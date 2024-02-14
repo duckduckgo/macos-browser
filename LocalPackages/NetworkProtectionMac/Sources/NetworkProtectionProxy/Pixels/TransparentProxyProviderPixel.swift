@@ -36,7 +36,7 @@ extension TransparentProxyProvider.StartError: ErrorWithPixelParameters {
 extension TransparentProxyProvider {
 
     public enum Event: PixelKitEventV2 {
-        case failedToUdateNetworkSettings(_ error: Error)
+        case failedToUpdateNetworkSettings(_ error: Error)
         case startInitiated
         case startSuccess
         case startFailure(_ error: Error)
@@ -49,7 +49,7 @@ extension TransparentProxyProvider {
 
         private var namePostfix: String {
             switch self {
-            case .failedToUdateNetworkSettings:
+            case .failedToUpdateNetworkSettings:
                 return "failed_to_update_network_settings"
             case .startFailure:
                 return "start_failure"
@@ -66,7 +66,7 @@ extension TransparentProxyProvider {
 
         public var parameters: [String: String]? {
             switch self {
-            case.failedToUdateNetworkSettings:
+            case.failedToUpdateNetworkSettings:
                 return nil
             case .startFailure:
                 return nil
@@ -79,7 +79,7 @@ extension TransparentProxyProvider {
 
         public var error: Error? {
             switch self {
-            case .failedToUdateNetworkSettings(let error):
+            case .failedToUpdateNetworkSettings(let error):
                 return error
             case .startInitiated:
                 return nil

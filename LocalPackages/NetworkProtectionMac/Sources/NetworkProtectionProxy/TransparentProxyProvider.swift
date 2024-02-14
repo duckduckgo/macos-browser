@@ -109,7 +109,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
                 setTunnelNetworkSettings(networkSettings) { [eventHandler, logger] error in
                     if let error {
                         logger.error("Failed to update network settings: \(String(describing: error), privacy: .public)")
-                        eventHandler?(.failedToUdateNetworkSettings(error))
+                        eventHandler?(.failedToUpdateNetworkSettings(error))
                         continuation.resume(throwing: error)
                         return
                     }
