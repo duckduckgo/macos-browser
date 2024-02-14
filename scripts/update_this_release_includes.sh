@@ -8,11 +8,12 @@
 # be run locally as part of the release process.
 #
 # Usage:
-#   ./update_this_release_includes.sh <release-task-id> <validation-section-id>
+#   ./update_this_release_includes.sh <release-task-id> <marketing-version> <validation-section-id>
 #
 
 set -e -o pipefail
 
+workspace_id="137249556945"
 asana_api_url="https://app.asana.com/api/1.0"
 task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
 cwd="$(dirname "${BASH_SOURCE[0]}")"
@@ -85,15 +86,48 @@ move_tasks_to_section() {
 		curl -fLSs "${asana_api_url}/sections/${section_id}/addTask" \
 			-H 'Content-Type: application/json' \
 			-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
-			--write-out '%{http_code}' \
 			--output /dev/null \
 			-d "{\"data\": {\"task\": \"${task_id}\"}}"
 	done
 }
 
+find_or_create_asana_release_tag() {
+	local marketing_version="$1"
+	local tag_name="macos-app-release-${marketing_version}"
+	local tag_id
+
+	tag_id="$(curl -fLSs "${asana_api_url}/tasks/${release_task_id}/tags?opt_fields=name" \
+		-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+		| jq -r ".data[] | select(.name==\"${tag_name}\").gid")"
+
+	if [[ -z "$tag_id" ]]; then # workspaces/workspace_gid/tags
+		tag_id=$(curl -fLSs "${asana_api_url}/workspaces/${workspace_id}/tags?opt_fields=gid" \
+			-H 'Content-Type: application/json' \
+			-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+			-d "{\"data\": {\"name\": \"${tag_name}\"}}" | jq -r .data.gid)
+	fi
+
+	echo "$tag_id"
+}
+
+tag_tasks() {
+	local tag_id="$1"
+	shift
+	local task_ids=("$@")
+
+	for task_id in "${task_ids[@]}"; do
+		curl -fLSs "${asana_api_url}/tasks/${task_id}/addTag" \
+			-H 'Content-Type: application/json' \
+			-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+			--output /dev/null \
+			-d "{\"data\": {\"tag\": \"${tag_id}\"}}"
+	done
+}
+
 main() {
 	local release_task_id="$1"
-	local validation_section_id="$2"
+	local marketing_version="$2"
+	local validation_section_id="$3"
 
 	if [[ -z "$release_task_id" ]]; then
 		echo "Usage: $0 <release-task-id>"
@@ -122,6 +156,13 @@ main() {
 	# 5. Move all tasks (including release task itself) to the validation section
 	task_ids+=("${release_task_id}")
 	move_tasks_to_section "$validation_section_id" "${task_ids[@]}"
+
+	# 6. Get the existing Asana tag for the release, or create a new one.
+	local tag_id
+	tag_id=$(find_or_create_asana_release_tag "$marketing_version")
+
+	# 7. Tag all tasks with the release tag
+	tag_tasks "$tag_id" "${task_ids[@]}"
 }
 
 main "$@"
