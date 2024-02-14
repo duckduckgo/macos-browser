@@ -103,7 +103,7 @@ find_or_create_asana_release_tag() {
 		-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
 		| jq -r ".data[] | select(.name==\"${tag_name}\").gid")"
 
-	if [[ -z "$tag_id" ]]; then # workspaces/workspace_gid/tags
+	if [[ -z "$tag_id" ]]; then
 		tag_id=$(curl -fLSs "${asana_api_url}/workspaces/${workspace_id}/tags?opt_fields=gid" \
 			-H 'Content-Type: application/json' \
 			-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
