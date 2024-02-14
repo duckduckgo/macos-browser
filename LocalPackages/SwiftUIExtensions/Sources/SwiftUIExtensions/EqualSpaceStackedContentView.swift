@@ -25,7 +25,7 @@ public struct EqualSpaceStackedContentView<Left: View, Right: View>: View {
     private let verticalSpacing: CGFloat?
     @ViewBuilder private let leftColumn: () -> Left
     @ViewBuilder private let rightColumn: () -> Right
-    
+
     /// Creates an instance with the given horizontal and vertical spacing, row height and
     /// - Parameters:
     ///   - horizontalSpacing: The horizontal distance between adjacent subviews.
