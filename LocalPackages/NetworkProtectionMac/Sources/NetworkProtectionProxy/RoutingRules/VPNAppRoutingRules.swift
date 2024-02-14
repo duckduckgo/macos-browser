@@ -18,18 +18,4 @@
 
 import Foundation
 
-public typealias VPNAppRoutingRules = [VPNRoutingAppIdentifier: VPNRoutingRule]
-
-/// An instance that identifies a specific app
-///
-/// For now this class only includes the bundle ID for the apps to apply rules to, but
-/// malicious apps may spoof the bundle ID, which means we need to consider adding
-/// other identifying data in this structure if possible.
-///
-public struct VPNRoutingAppIdentifier: Codable, Hashable, Equatable {
-    public let bundleID: String
-
-    public init(bundleID: String) {
-        self.bundleID = bundleID
-    }
-}
+public typealias VPNAppRoutingRules = [String: VPNRoutingRule]
