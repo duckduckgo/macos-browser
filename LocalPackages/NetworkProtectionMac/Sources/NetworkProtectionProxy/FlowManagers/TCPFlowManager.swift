@@ -189,7 +189,7 @@ final class TCPFlowManager {
         }
     }
 
-    func copyOutoundTraffic(to remoteConnection: NWConnection) async throws {
+    func copyOutboundTraffic(to remoteConnection: NWConnection) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             flow.readData { data, error in
                 switch (data, error) {
