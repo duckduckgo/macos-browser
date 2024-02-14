@@ -57,6 +57,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{ \"data\": { \"name\": \"$task_name\" }}" \
             | jq -r .data.new_task.gid)"
+          echo "marketing_version=${version}" >> $GITHUB_OUTPUT
           echo "asana_task_id=${asana_task_id}" >> $GITHUB_OUTPUT
           echo "asana_task_url=https://app.asana.com/0/0/${asana_task_id}/f" >> $GITHUB_OUTPUT
 
@@ -75,12 +76,15 @@ jobs:
             --output /dev/null \
             -d "{ \"data\": { \"assignee\": \"$assignee_id\" }}"
 
-      - name: Populate release contents
+      - name: Update Asana tasks for the release
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          ./scripts/update_this_release_includes.sh ${{ steps.create_release_task.outputs.asana_task_id }}
+          ./scripts/update_asana_for_release.sh \
+            ${{ steps.create_release_task.outputs.asana_task_id }} \
+            ${{ steps.create_release_task.outputs.marketing_version }} \
+            ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }}
 
   run_tests:
 

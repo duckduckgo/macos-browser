@@ -1,14 +1,17 @@
 #!/bin/bash
 #
-# This script updates "This release includs:" section of the release task
-# with the list of Asana tasks linked in git commit messages since the last
-# official release tag.
+# This scripts updates Asana tasks related to the release:
+# - Updates "This release includes:" section of the release task with the list
+#	of Asana tasks linked in git commit messages since the last official release tag.
+# - Moves all tasks (including the release task itself) to the Validation section
+#	in macOS App Board project.
+# - Tags all tasks with the release tag (creating the tag as needed).
 #
 # Note: this script is intended to be run in CI environment and should not
 # be run locally as part of the release process.
 #
 # Usage:
-#   ./update_this_release_includes.sh <release-task-id> <marketing-version> <validation-section-id>
+#   ./update_asana_for_release.sh <release-task-id> <marketing-version> <validation-section-id>
 #
 
 set -e -o pipefail
