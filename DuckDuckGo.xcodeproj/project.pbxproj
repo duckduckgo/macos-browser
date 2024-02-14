@@ -2406,6 +2406,9 @@
 		9FA173E32B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */; };
 		9FA173E42B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */; };
 		9FA173E52B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */; };
+		9FA173E72B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */; };
+		9FA173E82B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */; };
+		9FA173E92B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */; };
 		9FDA6C212B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		9FDA6C232B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
@@ -3934,6 +3937,7 @@
 		9F3910612B68C35600CB5112 /* DownloadsTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionTests.swift; sourceTree = "<group>"; };
 		9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtensionTests.swift; sourceTree = "<group>"; };
 		9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogFolderManagementView.swift; sourceTree = "<group>"; };
+		9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogStackedContentView.swift; sourceTree = "<group>"; };
 		9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFavoriteView.swift; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
@@ -6531,6 +6535,7 @@
 		9FA173DD2B7A0ECE00EE4E6E /* Dialog */ = {
 			isa = PBXGroup;
 			children = (
+				9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */,
 				9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */,
 				9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */,
 			);
@@ -9845,6 +9850,7 @@
 				3706FB9E293F65D500E42796 /* AboutModel.swift in Sources */,
 				3706FB9F293F65D500E42796 /* PasswordManagementCreditCardItemView.swift in Sources */,
 				3706FBA0293F65D500E42796 /* NSTextFieldExtension.swift in Sources */,
+				9FA173E82B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */,
 				3706FBA1293F65D500E42796 /* FireproofDomainsContainer.swift in Sources */,
 				3706FBA2293F65D500E42796 /* GeolocationService.swift in Sources */,
 				4B4D60C42A0C849600BCD287 /* NetworkProtectionInvitePresenter.swift in Sources */,
@@ -11069,6 +11075,7 @@
 				4B957AD72AC7AE700062CA31 /* CustomRoundedCornersShape.swift in Sources */,
 				4B957AD82AC7AE700062CA31 /* LocaleExtension.swift in Sources */,
 				4B957AD92AC7AE700062CA31 /* SavePaymentMethodViewController.swift in Sources */,
+				9FA173E92B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */,
 				4B957ADA2AC7AE700062CA31 /* BWStatus.swift in Sources */,
 				4B957ADB2AC7AE700062CA31 /* WebKitVersionProvider.swift in Sources */,
 				B6BCC54D2AFDF24B002C5499 /* TaskWithProgress.swift in Sources */,
@@ -11918,6 +11925,7 @@
 				4BB99D0026FE191E001E4761 /* CoreDataBookmarkImporter.swift in Sources */,
 				4BCF15D72ABB8A110083F6DF /* NetworkProtectionRemoteMessaging.swift in Sources */,
 				C168B9AC2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */,
+				9FA173E72B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift in Sources */,
 				D64A5FF82AEA5C2B00B6D6E7 /* HomeButtonMenuFactory.swift in Sources */,
 				37A6A8F62AFCCA59008580A3 /* FaviconsFetcherOnboardingViewController.swift in Sources */,
 				AA3F895324C18AD500628DDE /* SuggestionViewModel.swift in Sources */,
