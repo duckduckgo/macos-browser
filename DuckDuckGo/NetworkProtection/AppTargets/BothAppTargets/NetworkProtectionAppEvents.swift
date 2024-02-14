@@ -57,7 +57,7 @@ final class NetworkProtectionAppEvents {
     func applicationDidFinishLaunching() {
         let loginItemsManager = LoginItemsManager()
 
-        Task {
+        Task { @MainActor in
             await removeLegacyLoginItemAndVPNConfiguration()
             migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
 
