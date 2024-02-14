@@ -241,7 +241,7 @@ final class FakeStageDurationCalculator: StageDurationCalculator {
 /*
  I wasn't able to import this mock from the background agent project, so I had to re-use it here.
  */
-fileprivate final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
+private final class PrivacyConfigurationManagingMock: PrivacyConfigurationManaging {
 
     var data: Data {
         let configString = """
