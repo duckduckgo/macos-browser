@@ -244,7 +244,7 @@ struct UserText {
     static let saveImageAs = NSLocalizedString("save.image.as", value: "Save Image As…", comment: "Context menu item")
     static let copyEmailAddress = NSLocalizedString("copy.email.address", value: "Copy Email Address", comment: "Context menu item")
     static let copyEmailAddresses = NSLocalizedString("copy.email.addresses", value: "Copy Email Addresses", comment: "Context menu item")
-    static let downloadLinkedFileAs = NSLocalizedString("save.image.as", value: "Download Linked File As…", comment: "Context menu item")
+    static let downloadLinkedFileAs = NSLocalizedString("download.linked.file.at", value: "Download Linked File As…", comment: "Context menu item")
     static let addLinkToBookmarks = NSLocalizedString("add.link.to.bookmarks", value: "Add Link to Bookmarks", comment: "Context menu item")
     static let bookmarkPage = NSLocalizedString("bookmark.page", value: "Bookmark Page", comment: "Context menu item")
     static let searchWithDuckDuckGo = NSLocalizedString("search.with.DuckDuckGo", value: "Search with DuckDuckGo", comment: "Context menu item")
@@ -302,7 +302,7 @@ struct UserText {
     static let fireproof = NSLocalizedString("fireproof", value: "Fireproof", comment: "Fireproof button")
 
     static func domainIsFireproof(domain: String) -> String {
-        let localized = NSLocalizedString("fireproof", value: "%@ is now Fireproof", comment: "Domain fireproof status")
+        let localized = NSLocalizedString("domain-is-fireproof", value: "%@ is now Fireproof", comment: "Domain fireproof status")
         return String(format: localized, domain)
     }
 
@@ -321,75 +321,6 @@ struct UserText {
     static let autoconsentSettingsTitle = NSLocalizedString("autoconsent.title", value: "Cookie Pop-ups", comment: "Autoconsent settings section title")
     static let autoconsentCheckboxTitle = NSLocalizedString("autoconsent.checkbox.title", value: "Automatically handle cookie pop-ups", comment: "Autoconsent settings checkbox title")
     static let autoconsentExplanation = NSLocalizedString("autoconsent.explanation", value: "DuckDuckGo will try to select the most private settings available and hide these pop-ups for you.", comment: "Autoconsent feature explanation in settings")
-
-    // VPN Setting Titles
-
-    static let vpnLocationTitle = NSLocalizedString("vpn.location.title", value: "Location", comment: "Location section title in VPN settings")
-    static let vpnGeneralTitle = NSLocalizedString("vpn.general.title", value: "General", comment: "General section title in VPN settings")
-    static let vpnNotificationsSettingsTitle = NSLocalizedString("vpn.notifications.settings.title", value: "Notifications", comment: "Notifications section title in VPN settings")
-    static let vpnAdvancedSettingsTitle = NSLocalizedString("vpn.advanced.settings.title", value: "Advanced", comment: "VPN Advanced section title in VPN settings")
-
-    // VPN Location
-
-    static let vpnLocationChangeButtonTitle = NSLocalizedString("vpn.location.change.button.title", value: "Change...", comment: "Title of the VPN location preference change button")
-    static let vpnLocationListTitle = NSLocalizedString("vpn.location.list.title", value: "VPN Location", comment: "Title of the VPN location list screen")
-    static let vpnLocationRecommendedSectionTitle = NSLocalizedString("vpn.location.recommended.section.title", value: "Recommended", comment: "Title of the VPN location list recommended section")
-    static let vpnLocationCustomSectionTitle = NSLocalizedString("vpn.location.custom.section.title", value: "Custom", comment: "Title of the VPN location list custom section")
-    static let vpnLocationSubmitButtonTitle = NSLocalizedString("vpn.location.submit.button.title", value: "Submit", comment: "Title of the VPN location list submit button")
-    static let vpnLocationCancelButtonTitle = NSLocalizedString("vpn.location.custom.section.title", value: "Cancel", comment: "Title of the VPN location list cancel button")
-    static let vpnLocationNearest = NSLocalizedString(
-        "vpn.location.description.nearest",
-        value: "Nearest",
-        comment: "Nearest city setting description")
-    static let vpnLocationNearestAvailable = NSLocalizedString(
-        "vpn.location.description.nearest.available",
-        value: "Nearest available",
-        comment: "Nearest available location setting description")
-    static let vpnLocationNearestAvailableSubtitle = NSLocalizedString("vpn.location.nearest.available.title", value: "Automatically connect to the nearest server we can find.", comment: "Subtitle underneath the nearest available vpn location preference text.")
-
-    static func vpnLocationCountryItemFormattedCitiesCount(_ count: Int) -> String {
-        let message = NSLocalizedString("network.protection.vpn.location.country.item.formatted.cities.count", value: "%d cities", comment: "Subtitle of countries item when there are multiple cities, example : ")
-        return String(format: message, count)
-    }
-
-    // VPN Settings
-
-    static let vpnConnectOnLoginSettingTitle = NSLocalizedString(
-        "vpn.setting.title.connect.on.login",
-        value: "Connect on login",
-        comment: "Connect on Login setting title")
-    static let vpnShowInMenuBarSettingTitle = NSLocalizedString(
-        "vpn.setting.title.connect.on.login",
-        value: "Show VPN in menu bar",
-        comment: "Display VPN status in the menu bar.")
-    static let vpnAlwaysOnSettingDescription = NSLocalizedString(
-        "vpn.setting.description.always.on",
-        value: "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled.",
-        comment: "Always ON setting description")
-    static let vpnExcludeLocalNetworksSettingTitle = NSLocalizedString(
-        "vpn.setting.title.exclude.local.networks",
-        value: "Exclude local networks",
-        comment: "Exclude Local Networks setting title")
-    static let vpnExcludeLocalNetworksSettingDescription = NSLocalizedString(
-        "vpn.setting.description.exclude.local.networks",
-        value: "Bypass the VPN for local network connections, like to a printer.",
-        comment: "Exclude Local Networks setting description")
-    static let vpnSecureDNSSettingDescription = NSLocalizedString(
-        "vpn.setting.description.secure.dns",
-        value: "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit.",
-        comment: "Secure DNS setting description")
-    static let uninstallVPNButtonTitle = NSLocalizedString(
-        "vpn.button.title.uninstall.vpn",
-        value: "Uninstall DuckDuckGo VPN...",
-        comment: "Uninstall VPN button title")
-
-    // VPN Settings Alerts
-
-    static let uninstallVPNAlertTitle = NSLocalizedString("vpn.uninstall.alert.title", value: "Are you sure you want to uninstall the VPN?", comment: "Alert title when the user selects to uninstall our VPN")
-    static let uninstallVPNInformativeText = NSLocalizedString(
-        "vpn.uninstall.alert.informative.text",
-        value: "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device.",
-        comment: "Informative text for the alert that comes up when the user decides to uninstall our VPN")
 
     // Misc
 
@@ -525,10 +456,10 @@ struct UserText {
     static let devicePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
                                                                        value: "Allow “%@“ to use your %@?",
                                                                        comment: "Popover asking for domain %@ to use camera/mic/location (%@)")
-    static let popupWindowsPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.popups",
+    static let popupWindowsPermissionAuthorizationFormat = NSLocalizedString("permission.authorization.popups.format",
                                                                              value: "Allow “%@“ to open PopUp Window?",
                                                                              comment: "Popover asking for domain %@ to open Popup Window")
-    static let permissionMenuHeaderPopupWindowsFormat = NSLocalizedString("permission.authorization.popups",
+    static let permissionMenuHeaderPopupWindowsFormat = NSLocalizedString("permission.authorization.popups.menu-header",
                                                                           value: "Allow “%@“ to open PopUp Windows?",
                                                                           comment: "Popover asking for domain %@ to open Popup Window")
     static let externalSchemePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.externalScheme.format",
@@ -549,8 +480,8 @@ struct UserText {
     static let permissionUnmuteFormat = NSLocalizedString("permission.unmute", value: "Resume %@ use on “%@”", comment: "Resume input media device %@ access for %@ website")
     static let permissionReloadToEnable = NSLocalizedString("permission.reloadPage", value: "Reload to ask permission again", comment: "Reload webpage to ask for input media device access permission again")
 
-    static let permissionAllowExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme", value: "Allow “%@“ to open %@", comment: "Allow to open External Link (%@ 2) to open on current domain (%@ 1)")
-    static let permissionMenuHeaderExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme", value: "Allow the %@ to open “%@” links", comment: "Allow the App Name(%@ 1) to open “URL Scheme”(%@ 2) links")
+    static let permissionAllowExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme.format", value: "Allow “%@“ to open %@", comment: "Allow to open External Link (%@ 2) to open on current domain (%@ 1)")
+    static let permissionMenuHeaderExternalSchemeFormat = NSLocalizedString("permission.allow.externalScheme.menu-header", value: "Allow the %@ to open “%@” links", comment: "Allow the App Name(%@ 1) to open “URL Scheme”(%@ 2) links")
 
     static let permissionAppPermissionDisabledFormat = NSLocalizedString("permission.disabled.app", value: "%@ access is disabled for %@", comment: "The app (DuckDuckGo: %@ 2) has no access permission to (%@ 1) media device")
     static let permissionGeolocationServicesDisabled = NSLocalizedString("permission.disabled.system", value: "System location services are disabled", comment: "Geolocation Services are disabled in System Preferences")
@@ -598,8 +529,8 @@ struct UserText {
     static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
     static let showHomePage = NSLocalizedString("preferences.show-home", value: "Open a new window", comment: "Option to control session startup")
     
-    static let homePage = NSLocalizedString("preferences-homepage", value: "Homepage", comment: "Title for Homepage section in settings")
-    static let homePageDescription = NSLocalizedString("preferences-homepage", value: "When navigating home or opening new windows.", comment: "Homepage behavior description")
+    static let homePage = NSLocalizedString("preferences-homepage.title", value: "Homepage", comment: "Title for Homepage section in settings")
+    static let homePageDescription = NSLocalizedString("preferences-homepage.description", value: "When navigating home or opening new windows.", comment: "Homepage behavior description")
     static let newTab = NSLocalizedString("preferences-homepage-newTab", value: "New Tab page", comment: "Option to open a new tab")
     static let specificPage = NSLocalizedString("preferences-homepage-customPage", value: "Specific page", comment: "Option to control Specific Home Page")
     static let setPage = NSLocalizedString("preferences-homepage-set-page", value: "Set Page…", comment: "Option to control the Specific Page")
@@ -633,12 +564,16 @@ struct UserText {
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
     static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified.", comment: "About screen")
     static let aboutUnsupportedDeviceInfo1 = NSLocalizedString("preferences.about.unsupported-device-info1", value: "DuckDuckGo is no longer providing browser updates for your version of macOS.", comment: "")
+    static func aboutUnsupportedDeviceInfo2(version: String) -> String {
+        let localized = NSLocalizedString("preferences.about.unsupported-device-info2", value: "Please update to macOS %@ or later to use the most recent version", comment: "Link to the about page")
+        return String(format: localized, version)
+    }
     static let aboutUnsupportedDeviceInfo2Part1 = NSLocalizedString("preferences.about.unsupported-device-info2-part1", value: "Please", comment: "Second paragraph of unsupported device info - sentence part 1")
     static func aboutUnsupportedDeviceInfo2Part2(version: String) -> String {
         return String(format: NSLocalizedString("preferences.about.unsupported-device-info2-part2", value: "update to macOS %@", comment: "Second paragraph of unsupported device info - sentence part 2 (underlined)"), version)
     }
     static let aboutUnsupportedDeviceInfo2Part3 = NSLocalizedString("preferences.about.unsupported-device-info2-part3", value: "or later to use the most recent version", comment: "Second paragraph of unsupported device info - sentence part 3")
-    static let aboutUnsupportedDeviceInfo2Part4 = NSLocalizedString("preferences.about.unsupported-device-info2-part3", value: "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates.", comment: "Second paragraph of unsupported device info - sentence part 4")
+    static let aboutUnsupportedDeviceInfo2Part4 = NSLocalizedString("preferences.about.unsupported-device-info2-part4", value: "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates.", comment: "Second paragraph of unsupported device info - sentence part 4")
     static let unsupportedDeviceInfoAlertHeader = NSLocalizedString("unsupported.device.info.alert.header", value: "Your version of macOS is no longer supported.", comment: "")
 
 
@@ -780,7 +715,7 @@ struct UserText {
 
     static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
-        let localized = NSLocalizedString("home.page.protection.summary.info",
+        let localized = NSLocalizedString("home.page.protection.summary.message",
                                           value: "%@ tracking attempts blocked",
                                           comment: "")
         return String(format: localized, NumberFormatter.localizedString(from: NSNumber(value: numberOfTrackersBlocked), number: .decimal))
@@ -840,7 +775,7 @@ struct UserText {
     static let clearDataTodayDescription = NSLocalizedString("history.menu.clear.data.today.description", value: "Cookies and other data for sites visited today will also be cleared unless the site is Fireproof. History from other days will not be cleared.", comment: "Description in the alert with the confirmation to clear browsing history")
 
     static let showBookmarksBar = NSLocalizedString("bookmarks.bar.show", value: "Bookmarks Bar", comment: "Menu item for showing the bookmarks bar")
-    static let showBookmarksBarPreference = NSLocalizedString("bookmarks.bar.show", value: "Show Bookmarks Bar", comment: "Preference item for showing the bookmarks bar")
+    static let showBookmarksBarPreference = NSLocalizedString("bookmarks.bar.preferences.show", value: "Show Bookmarks Bar", comment: "Preference item for showing the bookmarks bar")
     static let showBookmarksBarAlways = NSLocalizedString("bookmarks.bar.show.always", value: "Always show", comment: "Preference for always showing the bookmarks bar")
     static let showBookmarksBarNewTabOnly = NSLocalizedString("bookmarks.bar.show.new-tab-only", value: "Only show on New Tab", comment: "Preference for only showing the bookmarks bar on new tab")
     static let bookmarksBarFolderEmpty = NSLocalizedString("bookmarks.bar.folder.empty", value: "Empty", comment: "Empty state for a bookmarks bar folder")
@@ -1056,8 +991,11 @@ struct UserText {
     static let disableEmailProtectionMessage = NSLocalizedString("disable.email.protection.mesage", value: "This will only disable Autofill for Duck Addresses in this browser. \n\n You can still manually enter Duck Addresses and continue to receive forwarded email.", comment: "Message for alert shown when user disables email protection")
     static let disable = NSLocalizedString("disable", value: "Disable", comment: "Email protection Disable button text")
 
-    static let dataBrokerProtectionOptionsMenuItem = NSLocalizedString("data-broker-protection.optionsMenu", value: "Personal Information Removal", comment: "Menu item data broker protection feature")
-    static let tabDataBrokerProtectionTitle = NSLocalizedString("tab.dbp.title", value: "Personal Information Removal", comment: "Tab data broker protection title")
+    // "data-broker-protection.optionsMenu" - Menu item data broker protection feature
+    static let dataBrokerProtectionOptionsMenuItem = "Personal Information Removal"
+    // "tab.dbp.title" - Tab data broker protection title
+    static let tabDataBrokerProtectionTitle = "Personal Information Removal"
+
 
     // Bookmarks bar prompt
     static let bookmarksBarPromptTitle = NSLocalizedString("bookmarks.bar.prompt.title", value: "Show Bookmarks Bar?", comment: "Title for bookmarks bar prompt")
