@@ -38,6 +38,7 @@ struct BookmarkDialogStackedContentView: View {
             leftColumn: {
                 ForEach(items, id: \.title) { item in
                     Text(item.title)
+                        .foregroundColor(.primary)
                         .fontWeight(.medium)
                 }
             },
