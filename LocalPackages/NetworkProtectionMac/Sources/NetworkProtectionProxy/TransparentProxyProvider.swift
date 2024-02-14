@@ -129,6 +129,8 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     override public func startProxy(options: [String: Any]?,
                                     completionHandler: @escaping (Error?) -> Void) {
 
+        eventHandler?(.startInitiated)
+
         logger.log(
             """
             Starting proxy\n
