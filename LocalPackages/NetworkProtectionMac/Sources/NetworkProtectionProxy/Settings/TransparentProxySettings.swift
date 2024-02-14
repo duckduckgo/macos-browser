@@ -74,7 +74,6 @@ public final class TransparentProxySettings {
 
     public func resetAll() {
         defaults.resetVPNProxyAppRoutingRules()
-        defaults.resetVPNProxyDryMode()
         defaults.resetVPNProxyExcludedDomains()
     }
 
