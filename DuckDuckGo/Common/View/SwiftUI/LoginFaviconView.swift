@@ -35,7 +35,8 @@ struct LoginFaviconView: View {
                     .cornerRadius(4.0)
                     .padding(.leading, 6)
             } else {
-                LetterIconView(title: generatedIconLetters, paddingLeading: 8, font: .system(size: 32, weight: .semibold))
+                LetterIconView(title: generatedIconLetters, font: .system(size: 32, weight: .semibold))
+                    .padding(.leading, 8)
             }
         }
     }

@@ -25,7 +25,6 @@ public struct LetterIconView: View {
     public var prefferedFirstCharacters: String?
     public var characterCount: Int
     private var padding: CGFloat = 0.33
-    private var paddingLeading: CGFloat
     private var font: Font
     private static let wwwPreffix = "www."
 
@@ -41,13 +40,11 @@ public struct LetterIconView: View {
                 size: CGFloat = 32,
                 prefferedFirstCharacters: String? = nil,
                 characterCount: Int = 2,
-                paddingLeading: CGFloat = 0,
                 font: Font = .title) {
         self.title = title
         self.size = size
         self.prefferedFirstCharacters = prefferedFirstCharacters
         self.characterCount = characterCount
-        self.paddingLeading = paddingLeading
         self.font = font
     }
 
@@ -63,6 +60,5 @@ public struct LetterIconView: View {
                 .minimumScaleFactor(0.01)
                 .font(font)
         }
-        .padding(.leading, paddingLeading)
     }
 }
