@@ -27,10 +27,6 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
 
     static var vpnProxyLogger = Logger(subsystem: OSLog.subsystem, category: "VPN Proxy")
 
-    private var extensionSharedMemory: VPNExtensionSharedMemory {
-        VPNExtensionSharedMemory.shared
-    }
-
     private var cancellables = Set<AnyCancellable>()
 
     @objc init() {
@@ -62,23 +58,6 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
                    logger: Self.vpnProxyLogger)
 
         eventHandler = eventHandler(_:)
-
-        Task { @MainActor in
-            self.tunnelConfiguration = extensionSharedMemory.tunnelConfiguration
-            subscribeToDNSChanges()
-        }
-    }
-
-    @MainActor
-    private func subscribeToDNSChanges() {
-        extensionSharedMemory.tunnelConfiguration.publisher.sink { [weak self] tunnelConfiguration in
-            guard let self else { return }
-
-            Task { @MainActor in
-                self.tunnelConfiguration = tunnelConfiguration
-                try? await self.updateNetworkSettings()
-            }
-        }.store(in: &cancellables)
     }
 
     private func eventHandler(_ event: TransparentProxyProvider.Event) {

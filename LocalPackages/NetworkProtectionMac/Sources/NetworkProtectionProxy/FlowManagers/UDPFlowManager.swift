@@ -130,7 +130,7 @@ final class UDPConnectionManager {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Data, Error>) in
             connection.receiveMessage { [weak self] data, _, isComplete, error in
 
-                guard let self else {
+                guard self != nil else {
                     continuation.resume(throwing: RemoteConnectionError.cancelled)
                     return
                 }
