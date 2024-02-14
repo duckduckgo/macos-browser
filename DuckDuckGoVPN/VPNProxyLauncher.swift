@@ -84,7 +84,11 @@ final class VPNProxyLauncher {
             }
 
             isControllingProxy = true
-            try await proxyController.start()
+            do {
+                try await proxyController.start()
+            } catch {
+                throw error
+            }
             isControllingProxy = false
         } else if await shouldStopProxy {
             guard !isControllingProxy else {
