@@ -27,7 +27,7 @@ extension TransparentProxyController.Event: Hashable {
 
         lhs.name == rhs.name && lhs.parameters == rhs.parameters
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         name.hash(into: &hasher)
         parameters.hash(into: &hasher)
