@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1706704064294,
+    "version": 1707497831317,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -258,9 +258,6 @@
                     "domain": "youtube.com"
                 },
                 {
-                    "domain": "forbes.com"
-                },
-                {
                     "domain": "tuc.org.uk"
                 },
                 {
@@ -286,16 +283,19 @@
                 ]
             },
             "state": "enabled",
-            "hash": "b082ab4a63d22eb4eafee199c52b1c61"
+            "hash": "df49b4912fc62299b3cc20b5538e3b89"
         },
         "autofill": {
             "exceptions": [
                 {
                     "domain": "roll20.net"
+                },
+                {
+                    "domain": "rumble.com"
                 }
             ],
             "state": "enabled",
-            "hash": "b1ae580a636957bcbe90d16aa92c40bd"
+            "hash": "5bb5c0fc0d462da4674e4ca07dbc9363"
         },
         "clickToLoad": {
             "exceptions": [
@@ -1064,6 +1064,10 @@
                     {
                         "domain": "web.whatsapp.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1780"
+                    },
+                    {
+                        "domain": "zalando.fr",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
                     }
                 ],
                 "webViewDefault": [
@@ -1087,7 +1091,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "492b7a86e347eae43cf3d6f633a184ff"
+            "hash": "96ca986dfe68dbb73a36dd7f3adbb53e"
         },
         "dbp": {
             "state": "enabled",
@@ -1687,6 +1691,7 @@
                     "close ad",
                     "close this ad",
                     "x",
+                    "_",
                     "sponsored",
                     "sponsorisé",
                     "story continues below advertisement",
@@ -2165,6 +2170,15 @@
                         ]
                     },
                     {
+                        "domain": "elpais.com",
+                        "rules": [
+                            {
+                                "selector": ".obne_ob",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "eniro.se",
                         "rules": [
                             {
@@ -2317,6 +2331,14 @@
                             {
                                 "selector": "fbs-ad",
                                 "type": "closest-empty"
+                            },
+                            {
+                                "selector": ".top-ad-container",
+                                "type": "hide"
+                            },
+                            {
+                                "selector": ".vestpocket",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -2618,6 +2640,19 @@
                         ]
                     },
                     {
+                        "domain": "ieee.org",
+                        "rules": [
+                            {
+                                "selector": ".top-leader-container",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[class*='rblad-ieee_']",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "ilfattoquotidiano.it",
                         "rules": [
                             {
@@ -2760,6 +2795,24 @@
                         ]
                     },
                     {
+                        "domain": "livescore.com",
+                        "rules": [
+                            {
+                                "selector": "#header-ads-holder",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "livesport.com",
+                        "rules": [
+                            {
+                                "selector": "#header-ads-holder",
+                                "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
                         "domain": "macrumors.com",
                         "rules": [
                             {
@@ -2869,6 +2922,27 @@
                             {
                                 "selector": ".kskdCls",
                                 "type": "hide"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "newatlas.com",
+                        "rules": [
+                            {
+                                "selector": ".OcelotAdModule",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='desktop_article_']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='mobile_article_']",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[id*='native_index_desktop_']",
+                                "type": "hide-empty"
                             }
                         ]
                     },
@@ -3119,6 +3193,19 @@
                             {
                                 "selector": ".ad-slot-wrapper",
                                 "type": "hide-empty"
+                            }
+                        ]
+                    },
+                    {
+                        "domain": "primagames.com",
+                        "rules": [
+                            {
+                                "selector": ".primis-player",
+                                "type": "hide-empty"
+                            },
+                            {
+                                "selector": "[data-freestar-ad]",
+                                "type": "hide"
                             }
                         ]
                     },
@@ -3852,7 +3939,7 @@
                 ]
             },
             "state": "enabled",
-            "hash": "405e753a74140923880f1bc6b1a30261"
+            "hash": "d2a8f09dc34bc7775ab582f4ad45518d"
         },
         "exceptionHandler": {
             "exceptions": [
@@ -4447,6 +4534,11 @@
             },
             "exceptions": [],
             "hash": "39a36ca9002bd5aea4dd7b6bdb5b79d4"
+        },
+        "mediaPlaybackRequiresUserGesture": {
+            "exceptions": [],
+            "state": "disabled",
+            "hash": "728493ef7a1488e4781656d3f9db84aa"
         },
         "navigatorInterface": {
             "exceptions": [
@@ -6241,7 +6333,7 @@
                     "hubspot.com": {
                         "rules": [
                             {
-                                "rule": "js.hubspot.com/web-interactives-embed.js",
+                                "rule": "hubspot.com/web-interactives",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -7673,7 +7765,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "c9ea7e3d491209cc42758decdbbb8143"
+            "hash": "f5cba883ae4a666f7b6135d3406c2797"
         },
         "trackingCookies1p": {
             "settings": {

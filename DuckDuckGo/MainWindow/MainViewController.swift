@@ -239,7 +239,7 @@ final class MainViewController: NSViewController {
     private func updateDividerColor() {
         NSAppearance.withAppAppearance {
             let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
-            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .addressBarSolidSeparatorColor
+            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .bookmarkBarBackground : .addressBarSolidSeparatorColor
             mainView.divider.backgroundColor = backgroundColor
         }
     }
@@ -414,7 +414,7 @@ final class MainViewController: NSViewController {
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .onboarding:
             self.view.makeMeFirstResponder()
-        case .url:
+        case .url, .subscription:
             browserTabViewController.makeWebViewFirstResponder()
         case .settings:
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()

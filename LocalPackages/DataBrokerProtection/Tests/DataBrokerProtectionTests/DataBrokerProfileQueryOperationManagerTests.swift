@@ -795,7 +795,7 @@ final class MockWebOperationRunner: WebOperationRunner {
     var wasScanCalled = false
     var wasOptOutCalled = false
 
-    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
+    func scan(_ profileQuery: BrokerProfileQueryData, stageCalculator: StageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws -> [ExtractedProfile] {
         wasScanCalled = true
 
         if shouldScanThrow {
@@ -805,7 +805,7 @@ final class MockWebOperationRunner: WebOperationRunner {
         }
     }
 
-    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: DataBrokerProtectionStageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
+    func optOut(profileQuery: BrokerProfileQueryData, extractedProfile: ExtractedProfile, stageCalculator: StageDurationCalculator, showWebView: Bool, shouldRunNextStep: @escaping () -> Bool) async throws {
         wasOptOutCalled = true
 
         if shouldOptOutThrow {

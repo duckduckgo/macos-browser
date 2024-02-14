@@ -21,7 +21,7 @@ import Common
 
 extension WindowsManager {
 
-    class func restoreState(from coder: NSCoder, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws {
+    @discardableResult class func restoreState(from coder: NSCoder, includePinnedTabs: Bool = true, includeWindows: Bool = true) throws -> WindowManagerStateRestoration {
         guard let state = coder.decodeObject(of: WindowManagerStateRestoration.self,
                                              forKey: NSKeyedArchiveRootObjectKey) else {
             throw coder.error ?? NSError(domain: "WindowsManagerStateRestoration", code: -1, userInfo: nil)
@@ -33,6 +33,8 @@ extension WindowsManager {
         if includeWindows {
             restoreWindows(from: state)
         }
+
+        return state
     }
 
     private class func restoreWindows(from state: WindowManagerStateRestoration) {

@@ -22,7 +22,6 @@ import Foundation
 public final class TransparentProxySettings {
     public enum Change: Codable {
         case appRoutingRules(_ routingRules: VPNAppRoutingRules)
-        case dryMode(_ value: Bool)
         case excludedDomains(_ excludedDomains: [String])
     }
 
@@ -35,12 +34,6 @@ public final class TransparentProxySettings {
                 .removeDuplicates()
                 .map { routingRules in
                     Change.appRoutingRules(routingRules)
-                }.eraseToAnyPublisher(),
-            defaults.vpnProxyDryModePublisher
-                .dropFirst()
-                .removeDuplicates()
-                .map { value in
-                    Change.dryMode(value)
                 }.eraseToAnyPublisher(),
             defaults.vpnProxyExcludedDomainsPublisher
                 .dropFirst()
@@ -67,16 +60,6 @@ public final class TransparentProxySettings {
         }
     }
 
-    public var dryMode: Bool {
-        get {
-            defaults.vpnProxyDryMode
-        }
-
-        set {
-            defaults.vpnProxyDryMode = newValue
-        }
-    }
-
     public var excludedDomains: [String] {
         get {
             defaults.vpnProxyExcludedDomains
@@ -91,21 +74,20 @@ public final class TransparentProxySettings {
 
     public func resetAll() {
         defaults.resetVPNProxyAppRoutingRules()
-        defaults.resetVPNProxyDryMode()
         defaults.resetVPNProxyExcludedDomains()
     }
 
     // MARK: - App routing rules logic
 
-    public func isBlocking(_ appIdentifier: VPNRoutingAppIdentifier) -> Bool {
+    public func isBlocking(_ appIdentifier: String) -> Bool {
         appRoutingRules[appIdentifier] == .block
     }
 
-    public func isExcluding(_ appIdentifier: VPNRoutingAppIdentifier) -> Bool {
+    public func isExcluding(_ appIdentifier: String) -> Bool {
         appRoutingRules[appIdentifier] == .exclude
     }
 
-    public func toggleBlocking(for appIdentifier: VPNRoutingAppIdentifier) {
+    public func toggleBlocking(for appIdentifier: String) {
         if isBlocking(appIdentifier) {
             appRoutingRules.removeValue(forKey: appIdentifier)
         } else {
@@ -113,7 +95,7 @@ public final class TransparentProxySettings {
         }
     }
 
-    public func toggleExclusion(for appIdentifier: VPNRoutingAppIdentifier) {
+    public func toggleExclusion(for appIdentifier: String) {
         if isExcluding(appIdentifier) {
             appRoutingRules.removeValue(forKey: appIdentifier)
         } else {
@@ -124,12 +106,11 @@ public final class TransparentProxySettings {
     // MARK: - Snapshot support
 
     public func snapshot() -> TransparentProxySettingsSnapshot {
-        .init(appRoutingRules: appRoutingRules, dryMode: dryMode, excludedDomains: excludedDomains)
+        .init(appRoutingRules: appRoutingRules, excludedDomains: excludedDomains)
     }
 
     public func apply(_ snapshot: TransparentProxySettingsSnapshot) {
         appRoutingRules = snapshot.appRoutingRules
-        dryMode = snapshot.dryMode
         excludedDomains = snapshot.excludedDomains
     }
 }
@@ -138,6 +119,5 @@ public struct TransparentProxySettingsSnapshot: Codable {
     public static let key = "com.duckduckgo.TransparentProxySettingsSnapshot"
 
     public let appRoutingRules: VPNAppRoutingRules
-    public let dryMode: Bool
     public let excludedDomains: [String]
 }

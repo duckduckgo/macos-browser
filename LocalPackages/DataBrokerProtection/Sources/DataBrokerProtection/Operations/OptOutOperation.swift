@@ -35,7 +35,7 @@ final class OptOutOperation: DataBrokerOperation {
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<Void, Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: DataBrokerProtectionStageDurationCalculator?
+    var stageCalculator: StageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
 
@@ -66,7 +66,7 @@ final class OptOutOperation: DataBrokerOperation {
     func run(inputValue: ExtractedProfile,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: DataBrokerProtectionStageDurationCalculator,
+             stageCalculator: StageDurationCalculator,
              showWebView: Bool = false) async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.extractedProfile = inputValue.merge(with: query.profileQuery)

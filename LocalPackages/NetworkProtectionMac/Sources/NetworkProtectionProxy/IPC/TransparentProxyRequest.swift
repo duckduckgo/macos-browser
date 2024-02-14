@@ -46,7 +46,7 @@ public enum TransparentProxyRequest {
     }
 }
 
-/// A transparent proxy.session.
+/// Respresents a transparent proxy session.
 ///
 /// Offers basic IPC communication support for the app that owns the proxy.  This mechanism
 /// is implemented through `NETunnelProviderSession` which means only the app that

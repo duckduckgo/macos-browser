@@ -22,15 +22,6 @@ import NetworkProtection
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import SystemConfiguration
 
-/// A private global actor to handle UDP flows management
-///
-@globalActor
-struct UDPFlowActor {
-    actor ActorType { }
-
-    static let shared: ActorType = ActorType()
-}
-
 open class TransparentProxyProvider: NETransparentProxyProvider {
 
     public enum StartError: Error {
@@ -41,6 +32,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     public typealias EventCallback = (Event) -> Void
     public typealias LoadOptionsCallback = (_ options: [String: Any]?) throws -> Void
 
+    @TCPFlowActor
     var tcpFlowManagers = Set<TCPFlowManager>()
 
     @UDPFlowActor
@@ -210,11 +202,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             - appID: \(String(describing: flow.metaData.sourceAppSigningIdentifier), privacy: .public)
             """)
 
-        guard !settings.dryMode else {
-            logger.debug("[TCP: \(String(describing: flow), privacy: .public)] Ignoring flow as proxy is running in dry mode")
-            return false
-        }
-
         guard let interface else {
             logger.error("[TCP: \(String(describing: flow), privacy: .public)] Expected an interface to exclude traffic through")
             return false
@@ -241,7 +228,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
         flow.networkInterface = directInterface
 
-        Task { @MainActor in
+        Task { @TCPFlowActor in
             let flowManager = TCPFlowManager(flow: flow)
             tcpFlowManagers.insert(flowManager)
 
@@ -263,11 +250,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             - flowID: \(String(describing: flow.metaData.filterFlowIdentifier?.uuidString), privacy: .public)
             - appID: \(String(describing: flow.metaData.sourceAppSigningIdentifier), privacy: .public)
             """)
-
-        guard !settings.dryMode else {
-            logger.debug("[UDP: \(String(describing: flow), privacy: .public)] Ignoring flow as proxy is running in dry mode")
-            return false
-        }
 
         guard let interface else {
             logger.error("[UDP: \(String(describing: flow), privacy: .public)] Expected an interface to exclude traffic through")
@@ -359,7 +341,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
     }
 
     private func path(for flow: NEAppProxyFlow) -> FlowPath {
-        let appIdentifier = VPNRoutingAppIdentifier(bundleID: flow.metaData.sourceAppSigningIdentifier)
+        let appIdentifier = flow.metaData.sourceAppSigningIdentifier
 
         switch settings.appRoutingRules[appIdentifier] {
         case .none:
@@ -374,8 +356,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
         case .exclude:
             return .excludeFromVPN(dueTo: .domainRule)
         }
-
-        return .routeThroughVPN
     }
 
     private func isExcludedDomain(_ hostname: String) -> Bool {

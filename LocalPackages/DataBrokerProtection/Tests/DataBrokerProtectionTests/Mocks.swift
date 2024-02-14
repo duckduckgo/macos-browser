@@ -360,20 +360,20 @@ final class MockAuthenticationRepository: AuthenticationRepository {
 }
 
 final class BrokerUpdaterRepositoryMock: BrokerUpdaterRepository {
-    var wasSaveLastRunDateCalled = false
-    var lastRunDate: Date?
+    var wasSaveLatestAppVersionCheckCalled = false
+    var lastCheckedVersion: String?
 
-    func saveLastRunDate(date: Date) {
-        wasSaveLastRunDateCalled = true
+    func saveLatestAppVersionCheck(version: String) {
+        wasSaveLatestAppVersionCheckCalled = true
     }
 
-    func getLastRunDate() -> Date? {
-        return lastRunDate
+    func getLastCheckedVersion() -> String? {
+        return lastCheckedVersion
     }
 
     func reset() {
-        wasSaveLastRunDateCalled = false
-        lastRunDate = nil
+        wasSaveLatestAppVersionCheckCalled = false
+        lastCheckedVersion = nil
     }
 }
 
@@ -800,5 +800,14 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastParentBrokerWhereChildSitesWhereFetched = nil
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
+    }
+}
+
+final class MockAppVersion: AppVersionNumberProvider {
+
+    var versionNumber: String
+
+    init(versionNumber: String) {
+        self.versionNumber = versionNumber
     }
 }

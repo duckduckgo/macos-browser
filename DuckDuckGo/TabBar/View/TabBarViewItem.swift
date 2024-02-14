@@ -331,7 +331,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func updateSubviews() {
         NSAppearance.withAppAppearance {
-            let backgroundColor = isSelected || isDragged ? NSColor.interfaceBackgroundColor : NSColor.clear
+            let backgroundColor = isSelected || isDragged ? NSColor.navigationBarBackground : NSColor.clear
             view.layer?.backgroundColor = backgroundColor.cgColor
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
@@ -516,7 +516,9 @@ extension TabBarViewItem: NSMenuDelegate {
 extension TabBarViewItem: MouseClickViewDelegate {
 
     func mouseOverView(_ mouseOverView: MouseOverView, isMouseOver: Bool) {
-        delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+        if self.isMouseOver != isMouseOver {
+            delegate?.tabBarViewItem(self, isMouseOver: isMouseOver)
+        }
         self.isMouseOver = isMouseOver
         view.needsLayout = true
     }

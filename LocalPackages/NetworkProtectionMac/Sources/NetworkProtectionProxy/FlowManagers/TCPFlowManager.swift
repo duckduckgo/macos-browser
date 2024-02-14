@@ -20,6 +20,16 @@ import Foundation
 import NetworkExtension
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 
+/// A private global actor to handle UDP flows management
+///
+@globalActor
+struct TCPFlowActor {
+    actor ActorType { }
+
+    static let shared: ActorType = ActorType()
+}
+
+@TCPFlowActor
 enum RemoteConnectionError: Error {
     case complete
     case cancelled
@@ -80,7 +90,7 @@ final class TCPFlowManager {
         }
     }
 
-    func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface, completion: @escaping (Result<NWConnection, Error>) -> Void) {
+    func connect(to remoteEndpoint: NWHostEndpoint, interface: NWInterface, completion: @escaping @TCPFlowActor (Result<NWConnection, Error>) -> Void) {
         let host = Network.NWEndpoint.Host(remoteEndpoint.hostname)
         let port = Network.NWEndpoint.Port(remoteEndpoint.port)!
 
@@ -93,18 +103,20 @@ final class TCPFlowManager {
         self.connection = connection
 
         connection.stateUpdateHandler = { (state: NWConnection.State) in
-            switch state {
-            case .ready:
-                connection.stateUpdateHandler = nil
-                completion(.success(connection))
-            case .cancelled:
-                connection.stateUpdateHandler = nil
-                completion(.failure(RemoteConnectionError.cancelled))
-            case .failed(let error), .waiting(let error):
-                connection.stateUpdateHandler = nil
-                completion(.failure(RemoteConnectionError.couldNotEstablishConnection(error)))
-            default:
-                break
+            Task { @TCPFlowActor in
+                switch state {
+                case .ready:
+                    connection.stateUpdateHandler = nil
+                    completion(.success(connection))
+                case .cancelled:
+                    connection.stateUpdateHandler = nil
+                    completion(.failure(RemoteConnectionError.cancelled))
+                case .failed(let error), .waiting(let error):
+                    connection.stateUpdateHandler = nil
+                    completion(.failure(RemoteConnectionError.couldNotEstablishConnection(error)))
+                default:
+                    break
+                }
             }
         }
 
@@ -120,7 +132,7 @@ final class TCPFlowManager {
                     }
 
                     try Task.checkCancellation()
-                    try await self.copyOutoundTraffic(to: remoteConnection)
+                    try await self.copyOutboundTraffic(to: remoteConnection)
                 }
             }
 
@@ -158,57 +170,61 @@ final class TCPFlowManager {
 
     func copyInboundTraffic(from remoteConnection: NWConnection) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            remoteConnection.receive(minimumIncompleteLength: 1,
-                                     maximumLength: Self.maxReceiveSize) { [weak flow] (data, _, isComplete, error) in
-                guard let flow else {
-                    continuation.resume(throwing: RemoteConnectionError.cancelled)
-                    return
-                }
-
-                switch (data, isComplete, error) {
-                case (.some(let data), _, _) where !data.isEmpty:
-                    flow.write(data) { writeError in
-                        if let writeError {
-                            continuation.resume(throwing: writeError)
-                            remoteConnection.cancel()
-                        } else {
-                            continuation.resume()
-                        }
+            Task { @TCPFlowActor in
+                remoteConnection.receive(minimumIncompleteLength: 1,
+                                         maximumLength: Self.maxReceiveSize) { [weak flow] (data, _, isComplete, error) in
+                    guard let flow else {
+                        continuation.resume(throwing: RemoteConnectionError.cancelled)
+                        return
                     }
-                case (_, isComplete, _) where isComplete == true:
-                    continuation.resume(throwing: RemoteConnectionError.complete)
-                    remoteConnection.cancel()
-                case (_, _, .some(let error)):
-                    continuation.resume(throwing: RemoteConnectionError.unhandledError(error))
-                    remoteConnection.cancel()
-                default:
-                    continuation.resume(throwing: RemoteConnectionError.complete)
-                    remoteConnection.cancel()
+
+                    switch (data, isComplete, error) {
+                    case (.some(let data), _, _) where !data.isEmpty:
+                        flow.write(data) { writeError in
+                            if let writeError {
+                                continuation.resume(throwing: writeError)
+                                remoteConnection.cancel()
+                            } else {
+                                continuation.resume()
+                            }
+                        }
+                    case (_, isComplete, _) where isComplete == true:
+                        continuation.resume(throwing: RemoteConnectionError.complete)
+                        remoteConnection.cancel()
+                    case (_, _, .some(let error)):
+                        continuation.resume(throwing: RemoteConnectionError.unhandledError(error))
+                        remoteConnection.cancel()
+                    default:
+                        continuation.resume(throwing: RemoteConnectionError.complete)
+                        remoteConnection.cancel()
+                    }
                 }
             }
         }
     }
 
-    func copyOutoundTraffic(to remoteConnection: NWConnection) async throws {
+    func copyOutboundTraffic(to remoteConnection: NWConnection) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            flow.readData { data, error in
-                switch (data, error) {
-                case (.some(let data), _) where !data.isEmpty:
-                    remoteConnection.send(content: data, completion: .contentProcessed({ error in
-                        if let error {
-                            continuation.resume(throwing: error)
-                            remoteConnection.cancel()
-                            return
-                        }
+            Task { @TCPFlowActor in
+                flow.readData { data, error in
+                    switch (data, error) {
+                    case (.some(let data), _) where !data.isEmpty:
+                        remoteConnection.send(content: data, completion: .contentProcessed({ error in
+                            if let error {
+                                continuation.resume(throwing: error)
+                                remoteConnection.cancel()
+                                return
+                            }
 
-                        continuation.resume()
-                    }))
-                case (_, .some(let error)):
-                    continuation.resume(throwing: error)
-                    remoteConnection.cancel()
-                default:
-                    continuation.resume(throwing: RemoteConnectionError.complete)
-                    remoteConnection.cancel()
+                            continuation.resume()
+                        }))
+                    case (_, .some(let error)):
+                        continuation.resume(throwing: error)
+                        remoteConnection.cancel()
+                    default:
+                        continuation.resume(throwing: RemoteConnectionError.complete)
+                        remoteConnection.cancel()
+                    }
                 }
             }
         }
