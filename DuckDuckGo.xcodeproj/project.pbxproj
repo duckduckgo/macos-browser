@@ -2403,6 +2403,9 @@
 		9F3910632B68C35600CB5112 /* DownloadsTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910612B68C35600CB5112 /* DownloadsTabExtensionTests.swift */; };
 		9F3910692B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */; };
 		9F39106A2B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */; };
+		9FDA6C212B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
+		9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
+		9FDA6C232B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA06B6B62672AF8100F541C5 /* Sparkle */; };
 		AA0877B826D5160D00B05660 /* SafariVersionReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */; };
 		AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
@@ -3927,6 +3930,7 @@
 		9F180D112B69C665000D695F /* DownloadsTabExtensionMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionMock.swift; sourceTree = "<group>"; };
 		9F3910612B68C35600CB5112 /* DownloadsTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionTests.swift; sourceTree = "<group>"; };
 		9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtensionTests.swift; sourceTree = "<group>"; };
+		9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFavoriteView.swift; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
 		AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionLoadingMock.swift; sourceTree = "<group>"; };
@@ -6520,6 +6524,14 @@
 			path = DuckDuckGoDBPBackgroundAgent;
 			sourceTree = "<group>";
 		};
+		9FA173DD2B7A0ECE00EE4E6E /* Dialog */ = {
+			isa = PBXGroup;
+			children = (
+				9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */,
+			);
+			path = Dialog;
+			sourceTree = "<group>";
+		};
 		AA0877B626D515EE00B05660 /* UserAgent */ = {
 			isa = PBXGroup;
 			children = (
@@ -7340,6 +7352,7 @@
 		AAC5E4C125D6A6C3007F5990 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				9FA173DD2B7A0ECE00EE4E6E /* Dialog */,
 				4B9292CA2667123700AD2C21 /* AddBookmarkFolderModalView.swift */,
 				7BEC20412B0F505F00243D3E /* AddBookmarkFolderPopoverView.swift */,
 				4B9292CB2667123700AD2C21 /* AddBookmarkModalView.swift */,
@@ -10107,6 +10120,7 @@
 				3706FC73293F65D500E42796 /* AddressBarButtonsViewController.swift in Sources */,
 				3706FC76293F65D500E42796 /* PixelDataRecord.swift in Sources */,
 				7BFE955A2A9DF4550081ABE9 /* NetworkProtectionWaitlistFeatureFlagOverridesMenu.swift in Sources */,
+				9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */,
 				3706FC77293F65D500E42796 /* PageObserverUserScript.swift in Sources */,
 				4BF0E5132AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				3706FC78293F65D500E42796 /* SecureVaultErrorReporter.swift in Sources */,
@@ -11075,6 +11089,7 @@
 				4B957AF02AC7AE700062CA31 /* NSException+Catch.m in Sources */,
 				4B957AF12AC7AE700062CA31 /* AppStateRestorationManager.swift in Sources */,
 				4B957AF22AC7AE700062CA31 /* DailyPixel.swift in Sources */,
+				9FDA6C232B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */,
 				4B957AF32AC7AE700062CA31 /* NavigationHotkeyHandler.swift in Sources */,
 				4B957AF42AC7AE700062CA31 /* ClickToLoadUserScript.swift in Sources */,
 				4B957AF52AC7AE700062CA31 /* WindowControllersManager.swift in Sources */,
@@ -11715,6 +11730,7 @@
 				AA9E9A5625A3AE8400D1959D /* NSWindowExtension.swift in Sources */,
 				7BD3AF5D2A8E7AF1006F9F56 /* KeychainType+ClientDefault.swift in Sources */,
 				370A34B12AB24E3700C77F7C /* SyncDebugMenu.swift in Sources */,
+				9FDA6C212B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */,
 				AAC5E4C725D6A6E8007F5990 /* AddBookmarkPopover.swift in Sources */,
 				37CC53F027E8D1440028713D /* PreferencesDownloadsView.swift in Sources */,
 				B6F7127E29F6779000594A45 /* QRSharingService.swift in Sources */,
