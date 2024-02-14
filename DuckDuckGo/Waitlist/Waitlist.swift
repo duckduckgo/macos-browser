@@ -357,7 +357,9 @@ struct DataBrokerProtectionWaitlist: Waitlist {
         UserDefaults().setValue(true, forKey: UserDefaultsWrapper<Bool>.Key.shouldShowDBPWaitlistInvitedCardUI.rawValue)
 
         sendInviteCodeAvailableNotification {
-            DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
+            DispatchQueue.main.async {
+                DataBrokerProtectionExternalWaitlistPixels.fire(pixel: .dataBrokerProtectionWaitlistNotificationShown, frequency: .dailyAndCount)
+            }
         }
     }
 }
