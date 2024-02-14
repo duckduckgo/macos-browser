@@ -20,6 +20,15 @@ import Foundation
 import NetworkExtension
 import OSLog // swiftlint:disable:this enforce_os_log_wrapper
 
+/// A private global actor to handle UDP flows management
+///
+@globalActor
+struct UDPFlowActor {
+    actor ActorType { }
+
+    static let shared: ActorType = ActorType()
+}
+
 /// Class to handle UDP connections
 ///
 /// This is necessary because as described in the reference comment for this implementation (see ``UDPFlowManager``'s documentation)
@@ -238,7 +247,7 @@ final class UDPFlowManager {
                 // Any failure means we close the connection
                 connectionManagers.removeValue(forKey: endpoint)
             }
-        case .failure(let error):
+        case .failure:
             // Any failure means we close the connection
             connectionManagers.removeValue(forKey: endpoint)
         }

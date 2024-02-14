@@ -84,7 +84,7 @@ public final class TransparentProxyController {
     private func subscribeToProviderConfigurationChanges() {
         notificationCenter.publisher(for: .NEVPNConfigurationChange)
             .receive(on: DispatchQueue.main)
-            .sink { notification in
+            .sink { _ in
                 self.reloadProviderConfiguration()
             }
             .store(in: &cancellables)

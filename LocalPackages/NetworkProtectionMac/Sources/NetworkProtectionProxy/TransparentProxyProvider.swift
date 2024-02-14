@@ -22,15 +22,6 @@ import NetworkProtection
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
 import SystemConfiguration
 
-/// A private global actor to handle UDP flows management
-///
-@globalActor
-struct UDPFlowActor {
-    actor ActorType { }
-
-    static let shared: ActorType = ActorType()
-}
-
 open class TransparentProxyProvider: NETransparentProxyProvider {
 
     public enum StartError: Error {
@@ -39,6 +30,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     public typealias LoadOptionsCallback = (_ options: [String: Any]?) throws -> Void
 
+    @TCPFlowActor
     var tcpFlowManagers = Set<TCPFlowManager>()
 
     @UDPFlowActor
@@ -228,7 +220,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
         flow.networkInterface = directInterface
 
-        Task { @MainActor in
+        Task { @TCPFlowActor in
             let flowManager = TCPFlowManager(flow: flow)
             tcpFlowManagers.insert(flowManager)
 
