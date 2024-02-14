@@ -74,10 +74,9 @@ final class UDPConnectionManager {
         }
 
         try await connect()
-        var receiveLoopRunning = true
 
         Task {
-            while receiveLoopRunning {
+            while true {
                 do {
                     let datagram = try await receive()
                     await onReceive(endpoint, .success(datagram))
