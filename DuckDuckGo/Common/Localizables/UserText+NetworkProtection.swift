@@ -271,8 +271,6 @@ extension UserText {
     // "vpn.feedback-form.button.submitting" - Title for the Submitting state of the VPN feedback form
     static let vpnFeedbackFormButtonSubmitting = "Submitting…"
 
-
-
     // MARK: - Setting Titles
     // "vpn.location.title" - Location section title in VPN settings
     static let vpnLocationTitle = "Location"
