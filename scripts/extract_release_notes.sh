@@ -6,7 +6,7 @@
 #   cat release_task_description.txt | ./extract_release_notes.sh
 #
 
-notes_start="release notes:"
+notes_start="release notes"
 notes_end="this release includes:"
 is_release_notes=0
 has_release_notes=0
