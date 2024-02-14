@@ -211,6 +211,7 @@ jobs:
         aws s3 cp ${{ github.workspace }}/release/${{ steps.set-outputs.outputs.dsym-name }} ${{ env.DSYM_S3_PATH }}
 
     - name: Report success
+      if: ${{ env.upload-to == 's3' }}
       uses: ./.github/actions/asana-log-message
       env:
         DSYM_S3_PATH: ${{ steps.upload-dsyms-to-s3.outputs.dsym-s3-path }}
@@ -298,6 +299,7 @@ jobs:
           s3://${{ env.RELEASE_BUCKET_NAME }}/${{ env.RELEASE_BUCKET_PREFIX }}/
 
     - name: Report success
+      if: ${{ env.upload-to == 's3' }}
       uses: ./.github/actions/asana-log-message
       env:
         DMG_URL: ${{ vars.DMG_URL_ROOT }}${{ steps.create-dmg.outputs.dmg }}
