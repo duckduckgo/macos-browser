@@ -10,6 +10,8 @@ jobs:
     name: Sync End to end Tests
     runs-on: macos-13-xlarge
 
+    timeout-minutes: 60
+
     steps:
     - name: Check out the code
       uses: actions/checkout@v3
