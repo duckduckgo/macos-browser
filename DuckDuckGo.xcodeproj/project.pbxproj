@@ -2403,6 +2403,9 @@
 		9F3910632B68C35600CB5112 /* DownloadsTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910612B68C35600CB5112 /* DownloadsTabExtensionTests.swift */; };
 		9F3910692B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */; };
 		9F39106A2B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */; };
+		9FA173DF2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */; };
+		9FA173E02B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */; };
+		9FA173E12B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */; };
 		9FA173E32B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */; };
 		9FA173E42B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */; };
 		9FA173E52B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */; };
@@ -3936,6 +3939,7 @@
 		9F180D112B69C665000D695F /* DownloadsTabExtensionMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionMock.swift; sourceTree = "<group>"; };
 		9F3910612B68C35600CB5112 /* DownloadsTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionTests.swift; sourceTree = "<group>"; };
 		9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtensionTests.swift; sourceTree = "<group>"; };
+		9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogButtonsView.swift; sourceTree = "<group>"; };
 		9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogFolderManagementView.swift; sourceTree = "<group>"; };
 		9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogStackedContentView.swift; sourceTree = "<group>"; };
 		9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFavoriteView.swift; sourceTree = "<group>"; };
@@ -6536,6 +6540,7 @@
 			isa = PBXGroup;
 			children = (
 				9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */,
+				9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */,
 				9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */,
 				9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */,
 			);
@@ -9607,6 +9612,7 @@
 				3706FAF1293F65D500E42796 /* PreferencesAboutView.swift in Sources */,
 				3706FAF2293F65D500E42796 /* ContentBlocking.swift in Sources */,
 				31F2D2002AF026D800BF0144 /* WaitlistTermsAndConditionsActionHandler.swift in Sources */,
+				9FA173E02B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */,
 				3706FAF3293F65D500E42796 /* LocalAuthenticationService.swift in Sources */,
 				1D36E659298AA3BA00AA485D /* InternalUserDeciderStore.swift in Sources */,
 				B6BCC5242AFCDABB002C5499 /* DataImportSourceViewModel.swift in Sources */,
@@ -11232,6 +11238,7 @@
 				4B957B612AC7AE700062CA31 /* HomePage.swift in Sources */,
 				4B957B622AC7AE700062CA31 /* RoundedSelectionRowView.swift in Sources */,
 				B6A22B652B1E29D000ECD2BA /* DataImportSummaryViewModel.swift in Sources */,
+				9FA173E12B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */,
 				4B957B632AC7AE700062CA31 /* LocalStatisticsStore.swift in Sources */,
 				4B957B642AC7AE700062CA31 /* BackForwardListItem.swift in Sources */,
 				4B957B672AC7AE700062CA31 /* AtbAndVariantCleanup.swift in Sources */,
@@ -11858,6 +11865,7 @@
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
+				9FA173DF2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift in Sources */,
 				F44C130225C2DA0400426E3E /* NSAppearanceExtension.swift in Sources */,
 				4B3B8490297A0E1000A384BD /* EmailManagerExtension.swift in Sources */,
 				B64C84F1269310120048FEBE /* PermissionManager.swift in Sources */,
