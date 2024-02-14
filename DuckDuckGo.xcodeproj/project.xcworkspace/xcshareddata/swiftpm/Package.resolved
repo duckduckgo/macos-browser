@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "branch" : "michal/subs-in-bsk",
-        "revision" : "6feeccf03650002f1065c22a20a4c89bb6d5a8e6"
+        "revision" : "328ce451fd1593809d1470ab5a0b5242a595f88c",
+        "version" : "107.0.0"
       }
     },
     {
