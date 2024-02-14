@@ -1,5 +1,5 @@
 //
-//  EqualSpaceStackedContentView.swift
+//  TwoColumnsListView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,7 @@
 import SwiftUI
 
 /// A view to arrange its subviews in two-column equally spaced rows.
-public struct EqualSpaceStackedContentView<Left: View, Right: View>: View {
+public struct TwoColumnsListView<Left: View, Right: View>: View {
     private let rowHeight: CGFloat?
     private let horizontalSpacing: CGFloat?
     private let verticalSpacing: CGFloat?

@@ -33,8 +33,6 @@ struct BookmarkFavoriteView: View {
         }
         .toggleStyle(.checkbox)
         .accessibilityIdentifier("bookmark.add.add.to.favorites.button")
-        .buttonStyle(.borderless)
-        .foregroundColor(Color.button)
     }
 }
 

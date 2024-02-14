@@ -31,7 +31,7 @@ struct BookmarkDialogStackedContentView: View {
     }
 
     var body: some View {
-        EqualSpaceStackedContentView(
+        TwoColumnsListView(
             horizontalSpacing: 16.0,
             verticalSpacing: 20.0,
             rowHeight: 22.0,

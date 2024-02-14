@@ -102,7 +102,7 @@ struct AddEditBookmarkDialogView: ModalView {
                 BookmarkDialogButtonsView(
                     viewState: .compressed,
                     otherButtonAction: .init(
-                        title: UserText.Bookmarks.Dialog.Action.cancel,
+                        title: UserText.cancel,
                         action: viewModel.cancelAction,
                         keyboardShortCut: .cancelAction
                     ), defaultButtonAction: .init(
@@ -137,7 +137,7 @@ private extension AddEditBookmarkDialogViewModel.Mode {
         case .add:
             return UserText.Bookmarks.Dialog.Action.addBookmark
         case .edit:
-            return UserText.Bookmarks.Dialog.Action.save
+            return UserText.save
         }
     }
 
