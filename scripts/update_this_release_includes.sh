@@ -8,15 +8,16 @@
 # be run locally as part of the release process.
 #
 # Usage:
-#   ./update_this_release_includes.sh <release-task-id>
+#   ./update_this_release_includes.sh <release-task-id> <validation-section-id>
 #
 
 set -e -o pipefail
 
+asana_api_url="https://app.asana.com/api/1.0"
 task_url_regex='^https://app.asana.com/[0-9]/[0-9]*/([0-9]*)/f$'
 cwd="$(dirname "${BASH_SOURCE[0]}")"
 
-fetch_task_urls() {
+find_task_urls_in_git_log() {
 	git fetch -q --tags
 	last_release_tag="$(gh api /repos/duckduckgo/macos-browser/releases/latest --jq .tag_name)"
 
@@ -25,7 +26,7 @@ fetch_task_urls() {
 
 fetch_current_release_notes() {
 	local release_task_id="$1"
-	curl -fLSs "https://app.asana.com/api/1.0/tasks/${release_task_id}?opt_fields=notes" \
+	curl -fLSs "${asana_api_url}/tasks/${release_task_id}?opt_fields=notes" \
 		-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
 		| jq -r .data.notes \
 		| "${cwd}"/extract_release_notes.sh
@@ -54,14 +55,10 @@ construct_task_description() {
 
 	printf '%s' '<h2>This release includes:</h2>'
 
-	# if task_urls is not empty
-	if [[ -n "${task_urls[*]}" ]]; then
+	if [[ -n "${task_ids[*]}" ]]; then
 		printf '%s' '<ul>'
-		for url in "${task_urls[@]}"; do
-			task_id=$(get_task_id "$url")
-			if [[ -n "$task_id" ]]; then
-				printf '%s' "<li><a data-asana-gid=\\\"${task_id}\\\"/></li>"
-			fi
+		for task_id in "${task_ids[@]}"; do
+			printf '%s' "<li><a data-asana-gid=\\\"${task_id}\\\"/></li>"
 		done
 		printf '%s' '</ul>'
 	fi
@@ -73,14 +70,30 @@ update_task_description() {
 	local html_notes="$1"
 	local request_payload="{\"data\":{\"html_notes\":\"${html_notes}\"}}"
 
-	curl -fLSs -X PUT "https://app.asana.com/api/1.0/tasks/${release_task_id}?opt_fields=permalink_url" \
+	curl -fLSs -X PUT "${asana_api_url}/tasks/${release_task_id}?opt_fields=permalink_url" \
 		-H 'Content-Type: application/json' \
 		-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
 		-d "$request_payload" | jq -r .data.permalink_url
 }
 
+move_tasks_to_section() {
+	local section_id="$1"
+	shift
+	local task_ids=("$@")
+
+	for task_id in "${task_ids[@]}"; do
+		curl -fLSs "${asana_api_url}/sections/${section_id}/addTask" \
+			-H 'Content-Type: application/json' \
+			-H "Authorization: Bearer ${ASANA_ACCESS_TOKEN}" \
+			--write-out '%{http_code}' \
+			--output /dev/null \
+			-d "{\"data\": {\"task\": \"${task_id}\"}}"
+	done
+}
+
 main() {
 	local release_task_id="$1"
+	local validation_section_id="$2"
 
 	if [[ -z "$release_task_id" ]]; then
 		echo "Usage: $0 <release-task-id>"
@@ -88,10 +101,10 @@ main() {
 	fi
 
 	# 1. Fetch task URLs from git commit messages
-	task_urls=()
+	task_ids=()
 	while read -r line; do
-		task_urls+=("$line")
-	done <<< "$(fetch_task_urls)"
+		task_ids+=("$(get_task_id "$line")")
+	done <<< "$(find_task_urls_in_git_log)"
 
 	# 2. Fetch current release notes from Asana release task.
 	release_notes=()
@@ -105,6 +118,10 @@ main() {
 
 	# 4. Update release task description
 	update_task_description "$html_notes"
+
+	# 5. Move all tasks (including release task itself) to the validation section
+	task_ids+=("${release_task_id}")
+	move_tasks_to_section "$validation_section_id" "${task_ids[@]}"
 }
 
 main "$@"
