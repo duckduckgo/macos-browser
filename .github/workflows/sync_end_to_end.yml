@@ -67,6 +67,8 @@ jobs:
         set -o pipefail && xcodebuild test \
           -scheme "Sync End-to-End UI Tests" \
           -derivedDataPath "DerivedData" \
+          -skipPackagePluginValidation \
+          ONLY_ACTIVE_ARCH=YES \
         | tee xcodebuild.log \
         | xcbeautify
     
