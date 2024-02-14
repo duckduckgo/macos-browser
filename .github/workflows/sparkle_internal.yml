@@ -87,7 +87,6 @@ jobs:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
-          exit 1
           echo -n "$SPARKLE_PRIVATE_KEY" > sparkle_private_key
           chmod 600 sparkle_private_key
 
