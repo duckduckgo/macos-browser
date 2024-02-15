@@ -23,59 +23,54 @@ struct AddBookmarkFolderPopoverView: ModalView {
     @ObservedObject var model: AddBookmarkFolderPopoverViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text(UserText.newFolder)
-                .bold()
-
-            VStack(alignment: .leading, spacing: 7) {
-                Text("Location:", comment: "Add Folder popover: parent folder picker title")
-
-                BookmarkFolderPicker(folders: model.folders, selectedFolder: $model.parent)
-                .accessibilityIdentifier("bookmark.folder.folder.dropdown")
-                .disabled(model.isDisabled)
+        BookmarkDialogContainerView(
+            title: UserText.Bookmarks.Dialog.Title.addFolder,
+            middleSection: {
+                BookmarkDialogStackedContentView(
+                    .init(
+                        title: UserText.Bookmarks.Dialog.Field.name,
+                        content: TextField("", text: $model.folderName)
+                            .focusedOnAppear()
+                            .accessibilityIdentifier("bookmark.folder.name.textfield")
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .font(.system(size: 14))
+                            .disabled(model.isDisabled)
+                    ),
+                    .init(
+                        title: UserText.Bookmarks.Dialog.Field.location,
+                        content: BookmarkFolderPicker(folders: model.folders, selectedFolder: $model.parent)
+                            .accessibilityIdentifier("bookmark.folder.folder.dropdown")
+                            .disabled(model.isDisabled)
+                    )
+                )
+            },
+            bottomSection: {
+                BookmarkDialogButtonsView(
+                    viewState: .expanded,
+                    otherButtonAction: .init(
+                        title: UserText.cancel,
+                        accessibilityIdentifier: "bookmark.add.cancel.button",
+                        isDisabled: model.isDisabled,
+                        action: { _ in model.cancel() }
+                    ),
+                    defaultButtonAction: .init(
+                        title: UserText.Bookmarks.Dialog.Action.addFolder,
+                        accessibilityIdentifier: "bookmark.add.add.folder.button",
+                        keyboardShortCut: .defaultAction,
+                        isDisabled: model.isAddFolderButtonDisabled || model.isDisabled,
+                        action: { _ in model.addFolder() }
+                    )
+                )
             }
-
-            VStack(alignment: .leading, spacing: 7) {
-                Text(UserText.newFolderDialogFolderNameTitle)
-
-                TextField("", text: $model.folderName)
-                    .focusedOnAppear()
-                    .accessibilityIdentifier("bookmark.folder.name.textfield")
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .disabled(model.isDisabled)
-            }
-            .padding(.bottom, 16)
-
-            HStack {
-                Spacer()
-
-                Button(action: {
-                    model.cancel()
-                }) {
-                    Text(UserText.cancel)
-                }
-                .accessibilityIdentifier("bookmark.add.cancel.button")
-                .disabled(model.isDisabled)
-
-                Button(action: {
-                    model.addFolder()
-                }) {
-                    Text("Add Folder", comment: "Add Folder popover: Create folder button")
-                }
-                .keyboardShortcut(.defaultAction)
-                .accessibilityIdentifier("bookmark.add.add.folder.button")
-                .disabled(model.isAddFolderButtonDisabled || model.isDisabled)
-            }
-        }
+        )
+        .padding(.vertical, 16.0)
         .font(.system(size: 13))
-        .padding()
-        .frame(width: 300, height: 229)
-        .background(Color(.popoverBackground))
+        .frame(width: 320)
     }
 }
 
 #if DEBUG
-#Preview {
+#Preview("Add Folder - Light") {
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
         BookmarkFolder(id: "1", title: "Folder 1", children: [
             BookmarkFolder(id: "2", title: "Nested Folder with a name that in theory won‘t fit into the picker", children: [
@@ -94,5 +89,15 @@ struct AddBookmarkFolderPopoverView: ModalView {
     return AddBookmarkFolderPopoverView(model: AddBookmarkFolderPopoverViewModel(bookmarkManager: bkman) {
         print("CompletionHandler:", $0?.title ?? "<nil>")
     })
+    .preferredColorScheme(.light)
+}
+
+#Preview("Add Folder - Dark") {
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
+
+    return AddBookmarkFolderPopoverView(model: AddBookmarkFolderPopoverViewModel(bookmarkManager: bkman) {
+        print("CompletionHandler:", $0?.title ?? "<nil>")
+    })
+    .preferredColorScheme(.dark)
 }
 #endif
