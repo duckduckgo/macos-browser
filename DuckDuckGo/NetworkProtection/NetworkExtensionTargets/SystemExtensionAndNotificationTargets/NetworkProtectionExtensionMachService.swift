@@ -17,7 +17,7 @@
 //
 
 import Foundation
-
+/*
 /// Helper methods associated with mach services.
 ///
 final class NetworkProtectionExtensionMachService {
@@ -28,4 +28,4 @@ final class NetworkProtectionExtensionMachService {
         NetworkProtectionBundle.extensionBundle().machServiceName
     }
 
-}
+}*/

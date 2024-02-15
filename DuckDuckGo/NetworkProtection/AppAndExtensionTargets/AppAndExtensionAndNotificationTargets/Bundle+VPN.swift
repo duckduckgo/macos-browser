@@ -1,5 +1,5 @@
 //
-//  NetworkProtectionBundle.swift
+//  Bundle+VPN.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -19,7 +19,28 @@
 import Foundation
 import NetworkProtection
 
-enum NetworkProtectionBundle {
+extension Bundle {
+
+    private enum VPNInfoKey: String {
+        case tunnelExtensionBundleID = "TUNNEL_EXTENSION_BUNDLE_ID"
+        case proxyExtensionBundleID = "PROXY_EXTENSION_BUNDLE_ID"
+    }
+
+    static var tunnelExtensionBundleID: String {
+        string(for: .tunnelExtensionBundleID)
+    }
+
+    static var proxyExtensionBundleID: String {
+        string(for: .proxyExtensionBundleID)
+    }
+
+    private static func string(for key: VPNInfoKey) -> String {
+        guard let bundleID = Bundle.main.object(forInfoDictionaryKey: key.rawValue) as? String else {
+            fatalError("Info.plist is missing \(key)")
+        }
+
+        return bundleID
+    }
 
 #if !NETWORK_EXTENSION
     // for the Main or Launcher Agent app
@@ -33,7 +54,7 @@ enum NetworkProtectionBundle {
     }
     // AppEx (App Store) can‘t access Main App Bundle
 #endif
-
+/*
     static func extensionBundle() -> Bundle {
 #if NETWORK_EXTENSION // When this code is compiled for any network-extension
         return Bundle.main
@@ -66,7 +87,7 @@ enum NetworkProtectionBundle {
         }
 
         return extensionBundle
-    }
+    }*/
 
     static let keychainType: KeychainType = {
 #if NETP_SYSTEM_EXTENSION
