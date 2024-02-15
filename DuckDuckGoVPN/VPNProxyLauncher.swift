@@ -102,8 +102,13 @@ final class VPNProxyLauncher {
                 }
             }
 
-            try await proxyController.start()
-            isControllingProxy = false
+            do {
+                try await proxyController.start()
+                isControllingProxy = false
+            } catch {
+                isControllingProxy = false
+                throw error
+            }
         } else if await shouldStopProxy {
             guard !isControllingProxy else {
                 return
@@ -117,22 +122,28 @@ final class VPNProxyLauncher {
 
     private var shouldStartProxy: Bool {
         get async {
+            let proxyIsDisconnected = await proxyController.status == .disconnected
+            let tunnelIsConnected = await tunnelController.status == .connected
+
             // Starting the proxy only when it's required for active features
             // is a product decision.  It may change once we decide the proxy
             // is stable enough to be running at all times.
-            await proxyController.status == .disconnected
-            && tunnelController.status == .connected
-            && proxyController.isRequiredForActiveFeatures
+            return proxyIsDisconnected
+                && tunnelIsConnected
+                && proxyController.isRequiredForActiveFeatures
         }
     }
 
     private var shouldStopProxy: Bool {
         get async {
+            let proxyIsConnected = await proxyController.status == .connected
+            let tunnelIsDisconnected = await tunnelController.status == .disconnected
+
             // Stopping the proxy when it's not required for active features
             // is a product decision.  It may change once we decide the proxy
             // is stable enough to be running at all times.
-            await proxyController.status == .connected
-            && (tunnelController.status == .disconnected || !proxyController.isRequiredForActiveFeatures)
+            return proxyIsConnected
+                && (tunnelIsDisconnected || !proxyController.isRequiredForActiveFeatures)
         }
     }
 }

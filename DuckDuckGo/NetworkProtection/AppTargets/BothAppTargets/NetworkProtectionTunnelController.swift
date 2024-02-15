@@ -39,10 +39,6 @@ typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
 
-    // MARK: - VPN Status
-
-    private(set) var status: NEVPNStatus = .invalid
-
     // MARK: - Settings
 
     let settings: VPNSettings
@@ -160,23 +156,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.settings = settings
         self.tokenStore = tokenStore
 
-        subscribeToProviderStatusChanges()
         subscribeToSettingsChanges()
-    }
-
-    // MARK: - VPN Status Changes
-
-    private func subscribeToProviderStatusChanges() {
-        notificationCenter.publisher(for: .NEVPNStatusDidChange)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard let session = ConnectionSessionUtilities.session(from: notification) else {
-                    return
-                }
-
-                self?.status = session.status
-            }
-            .store(in: &cancellables)
     }
 
     // MARK: - Tunnel Settings
@@ -328,6 +308,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
 
             return session
+        }
+    }
+
+    // MARK: - Connection
+
+    public var status: NEVPNStatus {
+        get async {
+            await connection?.status ?? .disconnected
         }
     }
 
