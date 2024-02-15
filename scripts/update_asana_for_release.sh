@@ -25,7 +25,17 @@ find_task_urls_in_git_log() {
 	git fetch -q --tags
 	last_release_tag="$(gh api /repos/duckduckgo/macos-browser/releases/latest --jq .tag_name)"
 
-	git log "${last_release_tag}"..HEAD | grep 'Task.*URL' | awk '{ print $3; }' | grep asana | uniq
+	# 1. Fetch all commit messages since the last release tag
+	# 2. Extract Asana task URLs from the commit messages
+	#    (Use -A 1 to handle cases where URL is on the next line after "Task/Issue URL:")
+	# 3. Print the last space-separated field ($NF) of each line
+	# 4. Filter only Asana URLs
+	# 5. Remove duplicates
+	git log "${last_release_tag}"..HEAD \
+		| grep -A 1 'Task.*URL' \
+		| awk '{ print $NF; }' \
+		| grep app\.asana\.com \
+		| uniq
 }
 
 fetch_current_release_notes() {
