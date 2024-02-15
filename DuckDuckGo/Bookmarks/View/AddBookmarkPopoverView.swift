@@ -70,10 +70,10 @@ struct AddBookmarkPopoverView: View {
                     ),
                     defaultButtonAction: .init(
                         title: UserText.Bookmarks.Dialog.Action.done,
-                        action: model.doneButtonAction,
-                        keyboardShortCut: .defaultAction
-                    ),
-                    shouldDisableDefaultButtonAction: model.isDefaultActionButtonDisabled
+                        keyboardShortCut: .defaultAction,
+                        isDisabled: model.isDefaultActionButtonDisabled,
+                        action: model.doneButtonAction
+                    )
                 )
             }
         )

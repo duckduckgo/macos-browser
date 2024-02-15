@@ -81,14 +81,14 @@ struct AddEditBookmarkFolderDialogView: ModalView {
                     viewState: .compressed,
                     otherButtonAction: .init(
                         title: UserText.cancel,
-                        action: viewModel.cancel,
-                        keyboardShortCut: .cancelAction
+                        keyboardShortCut: .cancelAction,
+                        action: viewModel.cancel
                     ), defaultButtonAction: .init(
                         title: viewModel.defaultActionTitle,
-                        action: viewModel.addOrSave,
-                        keyboardShortCut: .defaultAction
-                    ),
-                    shouldDisableDefaultButtonAction: viewModel.isDefaultActionButtonDisabled
+                        keyboardShortCut: .defaultAction,
+                        isDisabled: viewModel.isDefaultActionButtonDisabled,
+                        action: viewModel.addOrSave
+                    )
                 )
             }
         )
