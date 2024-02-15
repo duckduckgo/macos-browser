@@ -114,6 +114,8 @@
 		1E950E3F2912A10D0051A99B /* ContentBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E3E2912A10D0051A99B /* ContentBlocking */; };
 		1E950E412912A10D0051A99B /* PrivacyDashboard in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E402912A10D0051A99B /* PrivacyDashboard */; };
 		1E950E432912A10D0051A99B /* UserScript in Frameworks */ = {isa = PBXBuildFile; productRef = 1E950E422912A10D0051A99B /* UserScript */; };
+		1EA7B8D32B7E078C000330A4 /* SubscriptionUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1EA7B8D22B7E078C000330A4 /* SubscriptionUI */; };
+		1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 1EA7B8D42B7E078C000330A4 /* Subscription */; };
 		1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1ED910D72B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
@@ -4684,6 +4686,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				373FB4B12B4D6C42004C88D6 /* PreferencesViews in Frameworks */,
+				1EA7B8D32B7E078C000330A4 /* SubscriptionUI in Frameworks */,
 				B6F7128129F681EB00594A45 /* QuickLookUI.framework in Frameworks */,
 				9DB6E7242AA0DC5800A17F3C /* LoginItems in Frameworks */,
 				EE7295E32A545B9A008C0991 /* NetworkProtection in Frameworks */,
@@ -4699,6 +4702,7 @@
 				37269EFB2B332F9E005E8E46 /* Common in Frameworks */,
 				4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
+				1EA7B8D52B7E078C000330A4 /* Subscription in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
 				7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */,
@@ -8779,6 +8783,8 @@
 				3722177F2B3337FE00B8E9C2 /* TestUtils */,
 				373FB4B02B4D6C42004C88D6 /* PreferencesViews */,
 				7BA076BA2B65D61400D7FB72 /* NetworkProtectionProxy */,
+				1EA7B8D22B7E078C000330A4 /* SubscriptionUI */,
+				1EA7B8D42B7E078C000330A4 /* Subscription */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -13616,6 +13622,15 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = UserScript;
+		};
+		1EA7B8D22B7E078C000330A4 /* SubscriptionUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SubscriptionUI;
+		};
+		1EA7B8D42B7E078C000330A4 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
 		};
 		312978892B64131200B67619 /* DataBrokerProtection */ = {
 			isa = XCSwiftPackageProductDependency;
