@@ -85,7 +85,7 @@ struct AddBookmarkPopoverView: View {
 }
 
 #if DEBUG
-#Preview { {
+#Preview("Bookmark Added - Light") {
     let bkm = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "1")
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
         BookmarkFolder(id: "1", title: "Folder with a name that shouldn‘t fit into the picker", children: [
@@ -105,5 +105,15 @@ struct AddBookmarkPopoverView: View {
     customAssertionFailure = { _, _, _ in }
 
     return AddBookmarkPopoverView(model: AddBookmarkPopoverViewModel(bookmark: bkm, bookmarkManager: bkman))
-}() }
+        .preferredColorScheme(.light)
+}
+
+#Preview("Bookmark Added - Dark") {
+    let bkm = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "1")
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
+        BookmarkFolder(id: "1", title: "Folder with a name that shouldn‘t fit into the picker", children: [])]))
+
+    return AddBookmarkPopoverView(model: AddBookmarkPopoverViewModel(bookmark: bkm, bookmarkManager: bkman))
+        .preferredColorScheme(.dark)
+}
 #endif

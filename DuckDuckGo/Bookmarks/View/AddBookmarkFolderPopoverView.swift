@@ -70,7 +70,7 @@ struct AddBookmarkFolderPopoverView: ModalView {
 }
 
 #if DEBUG
-#Preview {
+#Preview("Add Folder - Light") {
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
         BookmarkFolder(id: "1", title: "Folder 1", children: [
             BookmarkFolder(id: "2", title: "Nested Folder with a name that in theory won‘t fit into the picker", children: [
@@ -89,5 +89,15 @@ struct AddBookmarkFolderPopoverView: ModalView {
     return AddBookmarkFolderPopoverView(model: AddBookmarkFolderPopoverViewModel(bookmarkManager: bkman) {
         print("CompletionHandler:", $0?.title ?? "<nil>")
     })
+    .preferredColorScheme(.light)
+}
+
+#Preview("Add Folder - Dark") {
+    let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
+
+    return AddBookmarkFolderPopoverView(model: AddBookmarkFolderPopoverViewModel(bookmarkManager: bkman) {
+        print("CompletionHandler:", $0?.title ?? "<nil>")
+    })
+    .preferredColorScheme(.dark)
 }
 #endif

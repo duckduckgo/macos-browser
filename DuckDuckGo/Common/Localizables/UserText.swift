@@ -413,7 +413,6 @@ struct UserText {
     static let exportBookmarks = NSLocalizedString("export.bookmarks.menu.item", value: "Export Bookmarks…", comment: "Export bookmarks menu item")
     static let bookmarks = NSLocalizedString("bookmarks", value: "Bookmarks", comment: "Button for bookmarks")
     static let favorites = NSLocalizedString("favorites", value: "Favorites", comment: "Title text for the Favorites menu item")
-    #warning("Remove below")
     static let newBookmark = NSLocalizedString("bookmarks.add.dialog.title", value: "New Bookmark", comment: "Bookmark creation dialog title")
     static let bookmarksOpenInNewTabs = NSLocalizedString("bookmarks.open.in.new.tabs", value: "Open in New Tabs", comment: "Open all bookmarks in folder in new tabs")
     static let addToFavorites = NSLocalizedString("add.to.favorites", value: "Add to Favorites", comment: "Button for adding bookmarks to favorites")
