@@ -54,40 +54,6 @@ extension Bundle {
     }
     // AppEx (App Store) can‘t access Main App Bundle
 #endif
-/*
-    static func extensionBundle() -> Bundle {
-#if NETWORK_EXTENSION // When this code is compiled for any network-extension
-        return Bundle.main
-#elseif NETP_SYSTEM_EXTENSION // When this code is compiled for the app when configured to use the sysex
-        let extensionsDirectoryURL = URL(fileURLWithPath: "Contents/Library/SystemExtensions", relativeTo: Bundle.main.bundleURL)
-        return extensionBundle(at: extensionsDirectoryURL)
-#else // When this code is compiled for the app when configured to use the appex
-        let extensionsDirectoryURL = URL(fileURLWithPath: "Contents/Plugins", relativeTo: Bundle.main.bundleURL)
-        return extensionBundle(at: extensionsDirectoryURL)
-#endif
-    }
-
-    static func extensionBundle(at url: URL) -> Bundle {
-        let extensionURLs: [URL]
-        do {
-            extensionURLs = try FileManager.default.contentsOfDirectory(at: url,
-                                                                        includingPropertiesForKeys: nil,
-                                                                        options: .skipsHiddenFiles)
-        } catch let error {
-            fatalError("🔵 Failed to get the contents of \(url.absoluteString): \(error.localizedDescription)")
-        }
-
-        // This should be updated to work well with other extensions
-        guard let extensionURL = extensionURLs.first else {
-            fatalError("🔵 Failed to find any system extensions")
-        }
-
-        guard let extensionBundle = Bundle(url: extensionURL) else {
-            fatalError("🔵 Failed to create a bundle with URL \(extensionURL.absoluteString)")
-        }
-
-        return extensionBundle
-    }*/
 
     static let keychainType: KeychainType = {
 #if NETP_SYSTEM_EXTENSION
