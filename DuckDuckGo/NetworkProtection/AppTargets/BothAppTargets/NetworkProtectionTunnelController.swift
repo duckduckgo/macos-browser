@@ -37,7 +37,7 @@ import SystemExtensions
 typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionStatus) -> Void
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
-final class NetworkProtectionTunnelController: NetworkProtection.TunnelController {
+final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
 
     // MARK: - VPN Status
 
@@ -79,6 +79,15 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     private let networkExtensionBundleID: String
     private let networkExtensionController: NetworkExtensionController
 
+    /// The proxy manager
+    ///
+    /// We're keeping a reference to this because we don't want to be calling `loadAllFromPreferences` more than
+    /// once.
+    ///
+    /// For reference read: https://app.asana.com/0/1203137811378537/1206513608690551/f
+    ///
+    private var internalManager: NETunnelProviderManager?
+
     // MARK: - User Defaults
 
     /* Temporarily disabled - https://app.asana.com/0/0/1205766100762904/f
@@ -93,20 +102,30 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     // MARK: - Tunnel Manager
 
-    /// The tunnel manager: will try to load if it its not loaded yet, but if one can't be loaded from preferences,
-    /// a new one will NOT be created.  This is useful for querying the connection state and information without triggering
-    /// a VPN-access popup to the user.
+    /// Loads the configuration matching our ``extensionID``.
     ///
     @MainActor
-    private func loadTunnelManager() async -> NETunnelProviderManager? {
-        try? await NETunnelProviderManager.loadAllFromPreferences().first {
-            ($0.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == networkExtensionBundleID
+    public var manager: NETunnelProviderManager? {
+        get async {
+            if let internalManager {
+                return internalManager
+            }
+
+            let manager = try? await NETunnelProviderManager.loadAllFromPreferences().first { manager in
+                (manager.protocolConfiguration as? NETunnelProviderProtocol)?.providerBundleIdentifier == networkExtensionBundleID
+            }
+            internalManager = manager
+            return manager
         }
     }
 
     @MainActor
     private func loadOrMakeTunnelManager() async throws -> NETunnelProviderManager {
-        let tunnelManager = await loadTunnelManager() ?? NETunnelProviderManager()
+        let tunnelManager = await manager ?? {
+            let manager = NETunnelProviderManager()
+            internalManager = manager
+            return manager
+        }()
 
         try await setupAndSave(tunnelManager)
         return tunnelManager
@@ -207,7 +226,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     private func handleSetIncludeAllNetworks(_ includeAllNetworks: Bool) async throws {
-        guard let tunnelManager = await loadTunnelManager(),
+        guard let tunnelManager = await manager,
               tunnelManager.protocolConfiguration?.includeAllNetworks == !includeAllNetworks else {
             return
         }
@@ -216,7 +235,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     private func handleSetEnforceRoutes(_ enforceRoutes: Bool) async throws {
-        guard let tunnelManager = await loadTunnelManager(),
+        guard let tunnelManager = await manager,
               tunnelManager.protocolConfiguration?.enforceRoutes == !enforceRoutes else {
             return
         }
@@ -225,7 +244,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     }
 
     private func handleSetExcludeLocalNetworks(_ excludeLocalNetworks: Bool) async throws {
-        guard let tunnelManager = await loadTunnelManager(),
+        guard let tunnelManager = await manager,
               tunnelManager.protocolConfiguration?.excludeLocalNetworks == !excludeLocalNetworks else {
             return
         }
@@ -235,9 +254,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
 
     private func relaySettingsChange(_ change: VPNSettings.Change) async throws {
         guard await isConnected,
-              let activeSession = try await ConnectionSessionUtilities.activeSession(networkExtensionBundleID: networkExtensionBundleID) else { return }
+              let session = await session else {
+            return
+        }
 
-        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderRequest(.changeTunnelSetting(change))
+        let errorMessage: ExtensionMessageString? = try await session.sendProviderRequest(.changeTunnelSetting(change))
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
@@ -285,6 +306,31 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
         }()
     }
 
+    // MARK: - Connection & Session
+
+    public var connection: NEVPNConnection? {
+        get async {
+            await manager?.connection
+        }
+    }
+
+    public func activeSession() async -> NETunnelProviderSession? {
+        await session
+    }
+
+    public var session: NETunnelProviderSession? {
+        get async {
+            guard let manager = await manager,
+                  let session = manager.connection as? NETunnelProviderSession else {
+
+                // The active connection is not running, so there's no session, this is acceptable
+                return nil
+            }
+
+            return session
+        }
+    }
+
     // MARK: - Connection Status Querying
 
     /// Queries Network Protection to know if its VPN is connected.
@@ -293,7 +339,7 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     var isConnected: Bool {
         get async {
-            switch status {
+            switch await connection?.status {
             case .connected, .connecting, .reasserting:
                 return true
             default:
@@ -472,12 +518,12 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     ///
     @MainActor
     func stop() async {
-        guard let tunnelManager = await loadTunnelManager() else {
+        guard let manager = await manager else {
             return
         }
 
         do {
-            try await stop(tunnelManager: tunnelManager)
+            try await stop(tunnelManager: manager)
         } catch {
             controllerErrorStore.lastErrorMessage = error.localizedDescription
         }
@@ -606,9 +652,11 @@ final class NetworkProtectionTunnelController: NetworkProtection.TunnelControlle
     @MainActor
     private func sendProviderMessageToActiveSession(_ message: ExtensionMessage) async throws {
         guard await isConnected,
-              let activeSession = try await ConnectionSessionUtilities.activeSession() else { return }
+              let session = await session else {
+            return
+        }
 
-        let errorMessage: ExtensionMessageString? = try await activeSession.sendProviderMessage(message)
+        let errorMessage: ExtensionMessageString? = try await session.sendProviderMessage(message)
         if let errorMessage {
             throw TunnelFailureError(errorDescription: errorMessage.value)
         }
