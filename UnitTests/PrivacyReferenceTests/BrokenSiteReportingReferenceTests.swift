@@ -122,6 +122,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                 if param.name == "errorDescriptions" {
                     // `localizedDescription` adds class information to the error. The value is not standardized across platforms
                     // so we'll just check for the content instead
+                    XCTAssert(absoluteURL.contains("\(param.name)="), "Param [\(param.name)] not found in [\(absoluteURL)]")
                     XCTAssert(absoluteURL.contains(param.value.percentEncoded(withAllowedCharacters: .alphanumerics)), "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
                 } else {
                     XCTAssertEqual(match.count, 1, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
