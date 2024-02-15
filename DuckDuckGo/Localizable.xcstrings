@@ -1524,6 +1524,126 @@
         }
       }
     },
+    "bookmarks.dialog.action.addBookmark" : {
+      "comment" : "CTA title for adding a Bookmark",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Bookmark"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.action.addFolder" : {
+      "comment" : "CTA title for adding a Folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.location" : {
+      "comment" : "Location field label for Bookmark folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.name" : {
+      "comment" : "Name field label for Bookmark or Folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.url" : {
+      "comment" : "URL field label for Bookmar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "URL"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.folder.title.add" : {
+      "comment" : "Bookmark folder creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.folder.title.edit" : {
+      "comment" : "Bookmark folder edit dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.add" : {
+      "comment" : "Bookmark creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add bookmark"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.added" : {
+      "comment" : "Bookmark added popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark Added"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.edit" : {
+      "comment" : "Bookmark edit dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit bookmark"
+          }
+        }
+      }
+    },
     "bookmarks.empty.state.message" : {
       "comment" : "Text displayed in Bookmark Manager when there is no bookmarks yet",
       "extractionState" : "extracted_with_value",
@@ -2168,6 +2288,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%@ is now Fireproof"
+          }
+        }
+      }
+    },
+    "done" : {
+      "comment" : "Done button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
           }
         }
       }
@@ -4865,6 +4997,30 @@
     "Manage Bookmarks" : {
       "comment" : "Main Menu History item"
     },
+    "menu.add.folder" : {
+      "comment" : "Menu item to add a folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder…"
+          }
+        }
+      }
+    },
+    "menu.bookmarks.edit" : {
+      "comment" : "Menu item to edit a bookmark or a folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit…"
+          }
+        }
+      }
+    },
     "menu.item.new.tab" : {
       "comment" : "Context menu item",
       "extractionState" : "extracted_with_value",
@@ -5557,6 +5713,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Open"
+          }
+        }
+      }
+    },
+    "open.all.in.new.tabs" : {
+      "comment" : "Menu item that opens all the bookmarks in a folder to new tabs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open All in New Tabs"
+          }
+        }
+      }
+    },
+    "open.all.tabs.in.new.window" : {
+      "comment" : "Menu item that opens all the bookmarks in a folder in a new window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open All in New Window"
           }
         }
       }
@@ -8451,6 +8631,18 @@
     },
     "Show Substitutions" : {
       "comment" : "Main Menu Edit-Substitutions item"
+    },
+    "show.folder.contents" : {
+      "comment" : "Menu item that shows the content of a folder ",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Folder Contents"
+          }
+        }
+      }
     },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item"
