@@ -69,7 +69,7 @@ struct AddBookmarkPopoverView: View {
                         action: model.removeButtonAction
                     ),
                     defaultButtonAction: .init(
-                        title: UserText.Bookmarks.Dialog.Action.done,
+                        title: UserText.done,
                         keyboardShortCut: .defaultAction,
                         isDisabled: model.isDefaultActionButtonDisabled,
                         action: model.doneButtonAction
@@ -79,7 +79,7 @@ struct AddBookmarkPopoverView: View {
         )
         .padding(.vertical, 16.0)
         .font(.system(size: 13))
-        .frame(width: 330)
+        .frame(width: 320)
     }
 
 }
