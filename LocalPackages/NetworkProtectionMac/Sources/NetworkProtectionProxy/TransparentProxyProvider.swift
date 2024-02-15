@@ -131,6 +131,7 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             """
             Starting proxy\n
             > configuration: \(String(describing: self.configuration), privacy: .public)\n
+            > settings: \(String(describing: self.settings), privacy: .public)\n
             > options: \(String(describing: options), privacy: .public)
             """)
 

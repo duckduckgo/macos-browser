@@ -115,6 +115,17 @@ public final class TransparentProxySettings {
     }
 }
 
+extension TransparentProxySettings: CustomStringConvertible {
+    public var description: String {
+        """
+        TransparentProxySettings {\n
+        appRoutingRules: \(appRoutingRules)\n
+        excludedDomains: \(excludedDomains)\n
+        }
+        """
+    }
+}
+
 public struct TransparentProxySettingsSnapshot: Codable {
     public static let key = "com.duckduckgo.TransparentProxySettingsSnapshot"
 
