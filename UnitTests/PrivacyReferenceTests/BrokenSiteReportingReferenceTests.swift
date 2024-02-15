@@ -67,8 +67,8 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            urlParametersRemoved: false,
                                            protectionsState: test.protectionsEnabled,
                                            reportFlow: .appMenu,
-                                           error: nil,
-                                           httpStatusCode: nil)
+                                           errors: nil,
+                                           httpStatusCodes: nil)
 
             let request = makeURLRequest(with: breakage.requestParameters)
 
