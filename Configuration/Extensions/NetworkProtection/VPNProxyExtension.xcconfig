@@ -17,9 +17,9 @@
 #include "../../AppStore.xcconfig"
 
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
-CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
-CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = VPNProxyExtension/VPNProxyExtension.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Release][sdk=macosx*] = VPNProxyExtension/VPNProxyExtension.entitlements
+CODE_SIGN_ENTITLEMENTS[config=Review][sdk=macosx*] = VPNProxyExtension/VPNProxyExtension.entitlements
 CODE_SIGN_STYLE[config=Debug][sdk=*] = Automatic
 
 CODE_SIGN_IDENTITY[sdk=macosx*] = 3rd Party Mac Developer Application
@@ -27,7 +27,7 @@ CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 GENERATE_INFOPLIST_FILE = YES
-INFOPLIST_FILE = NetworkProtectionAppExtension/Info.plist
+INFOPLIST_FILE = VPNProxyExtension/Info.plist
 INFOPLIST_KEY_NSHumanReadableCopyright = Copyright © 2023 DuckDuckGo. All rights reserved.
 
 FEATURE_FLAGS[arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
@@ -36,14 +36,14 @@ FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTIO
 FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
-PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(PROXY_EXTENSION_BUNDLE_ID)
 
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
-PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent.network-protection-extension macos
-PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent.review.network-protection-extension macos
+PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore $(AGENT_BUNDLE_ID_BASE).network-protection-extension macos
+PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = match AppStore $(AGENT_BUNDLE_ID_BASE).review.network-protection-extension macos
 
 SDKROOT = macosx
 SKIP_INSTALL = YES

@@ -60,13 +60,15 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private var cancellables = Set<AnyCancellable>()
 
-    var networkExtensionBundleID: String {
-        Bundle.main.networkExtensionBundleID
+    var proxyExtensionBundleID: String {
+        Bundle.proxyExtensionBundleID
     }
 
-#if NETWORK_PROTECTION
-    private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
-#endif
+    var tunnelExtensionBundleID: String {
+        Bundle.tunnelExtensionBundleID
+    }
+
+    private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: tunnelExtensionBundleID)
 
     private var storeProxySettingsInProviderConfiguration: Bool {
 #if NETP_SYSTEM_EXTENSION
@@ -87,7 +89,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     private lazy var proxyController: TransparentProxyController = {
         let controller = TransparentProxyController(
-            extensionID: networkExtensionBundleID,
+            extensionID: proxyExtensionBundleID,
             storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
             settings: proxySettings) { [weak self] manager in
                 guard let self else { return }
@@ -101,7 +103,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                 manager.protocolConfiguration = {
                     let protocolConfiguration = manager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
                     protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
-                    protocolConfiguration.providerBundleIdentifier = self.networkExtensionBundleID
+                    protocolConfiguration.providerBundleIdentifier = self.proxyExtensionBundleID
 
                     // always-on
                     protocolConfiguration.disconnectOnSleep = false
@@ -133,7 +135,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private lazy var tunnelController = NetworkProtectionTunnelController(
-        networkExtensionBundleID: networkExtensionBundleID,
+        networkExtensionBundleID: tunnelExtensionBundleID,
         networkExtensionController: networkExtensionController,
         settings: tunnelSettings)
 

@@ -17,7 +17,9 @@
 //
 
 import Combine
+import Common
 import Foundation
+import Networking
 import NetworkExtension
 import NetworkProtectionProxy
 import os.log // swiftlint:disable:this enforce_os_log_wrapper
@@ -58,6 +60,32 @@ final class MacTransparentProxyProvider: TransparentProxyProvider {
                    logger: Self.vpnProxyLogger)
 
         eventHandler = eventHandler(_:)
+
+#if !NETP_SYSTEM_EXTENSION
+        let dryRun: Bool
+#if DEBUG
+        dryRun = true
+#else
+        dryRun = false
+#endif
+
+        PixelKit.setUp(dryRun: dryRun,
+                       appVersion: AppVersion.shared.versionNumber,
+                       source: "vpnProxyExtension",
+                       defaultHeaders: [:],
+                       log: .networkProtectionPixel,
+                       defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in
+
+            let url = URL.pixelUrl(forPixelNamed: pixelName)
+            let apiHeaders = APIRequest.Headers(additionalHeaders: headers)
+            let configuration = APIRequest.Configuration(url: url, method: .get, queryParameters: parameters, headers: apiHeaders)
+            let request = APIRequest(configuration: configuration)
+
+            request.fetch { _, error in
+                onComplete(error == nil, error)
+            }
+        }
+#endif
     }
 
     private func eventHandler(_ event: TransparentProxyProvider.Event) {
