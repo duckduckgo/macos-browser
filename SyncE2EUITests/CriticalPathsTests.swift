@@ -27,14 +27,30 @@ final class CriticalPathsTests: XCTestCase {
 
     override func setUp() {
         // Launch App
-        app = XCUIApplication()
+        app = XCUIApplication(bundleIdentifier: "com.duckduckgo.macos.browser.review")
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
 
-        
+        let menuBarsQuery = app.menuBars
+
+        let welcomeWindow = app.windows["Welcome"]
+        if welcomeWindow.exists {
+            let getStartedButton = welcomeWindow.buttons["Get Started"]
+            _ = getStartedButton.waitForExistence(timeout: 5)
+            getStartedButton.click()
+
+            let maybeLaterButton = welcomeWindow.buttons["Maybe Later"]
+            maybeLaterButton.click()
+            _ = maybeLaterButton.waitForExistence(timeout: 5)
+            maybeLaterButton.click()
+
+            let fileMenuBarItem = menuBarsQuery.menuBarItems["File"]
+            fileMenuBarItem.click()
+            let newTabMenuItem = menuBarsQuery.menuItems["New Tab"]
+            newTabMenuItem.click()
+        }
 
         // Set Internal User
-        let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
         debugMenuBarItem.click()
         internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]

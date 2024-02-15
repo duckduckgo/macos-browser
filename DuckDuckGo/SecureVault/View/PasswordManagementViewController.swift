@@ -267,7 +267,7 @@ final class PasswordManagementViewController: NSViewController {
 
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
-#if DEBUG
+#if DEBUG || REVIEW
         if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
             toggleLockScreen(hidden: true)
             return

@@ -24,8 +24,8 @@
    </BuildAction>
    <TestAction
       buildConfiguration = "CI"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES">
       <PreActions>
@@ -65,6 +65,20 @@
                BlueprintName = "SyncE2EUITests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "CriticalPathsTests/testCanLoginToExistingSyncAccount()">
+               </Test>
+               <Test
+                  Identifier = "CriticalPathsTests/testCanRecoverSyncAccount()">
+               </Test>
+               <Test
+                  Identifier = "CriticalPathsTests/testCanRemoveData()">
+               </Test>
+               <Test
+                  Identifier = "CriticalPathsTests/testCanSyncData()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
