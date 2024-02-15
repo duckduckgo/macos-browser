@@ -46,6 +46,10 @@ extension UNNotificationCategory {
 /// This class takes care of requesting the presentation of notifications using UNNotificationCenter
 ///
 final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtectionNotificationsPresenter {
+    func showExpiredEntitlementNotification() {
+
+    }
+
     private static let threadIdentifier = "com.duckduckgo.NetworkProtectionNotificationsManager.threadIdentifier"
 
     private let appLauncher: AppLauncher

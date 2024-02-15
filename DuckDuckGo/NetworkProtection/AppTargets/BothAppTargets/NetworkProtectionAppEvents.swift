@@ -99,7 +99,8 @@ final class NetworkProtectionAppEvents {
         let legacyServiceName = "\(Bundle.main.bundleIdentifier!).authToken"
         let legacyKeychainStore = NetworkProtectionKeychainTokenStore(keychainType: .dataProtection(.unspecified),
                                                                       serviceName: legacyServiceName,
-                                                                      errorEvents: nil)
+                                                                      errorEvents: nil,
+                                                                      isSubscriptionEnabled: false)
 
         guard let token = try? legacyKeychainStore.fetchToken() else {
             // If fetching the token fails, we just assume we can't migrate anything and the user
