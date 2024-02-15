@@ -135,16 +135,16 @@ final class AutofillPreferences: AutofillPreferencesPersistor {
     private var selectedPasswordManager: String
 
     @UserDefaultsWrapper(key: .autofillDebugScriptEnabled, defaultValue: false)
-    var debugScriptEnabled: Bool
+    private var debugScriptEnabledWrapped: Bool
 
-    var enableDebugScript: Bool {
+    var debugScriptEnabled: Bool {
         get {
-            return debugScriptEnabled
+            return debugScriptEnabledWrapped
         }
 
         set {
-            if debugScriptEnabled != newValue {
-                debugScriptEnabled = newValue
+            if debugScriptEnabledWrapped != newValue {
+                debugScriptEnabledWrapped = newValue
             }
         }
     }

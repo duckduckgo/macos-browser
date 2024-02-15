@@ -682,7 +682,7 @@ import SubscriptionUI
     }
 
     @objc private func toggleAutofillScriptDebugSettingsAction(_ sender: NSMenuItem) {
-        AutofillPreferences().enableDebugScript = !AutofillPreferences().enableDebugScript
+        AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
         NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
         updateAutofillDebugScriptMenuItem()
     }
