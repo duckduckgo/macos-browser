@@ -85,41 +85,50 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         proxyController: proxyController)
 
     @MainActor
-    private lazy var proxyController = TransparentProxyController(
-        extensionID: networkExtensionBundleID,
-        storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
-        settings: proxySettings) { [weak self] manager in
+    private lazy var proxyController: TransparentProxyController = {
+        let controller = TransparentProxyController(
+            extensionID: networkExtensionBundleID,
+            storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
+            settings: proxySettings) { [weak self] manager in
+                guard let self else { return }
 
-        guard let self else { return }
+                manager.localizedDescription = "DuckDuckGo VPN Proxy"
 
-        manager.localizedDescription = "DuckDuckGo VPN Proxy"
+                if !manager.isEnabled {
+                    manager.isEnabled = true
+                }
 
-        if !manager.isEnabled {
-            manager.isEnabled = true
-        }
+                manager.protocolConfiguration = {
+                    let protocolConfiguration = manager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
+                    protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
+                    protocolConfiguration.providerBundleIdentifier = self.networkExtensionBundleID
 
-        manager.protocolConfiguration = {
-            let protocolConfiguration = manager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
-            protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
-            protocolConfiguration.providerBundleIdentifier = self.networkExtensionBundleID
+                    // always-on
+                    protocolConfiguration.disconnectOnSleep = false
 
-            // always-on
-            protocolConfiguration.disconnectOnSleep = false
+                    // kill switch
+                    // protocolConfiguration.enforceRoutes = false
 
-            // kill switch
-            // protocolConfiguration.enforceRoutes = false
+                    // this setting breaks Connection Tester
+                    // protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
 
-            // this setting breaks Connection Tester
-            // protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
+                    // This is intentionally not used but left here for documentation purposes.
+                    // The reason for this is that we want to have full control of the routes that
+                    // are excluded, so instead of using this setting we're just configuring the
+                    // excluded routes through our VPNSettings class, which our extension reads directly.
+                    // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
 
-            // This is intentionally not used but left here for documentation purposes.
-            // The reason for this is that we want to have full control of the routes that
-            // are excluded, so instead of using this setting we're just configuring the
-            // excluded routes through our VPNSettings class, which our extension reads directly.
-            // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
+                    return protocolConfiguration
+                }()
+            }
 
-            return protocolConfiguration
-        }()
+        controller.eventHandler = handleControllerEvent(_:)
+
+        return controller
+    }()
+
+    private func handleControllerEvent(_ event: TransparentProxyController.Event) {
+        PixelKit.fire(event)
     }
 
     @MainActor

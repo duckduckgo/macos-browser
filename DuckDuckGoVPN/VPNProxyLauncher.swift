@@ -19,6 +19,7 @@
 import Combine
 import Foundation
 import NetworkProtectionProxy
+import NetworkExtension
 
 /// Starts and stops the VPN proxy component.
 ///
@@ -55,7 +56,9 @@ final class VPNProxyLauncher {
 
     private func statusChanged(notification: Notification) {
         Task { @MainActor in
-            try await startOrStopProxyIfNeeded()
+            let isProxyConnectionStatusChange = await proxyController.connection == notification.object as? NEVPNConnection
+
+            try await startOrStopProxyIfNeeded(isProxyConnectionStatusChange: isProxyConnectionStatusChange)
         }
     }
 
@@ -77,18 +80,28 @@ final class VPNProxyLauncher {
 
     private var isControllingProxy = false
 
-    private func startOrStopProxyIfNeeded() async throws {
+    private func startOrStopProxyIfNeeded(isProxyConnectionStatusChange: Bool = false) async throws {
         if await shouldStartProxy {
             guard !isControllingProxy else {
                 return
             }
 
             isControllingProxy = true
-            do {
-                try await proxyController.start()
-            } catch {
-                throw error
+
+            // When we're auto-starting the proxy because its own status changed to
+            // disconnected, we want to give it a pause because if it fails to connect again
+            // we risk the proxy entering a frenetic connect / disconnect loop
+            if isProxyConnectionStatusChange {
+                // If the proxy connection was stopped, let's wait a bit before trying to enable it again
+                try await Task.sleep(interval: .seconds(10))
+
+                // And we want to check again if the proxy still needs to start after waiting
+                guard await shouldStartProxy else {
+                    return
+                }
             }
+
+            try await proxyController.start()
             isControllingProxy = false
         } else if await shouldStopProxy {
             guard !isControllingProxy else {
