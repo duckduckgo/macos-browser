@@ -22,19 +22,16 @@ struct BookmarkDialogButtonsView: View {
     private let viewState: ViewState
     private let otherButtonAction: Action
     private let defaultButtonAction: Action
-    private let shouldDisableDefaultButtonAction: Bool
     @Environment(\.dismiss) private var dismiss
 
     init(
         viewState: ViewState,
         otherButtonAction: Action,
-        defaultButtonAction: Action,
-        shouldDisableDefaultButtonAction: Bool
+        defaultButtonAction: Action
     ) {
         self.viewState = viewState
         self.otherButtonAction = otherButtonAction
         self.defaultButtonAction = defaultButtonAction
-        self.shouldDisableDefaultButtonAction = shouldDisableDefaultButtonAction
     }
 
     var body: some View {
@@ -46,7 +43,6 @@ struct BookmarkDialogButtonsView: View {
             actionButton(action: otherButtonAction, viewState: viewState)
 
             actionButton(action: defaultButtonAction, viewState: viewState)
-                .disabled(shouldDisableDefaultButtonAction)
         }
     }
 
@@ -60,6 +56,10 @@ struct BookmarkDialogButtonsView: View {
                 .frame(maxWidth: viewState.maxWidth)
         }
         .keyboardShortcut(action.keyboardShortCut)
+        .disabled(action.isDisabled)
+        .ifLet(action.accessibilityIdentifier) { view, value in
+            view.accessibilityIdentifier(value)
+        }
     }
 }
 
@@ -74,13 +74,23 @@ extension BookmarkDialogButtonsView {
 
     struct Action {
         let title: String
-        let action: @MainActor (_ dismiss: () -> Void) -> Void
         let keyboardShortCut: KeyboardShortcut?
+        let accessibilityIdentifier: String?
+        let isDisabled: Bool
+        let action: @MainActor (_ dismiss: () -> Void) -> Void
 
-        init(title: String, action: @MainActor @escaping (_ dismiss: () -> Void) -> Void, keyboardShortCut: KeyboardShortcut? = nil) {
+        init(
+            title: String,
+            accessibilityIdentifier: String? = nil,
+            keyboardShortCut: KeyboardShortcut? = nil,
+            isDisabled: Bool  = false,
+            action: @MainActor @escaping (_ dismiss: () -> Void) -> Void
+        ) {
             self.title = title
-            self.action = action
             self.keyboardShortCut = keyboardShortCut
+            self.accessibilityIdentifier = accessibilityIdentifier
+            self.isDisabled = isDisabled
+            self.action = action
         }
     }
 }
@@ -120,9 +130,9 @@ private extension BookmarkDialogButtonsView.ViewState {
         ),
         defaultButtonAction: .init(
             title: "Right",
+            isDisabled: true,
             action: {_ in }
-        ),
-        shouldDisableDefaultButtonAction: true
+        )
     )
     .frame(width: 320, height: 50)
 }
@@ -136,9 +146,9 @@ private extension BookmarkDialogButtonsView.ViewState {
         ),
         defaultButtonAction: .init(
             title: "Right",
+            isDisabled: false,
             action: {_ in }
-        ),
-        shouldDisableDefaultButtonAction: false
+        )
     )
     .frame(width: 320, height: 50)
 }
@@ -152,9 +162,9 @@ private extension BookmarkDialogButtonsView.ViewState {
         ),
         defaultButtonAction: .init(
             title: "Right",
+            isDisabled: true,
             action: {_ in }
-        ),
-        shouldDisableDefaultButtonAction: true
+        )
     )
     .frame(width: 320, height: 50)
 }
@@ -168,9 +178,9 @@ private extension BookmarkDialogButtonsView.ViewState {
         ),
         defaultButtonAction: .init(
             title: "Right",
+            isDisabled: false,
             action: {_ in }
-        ),
-        shouldDisableDefaultButtonAction: false
+        )
     )
     .frame(width: 320, height: 50)
 }
