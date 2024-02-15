@@ -92,19 +92,10 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
 
     @MainActor
     public func updateNetworkSettings() async throws {
-        guard isRunning else {
-            return
-        }
-
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             Task { @MainActor in
                 let networkSettings = makeNetworkSettings()
                 logger.log("Updating network settings: \(String(describing: networkSettings), privacy: .public)")
-
-                guard isRunning else {
-                    continuation.resume()
-                    return
-                }
 
                 setTunnelNetworkSettings(networkSettings) { [eventHandler, logger] error in
                     if let error {
