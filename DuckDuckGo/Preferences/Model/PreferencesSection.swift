@@ -29,6 +29,8 @@ struct PreferencesSection: Hashable, Identifiable {
 
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
+        let privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
+
         let regularPanes: [PreferencePaneIdentifier] = {
 #if SUBSCRIPTION
             var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
@@ -65,6 +67,7 @@ struct PreferencesSection: Hashable, Identifiable {
         }()
 
         return [
+            .init(id: .privacyProtections, panes: privacyPanes),
             .init(id: .regularPreferencePanes, panes: regularPanes),
             .init(id: .about, panes: [.about])
         ]
@@ -72,11 +75,30 @@ struct PreferencesSection: Hashable, Identifiable {
 }
 
 enum PreferencesSectionIdentifier: Hashable, CaseIterable {
+    case privacyProtections
     case regularPreferencePanes
     case about
+
+    var displayName: String? {
+        switch self {
+        case .privacyProtections:
+            return "Privacy Protections"
+        case .regularPreferencePanes:
+            return "Main Settings"
+        case .about:
+            return nil
+        }
+    }
+
 }
 
 enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
+    case defaultBrowser
+    case privateSearch
+    case webTrackingProtection
+    case cookiePopupProtection
+    case emailProtection
+
     case general
     case sync
     case appearance
@@ -112,6 +134,16 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     @MainActor
     var displayName: String {
         switch self {
+        case .defaultBrowser:
+            return "Default Browser App"
+        case .privateSearch:
+            return "Private Search"
+        case .webTrackingProtection:
+            return "Web Tracking Protection"
+        case .cookiePopupProtection:
+            return "Cookie Pop-up Protection"
+        case .emailProtection:
+            return "Email Protection"
         case .general:
             return UserText.general
         case .sync:
@@ -148,8 +180,18 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
 
     var preferenceIconName: String {
         switch self {
+        case .defaultBrowser:
+            return "DefaultBrowserIcon"
+        case .privateSearch:
+            return "PrivateSearchIcon"
+        case .webTrackingProtection:
+            return "WebTrackingProtectionIcon"
+        case .cookiePopupProtection:
+            return "CookieProtectionIcon"
+        case .emailProtection:
+            return "EmailProtectionIcon"
         case .general:
-            return "Rocket"
+            return "GeneralIcon"
         case .sync:
             return "Sync"
         case .appearance:

@@ -22,7 +22,24 @@ import SwiftUIExtensions
 
 extension Preferences {
 
-    struct SidebarItem: View {
+    struct SidebarSectionHeader: View {
+        let section: PreferencesSectionIdentifier
+
+        var body: some View {
+            Group {
+                if let name = section.displayName {
+                    Text(name)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 3)
+                        .font(PreferencesViews.Const.Fonts.sideBarHeader)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, minHeight: 31, alignment: .leading)
+                }
+            }
+        }
+    }
+
+    struct PaneSidebarItem: View {
         let pane: PreferencePaneIdentifier
         let isSelected: Bool
         let action: () -> Void
@@ -77,8 +94,9 @@ extension Preferences {
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(model.sections) { section in
+                            SidebarSectionHeader(section: section.id)
                             ForEach(section.panes) { pane in
-                                SidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
+                                PaneSidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
                                     model.selectPane(pane)
                                 }
                             }
