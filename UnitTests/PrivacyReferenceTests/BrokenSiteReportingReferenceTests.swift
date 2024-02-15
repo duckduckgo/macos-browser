@@ -27,6 +27,22 @@ import PrivacyDashboard
 final class BrokenSiteReportingReferenceTests: XCTestCase {
     private let testHelper = PrivacyReferenceTestHelper()
 
+    struct MockError: LocalizedError {
+        let description: String
+
+        init(_ description: String) {
+            self.description = description
+        }
+
+        var errorDescription: String? {
+            description
+        }
+
+        var localizedDescription: String? {
+            description
+        }
+    }
+
     private enum Resource {
         static let tests = "privacy-reference-tests/broken-site-reporting/tests.json"
     }
@@ -53,9 +69,18 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
             os_log("Testing [%s]", type: .info, test.name)
 
+            var errors: [Error]?
+            var statusCodes: [Int]?
+            if let error = test.errorDescription {
+                errors = [MockError(error)]
+            }
+            if let httpStatusCode = test.httpStatusCode {
+                statusCodes = [httpStatusCode]
+            }
+
             let breakage = WebsiteBreakage(siteUrl: test.siteURL,
-                                           category: "test",
-                                           description: "description",
+                                           category: test.category,
+                                           description: test.providedDescription,
                                            osVersion: test.os ?? "",
                                            manufacturer: "Apple",
                                            upgradedHttps: test.wasUpgraded,
@@ -67,8 +92,8 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            urlParametersRemoved: false,
                                            protectionsState: test.protectionsEnabled,
                                            reportFlow: .appMenu,
-                                           errors: nil,
-                                           httpStatusCodes: nil)
+                                           errors: errors,
+                                           httpStatusCodes: statusCodes)
 
             let request = makeURLRequest(with: breakage.requestParameters)
 
@@ -94,7 +119,13 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
                 let match = regex.matches(in: absoluteURL, range: NSRange(location: 0, length: absoluteURL.count))
 
-                XCTAssertEqual(match.count, 1, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
+                if param.name == "errorDescriptions" {
+                    // `localizedDescription` adds class information to the error. The value is not standardized across platforms
+                    // so we'll just check for the content instead
+                    XCTAssert(absoluteURL.contains(param.value.percentEncoded(withAllowedCharacters: .alphanumerics)), "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
+                } else {
+                    XCTAssertEqual(match.count, 1, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
+                }
             }
         }
     }
@@ -121,6 +152,7 @@ private struct Test: Codable {
     let siteURL: URL
     let wasUpgraded: Bool
     let category: String
+    let providedDescription: String?
     let blockedTrackers, surrogates: [String]
     let atb, blocklistVersion: String
     let expectReportURLPrefix: String
@@ -129,6 +161,8 @@ private struct Test: Codable {
     let manufacturer, model, os: String?
     let gpcEnabled: Bool?
     let protectionsEnabled: Bool
+    let errorDescription: String?
+    let httpStatusCode: Int?
 }
 
 // MARK: - ExpectReportURLParam
