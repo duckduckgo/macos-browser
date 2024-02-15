@@ -144,7 +144,6 @@ open class TransparentProxyProvider: NETransparentProxyProvider {
             """)
 
         do {
-            throw NSError(domain: "testing", code: 1)
             try loadProviderConfiguration()
         } catch {
             logger.error("Failed to load provider configuration, bailing out")
