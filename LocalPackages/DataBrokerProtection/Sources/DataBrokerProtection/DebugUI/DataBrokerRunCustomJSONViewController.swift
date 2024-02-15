@@ -1,5 +1,5 @@
 //
-//  AccountStorage.swift
+//  DataBrokerRunCustomJSONViewController.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -17,15 +17,13 @@
 //
 
 import Foundation
+import SwiftUI
 
-public protocol AccountStorage: AnyObject {
-    func getAuthToken() throws -> String?
-    func store(authToken: String) throws
-    func getAccessToken() throws -> String?
-    func store(accessToken: String) throws
-    func getEmail() throws -> String?
-    func store(email: String?) throws
-    func getExternalID() throws -> String?
-    func store(externalID: String?) throws
-    func clearAuthenticationState() throws
+public final class DataBrokerRunCustomJSONViewController: NSViewController {
+    public override func loadView() {
+        let contentView = DataBrokerRunCustomJSONView(viewModel: DataBrokerRunCustomJSONViewModel())
+        let hostingController = NSHostingController(rootView: contentView)
+        hostingController.view.autoresizingMask = [.width, .height]
+        self.view = hostingController.view
+    }
 }
