@@ -20,10 +20,6 @@ import Cocoa
 
 extension NSColor {
 
-    static var homePageBackgroundColor: NSColor {
-        NSColor(named: "HomePageBackgroundColor")!
-    }
-
     static var homePageSearchBarBackgroundColor: NSColor {
          return NSColor(named: "HomePageSearchBarBackgroundColor")!
      }

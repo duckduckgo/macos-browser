@@ -53,12 +53,16 @@ extension Preferences {
                             Text(UserText.privacySimplified).font(.privacySimplified)
 
                             Text(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
-                                .makeSelectable()
                                 .onTapGesture(count: 12) {
 #if NETWORK_PROTECTION && !SUBSCRIPTION
                                     model.displayNetPInvite()
 #endif
                                 }
+                                .contextMenu(ContextMenu(menuItems: {
+                                    Button(UserText.copy, action: {
+                                        model.copy(UserText.versionLabel(version: model.appVersion.versionNumber, build: model.appVersion.buildNumber))
+                                    })
+                                }))
                         }
                     }
                     .padding(.bottom, 8)
@@ -109,10 +113,7 @@ extension Preferences {
         }
 
         var combinedText: String {
-            return UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part2(version: versionString) + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
-            UserText.aboutUnsupportedDeviceInfo2Part4
+            return UserText.aboutUnsupportedDeviceInfo2(version: versionString)
         }
 
         var versionString: String {

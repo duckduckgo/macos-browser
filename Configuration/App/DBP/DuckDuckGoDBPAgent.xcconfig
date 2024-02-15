@@ -41,6 +41,7 @@ CODE_SIGN_IDENTITY[config=Debug][sdk=macosx*] = Apple Development
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
 PRODUCT_NAME = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME)
+PRODUCT_NAME[config=Review][arch=*][sdk=*] = $(DBP_BACKGROUND_AGENT_PRODUCT_NAME)
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Review][sdk=macosx*] = macOS DBP Agent - Review

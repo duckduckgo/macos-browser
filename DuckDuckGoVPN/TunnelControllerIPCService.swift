@@ -130,6 +130,9 @@ extension TunnelControllerIPCService: IPCServerInterface {
             if defaults.networkProtectionOnboardingStatus == .completed {
                 defaults.networkProtectionOnboardingStatus = .isOnboarding(step: .userNeedsToAllowVPNConfiguration)
             }
+        case .disableConnectOnDemandAndShutDown:
+            // Not implemented on macOS yet
+            break
         }
     }
 }
