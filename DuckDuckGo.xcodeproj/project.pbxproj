@@ -2420,6 +2420,9 @@
 		9F3910632B68C35600CB5112 /* DownloadsTabExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910612B68C35600CB5112 /* DownloadsTabExtensionTests.swift */; };
 		9F3910692B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */; };
 		9F39106A2B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */; };
+		9F514F912B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F514F902B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift */; };
+		9F514F922B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F514F902B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift */; };
+		9F514F932B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F514F902B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift */; };
 		9FA173DA2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DB2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
 		9FA173DC2B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */; };
@@ -4013,6 +4016,7 @@
 		9F180D112B69C665000D695F /* DownloadsTabExtensionMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionMock.swift; sourceTree = "<group>"; };
 		9F3910612B68C35600CB5112 /* DownloadsTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsTabExtensionTests.swift; sourceTree = "<group>"; };
 		9F3910682B68D87B00CB5112 /* ProgressExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressExtensionTests.swift; sourceTree = "<group>"; };
+		9F514F902B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkFolderDialogView.swift; sourceTree = "<group>"; };
 		9FA173D92B79BD8A00EE4E6E /* BookmarkDialogContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogContainerView.swift; sourceTree = "<group>"; };
 		9FA173DE2B7A0EFE00EE4E6E /* BookmarkDialogButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogButtonsView.swift; sourceTree = "<group>"; };
 		9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogFolderManagementView.swift; sourceTree = "<group>"; };
@@ -6698,6 +6702,7 @@
 				9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */,
 				9FA173E22B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift */,
 				9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */,
+				9F514F902B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift */,
 			);
 			path = Dialog;
 			sourceTree = "<group>";
@@ -10380,6 +10385,7 @@
 				3706FC50293F65D500E42796 /* FeedbackWindow.swift in Sources */,
 				3706FC51293F65D500E42796 /* RecentlyVisitedView.swift in Sources */,
 				B645D8F729FA95440024461F /* WKProcessPoolExtension.swift in Sources */,
+				9F514F922B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */,
 				3706FC52293F65D500E42796 /* MouseOverAnimationButton.swift in Sources */,
 				3706FC53293F65D500E42796 /* TabBarScrollView.swift in Sources */,
 				3706FC54293F65D500E42796 /* BookmarkListTreeControllerDataSource.swift in Sources */,
@@ -10998,6 +11004,7 @@
 				4B9579792AC7AE700062CA31 /* BWRequest.swift in Sources */,
 				4B95797A2AC7AE700062CA31 /* WKWebViewConfigurationExtensions.swift in Sources */,
 				4B95797B2AC7AE700062CA31 /* HomePageDefaultBrowserModel.swift in Sources */,
+				9F514F932B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */,
 				4B95797C2AC7AE700062CA31 /* CrashReporter.swift in Sources */,
 				4B95797D2AC7AE700062CA31 /* AddressBarTextSelectionNavigation.swift in Sources */,
 				4B37EE7D2B4CFF8300A89A61 /* SurveyURLBuilder.swift in Sources */,
@@ -12444,6 +12451,7 @@
 				AA72D5FE25FFF94E00C77619 /* NSMenuItemExtension.swift in Sources */,
 				4BA1A6C2258B0A1300F6F690 /* ContiguousBytesExtension.swift in Sources */,
 				B6A22B622B1E29D000ECD2BA /* DataImportSummaryViewModel.swift in Sources */,
+				9F514F912B7D88AD001832A9 /* AddEditBookmarkFolderDialogView.swift in Sources */,
 				9FA173E32B7A12B600EE4E6E /* BookmarkDialogFolderManagementView.swift in Sources */,
 				37534CA8281198CD002621E7 /* AdjacentItemEnumerator.swift in Sources */,
 				1EA7B8D82B7E1283000330A4 /* SubscriptionFeatureAvailability.swift in Sources */,
