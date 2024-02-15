@@ -38,76 +38,48 @@ struct AddBookmarkPopoverView: View {
 
     @MainActor
     private var addBookmarkView: some View {
-        VStack(alignment: .leading, spacing: 19) {
-            Text("Bookmark Added", comment: "Bookmark Added popover title")
-                .fontWeight(.bold)
-                .padding(.bottom, 4)
-
-            VStack(alignment: .leading, spacing: 10) {
-                TextField("", text: $model.bookmarkTitle)
-                    .focusedOnAppear()
-                    .accessibilityIdentifier("bookmark.add.name.textfield")
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .font(.system(size: 14))
-
-                HStack {
-                    BookmarkFolderPicker(folders: model.folders,
-                                         selectedFolder: $model.selectedFolder)
-                    .accessibilityIdentifier("bookmark.add.folder.dropdown")
-
-                    Button {
-                        model.addFolderButtonAction()
-                    } label: {
-                        Image(.addFolder)
-                    }
-                    .accessibilityIdentifier("bookmark.add.new.folder.button")
-                    .buttonStyle(StandardButtonStyle())
-                }
+        BookmarkDialogContainerView(
+            title: UserText.Bookmarks.Dialog.Title.addedBookmark,
+            middleSection: {
+                BookmarkDialogStackedContentView(
+                    .init(
+                        title: UserText.Bookmarks.Dialog.Field.name,
+                        content: TextField("", text: $model.bookmarkTitle)
+                            .focusedOnAppear()
+                            .accessibilityIdentifier("bookmark.add.name.textfield")
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .font(.system(size: 14))
+                    ),
+                    .init(
+                        title: UserText.Bookmarks.Dialog.Field.location,
+                        content: BookmarkDialogFolderManagementView(
+                            folders: model.folders,
+                            selectedFolder: $model.selectedFolder,
+                            onActionButton: model.addFolderButtonAction
+                        )
+                    )
+                )
+                BookmarkFavoriteView(isFavorite: $model.isBookmarkFavorite)
+            },
+            bottomSection: {
+                BookmarkDialogButtonsView(
+                    viewState: .expanded,
+                    otherButtonAction: .init(
+                        title: UserText.remove,
+                        action: model.removeButtonAction
+                    ),
+                    defaultButtonAction: .init(
+                        title: UserText.Bookmarks.Dialog.Action.done,
+                        action: model.doneButtonAction,
+                        keyboardShortCut: .defaultAction
+                    ),
+                    shouldDisableDefaultButtonAction: model.isDefaultActionButtonDisabled
+                )
             }
-
-            Divider()
-
-            Button {
-                model.favoritesButtonAction()
-            } label: {
-                HStack(spacing: 8) {
-                    if model.bookmark.isFavorite {
-                        Image(.favoriteFilled)
-                        Text(UserText.removeFromFavorites)
-                    } else {
-                        Image(.favorite)
-                        Text(UserText.addToFavorites)
-                    }
-                }
-            }
-            .accessibilityIdentifier("bookmark.add.add.to.favorites.button")
-            .buttonStyle(.borderless)
-            .foregroundColor(Color.button)
-
-            HStack {
-                Spacer()
-
-                Button {
-                    model.removeButtonAction(dismiss: dismiss.callAsFunction)
-                } label: {
-                    Text("Remove", comment: "Remove bookmark button title")
-                }
-                .accessibilityIdentifier("bookmark.add.remove.button")
-
-                Button {
-                    model.doneButtonAction(dismiss: dismiss.callAsFunction)
-                } label: {
-                    Text(UserText.done)
-                }
-                .keyboardShortcut(.defaultAction)
-                .accessibilityIdentifier("bookmark.add.done.button")
-            }
-
-        }
+        )
+        .padding(.vertical, 16.0)
         .font(.system(size: 13))
-        .padding(EdgeInsets(top: 19, leading: 19, bottom: 19, trailing: 19))
-        .frame(width: 300, height: 229)
-        .background(Color(.popoverBackground))
+        .frame(width: 330)
     }
 
 }
