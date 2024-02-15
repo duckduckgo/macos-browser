@@ -296,7 +296,8 @@ jobs:
       run: |
         aws s3 cp \
           ${{ github.workspace }}/${{ steps.create-dmg.outputs.dmg }} \
-          s3://${{ env.RELEASE_BUCKET_NAME }}/${{ env.RELEASE_BUCKET_PREFIX }}/
+          s3://${{ env.RELEASE_BUCKET_NAME }}/${{ env.RELEASE_BUCKET_PREFIX }}/ \\
+          --acl public-read
 
     - name: Report success
       if: ${{ env.upload-to == 's3' }}
