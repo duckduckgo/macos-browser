@@ -540,6 +540,8 @@ import SubscriptionUI
     // swiftlint:disable:next function_body_length
     private func setupDebugMenu() -> NSMenu {
         let debugMenu = NSMenu(title: "Debug") {
+            NSMenuItem(title: "Open vanilla browser", action: #selector(MainViewController.openVanillaBrowser))
+            NSMenuItem.separator()
             NSMenuItem(title: "Reset Data") {
                 NSMenuItem(title: "Reset Default Browser Prompt", action: #selector(MainViewController.resetDefaultBrowserPrompt))
                 NSMenuItem(title: "Reset Default Grammar Checks", action: #selector(MainViewController.resetDefaultGrammarChecks))
