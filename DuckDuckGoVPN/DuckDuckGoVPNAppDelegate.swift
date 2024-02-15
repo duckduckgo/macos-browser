@@ -88,44 +88,41 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private lazy var proxyController: TransparentProxyController = {
-        let setupCallback = { [weak self] (_ manager: NETransparentProxyManager) async in
-            guard let self else { return }
-
-            manager.localizedDescription = "DuckDuckGo VPN Proxy"
-
-            if !manager.isEnabled {
-                manager.isEnabled = true
-            }
-
-            manager.protocolConfiguration = {
-                let protocolConfiguration = manager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
-                protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
-                protocolConfiguration.providerBundleIdentifier = self.proxyExtensionBundleID
-
-                // always-on
-                protocolConfiguration.disconnectOnSleep = false
-
-                // kill switch
-                // protocolConfiguration.enforceRoutes = false
-
-                // this setting breaks Connection Tester
-                // protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
-
-                // This is intentionally not used but left here for documentation purposes.
-                // The reason for this is that we want to have full control of the routes that
-                // are excluded, so instead of using this setting we're just configuring the
-                // excluded routes through our VPNSettings class, which our extension reads directly.
-                // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
-
-                return protocolConfiguration
-            }()
-        }
-
         let controller = TransparentProxyController(
             extensionID: proxyExtensionBundleID,
             storeSettingsInProviderConfiguration: storeProxySettingsInProviderConfiguration,
-            settings: proxySettings,
-            setup: setupCallback)
+            settings: proxySettings) { [weak self] manager in
+                guard let self else { return }
+
+                manager.localizedDescription = "DuckDuckGo VPN Proxy"
+
+                if !manager.isEnabled {
+                    manager.isEnabled = true
+                }
+
+                manager.protocolConfiguration = {
+                    let protocolConfiguration = manager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
+                    protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
+                    protocolConfiguration.providerBundleIdentifier = self.proxyExtensionBundleID
+
+                    // always-on
+                    protocolConfiguration.disconnectOnSleep = false
+
+                    // kill switch
+                    // protocolConfiguration.enforceRoutes = false
+
+                    // this setting breaks Connection Tester
+                    // protocolConfiguration.includeAllNetworks = settings.includeAllNetworks
+
+                    // This is intentionally not used but left here for documentation purposes.
+                    // The reason for this is that we want to have full control of the routes that
+                    // are excluded, so instead of using this setting we're just configuring the
+                    // excluded routes through our VPNSettings class, which our extension reads directly.
+                    // protocolConfiguration.excludeLocalNetworks = settings.excludeLocalNetworks
+
+                    return protocolConfiguration
+                }()
+            }
 
         controller.eventHandler = handleControllerEvent(_:)
 
