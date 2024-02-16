@@ -35,7 +35,6 @@ struct FaviconView: View {
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-
     /// Initializes a `FaviconView`
     /// Note: The `letterPaddingModifier` parameter is only used when a `LetterIconView` is displayed instead of a Favicon image
     init(url: URL?, size: CGFloat = 32, letterPaddingModifier: CGFloat = 0.33, onFaviconMissing: (() -> Void)? = nil) {

@@ -57,7 +57,6 @@ public struct LetterIconView: View {
             RoundedRectangle(cornerRadius: size * 0.125)
                 .foregroundColor(Color.forString(title))
                 .frame(width: size, height: size)
-            
             Text(characters.capitalized(with: .current))
                 .frame(width: size - (size * paddingModifier), height: size - (size * paddingModifier))
                 .foregroundColor(.white)
