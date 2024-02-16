@@ -27,6 +27,7 @@ import NetworkProtectionUI
 
 protocol NetworkProtectionFeatureVisibility {
     func isNetworkProtectionVisible() -> Bool
+    func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers()
     func disableForWaitlistUsers()
 }
@@ -70,6 +71,12 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         #else
         return isEasterEggUser || waitlistIsOngoing
         #endif
+    }
+
+    /// Returns whether Network Protection should be uninstalled automatically.
+    /// This is only true when the user is not an Easter Egg user, _and_ the waitlist test has stopped.
+    func shouldUninstallAutomatically() -> Bool {
+        return isWaitlistUser && !isEasterEggUser && !waitlistIsOngoing
     }
 
     var isUserLocaleAllowed: Bool {
