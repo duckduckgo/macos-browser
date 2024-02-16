@@ -82,7 +82,7 @@ jobs:
           ${{ secrets.SSH_PRIVATE_KEY_FASTLANE_MATCH }}
 
     - name: Check out the code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
