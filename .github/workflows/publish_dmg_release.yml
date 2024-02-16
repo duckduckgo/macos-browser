@@ -1,4 +1,4 @@
-name: Publish a Release to Sparkle
+name: Publish DMG Release
 
 on:
   workflow_dispatch:
