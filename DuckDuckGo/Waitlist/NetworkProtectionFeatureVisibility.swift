@@ -140,10 +140,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         }
     }
 
-    private var isInternalUser: Bool {
-        NSApp.delegateTyped.internalUserDecider.isInternalUser
-    }
-
     func disableForAllUsers() {
         Task {
             await featureDisabler.disable(keepAuthToken: false, uninstallSystemExtension: false)
