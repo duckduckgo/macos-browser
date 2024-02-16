@@ -38,7 +38,7 @@ extension Preferences {
                 if !SupportedOSChecker.isCurrentOSReceivingUpdates {
                     UnsupportedDeviceInfoBox(wide: true)
                         .padding(.top, 10)
-                        .padding(.leading, -20)
+                        .padding(.leading, -20sssss)
                 }
 
                 PreferencePaneSection {
