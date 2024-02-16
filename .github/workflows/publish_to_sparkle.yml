@@ -1,4 +1,4 @@
-name: Publish Internal Release to Sparkle
+name: Publish a Release to Sparkle
 
 on:
   workflow_dispatch:
