@@ -61,7 +61,7 @@ final class NetworkProtectionAppEvents {
             await removeLegacyLoginItemAndVPNConfiguration()
             migrateNetworkProtectionAuthTokenToSharedKeychainIfNecessary()
 
-            guard featureVisibility.shouldUninstallAutomatically() else {
+            if featureVisibility.shouldUninstallAutomatically() {
                 featureVisibility.disableForAllUsers()
                 return
             }
