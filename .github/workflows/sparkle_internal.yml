@@ -1,4 +1,4 @@
-name: Publish DMG Release
+name: Publish Internal Release to Sparkle
 
 on:
   workflow_dispatch:
@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-
+    
       - name: Set up Sparkle tools
         env:
           SPARKLE_URL: https://github.com/sparkle-project/Sparkle/releases/download/${{ vars.SPARKLE_VERSION }}/Sparkle-${{ vars.SPARKLE_VERSION }}.tar.xz
