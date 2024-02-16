@@ -361,7 +361,12 @@ jobs:
                   export ASANA_LINK=" | [:asana: Asana task](${ASANA_TASK_URL})"
               fi
 
+              if [[ "${{ env.success }}" == "true" ]]; then
+                  status="success"
+              else
+                  status="failure"
+              fi
               curl -s -H 'Content-type: application/json' \
-                  -d "$(envsubst < message-template.json | jq ".${{ job.status }}")" \
+                  -d "$(envsubst < message-template.json | jq ".${status}")" \
                   ${{ secrets.MM_WEBHOOK_URL }}
           fi
