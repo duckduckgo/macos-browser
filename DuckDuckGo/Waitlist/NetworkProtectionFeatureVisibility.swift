@@ -74,7 +74,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     }
 
     /// Returns whether Network Protection should be uninstalled automatically.
-    /// This is only true when the user is not an Easter Egg user, _and_ the waitlist test has stopped.
+    /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
     func shouldUninstallAutomatically() -> Bool {
         let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
         let isNotEasterEggUser = !isEasterEggUser
