@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1707497831317,
+    "version": 1708001825742,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -1068,6 +1068,14 @@
                     {
                         "domain": "zalando.fr",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                    },
+                    {
+                        "domain": "www.canva.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1818"
+                    },
+                    {
+                        "domain": "53.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1824"
                     }
                 ],
                 "webViewDefault": [
@@ -1091,7 +1099,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "96ca986dfe68dbb73a36dd7f3adbb53e"
+            "hash": "d135871f701e3aa7e1052427ee721f31"
         },
         "dbp": {
             "state": "enabled",
@@ -1105,6 +1113,9 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -1112,7 +1123,7 @@
             },
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
-            "hash": "c90b300b1e5ab20c29a726c8de9fd2da"
+            "hash": "b405d032a1519de3059db2e833e81c9a"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -4338,9 +4349,6 @@
                     "domain": "tirerack.com"
                 },
                 {
-                    "domain": "sephora.com"
-                },
-                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -4362,7 +4370,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "0e4353dbfbf35914b784ef12e0073447"
+            "hash": "1a1373bcf16647d63220659fce650a83"
         },
         "harmfulApis": {
             "settings": {
@@ -4870,6 +4878,16 @@
                                 "rule": "c1.adform.net/serving/cookie/match",
                                 "domains": [
                                     "dhl.de"
+                                ]
+                            }
+                        ]
+                    },
+                    "adlightning.com": {
+                        "rules": [
+                            {
+                                "rule": "publisher.adlightning.com/user-api/session/",
+                                "domains": [
+                                    "boltive.com"
                                 ]
                             }
                         ]
@@ -6122,6 +6140,7 @@
                                 "rule": "googletagmanager.com/gtag/js",
                                 "domains": [
                                     "abril.com.br",
+                                    "algomalegalclinic.com",
                                     "cosmicbook.news",
                                     "thesimsresource.com",
                                     "tradersync.com"
@@ -7080,6 +7099,16 @@
                             }
                         ]
                     },
+                    "pubnation.com": {
+                        "rules": [
+                            {
+                                "rule": "scripts.pubnation.com/tags/",
+                                "domains": [
+                                    "n4g.com"
+                                ]
+                            }
+                        ]
+                    },
                     "qualtrics.com": {
                         "rules": [
                             {
@@ -7335,6 +7364,16 @@
                                 "rule": "succeedscene.com",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "sumo.com": {
+                        "rules": [
+                            {
+                                "rule": "load.sumo.com",
+                                "domains": [
+                                    "glennbeck.com"
                                 ]
                             }
                         ]
@@ -7765,7 +7804,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "f5cba883ae4a666f7b6135d3406c2797"
+            "hash": "faa9240f18945b1bb354bcb8b6f7483a"
         },
         "trackingCookies1p": {
             "settings": {
@@ -8152,10 +8191,20 @@
                                 "value": "enabled"
                             }
                         ]
+                    },
+                    {
+                        "domain": "myhome.experian.co.uk",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
                     }
                 ]
             },
-            "hash": "1a7df2f0fbf4e5838e7c4b21627d2086"
+            "hash": "151d7ee40451c4aac4badfcc829ea0b5"
         },
         "windowsPermissionUsage": {
             "exceptions": [],
