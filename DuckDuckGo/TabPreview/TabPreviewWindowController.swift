@@ -23,6 +23,7 @@ final class TabPreviewWindowController: NSWindowController {
 
     static let width: CGFloat = 280
     static let padding: CGFloat = 2
+    static let bottomPadding: CGFloat = 40
     static let delay: CGFloat = 1
 
     private var previewTimer: Timer?
@@ -124,8 +125,19 @@ final class TabPreviewWindowController: NSWindowController {
         guard let window = window else {
             return
         }
+        var topLeftPoint = topLeftPoint
 
-        window.setFrame(NSRect(x: 0, y: 0, width: 250, height: 58), display: true)
+        // Make sure preview is presented within screen
+        if let screenVisibleFrame = window.screen?.visibleFrame {
+            topLeftPoint.x = min(topLeftPoint.x, screenVisibleFrame.origin.x + screenVisibleFrame.width - window.frame.width)
+            topLeftPoint.x = max(topLeftPoint.x, screenVisibleFrame.origin.x)
+
+            let windowHeight = window.frame.size.height
+            if topLeftPoint.y <= windowHeight + screenVisibleFrame.origin.y {
+                topLeftPoint.y = topLeftPoint.y + windowHeight + Self.bottomPadding
+            }
+        }
+
         window.setFrameTopLeftPoint(topLeftPoint)
     }
 

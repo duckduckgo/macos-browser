@@ -37,6 +37,9 @@ final class UserAuthenticatorMock: UserAuthenticating {
         let authenticationResult = _authenticateUser(reason)
         result(authenticationResult)
     }
+    func authenticateUser(reason: DeviceAuthenticator.AuthenticationReason) async -> DeviceAuthenticationResult {
+        _authenticateUser(reason)
+    }
 }
 
 @MainActor

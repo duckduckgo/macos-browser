@@ -472,4 +472,8 @@ extension URL {
         }
         return self.absoluteString
     }
+
+    public func isChild(of url: URL) -> Bool {
+        self.absoluteString.hasPrefix(url.absoluteString)
+    }
 }
