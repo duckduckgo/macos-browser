@@ -149,8 +149,8 @@ jobs:
         template-name: debug-symbols-uploaded
 
     - name: Send Mattermost message
+      if: success() || failure() # Don't execute when cancelled
       env:
-        if: success() || failure() # Don't execute when cancelled
         WORKFLOW_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         DESTINATION: ${{ env.destination }}
       run: |
