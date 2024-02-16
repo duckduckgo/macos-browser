@@ -31,11 +31,17 @@
     "\nYour personal information is stored locally on your device." : {
 
     },
+    "**%lld** tracking attempts blocked" : {
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
+    },
     "%@ does not support storing passwords" : {
       "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
     },
     "%lld" : {
 
+    },
+    "%lld tracking attempts blocked" : {
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "• Because data broker sites often have multi-step processes required to have information removed, and because they regularly update their databases with new personal information, this authorization includes ongoing action on your behalf solely to perform the service." : {
 
@@ -3822,13 +3828,13 @@
       }
     },
     "home.page.protection.summary.message" : {
-      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab.",
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Tracking attempts blocked: %@"
+            "value" : "%@ tracking attempts blocked"
           }
         }
       }
@@ -9018,12 +9024,6 @@
           }
         }
       }
-    },
-    "Tracking attempts blocked: **%lld**" : {
-
-    },
-    "Tracking attempts blocked: %lld " : {
-
     },
     "Transformations" : {
       "comment" : "Main Menu Edit item"

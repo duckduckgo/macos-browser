@@ -440,9 +440,9 @@ struct SiteTrackerSummary: View {
             Group {
                 Group {
                     if #available(macOS 12, *) {
-                        Text("Tracking attempts blocked: **\(site.numberOfTrackersBlocked)**")
+                        Text("**\(site.numberOfTrackersBlocked)** tracking attempts blocked",  comment: "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@")
                     } else {
-                        Text("Tracking attempts blocked: \(site.numberOfTrackersBlocked) ")
+                        Text("\(site.numberOfTrackersBlocked) tracking attempts blocked",  comment: "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@")
                     }
                 }
                 .visibility(site.blockedEntities.isEmpty ? .gone : .visible)
