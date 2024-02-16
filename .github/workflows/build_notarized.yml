@@ -335,10 +335,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      success: ${{ (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
+      failure: ${{ (needs.export-notarized-app.result == 'failure') || (needs.create-dmg.result == 'failure') }}
+
     steps:
       - name: Send Mattermost message
+        if: ${{ env.success || env.failure }} # Don't execute when cancelled
         env:
-          if: success() || failure() # Don't execute when cancelled
           ASANA_TASK_URL: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
           GH_TOKEN: ${{ github.token }}
           RELEASE_TYPE: ${{ github.event.inputs.release-type || inputs.release-type }}
