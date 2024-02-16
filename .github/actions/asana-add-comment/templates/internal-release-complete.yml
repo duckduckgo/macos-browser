@@ -1,0 +1,8 @@
+data:
+  html_text: |
+    <body>
+      Build ${TAG} is now available for internal testing through Sparkle and TestFlight.
+
+
+      <a href='${DMG_URL}'>📥 DMG download link</a>
+    </body>
