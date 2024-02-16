@@ -66,11 +66,7 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
-        #if APPSTORE
-        return isEasterEggUser || (isUserLocaleAllowed && waitlistIsOngoing)
-        #else
         return isEasterEggUser || waitlistIsOngoing
-        #endif
     }
 
     /// Returns whether Network Protection should be uninstalled automatically.
@@ -81,25 +77,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
 
         return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
-    }
-
-    var isUserLocaleAllowed: Bool {
-        var regionCode: String?
-        if #available(macOS 13, *) {
-            regionCode = Locale.current.region?.identifier
-        } else {
-            regionCode = Locale.current.regionCode
-        }
-
-        if isInternalUser {
-            regionCode = "US"
-        }
-
-        #if DEBUG // Always assume US for debug builds
-        regionCode = "US"
-        #endif
-
-        return (regionCode ?? "US") == "US"
     }
 
     /// Whether the user is fully onboarded
