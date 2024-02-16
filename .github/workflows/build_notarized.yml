@@ -338,7 +338,7 @@ jobs:
     steps:
       - name: Send Mattermost message
         env:
-          if: ${{ success() || failure() }} # Don't execute when cancelled
+          if: success() || failure() # Don't execute when cancelled
           ASANA_TASK_URL: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
           GH_TOKEN: ${{ github.token }}
           RELEASE_TYPE: ${{ github.event.inputs.release-type || inputs.release-type }}
