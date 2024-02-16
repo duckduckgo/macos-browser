@@ -26,6 +26,7 @@ struct FaviconView: View {
     let url: URL?
     let size: CGFloat
     let onFaviconMissing: (() -> Void)?
+    private var letterPaddingModifier: CGFloat
 
     var domain: String {
         url?.host ?? ""
@@ -34,9 +35,13 @@ struct FaviconView: View {
     @State var image: NSImage?
     @State private var timer = Timer.publish(every: 0.1, tolerance: 0, on: .main, in: .default, options: nil).autoconnect()
 
-    init(url: URL?, size: CGFloat = 32, onFaviconMissing: (() -> Void)? = nil) {
+
+    /// Initializes a `FaviconView`
+    /// Note: The `letterPaddingModifier` parameter is only used when a `LetterIconView` is displayed instead of a Favicon image
+    init(url: URL?, size: CGFloat = 32, letterPaddingModifier: CGFloat = 0.33, onFaviconMissing: (() -> Void)? = nil) {
         self.url = url
         self.size = size
+        self.letterPaddingModifier = letterPaddingModifier
         self.onFaviconMissing = onFaviconMissing
     }
 
@@ -73,7 +78,7 @@ struct FaviconView: View {
                         timer.upstream.connect().cancel()
                     }
             } else {
-                LetterIconView(title: ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain, size: size)
+                LetterIconView(title: ContentBlocking.shared.tld.eTLDplus1(domain) ?? domain, size: size, paddingModifier: letterPaddingModifier)
             }
         }.onAppear {
             refreshImage()
