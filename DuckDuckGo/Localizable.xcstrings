@@ -32,7 +32,7 @@
 
     },
     "**%lld** tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "%@ does not support storing passwords" : {
       "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
@@ -41,7 +41,7 @@
 
     },
     "%lld tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "• Because data broker sites often have multi-step processes required to have information removed, and because they regularly update their databases with new personal information, this authorization includes ongoing action on your behalf solely to perform the service." : {
 
@@ -1001,6 +1001,7 @@
       }
     },
     "bitwarden.cant.access.container" : {
+      "comment" : "Requests user Full Disk access in order to access password manager Birwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1034,6 +1035,7 @@
       }
     },
     "bitwarden.connect.history-info" : {
+      "comment" : "Warn users that the password Manager Bitwarden will have access to their browsing history",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1227,6 +1229,7 @@
       }
     },
     "bitwarden.preferences.run" : {
+      "comment" : "Warns user that the password manager Bitwarden app is not running",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1238,6 +1241,7 @@
       }
     },
     "bitwarden.preferences.unable-to-connect" : {
+      "comment" : "Dialog telling the user Bitwarden (a password manager) is not available",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1249,6 +1253,7 @@
       }
     },
     "bitwarden.preferences.unlock" : {
+      "comment" : "Asks the user to unlock the password manager Bitwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2808,7 +2813,7 @@
       }
     },
     "email.copied" : {
-      "comment" : "Private email address was copied to clipboard message",
+      "comment" : "Notification that the Private email address was copied to clipboard after the user generated a new address",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2868,7 +2873,7 @@
       }
     },
     "email.optionsMenu.turnOn" : {
-      "comment" : "Enable email sub menu item",
+      "comment" : "Sub menu item to enable Email Protection",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3033,7 +3038,7 @@
       }
     },
     "feedback.bug.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3045,7 +3050,7 @@
       }
     },
     "feedback.disclaimer" : {
-      "comment" : "Disclaimer in breakage form",
+      "comment" : "Disclaimer in breakage form - a form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3057,7 +3062,7 @@
       }
     },
     "feedback.feature.request.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form for feature requests.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3123,7 +3128,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close %1$d active %2$@ and clear all browsing history and cookies (%3$d %4$@)."
+            "value" : "Close active tabs (%1$d) and clear all browsing history and cookies (sites: %2$d)."
           }
         }
       }
@@ -3363,7 +3368,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close this tab and clear its browsing history and cookies (%1$d %2$@)."
+            "value" : "Close this tab and clear its browsing history and cookies (sites: %d)."
           }
         }
       }
@@ -3823,6 +3828,7 @@
       }
     },
     "home.page.protection.summary.message" : {
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3891,7 +3897,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d bookmarks…"
+            "value" : "Importing bookmarks (%d)…"
           }
         }
       }
@@ -4431,7 +4437,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d passwords…"
+            "value" : "Importing passwords (%d)…"
           }
         }
       }
@@ -5076,13 +5082,13 @@
       }
     },
     "n.more.tabs" : {
-      "comment" : "suffix of string in Recently Closed menu",
+      "comment" : "String in Recently Closed menu item for recently closed browser window and number of tabs contained in the closed window",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : " (and %d more tabs)"
+            "value" : "Window with multiple tabs (%d)"
           }
         }
       }
@@ -5475,7 +5481,7 @@
       }
     },
     "no.access.to.downloads.folder.header" : {
-      "comment" : "Header of the alert dialog informing user about failed download",
+      "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5690,18 +5696,6 @@
         }
       }
     },
-    "one.more.tab" : {
-      "comment" : "suffix of string in Recently Closed menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " (and 1 more tab)"
-          }
-        }
-      }
-    },
     "Only Show on New Tab" : {
       "comment" : "Preference for only showing the bookmarks bar on new tab"
     },
@@ -5766,7 +5760,7 @@
       }
     },
     "open.externally.failed" : {
-      "comment" : "’Link’ is link on a website",
+      "comment" : "’Link’ is link on a website, it couldn't be opened due to the required app not being found",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -6545,7 +6539,7 @@
       }
     },
     "permission.popup.title" : {
-      "comment" : "List of blocked popups Title",
+      "comment" : "Title of a popup that has a list of blocked popups",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -7866,61 +7860,13 @@
       }
     },
     "preferences.about.unsupported-device-info2" : {
-      "comment" : "Link to the about page",
+      "comment" : "Copy in section that tells the user to update their macOS version since their current version is unsupported",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Please update to macOS %@ or later to use the most recent version"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part1" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 1",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Please"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part2" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 2 (underlined)",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "update to macOS %@"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part3" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 3",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "or later to use the most recent version"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part4" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 4",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
+            "value" : "Please update to macOS %@ or later to use the most recent version of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
           }
         }
       }
@@ -8184,18 +8130,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Open a new window"
-          }
-        }
-      }
-    },
-    "preferences.subscription" : {
-      "comment" : "Show subscription preferences",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
           }
         }
       }
@@ -8692,54 +8626,6 @@
         }
       }
     },
-    "subscription.menu.item" : {
-      "comment" : "Title for Subscription item in the options menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
-          }
-        }
-      }
-    },
-    "subscription.progress.view.completing.purchase" : {
-      "comment" : "Progress view title when completing the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Completing purchase..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.purchasing.subscription" : {
-      "comment" : "Progress view title when starting the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Purchase in progress..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.restoring.subscription" : {
-      "comment" : "Progress view title when restoring past subscription purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Restoring subscription..."
-          }
-        }
-      }
-    },
     "tab.bookmarks.title" : {
       "comment" : "Tab bookmarks title",
       "extractionState" : "extracted_with_value",
@@ -8948,7 +8834,7 @@
       }
     },
     "tooltip.clearHistory" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8960,7 +8846,7 @@
       }
     },
     "tooltip.clearHistoryAndData" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
