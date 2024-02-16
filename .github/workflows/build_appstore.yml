@@ -92,7 +92,6 @@ jobs:
       env:
         is-official-release: ${{ env.destination == 'appstore' && (startsWith(github.ref_name, 'release') || startsWith(github.ref_name, 'hotfix')) }}
       run: |
-        exit 1
         if [[ "${{ env.is-official-release }}" == "true" ]]; then
           upload_to=s3
           echo "upload-to=${upload_to}" >> $GITHUB_OUTPUT
