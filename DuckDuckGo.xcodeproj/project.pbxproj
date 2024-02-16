@@ -3100,10 +3100,9 @@
 		EEF12E6E2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF12E6F2A2111880023E6BF /* MacPacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF12E6D2A2111880023E6BF /* MacPacketTunnelProvider.swift */; };
 		EEF53E182950CED5002D78F4 /* JSAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF53E172950CED5002D78F4 /* JSAlertViewModelTests.swift */; };
-		F17D10122B7E6175002B50A8 /* BareBonesBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = F17D10112B7E6175002B50A8 /* BareBonesBrowser */; };
-		F17D10202B7E69BB002B50A8 /* BareBonesBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = F17D101F2B7E69BB002B50A8 /* BareBonesBrowser */; };
-		F17D102B2B7E74CB002B50A8 /* BareBonesBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = F17D102A2B7E74CB002B50A8 /* BareBonesBrowser */; };
-		F17D102D2B7E74D6002B50A8 /* BareBonesBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = F17D102C2B7E74D6002B50A8 /* BareBonesBrowser */; };
+		F12606AA2B7F700800C44851 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F12606A92B7F700800C44851 /* BareBonesBrowserKit */; };
+		F12606AC2B7F702A00C44851 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F12606AB2B7F702A00C44851 /* BareBonesBrowserKit */; };
+		F12606AE2B7F703800C44851 /* BareBonesBrowserKit in Frameworks */ = {isa = PBXBuildFile; productRef = F12606AD2B7F703800C44851 /* BareBonesBrowserKit */; };
 		F17D102F2B7E7915002B50A8 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17D102E2B7E7915002B50A8 /* MainMenuActions+VanillaBrowser.swift */; };
 		F17D10302B7E7915002B50A8 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17D102E2B7E7915002B50A8 /* MainMenuActions+VanillaBrowser.swift */; };
 		F17D10312B7E7915002B50A8 /* MainMenuActions+VanillaBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17D102E2B7E7915002B50A8 /* MainMenuActions+VanillaBrowser.swift */; };
@@ -4453,11 +4452,11 @@
 				372217822B33380700B8E9C2 /* TestUtils in Frameworks */,
 				3706FCAA293F65D500E42796 /* UserScript in Frameworks */,
 				3706FCAB293F65D500E42796 /* TrackerRadarKit in Frameworks */,
+				F12606AC2B7F702A00C44851 /* BareBonesBrowserKit in Frameworks */,
 				4BF97AD52B43C43F00EB4240 /* NetworkProtection in Frameworks */,
 				3739326529AE4B39009346AE /* DDGSync in Frameworks */,
 				37DF000729F9C061002B7D3E /* SyncDataProviders in Frameworks */,
 				3706FCAE293F65D500E42796 /* Lottie in Frameworks */,
-				F17D102B2B7E74CB002B50A8 /* BareBonesBrowser in Frameworks */,
 				37BA812F29B3CD6E0053F1A3 /* SyncUI in Frameworks */,
 				3706FCAF293F65D500E42796 /* PrivacyDashboard in Frameworks */,
 			);
@@ -4576,10 +4575,10 @@
 				7BBD44282AD730A400D0A064 /* PixelKit in Frameworks */,
 				7B31FD902AD1257B0086AA24 /* NetworkProtectionIPC in Frameworks */,
 				4B957BDE2AC7AE700062CA31 /* Configuration in Frameworks */,
+				F12606AE2B7F703800C44851 /* BareBonesBrowserKit in Frameworks */,
 				4B957BE02AC7AE700062CA31 /* Lottie in Frameworks */,
 				4B957BE22AC7AE700062CA31 /* Sparkle in Frameworks */,
 				373FB4B52B4D6C57004C88D6 /* PreferencesViews in Frameworks */,
-				F17D102D2B7E74D6002B50A8 /* BareBonesBrowser in Frameworks */,
 				4B957BE32AC7AE700062CA31 /* Navigation in Frameworks */,
 				1E21F8E32B73E48600FB272E /* Subscription in Frameworks */,
 				4B957BE42AC7AE700062CA31 /* DDGSync in Frameworks */,
@@ -4648,9 +4647,9 @@
 				CBC83E3629B63D380008E19C /* Configuration in Frameworks */,
 				7B31FD8C2AD125620086AA24 /* NetworkProtectionIPC in Frameworks */,
 				37269EFB2B332F9E005E8E46 /* Common in Frameworks */,
-				F17D10122B7E6175002B50A8 /* BareBonesBrowser in Frameworks */,
 				4B2AAAF529E70DEA0026AFC0 /* Lottie in Frameworks */,
 				AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */,
+				F12606AA2B7F700800C44851 /* BareBonesBrowserKit in Frameworks */,
 				B6B77BE8297973D4001E68A1 /* Navigation in Frameworks */,
 				3739326729AE4B42009346AE /* DDGSync in Frameworks */,
 				7BA59C9B2AE18B49009A97B1 /* SystemExtensionManager in Frameworks */,
@@ -4659,7 +4658,6 @@
 				37DF000529F9C056002B7D3E /* SyncDataProviders in Frameworks */,
 				37BA812D29B3CD690053F1A3 /* SyncUI in Frameworks */,
 				372217802B3337FE00B8E9C2 /* TestUtils in Frameworks */,
-				F17D10202B7E69BB002B50A8 /* BareBonesBrowser in Frameworks */,
 				4B4D60B12A0C83B900BCD287 /* NetworkProtectionUI in Frameworks */,
 				98A50964294B691800D10880 /* Persistence in Frameworks */,
 			);
@@ -8266,7 +8264,7 @@
 				4BF97AD42B43C43F00EB4240 /* NetworkProtection */,
 				373FB4B22B4D6C4B004C88D6 /* PreferencesViews */,
 				312978892B64131200B67619 /* DataBrokerProtection */,
-				F17D102A2B7E74CB002B50A8 /* BareBonesBrowser */,
+				F12606AB2B7F702A00C44851 /* BareBonesBrowserKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */;
@@ -8539,7 +8537,7 @@
 				372217832B33380E00B8E9C2 /* TestUtils */,
 				373FB4B42B4D6C57004C88D6 /* PreferencesViews */,
 				1E21F8E22B73E48600FB272E /* Subscription */,
-				F17D102C2B7E74D6002B50A8 /* BareBonesBrowser */,
+				F12606AD2B7F703800C44851 /* BareBonesBrowserKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = 4B957C412AC7AE700062CA31 /* DuckDuckGo Privacy Pro.app */;
@@ -8678,8 +8676,7 @@
 				37269EFA2B332F9E005E8E46 /* Common */,
 				3722177F2B3337FE00B8E9C2 /* TestUtils */,
 				373FB4B02B4D6C42004C88D6 /* PreferencesViews */,
-				F17D10112B7E6175002B50A8 /* BareBonesBrowser */,
-				F17D101F2B7E69BB002B50A8 /* BareBonesBrowser */,
+				F12606A92B7F700800C44851 /* BareBonesBrowserKit */,
 			);
 			productName = DuckDuckGo;
 			productReference = AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */;
@@ -8807,7 +8804,7 @@
 				371D00DF29D8509400EC8598 /* XCRemoteSwiftPackageReference "OpenSSL-XCFramework" */,
 				4B2AAAF329E70DEA0026AFC0 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
-				F17D101E2B7E69BB002B50A8 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */,
+				F12606A82B7F700800C44851 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */,
 			);
 			productRefGroup = AA585D7F248FD31100E9A3E2 /* Products */;
 			projectDirPath = "";
@@ -13289,7 +13286,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		F17D101E2B7E69BB002B50A8 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */ = {
+		F12606A82B7F700800C44851 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../BareBonesBrowser;
 		};
@@ -14046,23 +14043,19 @@
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
 			productName = NetworkProtection;
 		};
-		F17D10112B7E6175002B50A8 /* BareBonesBrowser */ = {
+		F12606A92B7F700800C44851 /* BareBonesBrowserKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = BareBonesBrowser;
+			productName = BareBonesBrowserKit;
 		};
-		F17D101F2B7E69BB002B50A8 /* BareBonesBrowser */ = {
+		F12606AB2B7F702A00C44851 /* BareBonesBrowserKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = BareBonesBrowser;
+			package = F12606A82B7F700800C44851 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
 		};
-		F17D102A2B7E74CB002B50A8 /* BareBonesBrowser */ = {
+		F12606AD2B7F703800C44851 /* BareBonesBrowserKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F17D101E2B7E69BB002B50A8 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */;
-			productName = BareBonesBrowser;
-		};
-		F17D102C2B7E74D6002B50A8 /* BareBonesBrowser */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F17D101E2B7E69BB002B50A8 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */;
-			productName = BareBonesBrowser;
+			package = F12606A82B7F700800C44851 /* XCLocalSwiftPackageReference "../BareBonesBrowser" */;
+			productName = BareBonesBrowserKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -17,7 +17,7 @@
 //
 
 import Foundation
-import BareBonesBrowserLib
+import BareBonesBrowserKit
 import SwiftUI
 
 extension MainViewController: BareBonesBrowserUIDelegate {
