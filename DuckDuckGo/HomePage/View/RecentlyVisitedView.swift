@@ -362,6 +362,10 @@ struct SiteIconAndConnector: View {
 
     @State var isHovering = false
 
+    private var favicon: FaviconView {
+        FaviconView(url: site.url, size: 22, letterPaddingModifier: 0.22)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             if site.isRealDomain {
@@ -383,7 +387,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(isHovering ? mouseOverColor : backgroundColor)
 
-            FaviconView(url: site.url, size: 22)
+            favicon
         }
         .link {
             self.isHovering = $0
@@ -405,7 +409,7 @@ struct SiteIconAndConnector: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(backgroundColor)
 
-            FaviconView(url: site.url, size: 22)
+            favicon
         }
         .frame(width: 32, height: 32)
     }
