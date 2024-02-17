@@ -88,4 +88,8 @@ class MockBookmarkManager: BookmarkManager {
     @Published var list: BookmarkList?
 
     var listPublisher: Published<BookmarkList?>.Publisher { $list }
+
+    func requestSync() {
+    }
+
 }

@@ -71,7 +71,7 @@ struct PinnedTabView: View {
 
     private var foregroundColor: Color {
         if isSelected {
-            return Color("InterfaceBackgroundColor")
+            return Color.navigationBarBackground
         }
         let isHovered = collectionModel.hoveredItem == model
         return showsHover && isHovered ? Color("TabMouseOverColor") : Color.clear
@@ -129,7 +129,7 @@ private struct BorderView: View {
     }
 
     private var bottomLineColor: Color {
-        isSelected ? Color("InterfaceBackgroundColor") : Color(TabShadowConfig.colorName)
+        isSelected ? Color.navigationBarBackground : Color(TabShadowConfig.colorName)
     }
 
     private var cornerPixelsColor: Color {

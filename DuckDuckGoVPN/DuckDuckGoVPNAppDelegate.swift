@@ -64,7 +64,7 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         Bundle.main.networkExtensionBundleID
     }
 
-#if NETP_SYSTEM_EXTENSION
+#if NETWORK_PROTECTION
     private lazy var networkExtensionController = NetworkExtensionController(extensionBundleID: networkExtensionBundleID)
 #endif
 
@@ -90,14 +90,17 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
 
     private lazy var statusReporter: NetworkProtectionStatusReporter = {
         let errorObserver = ConnectionErrorObserverThroughSession(
+            tunnelSessionProvider: tunnelController,
             platformNotificationCenter: NSWorkspace.shared.notificationCenter,
             platformDidWakeNotification: NSWorkspace.didWakeNotification)
 
         let statusObserver = ConnectionStatusObserverThroughSession(
+            tunnelSessionProvider: tunnelController,
             platformNotificationCenter: NSWorkspace.shared.notificationCenter,
             platformDidWakeNotification: NSWorkspace.didWakeNotification)
 
         let serverInfoObserver = ConnectionServerInfoObserverThroughSession(
+            tunnelSessionProvider: tunnelController,
             platformNotificationCenter: NSWorkspace.shared.notificationCenter,
             platformDidWakeNotification: NSWorkspace.didWakeNotification)
 
@@ -145,10 +148,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
             statusReporter: statusReporter,
             controller: tunnelController,
             iconProvider: iconProvider,
-            showLocationsAction: { [weak self] in
-                await self?.appLauncher.launchApp(withCommand: .showVPNLocations)
-            }
-        ) {
+            appLauncher: appLauncher,
+            menuItems: {
                 [
                     StatusBarMenu.MenuItem(name: UserText.networkProtectionStatusMenuVPNSettings, action: { [weak self] in
                         await self?.appLauncher.launchApp(withCommand: .showSettings)
@@ -160,7 +161,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                         await self?.appLauncher.launchApp(withCommand: .shareFeedback)
                     })
                 ]
-            }
+            },
+            agentLoginItem: nil)
     }
 
     @MainActor
@@ -184,9 +186,17 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
         dryRun = false
 #endif
 
+        let pixelSource: String
+
+#if NETP_SYSTEM_EXTENSION
+        pixelSource = "vpnAgent"
+#else
+        pixelSource = "vpnAgentAppStore"
+#endif
+
         PixelKit.setUp(dryRun: dryRun,
                        appVersion: AppVersion.shared.versionNumber,
-                       source: "vpnAgent",
+                       source: pixelSource,
                        defaultHeaders: [:],
                        log: .networkProtectionPixel,
                        defaults: .netP) { (pixelName: String, headers: [String: String], parameters: [String: String], _, _, onComplete: @escaping PixelKit.CompletionBlock) in

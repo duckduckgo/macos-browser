@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETP_SYSTEM_EXTENSION
+#if NETWORK_PROTECTION
 
 import Combine
 import Foundation

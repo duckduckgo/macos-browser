@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="luO-ux-o3b">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="luO-ux-o3b">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21225"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +20,7 @@
                                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="wlm-tA-4J8">
                                         <rect key="frame" x="1" y="438" width="364" height="5"/>
                                     </box>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h7h-Ho-bYo">
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h7h-Ho-bYo">
                                         <rect key="frame" x="10" y="453" width="80" height="19"/>
                                         <textFieldCell key="cell" lineBreakMode="clipping" title="Downloads" id="RlL-xR-1s1">
                                             <font key="font" textStyle="title3" name=".SFNS-Regular"/>
@@ -31,15 +30,15 @@
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="aKx-1h-4hp" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="291" y="447" width="32" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="32" id="qmK-lZ-dXW"/>
-                                            <constraint firstAttribute="height" constant="32" id="x7g-Vs-qTK"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="OpenDownloadsFolder" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="zPp-Ue-FE8">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="qmK-lZ-dXW"/>
+                                            <constraint firstAttribute="height" constant="32" id="x7g-Vs-qTK"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -60,15 +59,15 @@
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="cev-k6-wFH" userLabel="Downloads Button" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                         <rect key="frame" x="323" y="447" width="32" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="32" id="3WQ-PO-rHo"/>
-                                            <constraint firstAttribute="height" constant="32" id="mKF-nC-42R"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ClearDownloads" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="rtz-Fb-5yl">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <color key="contentTintColor" name="ButtonColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="3WQ-PO-rHo"/>
+                                            <constraint firstAttribute="height" constant="32" id="mKF-nC-42R"/>
+                                        </constraints>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                 <color key="value" name="ButtonMouseOverColor"/>
@@ -123,7 +122,7 @@
                                                                             </constraints>
                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Iz7-Te-xl9"/>
                                                                         </imageView>
-                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="w5d-I6-kEZ">
+                                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="w5d-I6-kEZ">
                                                                             <rect key="frame" x="43" y="32" width="96" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="16" id="e05-6Y-K6e"/>
@@ -134,7 +133,7 @@
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
-                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ziJ-5p-mOT">
+                                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ziJ-5p-mOT">
                                                                             <rect key="frame" x="43" y="13" width="96" height="16"/>
                                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Table View Cell" usesSingleLineMode="YES" id="P5k-0F-CZE">
                                                                                 <font key="font" usesAppearanceFont="YES"/>
@@ -144,14 +143,14 @@
                                                                         </textField>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CEa-RP-JgA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                                             <rect key="frame" x="329" y="14" width="32" height="32"/>
-                                                                            <constraints>
-                                                                                <constraint firstAttribute="width" constant="32" id="AKX-kw-xvN"/>
-                                                                                <constraint firstAttribute="height" constant="32" id="HHP-yL-gQB"/>
-                                                                            </constraints>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="CancelDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="kcy-Qa-BSO">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
+                                                                            <constraints>
+                                                                                <constraint firstAttribute="width" constant="32" id="AKX-kw-xvN"/>
+                                                                                <constraint firstAttribute="height" constant="32" id="HHP-yL-gQB"/>
+                                                                            </constraints>
                                                                             <userDefinedRuntimeAttributes>
                                                                                 <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                                                     <color key="value" name="ButtonMouseOverColor"/>
@@ -172,14 +171,14 @@
                                                                         </button>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ejd-n2-PCA" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                                             <rect key="frame" x="329" y="14" width="32" height="32"/>
-                                                                            <constraints>
-                                                                                <constraint firstAttribute="width" constant="32" id="qKm-7W-LEz"/>
-                                                                                <constraint firstAttribute="height" constant="32" id="qsN-ta-Rgl"/>
-                                                                            </constraints>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="8X3-Se-bda">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
+                                                                            <constraints>
+                                                                                <constraint firstAttribute="width" constant="32" id="qKm-7W-LEz"/>
+                                                                                <constraint firstAttribute="height" constant="32" id="qsN-ta-Rgl"/>
+                                                                            </constraints>
                                                                             <userDefinedRuntimeAttributes>
                                                                                 <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                                                     <color key="value" name="ButtonMouseOverColor"/>
@@ -200,14 +199,14 @@
                                                                         </button>
                                                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="foT-7L-XqL" customClass="MouseOverButton" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                                             <rect key="frame" x="329" y="14" width="32" height="32"/>
-                                                                            <constraints>
-                                                                                <constraint firstAttribute="height" constant="32" id="ZVA-V5-l0y"/>
-                                                                                <constraint firstAttribute="width" constant="32" id="bXx-M6-jmk"/>
-                                                                            </constraints>
                                                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RestartDownload" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="OH5-JL-AF7">
                                                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
+                                                                            <constraints>
+                                                                                <constraint firstAttribute="height" constant="32" id="ZVA-V5-l0y"/>
+                                                                                <constraint firstAttribute="width" constant="32" id="bXx-M6-jmk"/>
+                                                                            </constraints>
                                                                             <userDefinedRuntimeAttributes>
                                                                                 <userDefinedRuntimeAttribute type="color" keyPath="mouseOverColor">
                                                                                     <color key="value" name="ButtonMouseOverColor"/>
@@ -270,11 +269,11 @@
                                                                         <outlet property="titleLabel" destination="w5d-I6-kEZ" id="SCM-u6-XnF"/>
                                                                     </connections>
                                                                 </tableCellView>
-                                                                <tableCellView identifier="NoDownloads" id="q3R-14-XtD" userLabel="No Downloads Cell View">
+                                                                <tableCellView identifier="NoDownloads" id="q3R-14-XtD" userLabel="No Downloads Cell View" customClass="NoDownloadViewCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="60" width="365" height="60"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0d3-Th-2Ic">
+                                                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0d3-Th-2Ic">
                                                                             <rect key="frame" x="116" y="32" width="133" height="16"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="No recent downloads" id="qQZ-ro-Kgg">
                                                                                 <font key="font" usesAppearanceFont="YES"/>
@@ -300,8 +299,12 @@
                                                                         <constraint firstItem="l4f-0C-oRY" firstAttribute="centerX" secondItem="q3R-14-XtD" secondAttribute="centerX" id="tSu-Dg-QgC"/>
                                                                         <constraint firstItem="0d3-Th-2Ic" firstAttribute="top" secondItem="q3R-14-XtD" secondAttribute="top" constant="12" id="x7x-WM-LPh"/>
                                                                     </constraints>
+                                                                    <connections>
+                                                                        <outlet property="openFolderButton" destination="l4f-0C-oRY" id="EcS-Yt-5FO"/>
+                                                                        <outlet property="titleLabel" destination="0d3-Th-2Ic" id="e4X-dI-J8a"/>
+                                                                    </connections>
                                                                 </tableCellView>
-                                                                <tableCellView identifier="OpenDownloads" id="n1l-Gb-vtG" userLabel="Open Downloads Cell View">
+                                                                <tableCellView identifier="OpenDownloads" id="n1l-Gb-vtG" userLabel="Open Downloads Cell View" customClass="OpenDownloadViewCell" customModule="DuckDuckGo_Privacy_Browser" customModuleProvider="target">
                                                                     <rect key="frame" x="0.0" y="120" width="365" height="60"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -321,6 +324,9 @@
                                                                         <constraint firstItem="Jbc-kS-JbC" firstAttribute="centerX" secondItem="n1l-Gb-vtG" secondAttribute="centerX" id="tRC-kP-3dA"/>
                                                                         <constraint firstItem="Jbc-kS-JbC" firstAttribute="centerY" secondItem="n1l-Gb-vtG" secondAttribute="centerY" id="uSf-1L-x5J"/>
                                                                     </constraints>
+                                                                    <connections>
+                                                                        <outlet property="openFolderButton" destination="Jbc-kS-JbC" id="Iy6-7S-cGF"/>
+                                                                    </connections>
                                                                 </tableCellView>
                                                             </prototypeCellViews>
                                                         </tableColumn>
@@ -378,11 +384,20 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="clearAllItem" destination="u1l-bF-hk1" id="KhZ-ke-xgr"/>
                         <outlet property="clearDownloadsButton" destination="cev-k6-wFH" id="LWh-5Y-4p5"/>
                         <outlet property="contextMenu" destination="SCZ-TM-duL" id="Moa-bC-2Tb"/>
+                        <outlet property="copyDownloadLinkItem" destination="p9Q-4g-R6I" id="VJH-8I-Btg"/>
                         <outlet property="openDownloadsFolderButton" destination="aKx-1h-4hp" id="kPG-jg-ZTE"/>
+                        <outlet property="openItem" destination="i63-Th-gK9" id="wwV-jq-CNq"/>
+                        <outlet property="openWebsiteItem" destination="ctA-Z1-mdh" id="Fdx-7i-uxS"/>
+                        <outlet property="removeFromListItem" destination="sco-zV-CtX" id="wNw-dg-v6f"/>
+                        <outlet property="restartItem" destination="m1O-Mn-Tpq" id="UcI-Jc-0Gs"/>
+                        <outlet property="showInFinderItem" destination="mpk-Xn-tEe" id="UbD-y3-quN"/>
+                        <outlet property="stopItem" destination="8LJ-NR-kVo" id="VKl-cp-Bvp"/>
                         <outlet property="tableView" destination="zWp-mP-b3k" id="uqE-oO-u61"/>
                         <outlet property="tableViewHeightConstraint" destination="pa7-BQ-jMF" id="i8E-WJ-esr"/>
+                        <outlet property="titleLabel" destination="h7h-Ho-bYo" id="G9g-GN-Vii"/>
                     </connections>
                 </viewController>
                 <customObject id="mPI-ye-bXg" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

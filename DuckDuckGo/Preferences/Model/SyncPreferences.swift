@@ -118,12 +118,14 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
         syncService: DDGSyncing,
         syncBookmarksAdapter: SyncBookmarksAdapter,
         appearancePreferences: AppearancePreferences = .shared,
-        managementDialogModel: ManagementDialogModel = ManagementDialogModel()
+        managementDialogModel: ManagementDialogModel = ManagementDialogModel(),
+        userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared
     ) {
         self.syncService = syncService
         self.syncBookmarksAdapter = syncBookmarksAdapter
         self.appearancePreferences = appearancePreferences
         self.syncFeatureFlags = syncService.featureFlags
+        self.userAuthenticator = userAuthenticator
 
         self.isFaviconsFetchingEnabled = syncBookmarksAdapter.isFaviconsFetchingEnabled
         self.isUnifiedFavoritesEnabled = appearancePreferences.favoritesDisplayMode.isDisplayUnified
@@ -352,6 +354,7 @@ final class SyncPreferences: ObservableObject, SyncUI.ManagementViewModel {
     private let appearancePreferences: AppearancePreferences
     private var cancellables = Set<AnyCancellable>()
     private var connector: RemoteConnecting?
+    private let userAuthenticator: UserAuthenticating
 }
 
 extension SyncPreferences: ManagementDialogModelDelegate {
@@ -532,6 +535,11 @@ extension SyncPreferences: ManagementDialogModelDelegate {
             .generate(recoveryCode)
 
         Task { @MainActor in
+            let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+            guard authenticationResult.authenticated else {
+                return
+            }
+
             let panel = NSSavePanel.savePanelWithFileTypeChooser(fileTypes: [.pdf], suggestedFilename: "Sync Data Recovery - DuckDuckGo.pdf")
             let response = await panel.begin()
 
@@ -539,7 +547,9 @@ extension SyncPreferences: ManagementDialogModelDelegate {
                   let location = panel.url else { return }
 
             do {
-                try data.writeFileWithProgress(to: location)
+                try Progress.withPublishedProgress(url: location) {
+                    try data.write(to: location)
+                }
             } catch {
                 managementDialogModel.syncErrorMessage = SyncErrorMessage(type: .unableCreateRecoveryPDF, description: error.localizedDescription)
                 firePixelIfNeeded(event: .debug(event: .syncCannotCreateRecoveryPDF, error: nil))
@@ -568,7 +578,10 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    func syncWithAnotherDevicePressed() {
+    func syncWithAnotherDevicePressed() async {
+        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+            return
+        }
         if isSyncEnabled {
             presentDialog(for: .syncWithAnotherDevice(code: recoveryCode ?? ""))
         } else {
@@ -577,18 +590,19 @@ extension SyncPreferences: ManagementDialogModelDelegate {
     }
 
     @MainActor
-    func syncWithServerPressed() {
+    func syncWithServerPressed() async {
+        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+            return
+        }
         presentDialog(for: .syncWithServer)
     }
 
     @MainActor
-    func recoverDataPressed() {
+    func recoverDataPressed() async {
+        guard await userAuthenticator.authenticateUser(reason: .syncSettings).authenticated else {
+            return
+        }
         presentDialog(for: .recoverSyncedData)
-    }
-
-    @MainActor
-    func downloadDDGPressed() {
-
     }
 
     @MainActor

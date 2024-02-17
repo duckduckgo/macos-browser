@@ -104,7 +104,9 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     }
 
     func removeSystemExtension() async throws {
+#if NETP_SYSTEM_EXTENSION
         try await ipcClient.debugCommand(.removeSystemExtension)
+#endif
     }
 
     private func unpinNetworkProtection() {
@@ -118,17 +120,6 @@ final class NetworkProtectionFeatureDisabler: NetworkProtectionFeatureDisabling 
     private func removeVPNConfiguration() async throws {
         // Remove the agent VPN configuration
         try await ipcClient.debugCommand(.removeVPNConfiguration)
-
-        // Remove the legacy (local) configuration
-        // We don't care if this fails
-        let tunnels = try? await NETunnelProviderManager.loadAllFromPreferences()
-
-        if let tunnels = tunnels {
-            for tunnel in tunnels {
-                tunnel.connection.stopVPNTunnel()
-                try? await tunnel.removeFromPreferences()
-            }
-        }
     }
 
     private func resetUserDefaults() {

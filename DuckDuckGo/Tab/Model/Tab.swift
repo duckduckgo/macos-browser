@@ -25,6 +25,10 @@ import Navigation
 import UserScript
 import WebKit
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 #if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionIPC
@@ -57,6 +61,7 @@ protocol NewWindowPolicyDecisionMaker {
         case onboarding
         case none
         case dataBrokerProtection
+        case subscription(URL)
 
         enum URLSource: Equatable {
             case pendingStateRestoration
@@ -109,6 +114,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         }
 
+        // swiftlint:disable:next cyclomatic_complexity
         static func contentFromURL(_ url: URL?, source: URLSource) -> TabContent {
             switch url {
             case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
@@ -128,6 +134,14 @@ protocol NewWindowPolicyDecisionMaker {
                 return .url(customURL, source: source)
             default: break
             }
+
+#if SUBSCRIPTION
+            if let url {
+                if url.isChild(of: URL.subscriptionBaseURL) || url.isChild(of: URL.identityTheftRestoration) {
+                    return .subscription(url)
+                }
+            }
+#endif
 
             if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .settings(pane: settingsPane)
@@ -184,6 +198,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
             case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
+            case .subscription: return nil
             }
         }
 
@@ -215,6 +230,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .welcome
             case .dataBrokerProtection:
                 return .dataBrokerProtection
+            case .subscription(let url):
+                return url
             case .none:
                 return nil
             }
@@ -222,7 +239,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUrl: Bool {
             switch self {
-            case .url:
+            case .url, .subscription:
                 return true
             default:
                 return false
@@ -576,6 +593,10 @@ protocol NewWindowPolicyDecisionMaker {
 
     // MARK: - Event Publishers
 
+    let webViewDidStartNavigationPublisher = PassthroughSubject<Void, Never>()
+    let webViewDidReceiveUserInteractiveChallengePublisher = PassthroughSubject<Void, Never>()
+    let webViewDidReceiveRedirectPublisher = PassthroughSubject<Void, Never>()
+    let webViewDidCommitNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFinishNavigationPublisher = PassthroughSubject<Void, Never>()
     let webViewDidFailNavigationPublisher = PassthroughSubject<Void, Never>()
 
@@ -1087,6 +1108,9 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func didReceive(_ challenge: URLAuthenticationChallenge, for navigation: Navigation?) async -> AuthChallengeDisposition? {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic else { return nil }
 
+        // send this event only when we're interrupting loading and showing extra UI to the user
+        webViewDidReceiveUserInteractiveChallengePublisher.send()
+
         // when navigating to a URL with basic auth username/password, cache it and redirect to a trimmed URL
         if case .url(let url, credential: .some(let credential), source: let source) = content,
            url.matches(challenge.protectionSpace),
@@ -1108,6 +1132,15 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         } catch {
             return .cancel
         }
+    }
+
+    func didReceiveRedirect(_ navigationAction: NavigationAction, for navigation: Navigation) {
+        webViewDidReceiveRedirectPublisher.send()
+    }
+
+    @MainActor
+    func didCommit(_ navigation: Navigation) {
+        webViewDidCommitNavigationPublisher.send()
     }
 
     @MainActor
@@ -1154,6 +1187,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
 
     @MainActor
     func didStart(_ navigation: Navigation) {
+        webViewDidStartNavigationPublisher.send()
         delegate?.tabDidStartNavigation(self)
         userInteractionDialog = nil
 

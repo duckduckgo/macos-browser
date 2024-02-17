@@ -33,6 +33,9 @@ final class FireproofDomainsViewController: NSViewController {
 
     @IBOutlet var tableView: NSTableView!
     @IBOutlet var removeDomainButton: NSButton!
+    @IBOutlet var removeAllDomainsButton: NSButton!
+    @IBOutlet var doneButton: NSButton!
+    @IBOutlet var fireproofSitesLabel: NSTextField!
 
     private let faviconManagement: FaviconManagement = FaviconManager.shared
 
@@ -48,6 +51,14 @@ final class FireproofDomainsViewController: NSViewController {
 
         applyModalWindowStyleIfNeeded()
         reloadData()
+        setUpStrings()
+    }
+
+    private func setUpStrings() {
+        removeDomainButton.title = UserText.remove
+        removeAllDomainsButton.title = UserText.fireproofRemoveAllButton
+        doneButton.title = UserText.done
+        fireproofSitesLabel.stringValue = UserText.fireproofSites
     }
 
     private func updateRemoveButtonState() {
