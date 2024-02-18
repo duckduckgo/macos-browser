@@ -69,7 +69,8 @@ jobs:
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
         set -o pipefail && xcodebuild test \
           -scheme "Sync End-to-End UI Tests" \
-          -derivedDataPath "DerivedData" \
+          -configuration Review \
+          -derivedDataPath DerivedData \
           -skipPackagePluginValidation \
         | tee xcodebuild.log \
         | xcbeautify
