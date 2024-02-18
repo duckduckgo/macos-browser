@@ -83,31 +83,25 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
         dismiss()
     }
 
-    func addFolderButtonAction() {
-//        guard case let .edit(_, parent) = mode else {
-//            assertionFailure("Cannot add a folder if we already adding one.")
-//            return
-//        }
-//        self.mode = .add(parentFolder: parent)
-//        objectWillChange.send()
-    }
 }
 
 // MARK: - Private
 
 private extension AddEditBookmarkFolderDialogViewModel {
 
-    #warning("Can we update the tile and move at the same time?")
     func update(folder: BookmarkFolder, parent: BookmarkFolder?) {
         // Update title of the folder
-        folder.title = folderName
-        bookmarkManager.update(folder: folder)
+        if folder.title != folderName {
+            folder.title = folderName
+            bookmarkManager.update(folder: folder)
+        }
         // If the original location of the folder changed move it
-        if selectedFolder?.id != parent?.id, let selectedFolder {
+        if selectedFolder?.id != parent?.id {
+            let parentFolderType: ParentFolderType = selectedFolder.flatMap { ParentFolderType.parent(uuid: $0.id) } ?? .root
             bookmarkManager.move(
                 objectUUIDs: [folder.id],
                 toIndex: nil,
-                withinParentFolder: .parent(uuid: selectedFolder.id),
+                withinParentFolder: parentFolderType,
                 completion: { _ in }
             )
         }
@@ -140,11 +134,11 @@ struct AddEditBookmarkFolderDialogView: ModalView {
                     ),
                     .init(
                         title: UserText.Bookmarks.Dialog.Field.location,
-                        content: BookmarkDialogFolderManagementView(
+                        content: BookmarkFolderPicker(
                             folders: viewModel.folders,
-                            selectedFolder: $viewModel.selectedFolder,
-                            onActionButton: viewModel.addFolderButtonAction
+                            selectedFolder: $viewModel.selectedFolder
                         )
+                        .accessibilityIdentifier("bookmark.folder.folder.dropdown")
                     )
                 )
             },
@@ -171,7 +165,7 @@ struct AddEditBookmarkFolderDialogView: ModalView {
 
 // MARK: - AddEditBookmarkFolderDialogViewModel.Mode
 
-extension AddEditBookmarkFolderDialogViewModel.Mode {
+private extension AddEditBookmarkFolderDialogViewModel.Mode {
 
     var title: String {
         switch self {
