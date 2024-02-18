@@ -32,7 +32,7 @@
 
     },
     "**%lld** tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "%@ does not support storing passwords" : {
       "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
@@ -41,7 +41,7 @@
 
     },
     "%lld tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "• Because data broker sites often have multi-step processes required to have information removed, and because they regularly update their databases with new personal information, this authorization includes ongoing action on your behalf solely to perform the service." : {
 
@@ -1001,6 +1001,7 @@
       }
     },
     "bitwarden.cant.access.container" : {
+      "comment" : "Requests user Full Disk access in order to access password manager Birwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1034,6 +1035,7 @@
       }
     },
     "bitwarden.connect.history-info" : {
+      "comment" : "Warn users that the password Manager Bitwarden will have access to their browsing history",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1227,6 +1229,7 @@
       }
     },
     "bitwarden.preferences.run" : {
+      "comment" : "Warns user that the password manager Bitwarden app is not running",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1238,6 +1241,7 @@
       }
     },
     "bitwarden.preferences.unable-to-connect" : {
+      "comment" : "Dialog telling the user Bitwarden (a password manager) is not available",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1249,6 +1253,7 @@
       }
     },
     "bitwarden.preferences.unlock" : {
+      "comment" : "Asks the user to unlock the password manager Bitwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1520,6 +1525,126 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Only show on New Tab"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.action.addBookmark" : {
+      "comment" : "CTA title for adding a Bookmark",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Bookmark"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.action.addFolder" : {
+      "comment" : "CTA title for adding a Folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.location" : {
+      "comment" : "Location field label for Bookmark folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.name" : {
+      "comment" : "Name field label for Bookmark or Folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.url" : {
+      "comment" : "URL field label for Bookmar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "URL"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.folder.title.add" : {
+      "comment" : "Bookmark folder creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.folder.title.edit" : {
+      "comment" : "Bookmark folder edit dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.add" : {
+      "comment" : "Bookmark creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add bookmark"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.added" : {
+      "comment" : "Bookmark added popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark Added"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.edit" : {
+      "comment" : "Bookmark edit dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit bookmark"
           }
         }
       }
@@ -2172,6 +2297,18 @@
         }
       }
     },
+    "done" : {
+      "comment" : "Done button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
+          }
+        }
+      }
+    },
     "dont.quit" : {
       "comment" : "Don’t Quit button",
       "extractionState" : "extracted_with_value",
@@ -2676,7 +2813,7 @@
       }
     },
     "email.copied" : {
-      "comment" : "Private email address was copied to clipboard message",
+      "comment" : "Notification that the Private email address was copied to clipboard after the user generated a new address",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2736,7 +2873,7 @@
       }
     },
     "email.optionsMenu.turnOn" : {
-      "comment" : "Enable email sub menu item",
+      "comment" : "Sub menu item to enable Email Protection",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2752,18 +2889,6 @@
     },
     "Error message & code" : {
 
-    },
-    "error.unknown" : {
-      "comment" : "Error page subtitle",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "An unknown error has occurred"
-          }
-        }
-      }
     },
     "error.unknown.try.again" : {
       "comment" : "Generic error message on a dialog for when the cause is not known.",
@@ -2901,7 +3026,7 @@
       }
     },
     "feedback.bug.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2913,7 +3038,7 @@
       }
     },
     "feedback.disclaimer" : {
-      "comment" : "Disclaimer in breakage form",
+      "comment" : "Disclaimer in breakage form - a form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2925,7 +3050,7 @@
       }
     },
     "feedback.feature.request.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form for feature requests.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2991,7 +3116,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close %1$d active %2$@ and clear all browsing history and cookies (%3$d %4$@)."
+            "value" : "Close active tabs (%1$d) and clear all browsing history and cookies (sites: %2$d)."
           }
         }
       }
@@ -3231,7 +3356,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close this tab and clear its browsing history and cookies (%1$d %2$@)."
+            "value" : "Close this tab and clear its browsing history and cookies (sites: %d)."
           }
         }
       }
@@ -3691,6 +3816,7 @@
       }
     },
     "home.page.protection.summary.message" : {
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3759,7 +3885,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d bookmarks…"
+            "value" : "Importing bookmarks (%d)…"
           }
         }
       }
@@ -4299,7 +4425,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d passwords…"
+            "value" : "Importing passwords (%d)…"
           }
         }
       }
@@ -4865,6 +4991,30 @@
     "Manage Bookmarks" : {
       "comment" : "Main Menu History item"
     },
+    "menu.add.folder" : {
+      "comment" : "Menu item to add a folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder…"
+          }
+        }
+      }
+    },
+    "menu.bookmarks.edit" : {
+      "comment" : "Menu item to edit a bookmark or a folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit…"
+          }
+        }
+      }
+    },
     "menu.item.new.tab" : {
       "comment" : "Context menu item",
       "extractionState" : "extracted_with_value",
@@ -4920,13 +5070,13 @@
       }
     },
     "n.more.tabs" : {
-      "comment" : "suffix of string in Recently Closed menu",
+      "comment" : "String in Recently Closed menu item for recently closed browser window and number of tabs contained in the closed window",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : " (and %d more tabs)"
+            "value" : "Window with multiple tabs (%d)"
           }
         }
       }
@@ -5319,7 +5469,7 @@
       }
     },
     "no.access.to.downloads.folder.header" : {
-      "comment" : "Header of the alert dialog informing user about failed download",
+      "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5534,18 +5684,6 @@
         }
       }
     },
-    "one.more.tab" : {
-      "comment" : "suffix of string in Recently Closed menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " (and 1 more tab)"
-          }
-        }
-      }
-    },
     "Only Show on New Tab" : {
       "comment" : "Preference for only showing the bookmarks bar on new tab"
     },
@@ -5557,6 +5695,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Open"
+          }
+        }
+      }
+    },
+    "open.all.in.new.tabs" : {
+      "comment" : "Menu item that opens all the bookmarks in a folder to new tabs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open All in New Tabs"
+          }
+        }
+      }
+    },
+    "open.all.tabs.in.new.window" : {
+      "comment" : "Menu item that opens all the bookmarks in a folder in a new window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open All in New Window"
           }
         }
       }
@@ -5586,7 +5748,7 @@
       }
     },
     "open.externally.failed" : {
-      "comment" : "’Link’ is link on a website",
+      "comment" : "’Link’ is link on a website, it couldn't be opened due to the required app not being found",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5736,6 +5898,42 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Remove Fireproofing"
+          }
+        }
+      }
+    },
+    "page.crash.header" : {
+      "comment" : "Error page heading text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This webpage has crashed."
+          }
+        }
+      }
+    },
+    "page.crash.message" : {
+      "comment" : "Error page message text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try reloading the page or come back later."
+          }
+        }
+      }
+    },
+    "page.error.header" : {
+      "comment" : "Error page heading text",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo can’t load this page."
           }
         }
       }
@@ -6365,7 +6563,7 @@
       }
     },
     "permission.popup.title" : {
-      "comment" : "List of blocked popups Title",
+      "comment" : "Title of a popup that has a list of blocked popups",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -7686,61 +7884,13 @@
       }
     },
     "preferences.about.unsupported-device-info2" : {
-      "comment" : "Link to the about page",
+      "comment" : "Copy in section that tells the user to update their macOS version since their current version is unsupported",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Please update to macOS %@ or later to use the most recent version"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part1" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 1",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Please"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part2" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 2 (underlined)",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "update to macOS %@"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part3" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 3",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "or later to use the most recent version"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part4" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 4",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
+            "value" : "Please update to macOS %@ or later to use the most recent version of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
           }
         }
       }
@@ -8004,18 +8154,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Open a new window"
-          }
-        }
-      }
-    },
-    "preferences.subscription" : {
-      "comment" : "Show subscription preferences",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
           }
         }
       }
@@ -8452,6 +8590,18 @@
     "Show Substitutions" : {
       "comment" : "Main Menu Edit-Substitutions item"
     },
+    "show.folder.contents" : {
+      "comment" : "Menu item that shows the content of a folder ",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Folder Contents"
+          }
+        }
+      }
+    },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item"
     },
@@ -8500,54 +8650,6 @@
         }
       }
     },
-    "subscription.menu.item" : {
-      "comment" : "Title for Subscription item in the options menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
-          }
-        }
-      }
-    },
-    "subscription.progress.view.completing.purchase" : {
-      "comment" : "Progress view title when completing the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Completing purchase..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.purchasing.subscription" : {
-      "comment" : "Progress view title when starting the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Purchase in progress..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.restoring.subscription" : {
-      "comment" : "Progress view title when restoring past subscription purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Restoring subscription..."
-          }
-        }
-      }
-    },
     "tab.bookmarks.title" : {
       "comment" : "Tab bookmarks title",
       "extractionState" : "extracted_with_value",
@@ -8567,7 +8669,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Oops!"
+            "value" : "Failed to open page"
           }
         }
       }
@@ -8756,7 +8858,7 @@
       }
     },
     "tooltip.clearHistory" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8768,7 +8870,7 @@
       }
     },
     "tooltip.clearHistoryAndData" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

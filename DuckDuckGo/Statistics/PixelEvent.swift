@@ -288,7 +288,6 @@ extension Pixel {
             case removedInvalidBookmarkManagedObjects
 
             case bitwardenNotResponding
-            case bitwardenRespondedCannotDecrypt
             case bitwardenRespondedCannotDecryptUnique(repetition: Repetition = .init(key: "bitwardenRespondedCannotDecryptUnique"))
             case bitwardenHandshakeFailed
             case bitwardenDecryptionOfSharedKeyFailed
@@ -734,8 +733,6 @@ extension Pixel.Event.Debug {
 
         case .bitwardenNotResponding:
             return "bitwarden_not_responding"
-        case .bitwardenRespondedCannotDecrypt:
-            return "bitwarden_responded_cannot_decrypt"
         case .bitwardenRespondedCannotDecryptUnique:
             return "bitwarden_responded_cannot_decrypt_unique"
         case .bitwardenHandshakeFailed:

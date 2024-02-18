@@ -100,18 +100,7 @@ private extension NSMenuItem {
                 return nil
             }
 
-            if recentlyClosedWindow.tabs.count > 1 {
-                let moreCount = recentlyClosedWindow.tabs.count - 1
-                let titleSuffix: String
-                if moreCount == 1 {
-                    titleSuffix = UserText.recentlyClosedMenuItemSuffixOne
-                } else {
-                    titleSuffix = String(format: UserText.recentlyClosedMenuItemSuffixMultiple, moreCount)
-                }
-
-                item.title = item.title.truncated(length: MainMenu.Constants.maxTitleLength - titleSuffix.count)
-                item.title += titleSuffix
-            }
+            item.title = String(format: UserText.recentlyClosedWindowMenuItem, recentlyClosedWindow.tabs.count)
             item.representedObject = recentlyClosedWindow
             return item
         }
