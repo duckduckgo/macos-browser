@@ -134,6 +134,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 .targetting(self)
             NSMenuItem(title: "Force Profile Removal", action: #selector(DataBrokerProtectionDebugMenu.showForceOptOutWindow))
                 .targetting(self)
+            NSMenuItem(title: "Force broker JSON files update", action: #selector(DataBrokerProtectionDebugMenu.forceBrokerJSONFilesUpdate))
+                .targetting(self)
+            NSMenuItem(title: "Run Personal Information Removal Debug Mode", action: #selector(DataBrokerProtectionDebugMenu.runCustomJSON))
+                .targetting(self)
         }
     }
 
@@ -252,6 +256,27 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         dataBrokerForceOptOutWindowController = NSWindowController(window: window)
         dataBrokerForceOptOutWindowController?.showWindow(nil)
         window.delegate = self
+    }
+
+    @objc private func runCustomJSON() {
+        let viewController = DataBrokerRunCustomJSONViewController()
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+                              styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                              backing: .buffered,
+                              defer: false)
+
+        window.contentViewController = viewController
+        window.minSize = NSSize(width: 500, height: 400)
+        window.center()
+        databaseBrowserWindowController = NSWindowController(window: window)
+        databaseBrowserWindowController?.showWindow(nil)
+        window.delegate = self
+    }
+
+    @objc private func forceBrokerJSONFilesUpdate() {
+        if let updater = DataBrokerProtectionBrokerUpdater.provide() {
+            updater.updateBrokers()
+        }
     }
 
     @objc private func resetWaitlistState() {

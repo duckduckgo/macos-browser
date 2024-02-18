@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "c14f36805fc5c4c8ec68198fc1ce7e0e0a97e233",
-        "version" : "105.0.0"
+        "revision" : "93a9a4153429de38c8b9f186617ff34db84f9250",
+        "version" : "107.0.1"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle.git",
       "state" : {
-        "revision" : "1f07f4096e52f19b5e7abaa697b7fc592b7ff57c",
-        "version" : "2.5.1"
+        "revision" : "47d3d90aee3c52b6f61d04ceae426e607df62347",
+        "version" : "2.5.2"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
       "state" : {
-        "revision" : "59b663f68e69f27a87b45de48cb63264b8194605",
-        "version" : "1.15.1"
+        "revision" : "e7b77228b34057041374ebef00c0fd7739d71a2b",
+        "version" : "1.15.3"
       }
     },
     {

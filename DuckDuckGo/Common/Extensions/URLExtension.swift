@@ -225,10 +225,10 @@ extension URL {
         toString(decodePunycode: decodePunycode, dropScheme: dropScheme, needsWWW: nil, dropTrailingSlash: dropTrailingSlash)
     }
 
-    private func toString(decodePunycode: Bool,
-                          dropScheme: Bool,
-                          needsWWW: Bool? = nil,
-                          dropTrailingSlash: Bool) -> String {
+    func toString(decodePunycode: Bool,
+                  dropScheme: Bool,
+                  needsWWW: Bool? = nil,
+                  dropTrailingSlash: Bool) -> String {
         guard let components = URLComponents(url: self, resolvingAgainstBaseURL: true),
               var string = components.string
         else {
@@ -473,5 +473,9 @@ extension URL {
             return "\(strippedURL)\(uuid)"
         }
         return self.absoluteString
+    }
+
+    public func isChild(of url: URL) -> Bool {
+        self.absoluteString.hasPrefix(url.absoluteString)
     }
 }

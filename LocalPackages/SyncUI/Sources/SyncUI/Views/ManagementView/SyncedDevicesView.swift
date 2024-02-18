@@ -41,10 +41,10 @@ struct SyncedDevicesView<ViewModel>: View where ViewModel: ManagementViewModel {
             .onDisappear {
                 isVisible = false
             }
-            Button {
-                model.syncWithAnotherDevicePressed()
-            } label: {
-                Text(UserText.beginSyncButton)
+            Button(UserText.beginSyncButton) {
+                Task {
+                    await model.syncWithAnotherDevicePressed()
+                }
             }
             .disabled(!model.isConnectingDevicesAvailable)
             .padding(.horizontal, 10)

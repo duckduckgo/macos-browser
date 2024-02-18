@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: SwiftLint
         uses: docker://norionomura/swiftlint:0.54.0
         with:
@@ -37,11 +37,11 @@ jobs:
     steps:
     - name: Check out the code
       if: github.event_name == 'pull_request' || github.event_name == 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Check out the code
       if: github.event_name != 'pull_request' && github.event_name != 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: ${{ inputs.branch || github.ref_name }}
 
@@ -88,13 +88,13 @@ jobs:
     steps:
     - name: Check out the code
       if: github.event_name == 'pull_request' || github.event_name == 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Check out the code
       if: github.event_name != 'pull_request' && github.event_name != 'push'
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
         ref: ${{ inputs.branch || github.ref_name }}
@@ -119,10 +119,6 @@ jobs:
 
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
-
-    - name: Install xcbeautify
-      continue-on-error: true
-      run: brew install xcbeautify
 
     - name: Build and run unit tests
       run: |
@@ -269,7 +265,7 @@ jobs:
 
     steps:
     - name: Check out the code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -311,10 +307,6 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Install xcbeautify
-      continue-on-error: true
-      run: brew install xcbeautify
-
     - name: Build the app
       run: |
         export OS_ACTIVITY_MODE=debug
@@ -339,7 +331,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 16

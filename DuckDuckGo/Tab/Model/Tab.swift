@@ -25,6 +25,10 @@ import Navigation
 import UserScript
 import WebKit
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 #if NETWORK_PROTECTION
 import NetworkProtection
 import NetworkProtectionIPC
@@ -57,6 +61,7 @@ protocol NewWindowPolicyDecisionMaker {
         case onboarding
         case none
         case dataBrokerProtection
+        case subscription(URL)
 
         enum URLSource: Equatable {
             case pendingStateRestoration
@@ -109,6 +114,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         }
 
+        // swiftlint:disable:next cyclomatic_complexity
         static func contentFromURL(_ url: URL?, source: URLSource) -> TabContent {
             switch url {
             case URL.newtab, URL.Invalid.aboutNewtab, URL.Invalid.duckHome:
@@ -128,6 +134,14 @@ protocol NewWindowPolicyDecisionMaker {
                 return .url(customURL, source: source)
             default: break
             }
+
+#if SUBSCRIPTION
+            if let url {
+                if url.isChild(of: URL.subscriptionBaseURL) || url.isChild(of: URL.identityTheftRestoration) {
+                    return .subscription(url)
+                }
+            }
+#endif
 
             if let settingsPane = url.flatMap(PreferencePaneIdentifier.init(url:)) {
                 return .settings(pane: settingsPane)
@@ -184,6 +198,7 @@ protocol NewWindowPolicyDecisionMaker {
             case .bookmarks: return UserText.tabBookmarksTitle
             case .onboarding: return UserText.tabOnboardingTitle
             case .dataBrokerProtection: return UserText.tabDataBrokerProtectionTitle
+            case .subscription: return nil
             }
         }
 
@@ -215,6 +230,8 @@ protocol NewWindowPolicyDecisionMaker {
                 return .welcome
             case .dataBrokerProtection:
                 return .dataBrokerProtection
+            case .subscription(let url):
+                return url
             case .none:
                 return nil
             }
@@ -222,7 +239,7 @@ protocol NewWindowPolicyDecisionMaker {
 
         var isUrl: Bool {
             switch self {
-            case .url:
+            case .url, .subscription:
                 return true
             default:
                 return false
