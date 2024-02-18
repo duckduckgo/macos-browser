@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import Foundation
 import BrowserServicesKit
+import Common
+import Foundation
 import UniformTypeIdentifiers
 
 extension String {
@@ -32,6 +33,42 @@ extension String {
         self.replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
             .replacingOccurrences(of: "'", with: "\\'")
+            .replacingOccurrences(of: "\n", with: "\\n")
+    }
+
+    private static let unicodeHtmlCharactersMapping: [Character: String] = [
+        "&": "&amp;",
+        "\"": "&quot;",
+        "'": "&apos;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "/": "&#x2F;",
+        "!": "&excl;",
+        "$": "&#36;",
+        "%": "&percnt;",
+        "=": "&#61;",
+        "#": "&#35;",
+        "@": "&#64;",
+        "[": "&#91;",
+        "\\": "&#92;",
+        "]": "&#93;",
+        "^": "&#94;",
+        "`": "&#97;",
+        "{": "&#123;",
+        "}": "&#125;",
+    ]
+    func escapedUnicodeHtmlString() -> String {
+        var result = ""
+
+        for character in self {
+            if let mapped = Self.unicodeHtmlCharactersMapping[character] {
+                result.append(mapped)
+            } else {
+                result.append(character)
+            }
+        }
+
+        return result
     }
 
     init(_ staticString: StaticString) {

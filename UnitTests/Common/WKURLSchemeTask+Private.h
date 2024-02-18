@@ -1,7 +1,7 @@
 //
-//  TestsBridging.h
+//  WKURLSchemeTask+Private.h
 //
-//  Copyright © 2021 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,7 +16,15 @@
 //  limitations under the License.
 //
 
-#import "Bridging.h"
+#import <WebKit/WebKit.h>
 
-#import "DownloadsWebViewMock.h"
-#import "WKURLSchemeTask+Private.h"
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol WKURLSchemeTaskPrivate <WKURLSchemeTask>
+
+- (void)_willPerformRedirection:(NSURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest *))completionHandler;
+- (void)_didPerformRedirection:(NSURLResponse *)response newRequest:(NSURLRequest *)request;
+
+@end
+
+NS_ASSUME_NONNULL_END
