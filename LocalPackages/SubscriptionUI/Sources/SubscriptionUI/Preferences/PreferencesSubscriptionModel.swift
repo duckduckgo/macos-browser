@@ -189,7 +189,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 subscriptionPlatform = response.platform
             }
 
-            self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
+            self.hasEntitlements = await AccountManager().hasEntitlement(for: .networkProtection)
         }
     }
 

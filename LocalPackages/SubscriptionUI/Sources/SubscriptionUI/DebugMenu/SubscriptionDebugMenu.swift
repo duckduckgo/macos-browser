@@ -103,9 +103,10 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         Task {
             var results: [String] = []
 
-            for entitlementName in ["fake", "dummy1", "dummy2", "dummy3"] {
-                let result = await AccountManager().hasEntitlement(for: entitlementName)
-                let resultSummary = "Entitlement check for \(entitlementName): \(result)"
+            let entitlements: [AccountManager.Entitlement] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
+            for entitlement in entitlements {
+                let result = await AccountManager().hasEntitlement(for: entitlement)
+                let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
                 results.append(resultSummary)
                 print(resultSummary)
             }
