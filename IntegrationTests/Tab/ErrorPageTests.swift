@@ -469,12 +469,12 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(tab.currentHistoryItem?.title, URL.test.host)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
-        XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
+        XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab, "url")
         XCTAssertTrue(tab.canGoBack)
 
         XCTAssertEqual(tab.forwardHistoryItems.count, 1)
-        XCTAssertEqual(tab.forwardHistoryItems.first?.url, .alternative)
-        XCTAssertEqual(tab.forwardHistoryItems.first?.title, Self.alternativeTitle)
+        XCTAssertEqual(tab.forwardHistoryItems.first?.url, .alternative, "url")
+        XCTAssertEqual(tab.forwardHistoryItems.first?.title, Self.alternativeTitle, "title")
         XCTAssertTrue(tab.canGoForward)
 
         XCTAssertTrue(tab.canReload)
@@ -611,13 +611,13 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(tab.currentHistoryItem?.title, URL.test.host)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
-        XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab)
-        XCTAssertNil(tab.backHistoryItems.first?.title)
+        XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab, "url")
+        XCTAssertNil(tab.backHistoryItems.first?.title, "title")
         XCTAssertTrue(tab.canGoBack)
 
         XCTAssertEqual(tab.forwardHistoryItems.count, 1)
-        XCTAssertEqual(tab.forwardHistoryItems.first?.url, .alternative)
-        XCTAssertEqual(tab.forwardHistoryItems.first?.title, Self.alternativeTitle)
+        XCTAssertEqual(tab.forwardHistoryItems.first?.url, .alternative, "url")
+        XCTAssertEqual(tab.forwardHistoryItems.first?.title, Self.alternativeTitle, "title")
         XCTAssertTrue(tab.canGoForward)
 
         XCTAssertTrue(tab.canReload)
