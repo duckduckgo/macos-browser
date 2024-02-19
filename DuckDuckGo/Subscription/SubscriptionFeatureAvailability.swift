@@ -49,7 +49,10 @@ struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
     }
 
     private var isDBPActivated: Bool {
-        // TODO: DBP check?
+#if DBP
         return DataBrokerProtectionManager.shared.dataManager.fetchProfile(ignoresCache: true) != nil
+#else
+        return false
+#endif
     }
 }
