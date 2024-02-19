@@ -16,8 +16,6 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
-
 import Foundation
 import Networking
 import UserNotifications
@@ -154,6 +152,8 @@ extension ProductWaitlistRequest {
         self.init(productName: productName, makeHTTPRequest: makeHTTPRequest)
     }
 }
+
+#if NETWORK_PROTECTION
 
 // MARK: - Network Protection Waitlist
 

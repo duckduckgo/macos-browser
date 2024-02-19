@@ -16,7 +16,7 @@
 //  limitations under the License.
 //
 
-#if NETWORK_PROTECTION
+#if NETWORK_PROTECTION || DBP
 
 import AppKit
 import SwiftUI
