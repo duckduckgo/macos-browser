@@ -2346,6 +2346,7 @@
 		85F1B0C925EF9759004792B6 /* URLEventHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F1B0C825EF9759004792B6 /* URLEventHandlerTests.swift */; };
 		85F487B5276A8F2E003CE668 /* OnboardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F487B4276A8F2E003CE668 /* OnboardingTests.swift */; };
 		85F69B3C25EDE81F00978E59 /* URLExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */; };
+		89BD9E882B83187300D5E881 /* BookmarksBarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89BD9E872B83187300D5E881 /* BookmarksBarTests.swift */; };
 		9807F645278CA16F00E1547B /* BrowserServicesKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9807F644278CA16F00E1547B /* BrowserServicesKit */; };
 		9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9812D894276CEDA5004B6181 /* ContentBlockerRulesLists.swift */; };
 		981E20B6299A39B8002B68CD /* BookmarkMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98A95D87299A2DF900B9B81A /* BookmarkMigrationTests.swift */; };
@@ -2667,7 +2668,6 @@
 		B630794226731F5400DCEE41 /* WKDownloadMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630794126731F5400DCEE41 /* WKDownloadMock.swift */; };
 		B630E7FE29C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
 		B630E7FF29C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
-		B630E80029C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
 		B630E80129C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
 		B630E80229C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B630E7FD29C887ED00363609 /* NSErrorAdditionalInfo.swift */; };
 		B634DBDF293C8F7F00C3C99E /* Tab+UIDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B634DBDE293C8F7F00C3C99E /* Tab+UIDelegate.swift */; };
@@ -2688,8 +2688,6 @@
 		B63ED0E026AFE32F00A9DAD1 /* GeolocationProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0DF26AFE32F00A9DAD1 /* GeolocationProviderMock.swift */; };
 		B63ED0E326B3E7FA00A9DAD1 /* CLLocationManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E226B3E7FA00A9DAD1 /* CLLocationManagerMock.swift */; };
 		B63ED0E526BB8FB900A9DAD1 /* SharingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B63ED0E426BB8FB900A9DAD1 /* SharingMenu.swift */; };
-		B63FCB3529B5B2680022C61A /* TestRunHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F8029B1B4AD007BFAA8 /* TestRunHelper.swift */; };
-		B63FCB3629B5B2730022C61A /* FileManagerTempDirReplacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = B60C6F8329B1BAD3007BFAA8 /* FileManagerTempDirReplacement.swift */; };
 		B642738227B65BAC0005DFD1 /* SecureVaultErrorReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B642738127B65BAC0005DFD1 /* SecureVaultErrorReporter.swift */; };
 		B643BF1427ABF772000BACEC /* NSWorkspaceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B643BF1327ABF772000BACEC /* NSWorkspaceExtension.swift */; };
 		B644B43D29D56829003FA9AB /* SearchNonexistentDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B644B43929D565DB003FA9AB /* SearchNonexistentDomainTests.swift */; };
@@ -2728,7 +2726,6 @@
 		B65CD8CD2B316DFC00A595BB /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = B65CD8CC2B316DFC00A595BB /* SnapshotTesting */; };
 		B65CD8CF2B316E0200A595BB /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = B65CD8CE2B316E0200A595BB /* SnapshotTesting */; };
 		B65CD8D12B316E0C00A595BB /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = B65CD8D02B316E0C00A595BB /* SnapshotTesting */; };
-		B65CD8D32B316E1700A595BB /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = B65CD8D22B316E1700A595BB /* SnapshotTesting */; };
 		B65CD8D52B316FCA00A595BB /* __Snapshots__ in Resources */ = {isa = PBXBuildFile; fileRef = B65CD8D42B316FCA00A595BB /* __Snapshots__ */; };
 		B65CD8D62B316FCA00A595BB /* __Snapshots__ in Resources */ = {isa = PBXBuildFile; fileRef = B65CD8D42B316FCA00A595BB /* __Snapshots__ */; };
 		B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B602E81F2A1E2603006D261F /* Bundle+NetworkProtectionExtensions.swift */; };
@@ -3180,13 +3177,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 9D9AE8D32AAA39D30026E7DC;
 			remoteInfo = DuckDuckGoDBPBackgroundAgentAppStore;
-		};
-		7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA585D76248FD31100E9A3E2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AA585D7D248FD31100E9A3E2;
-			remoteInfo = "DuckDuckGo Privacy Browser";
 		};
 		7BEC18302AD5DA3300D30536 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3778,7 +3768,7 @@
 		7B2E52242A5FEC09000C6D39 /* NetworkProtectionAgentNotificationsPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionAgentNotificationsPresenter.swift; sourceTree = "<group>"; };
 		7B3618C12ADE75C8000D6154 /* NetworkProtectionNavBarPopoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionNavBarPopoverManager.swift; sourceTree = "<group>"; };
 		7B430EA02A71411A00BAC4A1 /* NetworkProtectionSimulateFailureMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkProtectionSimulateFailureMenu.swift; sourceTree = "<group>"; };
-		7B4CE8DA26F02108009134B1 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B4CE8DA26F02108009134B1 /* UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B4CE8DE26F02108009134B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B4CE8E626F02134009134B1 /* TabBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarTests.swift; sourceTree = "<group>"; };
 		7B5291882A1697680022E406 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3901,6 +3891,7 @@
 		85F487B4276A8F2E003CE668 /* OnboardingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTests.swift; sourceTree = "<group>"; };
 		85F69B3B25EDE81F00978E59 /* URLExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLExtensionTests.swift; sourceTree = "<group>"; };
 		85F91D9327F47BC40096B1C8 /* History 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "History 5.xcdatamodel"; sourceTree = "<group>"; };
+		89BD9E872B83187300D5E881 /* BookmarksBarTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksBarTests.swift; sourceTree = "<group>"; };
 		9812D894276CEDA5004B6181 /* ContentBlockerRulesLists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockerRulesLists.swift; sourceTree = "<group>"; };
 		9826B09F2747DF3D0092F683 /* ContentBlocking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlocking.swift; sourceTree = "<group>"; };
 		9826B0A12747DFEB0092F683 /* AppPrivacyConfigurationDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPrivacyConfigurationDataProvider.swift; sourceTree = "<group>"; };
@@ -4613,7 +4604,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B65CD8D32B316E1700A595BB /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6104,6 +6094,7 @@
 			isa = PBXGroup;
 			children = (
 				7B4CE8E626F02134009134B1 /* TabBarTests.swift */,
+				89BD9E872B83187300D5E881 /* BookmarksBarTests.swift */,
 				7B4CE8DE26F02108009134B1 /* Info.plist */,
 			);
 			path = UITests;
@@ -6665,7 +6656,7 @@
 				AA585D7E248FD31100E9A3E2 /* DuckDuckGo.app */,
 				AA585D90248FD31400E9A3E2 /* Unit Tests.xctest */,
 				4B1AD89D25FC27E200261379 /* Integration Tests.xctest */,
-				7B4CE8DA26F02108009134B1 /* UI Tests.xctest */,
+				7B4CE8DA26F02108009134B1 /* UITests.xctest */,
 				3706FD05293F65D500E42796 /* DuckDuckGo App Store.app */,
 				3706FE99293F661700E42796 /* Unit Tests App Store.xctest */,
 				3706FEB2293F662100E42796 /* Integration Tests App Store.xctest */,
@@ -8579,9 +8570,9 @@
 			productReference = 565E46DD2B2725DC0013AC2A /* SyncE2EUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		7B4CE8D926F02108009134B1 /* UI Tests */ = {
+		7B4CE8D926F02108009134B1 /* UITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7B4CE8E526F02108009134B1 /* Build configuration list for PBXNativeTarget "UI Tests" */;
+			buildConfigurationList = 7B4CE8E526F02108009134B1 /* Build configuration list for PBXNativeTarget "UITests" */;
 			buildPhases = (
 				7B4CE8D626F02108009134B1 /* Sources */,
 				7B4CE8D726F02108009134B1 /* Frameworks */,
@@ -8590,15 +8581,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				B6080B9B2B20AF6400B418EF /* PBXTargetDependency */,
-				7B4CE8E026F02108009134B1 /* PBXTargetDependency */,
 			);
-			name = "UI Tests";
+			name = UITests;
 			packageProductDependencies = (
-				B65CD8D22B316E1700A595BB /* SnapshotTesting */,
 			);
 			productName = "UI Tests";
-			productReference = 7B4CE8DA26F02108009134B1 /* UI Tests.xctest */;
+			productReference = 7B4CE8DA26F02108009134B1 /* UITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		9D9AE8B22AAA39A70026E7DC /* DuckDuckGoDBPBackgroundAgent */ = {
@@ -8829,7 +8817,7 @@
 			targets = (
 				AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */,
 				3706FA6A293F65D500E42796 /* DuckDuckGo Privacy Browser App Store */,
-				7B4CE8D926F02108009134B1 /* UI Tests */,
+				7B4CE8D926F02108009134B1 /* UITests */,
 				565E46DC2B2725DC0013AC2A /* SyncE2EUITests */,
 				376113C82B29CD5B00E794BB /* SyncE2EUITests App Store */,
 				AA585D8F248FD31400E9A3E2 /* Unit Tests */,
@@ -11380,9 +11368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B4CE8E726F02135009134B1 /* TabBarTests.swift in Sources */,
-				B63FCB3529B5B2680022C61A /* TestRunHelper.swift in Sources */,
-				B630E80029C887ED00363609 /* NSErrorAdditionalInfo.swift in Sources */,
-				B63FCB3629B5B2730022C61A /* FileManagerTempDirReplacement.swift in Sources */,
+				89BD9E882B83187300D5E881 /* BookmarksBarTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12452,11 +12438,6 @@
 			target = 9D9AE8D32AAA39D30026E7DC /* DuckDuckGoDBPBackgroundAgentAppStore */;
 			targetProxy = 4BBA2D2A2B6AD01E00F6A470 /* PBXContainerItemProxy */;
 		};
-		7B4CE8E026F02108009134B1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
-			targetProxy = 7B4CE8DF26F02108009134B1 /* PBXContainerItemProxy */;
-		};
 		7BEC18312AD5DA3300D30536 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4B2537592A11BE7300610219 /* NetworkProtectionSystemExtension */;
@@ -12466,10 +12447,6 @@
 			isa = PBXTargetDependency;
 			target = AA585D7D248FD31100E9A3E2 /* DuckDuckGo Privacy Browser */;
 			targetProxy = AA585D91248FD31400E9A3E2 /* PBXContainerItemProxy */;
-		};
-		B6080B9B2B20AF6400B418EF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = B6080B9A2B20AF6400B418EF /* SwiftLintPlugin */;
 		};
 		B6080B9D2B20AF7700B418EF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -12881,6 +12858,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 			};
 			name = Debug;
 		};
@@ -12895,6 +12873,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 			};
 			name = Release;
 		};
@@ -12902,6 +12883,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 376113C52B29BCD600E794BB /* SyncE2EUITests.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 			};
 			name = Review;
 		};
@@ -12909,6 +12891,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
+				INFOPLIST_FILE = UITests/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.UITests;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
 			};
 			name = Debug;
 		};
@@ -12916,6 +12906,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = UITests/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.UITests;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
 			};
 			name = CI;
 		};
@@ -12923,6 +12919,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
+				INFOPLIST_FILE = UITests/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.UITests;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
 			};
 			name = Release;
 		};
@@ -13056,6 +13060,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 378B588C295CF446002C0CC0 /* UITests.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = HKE973VLUW;
+				INFOPLIST_FILE = UITests/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.UITests;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				TEST_TARGET_NAME = "DuckDuckGo Privacy Browser";
 			};
 			name = Review;
 		};
@@ -13222,7 +13234,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7B4CE8E526F02108009134B1 /* Build configuration list for PBXNativeTarget "UI Tests" */ = {
+		7B4CE8E526F02108009134B1 /* Build configuration list for PBXNativeTarget "UITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7B4CE8E126F02108009134B1 /* Debug */,
@@ -13892,11 +13904,6 @@
 			package = AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
-		B6080B9A2B20AF6400B418EF /* SwiftLintPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
-			productName = "plugin:SwiftLintPlugin";
-		};
 		B6080B9C2B20AF7700B418EF /* SwiftLintPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
@@ -13948,11 +13955,6 @@
 			productName = SnapshotTesting;
 		};
 		B65CD8D02B316E0C00A595BB /* SnapshotTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
-			productName = SnapshotTesting;
-		};
-		B65CD8D22B316E1700A595BB /* SnapshotTesting */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B65CD8C92B316DF100A595BB /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;

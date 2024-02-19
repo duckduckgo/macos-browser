@@ -107,8 +107,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7B4CE8D926F02108009134B1"
-               BuildableName = "UI Tests.xctest"
-               BlueprintName = "UI Tests"
+               BuildableName = "UITests.xctest"
+               BlueprintName = "UITests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
          </TestableReference>
