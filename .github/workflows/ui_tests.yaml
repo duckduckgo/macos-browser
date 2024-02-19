@@ -58,7 +58,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Start recording
-      run: screencapture -T0 -V 430 foo.mov &
+      run: screencapture -v -V 430 foo.mov &
 
     - name: Build and run UI Testing
       run: |
