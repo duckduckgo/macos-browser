@@ -26,44 +26,18 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     }
 
     var body: some View {
-        BookmarkDialogContainerView(
+        AddEditBookmarkFolderView(
             title: viewModel.title,
-            middleSection: {
-                BookmarkDialogStackedContentView(
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.name,
-                        content: TextField("", text: $viewModel.folderName)
-                            .focusedOnAppear()
-                            .accessibilityIdentifier("bookmark.add.name.textfield")
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .font(.system(size: 14))
-                    ),
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.location,
-                        content: BookmarkFolderPicker(
-                            folders: viewModel.folders,
-                            selectedFolder: $viewModel.selectedFolder
-                        )
-                        .accessibilityIdentifier("bookmark.folder.folder.dropdown")
-                    )
-                )
-            },
-            bottomSection: {
-                BookmarkDialogButtonsView(
-                    viewState: .compressed,
-                    otherButtonAction: .init(
-                        title: viewModel.cancelActionTitle,
-                        keyboardShortCut: .cancelAction,
-                        isDisabled: viewModel.isCancelActionDisabled,
-                        action: viewModel.cancel
-                    ), defaultButtonAction: .init(
-                        title: viewModel.defaultActionTitle,
-                        keyboardShortCut: .defaultAction,
-                        isDisabled: viewModel.isDefaultActionButtonDisabled,
-                        action: viewModel.addOrSave
-                    )
-                )
-            }
+            buttonsState: .compressed,
+            folders: viewModel.folders,
+            folderName: $viewModel.folderName,
+            selectedFolder: $viewModel.selectedFolder,
+            cancelActionTitle: viewModel.cancelActionTitle,
+            isCancelActionDisabled: viewModel.isCancelActionDisabled,
+            cancelAction: viewModel.cancel,
+            defaultActionTitle: viewModel.defaultActionTitle,
+            isDefaultActionDisabled: viewModel.isDefaultActionButtonDisabled,
+            defaultAction: viewModel.addOrSave
         )
         .font(.system(size: 13))
         .frame(width: 448, height: 210)
