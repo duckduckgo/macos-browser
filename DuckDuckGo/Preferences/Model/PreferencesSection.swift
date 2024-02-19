@@ -36,12 +36,6 @@ struct PreferencesSection: Hashable, Identifiable {
             if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
                 panes = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
 
-                if NSApp.delegateTyped.internalUserDecider.isInternalUser {
-                    if let generalIndex = panes.firstIndex(of: .general) {
-                        panes.insert(.sync, at: generalIndex + 1)
-                    }
-                }
-
                 if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
                     if let subscriptionIndex = panes.firstIndex(of: .subscription) {
                         panes.remove(at: subscriptionIndex)
@@ -49,11 +43,11 @@ struct PreferencesSection: Hashable, Identifiable {
                 }
             } else {
                 panes = [.general, .appearance, .privacy, .autofill, .downloads]
+            }
 
-                if includingSync {
-                    if let generalIndex = panes.firstIndex(of: .general) {
-                        panes.insert(.sync, at: generalIndex + 1)
-                    }
+            if includingSync {
+                if let generalIndex = panes.firstIndex(of: .general) {
+                    panes.insert(.sync, at: generalIndex + 1)
                 }
             }
 
