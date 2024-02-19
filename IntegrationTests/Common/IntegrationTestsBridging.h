@@ -1,5 +1,5 @@
 //
-//  TestsBridging.h
+//  IntegrationTestsBridging.h
 //
 //  Copyright © 2021 DuckDuckGo. All rights reserved.
 //
@@ -18,5 +18,4 @@
 
 #import "Bridging.h"
 
-#import "DownloadsWebViewMock.h"
 #import "WKURLSchemeTask+Private.h"

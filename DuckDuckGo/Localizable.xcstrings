@@ -2890,18 +2890,6 @@
     "Error message & code" : {
 
     },
-    "error.unknown" : {
-      "comment" : "Error page subtitle",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "An unknown error has occurred"
-          }
-        }
-      }
-    },
     "error.unknown.try.again" : {
       "comment" : "Generic error message on a dialog for when the cause is not known.",
       "extractionState" : "extracted_with_value",
@@ -5914,6 +5902,42 @@
         }
       }
     },
+    "page.crash.header" : {
+      "comment" : "Error page heading text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This webpage has crashed."
+          }
+        }
+      }
+    },
+    "page.crash.message" : {
+      "comment" : "Error page message text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try reloading the page or come back later."
+          }
+        }
+      }
+    },
+    "page.error.header" : {
+      "comment" : "Error page heading text",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo can’t load this page."
+          }
+        }
+      }
+    },
     "passsword.management" : {
       "comment" : "Used as title for password management user interface",
       "extractionState" : "extracted_with_value",
@@ -8645,7 +8669,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Oops!"
+            "value" : "Failed to open page"
           }
         }
       }

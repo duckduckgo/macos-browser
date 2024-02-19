@@ -144,6 +144,8 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                 .targetting(self)
             NSMenuItem(title: "Run Personal Information Removal Debug Mode", action: #selector(DataBrokerProtectionDebugMenu.runCustomJSON))
                 .targetting(self)
+            NSMenuItem(title: "Reset All State and Delete All Data", action: #selector(DataBrokerProtectionDebugMenu.deleteAllDataAndStopAgent))
+                .targetting(self)
         }
     }
 
@@ -232,6 +234,14 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
 
     @objc private func backgroundAgentEnable() {
         LoginItemsManager().enableLoginItems([LoginItem.dbpBackgroundAgent], log: .dbp)
+    }
+
+    @objc private func deleteAllDataAndStopAgent() {
+        Task { @MainActor in
+            guard case .alertFirstButtonReturn = await NSAlert.removeAllDBPStateAndDataAlert().runModal() else { return }
+            resetWaitlistState()
+            DataBrokerProtectionFeatureDisabler().disableAndDelete()
+        }
     }
 
     @objc private func showDatabaseBrowser() {

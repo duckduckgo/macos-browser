@@ -130,6 +130,8 @@ extension URL {
     static let welcome = URL(string: "duck://welcome")!
     static let settings = URL(string: "duck://settings")!
     static let bookmarks = URL(string: "duck://bookmarks")!
+    // base url for Error Page Alternate HTML loaded into Web View
+    static let error = URL(string: "duck://error")!
 
     static let dataBrokerProtection = URL(string: "duck://dbp")!
 
