@@ -18,10 +18,14 @@
 CODE_SIGN_STYLE = Automatic
 CODE_SIGN_IDENTITY[config=CI][sdk=macosx*] =
 
+CODE_SIGN_IDENTITY[config=Review][sdk=macosx*] =
+CODE_SIGN_STYLE[config=Review][sdk=macosx*] = Manual
+CODE_SIGNING_ALLOWED[config=Review][sdk=macosx*] = NO
+
 DEAD_CODE_STRIPPING = YES
 
 MACOSX_DEPLOYMENT_TARGET = 11.4
-
+DEVELOPMENT_TEAM[config=Review][sdk=macosx*] 
 INFOPLIST_FILE = UI Tests/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.UI-Tests
 PRODUCT_NAME = $(TARGET_NAME)
