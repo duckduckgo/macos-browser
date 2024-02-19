@@ -468,6 +468,45 @@ final class LocalBookmarkStoreTests: XCTestCase {
         XCTAssertEqual(topLevelEntityIDs, [testState.initialParentFolder.id, testState.bookmark3.id])
     }
 
+    func testWhenUpdatingAndMovingBookmarkFolder_ThenBookmarkFolderIsMovedAndTitleUpdated() async throws {
+        let context = container.viewContext
+        let bookmarkStore = LocalBookmarkStore(context: context)
+
+        let folder1 = BookmarkFolder(id: UUID().uuidString, title: "Folder 1")
+        let folder2 = BookmarkFolder(id: UUID().uuidString, title: "Folder 2")
+        let folder3 = BookmarkFolder(id: UUID().uuidString, title: "Folder 3")
+
+        // Save the initial bookmarks state:
+
+        _ = await bookmarkStore.save(folder: folder1, parent: nil)
+        _ = await bookmarkStore.save(folder: folder2, parent: nil)
+        _ = await bookmarkStore.save(folder: folder3, parent: nil)
+
+        // Fetch persisted bookmark folders back from the store:
+
+        let folders = try await bookmarkStore.loadAll(type: .topLevelEntities).get().compactMap { $0 as? BookmarkFolder }
+
+        XCTAssertEqual(folders.count, 3)
+        XCTAssertEqual(folders[0], folder1)
+        XCTAssertEqual(folders[1], folder2)
+        XCTAssertEqual(folders[2], folder3)
+
+        // Update the folder title and parent:
+
+        var folderToMove = folder1
+        folderToMove.title = #function
+        bookmarkStore.update(folder: folder1, andMoveToParent: .parent(uuid: folder2.id))
+
+        // Check the new bookmark folders order:
+
+        let newFolders = try await bookmarkStore.loadAll(type: .topLevelEntities).get().compactMap { $0 as? BookmarkFolder }
+
+        XCTAssertEqual(newFolders.count, 2)
+        XCTAssertEqual(newFolders[0].id, folder2.id)
+        XCTAssertEqual(newFolders[0].children, [folder1])
+        XCTAssertEqual(newFolders[1], folder3)
+    }
+
     // MARK: Favorites
 
     func testThatTopLevelEntitiesDoNotContainFavoritesFolder() async {

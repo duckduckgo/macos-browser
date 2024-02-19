@@ -48,6 +48,7 @@ public final class BookmarkStoreMock: BookmarkStore {
 
     var capturedFolder: BookmarkFolder?
     var capturedParentFolder: BookmarkFolder?
+    var capturedParentFolderType: ParentFolderType?
 
     var loadAllCalled = false
     var bookmarks: [BaseBookmarkEntity]?
@@ -105,6 +106,13 @@ public final class BookmarkStoreMock: BookmarkStore {
         capturedFolder = folder
     }
 
+    var updateFolderAndMoveToParentCalled = false
+    func update(folder: BookmarkFolder, andMoveToParent parent: ParentFolderType) {
+        updateFolderAndMoveToParentCalled = true
+        capturedFolder = folder
+        capturedParentFolderType = parent
+    }
+
     var addChildCalled = false
     func add(objectsWithUUIDs: [String], to parent: BookmarkFolder?, completion: @escaping (Error?) -> Void) {
         addChildCalled = true
@@ -129,7 +137,6 @@ public final class BookmarkStoreMock: BookmarkStore {
 
     var moveObjectUUIDCalled = false
     var capturedObjectUUIDs: [String]?
-    var capturedParentFolderType: ParentFolderType?
     func move(objectUUIDs: [String], toIndex: Int?, withinParentFolder: ParentFolderType, completion: @escaping (Error?) -> Void) {
         moveObjectUUIDCalled = true
         capturedObjectUUIDs = objectUUIDs
@@ -146,7 +153,7 @@ public final class BookmarkStoreMock: BookmarkStore {
 }
 
 extension ParentFolderType: Equatable {
-    public static func ==(lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs, rhs) {
         case (.root, .root):
             return true

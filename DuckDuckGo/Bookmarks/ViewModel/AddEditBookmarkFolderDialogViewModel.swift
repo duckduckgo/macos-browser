@@ -84,6 +84,8 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
     }
 
     func addOrSave(dismiss: () -> Void) {
+        defer { dismiss() }
+
         guard !folderName.isEmpty else {
             assertionFailure("folderName is empty, button should be disabled")
             return
@@ -93,12 +95,13 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
 
         switch mode {
         case let .edit(folder, originalParent):
-            update(folder: folder, parent: originalParent)
+            // If there are no pending changes dismiss
+            guard folder.title != folderName || selectedFolder?.id != originalParent?.id else { return }
+            // Otherwise update Folder.
+            update(folder: folder, originalParent: originalParent, newParent: selectedFolder)
         case .add:
             add(folderWithName: folderName, to: selectedFolder)
         }
-
-        dismiss()
     }
 
 }
@@ -107,21 +110,16 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
 
 private extension AddEditBookmarkFolderDialogViewModel {
 
-    func update(folder: BookmarkFolder, parent: BookmarkFolder?) {
-        // Update the title of the folder
-        if folder.title != folderName {
+    func update(folder: BookmarkFolder, originalParent: BookmarkFolder?, newParent: BookmarkFolder?) {
+        // If the original location of the folder changed move it to the new folder.
+        if selectedFolder?.id != originalParent?.id {
+            // Update the title anyway.
+            folder.title = folderName
+            let parentFolderType: ParentFolderType = newParent.flatMap { ParentFolderType.parent(uuid: $0.id) } ?? .root
+            bookmarkManager.update(folder: folder, andMoveToParent: parentFolderType)
+        } else if folder.title != folderName { // If only title changed just update the folder title without updating its parent.
             folder.title = folderName
             bookmarkManager.update(folder: folder)
-        }
-        // If the original location of the folder changed move it to the new folder.
-        if selectedFolder?.id != parent?.id {
-            let parentFolderType: ParentFolderType = selectedFolder.flatMap { ParentFolderType.parent(uuid: $0.id) } ?? .root
-            bookmarkManager.move(
-                objectUUIDs: [folder.id],
-                toIndex: nil,
-                withinParentFolder: parentFolderType,
-                completion: { _ in }
-            )
         }
     }
 

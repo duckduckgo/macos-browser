@@ -369,8 +369,8 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let folder = BookmarkFolder.mock
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: nil), bookmarkManager: bookmarkManager)
         sut.selectedFolder = location
-        XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
-        XCTAssertNil(bookmarkStoreMock.capturedObjectUUIDs)
+        XCTAssertFalse(bookmarkStoreMock.updateFolderAndMoveToParentCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolder)
         XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
 
         // WHEN
@@ -378,8 +378,8 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertFalse(bookmarkStoreMock.saveFolderCalled)
-        XCTAssertTrue(bookmarkStoreMock.moveObjectUUIDCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedObjectUUIDs, [folder.id])
+        XCTAssertTrue(bookmarkStoreMock.updateFolderAndMoveToParentCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolder, folder)
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: #file))
     }
 
@@ -389,8 +389,8 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let folder = BookmarkFolder.mock
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: .mock), bookmarkManager: bookmarkManager)
         sut.selectedFolder = nil
-        XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
-        XCTAssertNil(bookmarkStoreMock.capturedObjectUUIDs)
+        XCTAssertFalse(bookmarkStoreMock.updateFolderAndMoveToParentCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedFolder)
         XCTAssertNil(bookmarkStoreMock.capturedParentFolderType)
 
         // WHEN
@@ -398,8 +398,8 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertFalse(bookmarkStoreMock.saveFolderCalled)
-        XCTAssertTrue(bookmarkStoreMock.moveObjectUUIDCalled)
-        XCTAssertEqual(bookmarkStoreMock.capturedObjectUUIDs, [folder.id])
+        XCTAssertTrue(bookmarkStoreMock.updateFolderAndMoveToParentCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedFolder, folder)
         XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .root)
     }
 
