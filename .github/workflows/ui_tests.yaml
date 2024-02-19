@@ -9,7 +9,7 @@ on:
 jobs:
   ui-tests:
     name: UI tests
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
 
     timeout-minutes: 60
 
