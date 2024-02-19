@@ -60,8 +60,10 @@ final class CriticalPathsTests: XCTestCase {
     func testCanCreateSyncAccount() throws {
         // Go to Sync Set up
         let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        let menuBarsQuery = app.menuBars
+        let duckDuckGoMenuBarItem = menuBarsQuery.menuBarItems.element(boundBy: 1)
+        duckDuckGoMenuBarItem.click()
+        menuBarsQuery.menuItems["openPreferences:"].click()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
