@@ -95,7 +95,7 @@ jobs:
         report_paths: ui-tests.xml
 
     - name: Upload logs when workflow failed
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: BuildLogs
