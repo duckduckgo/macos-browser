@@ -23,9 +23,10 @@ final class BookmarksBarTests: XCTestCase {
     var debugMenuBarItem: XCUIElement!
     var internaluserstateMenuItem: XCUIElement!
 
+
     override func setUp() {
         // Launch App
-        app = XCUIApplication(url: URL(fileURLWithPath: "/Users/runner/work/macos-browser/macos-browser/DerivedData/Build/Products/Review/DuckDuckGo Review.app"))
+        app = XCUIApplication()
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
 

@@ -59,6 +59,9 @@ jobs:
 
     - name: Start recording
       run: screencapture -v -V 430 foo.mov &
+    
+    - name: Launch activity monitor
+      run: open /System/Applications/Utilities/Activity\ Monitor.app
 
     - name: Build and run UI Testing
       run: |
@@ -70,7 +73,8 @@ jobs:
           -skipPackagePluginValidation 
     
     - name: Sleep
-      run: sleep 60 
+      if: ${{ always() }}
+      run: sleep 90
 
     - name : Upload recording
       uses: actions/upload-artifact@v3
