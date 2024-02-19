@@ -134,18 +134,23 @@ final class TabViewModelTests: XCTestCase {
         XCTAssertEqual(tabViewModel.title, "New Tab")
     }
 
-    func testWhenTabTitleIsNotNilThenTitleReflectsTabTitle() {
+    func testWhenTabTitleIsNotNilThenTitleReflectsTabTitle() async throws {
         let tabViewModel = TabViewModel.forTabWithURL(.duckDuckGo)
         let testTitle = "Test title"
-        tabViewModel.tab.title = testTitle
 
         let titleExpectation = expectation(description: "Title")
-
-        tabViewModel.$title.debounce(for: 0.1, scheduler: RunLoop.main).sink { title in
+        tabViewModel.$title.dropFirst().sink {
+            if case .failure(let error) = $0 {
+                XCTFail("\(error)")
+            }
+        } receiveValue: { title in
             XCTAssertEqual(title, testTitle)
             titleExpectation.fulfill()
         } .store(in: &cancellables)
-        waitForExpectations(timeout: 1, handler: nil)
+
+        tabViewModel.tab.title = testTitle
+
+        await fulfillment(of: [titleExpectation], timeout: 0.5)
     }
 
     func testWhenTabTitleIsNilThenTitleIsAddressBarString() {
@@ -153,7 +158,7 @@ final class TabViewModelTests: XCTestCase {
 
         let titleExpectation = expectation(description: "Title")
 
-        tabViewModel.$title.debounce(for: 0.1, scheduler: RunLoop.main).sink { title in
+        tabViewModel.$title.debounce(for: 0.01, scheduler: RunLoop.main).sink { title in
             XCTAssertEqual(title, URL.duckDuckGo.host!)
             titleExpectation.fulfill()
         } .store(in: &cancellables)
