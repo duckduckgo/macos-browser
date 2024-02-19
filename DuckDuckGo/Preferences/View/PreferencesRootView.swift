@@ -52,17 +52,17 @@ enum Preferences {
 
                             switch model.selectedPane {
                             case .defaultBrowser:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
+                                DefaultBrowserView(defaultBrowserModel: DefaultBrowserPreferences())
                             case .privateSearch:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
+                                PrivateSearchView(model: SearchPreferences.shared)
                             case .webTrackingProtection:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
+                                GeneralView(startupModel: StartupPreferences.shared)
                             case .cookiePopupProtection:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
+                                GeneralView(startupModel: StartupPreferences.shared)
                             case .emailProtection:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
+                                GeneralView(startupModel: StartupPreferences.shared)
                             case .general:
-                                GeneralView(defaultBrowserModel: DefaultBrowserPreferences(), startupModel: StartupPreferences.shared)
+                                GeneralView(startupModel: StartupPreferences.shared)
                             case .sync:
                                 SyncView()
                             case .appearance:

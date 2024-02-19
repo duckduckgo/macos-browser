@@ -98,7 +98,6 @@ extension Preferences {
                 // SECTION 2: Address Bar
                 PreferencePaneSection(UserText.addressBar) {
                     ToggleMenuItem(UserText.showFullWebsiteAddress, isOn: $model.showFullURL)
-                    ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
 
                 // SECTION 3: New Tab Page

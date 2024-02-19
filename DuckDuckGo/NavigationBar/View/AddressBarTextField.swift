@@ -583,9 +583,9 @@ final class AddressBarTextField: NSTextField {
     }
 
     @objc func toggleAutocomplete(_ menuItem: NSMenuItem) {
-        AppearancePreferences.shared.showAutocompleteSuggestions.toggle()
+        SearchPreferences.shared.showAutocompleteSuggestions.toggle()
 
-        let shouldShowAutocomplete = AppearancePreferences.shared.showAutocompleteSuggestions
+        let shouldShowAutocomplete = SearchPreferences.shared.showAutocompleteSuggestions
 
         menuItem.state = shouldShowAutocomplete ? .on : .off
 
@@ -1043,7 +1043,7 @@ private extension NSMenuItem {
             action: #selector(AddressBarTextField.toggleAutocomplete(_:)),
             keyEquivalent: ""
         )
-        menuItem.state = AppearancePreferences.shared.showAutocompleteSuggestions ? .on : .off
+        menuItem.state = SearchPreferences.shared.showAutocompleteSuggestions ? .on : .off
 
         return menuItem
     }

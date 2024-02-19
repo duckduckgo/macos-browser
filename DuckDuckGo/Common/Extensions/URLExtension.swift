@@ -344,6 +344,14 @@ extension URL {
         return URL(string: "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/")!
     }
 
+    static var privateSearchLearnMore: URL {
+        return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/search-privacy/")!
+    }
+
+    static var searchSettings: URL {
+        return URL(string: "https://duckduckgo.com/settings/")!
+    }
+
     static var ddgLearnMore: URL {
         return URL(string: "https://duckduckgo.com/duckduckgo-help-pages/get-duckduckgo/get-duckduckgo-browser-on-mac/")!
     }

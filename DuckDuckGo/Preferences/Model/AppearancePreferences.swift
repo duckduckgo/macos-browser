@@ -23,7 +23,6 @@ import Common
 
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
-    var showAutocompleteSuggestions: Bool { get set }
     var currentThemeName: String { get set }
     var defaultPageZoom: CGFloat { get set }
     var favoritesDisplayMode: String? { get set }
@@ -38,9 +37,6 @@ protocol AppearancePreferencesPersistor {
 struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersistor {
     @UserDefaultsWrapper(key: .showFullURL, defaultValue: false)
     var showFullURL: Bool
-
-    @UserDefaultsWrapper(key: .showAutocompleteSuggestions, defaultValue: true)
-    var showAutocompleteSuggestions: Bool
 
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
@@ -181,12 +177,6 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var showAutocompleteSuggestions: Bool {
-        didSet {
-            persistor.showAutocompleteSuggestions = showAutocompleteSuggestions
-        }
-    }
-
     @Published var favoritesDisplayMode: FavoritesDisplayMode {
         didSet {
             persistor.favoritesDisplayMode = favoritesDisplayMode.description
@@ -260,7 +250,6 @@ final class AppearancePreferences: ObservableObject {
         self.persistor = persistor
         currentThemeName = .init(rawValue: persistor.currentThemeName) ?? .systemDefault
         showFullURL = persistor.showFullURL
-        showAutocompleteSuggestions = persistor.showAutocompleteSuggestions
         favoritesDisplayMode = persistor.favoritesDisplayMode.flatMap(FavoritesDisplayMode.init) ?? .default
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible

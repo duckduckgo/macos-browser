@@ -25,33 +25,13 @@ import SwiftUIExtensions
 extension Preferences {
 
     struct GeneralView: View {
-        @ObservedObject var defaultBrowserModel: DefaultBrowserPreferences
         @ObservedObject var startupModel: StartupPreferences
         @State private var showingCustomHomePageSheet = false
 
         var body: some View {
             PreferencePane(UserText.general) {
 
-                // SECTION 1: Default Browser
-                PreferencePaneSection(UserText.defaultBrowser) {
-
-                    PreferencePaneSubSection {
-                        HStack {
-                            if defaultBrowserModel.isDefault {
-                                Image("SolidCheckmark")
-                                Text(UserText.isDefaultBrowser)
-                            } else {
-                                Image("Warning").foregroundColor(Color("LinkBlueColor"))
-                                Text(UserText.isNotDefaultBrowser)
-                                Button(UserText.makeDefaultBrowser) {
-                                    defaultBrowserModel.becomeDefault()
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // SECTION 2: On Startup
+                // SECTION 1: On Startup
                 PreferencePaneSection(UserText.onStartup) {
 
                     PreferencePaneSubSection {
@@ -65,7 +45,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 3: Home Page
+                // SECTION 2: Home Page
                 PreferencePaneSection(UserText.homePage) {
 
                     PreferencePaneSubSection {
