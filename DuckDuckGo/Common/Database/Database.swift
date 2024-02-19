@@ -22,6 +22,45 @@ import Foundation
 import CoreData
 import Persistence
 
+#if REVIEW
+import CryptoKit
+final class UITestsEncryptionKeyStore: NSObject, EncryptionKeyStoring {
+
+    private(set) var storedKeys: [String: SymmetricKey] = [:]
+    private let generator: EncryptionKeyGenerating
+    private let account: String
+
+    init(generator: EncryptionKeyGenerating, account: String) {
+        self.generator = generator
+        self.account = account
+    }
+
+    override convenience init() {
+        self.init(generator: EncryptionKeyGenerator(), account: "mock-account")
+    }
+
+    func store(key: SymmetricKey) throws {
+        storedKeys[account] = key
+    }
+
+    func readKey() throws -> SymmetricKey {
+        if let key = storedKeys[account] {
+            return key
+        } else {
+            let newKey = generator.randomKey()
+            storedKeys[account] = newKey
+
+            return newKey
+        }
+    }
+
+    func deleteKey() throws {
+        storedKeys = [:]
+    }
+
+}
+#endif
+
 final class Database {
 
     fileprivate struct Constants {
@@ -69,6 +108,14 @@ final class Database {
 #if CI
         keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
         containerLocation = FileManager.default.temporaryDirectory
+#elseif REVIEW
+        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+            keyStore = UITestsEncryptionKeyStore()
+            containerLocation = FileManager.default.temporaryDirectory
+        } else {
+            keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
+            containerLocation = URL.sandboxApplicationSupportURL
+        }
 #else
         keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
         containerLocation = URL.sandboxApplicationSupportURL
