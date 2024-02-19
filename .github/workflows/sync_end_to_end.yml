@@ -57,7 +57,9 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Enable UI Automation
-      run: sudo automationmodetool enable-automationmode-without-authentication
+      run: |
+        sudo automationmodetool enable-automationmode-without-authentication
+        sudo security authorizationdb write com.apple.trust-settings.admin allow
 
     - name: Create test account for Sync and return the recovery code
       uses: duckduckgo/sync_crypto/action@main
