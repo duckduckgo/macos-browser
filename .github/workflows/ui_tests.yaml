@@ -57,6 +57,15 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
+    - name: Set resolution
+      run: |
+          sudo "/Library/Application Support/VMware Tools/vmware-resolutionSet" 1920 1080
+          sleep 5
+        timeout-minutes: 10
+
+    - name: Start recording
+      run: screencapture -T0 -V 5 foo.mov
+
     - name: Build and run UI Testing
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
@@ -66,3 +75,9 @@ jobs:
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation 
     
+    - name : Upload recording
+      uses: actions/upload-artifact@v3
+        if: ${{ always() }}
+        with:
+            name: latest
+            path: foo.mov
