@@ -40,6 +40,18 @@ enum Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
+#if SUBSCRIPTION
+        var subscriptionModel: PreferencesSubscriptionModel?
+#endif
+
+        init(model: PreferencesSidebarModel) {
+            self.model = model
+
+#if SUBSCRIPTION
+            self.subscriptionModel = makeSubscriptionViewModel()
+#endif
+        }
+
         var body: some View {
             HStack(spacing: 0) {
                 Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
@@ -67,7 +79,7 @@ enum Preferences {
 
 #if SUBSCRIPTION
                             case .subscription:
-                                makeSubscriptionView()
+                                SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
 #endif
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
@@ -98,7 +110,7 @@ enum Preferences {
         }
 
 #if SUBSCRIPTION
-        private func makeSubscriptionView() -> some View {
+        private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
             let openURL: (URL) -> Void = { url in
                 DispatchQueue.main.async {
                     WindowControllersManager.shared.showTab(with: .subscription(url))
@@ -109,9 +121,8 @@ enum Preferences {
                                                                       openURLHandler: openURL,
                                                                       goToSyncPreferences: { self.model.selectPane(.sync) })
 
-            let model = PreferencesSubscriptionModel(openURLHandler: openURL,
-                                                     sheetActionHandler: sheetActionHandler)
-            return SubscriptionUI.PreferencesSubscriptionView(model: model)
+            return PreferencesSubscriptionModel(openURLHandler: openURL,
+                                                sheetActionHandler: sheetActionHandler)
         }
 #endif
     }
