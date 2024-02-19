@@ -69,6 +69,7 @@ public struct UserDefaultsWrapper<T> {
         case askToSaveAddresses = "preferences.ask-to-save.addresses"
         case askToSavePaymentMethods = "preferences.ask-to-save.payment-methods"
         case autolockLocksFormFilling = "preferences.lock-autofill-form-fill"
+        case autofillDebugScriptEnabled = "preferences.enable-autofill-debug-script"
 
         case saveAsPreferredFileType = "saveAs.selected.filetype"
 
