@@ -98,7 +98,7 @@ extension Preferences {
         private func colorForStatus(_ status: StatusIndicator) -> Color {
             switch status {
             case .on:
-                return .green
+                return .alertGreen
             case .off:
                 return Color.secondary.opacity(0.33)
             case .custom:
@@ -151,7 +151,7 @@ extension Preferences {
                                 PaneSidebarItem(pane: pane,
                                                 isSelected: model.selectedPane == pane,
                                                 action: { model.selectPane(pane) },
-                                                statusIndicator: section.id == .privacyProtections ? .off : nil)
+                                                statusIndicator: section.id == .privacyProtections ? .on : nil)
                             }
                             if section != model.sections.last {
                                 Color(NSColor.separatorColor)
