@@ -148,6 +148,16 @@ extension NSAlert {
         return alert
     }
 
+    static func removeAllDBPStateAndDataAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = "Uninstall Personal Information Removal Login Item?"
+        alert.informativeText = "This will remove the Personal Information Removal Login Item, delete all your data and reset the waitlist state."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Uninstall")
+        alert.addButton(withTitle: UserText.cancel)
+        return alert
+    }
+
     static func noAccessToDownloads() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.noAccessToDownloadsFolderHeader
@@ -190,10 +200,7 @@ extension NSAlert {
     static func osNotSupported() -> NSAlert {
         let alert = NSAlert()
         alert.messageText = UserText.aboutUnsupportedDeviceInfo1
-        alert.informativeText = UserText.aboutUnsupportedDeviceInfo2Part1 + " " +
-        UserText.aboutUnsupportedDeviceInfo2Part2(version: "\(SupportedOSChecker.SupportedVersion.major).\(SupportedOSChecker.SupportedVersion.minor)") + " " +
-        UserText.aboutUnsupportedDeviceInfo2Part3 + " " +
-        UserText.aboutUnsupportedDeviceInfo2Part4
+        alert.informativeText = UserText.aboutUnsupportedDeviceInfo2(version: "\(SupportedOSChecker.SupportedVersion.major).\(SupportedOSChecker.SupportedVersion.minor)")
         alert.alertStyle = .warning
 
         alert.addButton(withTitle: UserText.checkForUpdate)

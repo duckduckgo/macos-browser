@@ -27,8 +27,17 @@ extension NSError {
         method_exchangeImplementations(originalLocalizedDescription, swizzledLocalizedDescription)
     }()
 
-    @objc func swizzledLocalizedDescription() -> String {
-        self.debugDescription
+    // use `NSError.disableSwizzledDescription = true` to return an original localizedDescription, don‘t forget to set it back in tearDown
+    @objc dynamic func swizzledLocalizedDescription() -> String {
+        if Self.disableSwizzledDescription {
+            self.swizzledLocalizedDescription() // return original
+        } else {
+            self.debugDescription + " – NSErrorAdditionalInfo.swift"
+        }
     }
+
+    private static let disableSwizzledDescriptionKey = UnsafeRawPointer(bitPattern: "disableSwizzledDescriptionKey".hashValue)!
+
+    static var disableSwizzledDescription: Bool = false
 
 }

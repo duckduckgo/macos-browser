@@ -1,7 +1,7 @@
 //
-//  SubscriptionTests.swift
+//  NSObject+performSelector.h
 //
-//  Copyright © 2023 DuckDuckGo. All rights reserved.
+//  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 //  limitations under the License.
 //
 
-import XCTest
-@testable import Subscription
+#import <Foundation/Foundation.h>
 
-final class SubscriptionTests: XCTestCase {
-}
+NS_ASSUME_NONNULL_BEGIN
+
+@interface NSObject (performSelector)
+- (id)performSelector:(SEL)selector withArguments:(NSArray *)arguments;
+@end
+
+NS_ASSUME_NONNULL_END
