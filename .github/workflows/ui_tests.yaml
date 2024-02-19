@@ -60,9 +60,6 @@ jobs:
     - name: Permissions
       run: sudo automationmodetool enable-automationmode-without-authentication
 
-    - name: Start recording
-      run: screencapture -v -V 430 foo.mov &
-    
     - name: Launch activity monitor
       run: open /System/Applications/Utilities/Activity\ Monitor.app
 
@@ -75,13 +72,12 @@ jobs:
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation 
     
-    - name: Sleep
-      if: ${{ always() }}
-      run: sleep 90
-
     - name : Upload recording
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
       with:
         name: latest
-        path: foo.mov
+        path: | 
+          /Users/runner/work/macos-browser/macos-browser/DerivedData/Build/Products/Review/UITests-Runner.app/Contents/PlugIns/UITests.xctest.dSYM
+          /Users/runner/work/macos-browser/macos-browser/DerivedData/Build/Products/Review/DuckDuckGo\ Review.app.dSYM
+          ~/Library/Logs/DiagnosticReports/*
