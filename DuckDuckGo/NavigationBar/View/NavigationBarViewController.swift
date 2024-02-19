@@ -1033,6 +1033,10 @@ extension NavigationBarViewController: OptionsButtonMenuDelegate {
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu) {
         WindowControllersManager.shared.showTab(with: .subscription(.subscriptionPurchase))
     }
+
+    func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu) {
+        WindowControllersManager.shared.showTab(with: .subscription(.identityTheftRestoration))
+    }
 #endif
 
 }
