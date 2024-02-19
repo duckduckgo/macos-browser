@@ -58,7 +58,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
     - name: Permissions
-      run: sudo automationmodetool disable-automationmode-without-authentication
+      run: sudo automationmodetool enable-automationmode-without-authentication
 
     - name: Start recording
       run: screencapture -v -V 430 foo.mov &
