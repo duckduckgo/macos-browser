@@ -92,19 +92,19 @@ final class SearchNonexistentDomainTests: XCTestCase {
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let eRedirected = Future<URL, Never> { promise in
-            self.schemeHandler.middleware = [{ request in
-                if request.url!.isDuckDuckGoSearch {
-                    promise(.success(request.url!))
-                    return .ok(.html(""))
-                } else {
-                    return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
-                }
-            }]
-        }.timeout(3).first().promise()
-
         let url = urls.invalidTLD
         let enteredString = url.absoluteString.dropping(prefix: url.navigationalScheme!.separated())
+
+        let eRedirected = expectation(description: "Redirected to SERP")
+        self.schemeHandler.middleware = [{ request in
+            if request.url!.isDuckDuckGoSearch {
+                XCTAssertEqual(request.url, URL.makeSearchUrl(from: enteredString))
+                eRedirected.fulfill()
+                return .ok(.html(""))
+            } else {
+                return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+            }
+        }]
 
         addressBar.makeMeFirstResponder()
         addressBar.stringValue = enteredString
@@ -112,8 +112,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
         NSApp.swizzled_currentEvent = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [], timestamp: Date().timeIntervalSinceReferenceDate, windowNumber: 0, context: nil, characters: "\n", charactersIgnoringModifiers: "", isARepeat: false, keyCode: UInt16(kVK_Return))!
         _=addressBar.control(addressBar, textView: addressBar.currentEditor() as! NSTextView, doCommandBy: #selector(NSResponder.insertNewline))
 
-        let redirectUrl = try await eRedirected.value
-        XCTAssertEqual(redirectUrl, URL.makeSearchUrl(from: enteredString))
+        await fulfillment(of: [eRedirected], timeout: 3)
     }
 
     @MainActor
@@ -121,11 +120,17 @@ final class SearchNonexistentDomainTests: XCTestCase {
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        self.schemeHandler.middleware = [{ _ in
-            .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+        self.schemeHandler.middleware = [{ request in
+            XCTAssertFalse(request.url!.isDuckDuckGoSearch)
+            return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
         }]
         let eNavigationFailed = tab.$error
             .compactMap { $0 }
+            .timeout(3)
+            .first()
+            .promise()
+        // error page navigation
+        let eNavigationDidFinish = tab.webViewDidFinishNavigationPublisher
             .timeout(3)
             .first()
             .promise()
@@ -140,6 +145,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
         _=addressBar.control(addressBar, textView: addressBar.currentEditor() as! NSTextView, doCommandBy: #selector(NSResponder.insertNewline))
 
         let error = try await eNavigationFailed.value
+        _=try await eNavigationDidFinish.value
         XCTAssertEqual(error.errorCode, NSURLErrorCannotFindHost)
     }
 
@@ -148,11 +154,17 @@ final class SearchNonexistentDomainTests: XCTestCase {
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        self.schemeHandler.middleware = [{ _ in
-                .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+        self.schemeHandler.middleware = [{ request in
+            XCTAssertFalse(request.url!.isDuckDuckGoSearch)
+            return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
         }]
         let eNavigationFailed = tab.$error
             .compactMap { $0 }
+            .timeout(3)
+            .first()
+            .promise()
+        // error page navigation
+        let eNavigationDidFinish = tab.webViewDidFinishNavigationPublisher
             .timeout(3)
             .first()
             .promise()
@@ -167,6 +179,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
         _=addressBar.control(addressBar, textView: addressBar.currentEditor() as! NSTextView, doCommandBy: #selector(NSResponder.insertNewline))
 
         let error = try await eNavigationFailed.value
+        _=try await eNavigationDidFinish.value
         XCTAssertEqual(error.errorCode, NSURLErrorCannotFindHost)
     }
 
@@ -175,11 +188,17 @@ final class SearchNonexistentDomainTests: XCTestCase {
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        self.schemeHandler.middleware = [{ _ in
-            .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+        self.schemeHandler.middleware = [{ request in
+            XCTAssertFalse(request.url!.isDuckDuckGoSearch)
+            return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
         }]
         let eNavigationFailed = tab.$error
             .compactMap { $0 }
+            .timeout(3)
+            .first()
+            .promise()
+        // error page navigation
+        let eNavigationDidFinish = tab.webViewDidFinishNavigationPublisher
             .timeout(10)
             .first()
             .promise()
@@ -189,6 +208,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
         tab.setUrl(url, source: .link)
 
         let error = try await eNavigationFailed.value
+        _=try await eNavigationDidFinish.value
         XCTAssertEqual(error.errorCode, NSURLErrorCannotFindHost)
     }
 
@@ -197,19 +217,20 @@ final class SearchNonexistentDomainTests: XCTestCase {
         let tab = Tab(content: .none, webViewConfiguration: webViewConfiguration, privacyFeatures: privacyFeaturesMock)
         window = WindowsManager.openNewWindow(with: tab)!
 
-        let eRedirected = Future<URL, Never> { promise in
-            self.schemeHandler.middleware = [{ request in
-                if request.url!.isDuckDuckGoSearch {
-                    promise(.success(request.url!))
-                    return .ok(.html(""))
-                } else {
-                    return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
-                }
-            }]
-        }.timeout(3).first().promise()
-
         let url = urls.invalidTLD
         let enteredString = url.absoluteString.dropping(prefix: url.navigationalScheme!.separated())
+
+        let eRedirected = expectation(description: "Redirected to SERP")
+        self.schemeHandler.middleware = [{ request in
+            if request.url!.isDuckDuckGoSearch {
+                XCTAssertEqual(request.url, URL.makeSearchUrl(from: enteredString))
+                eRedirected.fulfill()
+
+                return .ok(.html(""))
+            } else {
+                return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotFindHost))
+            }
+        }]
 
         addressBar.makeMeFirstResponder()
         addressBar.stringValue = enteredString
@@ -223,8 +244,7 @@ final class SearchNonexistentDomainTests: XCTestCase {
 
         addressBar.suggestionViewControllerDidConfirmSelection(addressBar.suggestionViewController)
 
-        let redirectUrl = try await eRedirected.value
-        XCTAssertEqual(redirectUrl, URL.makeSearchUrl(from: enteredString))
+        await fulfillment(of: [eRedirected], timeout: 3)
     }
 
 }
