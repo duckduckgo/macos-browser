@@ -30,7 +30,7 @@ import SubscriptionUI
 enum Preferences {
 
     enum Const {
-        static let sidebarWidth: CGFloat = 256
+        static let sidebarWidth: CGFloat = 300
         static let paneContentWidth: CGFloat = 524
         static let panePaddingHorizontal: CGFloat = 48
         static let panePaddingVertical: CGFloat = 40

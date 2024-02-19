@@ -43,15 +43,67 @@ extension Preferences {
         let pane: PreferencePaneIdentifier
         let isSelected: Bool
         let action: () -> Void
+        var statusIndicator: StatusIndicator?
 
         var body: some View {
             Button(action: action) {
                 HStack(spacing: 6) {
                     Image(pane.preferenceIconName).frame(width: 16, height: 16)
                     Text(pane.displayName).font(PreferencesViews.Const.Fonts.sideBarItem)
+
+                    Spacer()
+
+                    if let status = statusIndicator {
+                        StatusIndicatorView(status: status, isSelected: isSelected)
+                    }
                 }
             }
             .buttonStyle(SidebarItemButtonStyle(isSelected: isSelected))
+        }
+    }
+
+    enum StatusIndicator {
+        case on
+        case off
+        case custom(String)
+
+        var text: String {
+            switch self {
+            case .on:
+                return "On"
+            case .off:
+                return "Off"
+            case .custom(let customText):
+                return customText
+            }
+        }
+    }
+
+    struct StatusIndicatorView: View {
+        var status: StatusIndicator
+        var isSelected: Bool
+
+        var body: some View {
+            HStack(spacing: 4) {
+                Circle()
+                    .frame(width: 5, height: 5)
+                    .foregroundColor(colorForStatus(status))
+
+                Text(status.text)
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            }
+        }
+
+        private func colorForStatus(_ status: StatusIndicator) -> Color {
+            switch status {
+            case .on:
+                return .green
+            case .off:
+                return Color.secondary.opacity(0.33)
+            case .custom:
+                return .orange
+            }
         }
     }
 
@@ -96,9 +148,10 @@ extension Preferences {
                         ForEach(model.sections) { section in
                             SidebarSectionHeader(section: section.id)
                             ForEach(section.panes) { pane in
-                                PaneSidebarItem(pane: pane, isSelected: model.selectedPane == pane) {
-                                    model.selectPane(pane)
-                                }
+                                PaneSidebarItem(pane: pane,
+                                                isSelected: model.selectedPane == pane,
+                                                action: { model.selectPane(pane) },
+                                                statusIndicator: section.id == .privacyProtections ? .off : nil)
                             }
                             if section != model.sections.last {
                                 Color(NSColor.separatorColor)
