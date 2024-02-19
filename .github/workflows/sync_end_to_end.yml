@@ -8,7 +8,7 @@ on:
 jobs:
   sync-end-to-end-tests:
     name: Sync End to end Tests
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
 
     timeout-minutes: 60
 
