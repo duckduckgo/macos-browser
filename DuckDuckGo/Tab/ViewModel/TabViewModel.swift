@@ -100,10 +100,15 @@ final class TabViewModel {
 
     private func subscribeToUrl() {
         tab.$content
-            .map { [tab] _ in
-                // Update the address bar only after the tab did commit navigation
-                // to prevent Address Bar Spoofing
-                tab.webViewDidCommitNavigationPublisher
+            .map { [tab] content in
+                if case .url = content {
+                    // Update the address bar only after the tab did commit navigation
+                    // to prevent Address Bar Spoofing
+                    return tab.webViewDidCommitNavigationPublisher.eraseToAnyPublisher()
+                } else {
+                    // Update the address bar instantly for built-in content types
+                    return Just( () ).eraseToAnyPublisher()
+                }
             }
             .switchToLatest()
             .sink { [weak self] _ in

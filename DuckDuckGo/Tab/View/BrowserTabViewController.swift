@@ -23,6 +23,7 @@ import Common
 import SwiftUI
 import WebKit
 
+// swiftlint:disable:next type_body_length
 final class BrowserTabViewController: NSViewController {
 
     private lazy var homePageView = NSView()
@@ -186,7 +187,7 @@ final class BrowserTabViewController: NSViewController {
         guard WindowControllersManager.shared.lastKeyMainWindowController === self.view.window?.windowController,
               let previouslySelectedTab else { return }
 
-        if let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
+        if let activeTab = tabViewModel?.tab,
            let url = activeTab.url,
            EmailUrls().isDuckDuckGoEmailProtection(url: url) {
 
@@ -206,7 +207,7 @@ final class BrowserTabViewController: NSViewController {
 
     @objc
     private func onCloseDataBrokerProtection(_ notification: Notification) {
-        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab,
+        guard let activeTab = tabViewModel?.tab,
               view.window?.isKeyWindow == true else { return }
 
         self.closeTab(activeTab)
@@ -227,7 +228,7 @@ final class BrowserTabViewController: NSViewController {
 #if SUBSCRIPTION
     @objc
     private func onCloseSubscriptionPage(_ notification: Notification) {
-        guard let activeTab = tabCollectionViewModel.selectedTabViewModel?.tab else { return }
+        guard let activeTab = tabViewModel?.tab else { return }
         self.closeTab(activeTab)
 
         if let previouslySelectedTab = self.previouslySelectedTab {
@@ -250,6 +251,8 @@ final class BrowserTabViewController: NSViewController {
                 self.subscribeToTabContent(of: selectedTabViewModel)
                 self.subscribeToHoveredLink(of: selectedTabViewModel)
                 self.subscribeToUserDialogs(of: selectedTabViewModel)
+
+                self.adjustFirstResponder()
             }
             .store(in: &cancellables)
     }
@@ -356,11 +359,6 @@ final class BrowserTabViewController: NSViewController {
         if let oldWebView = oldWebView, let webViewContainer = webViewContainer, oldWebView !== webView {
             removeWebViewFromHierarchy(webView: oldWebView, container: webViewContainer)
         }
-
-        if setFirstResponderAfterAdding {
-            setFirstResponderAfterAdding = false
-            makeWebViewFirstResponder()
-        }
     }
 
     private func subscribeToTabContent(of tabViewModel: TabViewModel?) {
@@ -424,47 +422,76 @@ final class BrowserTabViewController: NSViewController {
 #endif
     }
 
-    func makeWebViewFirstResponder() {
-        if let webView = self.webView {
-            webView.makeMeFirstResponder()
-        } else {
-            setFirstResponderAfterAdding = true
+    private var shouldMakeContentViewFirstResponder: Bool {
+        // always steal focus when first responder is not a text field
+        guard view.window?.firstResponder is NSText else {
+            return true
+        }
+
+        switch tabViewModel?.tab.content {
+        case .newtab:
+            return false
+        case .url(_, _, source: .pendingStateRestoration),
+             .url(_, _, source: .loadedByStateRestoration),
+             .url(_, _, source: .webViewUpdated):
+            // prevent Address Bar deactivation when the WebView is restoring state or updates url on redirect
+            return false
+
+        case .url(_, _, source: .userEntered),
+             .url(_, _, source: .historyEntry),
+             .url(_, _, source: .bookmark),
+             .url(_, _, source: .ui),
+             .url(_, _, source: .link),
+             .url(_, _, source: .appOpenUrl),
+             .url(_, _, source: .reload):
+            return true
+
+        case .settings, .bookmarks, .dataBrokerProtection, .subscription:
+            return true
+
+        case .onboarding, .some(.none), nil:
+            return false
+        }
+    }
+
+    func adjustFirstResponder() {
+        firstResponderWindowCancellable = nil
+        guard shouldMakeContentViewFirstResponder else { return }
+
+        let contentView: NSView? = switch tabViewModel?.tab.content {
+        case .newtab,
+             .url where webView?.url == nil,
+             .some(.none), nil:
+            nil
+        case .url, .subscription:
+            webView
+        case .settings:
+            preferencesViewController?.view
+        case .bookmarks:
+            bookmarksViewController?.view
+        case .dataBrokerProtection:
+            dataBrokerProtectionHomeViewController?.view
+        case .onboarding:
+            view.window?.contentView
+        }
+
+        guard let contentView else {
             view.window?.makeFirstResponder(nil)
-        }
-    }
-
-    private var setFirstResponderAfterAdding = false
-
-    private var shouldMakeWebViewFirstResponder: Bool {
-        if !(view.window?.firstResponder is NSText) {
-            return true
-        } else if case .url(_, _, source: let source) = tabViewModel?.tab.content {
-            switch source {
-            case .pendingStateRestoration, .loadedByStateRestoration, .webViewUpdated:
-                // prevent Address Bar deactivation when the WebView is restoring state or updates url on redirect
-                return false
-            case .userEntered, .historyEntry, .bookmark, .ui, .link, .appOpenUrl, .reload:
-                return true
-            }
-        } else {
-            return true
-        }
-    }
-
-    private func setFirstResponderIfNeeded() {
-
-        guard shouldMakeWebViewFirstResponder else { return }
-        guard let webView else {
-            setFirstResponderAfterAdding = true
-            return
-        }
-        guard webView.url != nil else {
             return
         }
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self, shouldMakeWebViewFirstResponder else { return }
-            self.makeWebViewFirstResponder()
+        guard contentView.window != nil else {
+            setFirstResponderAfterAdding(contentView)
+            return
+        }
+        contentView.makeMeFirstResponder()
+    }
+
+    private var firstResponderWindowCancellable: AnyCancellable?
+    private func setFirstResponderAfterAdding(_ contentView: NSView) {
+        firstResponderWindowCancellable = contentView.publisher(for: \.window).sink { [weak self] window in
+            guard let self, window != nil else { return }
+            adjustFirstResponder()
         }
     }
 
@@ -519,6 +546,9 @@ final class BrowserTabViewController: NSViewController {
             return
         }
         scheduleHoverLabelUpdatesForUrl(nil)
+        defer {
+            adjustFirstResponder()
+        }
 
         switch tabViewModel?.tab.content {
         case .bookmarks:
@@ -731,20 +761,19 @@ extension BrowserTabViewController: TabDelegate {
     }
 
     func tabPageDOMLoaded(_ tab: Tab) {
-        if tabViewModel?.tab == tab {
+        if tabViewModel?.tab === tab {
             tabViewModel?.isLoading = false
         }
     }
 
     func tabDidStartNavigation(_ tab: Tab) {
-        setFirstResponderIfNeeded()
-        guard let tabViewModel = tabViewModel else { return }
+        guard let tabViewModel, tabViewModel.tab === tab else { return }
 
-        tab.permissions.tabDidStartNavigation()
         if !tabViewModel.isLoading,
            tabViewModel.tab.webView.isLoading {
             tabViewModel.isLoading = true
         }
+        adjustFirstResponder()
     }
 
     func tab(_ parentTab: Tab, createdChild childTab: Tab, of kind: NewWindowPolicy) {
@@ -1110,14 +1139,11 @@ extension BrowserTabViewController {
 
     private func hideWebViewSnapshotIfNeeded() {
         if webViewSnapshot != nil {
-            DispatchQueue.main.async {
-                let isWebViewFirstResponder = self.view.window?.firstResponder === self.view.window
-                // check this because if address bar was the first responder, we don't want to mess with it
-                if isWebViewFirstResponder {
-                    self.setFirstResponderAfterAdding = true
-                }
-                self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
-                self.webViewSnapshot?.removeFromSuperview()
+            DispatchQueue.main.async { [weak self, tabViewModel] in
+                guard let self,
+                      self.tabViewModel === tabViewModel else { return }
+                showTabContent(of: tabViewModel)
+                webViewSnapshot?.removeFromSuperview()
             }
         }
     }

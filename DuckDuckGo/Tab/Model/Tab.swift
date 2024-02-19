@@ -610,7 +610,7 @@ protocol NewWindowPolicyDecisionMaker {
 
     let burnerMode: BurnerMode
 
-    @Published private(set) var content: TabContent {
+    @PublishedAfter private(set) var content: TabContent {
         didSet {
             if !content.displaysContentInWebView && oldValue.displaysContentInWebView {
                 webView.stopAllMedia(shouldStopLoading: false)
@@ -1276,6 +1276,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func didStart(_ navigation: Navigation) {
         webViewDidStartNavigationPublisher.send()
         delegate?.tabDidStartNavigation(self)
+        permissions.tabDidStartNavigation()
         userInteractionDialog = nil
 
         // Unnecessary assignment triggers publishing

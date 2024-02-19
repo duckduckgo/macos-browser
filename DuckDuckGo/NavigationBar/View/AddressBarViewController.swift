@@ -58,6 +58,7 @@ final class AddressBarViewController: NSViewController {
         didSet {
             updateView()
             self.addressBarButtonsViewController?.isTextFieldEditorFirstResponder = isFirstResponder
+            self.clickPoint = nil // reset click point if the address bar activated during click
         }
     }
 
@@ -95,6 +96,8 @@ final class AddressBarViewController: NSViewController {
 
         view.wantsLayer = true
         view.layer?.masksToBounds = false
+
+        addressBarTextField.placeholderString = UserText.addressBarPlaceholder
 
         updateView()
         // only activate active text field leading constraint on its appearance to avoid constraint conflicts
@@ -319,6 +322,8 @@ final class AddressBarViewController: NSViewController {
         activeBackgroundView.layer?.borderColor = NSColor.controlAccentColor.withAlphaComponent(0.8).cgColor
         activeOuterBorderView.layer?.backgroundColor = accentColor.withAlphaComponent(0.2).cgColor
         activeBackgroundView.layer?.borderColor = accentColor.withAlphaComponent(0.8).cgColor
+
+        addressBarTextField.placeholderString = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab ? UserText.addressBarPlaceholder : ""
     }
 
     private func updateShadowViewPresence(_ isFirstResponder: Bool) {

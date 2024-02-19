@@ -235,6 +235,18 @@
     "Address:" : {
       "comment" : "Add Bookmark dialog bookmark url field heading"
     },
+    "address.bar.placeholder" : {
+      "comment" : "Empty Address Bar placeholder text displayed on the new tab page.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Search or enter address"
+          }
+        }
+      }
+    },
     "address.bar.search.suffix" : {
       "comment" : "Suffix of searched terms in address bar. Example: best watching machine . Search DuckDuckGo",
       "extractionState" : "extracted_with_value",
