@@ -27,7 +27,7 @@ enum SyncUIViews {
             Text(text)
                 .bold()
                 .font(.system(size: 17))
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.center)
         }
     }
@@ -49,7 +49,7 @@ enum SyncUIViews {
 
         var body: some View {
             Text(text)
-                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.center)
         }
     }
