@@ -105,10 +105,12 @@ public final class SubscriptionDebugMenu: NSMenuItem {
 
             let entitlements: [AccountManager.Entitlement] = [.networkProtection, .dataBrokerProtection, .identityTheftRestoration]
             for entitlement in entitlements {
-                let result = await AccountManager().hasEntitlement(for: entitlement)
-                let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
-                results.append(resultSummary)
-                print(resultSummary)
+
+                if case let .success(result) = await AccountManager().hasEntitlement(for: entitlement) {
+                    let resultSummary = "Entitlement check for \(entitlement.rawValue): \(result)"
+                    results.append(resultSummary)
+                    print(resultSummary)
+                }
             }
 
             showAlert(title: "Check Entitlements", message: results.joined(separator: "\n"))
