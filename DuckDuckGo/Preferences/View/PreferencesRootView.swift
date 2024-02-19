@@ -100,7 +100,9 @@ enum Preferences {
 #if SUBSCRIPTION
         private func makeSubscriptionView() -> some View {
             let openURL: (URL) -> Void = { url in
-                WindowControllersManager.shared.showTab(with: .subscription(url))
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
+                }
             }
 
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
