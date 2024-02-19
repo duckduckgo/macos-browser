@@ -29,7 +29,9 @@ protocol SubscriptionFeatureAvailability {
 struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
 
     func isFeatureAvailable() -> Bool {
-#if SUBSCRIPTION
+#if SUBSCRIPTION_OVERRIDE_ENABLED
+        return true
+#elseif SUBSCRIPTION
         return isInternalUser && !isVPNActivated && !isDBPActivated
 #else
         return false
