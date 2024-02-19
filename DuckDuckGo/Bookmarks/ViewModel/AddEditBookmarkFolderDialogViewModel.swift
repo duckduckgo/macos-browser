@@ -108,12 +108,12 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
 private extension AddEditBookmarkFolderDialogViewModel {
 
     func update(folder: BookmarkFolder, parent: BookmarkFolder?) {
-        // Update title of the folder
+        // Update the title of the folder
         if folder.title != folderName {
             folder.title = folderName
             bookmarkManager.update(folder: folder)
         }
-        // If the original location of the folder changed move it
+        // If the original location of the folder changed move it to the new folder.
         if selectedFolder?.id != parent?.id {
             let parentFolderType: ParentFolderType = selectedFolder.flatMap { ParentFolderType.parent(uuid: $0.id) } ?? .root
             bookmarkManager.move(
