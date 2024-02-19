@@ -48,6 +48,7 @@ protocol OptionsButtonMenuDelegate: AnyObject {
 #endif
 #if SUBSCRIPTION
     func optionsButtonMenuRequestedSubscriptionPurchasePage(_ menu: NSMenu)
+    func optionsButtonMenuRequestedIdentityTheftRestoration(_ menu: NSMenu)
 #endif
 }
 
@@ -244,6 +245,10 @@ final class MoreOptionsMenu: NSMenu {
     @objc func openSubscriptionPurchasePage(_ sender: NSMenuItem) {
         actionDelegate?.optionsButtonMenuRequestedSubscriptionPurchasePage(self)
     }
+
+    @objc func openIdentityTheftRestoration(_ sender: NSMenuItem) {
+        actionDelegate?.optionsButtonMenuRequestedIdentityTheftRestoration(self)
+    }
 #endif
 
     @objc func findInPage(_ sender: NSMenuItem) {
@@ -351,8 +356,18 @@ final class MoreOptionsMenu: NSMenu {
         } else {
             DefaultDataBrokerProtectionFeatureVisibility().disableAndDeleteForWaitlistUsers()
         }
-
 #endif // DBP
+
+#if SUBSCRIPTION
+        if AccountManager().isUserAuthenticated {
+            let identityTheftRestorationItem = NSMenuItem(title: UserText.identityTheftRestorationOptionsMenuItem,
+                                                          action: #selector(openIdentityTheftRestoration),
+                                                          keyEquivalent: "")
+                .targetting(self)
+                .withImage(NSImage(named: "ITR-Icon"))
+            items.append(identityTheftRestorationItem)
+        }
+#endif
 
         return items
     }
