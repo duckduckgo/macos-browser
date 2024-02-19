@@ -49,12 +49,6 @@ final class CriticalPathsTests: XCTestCase {
             let newTabMenuItem = menuBarsQuery.menuItems["New Tab"]
             newTabMenuItem.click()
         }
-
-        // Set Internal User
-        debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
-        debugMenuBarItem.click()
-        internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
-        internaluserstateMenuItem.click()
     }
 
     func testCanCreateSyncAccount() throws {
@@ -71,6 +65,7 @@ final class CriticalPathsTests: XCTestCase {
         let sheetsQuery = settingsWindow.sheets
         settingsWindow/*@START_MENU_TOKEN@*/.buttons["Sync and Back Up This Device"]/*[[".groups",".scrollViews.buttons[\"Sync and Back Up This Device\"]",".buttons[\"Sync and Back Up This Device\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.click()
         sheetsQuery.buttons["Turn On Sync & Backup"].click()
+        _ = sheetsQuery.buttons["Next"].waitForExistence(timeout: 5)
         sheetsQuery.buttons["Next"].click()
         sheetsQuery.buttons["Done"].click()
         let syncEnabledElement = settingsWindow.staticTexts["Sync Enabled"]
@@ -82,9 +77,7 @@ final class CriticalPathsTests: XCTestCase {
         sheetsQuery.buttons["Delete Data"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
-        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
+        XCTAssertTrue(beginSync.exists, "Begin Syncing text is not visible")
     }
 
     func testCanRecoverSyncAccount() throws {
