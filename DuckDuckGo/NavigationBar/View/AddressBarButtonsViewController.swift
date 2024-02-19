@@ -395,10 +395,7 @@ final class AddressBarButtonsViewController: NSViewController {
     func updateButtons(for selectedTabViewModel: TabViewModel? = nil) {
         stopAnimationsAfterFocus()
 
-        guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else {
-            assertionFailure("No selectedTabViewModel")
-            return
-        }
+        guard let selectedTabViewModel = selectedTabViewModel ?? tabCollectionViewModel.selectedTabViewModel else { return }
 
         clearButton.isHidden = !(isTextFieldEditorFirstResponder && !(textFieldValue?.isEmpty ?? true))
 

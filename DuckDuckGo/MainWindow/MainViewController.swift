@@ -254,10 +254,7 @@ final class MainViewController: NSViewController {
 
     private func subscribeToSelectedTabViewModel() {
         selectedTabViewModelCancellable = tabCollectionViewModel.$selectedTabViewModel.sink { [weak self] tabViewModel in
-            guard let self, let tabViewModel else {
-                assertionFailure("No selectedTabViewModel")
-                return
-            }
+            guard let self, let tabViewModel else { return }
 
             tabViewModelCancellables.removeAll(keepingCapacity: true)
             subscribeToCanGoBackForward(of: tabViewModel)
