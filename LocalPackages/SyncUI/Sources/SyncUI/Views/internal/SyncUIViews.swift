@@ -27,6 +27,8 @@ enum SyncUIViews {
             Text(text)
                 .bold()
                 .font(.system(size: 17))
+                .fixedSize(horizontal: false, vertical: /*@START_MENU_TOKEN@*/true/*@END_MENU_TOKEN@*/)
+                .multilineTextAlignment(.center)
         }
     }
 
