@@ -332,7 +332,8 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
     }
 
     func deleteProfileData() throws {
-        try db.write { db in
+        try db.writeWithoutTransaction { db in
+            try db.execute(sql: "PRAGMA foreign_keys = OFF;")
             try OptOutDB
                 .deleteAll(db)
             try ScanDB
@@ -343,6 +344,11 @@ final class DefaultDataBrokerProtectionDatabaseProvider: GRDBSecureStorageDataba
                 .deleteAll(db)
             try PhoneDB
                 .deleteAll(db)
+            try ProfileDB
+                .deleteAll(db)
+            try BrokerDB
+                .deleteAll(db)
+            try db.execute(sql: "PRAGMA foreign_keys = ON;")
         }
     }
 

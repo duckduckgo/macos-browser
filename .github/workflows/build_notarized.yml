@@ -331,12 +331,17 @@ jobs:
     name: Send Mattermost message
 
     needs: [export-notarized-app, create-dmg]
-    if: ${{ always() && (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
+    if: always()
 
     runs-on: ubuntu-latest
 
+    env:
+      success: ${{ (needs.export-notarized-app.result == 'success') && (needs.create-dmg.result == 'success' || needs.create-dmg.result == 'skipped') }}
+      failure: ${{ (needs.export-notarized-app.result == 'failure') || (needs.create-dmg.result == 'failure') }}
+
     steps:
       - name: Send Mattermost message
+        if: ${{ env.success || env.failure }} # Don't execute when cancelled
         env:
           ASANA_TASK_URL: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
           GH_TOKEN: ${{ github.token }}
@@ -356,7 +361,12 @@ jobs:
                   export ASANA_LINK=" | [:asana: Asana task](${ASANA_TASK_URL})"
               fi
 
+              if [[ "${{ env.success }}" == "true" ]]; then
+                  status="success"
+              else
+                  status="failure"
+              fi
               curl -s -H 'Content-type: application/json' \
-                  -d "$(envsubst < message-template.json)" \
+                  -d "$(envsubst < message-template.json | jq ".${status}")" \
                   ${{ secrets.MM_WEBHOOK_URL }}
           fi
