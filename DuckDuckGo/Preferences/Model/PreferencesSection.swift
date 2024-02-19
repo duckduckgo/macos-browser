@@ -35,12 +35,6 @@ struct PreferencesSection: Hashable, Identifiable {
 
             if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
                 panes = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
-
-                if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
-                    if let subscriptionIndex = panes.firstIndex(of: .subscription) {
-                        panes.remove(at: subscriptionIndex)
-                    }
-                }
             } else {
                 panes = [.general, .appearance, .privacy, .autofill, .downloads]
             }
