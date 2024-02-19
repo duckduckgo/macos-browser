@@ -65,7 +65,7 @@ final class MainViewController: NSViewController {
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
         navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner)
-        browserTabViewController = BrowserTabViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
         fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
         bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
@@ -240,7 +240,7 @@ final class MainViewController: NSViewController {
     private func updateDividerColor() {
         NSAppearance.withAppAppearance {
             let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
-            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .addressBarFocusedBackgroundColor : .addressBarSolidSeparatorColor
+            let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .bookmarkBarBackground : .addressBarSolidSeparatorColor
             mainView.divider.backgroundColor = backgroundColor
         }
     }
@@ -415,7 +415,7 @@ final class MainViewController: NSViewController {
             navigationBarViewController.addressBarViewController?.addressBarTextField.makeMeFirstResponder()
         case .onboarding:
             self.view.makeMeFirstResponder()
-        case .url:
+        case .url, .subscription:
             browserTabViewController.makeWebViewFirstResponder()
         case .settings:
             browserTabViewController.preferencesViewController?.view.makeMeFirstResponder()

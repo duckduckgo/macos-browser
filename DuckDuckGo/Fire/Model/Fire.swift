@@ -300,6 +300,9 @@ final class Fire {
             }
         }
 
+        // If the app is not active, don't retake focus by opening a new window
+        guard NSApp.isActive else { return }
+
         // Open a new window in case there is none
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }

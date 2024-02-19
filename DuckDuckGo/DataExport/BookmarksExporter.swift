@@ -34,7 +34,7 @@ struct BookmarksExporter {
         for entity in entities {
             if let bookmark = entity as? Bookmark {
                 content.append(Template.bookmark(level: level,
-                                                 title: bookmark.title.escapedForHTML,
+                                                 title: bookmark.title.escapedUnicodeHtmlString(),
                                                  url: bookmark.url,
                                                  isFavorite: bookmark.isFavorite))
             }
@@ -99,12 +99,6 @@ extension BookmarksExporter {
 }
 
 fileprivate extension String {
-
-    var escapedForHTML: String {
-        self.replacingOccurrences(of: "&", with: "&amp;")
-            .replacingOccurrences(of: "<", with: "&lt;")
-            .replacingOccurrences(of: ">", with: "&gt;")
-    }
 
     static func indent(by level: Int) -> String {
         return String(repeating: "\t", count: level)

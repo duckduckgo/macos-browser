@@ -39,21 +39,40 @@ enum ErrorCategory: Equatable {
     }
 }
 
-final class DataBrokerProtectionStageDurationCalculator {
+enum Stage: String {
+    case start
+    case emailGenerate = "email-generate"
+    case captchaParse = "captcha-parse"
+    case captchaSend = "captcha-send"
+    case captchaSolve = "captcha-solve"
+    case submit
+    case emailReceive = "email-receive"
+    case emailConfirm = "email-confirm"
+    case validate
+    case other
+}
 
-    enum Stage: String {
-        case start
-        case emailGenerate = "email-generate"
-        case captchaParse = "captcha-parse"
-        case captchaSend = "captcha-send"
-        case captchaSolve = "captcha-solve"
-        case submit
-        case emailReceive = "email-receive"
-        case emailConfirm = "email-confirm"
-        case validate
-        case other
-    }
+protocol StageDurationCalculator {
+    func durationSinceLastStage() -> Double
+    func durationSinceStartTime() -> Double
+    func fireOptOutStart()
+    func fireOptOutEmailGenerate()
+    func fireOptOutCaptchaParse()
+    func fireOptOutCaptchaSend()
+    func fireOptOutCaptchaSolve()
+    func fireOptOutSubmit()
+    func fireOptOutEmailReceive()
+    func fireOptOutEmailConfirm()
+    func fireOptOutValidate()
+    func fireOptOutSubmitSuccess()
+    func fireOptOutFailure()
+    func fireScanSuccess(matchesFound: Int)
+    func fireScanFailed()
+    func fireScanError(error: Error)
+    func setStage(_ stage: Stage)
+}
 
+final class DataBrokerProtectionStageDurationCalculator: StageDurationCalculator {
     let handler: EventMapping<DataBrokerProtectionPixels>
     let attemptId: UUID
     let dataBroker: String
