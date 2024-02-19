@@ -18,100 +18,6 @@
 
 import SwiftUI
 
-@MainActor
-final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
-
-    /// The type of operation to perform on a folder
-    enum Mode {
-        /// Add a new folder. Folders can have a parent folder but not necessarily.
-        /// If the users add a folder to a folder whose parent is the root `Bookmarks` folder, then the parent folder is `nil`.
-        /// If the users add a folder to a folder whose parent is not the root `Bookmarks` folder, then the parent folder is not `nil`.
-        case add(parentFolder: BookmarkFolder? = nil)
-        /// Edit an existing folder. Existing folder can have a parent folder but not necessarily.
-        /// If the users edit a  folder whose parent is the root `Bookmarks` folder, then the parent folder is `nil`
-        /// If the users edit a folder whose parent is not the root `Bookmarks` folder, then the parent folder is not `nil`.
-        case edit(folder: BookmarkFolder, parentFolder: BookmarkFolder?)
-    }
-
-    @Published var folderName: String
-    @Published var selectedFolder: BookmarkFolder?
-
-    let folders: [FolderViewModel]
-
-    var title: String {
-        mode.title
-    }
-
-    var defaultActionTitle: String {
-        mode.defaultActionTitle
-    }
-
-    var isDefaultActionButtonDisabled: Bool {
-        folderName.trimmingWhitespace().isEmpty
-    }
-
-    private var mode: Mode
-    private let bookmarkManager: BookmarkManager
-
-    init(mode: Mode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
-        self.mode = mode
-        self.bookmarkManager = bookmarkManager
-        folderName = mode.folderName
-        folders = .init(bookmarkManager.list)
-        selectedFolder = mode.parentFolder
-    }
-
-    func cancel(dismiss: () -> Void) {
-        dismiss()
-    }
-
-    func addOrSave(dismiss: () -> Void) {
-        guard !folderName.isEmpty else {
-            assertionFailure("folderName is empty, button should be disabled")
-            return
-        }
-
-        let folderName = folderName.trimmingWhitespace()
-
-        switch mode {
-        case let .edit(folder, originalParent):
-            update(folder: folder, parent: originalParent)
-        case .add:
-            add(folderWithName: folderName, to: selectedFolder)
-        }
-
-        dismiss()
-    }
-
-}
-
-// MARK: - Private
-
-private extension AddEditBookmarkFolderDialogViewModel {
-
-    func update(folder: BookmarkFolder, parent: BookmarkFolder?) {
-        // Update title of the folder
-        if folder.title != folderName {
-            folder.title = folderName
-            bookmarkManager.update(folder: folder)
-        }
-        // If the original location of the folder changed move it
-        if selectedFolder?.id != parent?.id {
-            let parentFolderType: ParentFolderType = selectedFolder.flatMap { ParentFolderType.parent(uuid: $0.id) } ?? .root
-            bookmarkManager.move(
-                objectUUIDs: [folder.id],
-                toIndex: nil,
-                withinParentFolder: parentFolderType,
-                completion: { _ in }
-            )
-        }
-    }
-
-    func add(folderWithName name: String, to parent: BookmarkFolder?) {
-        bookmarkManager.makeFolder(for: name, parent: parent, completion: { _ in })
-    }
-}
-
 struct AddEditBookmarkFolderDialogView: ModalView {
     @ObservedObject private var viewModel: AddEditBookmarkFolderDialogViewModel
 
@@ -146,8 +52,9 @@ struct AddEditBookmarkFolderDialogView: ModalView {
                 BookmarkDialogButtonsView(
                     viewState: .compressed,
                     otherButtonAction: .init(
-                        title: UserText.cancel,
+                        title: viewModel.cancelActionTitle,
                         keyboardShortCut: .cancelAction,
+                        isDisabled: viewModel.isCancelActionDisabled,
                         action: viewModel.cancel
                     ), defaultButtonAction: .init(
                         title: viewModel.defaultActionTitle,
@@ -163,79 +70,67 @@ struct AddEditBookmarkFolderDialogView: ModalView {
     }
 }
 
-// MARK: - AddEditBookmarkFolderDialogViewModel.Mode
-
-private extension AddEditBookmarkFolderDialogViewModel.Mode {
-
-    var title: String {
-        switch self {
-        case .add:
-            return UserText.Bookmarks.Dialog.Title.addFolder
-        case .edit:
-            return UserText.Bookmarks.Dialog.Title.editFolder
-        }
-    }
-
-    var defaultActionTitle: String {
-        switch self {
-        case .add:
-            return UserText.Bookmarks.Dialog.Action.addFolder
-        case .edit:
-            return UserText.save
-        }
-    }
-
-    var folderName: String {
-        switch self {
-        case .add:
-            return ""
-        case let .edit(folder, _):
-            return folder.title
-        }
-    }
-
-    var parentFolder: BookmarkFolder? {
-        switch self {
-        case let .add(parentFolder):
-            return parentFolder
-        case let .edit(_, parentFolder):
-            return parentFolder
-        }
-    }
-
-}
-
 // MARK: - Previews
-
+#if DEBUG
 #Preview("Add Folder To Bookmarks - Light") {
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add())
+    let bookmarkFolder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [])
+    let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
+    bookmarkManager.loadBookmarks()
+    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
     return AddEditBookmarkFolderDialogView(viewModel: viewModel)
         .preferredColorScheme(.light)
 }
 
 #Preview("Add Folder To Bookmarks Subfolder - Light") {
-    let bookmarkFolder = BookmarkFolder(id: "", title: "Test")
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add())
+    let bookmarkFolder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [])
+    let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
+    bookmarkManager.loadBookmarks()
+    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: bookmarkFolder), bookmarkManager: bookmarkManager)
     return AddEditBookmarkFolderDialogView(viewModel: viewModel)
         .preferredColorScheme(.light)
 }
 
 #Preview("Edit Folder - Light") {
-    let bookmarkFolder = BookmarkFolder(id: "", title: "Test Bookmarks")
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: bookmarkFolder, parentFolder: nil))
+    let bookmarkFolder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [])
+    let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
+    bookmarkManager.loadBookmarks()
+    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: bookmarkFolder, parentFolder: nil), bookmarkManager: bookmarkManager)
     return AddEditBookmarkFolderDialogView(viewModel: viewModel)
         .preferredColorScheme(.light)
 }
 
-#Preview("Add Folder - Dark") {
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add())
+#Preview("Add Folder To Bookmarks - Dark") {
+    let store = BookmarkStoreMock(bookmarks: [])
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
+    bookmarkManager.loadBookmarks()
+    customAssertionFailure = { _, _, _ in }
+    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
     return AddEditBookmarkFolderDialogView(viewModel: viewModel)
         .preferredColorScheme(.dark)
 }
 
-#Preview("Edit Folder - Dark") {
-    let bookmarkFolder = BookmarkFolder(id: "", title: "Test Bookmarks")
-    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: bookmarkFolder, parentFolder: nil))
+#Preview("Add Folder To Bookmarks Subfolder - Dark") {
+    let bookmarkFolder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [])
+    let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
+    bookmarkManager.loadBookmarks()
+    customAssertionFailure = { _, _, _ in }
+    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: bookmarkFolder), bookmarkManager: bookmarkManager)
     return AddEditBookmarkFolderDialogView(viewModel: viewModel)
         .preferredColorScheme(.dark)
 }
+
+#Preview("Edit Folder in Subfolder - Dark") {
+    let bookmarkFolder = BookmarkFolder(id: "1", title: "DuckDuckGo", children: [])
+    let store = BookmarkStoreMock(bookmarks: [bookmarkFolder])
+    let bookmarkManager = LocalBookmarkManager(bookmarkStore: store)
+    bookmarkManager.loadBookmarks()
+    customAssertionFailure = { _, _, _ in }
+    let viewModel = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: bookmarkFolder, parentFolder: bookmarkFolder), bookmarkManager: bookmarkManager)
+    return AddEditBookmarkFolderDialogView(viewModel: viewModel)
+        .preferredColorScheme(.dark)
+}
+#endif
