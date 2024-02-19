@@ -53,7 +53,6 @@ final class CriticalPathsTests: XCTestCase {
 
     func testCanCreateSyncAccount() throws {
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
         let menuBarsQuery = app.menuBars
         let duckDuckGoMenuBarItem = menuBarsQuery.menuBarItems.element(boundBy: 1)
         duckDuckGoMenuBarItem.click()

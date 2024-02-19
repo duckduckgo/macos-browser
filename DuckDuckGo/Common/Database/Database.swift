@@ -109,13 +109,13 @@ final class Database {
         keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
         containerLocation = FileManager.default.temporaryDirectory
 #elseif REVIEW
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
-            keyStore = UITestsEncryptionKeyStore()
-            containerLocation = FileManager.default.temporaryDirectory
-        } else {
+//        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+//            keyStore = UITestsEncryptionKeyStore()
+//            containerLocation = FileManager.default.temporaryDirectory
+//        } else {
             keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
             containerLocation = URL.sandboxApplicationSupportURL
-        }
+//        }
 #else
         keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
         containerLocation = URL.sandboxApplicationSupportURL
