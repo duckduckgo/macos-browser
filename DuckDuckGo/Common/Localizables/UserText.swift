@@ -17,6 +17,7 @@
 //
 
 import Foundation
+import Navigation
 
 struct UserText {
 
@@ -212,12 +213,15 @@ struct UserText {
     static let tabPreferencesTitle = NSLocalizedString("tab.preferences.title", value: "Settings", comment: "Tab preferences title")
     static let tabBookmarksTitle = NSLocalizedString("tab.bookmarks.title", value: "Bookmarks", comment: "Tab bookmarks title")
     static let tabOnboardingTitle = NSLocalizedString("tab.onboarding.title", value: "Welcome", comment: "Tab onboarding title")
-    static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Oops!", comment: "Tab error title")
+    static let tabErrorTitle = NSLocalizedString("tab.error.title", value: "Failed to open page", comment: "Tab error title")
+    static let errorPageHeader = NSLocalizedString("page.error.header", value: "DuckDuckGo can’t load this page.", comment: "Error page heading text")
+    static let webProcessCrashPageHeader = NSLocalizedString("page.crash.header", value: "This webpage has crashed.", comment: "Error page heading text shown when a Web Page process had crashed")
+    static let webProcessCrashPageMessage = NSLocalizedString("page.crash.message", value: "Try reloading the page or come back later.", comment: "Error page message text shown when a Web Page process had crashed")
+
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
     static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "")
     static let checkForUpdate = NSLocalizedString("check.for.update", value: "Check for Update", comment: "Button users can use to check for a new update")
 
-    static let unknownErrorMessage = NSLocalizedString("error.unknown", value: "An unknown error has occurred", comment: "Error page subtitle")
     static let unknownErrorTryAgainMessage = NSLocalizedString("error.unknown.try.again", value: "An unknown error has occurred", comment: "Generic error message on a dialog for when the cause is not known.")
 
     static let moveTabToNewWindow = NSLocalizedString("options.menu.move.tab.to.new.window",
@@ -284,19 +288,16 @@ struct UserText {
     static let selectedDomainsDescription = NSLocalizedString("fire.selected-domains.description", value: "Clear data only for selected domains", comment: "Description of the 'Current Window' configuration option for the fire button")
     static let selectSiteToClear = NSLocalizedString("fire.select-site-to-clear", value: "Select a site to clear its data.", comment: "Info label in the fire button popover")
     static func activeTabsInfo(tabs: Int, sites: Int) -> String {
-        let siteString = sites == 1 ? "site" : "sites"
-        let tabsString = tabs == 1 ? "tab" : "tabs"
         let localized = NSLocalizedString("fire.active-tabs-info",
-                                          value: "Close %d active %@ and clear all browsing history and cookies (%d %@).",
+                                          value: "Close active tabs (%d) and clear all browsing history and cookies (sites: %d).",
                                           comment: "Info in the Fire Button popover")
-        return String(format: localized, tabs, tabsString, sites, siteString)
+        return String(format: localized, tabs, sites)
     }
     static func oneTabInfo(sites: Int) -> String {
-        let siteString = sites == 1 ? "site" : "sites"
         let localized = NSLocalizedString("fire.one-tab-info",
-                                          value: "Close this tab and clear its browsing history and cookies (%d %@).",
+                                          value: "Close this tab and clear its browsing history and cookies (sites: %d).",
                                           comment: "Info in the Fire Button popover")
-        return String(format: localized, sites, siteString)
+        return String(format: localized, sites)
     }
     static let fireDialogDetails = NSLocalizedString("fire.dialog.details", value: "Details", comment: "Button to show more details")
     static let fireDialogWindowWillClose = NSLocalizedString("fire.dialog.window-will-close", value: "Current window will close", comment: "Warning label shown in an expanded view of the fire popover")
@@ -444,8 +445,8 @@ struct UserText {
     static let emailOptionsMenuItem = NSLocalizedString("email.optionsMenu", value: "Email Protection", comment: "Menu item email feature")
     static let emailOptionsMenuCreateAddressSubItem = NSLocalizedString("email.optionsMenu.createAddress", value: "Generate Private Duck Address", comment: "Create an email alias sub menu item")
     static let emailOptionsMenuTurnOffSubItem = NSLocalizedString("email.optionsMenu.turnOff", value: "Disable Email Protection Autofill", comment: "Disable email sub menu item")
-    static let emailOptionsMenuTurnOnSubItem = NSLocalizedString("email.optionsMenu.turnOn", value: "Enable Email Protection", comment: "Enable email sub menu item")
-    static let privateEmailCopiedToClipboard = NSLocalizedString("email.copied", value: "New address copied to your clipboard", comment: "Private email address was copied to clipboard message")
+    static let emailOptionsMenuTurnOnSubItem = NSLocalizedString("email.optionsMenu.turnOn", value: "Enable Email Protection", comment: "Sub menu item to enable Email Protection")
+    static let privateEmailCopiedToClipboard = NSLocalizedString("email.copied", value: "New address copied to your clipboard", comment: "Notification that the Private email address was copied to clipboard after the user generated a new address")
     static let emailOptionsMenuManageAccountSubItem = NSLocalizedString("email.optionsMenu.manageAccount", value: "Manage Account", comment: "Manage private email account sub menu item")
 
     static let newFolder = NSLocalizedString("folder.optionsMenu.newFolder", value: "New Folder", comment: "Option for creating a new folder")
@@ -456,7 +457,7 @@ struct UserText {
 
     static let updateBookmark = NSLocalizedString("bookmark.update", value: "Update Bookmark", comment: "Option for updating a bookmark")
 
-    static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website")
+    static let failedToOpenExternally = NSLocalizedString("open.externally.failed", value: "The app required to open that link can’t be found", comment: "’Link’ is link on a website, it couldn't be opened due to the required app not being found")
 
     // MARK: Permission
     static let devicePermissionAuthorizationFormat = NSLocalizedString("permission.authorization.format",
@@ -493,7 +494,7 @@ struct UserText {
     static let permissionGeolocationServicesDisabled = NSLocalizedString("permission.disabled.system", value: "System location services are disabled", comment: "Geolocation Services are disabled in System Preferences")
     static let permissionOpenSystemSettings = NSLocalizedString("permission.open.settings", value: "Open System Settings", comment: "Open System Settings (to re-enable permission for the App) (macOS 13 and above)")
 
-    static let permissionPopupTitle = NSLocalizedString("permission.popup.title", value: "Blocked Pop-ups", comment: "List of blocked popups Title")
+    static let permissionPopupTitle = NSLocalizedString("permission.popup.title", value: "Blocked Pop-ups", comment: "Title of a popup that has a list of blocked popups")
     static let permissionPopupOpenFormat = NSLocalizedString("permission.popup.open.format", value: "%@", comment: "Open %@ URL Pop-up")
 
     static let permissionExternalSchemeOpenFormat = NSLocalizedString("permission.externalScheme.open.format", value: "Open %@", comment: "Open %@ App Name")
@@ -571,15 +572,15 @@ struct UserText {
     static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified.", comment: "About screen")
     static let aboutUnsupportedDeviceInfo1 = NSLocalizedString("preferences.about.unsupported-device-info1", value: "DuckDuckGo is no longer providing browser updates for your version of macOS.", comment: "")
     static func aboutUnsupportedDeviceInfo2(version: String) -> String {
-        let localized = NSLocalizedString("preferences.about.unsupported-device-info2", value: "Please update to macOS %@ or later to use the most recent version", comment: "Link to the about page")
+        let localized = NSLocalizedString("preferences.about.unsupported-device-info2", value: "Please update to macOS %@ or later to use the most recent version of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates.", comment: "Copy in section that tells the user to update their macOS version since their current version is unsupported")
         return String(format: localized, version)
     }
-    static let aboutUnsupportedDeviceInfo2Part1 = NSLocalizedString("preferences.about.unsupported-device-info2-part1", value: "Please", comment: "Second paragraph of unsupported device info - sentence part 1")
+    static let aboutUnsupportedDeviceInfo2Part1 = "Please"
     static func aboutUnsupportedDeviceInfo2Part2(version: String) -> String {
-        return String(format: NSLocalizedString("preferences.about.unsupported-device-info2-part2", value: "update to macOS %@", comment: "Second paragraph of unsupported device info - sentence part 2 (underlined)"), version)
+        return String(format: "update to macOS %@", version)
     }
-    static let aboutUnsupportedDeviceInfo2Part3 = NSLocalizedString("preferences.about.unsupported-device-info2-part3", value: "or later to use the most recent version", comment: "Second paragraph of unsupported device info - sentence part 3")
-    static let aboutUnsupportedDeviceInfo2Part4 = NSLocalizedString("preferences.about.unsupported-device-info2-part4", value: "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates.", comment: "Second paragraph of unsupported device info - sentence part 4")
+    static let aboutUnsupportedDeviceInfo2Part3 = "or later to use the most recent version"
+    static let aboutUnsupportedDeviceInfo2Part4 = "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
     static let unsupportedDeviceInfoAlertHeader = NSLocalizedString("unsupported.device.info.alert.header", value: "Your version of macOS is no longer supported.", comment: "")
 
 
@@ -590,10 +591,10 @@ struct UserText {
 
     static let sendFeedback = NSLocalizedString("preferences.about.send-feedback", value: "Send Feedback", comment: "Feedback button in the about preferences page")
 
-    static let feedbackDisclaimer = NSLocalizedString("feedback.disclaimer", value: "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.", comment: "Disclaimer in breakage form")
+    static let feedbackDisclaimer = NSLocalizedString("feedback.disclaimer", value: "Reports sent to DuckDuckGo are 100% anonymous and only include your message, the DuckDuckGo app version, and your macOS version.", comment: "Disclaimer in breakage form - a form that users can submit to say that a website is not working properly in DuckDuckGo")
 
-    static let feedbackBugDescription = NSLocalizedString("feedback.bug.description", value: "Please describe the problem in as much detail as possible:", comment: "Label in the feedback form")
-    static let feedbackFeatureRequestDescription = NSLocalizedString("feedback.feature.request.description", value: "What feature would you like to see?", comment: "Label in the feedback form")
+    static let feedbackBugDescription = NSLocalizedString("feedback.bug.description", value: "Please describe the problem in as much detail as possible:", comment: "Label in the feedback form that users can submit to say that a website is not working properly in DuckDuckGo")
+    static let feedbackFeatureRequestDescription = NSLocalizedString("feedback.feature.request.description", value: "What feature would you like to see?", comment: "Label in the feedback form for feature requests.")
     static let feedbackOtherDescription = NSLocalizedString("feedback.other.description", value: "Please give us your feedback:", comment: "Label in the feedback form")
 
     static func versionLabel(version: String, build: String) -> String {
@@ -697,7 +698,7 @@ struct UserText {
 
     static func importingBookmarks(_ numberOfBookmarks: Int?) -> String {
         if let numberOfBookmarks, numberOfBookmarks > 0 {
-            let localized = NSLocalizedString("import.bookmarks.number.progress.text", value: "Importing %d bookmarks…", comment: "Operation progress info message about %d number of bookmarks being imported")
+            let localized = NSLocalizedString("import.bookmarks.number.progress.text", value: "Importing bookmarks (%d)…", comment: "Operation progress info message about %d number of bookmarks being imported")
             return String(format: localized, numberOfBookmarks)
         } else {
             return NSLocalizedString("import.bookmarks.indefinite.progress.text", value: "Importing bookmarks…", comment: "Operation progress info message about indefinite number of bookmarks being imported")
@@ -706,7 +707,7 @@ struct UserText {
 
     static func importingPasswords(_ numberOfPasswords: Int?) -> String {
         if let numberOfPasswords, numberOfPasswords > 0 {
-            let localized = NSLocalizedString("import.passwords.number.progress.text", value: "Importing %d passwords…", comment: "Operation progress info message about %d number of passwords being imported")
+            let localized = NSLocalizedString("import.passwords.number.progress.text", value: "Importing passwords (%d)…", comment: "Operation progress info message about %d number of passwords being imported")
             return String(format: localized, numberOfPasswords)
         } else {
             return NSLocalizedString("import.passwords.indefinite.progress.text", value: "Importing passwords…", comment: "Operation progress info message about indefinite number of passwords being imported")
@@ -723,7 +724,7 @@ struct UserText {
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.message",
                                           value: "%@ tracking attempts blocked",
-                                          comment: "")
+                                          comment: "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@")
         return String(format: localized, NumberFormatter.localizedString(from: NSNumber(value: numberOfTrackersBlocked), number: .decimal))
     }
     static let homePageProtectionDurationInfo = NSLocalizedString("home.page.protection.duration", value: "PAST 7 DAYS", comment: "Past 7 days in uppercase.")
@@ -740,18 +741,17 @@ struct UserText {
     static func tooltipClearHistoryAndData(domain: String) -> String {
         let localized = NSLocalizedString("tooltip.clearHistoryAndData",
                                           value: "Clear browsing history and data for %@",
-                                          comment: "Tooltip for burn button")
+                                          comment: "Tooltip for burn button where %@ is the domain")
         return String(format: localized, domain)
     }
     static func tooltipClearHistory(domain: String) -> String {
         let localized = NSLocalizedString("tooltip.clearHistory",
                                           value: "Clear browsing history for %@",
-                                          comment: "Tooltip for burn button")
+                                          comment: "Tooltip for burn button where %@ is the domain")
         return String(format: localized, domain)
     }
 
-    static let recentlyClosedMenuItemSuffixOne = NSLocalizedString("one.more.tab", value: " (and 1 more tab)", comment: "suffix of string in Recently Closed menu")
-    static let recentlyClosedMenuItemSuffixMultiple = NSLocalizedString("n.more.tabs", value: " (and %d more tabs)", comment: "suffix of string in Recently Closed menu")
+    static let recentlyClosedWindowMenuItem = NSLocalizedString("n.more.tabs", value: "Window with multiple tabs (%d)", comment: "String in Recently Closed menu item for recently closed browser window and number of tabs contained in the closed window")
 
     static let reopenLastClosedTab = NSLocalizedString("reopen.last.closed.tab", value: "Reopen Last Closed Tab", comment: "")
     static let reopenLastClosedWindow = NSLocalizedString("reopen.last.closed.window", value: "Reopen Last Closed Window", comment: "")
@@ -795,18 +795,18 @@ struct UserText {
     // MARK: - Bitwarden
 
     static let passwordManager = NSLocalizedString("password.manager", value: "Password Manager", comment: "Section header")
-    static let bitwardenPreferencesUnableToConnect = NSLocalizedString("bitwarden.preferences.unable-to-connect", value: "Unable to find or connect to Bitwarden", comment: "")
+    static let bitwardenPreferencesUnableToConnect = NSLocalizedString("bitwarden.preferences.unable-to-connect", value: "Unable to find or connect to Bitwarden", comment: "Dialog telling the user Bitwarden (a password manager) is not available")
     static let bitwardenPreferencesCompleteSetup = NSLocalizedString("bitwarden.preferences.complete-setup", value: "Complete Setup…", comment: "")
     static let bitwardenPreferencesOpenBitwarden = NSLocalizedString("bitwarden.preferences.open-bitwarden", value: "Open Bitwarden", comment: "")
-    static let bitwardenPreferencesUnlock = NSLocalizedString("bitwarden.preferences.unlock", value: "Unlock Bitwarden", comment: "")
-    static let bitwardenPreferencesRun = NSLocalizedString("bitwarden.preferences.run", value: "Bitwarden app not running", comment: "")
+    static let bitwardenPreferencesUnlock = NSLocalizedString("bitwarden.preferences.unlock", value: "Unlock Bitwarden", comment: "Asks the user to unlock the password manager Bitwarden")
+    static let bitwardenPreferencesRun = NSLocalizedString("bitwarden.preferences.run", value: "Bitwarden app not running", comment: "Warns user that the password manager Bitwarden app is not running")
     static let bitwardenError = NSLocalizedString("bitwarden.error", value: "Unable to find or connect to Bitwarden", comment: "")
     static let bitwardenNotInstalled = NSLocalizedString("bitwarden.not.installed", value: "Bitwarden app is not installed", comment: "")
     static let bitwardenOldVersion = NSLocalizedString("bitwarden.old.version", value: "Please update Bitwarden to the latest version", comment: "")
     static let bitwardenIntegrationNotApproved = NSLocalizedString("bitwarden.integration.not.approved", value: "Integration with DuckDuckGo is not approved in Bitwarden app", comment: "")
     static let bitwardenMissingHandshake = NSLocalizedString("bitwarden.missing.handshake", value: "Missing handshake", comment: "")
     static let bitwardenWaitingForHandshake = NSLocalizedString("bitwarden.waiting.for.handshake", value: "Waiting for the handshake approval in Bitwarden app", comment: "")
-    static let bitwardenCantAccessContainer = NSLocalizedString("bitwarden.cant.access.container", value: "DuckDuckGo needs permission to access Bitwarden. You can grant DuckDuckGo Full Disk Access in System Settings, or switch back to the built-in password manager.", comment: "")
+    static let bitwardenCantAccessContainer = NSLocalizedString("bitwarden.cant.access.container", value: "DuckDuckGo needs permission to access Bitwarden. You can grant DuckDuckGo Full Disk Access in System Settings, or switch back to the built-in password manager.", comment: "Requests user Full Disk access in order to access password manager Birwarden")
     static let bitwardenHanshakeNotApproved = NSLocalizedString("bitwarden.handshake.not.approved", value: "Handshake not approved in Bitwarden app", comment: "")
     static let bitwardenConnecting = NSLocalizedString("bitwarden.connecting", value: "Connecting to Bitwarden", comment: "")
     static let bitwardenWaitingForStatusResponse = NSLocalizedString("bitwarden.waiting.for.status.response", value: "Waiting for the status response from Bitwarden", comment: "")
@@ -834,7 +834,7 @@ struct UserText {
     static let bitwardenIntegrationCompleteInfo = NSLocalizedString("bitwarden.integration.complete.info", value: "You are now using Bitwarden as your password manager.", comment: "Setup of the integration with Bitwarden app")
 
     static let bitwardenCommunicationInfo = NSLocalizedString("bitwarden.connect.communication-info", value: "All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.", comment: "")
-    static let bitwardenHistoryInfo = NSLocalizedString("bitwarden.connect.history-info", value: "Bitwarden will have access to your browsing history.", comment: "")
+    static let bitwardenHistoryInfo = NSLocalizedString("bitwarden.connect.history-info", value: "Bitwarden will have access to your browsing history.", comment: "Warn users that the password Manager Bitwarden will have access to their browsing history")
 
     static let showAutofillShortcut = NSLocalizedString("pinning.show-autofill-shortcut", value: "Show Autofill Shortcut", comment: "Menu item for showing the autofill shortcut")
     static let hideAutofillShortcut = NSLocalizedString("pinning.hide-autofill-shortcut", value: "Hide Autofill Shortcut", comment: "Menu item for hiding the autofill shortcut")
@@ -931,7 +931,7 @@ struct UserText {
         return String(format: localized, domain)
     }
 
-    static let noAccessToDownloadsFolderHeader = NSLocalizedString("no.access.to.downloads.folder.header", value: "DuckDuckGo needs permission to access your Downloads folder", comment: "Header of the alert dialog informing user about failed download")
+    static let noAccessToDownloadsFolderHeader = NSLocalizedString("no.access.to.downloads.folder.header", value: "DuckDuckGo needs permission to access your Downloads folder", comment: "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder")
 
     private static let noAccessToDownloadsFolderLegacy = NSLocalizedString("no.access.to.downloads.folder.legacy", value: "Grant access in Security & Privacy preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder. This is used for macOS version 12 and below")
     private static let noAccessToDownloadsFolderModern = NSLocalizedString("no.access.to.downloads.folder.modern", value: "Grant access in Privacy & Security preferences in System Settings.", comment: "Alert presented to user if the app doesn't have rights to access Downloads folder. This is used for macOS version 13 and above")
@@ -1058,11 +1058,24 @@ struct UserText {
     }
 
 #if SUBSCRIPTION
-    static let subscriptionOptionsMenuItem = NSLocalizedString("subscription.menu.item", value: "Privacy Pro", comment: "Title for Subscription item in the options menu")
-    static let subscription = NSLocalizedString("preferences.subscription", value: "Privacy Pro", comment: "Show subscription preferences")
+    // Key: "subscription.menu.item"
+    // Comment: "Title for Subscription item in the options menu"
+    static let subscriptionOptionsMenuItem = "Privacy Pro"
 
-    static let purchasingSubscriptionTitle = NSLocalizedString("subscription.progress.view.purchasing.subscription", value: "Purchase in progress...", comment: "Progress view title when starting the purchase")
-    static let restoringSubscriptionTitle = NSLocalizedString("subscription.progress.view.restoring.subscription", value: "Restoring subscription...", comment: "Progress view title when restoring past subscription purchase")
-    static let completingPurchaseTitle = NSLocalizedString("subscription.progress.view.completing.purchase", value: "Completing purchase...", comment: "Progress view title when completing the purchase")
+    // Key: "preferences.subscription"
+    // Comment: "Show subscription preferences"
+    static let subscription = "Privacy Pro"
+
+    // Key: "subscription.progress.view.purchasing.subscription"
+    // Comment: "Progress view title when starting the purchase"
+    static let purchasingSubscriptionTitle = "Purchase in progress..."
+
+    // Key: "subscription.progress.view.restoring.subscription"
+    // Comment: "Progress view title when restoring past subscription purchase"
+    static let restoringSubscriptionTitle = "Restoring subscription..."
+
+    // Key: "subscription.progress.view.completing.purchase"
+    // Comment: "Progress view title when completing the purchase"
+    static let completingPurchaseTitle = "Completing purchase..."
 #endif
 }

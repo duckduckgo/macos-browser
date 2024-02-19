@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1707497831317,
+    "version": 1708083739957,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -258,9 +258,6 @@
                     "domain": "youtube.com"
                 },
                 {
-                    "domain": "tuc.org.uk"
-                },
-                {
                     "domain": "newsmax.com"
                 },
                 {
@@ -279,11 +276,11 @@
             "settings": {
                 "disabledCMPs": [
                     "generic-cosmetic",
-                    "EZoic"
+                    "termsfeed3"
                 ]
             },
             "state": "enabled",
-            "hash": "df49b4912fc62299b3cc20b5538e3b89"
+            "hash": "ce906469aa6ac0fb5ecf3f39710ef05b"
         },
         "autofill": {
             "exceptions": [
@@ -1068,6 +1065,18 @@
                     {
                         "domain": "zalando.fr",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
+                    },
+                    {
+                        "domain": "www.canva.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1818"
+                    },
+                    {
+                        "domain": "53.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1824"
+                    },
+                    {
+                        "domain": "www.evernote.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1827"
                     }
                 ],
                 "webViewDefault": [
@@ -1091,7 +1100,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "96ca986dfe68dbb73a36dd7f3adbb53e"
+            "hash": "653b8d161df5462850be095097e85143"
         },
         "dbp": {
             "state": "enabled",
@@ -1105,6 +1114,9 @@
                         "steps": [
                             {
                                 "percent": 10
+                            },
+                            {
+                                "percent": 50
                             }
                         ]
                     }
@@ -1112,7 +1124,7 @@
             },
             "exceptions": [],
             "minSupportedVersion": "1.70.0",
-            "hash": "c90b300b1e5ab20c29a726c8de9fd2da"
+            "hash": "b405d032a1519de3059db2e833e81c9a"
         },
         "duckPlayer": {
             "exceptions": [],
@@ -4338,9 +4350,6 @@
                     "domain": "tirerack.com"
                 },
                 {
-                    "domain": "sephora.com"
-                },
-                {
                     "domain": "earth.google.com"
                 },
                 {
@@ -4362,7 +4371,7 @@
                     "privacy-test-pages.site"
                 ]
             },
-            "hash": "0e4353dbfbf35914b784ef12e0073447"
+            "hash": "1a1373bcf16647d63220659fce650a83"
         },
         "harmfulApis": {
             "settings": {
@@ -4874,6 +4883,16 @@
                             }
                         ]
                     },
+                    "adlightning.com": {
+                        "rules": [
+                            {
+                                "rule": "publisher.adlightning.com/user-api/session/",
+                                "domains": [
+                                    "boltive.com"
+                                ]
+                            }
+                        ]
+                    },
                     "ads-twitter.com": {
                         "rules": [
                             {
@@ -5220,7 +5239,19 @@
                     "cloudflare.com": {
                         "rules": [
                             {
-                                "rule": "cdnjs.cloudflare.com/cdn-cgi/scripts/.*/cloudflare-static/rocket-loader.min.js",
+                                "rule": "cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "cloudflare.com/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "cloudflare.com/cdn-cgi/scripts/1680307200/cloudflare-static/rocket-loader.min.js",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -5950,6 +5981,7 @@
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
+                                    "saplinglearning.com",
                                     "worlddutyfree.com"
                                 ]
                             },
@@ -6122,7 +6154,9 @@
                                 "rule": "googletagmanager.com/gtag/js",
                                 "domains": [
                                     "abril.com.br",
+                                    "algomalegalclinic.com",
                                     "cosmicbook.news",
+                                    "eatroyo.com",
                                     "thesimsresource.com",
                                     "tradersync.com"
                                 ]
@@ -7080,6 +7114,16 @@
                             }
                         ]
                     },
+                    "pubnation.com": {
+                        "rules": [
+                            {
+                                "rule": "scripts.pubnation.com/tags/",
+                                "domains": [
+                                    "n4g.com"
+                                ]
+                            }
+                        ]
+                    },
                     "qualtrics.com": {
                         "rules": [
                             {
@@ -7335,6 +7379,16 @@
                                 "rule": "succeedscene.com",
                                 "domains": [
                                     "<all>"
+                                ]
+                            }
+                        ]
+                    },
+                    "sumo.com": {
+                        "rules": [
+                            {
+                                "rule": "load.sumo.com",
+                                "domains": [
+                                    "glennbeck.com"
                                 ]
                             }
                         ]
@@ -7765,7 +7819,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "f5cba883ae4a666f7b6135d3406c2797"
+            "hash": "63057921f3dafa389fd7c132ea62393d"
         },
         "trackingCookies1p": {
             "settings": {
@@ -8152,10 +8206,20 @@
                                 "value": "enabled"
                             }
                         ]
+                    },
+                    {
+                        "domain": "myhome.experian.co.uk",
+                        "patchSettings": [
+                            {
+                                "op": "replace",
+                                "path": "/messageHandlers/state",
+                                "value": "enabled"
+                            }
+                        ]
                     }
                 ]
             },
-            "hash": "1a7df2f0fbf4e5838e7c4b21627d2086"
+            "hash": "151d7ee40451c4aac4badfcc829ea0b5"
         },
         "windowsPermissionUsage": {
             "exceptions": [],

@@ -53,7 +53,7 @@ class TestSchemeHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         for middleware in middleware {
             if let handler = middleware(urlSchemeTask.request) {
-                handler(urlSchemeTask)
+                handler(urlSchemeTask as! WKURLSchemeTaskPrivate)
                 return
             }
         }
@@ -103,12 +103,12 @@ struct WKURLSchemeTaskHandler {
         }
     }
 
-    let handler: (WKURLSchemeTask) -> Void
-    init(handler: @escaping (WKURLSchemeTask) -> Void) {
+    let handler: (WKURLSchemeTaskPrivate) -> Void
+    init(handler: @escaping (WKURLSchemeTaskPrivate) -> Void) {
         self.handler = handler
     }
 
-    func callAsFunction(_ task: WKURLSchemeTask) {
+    func callAsFunction(_ task: WKURLSchemeTaskPrivate) {
         handler(task)
     }
 
