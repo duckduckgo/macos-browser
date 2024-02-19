@@ -25,7 +25,7 @@ CODE_SIGNING_ALLOWED[config=Review][sdk=macosx*] = NO
 DEAD_CODE_STRIPPING = YES
 
 MACOSX_DEPLOYMENT_TARGET = 11.4
-DEVELOPMENT_TEAM[config=Review][sdk=macosx*] 
+DEVELOPMENT_TEAM[config=Review][sdk=macosx*] =
 INFOPLIST_FILE = UI Tests/Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.duckduckgo.UI-Tests
 PRODUCT_NAME = $(TARGET_NAME)
