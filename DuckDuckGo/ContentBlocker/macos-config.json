@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1708083739957,
+    "version": 1708360600128,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -258,12 +258,6 @@
                     "domain": "youtube.com"
                 },
                 {
-<<<<<<< HEAD
-                    "domain": "tuc.org.uk"
-                },
-                {
-=======
->>>>>>> main
                     "domain": "newsmax.com"
                 },
                 {
@@ -286,11 +280,7 @@
                 ]
             },
             "state": "enabled",
-<<<<<<< HEAD
-            "hash": "df49b4912fc62299b3cc20b5538e3b89"
-=======
             "hash": "ce906469aa6ac0fb5ecf3f39710ef05b"
->>>>>>> main
         },
         "autofill": {
             "exceptions": [
@@ -1075,8 +1065,6 @@
                     {
                         "domain": "zalando.fr",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/667"
-<<<<<<< HEAD
-=======
                     },
                     {
                         "domain": "www.canva.com",
@@ -1089,7 +1077,6 @@
                     {
                         "domain": "www.evernote.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1827"
->>>>>>> main
                     }
                 ],
                 "webViewDefault": [
@@ -1113,11 +1100,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-<<<<<<< HEAD
-            "hash": "96ca986dfe68dbb73a36dd7f3adbb53e"
-=======
             "hash": "653b8d161df5462850be095097e85143"
->>>>>>> main
         },
         "dbp": {
             "state": "enabled",
@@ -7836,11 +7819,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-<<<<<<< HEAD
-            "hash": "f5cba883ae4a666f7b6135d3406c2797"
-=======
             "hash": "63057921f3dafa389fd7c132ea62393d"
->>>>>>> main
         },
         "trackingCookies1p": {
             "settings": {
