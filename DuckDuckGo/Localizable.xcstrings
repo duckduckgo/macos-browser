@@ -9234,6 +9234,18 @@
     "We were unable to import passwords directly from %@." : {
       "comment" : "Message when data import fails from a browser. %@ - a browser name"
     },
+    "web.tracking.protection.explanation" : {
+      "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default."
+          }
+        }
+      }
+    },
     "web.tracking.protection.explenation" : {
       "comment" : "feature explanation in settings",
       "extractionState" : "extracted_with_value",

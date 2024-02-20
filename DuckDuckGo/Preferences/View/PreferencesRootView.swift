@@ -56,7 +56,7 @@ enum Preferences {
                             case .privateSearch:
                                 PrivateSearchView(model: SearchPreferences.shared)
                             case .webTrackingProtection:
-                                GeneralView(startupModel: StartupPreferences.shared)
+                                WebTrackingProtectionView(model: WebTrackingProtectionPreferences.shared)
                             case .cookiePopupProtection:
                                 GeneralView(startupModel: StartupPreferences.shared)
                             case .emailProtection:

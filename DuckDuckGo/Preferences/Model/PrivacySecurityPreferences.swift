@@ -27,14 +27,6 @@ final class PrivacySecurityPreferences {
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
     var loginDetectionEnabled: Bool
 
-    @Published
-    var gpcEnabled: Bool = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true).wrappedValue {
-        didSet {
-            let udWrapper = UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
-            udWrapper.wrappedValue = gpcEnabled
-        }
-    }
-
     @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: true)
     var autoconsentEnabled: Bool
 

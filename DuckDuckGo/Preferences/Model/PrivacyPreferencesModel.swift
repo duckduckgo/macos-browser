@@ -27,13 +27,6 @@ final class PrivacyPreferencesModel: ObservableObject {
         }
     }
 
-    @Published
-    var isGPCEnabled: Bool {
-        didSet {
-            privacySecurityPreferences.gpcEnabled = isGPCEnabled
-        }
-    }
-
     @Published var isAutoconsentEnabled: Bool {
         didSet {
             privacySecurityPreferences.autoconsentEnabled = isAutoconsentEnabled
@@ -62,7 +55,6 @@ final class PrivacyPreferencesModel: ObservableObject {
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-        isGPCEnabled = privacySecurityPreferences.gpcEnabled
         isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled
     }
 

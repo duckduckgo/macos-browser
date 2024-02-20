@@ -28,18 +28,7 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.privacy) {
 
-                // SECTION 1: Web Tracking Protection Section
-                PreferencePaneSection(UserText.webTrackingProtectionSettingsTitle) {
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        TextMenuItemCaption(UserText.webTrackingProtectionExplenation)
-                        TextButton(UserText.learnMore) {
-                            model.openURL(.webTrackingProtection)
-                        }
-                    }
-                }
-
-                // SECTION 2: Cookie Consent Pop-ups
+                // SECTION 1: Cookie Consent Pop-ups
                 PreferencePaneSection(UserText.autoconsentSettingsTitle) {
 
                     ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
@@ -51,7 +40,7 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 3: Fireproof Site
+                // SECTION 2: Fireproof Site
                 PreferencePaneSection(UserText.fireproofSites) {
 
                     PreferencePaneSubSection {
@@ -71,17 +60,6 @@ extension Preferences {
                     }
                 }
 
-                // SECTION 4: Global privacy control
-                PreferencePaneSection(UserText.gpcSettingsTitle) {
-
-                    ToggleMenuItem(UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
-                    VStack(alignment: .leading, spacing: 0) {
-                        TextMenuItemCaption(UserText.gpcExplanation)
-                        TextButton(UserText.learnMore) {
-                            model.openURL(.gpcLearnMore)
-                        }
-                    }
-                }
             }
         }
     }

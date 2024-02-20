@@ -283,7 +283,7 @@ extension PrivacyDashboardViewController {
                                               tdsETag: ContentBlocking.shared.contentBlockingManager.currentRules.first?.etag,
                                               blockedTrackerDomains: blockedTrackerDomains,
                                               installedSurrogates: installedSurrogates,
-                                              isGPCEnabled: PrivacySecurityPreferences.shared.gpcEnabled,
+                                              isGPCEnabled: WebTrackingProtectionPreferences.shared.isGPCEnabled,
                                               ampURL: ampURL,
                                               urlParametersRemoved: urlParametersRemoved,
                                               protectionsState: protectionsState,
