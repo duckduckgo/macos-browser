@@ -84,7 +84,6 @@ struct SyncWithAnotherDeviceView: View {
             pickerOptionView(imageName: "QR-Icon", title: UserText.syncWithAnotherDeviceShowCodeButton, tag: 0)
             pickerOptionView(imageName: "Keyboard-16D", title: UserText.syncWithAnotherDeviceEnterCodeButton, tag: 1)
         }
-//        .frame(width: 348, height: 32)
         .frame(height: 32)
         .frame(minWidth: 348)
         .roundedBorder()
