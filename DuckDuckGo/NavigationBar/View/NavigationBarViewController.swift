@@ -330,12 +330,14 @@ final class NavigationBarViewController: NSViewController {
         }
 
         #if SUBSCRIPTION
-        let accountManager = AccountManager()
-        let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
-
-        if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
-            print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
-            return
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
+            let accountManager = AccountManager()
+            let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
+            
+            if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
+                print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
+                return
+            }
         }
         #endif
 
