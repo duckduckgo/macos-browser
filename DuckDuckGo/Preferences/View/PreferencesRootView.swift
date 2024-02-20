@@ -105,11 +105,23 @@ enum Preferences {
                 }
             }
 
+            let openVPN: () -> Void = {
+                NotificationCenter.default.post(name: .ToggleNetworkProtectionInMainWindow, object: self, userInfo: nil)
+            }
+
+            let openDBP: () -> Void = {
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .dataBrokerProtection)
+                }
+            }
+
             let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
                                                                       openURLHandler: openURL,
                                                                       goToSyncPreferences: { self.model.selectPane(.sync) })
 
             let model = PreferencesSubscriptionModel(openURLHandler: openURL,
+                                                     openVPNHandler: openVPN,
+                                                     openDBPHandler: openDBP,
                                                      sheetActionHandler: sheetActionHandler)
             return SubscriptionUI.PreferencesSubscriptionView(model: model)
         }
