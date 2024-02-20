@@ -111,6 +111,9 @@ struct AddEditBookmarkDialogView: ModalView {
         )
         .font(.system(size: 13))
         .frame(width: 448, height: 210)
+        .onAppear {
+            addFolderViewModel.selectedFolder = viewModel.selectedFolder
+        }
     }
 }
 
