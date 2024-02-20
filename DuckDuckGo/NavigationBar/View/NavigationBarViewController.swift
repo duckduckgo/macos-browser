@@ -372,7 +372,7 @@ final class NavigationBarViewController: NSViewController {
 
 #if NETWORK_PROTECTION
     func listenToVPNToggleNotifications() {
-        vpnToggleCancellable = NotificationCenter.default.publisher(for: .ToggleNetworkProtectionInMainWindow).sink { [weak self] _ in
+        vpnToggleCancellable = NotificationCenter.default.publisher(for: .ToggleNetworkProtectionInMainWindow).receive(on: DispatchQueue.main).sink { [weak self] _ in
             guard self?.view.window?.isKeyWindow == true else {
                 return
             }
