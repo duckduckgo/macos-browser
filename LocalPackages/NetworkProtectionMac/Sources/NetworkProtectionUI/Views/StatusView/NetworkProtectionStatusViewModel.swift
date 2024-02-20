@@ -93,6 +93,8 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
+        private let accountManager: SubscriptionAccountManaging
+
         private var cancellables = Set<AnyCancellable>()
 
         // MARK: - Dispatch Queues
@@ -111,7 +113,8 @@ extension NetworkProtectionStatusView {
                     appLauncher: AppLaunching,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
-                    runLoopMode: RunLoop.Mode? = nil) {
+                    runLoopMode: RunLoop.Mode? = nil,
+                    accountManager: SubscriptionAccountManaging) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher
@@ -120,6 +123,7 @@ extension NetworkProtectionStatusView {
             self.menuItems = menuItems
             self.agentLoginItem = agentLoginItem
             self.runLoopMode = runLoopMode
+            self.accountManager = accountManager
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
                                                                   onboardingStatusPublisher: onboardingStatusPublisher,
@@ -146,6 +150,14 @@ extension NetworkProtectionStatusView {
                 self?.onboardingStatus = status
             }
             .store(in: &cancellables)
+
+            Task {
+                if await accountManager.hasEntitlement(for: "subscriber") {
+                    shouldShowSubscriptionExpired = false
+                } else {
+                    shouldShowSubscriptionExpired = true
+                }
+            }
         }
 
         func refreshLoginItemStatus() {
@@ -280,6 +292,9 @@ extension NetworkProtectionStatusView {
         // MARK: - Child View Models
 
         let tunnelControllerViewModel: TunnelControllerViewModel
+
+        @Published
+        var shouldShowSubscriptionExpired: Bool = false
 
         var promptActionViewModel: PromptActionView.Model? {
 #if !APPSTORE && !DEBUG

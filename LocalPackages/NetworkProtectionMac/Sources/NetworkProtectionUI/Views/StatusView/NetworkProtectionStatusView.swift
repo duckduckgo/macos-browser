@@ -50,7 +50,9 @@ public struct NetworkProtectionStatusView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            if let promptActionViewModel = model.promptActionViewModel {
+            if model.shouldShowSubscriptionExpired {
+                SubscriptionExpiredView()
+            } else if let promptActionViewModel = model.promptActionViewModel {
                 PromptActionView(model: promptActionViewModel)
                     .padding(.horizontal, 5)
                     .padding(.top, 5)

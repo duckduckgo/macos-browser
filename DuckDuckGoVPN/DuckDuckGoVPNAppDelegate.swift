@@ -27,6 +27,7 @@ import NetworkProtectionIPC
 import NetworkProtectionUI
 import ServiceManagement
 import PixelKit
+import Subscription
 
 @objc(Application)
 final class DuckDuckGoVPNApplication: NSApplication {
@@ -159,7 +160,9 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     })
                 ]
             },
-            agentLoginItem: nil)
+            agentLoginItem: nil,
+            accountManager: AccountManager()
+        )
     }
 
     @MainActor

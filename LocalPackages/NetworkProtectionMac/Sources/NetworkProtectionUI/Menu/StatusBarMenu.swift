@@ -55,7 +55,8 @@ public final class StatusBarMenu: NSObject {
                 iconProvider: IconProvider,
                 appLauncher: AppLaunching,
                 menuItems: @escaping () -> [MenuItem],
-                agentLoginItem: LoginItem?) {
+                agentLoginItem: LoginItem?,
+                accountManager: SubscriptionAccountManaging) {
 
         self.model = model
         let statusItem = statusItem ?? NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -67,7 +68,9 @@ public final class StatusBarMenu: NSObject {
                                            statusReporter: statusReporter,
                                            appLauncher: appLauncher,
                                            menuItems: menuItems,
-                                           agentLoginItem: agentLoginItem)
+                                           agentLoginItem: agentLoginItem,
+                                           accountManager: accountManager)
+
         popover.behavior = .transient
 
         super.init()

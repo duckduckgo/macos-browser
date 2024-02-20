@@ -55,16 +55,18 @@ public final class NetworkProtectionPopover: NSPopover {
                          statusReporter: NetworkProtectionStatusReporter,
                          appLauncher: AppLaunching,
                          menuItems: @escaping () -> [MenuItem],
-                         agentLoginItem: LoginItem?) {
+                         agentLoginItem: LoginItem?,
+                         accountManager: SubscriptionAccountManaging) {
 
         self.statusReporter = statusReporter
         self.model = NetworkProtectionStatusView.Model(controller: controller,
-                                                      onboardingStatusPublisher: onboardingStatusPublisher,
-                                                      statusReporter: statusReporter,
-                                                      debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
-                                                      appLauncher: appLauncher,
-                                                      menuItems: menuItems,
-                                                      agentLoginItem: agentLoginItem)
+                                                       onboardingStatusPublisher: onboardingStatusPublisher,
+                                                       statusReporter: statusReporter,
+                                                       debugInformationPublisher: debugInformationPublisher.eraseToAnyPublisher(),
+                                                       appLauncher: appLauncher,
+                                                       menuItems: menuItems,
+                                                       agentLoginItem: agentLoginItem,
+                                                       accountManager: accountManager)
 
         super.init()
 

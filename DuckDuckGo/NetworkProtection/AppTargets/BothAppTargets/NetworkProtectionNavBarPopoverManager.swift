@@ -23,6 +23,7 @@ import LoginItems
 import NetworkProtection
 import NetworkProtectionIPC
 import NetworkProtectionUI
+import Subscription
 
 #if NETWORK_PROTECTION
 final class NetworkProtectionNavBarPopoverManager {
@@ -84,7 +85,8 @@ final class NetworkProtectionNavBarPopoverManager {
 
                 return menuItems
             },
-                                                   agentLoginItem: LoginItem.vpnMenu
+                                                   agentLoginItem: LoginItem.vpnMenu,
+                                                   accountManager: AccountManager()
             )
             popover.delegate = delegate
 
