@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - name: Check out the code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -57,12 +57,6 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Launch activity monitor
-      run: open /System/Applications/Utilities/Activity\ Monitor.app
-
-    - name: Start recording
-      run: screencapture -v -V 430 recording.mov &
-
     - name: Build and run UI Testing
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
@@ -70,18 +64,24 @@ jobs:
           -scheme "UITests" \
           -configuration Review \
           -derivedDataPath DerivedData \
-          -skipPackagePluginValidation 
-    
-    - name: Sleep for recording to finish
-      if: ${{ always() }}
-      run: sleep 150
+          -skipPackagePluginValidation \
+        | tee xcodebuild.log \
+        | xcbeautify --report junit --report-path . --junit-report-filename ui-tests.xml \
 
-    - name : Upload recording
-      uses: actions/upload-artifact@v3
-      if: ${{ always() }}
+    - name: Publish tests report
+      uses: mikepenz/action-junit-report@v3
+      if: always() 
       with:
-        name: latest
-        path: | 
-          recording.mov
-          /Users/runner/work/macos-browser/macos-browser/DerivedData/Build/Products/Review/DuckDuckGo\ Review.app.dSYM
+        check_name: "Test Report"
+        report_paths: ui-tests.xml
+
+    - name: Upload logs when workflow failed
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: BuildLogs
+        path: |
+          xcodebuild.log
+          DerivedData/Logs/Test/*.xcresult
           ~/Library/Logs/DiagnosticReports/*
+        retention-days: 7

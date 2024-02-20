@@ -23,7 +23,6 @@ final class BookmarksBarTests: XCTestCase {
     var debugMenuBarItem: XCUIElement!
     var internaluserstateMenuItem: XCUIElement!
 
-
     override func setUp() {
         // Launch App
         app = XCUIApplication()
@@ -44,11 +43,19 @@ final class BookmarksBarTests: XCTestCase {
         newTabWindow.menuItems["openPreferences:"].click()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Appearance"].click()
+        let showBookmarksBarCheckbox = settingsWindow.checkBoxes["Show Bookmarks Bar"]
 
-        settingsWindow.checkBoxes["Show Bookmarks Bar"].click()
-        // _NS:20 appears to be a static id?
-        XCTAssertEqual(settingsWindow.collectionViews.matching(identifier: "_NS:20").count, 0)
-        settingsWindow.checkBoxes["Show Bookmarks Bar"].click()
-        XCTAssertEqual(settingsWindow.collectionViews.matching(identifier: "_NS:20").count, 1)
+        let isChecked = showBookmarksBarCheckbox.value as? Int == 1
+        if isChecked {
+            showBookmarksBarCheckbox.click()
+            XCTAssertEqual(settingsWindow.collectionViews.matching(identifier: "_NS:20").count, 0)
+            showBookmarksBarCheckbox.click()
+            XCTAssertEqual(settingsWindow.collectionViews.matching(identifier: "_NS:20").count, 1)
+        } else {
+            showBookmarksBarCheckbox.click()
+            XCTAssertEqual(settingsWindow.collectionViews.matching(identifier: "_NS:20").count, 1)
+            showBookmarksBarCheckbox.click()
+            XCTAssertEqual(settingsWindow.collectionViews.matching(identifier: "_NS:20").count, 0)
+        }
     }
 }
