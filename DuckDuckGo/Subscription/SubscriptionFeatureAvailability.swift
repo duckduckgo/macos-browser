@@ -18,6 +18,10 @@
 
 import AppKit
 
+#if SUBSCRIPTION
+import Subscription
+#endif
+
 #if NETWORK_PROTECTION
 import NetworkProtection
 #endif
@@ -29,10 +33,11 @@ protocol SubscriptionFeatureAvailability {
 struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
 
     func isFeatureAvailable() -> Bool {
+        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
 #if SUBSCRIPTION_OVERRIDE_ENABLED
         return true
 #elseif SUBSCRIPTION
-        return isInternalUser && !isVPNActivated && !isDBPActivated
+        return AccountManager().isUserAuthenticated || isInternalUser && !isVPNActivated && !isDBPActivated
 #else
         return false
 #endif
