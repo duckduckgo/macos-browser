@@ -72,6 +72,9 @@ jobs:
           -derivedDataPath DerivedData \
           -skipPackagePluginValidation 
     
+    - name: Sleep for recording to finish
+      run: sleep 60
+      
     - name : Upload recording
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
