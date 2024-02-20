@@ -77,7 +77,7 @@ struct UserText {
     // MARK: - Main Menu -> -File
     static let mainMenuFile = NSLocalizedString("main-menu.file", value:"File", comment: "Main Menu File")
     static let mainMenuFileNewTab = NSLocalizedString("main-menu.file.new-tab", value:"New Tab", comment: "Main Menu File item")
-    static let mainMenuFileOpenLocation = NSLocalizedString("main-menu.file.open-location", value:"Open Location…", comment: "Main Menu File item")
+    static let mainMenuFileOpenLocation = NSLocalizedString("main-menu.file.open-location", value:"Open Location…", comment: "Main Menu File item- Menu option that allows the user to connect to an address (type an address) on click the address bar of the browser is selected and the user can type.")
     static let mainMenuFileCloseWindow = NSLocalizedString("main-menu.file.close-window", value:"Close Window", comment: "Main Menu File item")
     static let mainMenuFileCloseAllWindows = NSLocalizedString("main-menu.file.close-all-windows", value:"Close All Windows", comment: "Main Menu File item")
     static let mainMenuFileSaveAs = NSLocalizedString("main-menu.file.save-as", value:"Save As…", comment: "Main Menu File item")
@@ -93,7 +93,7 @@ struct UserText {
     static let mainMenuEditCut = NSLocalizedString("main-menu.edit.cut", value:"Cut", comment: "Main Menu Edit item")
     static let mainMenuEditCopy = NSLocalizedString("main-menu.edit.copy", value:"Copy", comment: "Main Menu Edit item")
     static let mainMenuEditPaste = NSLocalizedString("main-menu.edit.paste", value:"Paste", comment: "Main Menu Edit item")
-    static let mainMenuEditPasteAndMatchStyle = NSLocalizedString("main-menu.edit.paste-and-match-style", value:"Paste and Match Style", comment: "Main Menu Edit item")
+    static let mainMenuEditPasteAndMatchStyle = NSLocalizedString("main-menu.edit.paste-and-match-style", value:"Paste and Match Style", comment: "Main Menu Edit item - Action that allows the user to paste copy into a target document and the target document's style will be retained (instead of the source style)")
     static let mainMenuEditDelete = NSLocalizedString("main-menu.edit.delete", value:"Delete", comment: "Main Menu Edit item")
     static let mainMenuEditSelectAll = NSLocalizedString("main-menu.edit.select-all", value:"Select All", comment: "Main Menu Edit item")
 
@@ -219,7 +219,7 @@ struct UserText {
     static let webProcessCrashPageMessage = NSLocalizedString("page.crash.message", value: "Try reloading the page or come back later.", comment: "Error page message text shown when a Web Page process had crashed")
 
     static let openSystemPreferences = NSLocalizedString("open.preferences", value: "Open System Preferences", comment: "Open System Preferences (to re-enable permission for the App) (up to and including macOS 12")
-    static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "")
+    static let openSystemSettings = NSLocalizedString("open.settings", value: "Open System Settings…", comment: "This string represents a prompt or button label prompting the user to open system settings")
     static let checkForUpdate = NSLocalizedString("check.for.update", value: "Check for Update", comment: "Button users can use to check for a new update")
 
     static let unknownErrorTryAgainMessage = NSLocalizedString("error.unknown.try.again", value: "An unknown error has occurred", comment: "Generic error message on a dialog for when the cause is not known.")
@@ -347,7 +347,7 @@ struct UserText {
     static let autofillPasswordManagerBitwarden = NSLocalizedString("autofill.password-manager.bitwarden", value: "Bitwarden", comment: "Autofill password manager row title")
     static let autofillPasswordManagerBitwardenDisclaimer = NSLocalizedString("autofill.password-manager.bitwarden.disclaimer", value: "Setup requires installing the Bitwarden app.", comment: "Autofill password manager Bitwarden disclaimer")
     static let restartBitwarden = NSLocalizedString("restart.bitwarden", value: "Restart Bitwarden", comment: "Button to restart Bitwarden application")
-    static let restartBitwardenInfo = NSLocalizedString("restart.bitwarden.info", value: "Bitwarden is not responding. Please restart it to initiate the communication again", comment: "")
+    static let restartBitwardenInfo = NSLocalizedString("restart.bitwarden.info", value: "Bitwarden is not responding. Please restart it to initiate the communication again", comment: "This string represents a message informing the user that Bitwarden is not responding and prompts them to restart the application to initiate communication again.")
 
     static let autofillViewContentButton = NSLocalizedString("autofill.view-autofill-content",  value: "View Autofill Content…", comment: "View Autofill Content Button name in the autofill settings")
     static let autofillAskToSave = NSLocalizedString("autofill.ask-to-save", value: "Save and Autofill", comment: "Autofill settings section title")
@@ -531,7 +531,7 @@ struct UserText {
     static let downloads = NSLocalizedString("preferences.downloads", value: "Downloads", comment: "Show downloads browser preferences")
     static let isDefaultBrowser = NSLocalizedString("preferences.default-browser.active", value: "DuckDuckGo is your default browser", comment: "Indicate that the browser is the default")
     static let isNotDefaultBrowser = NSLocalizedString("preferences.default-browser.inactive", value: "DuckDuckGo is not your default browser.", comment: "Indicate that the browser is not the default")
-    static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default…", comment: "")
+    static let makeDefaultBrowser = NSLocalizedString("preferences.default-browser.button.make-default", value: "Make DuckDuckGo Default…", comment: "represents a prompt message asking the user to make DuckDuckGo their default browser.")
     static let onStartup = NSLocalizedString("preferences.on-startup", value: "On Startup", comment: "Name of the preferences section related to app startup")
     static let reopenAllWindowsFromLastSession = NSLocalizedString("preferences.reopen-windows", value: "Reopen all windows from last session", comment: "Option to control session restoration")
     static let showHomePage = NSLocalizedString("preferences.show-home", value: "Open a new window", comment: "Option to control session startup")
@@ -570,7 +570,7 @@ struct UserText {
 
     static let aboutDuckDuckGo = NSLocalizedString("preferences.about.about-duckduckgo", value: "About DuckDuckGo", comment: "About screen")
     static let privacySimplified = NSLocalizedString("preferences.about.privacy-simplified", value: "Privacy, simplified.", comment: "About screen")
-    static let aboutUnsupportedDeviceInfo1 = NSLocalizedString("preferences.about.unsupported-device-info1", value: "DuckDuckGo is no longer providing browser updates for your version of macOS.", comment: "")
+    static let aboutUnsupportedDeviceInfo1 = NSLocalizedString("preferences.about.unsupported-device-info1", value: "DuckDuckGo is no longer providing browser updates for your version of macOS.", comment: "This string represents a message informing the user that DuckDuckGo is no longer providing browser updates for their version of macOS")
     static func aboutUnsupportedDeviceInfo2(version: String) -> String {
         let localized = NSLocalizedString("preferences.about.unsupported-device-info2", value: "Please update to macOS %@ or later to use the most recent version of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates.", comment: "Copy in section that tells the user to update their macOS version since their current version is unsupported")
         return String(format: localized, version)
@@ -581,7 +581,7 @@ struct UserText {
     }
     static let aboutUnsupportedDeviceInfo2Part3 = "or later to use the most recent version"
     static let aboutUnsupportedDeviceInfo2Part4 = "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
-    static let unsupportedDeviceInfoAlertHeader = NSLocalizedString("unsupported.device.info.alert.header", value: "Your version of macOS is no longer supported.", comment: "")
+    static let unsupportedDeviceInfoAlertHeader = NSLocalizedString("unsupported.device.info.alert.header", value: "Your version of macOS is no longer supported.", comment: "his string represents the header for an alert informing the user that their version of macOS is no longer supported")
 
 
     static func moreAt(url: String) -> String {
@@ -717,10 +717,10 @@ struct UserText {
     static let moreOrLessCollapse = NSLocalizedString("more.or.less.collapse", value: "Show Less", comment: "For collapsing views to show less.")
     static let moreOrLessExpand = NSLocalizedString("more.or.less.expand", value: "Show More", comment: "For expanding views to show more.")
 
-    static let defaultBrowserPromptMessage = NSLocalizedString("default.browser.prompt.message", value: "Make DuckDuckGo your default browser", comment: "")
-    static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default…", comment: "")
+    static let defaultBrowserPromptMessage = NSLocalizedString("default.browser.prompt.message", value: "Make DuckDuckGo your default browser", comment: "represents a prompt message asking the user to make DuckDuckGo their default browser.")
+    static let defaultBrowserPromptButton = NSLocalizedString("default.browser.prompt.button", value: "Set Default…", comment: "represents a prompt message asking the user to make DuckDuckGo their default browser.")
 
-    static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "")
+    static let homePageProtectionSummaryInfo = NSLocalizedString("home.page.protection.summary.info", value: "No recent activity", comment: "This string represents a message in the protection summary on the home page, indicating that there is no recent activity")
     static func homePageProtectionSummaryMessage(numberOfTrackersBlocked: Int) -> String {
         let localized = NSLocalizedString("home.page.protection.summary.message",
                                           value: "%@ tracking attempts blocked",
@@ -729,10 +729,10 @@ struct UserText {
     }
     static let homePageProtectionDurationInfo = NSLocalizedString("home.page.protection.duration", value: "PAST 7 DAYS", comment: "Past 7 days in uppercase.")
 
-    static let homePageEmptyStateItemTitle = NSLocalizedString("home.page.empty.state.item.title", value: "Recently visited sites appear here", comment: "")
-    static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "")
-    static let homePageNoTrackersFound = NSLocalizedString("home.page.no.trackers.found", value: "No trackers found", comment: "")
-    static let homePageNoTrackersBlocked = NSLocalizedString("home.page.no.trackers.blocked", value: "No trackers blocked", comment: "")
+    static let homePageEmptyStateItemTitle = NSLocalizedString("home.page.empty.state.item.title", value: "Recently visited sites appear here", comment: "This string represents the title for an empty state item on the home page, indicating that recently visited sites will appear here")
+    static let homePageEmptyStateItemMessage = NSLocalizedString("home.page.empty.state.item.message", value: "Keep browsing to see how many trackers were blocked", comment: "This string represents the message for an empty state item on the home page, encouraging the user to keep browsing to see how many trackers were blocked")
+    static let homePageNoTrackersFound = NSLocalizedString("home.page.no.trackers.found", value: "No trackers found", comment: "This string represents a message on the home page indicating that no trackers were found")
+    static let homePageNoTrackersBlocked = NSLocalizedString("home.page.no.trackers.blocked", value: "No trackers blocked", comment: "This string represents a message on the home page indicating that no trackers were blocked")
     static let homePageBurnFireproofSiteAlert = NSLocalizedString("home.page.burn.fireproof.site.alert", value: "History will be cleared for this site, but related data will remain, because this site is Fireproof", comment: "Message for an alert displayed when trying to burn a fireproof website")
     static let homePageClearHistory = NSLocalizedString("home.page.clear.history", value: "Clear History", comment: "Button caption for the burn fireproof website alert")
 
@@ -753,8 +753,8 @@ struct UserText {
 
     static let recentlyClosedWindowMenuItem = NSLocalizedString("n.more.tabs", value: "Window with multiple tabs (%d)", comment: "String in Recently Closed menu item for recently closed browser window and number of tabs contained in the closed window")
 
-    static let reopenLastClosedTab = NSLocalizedString("reopen.last.closed.tab", value: "Reopen Last Closed Tab", comment: "")
-    static let reopenLastClosedWindow = NSLocalizedString("reopen.last.closed.window", value: "Reopen Last Closed Window", comment: "")
+    static let reopenLastClosedTab = NSLocalizedString("reopen.last.closed.tab", value: "Reopen Last Closed Tab", comment: "This string represents an action to reopen the last closed tab in the browser")
+    static let reopenLastClosedWindow = NSLocalizedString("reopen.last.closed.window", value: "Reopen Last Closed Window", comment: "This string represents an action to reopen the last closed window in the browser")
     static let cookiePopupManagedNotification = NSLocalizedString("notification.badge.cookiesmanaged", value: "Cookies Managed", comment: "Notification that appears when browser automatically handle cookies")
     static let cookiePopupHiddenNotification = NSLocalizedString("notification.badge.popuphidden", value: "Pop-up Hidden", comment: "Notification that appears when browser cosmetically hides a cookie popup")
 
@@ -796,24 +796,24 @@ struct UserText {
 
     static let passwordManager = NSLocalizedString("password.manager", value: "Password Manager", comment: "Section header")
     static let bitwardenPreferencesUnableToConnect = NSLocalizedString("bitwarden.preferences.unable-to-connect", value: "Unable to find or connect to Bitwarden", comment: "Dialog telling the user Bitwarden (a password manager) is not available")
-    static let bitwardenPreferencesCompleteSetup = NSLocalizedString("bitwarden.preferences.complete-setup", value: "Complete Setup…", comment: "")
-    static let bitwardenPreferencesOpenBitwarden = NSLocalizedString("bitwarden.preferences.open-bitwarden", value: "Open Bitwarden", comment: "")
+    static let bitwardenPreferencesCompleteSetup = NSLocalizedString("bitwarden.preferences.complete-setup", value: "Complete Setup…", comment: "action option that prompts the user to complete the setup process in Bitwarden preferences")
+    static let bitwardenPreferencesOpenBitwarden = NSLocalizedString("bitwarden.preferences.open-bitwarden", value: "Open Bitwarden", comment: "Button to open Bitwarden app")
     static let bitwardenPreferencesUnlock = NSLocalizedString("bitwarden.preferences.unlock", value: "Unlock Bitwarden", comment: "Asks the user to unlock the password manager Bitwarden")
     static let bitwardenPreferencesRun = NSLocalizedString("bitwarden.preferences.run", value: "Bitwarden app not running", comment: "Warns user that the password manager Bitwarden app is not running")
-    static let bitwardenError = NSLocalizedString("bitwarden.error", value: "Unable to find or connect to Bitwarden", comment: "")
+    static let bitwardenError = NSLocalizedString("bitwarden.error", value: "Unable to find or connect to Bitwarden", comment: "This message appears when the application is unable to find or connect to Bitwarden, indicating a connection issue.")
     static let bitwardenNotInstalled = NSLocalizedString("bitwarden.not.installed", value: "Bitwarden app is not installed", comment: "")
-    static let bitwardenOldVersion = NSLocalizedString("bitwarden.old.version", value: "Please update Bitwarden to the latest version", comment: "")
-    static let bitwardenIntegrationNotApproved = NSLocalizedString("bitwarden.integration.not.approved", value: "Integration with DuckDuckGo is not approved in Bitwarden app", comment: "")
-    static let bitwardenMissingHandshake = NSLocalizedString("bitwarden.missing.handshake", value: "Missing handshake", comment: "")
-    static let bitwardenWaitingForHandshake = NSLocalizedString("bitwarden.waiting.for.handshake", value: "Waiting for the handshake approval in Bitwarden app", comment: "")
+    static let bitwardenOldVersion = NSLocalizedString("bitwarden.old.version", value: "Please update Bitwarden to the latest version", comment: "Message that warns user they need to update their password manager Bitwarden app vesion")
+    static let bitwardenIntegrationNotApproved = NSLocalizedString("bitwarden.integration.not.approved", value: "Integration with DuckDuckGo is not approved in Bitwarden app", comment: "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates that the integration with DuckDuckGo has not been approved in the Bitwarden app.")
+    static let bitwardenMissingHandshake = NSLocalizedString("bitwarden.missing.handshake", value: "Missing handshake", comment: "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates a missing handshake (a way for two devices or systems to say hello to each other and agree to communicate or exchange information).")
+    static let bitwardenWaitingForHandshake = NSLocalizedString("bitwarden.waiting.for.handshake", value: "Waiting for the handshake approval in Bitwarden app", comment: "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates the system is waiting for the handshake (a way for two devices or systems to say hello to each other and agree to communicate or exchange information).")
     static let bitwardenCantAccessContainer = NSLocalizedString("bitwarden.cant.access.container", value: "DuckDuckGo needs permission to access Bitwarden. You can grant DuckDuckGo Full Disk Access in System Settings, or switch back to the built-in password manager.", comment: "Requests user Full Disk access in order to access password manager Birwarden")
-    static let bitwardenHanshakeNotApproved = NSLocalizedString("bitwarden.handshake.not.approved", value: "Handshake not approved in Bitwarden app", comment: "")
-    static let bitwardenConnecting = NSLocalizedString("bitwarden.connecting", value: "Connecting to Bitwarden", comment: "")
-    static let bitwardenWaitingForStatusResponse = NSLocalizedString("bitwarden.waiting.for.status.response", value: "Waiting for the status response from Bitwarden", comment: "")
+    static let bitwardenHanshakeNotApproved = NSLocalizedString("bitwarden.handshake.not.approved", value: "Handshake not approved in Bitwarden app", comment: "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action. This message indicates that the handshake process was not approved in the Bitwarden app.")
+    static let bitwardenConnecting = NSLocalizedString("bitwarden.connecting", value: "Connecting to Bitwarden", comment: "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action, in this case we are in the progress of connecting the browser to the Bitwarden password maanger.")
+    static let bitwardenWaitingForStatusResponse = NSLocalizedString("bitwarden.waiting.for.status.response", value: "Waiting for the status response from Bitwarden", comment: "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action, in this case that the application is currently waiting for a response from the Bitwarden service.")
 
     static let connectToBitwarden = NSLocalizedString("bitwarden.connect.title", value: "Connect to Bitwarden", comment: "Title for the Bitwarden onboarding flow")
 
-    static let connectToBitwardenDescription = NSLocalizedString("bitwarden.connect.description", value: "We’ll walk you through connecting to Bitwarden, so you can use it in DuckDuckGo.", comment: "")
+    static let connectToBitwardenDescription = NSLocalizedString("bitwarden.connect.description", value: "We’ll walk you through connecting to Bitwarden, so you can use it in DuckDuckGo.", comment: "Description for when the user wants to connect the browser to the password manager Bitwarned.")
 
     static let connectToBitwardenPrivacy = NSLocalizedString("bitwarden.connect.privacy", value: "Privacy", comment: "")
     static let installBitwarden = NSLocalizedString("bitwarden.install", value: "Install Bitwarden", comment: "Button to install Bitwarden app")
@@ -833,7 +833,7 @@ struct UserText {
     static let bitwardenIntegrationComplete = NSLocalizedString("bitwarden.integration.complete", value: "Bitwarden integration complete!", comment: "Setup of the integration with Bitwarden app")
     static let bitwardenIntegrationCompleteInfo = NSLocalizedString("bitwarden.integration.complete.info", value: "You are now using Bitwarden as your password manager.", comment: "Setup of the integration with Bitwarden app")
 
-    static let bitwardenCommunicationInfo = NSLocalizedString("bitwarden.connect.communication-info", value: "All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.", comment: "")
+    static let bitwardenCommunicationInfo = NSLocalizedString("bitwarden.connect.communication-info", value: "All communication between Bitwarden and DuckDuckGo is encrypted and the data never leaves your device.", comment: "Warns users that all communication between the DuckDuckGo browser and the password manager Bitwarden is encrypted and doesn't leave the user device")
     static let bitwardenHistoryInfo = NSLocalizedString("bitwarden.connect.history-info", value: "Bitwarden will have access to your browsing history.", comment: "Warn users that the password Manager Bitwarden will have access to their browsing history")
 
     static let showAutofillShortcut = NSLocalizedString("pinning.show-autofill-shortcut", value: "Show Autofill Shortcut", comment: "Menu item for showing the autofill shortcut")
@@ -987,10 +987,10 @@ struct UserText {
     static let newTabRecentActivitySectionTitle = NSLocalizedString("newTab.recent.activity.section.title", value: "Recent Activity", comment: "Title of the RecentActivity section in the home page")
     static let burnerWindowHeader = NSLocalizedString("burner.window.header", value: "Fire Window", comment: "Header shown on the hompage of the Fire Window")
     static let burnerTabHomeTitle = NSLocalizedString("burner.tab.home.title", value: "New Fire Tab", comment: "Tab title for Fire Tab")
-    static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "Browse without saving local history", comment: "")
-    static let burnerHomepageDescription2 = NSLocalizedString("burner.homepage.description.2", value: "Sign in to a site with a different account", comment: "")
-    static let burnerHomepageDescription3 = NSLocalizedString("burner.homepage.description.3", value: "Troubleshoot websites", comment: "")
-    static let burnerHomepageDescription4 = NSLocalizedString("burner.homepage.description.4", value: "Fire windows are isolated from other browser data, and their data is burned when you close them. They have the same tracking protection as other windows.", comment: "")
+    static let burnerHomepageDescription1 = NSLocalizedString("burner.homepage.description.1", value: "Browse without saving local history", comment: "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.")
+    static let burnerHomepageDescription2 = NSLocalizedString("burner.homepage.description.2", value: "Sign in to a site with a different account", comment: "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.")
+    static let burnerHomepageDescription3 = NSLocalizedString("burner.homepage.description.3", value: "Troubleshoot websites", comment: "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.")
+    static let burnerHomepageDescription4 = NSLocalizedString("burner.homepage.description.4", value: "Fire windows are isolated from other browser data, and their data is burned when you close them. They have the same tracking protection as other windows.", comment: "This describes the functionality of one of out browser feature Fire Window, highlighting their isolation from other browser data and the automatic deletion of their data upon closure. Additionally, it emphasizes that fire windows offer the same level of tracking protection as other browsing windows.")
 
     // Email Protection Management
     static let disableEmailProtectionTitle = NSLocalizedString("disable.email.protection.title", value: "Disable Email Protection Autofill?", comment: "Title for alert shown when user disables email protection")

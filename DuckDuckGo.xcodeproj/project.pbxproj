@@ -671,7 +671,6 @@
 		3706FCC0293F65D500E42796 /* FindInPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85A0117325AF2EDF00FA6A0C /* FindInPage.storyboard */; };
 		3706FCC3293F65D500E42796 /* userscript.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055BE27A1BA1D001AC618 /* userscript.js */; };
 		3706FCC4293F65D500E42796 /* fb-tds.json in Resources */ = {isa = PBXBuildFile; fileRef = EA4617EF273A28A700F110A2 /* fb-tds.json */; };
-		3706FCC5293F65D500E42796 /* TabPreview.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE8B101258A41C000E81239 /* TabPreview.storyboard */; };
 		3706FCC6293F65D500E42796 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AA68C3D62490F821001B8783 /* README.md */; };
 		3706FCC8293F65D500E42796 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		3706FCC9293F65D500E42796 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */; };
@@ -1955,7 +1954,6 @@
 		4B957BFD2AC7AE700062CA31 /* JSAlert.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEC111E3294D06020086524F /* JSAlert.storyboard */; };
 		4B957C002AC7AE700062CA31 /* userscript.js in Resources */ = {isa = PBXBuildFile; fileRef = B31055BE27A1BA1D001AC618 /* userscript.js */; };
 		4B957C012AC7AE700062CA31 /* fb-tds.json in Resources */ = {isa = PBXBuildFile; fileRef = EA4617EF273A28A700F110A2 /* fb-tds.json */; };
-		4B957C022AC7AE700062CA31 /* TabPreview.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE8B101258A41C000E81239 /* TabPreview.storyboard */; };
 		4B957C032AC7AE700062CA31 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AA68C3D62490F821001B8783 /* README.md */; };
 		4B957C042AC7AE700062CA31 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA585D85248FD31400E9A3E2 /* Assets.xcassets */; };
 		4B957C052AC7AE700062CA31 /* NavigationBar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85589E8C27BBBB870038AD11 /* NavigationBar.storyboard */; };
@@ -2559,7 +2557,6 @@
 		AAE7527C263B056C00B973F8 /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527B263B056C00B973F8 /* HistoryStore.swift */; };
 		AAE7527E263B05C600B973F8 /* HistoryEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527D263B05C600B973F8 /* HistoryEntry.swift */; };
 		AAE75280263B0A4D00B973F8 /* HistoryCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE7527F263B0A4D00B973F8 /* HistoryCoordinator.swift */; };
-		AAE8B102258A41C000E81239 /* TabPreview.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AAE8B101258A41C000E81239 /* TabPreview.storyboard */; };
 		AAE8B110258A456C00E81239 /* TabPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */; };
 		AAE99B8927088A19008B6BD9 /* FirePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE99B8827088A19008B6BD9 /* FirePopover.swift */; };
 		AAEC74B22642C57200C2EFBC /* HistoryCoordinatingMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */; };
@@ -4104,7 +4101,6 @@
 		AAE7527B263B056C00B973F8 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		AAE7527D263B05C600B973F8 /* HistoryEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntry.swift; sourceTree = "<group>"; };
 		AAE7527F263B0A4D00B973F8 /* HistoryCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinator.swift; sourceTree = "<group>"; };
-		AAE8B101258A41C000E81239 /* TabPreview.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TabPreview.storyboard; sourceTree = "<group>"; };
 		AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabPreviewViewController.swift; sourceTree = "<group>"; };
 		AAE99B8827088A19008B6BD9 /* FirePopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirePopover.swift; sourceTree = "<group>"; };
 		AAEC74B12642C57200C2EFBC /* HistoryCoordinatingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCoordinatingMock.swift; sourceTree = "<group>"; };
@@ -7673,7 +7669,6 @@
 		AAE8B0FD258A416F00E81239 /* TabPreview */ = {
 			isa = PBXGroup;
 			children = (
-				AAE8B101258A41C000E81239 /* TabPreview.storyboard */,
 				AAC82C5F258B6CB5009B6B42 /* TabPreviewWindowController.swift */,
 				AAE8B10F258A456C00E81239 /* TabPreviewViewController.swift */,
 				1DB67F272B6FE21D003DF243 /* Model */,
@@ -8892,7 +8887,6 @@
 				EEC8EB3F2982CA440065AA39 /* JSAlert.storyboard in Resources */,
 				3706FCC3293F65D500E42796 /* userscript.js in Resources */,
 				3706FCC4293F65D500E42796 /* fb-tds.json in Resources */,
-				3706FCC5293F65D500E42796 /* TabPreview.storyboard in Resources */,
 				3706FCC6293F65D500E42796 /* README.md in Resources */,
 				3706FCC8293F65D500E42796 /* Assets.xcassets in Resources */,
 				3706FCC9293F65D500E42796 /* NavigationBar.storyboard in Resources */,
@@ -9019,7 +9013,6 @@
 				4B957BFD2AC7AE700062CA31 /* JSAlert.storyboard in Resources */,
 				4B957C002AC7AE700062CA31 /* userscript.js in Resources */,
 				4B957C012AC7AE700062CA31 /* fb-tds.json in Resources */,
-				4B957C022AC7AE700062CA31 /* TabPreview.storyboard in Resources */,
 				4B957C032AC7AE700062CA31 /* README.md in Resources */,
 				4B957C042AC7AE700062CA31 /* Assets.xcassets in Resources */,
 				4B957C052AC7AE700062CA31 /* NavigationBar.storyboard in Resources */,
@@ -9115,7 +9108,6 @@
 				EEC111E4294D06020086524F /* JSAlert.storyboard in Resources */,
 				B31055C627A1BA1D001AC618 /* userscript.js in Resources */,
 				EA4617F0273A28A700F110A2 /* fb-tds.json in Resources */,
-				AAE8B102258A41C000E81239 /* TabPreview.storyboard in Resources */,
 				AA68C3D72490F821001B8783 /* README.md in Resources */,
 				AA585D86248FD31400E9A3E2 /* Assets.xcassets in Resources */,
 				85589E8D27BBBB870038AD11 /* NavigationBar.storyboard in Resources */,
@@ -13409,7 +13401,7 @@
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
 				kind = exactVersion;
-				version = 108.1.0;
+				version = 109.0.0;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
