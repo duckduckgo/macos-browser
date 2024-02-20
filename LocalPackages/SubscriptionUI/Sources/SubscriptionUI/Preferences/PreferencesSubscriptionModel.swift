@@ -40,7 +40,7 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager = AccountManager(), 
+    public init(accountManager: AccountManager = AccountManager(),
                 openURLHandler: @escaping (URL) -> Void,
                 openVPNHandler: @escaping () -> Void,
                 openDBPHandler: @escaping () -> Void,
