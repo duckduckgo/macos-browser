@@ -85,7 +85,8 @@ struct ScriptSourceProvider: ScriptSourceProviding {
         return DefaultAutofillSourceProvider.Builder(privacyConfigurationManager: privacyConfigurationManager,
                                                      properties: ContentScopeProperties(gpcEnabled: privacySettings.gpcEnabled,
                                                                                         sessionKey: self.sessionKey ?? "",
-                                                                                        featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)))
+                                                                                        featureToggles: ContentScopeFeatureToggles.supportedFeaturesOnMacOS(privacyConfig)),
+                                                     isDebug: AutofillPreferences().debugScriptEnabled)
                 .withJSLoading()
                 .build()
     }
