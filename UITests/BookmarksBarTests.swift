@@ -40,7 +40,7 @@ final class BookmarksBarTests: XCTestCase {
 
     func testEnableDisableBookMarks() throws {
         let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
+        app.buttons["Options Button"].click()
         newTabWindow.menuItems["openPreferences:"].click()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Appearance"].click()
