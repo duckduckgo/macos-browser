@@ -21,8 +21,8 @@ import SwiftUIExtensions
 
 struct PinnedTabView: View {
     enum Const {
-        static let dimension: CGFloat = 32
-        static let cornerRadius: CGFloat = 6
+        static let dimension: CGFloat = 34
+        static let cornerRadius: CGFloat = 8.5
     }
 
     @ObservedObject var model: Tab
@@ -206,13 +206,12 @@ struct PinnedTabInnerView: View {
                 Circle()
                     .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
                     .background(Circle().foregroundColor(Color("PinnedTabMuteStateCircleColor")))
-                    .frame(width: 14, height: 14)
+                    .frame(width: 16, height: 16)
                 Image("Audio-Mute")
                     .resizable()
                     .renderingMode(.template)
-                    .foregroundColor(.gray)
-                    .frame(width: 9, height: 9)
-            }.offset(x: 6, y: -2)
+                    .frame(width: 12, height: 12)
+            }.offset(x: 8, y: -8)
         default: EmptyView()
         }
     }

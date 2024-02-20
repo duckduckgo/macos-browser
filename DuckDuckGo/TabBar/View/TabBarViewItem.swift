@@ -53,9 +53,11 @@ protocol TabBarViewItemDelegate: AnyObject {
 final class TabBarViewItem: NSCollectionViewItem {
 
     enum Constants {
-        static let textFieldPadding: CGFloat = 32
+        static let textFieldPadding: CGFloat = 28
         static let textFieldPaddingNoFavicon: CGFloat = 12
-        static let textFieldPaddingMuteIconPresent: CGFloat = 56
+        static let textFieldPaddingMuteIconPresent: CGFloat = 48
+        static let faviconLeadingPadding: CGFloat = 4
+        static let faviconLeadingPaddingMuteIconPresent: CGFloat = 6
     }
 
     var widthStage: WidthStage {
@@ -276,7 +278,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         layer.borderWidth = TabShadowConfig.dividerSize
         layer.opacity = TabShadowConfig.alpha
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-        layer.cornerRadius = 7
+        layer.cornerRadius = 11
         layer.mask = layerMask
         return layer
     }()
@@ -328,7 +330,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func setupView() {
         view.wantsLayer = true
-        view.layer?.cornerRadius = 7
+        view.layer?.cornerRadius = 11
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
         view.layer?.addSublayer(borderLayer)
@@ -352,8 +354,20 @@ final class TabBarViewItem: NSCollectionViewItem {
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
 
-        faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
-        faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+        if mutedTabIcon.isHidden {
+            faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
+            faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
+        } else {
+            // When the mute icon is visible and the tab is compressed we need to center both
+            faviconWrapperViewCenterConstraint.priority = .defaultLow
+            faviconWrapperViewLeadingConstraint.priority = .defaultHigh
+
+            if titleTextField.isHidden { // If the title text is hidden it means the tab is compressed
+                faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPaddingMuteIconPresent
+            } else {
+                faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPadding
+            }
+        }
 
         updateBorderLayerColor()
 
@@ -598,11 +612,11 @@ extension TabBarViewItem: MouseClickViewDelegate {
 extension TabBarViewItem {
 
     enum Height: CGFloat {
-        case standard = 32
+        case standard = 34
     }
 
     enum Width: CGFloat {
-        case minimum = 50
+        case minimum = 56
         case minimumSelected = 120
         case maximum = 240
     }
