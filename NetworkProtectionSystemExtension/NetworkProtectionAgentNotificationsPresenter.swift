@@ -23,9 +23,6 @@ import NetworkProtection
 /// the established IPC connection.
 ///
 final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotificationsPresenter {
-    func showExpiredEntitlementNotification() {
-
-    }
 
     private let notificationCenter: NetworkProtectionNotificationCenter
 
@@ -49,6 +46,10 @@ final class NetworkProtectionAgentNotificationsPresenter: NetworkProtectionNotif
 
     func showSupersededNotification() {
         notificationCenter.post(.showVPNSupersededNotification)
+    }
+
+    func showExpiredEntitlementNotification() {
+        notificationCenter.post(.showExpiredEntitlementNotification)
     }
 
     func showTestNotification() {

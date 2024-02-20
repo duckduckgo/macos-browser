@@ -46,9 +46,6 @@ extension UNNotificationCategory {
 /// This class takes care of requesting the presentation of notifications using UNNotificationCenter
 ///
 final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtectionNotificationsPresenter {
-    func showExpiredEntitlementNotification() {
-
-    }
 
     private static let threadIdentifier = "com.duckduckgo.NetworkProtectionNotificationsManager.threadIdentifier"
 
@@ -137,6 +134,12 @@ final class NetworkProtectionUNNotificationsPresenter: NSObject, NetworkProtecti
         showNotification(.superseded, content)
     }
 
+    func showExpiredEntitlementNotification() {
+        let content = notificationContent(title: UserText.networkProtectionEntitlementExpiredNotificationTitle,
+                                          subtitle: UserText.networkProtectionEntitlementExpiredNotificationBody)
+        showNotification(.expiredEntitlement, content)
+    }
+
     func showTestNotification() {
         // These strings are deliberately hardcoded as we don't want them localized, they're only for debugging:
         let content = notificationContent(title: "Test notification",
@@ -165,6 +168,7 @@ public enum NetworkProtectionNotificationIdentifier: String {
     case reconnecting = "network-protection.notification.reconnecting"
     case connected = "network-protection.notification.connected"
     case superseded = "network-protection.notification.superseded"
+    case expiredEntitlement = "network-protection.notification.expired-entitlement"
     case test = "network-protection.notification.test"
 }
 
