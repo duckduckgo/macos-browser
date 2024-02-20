@@ -1,0 +1,38 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>DuckDuckGo</title>
+        <item>
+            <pubDate>Fri, 16 Feb 2024 20:25:16 +0000</pubDate>
+            <sparkle:channel>internal-channel</sparkle:channel>
+            <sparkle:version>120</sparkle:version>
+            <sparkle:shortVersionString>1.75.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>11.4</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3 style="font-size:14px">What's new</h3>
+<ul style="font-size:12px">
+<li>Tab previews now load faster and include a preview of the page, making it easier to find the tab you’re looking for.</li>
+<li>We've updated the print dialog to include page orientation, paper type, and scale settings.</li>
+</ul>]]></description>
+            <enclosure url="https://staticcdn.duckduckgo.com/macos-desktop-browser/duckduckgo-1.75.0.120.dmg" length="62296392" type="application/octet-stream" sparkle:edSignature="ROnc/qGlxhuQU9vb58RZVVhxtWCTj9DG3wDyR0R182KZWSdF9gV3SoO8oJCZgBYQ+myY9GoOSlRHaZiXtdaGBQ=="/>
+            <sparkle:deltas>
+                <enclosure url="https://staticcdn.duckduckgo.com/macos-desktop-browser/DuckDuckGo120-119.delta" sparkle:deltaFrom="119" length="1326530" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="865120" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="nfJeWm4nzEC+JbkVegaesi6d4v41oBYjsBVPr0WXgi0TWihnJoUIxetulSo62XN76SqSCfnlP+CJXU3jC6/aCQ=="/>
+                <enclosure url="https://staticcdn.duckduckgo.com/macos-desktop-browser/DuckDuckGo120-118.delta" sparkle:deltaFrom="118" length="1480426" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="865120" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,en" sparkle:edSignature="WvrfAZS8IrCgTFvfSteHInQ6gigQoe/D+PCZ2X66ah+w13SVx7BG314+cUSFVpeKWRS38kdsv/4m/blcs2C1CA=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
+            <title>1.55.0</title>
+            <pubDate>Mon, 11 Sep 2023 19:28:06 +0600</pubDate>
+            <sparkle:phasedRolloutInterval>43200</sparkle:phasedRolloutInterval>
+            <sparkle:version>1.55.0</sparkle:version>
+            <sparkle:shortVersionString>1.55.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>10.15.4</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3 style="font-size:14px">What's new</h3>
+<ul style="font-size:12px">
+<li>DuckDuckGo will no longer provide browser updates for macOS Catalina and Big Sur below version 11.4. Update to a newer version of macOS in order to continue using the most recent version of DuckDuckGo.</li>
+<li>You can now enable Autofill Auto-lock to also protect access to your Logins and Credit Card while filling forms.</li>
+<li>We fixed a bug that prevented opening Outlook emails in a new Window.</li>
+</ul>]]></description>
+            <enclosure url="https://staticcdn.duckduckgo.com/macos-desktop-browser/duckduckgo-1.55.0.dmg" length="38428228" type="application/octet-stream" sparkle:edSignature="1aj02MvfnkwbOtj2KwnOhGyoNfDS+StbRHfTyKEqL9qED3AZ0/+UssVw5G1ghrK6mRsa1oP+p5zrR3Y95p3PDA=="/>
+        </item>
+    </channel>
+</rss>
