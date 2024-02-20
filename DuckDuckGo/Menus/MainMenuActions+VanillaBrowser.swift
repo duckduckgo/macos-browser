@@ -26,8 +26,15 @@ extension MainViewController: BareBonesBrowserUIDelegate {
         openVanillaBrowser(url: URL(string: "https://duckduckgo.com/")!)
     }
 
+    static var webViewConfiguration: WKWebViewConfiguration = {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+        configuration.processPool = WKProcessPool()
+        return configuration
+    }()
+
     private func openVanillaBrowser(url: URL) {
-        let myView = NSHostingView(rootView: BareBonesBrowserView(initialURL: url, homeURL: url, uiDelegate: self))
+        let myView = NSHostingView(rootView: BareBonesBrowserView(initialURL: url, homeURL: url, uiDelegate: self, configuration: Self.webViewConfiguration))
         myView.translatesAutoresizingMaskIntoConstraints = false
         myView.widthAnchor.constraint(greaterThanOrEqualToConstant: 640).isActive = true
         myView.heightAnchor.constraint(greaterThanOrEqualToConstant: 480).isActive = true
@@ -36,6 +43,7 @@ extension MainViewController: BareBonesBrowserUIDelegate {
         let window = NSWindow(contentViewController: viewController)
         window.contentViewController = viewController
         window.center()
+        window.title = "Vanilla browser"
         let wc = NSWindowController(window: window)
         wc.showWindow(nil)
     }
