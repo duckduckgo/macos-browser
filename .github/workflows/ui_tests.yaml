@@ -73,8 +73,9 @@ jobs:
           -skipPackagePluginValidation 
     
     - name: Sleep for recording to finish
-      run: sleep 60
-      
+      if: ${{ always() }}
+      run: sleep 90
+
     - name : Upload recording
       uses: actions/upload-artifact@v3
       if: ${{ always() }}
