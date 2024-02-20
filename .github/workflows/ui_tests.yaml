@@ -57,11 +57,11 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Permissions
-      run: sudo automationmodetool enable-automationmode-without-authentication
-
     - name: Launch activity monitor
       run: open /System/Applications/Utilities/Activity\ Monitor.app
+
+    - name: Start recording
+      run: screencapture -v -V 430 recording.mov &
 
     - name: Build and run UI Testing
       run: |
@@ -78,6 +78,6 @@ jobs:
       with:
         name: latest
         path: | 
-          /Users/runner/work/macos-browser/macos-browser/DerivedData/Build/Products/Review/UITests-Runner.app/Contents/PlugIns/UITests.xctest.dSYM
+          recording.mov
           /Users/runner/work/macos-browser/macos-browser/DerivedData/Build/Products/Review/DuckDuckGo\ Review.app.dSYM
           ~/Library/Logs/DiagnosticReports/*
