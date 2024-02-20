@@ -70,10 +70,12 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
 
     private let mode: Mode
     private let bookmarkManager: BookmarkManager
+    private let onFolderAdded: ((BookmarkFolder?) -> Void)?
 
-    init(mode: Mode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
+    init(mode: Mode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, onFolderAdded: ((BookmarkFolder?) -> Void)? = nil) {
         self.mode = mode
         self.bookmarkManager = bookmarkManager
+        self.onFolderAdded = onFolderAdded
         folderName = mode.folderName
         folders = .init(bookmarkManager.list)
         selectedFolder = mode.parentFolder
@@ -124,7 +126,9 @@ private extension AddEditBookmarkFolderDialogViewModel {
     }
 
     func add(folderWithName name: String, to parent: BookmarkFolder?) {
-        bookmarkManager.makeFolder(for: name, parent: parent, completion: { _ in })
+        bookmarkManager.makeFolder(for: name, parent: parent) { [weak self] bookmarkFolder in
+            self?.onFolderAdded?(bookmarkFolder)
+        }
     }
 
 }
