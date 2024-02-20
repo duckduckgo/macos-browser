@@ -5099,7 +5099,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Mute"
+            "value" : "Mute Tab"
           }
         }
       }
@@ -9119,7 +9119,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Unmute"
+            "value" : "Unmute Tab"
           }
         }
       }
