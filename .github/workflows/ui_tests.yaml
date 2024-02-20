@@ -74,7 +74,7 @@ jobs:
     
     - name: Sleep for recording to finish
       if: ${{ always() }}
-      run: sleep 90
+      run: sleep 150
 
     - name : Upload recording
       uses: actions/upload-artifact@v3
