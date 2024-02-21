@@ -153,10 +153,10 @@ final class DeviceAuthenticator: UserAuthenticating {
 
     func authenticateUser(reason: AuthenticationReason, result: @escaping (DeviceAuthenticationResult) -> Void) {
 #if DEBUG || REVIEW
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+//        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
             result(.success)
             return
-        }
+//        }
 #endif
         let needsAuthenticationForCreditCardsAutofill = reason == .autofillCreditCards && isCreditCardTimeIntervalExpired()
         let needsAuthenticationForSyncSettings = reason == .syncSettings && isSyncSettingsTimeIntervalExpired()

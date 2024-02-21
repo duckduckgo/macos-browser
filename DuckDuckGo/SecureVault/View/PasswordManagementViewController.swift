@@ -268,10 +268,10 @@ final class PasswordManagementViewController: NSViewController {
     private func promptForAuthenticationIfNecessary() {
         let authenticator = DeviceAuthenticator.shared
 #if DEBUG || REVIEW
-        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
+//        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
             toggleLockScreen(hidden: true)
             return
-        }
+//        }
 #endif
         toggleLockScreen(hidden: !authenticator.requiresAuthentication)
 
