@@ -303,9 +303,10 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         // GIVEN
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
         var didCallDismiss = false
+        sut.folderName = "DuckDuckGo"
 
         // WHEN
-        sut.cancel {
+        sut.addOrSave {
             didCallDismiss = true
         }
 

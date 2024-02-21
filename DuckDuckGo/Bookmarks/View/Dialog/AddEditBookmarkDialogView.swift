@@ -120,7 +120,7 @@ struct AddEditBookmarkDialogView: ModalView {
 #Preview("Add Bookmark - Light Mode") {
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
     bookmarkManager.loadBookmarks()
-    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add, bookmarkManager: bookmarkManager)
+    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
     let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
     let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
     return AddEditBookmarkDialogView(viewModel: viewModel)
@@ -130,7 +130,7 @@ struct AddEditBookmarkDialogView: ModalView {
 #Preview("Add Bookmark - Light Mode") {
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
     bookmarkManager.loadBookmarks()
-    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add, bookmarkManager: bookmarkManager)
+    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
     let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
     let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
     return AddEditBookmarkDialogView(viewModel: viewModel)

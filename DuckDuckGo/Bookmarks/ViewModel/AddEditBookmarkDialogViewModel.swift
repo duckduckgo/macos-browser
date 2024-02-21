@@ -32,7 +32,7 @@ protocol AddEditBookmarkDialogViewModelProtocol: BookmarksDialogViewModel {
 final class AddEditBookmarkDialogViewModel: AddEditBookmarkDialogViewModelProtocol {
 
     enum Mode {
-        case add
+        case add(parentFolder: BookmarkFolder? = nil)
         case edit(bookmark: Bookmark)
     }
 
@@ -78,8 +78,13 @@ final class AddEditBookmarkDialogViewModel: AddEditBookmarkDialogViewModelProtoc
         bookmarkURLPath = mode.bookmark?.url ?? ""
         isBookmarkFavorite = mode.bookmark?.isFavorite ?? false
         folders = .init(bookmarkManager.list)
-        selectedFolder = mode.bookmark.flatMap { bookmark in
-            folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
+        switch mode {
+        case let .add(parentFolder):
+            selectedFolder = parentFolder
+        case let .edit(bookmark):
+            selectedFolder = mode.bookmark.flatMap { bookmark in
+                folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
+            }
         }
         bind()
     }
