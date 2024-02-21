@@ -24,7 +24,7 @@ let package = Package(
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
             resources: [
-                .process("Resources") // Adjust this line to match the actual path to your resources
+                .process("Resources")
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
