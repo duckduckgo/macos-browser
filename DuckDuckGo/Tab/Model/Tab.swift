@@ -904,7 +904,7 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        webView.load(URLRequest(url: .welcome))
+        setContent(.onboarding)
     }
 
     @MainActor(unsafe)
