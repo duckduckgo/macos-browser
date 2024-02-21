@@ -661,6 +661,30 @@
         }
       }
     },
+    "autofill.dialog.delete-all-passwords-dialog-information-text" : {
+      "comment" : "Information message displayed on dialog asking user to confirm deletion of all passwords",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts."
+          }
+        }
+      }
+    },
+    "autofill.dialog.delete-all-passwords-dialog-message-text" : {
+      "comment" : "Message displayed on dialog asking user to confirm deletion of all passwords",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete %d passwords"
+          }
+        }
+      }
+    },
     "autofill.excluded-sites" : {
       "comment" : "Autofill settings section title",
       "extractionState" : "extracted_with_value",
@@ -777,6 +801,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Unlocked"
+          }
+        }
+      }
+    },
+    "autofill.menu.delete-all-passwords" : {
+      "comment" : "Opens Delete All Passwords dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete All Passwords…"
           }
         }
       }

@@ -1059,6 +1059,18 @@ struct UserText {
         }
     }
 
+    // MARK: Autofill Item Deletion (Autofill -> More Menu, Settings -> Autofill)
+    static let deleteAllPasswords = NSLocalizedString("autofill.menu.delete-all-passwords", value: "Delete All Passwords…", comment: "Opens Delete All Passwords dialog")
+    static func deleteAllPasswordsDialogMessageText(count: Int) -> String {
+        guard count > 1 else { return UserText.passwordManagerAlertRemovePasswordConfirmation }
+
+        let localized = NSLocalizedString("autofill.dialog.delete-all-passwords-dialog-message-text", value: "Are you sure you want to delete %d passwords", comment: "Message displayed on dialog asking user to confirm deletion of all passwords")
+        return String(format: localized, count)
+    }
+    static let deleteAllPasswordsDialogInformationText = NSLocalizedString("autofill.dialog.delete-all-passwords-dialog-information-text",
+                                                                           value: "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts.",
+                                                                           comment: "Information message displayed on dialog asking user to confirm deletion of all passwords")
+
 #if SUBSCRIPTION
     // Key: "subscription.menu.item"
     // Comment: "Title for Subscription item in the options menu"
