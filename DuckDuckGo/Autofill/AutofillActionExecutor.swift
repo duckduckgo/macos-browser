@@ -19,13 +19,20 @@
 import Foundation
 import BrowserServicesKit
 import DDGSync
+import AppKit
 
 protocol AutofillActionExecutor {
     init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncRequester: DDGSyncing)
+    var associatedAlert: NSAlert { get }
     func execute()
 }
 
 struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
+
+    var associatedAlert: NSAlert {
+        let accounts = (try? secureVault.accounts()) ?? []
+        return NSAlert.deleteAllPasswordAlert(count: accounts.count)
+    }
 
     private var userAuthenticator: UserAuthenticating
     private var secureVault: any AutofillSecureVault
@@ -44,7 +51,7 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
 
             do {
                 try secureVault.deleteAllWebsiteCredentials()
-                syncRequester.scheduler.requestSyncImmediately()
+                syncRequester.scheduler.notifyDataChanged()
             } catch {
                 Pixel.fire(.debug(event: .secureVaultError, error: error))
             }

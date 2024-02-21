@@ -21,6 +21,16 @@ import Cocoa
 
 extension NSAlert {
 
+    // Tiny class to enable an Alert to respond to checkbox changed events (e.g enabling/disabling a button)
+    final class AutofillActionAlert: NSAlert {
+        var confirmButton: NSButton?
+
+        @objc
+        public func checkboxChanged(_ sender: NSButton) {
+            confirmButton?.isEnabled = (sender.state == .on)
+        }
+    }
+
     static var cautionImage = NSImage(named: "NSCaution")
 
     static func javascriptAlert(with message: String) -> NSAlert {
@@ -252,6 +262,32 @@ extension NSAlert {
         alert.accessoryView = textField
         alert.window.initialFirstResponder = alert.accessoryView
         textField.currentEditor()?.selectAll(nil)
+        return alert
+    }
+
+    static func deleteAllPasswordAlert(count: Int) -> NSAlert {
+        autofillActionAlert(messageText: UserText.deleteAllPasswordsDialogMessageText(count: count),
+                            informationText: UserText.deleteAllPasswordsDialogInformationText,
+                            confirmButtonText: UserText.passwordManagerAlerDeleteButton,
+                            style: .warning,
+                            icon: NSImage(named: "PasswordsDDG")!)
+    }
+
+    private static func autofillActionAlert(messageText: String,
+                                            informationText: String,
+                                            confirmButtonText: String,
+                                            style: NSAlert.Style,
+                                            icon: NSImage) -> NSAlert {
+        let alert = AutofillActionAlert()
+        alert.messageText = messageText
+        alert.informativeText = informationText
+        alert.alertStyle = style
+        alert.icon = icon
+        alert.confirmButton = alert.addButton(withTitle: confirmButtonText)
+        alert.confirmButton?.isEnabled = false
+        alert.addButton(withTitle: UserText.cancel)
+        let checkbox = NSButton(checkboxWithTitle: "Click to confirm", target: alert, action: #selector(AutofillActionAlert.checkboxChanged(_:)))
+        alert.accessoryView = checkbox
         return alert
     }
 
