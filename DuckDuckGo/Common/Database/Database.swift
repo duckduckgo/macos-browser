@@ -22,45 +22,6 @@ import Foundation
 import CoreData
 import Persistence
 
-#if REVIEW
-import CryptoKit
-final class UITestsEncryptionKeyStore: NSObject, EncryptionKeyStoring {
-
-    private(set) var storedKeys: [String: SymmetricKey] = [:]
-    private let generator: EncryptionKeyGenerating
-    private let account: String
-
-    init(generator: EncryptionKeyGenerating, account: String) {
-        self.generator = generator
-        self.account = account
-    }
-
-    override convenience init() {
-        self.init(generator: EncryptionKeyGenerator(), account: "mock-account")
-    }
-
-    func store(key: SymmetricKey) throws {
-        storedKeys[account] = key
-    }
-
-    func readKey() throws -> SymmetricKey {
-        if let key = storedKeys[account] {
-            return key
-        } else {
-            let newKey = generator.randomKey()
-            storedKeys[account] = newKey
-
-            return newKey
-        }
-    }
-
-    func deleteKey() throws {
-        storedKeys = [:]
-    }
-
-}
-#endif
-
 final class Database {
 
     fileprivate struct Constants {
@@ -80,16 +41,27 @@ final class Database {
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
-//            do {
-//                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
-//                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-//                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
-//                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-//                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
-//                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-//            } catch {
-//                return (nil, error)
-//            }
+            let useEncryptedValueTransformers: Bool = {
+#if REVIEW
+                return ProcessInfo.processInfo.environment["UITEST_MODE"] == nil
+#else
+                return true
+#endif
+            }()
+
+            if useEncryptedValueTransformers {
+                do {
+                    try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
+                } catch {
+                    return (nil, error)
+                }
+            }
+
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
             let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
@@ -108,14 +80,6 @@ final class Database {
 #if CI
         keyStore = (NSClassFromString("MockEncryptionKeyStore") as? EncryptionKeyStoring.Type)!.init()
         containerLocation = FileManager.default.temporaryDirectory
-#elseif REVIEW
-//        if ProcessInfo.processInfo.environment["UITEST_MODE"] == "1" {
-//            keyStore = UITestsEncryptionKeyStore()
-//            containerLocation = FileManager.default.temporaryDirectory
-//        } else {
-            keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
-            containerLocation = URL.sandboxApplicationSupportURL
-//        }
 #else
         keyStore = EncryptionKeyStore(generator: EncryptionKeyGenerator())
         containerLocation = URL.sandboxApplicationSupportURL
