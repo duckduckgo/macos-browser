@@ -152,6 +152,7 @@ extension BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: "parent",
+                url: "parent.com",
                 steps: [Step](),
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock
@@ -165,6 +166,7 @@ extension BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: "child",
+                url: "child.com",
                 steps: [Step](),
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
