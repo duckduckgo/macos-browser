@@ -32,7 +32,7 @@ extension NetworkProtectionDeviceManager {
                                               tokenStore: tokenStore,
                                               keyStore: keyStore,
                                               errorEvents: .networkProtectionAppDebugEvents,
-                                              subscriptionConfiguration: .init(isSubscriptionEnabled: false, isEntitlementValid: { true }))
+                                              isSubscriptionEnabled: false)
     }
 }
 

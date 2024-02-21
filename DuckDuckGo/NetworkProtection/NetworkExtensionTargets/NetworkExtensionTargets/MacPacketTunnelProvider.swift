@@ -241,7 +241,8 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
-                   isSubscriptionEnabled: false)
+                   isSubscriptionEnabled: false,
+                   entitlementCheck: nil)
 
         observeConnectionStatusChanges()
         observeServerChanges()
