@@ -67,10 +67,7 @@ final class Database {
         static let databaseName = "Database"
     }
 
-    @inline(never)
-    static let shared: CoreDataDatabase = makeSharedDatabase()
-
-    static func makeSharedDatabase() -> CoreDataDatabase {
+    static let shared: CoreDataDatabase = {
         let (database, error) = makeDatabase()
         if database == nil {
             firePixelErrorIfNeeded(error: error)
@@ -79,20 +76,20 @@ final class Database {
         }
 
         return database!
-    }
+    }()
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
-            do {
-                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-            } catch {
-                return (nil, error)
-            }
+//            do {
+//                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
+//                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
+//                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
+//                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
+//                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
+//                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
+//            } catch {
+//                return (nil, error)
+//            }
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
             let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
