@@ -119,6 +119,7 @@
 		1EA7B8D82B7E1283000330A4 /* SubscriptionFeatureAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA7B8D72B7E1283000330A4 /* SubscriptionFeatureAvailability.swift */; };
 		1EA7B8D92B7E1283000330A4 /* SubscriptionFeatureAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA7B8D72B7E1283000330A4 /* SubscriptionFeatureAvailability.swift */; };
 		1EA7B8DA2B7E1283000330A4 /* SubscriptionFeatureAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA7B8D72B7E1283000330A4 /* SubscriptionFeatureAvailability.swift */; };
+		1EB878322B864CBE00837436 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = 1EB878312B864CBE00837436 /* Subscription */; };
 		1ED910D52B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1ED910D62B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
 		1ED910D72B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */; };
@@ -3335,6 +3336,7 @@
 		1E7E2E932902AC0E00C01B54 /* PrivacyDashboardPermissionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPermissionHandler.swift; sourceTree = "<group>"; };
 		1E862A882A9FC01200F84D4B /* SubscriptionUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = SubscriptionUI; sourceTree = "<group>"; };
 		1EA7B8D72B7E1283000330A4 /* SubscriptionFeatureAvailability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionFeatureAvailability.swift; sourceTree = "<group>"; };
+		1EB878302B864BD000837436 /* BrowserServicesKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = BrowserServicesKit; path = ../BrowserServicesKit; sourceTree = "<group>"; };
 		1ED910D42B63BFB300936947 /* IdentityTheftRestorationPagesUserScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityTheftRestorationPagesUserScript.swift; sourceTree = "<group>"; };
 		310E79BE294A19A8007C49E8 /* FireproofingReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireproofingReferenceTests.swift; sourceTree = "<group>"; };
 		311B262628E73E0A00FD181A /* TabShadowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabShadowConfig.swift; sourceTree = "<group>"; };
@@ -4514,6 +4516,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37269F012B332FC8005E8E46 /* Common in Frameworks */,
+				1EB878322B864CBE00837436 /* Subscription in Frameworks */,
 				EE7295E92A545BC4008C0991 /* NetworkProtection in Frameworks */,
 				4B2537772A11BFE100610219 /* PixelKit in Frameworks */,
 				4B2D062C2A11C0E100DE1F49 /* Networking in Frameworks */,
@@ -6650,6 +6653,7 @@
 		AA585D75248FD31100E9A3E2 = {
 			isa = PBXGroup;
 			children = (
+				1EB878302B864BD000837436 /* BrowserServicesKit */,
 				378B5886295CF2A4002C0CC0 /* Configuration */,
 				378E279C2970217400FCADA2 /* LocalPackages */,
 				7BB108552A43375D000AB95F /* LocalThirdParty */,
@@ -8412,6 +8416,7 @@
 				4B2D062B2A11C0E100DE1F49 /* Networking */,
 				EE7295E82A545BC4008C0991 /* NetworkProtection */,
 				37269F002B332FC8005E8E46 /* Common */,
+				1EB878312B864CBE00837436 /* Subscription */,
 			);
 			productName = NetworkProtectionSystemExtension;
 			productReference = 4B25375A2A11BE7300610219 /* com.duckduckgo.macos.vpn.network-extension.debug.systemextension */;
@@ -13470,6 +13475,10 @@
 		1EA7B8D42B7E078C000330A4 /* Subscription */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9807F643278CA16F00E1547B /* XCRemoteSwiftPackageReference "BrowserServicesKit" */;
+			productName = Subscription;
+		};
+		1EB878312B864CBE00837436 /* Subscription */ = {
+			isa = XCSwiftPackageProductDependency;
 			productName = Subscription;
 		};
 		312978892B64131200B67619 /* DataBrokerProtection */ = {
