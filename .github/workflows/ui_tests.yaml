@@ -5,6 +5,7 @@ on:
   push:
     branches: 
       - "kieran/ui-testing"
+      - "kieran/ui-testing-v2"
 
 jobs:
   ui-tests:
