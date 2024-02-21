@@ -167,6 +167,10 @@ final class NetworkProtectionVisibilityMock: NetworkProtectionFeatureVisibility 
         self.visible = visible
     }
 
+    func shouldUninstallAutomatically() -> Bool {
+        return !visible
+    }
+
     func isNetworkProtectionVisible() -> Bool {
         return visible
     }

@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1708001825742,
+    "version": 1708360600128,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -258,9 +258,6 @@
                     "domain": "youtube.com"
                 },
                 {
-                    "domain": "tuc.org.uk"
-                },
-                {
                     "domain": "newsmax.com"
                 },
                 {
@@ -279,11 +276,11 @@
             "settings": {
                 "disabledCMPs": [
                     "generic-cosmetic",
-                    "EZoic"
+                    "termsfeed3"
                 ]
             },
             "state": "enabled",
-            "hash": "df49b4912fc62299b3cc20b5538e3b89"
+            "hash": "ce906469aa6ac0fb5ecf3f39710ef05b"
         },
         "autofill": {
             "exceptions": [
@@ -1076,6 +1073,10 @@
                     {
                         "domain": "53.com",
                         "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1824"
+                    },
+                    {
+                        "domain": "www.evernote.com",
+                        "reason": "https://github.com/duckduckgo/privacy-configuration/issues/1827"
                     }
                 ],
                 "webViewDefault": [
@@ -1099,7 +1100,7 @@
             },
             "exceptions": [],
             "state": "enabled",
-            "hash": "d135871f701e3aa7e1052427ee721f31"
+            "hash": "653b8d161df5462850be095097e85143"
         },
         "dbp": {
             "state": "enabled",
@@ -5238,7 +5239,19 @@
                     "cloudflare.com": {
                         "rules": [
                             {
-                                "rule": "cdnjs.cloudflare.com/cdn-cgi/scripts/.*/cloudflare-static/rocket-loader.min.js",
+                                "rule": "cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "cloudflare.com/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js",
+                                "domains": [
+                                    "<all>"
+                                ]
+                            },
+                            {
+                                "rule": "cloudflare.com/cdn-cgi/scripts/1680307200/cloudflare-static/rocket-loader.min.js",
                                 "domains": [
                                     "<all>"
                                 ]
@@ -5968,6 +5981,7 @@
                                     "doterra.com",
                                     "easyjet.com",
                                     "edx.org",
+                                    "saplinglearning.com",
                                     "worlddutyfree.com"
                                 ]
                             },
@@ -6142,6 +6156,7 @@
                                     "abril.com.br",
                                     "algomalegalclinic.com",
                                     "cosmicbook.news",
+                                    "eatroyo.com",
                                     "thesimsresource.com",
                                     "tradersync.com"
                                 ]
@@ -7804,7 +7819,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "faa9240f18945b1bb354bcb8b6f7483a"
+            "hash": "63057921f3dafa389fd7c132ea62393d"
         },
         "trackingCookies1p": {
             "settings": {

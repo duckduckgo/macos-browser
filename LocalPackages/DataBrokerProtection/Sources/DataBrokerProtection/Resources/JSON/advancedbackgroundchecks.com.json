@@ -1,8 +1,9 @@
 {
-  "name": "advancedbackgroundchecks.com",
-  "version": "0.1.0",
+  "name": "AdvancedBackgroundChecks",
+  "url": "advancedbackgroundchecks.com",
+  "version": "0.1.4",
   "parent": "peoplefinders.com",
-  "addedDatetime": 1678078800000,
+  "addedDatetime": 1678082400000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "ef8031e6-5e61-4183-b57e-7df156c7129a",
+          "id": "c73ba931-9e01-4d37-9e15-2fd7a14eefa3",
           "url": "https://www.advancedbackgroundchecks.com/names/${firstName}-${lastName}_${city}-${state}_age_${age}"
         },
         {
           "actionType": "extract",
-          "id": "f3ed744c-6cfc-4a99-b46e-6095587eadfc",
+          "id": "94003082-0a9d-4418-ac88-68595c7f4953",
           "selector": ".card-block",
           "profile": {
             "name": {

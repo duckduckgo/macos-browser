@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bhall/bump-css"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.0"),
     ],
     targets: [
         .target(

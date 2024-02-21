@@ -42,6 +42,10 @@ extension Tab: NavigationResponder {
         navigationDelegate.setResponders(
             .weak(nullable: self.navigationHotkeyHandler),
 
+            // redirect to SERP for non-valid domains entered by user
+            // should be before `self` to avoid Tab presenting an error screen
+            .weak(nullable: self.searchForNonexistentDomains),
+
             .weak(self),
 
             // Duck Player overlay navigations handling
@@ -64,9 +68,6 @@ extension Tab: NavigationResponder {
 
             // add extra headers to SERP requests
             .struct(SerpHeadersNavigationResponder()),
-
-            // redirect to SERP for non-valid domains entered by user
-            .weak(nullable: self.searchForNonexistentDomains),
 
             // ensure Content Blocking Rules are applied before navigation
             .weak(nullable: self.contentBlockingAndSurrogates),
