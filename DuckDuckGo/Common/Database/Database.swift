@@ -68,7 +68,9 @@ final class Database {
     }
 
     @inline(never)
-    static let shared: CoreDataDatabase = {
+    static let shared: CoreDataDatabase = makeSharedDatabase()
+
+    static func makeSharedDatabase() -> CoreDataDatabase {
         let (database, error) = makeDatabase()
         if database == nil {
             firePixelErrorIfNeeded(error: error)
@@ -77,7 +79,7 @@ final class Database {
         }
 
         return database!
-    }()
+    }
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
