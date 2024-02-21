@@ -33,10 +33,6 @@ final public class DataBrokerProtectionViewController: NSViewController {
     private let openURLHandler: (URL?) -> Void
     private var reloadObserver: NSObjectProtocol?
 
-    private enum Consts {
-        static let loaderDimension: CGFloat = 50.0
-    }
-
     public init(scheduler: DataBrokerProtectionScheduler,
                 dataManager: DataBrokerProtectionDataManaging,
                 privacyConfig: PrivacyConfigurationManaging? = nil,
@@ -100,13 +96,12 @@ final public class DataBrokerProtectionViewController: NSViewController {
         loader.controlSize = .regular
         loader.sizeToFit()
         loader.translatesAutoresizingMaskIntoConstraints = false
+        loader.controlSize = .large
         view.addSubview(loader)
 
         NSLayoutConstraint.activate([
             loader.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loader.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            loader.widthAnchor.constraint(equalToConstant: Consts.loaderDimension),
-            loader.heightAnchor.constraint(equalToConstant: Consts.loaderDimension)
         ])
     }
 
