@@ -56,8 +56,6 @@ final class TabBarViewItem: NSCollectionViewItem {
         static let textFieldPadding: CGFloat = 28
         static let textFieldPaddingNoFavicon: CGFloat = 12
         static let textFieldPaddingMuteIconPresent: CGFloat = 48
-        static let faviconLeadingPadding: CGFloat = 5
-        static let faviconLeadingPaddingMuteIconPresent: CGFloat = 7
     }
 
     var widthStage: WidthStage {
@@ -108,7 +106,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     @IBOutlet var permissionCloseButtonTrailingConstraint: NSLayoutConstraint!
     @IBOutlet var tabLoadingPermissionLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var closeButtonTrailingConstraint: NSLayoutConstraint!
-
     @IBOutlet weak var mutedTabIcon: NSImageView!
     private let titleTextFieldMaskLayer = CAGradientLayer()
 
@@ -347,12 +344,12 @@ final class TabBarViewItem: NSCollectionViewItem {
             mouseOverView.mouseOverColor = isSelected || isDragged ? NSColor.clear : NSColor.tabMouseOverColor
         }
 
-        setupMuteOrUnmutedIcon()
         let showCloseButton = (isMouseOver && !widthStage.isCloseButtonHidden) || isSelected
         closeButton.isHidden = !showCloseButton
         updateSeparatorView()
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
+        setupMuteOrUnmutedIcon()
 
         if mutedTabIcon.isHidden {
             faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
@@ -361,12 +358,6 @@ final class TabBarViewItem: NSCollectionViewItem {
             // When the mute icon is visible and the tab is compressed we need to center both
             faviconWrapperViewCenterConstraint.priority = .defaultLow
             faviconWrapperViewLeadingConstraint.priority = .defaultHigh
-
-            if titleTextField.isHidden { // If the title text is hidden it means the tab is compressed
-                faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPaddingMuteIconPresent
-            } else {
-                faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPadding
-            }
         }
 
         updateBorderLayerColor()
@@ -617,8 +608,7 @@ extension TabBarViewItem {
     }
 
     enum Width: CGFloat {
-        case minimum = 50
-        case minumumMuted = 56
+        case minimum = 52
         case minimumSelected = 120
         case maximum = 240
     }
