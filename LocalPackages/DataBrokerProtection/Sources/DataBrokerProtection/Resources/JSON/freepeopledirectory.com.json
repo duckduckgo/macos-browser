@@ -1,6 +1,7 @@
 {
-  "name": "freepeopledirectory.com",
-  "version": "0.1.1",
+  "name": "FreePeopleDirectory",
+  "url": "freepeopledirectory.com",
+  "version": "0.1.4",
   "parent": "spokeo.com",
   "addedDatetime": 1674540000000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "815a1cd3-2577-4f43-a163-0cf4d22e66a4",
+          "id": "4c607417-36bc-47d4-8562-9c2244db354d",
           "url": "https://www.freepeopledirectory.com/name/${firstName}-${lastName}/${state|upcase}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "10738ba0-bc6b-42ba-a37c-487ff3927dd5",
+          "id": "a1637310-ca7a-40b0-b2f5-db22b43b5d54",
           "selector": ".whole-card",
           "profile": {
             "name": {
