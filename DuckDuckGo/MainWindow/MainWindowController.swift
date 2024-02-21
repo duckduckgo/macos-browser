@@ -203,6 +203,11 @@ extension MainWindowController: NSWindowDelegate {
 
     func windowWillEnterFullScreen(_ notification: Notification) {
         mainViewController.tabBarViewController.draggingSpace.isHidden = true
+        mainViewController.windowWillEnterFullScreen()
+    }
+
+    func windowWillMiniaturize(_ notification: Notification) {
+        mainViewController.windowWillMiniaturize()
     }
 
     func windowDidEnterFullScreen(_ notification: Notification) {
