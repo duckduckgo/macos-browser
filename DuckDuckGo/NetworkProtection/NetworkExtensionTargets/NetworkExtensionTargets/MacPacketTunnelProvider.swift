@@ -245,9 +245,9 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
         os_log("[+] MacPacketTunnelProvider init()", log: .networkProtectionMemoryLog, type: .debug)
 
-        var token = ""
+        var token = "()"
         do {
-            token = try SubscriptionTokenKeychainStorage().getAccessToken() ?? ""
+            token = try SubscriptionTokenKeychainStorage().getTestString() ?? "(nil)"
         } catch {
             os_log("[+] MacPacketTunnelProvider token: \(error)", log: .networkProtectionMemoryLog, type: .debug)
             os_log("[+] MacPacketTunnelProvider token: \(error.localizedDescription)", log: .networkProtectionMemoryLog, type: .debug)
