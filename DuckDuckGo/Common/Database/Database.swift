@@ -67,6 +67,7 @@ final class Database {
         static let databaseName = "Database"
     }
 
+    @inline(never)
     static let shared: CoreDataDatabase = {
         let (database, error) = makeDatabase()
         if database == nil {
