@@ -38,8 +38,7 @@ extension MainViewController: BareBonesBrowserUIDelegate {
                                                                   homeURL: url,
                                                                   uiDelegate: self,
                                                                   configuration: Self.webViewConfiguration,
-                                                                  userAgent: UserAgent.brandedDefault)
-        )
+                                                                  userAgent: UserAgent.brandedDefault))
         myView.translatesAutoresizingMaskIntoConstraints = false
         myView.widthAnchor.constraint(greaterThanOrEqualToConstant: 640).isActive = true
         myView.heightAnchor.constraint(greaterThanOrEqualToConstant: 480).isActive = true
