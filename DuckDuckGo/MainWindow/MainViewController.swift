@@ -209,6 +209,14 @@ final class MainViewController: NSViewController {
         tabBarViewController.hideTabPreview()
     }
 
+    func windowWillMiniaturize() {
+        tabBarViewController.hideTabPreview()
+    }
+
+    func windowWillEnterFullScreen() {
+        tabBarViewController.hideTabPreview()
+    }
+
     func toggleBookmarksBarVisibility() {
         updateBookmarksBarViewVisibility(visible: !(mainView.bookmarksBarHeightConstraint.constant > 0))
     }
