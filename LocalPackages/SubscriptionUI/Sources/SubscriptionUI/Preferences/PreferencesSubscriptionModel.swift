@@ -181,6 +181,18 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
+
+        // Testing shared keychain storage
+        do {
+            print("---")
+            try SubscriptionTokenKeychainStorage().updateTestString()
+
+            let testString = (try? SubscriptionTokenKeychainStorage().getTestString()) ?? ""
+            print("Updated testString: \(testString)")
+        } catch {
+            print(error)
+        }
+        
         guard fetchSubscriptionDetailsTask == nil else { return }
 
         fetchSubscriptionDetailsTask = Task { [weak self] in
