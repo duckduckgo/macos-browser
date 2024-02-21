@@ -5590,7 +5590,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "You've unlocked a feature!"
+            "value" : "Enter your invite code"
           }
         }
       }
