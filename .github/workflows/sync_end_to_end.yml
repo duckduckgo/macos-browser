@@ -18,6 +18,41 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Setup vnc
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_TOKEN }}
+        VNC_USER_PASSWORD: ${{ secrets.VNC_USER_PASSWORD }}
+        VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
+      run: | 
+        sudo mdutil -i off -a
+        sudo dscl . -create /Users/vncuser
+        sudo dscl . -create /Users/vncuser UserShell /bin/bash
+        sudo dscl . -create /Users/vncuser RealName "VNC User"
+        sudo dscl . -create /Users/vncuser UniqueID 1001
+        sudo dscl . -create /Users/vncuser PrimaryGroupID 80
+        sudo dscl . -create /Users/vncuser NFSHomeDirectory /Users/vncuser
+        sudo dscl . -passwd /Users/vncuser ${{ env.VNC_USER_PASSWORD }}
+        sudo dscl . -passwd /Users/vncuser ${{ env.VNC_USER_PASSWORD }}
+        sudo createhomedir -c -u vncuser > /dev/null
+
+        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -allowAccessFor -allUsers -privs -all
+        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -clientopts -setvnclegacy -vnclegacy yes 
+
+        echo ${{ env.VNC_PASSWORD }} | perl -we 'BEGIN { @k = unpack "C*", pack "H*", "1734516E8BA8C5E2FF1C39567390ADCA"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack "C*", $_; foreach (@k) { printf "%02X", $_ ^ (shift @p || 0) }; print "\n"' | sudo tee /Library/Preferences/com.apple.VNCSettings.txt
+
+        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -restart -agent -console
+        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate
+
+        brew install --cask ngrok
+        ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }} 
+        ngrok tcp 5900 &
+
+    - name: NGROK URL
+      run: curl --silent http://127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url'
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
     - name: Set cache key hash
       run: |
         has_only_tags=$(jq '[ .pins[].state | has("version") ] | all' DuckDuckGo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
@@ -91,7 +126,7 @@ jobs:
     #       --header "Authorization: Bearer ${{ secrets.ASANA_ACCESS_TOKEN }}" \
     #       --header "Content-Type: application/json" \
     #       --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
-
+    
     - name: Publish tests report
       uses: mikepenz/action-junit-report@v3
       if: always() # always run even if the previous step fails
@@ -109,3 +144,4 @@ jobs:
           DerivedData/Logs/Test/*.xcresult
           ~/Library/Logs/DiagnosticReports/*
         retention-days: 7
+
