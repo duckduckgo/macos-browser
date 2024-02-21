@@ -41,7 +41,6 @@ extension MainViewController: BareBonesBrowserUIDelegate {
         let viewController = NSViewController()
         viewController.view = myView
         let window = NSWindow(contentViewController: viewController)
-        window.contentViewController = viewController
         window.center()
         window.title = "Vanilla browser"
         let wc = NSWindowController(window: window)
