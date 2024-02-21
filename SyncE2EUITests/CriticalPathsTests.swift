@@ -30,9 +30,10 @@ final class CriticalPathsTests: XCTestCase {
         app = XCUIApplication(bundleIdentifier: "com.duckduckgo.macos.browser.review")
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
+        skipOnboardingIfNeeded()
+    }
 
-        let menuBarsQuery = app.menuBars
-
+    private func skipOnboardingIfNeeded() {
         let welcomeWindow = app.windows["Welcome"]
         if welcomeWindow.exists {
             let getStartedButton = welcomeWindow.buttons["Get Started"]
@@ -44,6 +45,7 @@ final class CriticalPathsTests: XCTestCase {
             _ = maybeLaterButton.waitForExistence(timeout: 5)
             maybeLaterButton.click()
 
+            let menuBarsQuery = app.menuBars
             let fileMenuBarItem = menuBarsQuery.menuBarItems["File"]
             fileMenuBarItem.click()
             let newTabMenuItem = menuBarsQuery.menuItems["New Tab"]
@@ -57,6 +59,8 @@ final class CriticalPathsTests: XCTestCase {
         let duckDuckGoMenuBarItem = menuBarsQuery.menuBarItems.element(boundBy: 1)
         duckDuckGoMenuBarItem.click()
         menuBarsQuery.menuItems["openPreferences:"].click()
+
+        skipOnboardingIfNeeded()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
