@@ -1,5 +1,5 @@
 //
-//  SearchPreferences.swift
+//  WebTrackingProtectionPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -21,11 +21,11 @@ import AppKit
 import Bookmarks
 import Common
 
-protocol WebTrackingPreferencesPersistor {
+protocol WebTrackingProtectionPreferencesPersistor {
     var gpcEnabled: Bool { get set }
 }
 
-struct WebTrackingPreferencesUserDefaultsPersistor: WebTrackingPreferencesPersistor {
+struct WebTrackingProtectionPreferencesUserDefaultsPersistor: WebTrackingProtectionPreferencesPersistor {
 
     @UserDefaultsWrapper(key: .gpcEnabled, defaultValue: true)
     var gpcEnabled: Bool
@@ -43,10 +43,10 @@ final class WebTrackingProtectionPreferences: ObservableObject {
         }
     }
 
-    init(persistor: WebTrackingPreferencesPersistor = WebTrackingPreferencesUserDefaultsPersistor()) {
+    init(persistor: WebTrackingProtectionPreferencesPersistor = WebTrackingProtectionPreferencesUserDefaultsPersistor()) {
         self.persistor = persistor
         isGPCEnabled = persistor.gpcEnabled
     }
 
-    private var persistor: WebTrackingPreferencesPersistor
+    private var persistor: WebTrackingProtectionPreferencesPersistor
 }

@@ -27,7 +27,4 @@ final class PrivacySecurityPreferences {
     @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
     var loginDetectionEnabled: Bool
 
-    @UserDefaultsWrapper(key: .autoconsentEnabled, defaultValue: true)
-    var autoconsentEnabled: Bool
-
 }

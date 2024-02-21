@@ -1976,6 +1976,18 @@
     "Contact Info" : {
 
     },
+    "cookie.popup.protection.explanation" : {
+      "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When DuckDuckGo detects cookie pop-ups on sites you visit, we can automatically set your cookie preferences to minimize cookies and maximize privacy, then close pop-ups."
+          }
+        }
+      }
+    },
     "copy" : {
       "comment" : "Copy button",
       "extractionState" : "extracted_with_value",

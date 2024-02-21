@@ -27,12 +27,6 @@ final class PrivacyPreferencesModel: ObservableObject {
         }
     }
 
-    @Published var isAutoconsentEnabled: Bool {
-        didSet {
-            privacySecurityPreferences.autoconsentEnabled = isAutoconsentEnabled
-        }
-    }
-
     @MainActor
     func presentManageFireproofSitesDialog() {
         let fireproofDomainsWindowController = FireproofDomainsViewController.create().wrappedInWindowController()
@@ -55,7 +49,6 @@ final class PrivacyPreferencesModel: ObservableObject {
     init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
         self.privacySecurityPreferences = privacySecurityPreferences
         isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-        isAutoconsentEnabled = privacySecurityPreferences.autoconsentEnabled
     }
 
     private let privacySecurityPreferences: PrivacySecurityPreferences

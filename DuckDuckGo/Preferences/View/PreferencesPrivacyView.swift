@@ -28,19 +28,7 @@ extension Preferences {
         var body: some View {
             PreferencePane(UserText.privacy) {
 
-                // SECTION 1: Cookie Consent Pop-ups
-                PreferencePaneSection(UserText.autoconsentSettingsTitle) {
-
-                    ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
-                    VStack(alignment: .leading, spacing: 0) {
-                        TextMenuItemCaption(UserText.autoconsentExplanation)
-                        TextButton(UserText.learnMore) {
-                            model.openURL(.cookieConsentPopUpManagement)
-                        }
-                    }
-                }
-
-                // SECTION 2: Fireproof Site
+                // SECTION 1: Fireproof Site
                 PreferencePaneSection(UserText.fireproofSites) {
 
                     PreferencePaneSubSection {
