@@ -56,8 +56,8 @@ final class TabBarViewItem: NSCollectionViewItem {
         static let textFieldPadding: CGFloat = 28
         static let textFieldPaddingNoFavicon: CGFloat = 12
         static let textFieldPaddingMuteIconPresent: CGFloat = 48
-//        static let faviconLeadingPadding: CGFloat = 7
-//        static let faviconLeadingPaddingMuteIconPresent: CGFloat = 7
+        static let faviconLeadingPadding: CGFloat = 5
+        static let faviconLeadingPaddingMuteIconPresent: CGFloat = 7
     }
 
     var widthStage: WidthStage {
@@ -278,7 +278,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         layer.borderWidth = TabShadowConfig.dividerSize
         layer.opacity = TabShadowConfig.alpha
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-        layer.cornerRadius = 11
+        layer.cornerRadius = 7
         layer.mask = layerMask
         return layer
     }()
@@ -330,7 +330,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func setupView() {
         view.wantsLayer = true
-        view.layer?.cornerRadius = 11
+        view.layer?.cornerRadius = 7
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
         view.layer?.addSublayer(borderLayer)
@@ -353,19 +353,20 @@ final class TabBarViewItem: NSCollectionViewItem {
         updateSeparatorView()
         permissionCloseButtonTrailingConstraint.isActive = !closeButton.isHidden
         titleTextField.isHidden = widthStage.isTitleHidden && faviconImageView.image != nil
-//        faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPadding
 
         if mutedTabIcon.isHidden {
             faviconWrapperViewCenterConstraint.priority = titleTextField.isHidden ? .defaultHigh : .defaultLow
             faviconWrapperViewLeadingConstraint.priority = titleTextField.isHidden ? .defaultLow : .defaultHigh
         } else {
             // When the mute icon is visible and the tab is compressed we need to center both
-//            faviconWrapperViewCenterConstraint.priority = .defaultLow
-//            faviconWrapperViewLeadingConstraint.priority = .defaultHigh
-//
-//            if titleTextField.isHidden { // If the title text is hidden it means the tab is compressed
-//                faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPaddingMuteIconPresent
-//            }
+            faviconWrapperViewCenterConstraint.priority = .defaultLow
+            faviconWrapperViewLeadingConstraint.priority = .defaultHigh
+
+            if titleTextField.isHidden { // If the title text is hidden it means the tab is compressed
+                faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPaddingMuteIconPresent
+            } else {
+                faviconWrapperViewLeadingConstraint.constant = Constants.faviconLeadingPadding
+            }
         }
 
         updateBorderLayerColor()
@@ -378,7 +379,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
         // Adjust colors for burner window
         if isBurner && faviconImageView.image === TabViewModel.Favicon.burnerHome {
-                    faviconImageView.contentTintColor = .textColor
+            faviconImageView.contentTintColor = .textColor
         } else {
             faviconImageView.contentTintColor = nil
         }
@@ -612,11 +613,12 @@ extension TabBarViewItem: MouseClickViewDelegate {
 extension TabBarViewItem {
 
     enum Height: CGFloat {
-        case standard = 34
+        case standard = 32
     }
 
     enum Width: CGFloat {
         case minimum = 50
+        case minumumMuted = 56
         case minimumSelected = 120
         case maximum = 240
     }

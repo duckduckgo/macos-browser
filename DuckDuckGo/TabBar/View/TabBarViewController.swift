@@ -473,14 +473,14 @@ final class TabBarViewController: NSViewController {
         return numberOfItems
     }
 
-    private func currentTabWidth(selected: Bool = false, removedIndex: Int? = nil) -> CGFloat {
+    private func currentTabWidth(selected: Bool = false, isMuted: Bool = false, removedIndex: Int? = nil) -> CGFloat {
         let numberOfItems = CGFloat(self.layoutNumberOfItems(removedIndex: removedIndex))
         guard numberOfItems > 0 else {
             return 0
         }
 
         let tabsWidth = scrollView.bounds.width - footerCurrentWidthDimension
-        let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : TabBarViewItem.Width.minimum.rawValue
+        let minimumWidth = selected ? TabBarViewItem.Width.minimumSelected.rawValue : (isMuted ? TabBarViewItem.Width.minumumMuted.rawValue : TabBarViewItem.Width.minimum.rawValue)
 
         if tabMode == .divided {
             var dividedWidth = tabsWidth / numberOfItems
@@ -795,7 +795,8 @@ extension TabBarViewController: NSCollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> NSSize {
         let isItemSelected = tabCollectionViewModel.selectionIndex == .unpinned(indexPath.item)
-        return NSSize(width: self.currentTabWidth(selected: isItemSelected), height: TabBarViewItem.Height.standard.rawValue)
+        let isMuted = tabCollectionViewModel.tabCollection.tabs[indexPath.item].audioState == .muted
+        return NSSize(width: self.currentTabWidth(selected: isItemSelected, isMuted: isMuted), height: TabBarViewItem.Height.standard.rawValue)
     }
 
 }

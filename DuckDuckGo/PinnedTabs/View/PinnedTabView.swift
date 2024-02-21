@@ -22,7 +22,7 @@ import SwiftUIExtensions
 struct PinnedTabView: View {
     enum Const {
         static let dimension: CGFloat = 34
-        static let cornerRadius: CGFloat = 8.5
+        static let cornerRadius: CGFloat = 8
     }
 
     @ObservedObject var model: Tab
