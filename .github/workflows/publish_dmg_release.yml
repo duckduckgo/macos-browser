@@ -68,7 +68,7 @@ jobs:
         env:
           DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.release-version }}.dmg
         run: |
-          DMG_URL="${{ vars.DMG_URL_ROOT }}${DMG_NAME}"
+          DMG_URL="${{ vars.TEST_DMG_URL_ROOT }}${DMG_NAME}"
           curl -fLSs -o "$DMG_NAME" "$DMG_URL"
           echo "dmg-name=$DMG_NAME" >> $GITHUB_OUTPUT
           echo "dmg-path=$DMG_NAME" >> $GITHUB_OUTPUT
@@ -140,16 +140,16 @@ jobs:
       - name: Upload to S3
         id: upload
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
-          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+          AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
           VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           # Back up existing appcast2.xml
           OLD_APPCAST_NAME=appcast2_old.xml
           echo "OLD_APPCAST_NAME=${OLD_APPCAST_NAME}" >> $GITHUB_ENV
-          curl -fLSs "${{ vars.DMG_URL_ROOT }}appcast2.xml" --output "${OLD_APPCAST_NAME}"
+          curl -fLSs "${{ vars.TEST_DMG_URL_ROOT }}appcast2.xml" --output "${OLD_APPCAST_NAME}"
 
           # Upload files to S3
           if [[ "${RELEASE_TYPE}" == "internal" ]]; then
@@ -171,7 +171,7 @@ jobs:
         run: |
           echo "APPCAST_PATCH_NAME=${{ steps.appcast.outputs.appcast-patch-name }}" >> $GITHUB_ENV
           echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
-          echo "DMG_URL=${{ vars.DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
+          echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
           echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
