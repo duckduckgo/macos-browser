@@ -35,6 +35,7 @@ final class CriticalPathsTests: XCTestCase {
 
     private func skipOnboardingIfNeeded() {
         let welcomeWindow = app.windows["Welcome"]
+        _ = welcomeWindow.waitForExistence(timeout: 3)
         if welcomeWindow.exists {
             let getStartedButton = welcomeWindow.buttons["Get Started"]
             _ = getStartedButton.waitForExistence(timeout: 5)
