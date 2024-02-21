@@ -228,7 +228,6 @@ class MockDDGSyncing: DDGSyncing {
 
 class CapturingScheduler: Scheduling {
     var notifyDataChangedCalled = false
-    var requestSyncImmediatelyCalled = false
 
     func notifyDataChanged() {
         notifyDataChangedCalled = true
@@ -238,7 +237,6 @@ class CapturingScheduler: Scheduling {
     }
 
     func requestSyncImmediately() {
-        requestSyncImmediatelyCalled = true
     }
 
     func cancelSyncAndSuspendSyncQueue() {

@@ -19,6 +19,7 @@
 import Foundation
 import AppKit
 
+/// Handles presentation of an alert associated with an `AutofillActionExecutor`
 struct AutofillActionPresenter {
 
     @MainActor

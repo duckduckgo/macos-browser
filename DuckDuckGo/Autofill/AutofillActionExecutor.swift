@@ -21,12 +21,17 @@ import BrowserServicesKit
 import DDGSync
 import AppKit
 
+
+/// Conforming types provide an `execute` method which performs some action on autofill types (e.g delete all passwords)
 protocol AutofillActionExecutor {
     init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncRequester: DDGSyncing)
+    /// NSAlert associated with the autofill action
     var associatedAlert: NSAlert { get }
+    /// Executes the action
     func execute()
 }
 
+/// Concrete `AutofillActionExecutor` for deletion of all autofill passwords
 struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
 
     var associatedAlert: NSAlert {
@@ -55,7 +60,6 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
             } catch {
                 Pixel.fire(.debug(event: .secureVaultError, error: error))
             }
-
         }
     }
 }

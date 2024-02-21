@@ -69,10 +69,10 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
         XCTAssert(secureVault.storedCredentials.isEmpty)
     }
 
-    func testExecuteCallsRequestSyncImmediately() async throws {
+    func testExecuteCallsNotifyDataChanged() async throws {
         // Given
         let expectation = expectation(description: "called sync immediately")
-        XCTAssertFalse(scheduler.requestSyncImmediatelyCalled)
+        XCTAssertFalse(scheduler.notifyDataChangedCalled)
 
         // When
         Task { @MainActor in
@@ -82,6 +82,6 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
 
         // Then
         await fulfillment(of: [expectation], timeout: 3)
-        XCTAssertTrue(scheduler.requestSyncImmediatelyCalled)
+        XCTAssertTrue(scheduler.notifyDataChangedCalled)
     }
 }
