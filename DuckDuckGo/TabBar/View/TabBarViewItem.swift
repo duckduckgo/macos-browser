@@ -278,7 +278,7 @@ final class TabBarViewItem: NSCollectionViewItem {
         layer.borderWidth = TabShadowConfig.dividerSize
         layer.opacity = TabShadowConfig.alpha
         layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-        layer.cornerRadius = 7
+        layer.cornerRadius = 11
         layer.mask = layerMask
         return layer
     }()
@@ -330,7 +330,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     private func setupView() {
         view.wantsLayer = true
-        view.layer?.cornerRadius = 7
+        view.layer?.cornerRadius = 11
         view.layer?.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         view.layer?.masksToBounds = true
         view.layer?.addSublayer(borderLayer)
