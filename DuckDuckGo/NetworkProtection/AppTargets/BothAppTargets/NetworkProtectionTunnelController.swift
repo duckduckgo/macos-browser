@@ -70,6 +70,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     private let networkExtensionBundleID: String
     private let networkExtensionController: NetworkExtensionController
 
+    // MARK: - Notification Center
+
+    private let notificationCenter: NotificationCenter
+
     /// The proxy manager
     ///
     /// We're keeping a reference to this because we don't want to be calling `loadAllFromPreferences` more than
@@ -146,13 +150,41 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
+        self.notificationCenter = notificationCenter
         self.settings = settings
         self.tokenStore = tokenStore
 
         subscribeToSettingsChanges()
+        subscribeToStatusChanges()
     }
 
-    // MARK: - Tunnel Settings
+    // MARK: - Observing Status Changes
+
+    private func subscribeToStatusChanges() {
+        notificationCenter.publisher(for: .NEVPNStatusDidChange)
+            .sink(receiveValue: handleStatusChange(_:))
+            .store(in: &cancellables)
+    }
+
+    private func handleStatusChange(_ notification: Notification) {
+        guard let session = (notification.object as? NETunnelProviderSession),
+            let manager = session.manager as? NETunnelProviderManager else {
+
+            return
+        }
+
+        Task { @MainActor in
+            switch session.status {
+            case .connected:
+                try await enableOnDemand(tunnelManager: manager)
+            default:
+                break
+            }
+
+        }
+    }
+
+    // MARK: - Subscriptions
 
     private func subscribeToSettingsChanges() {
         settings.changePublisher
@@ -170,6 +202,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
             .store(in: &cancellables)
     }
+
+    // MARK: - Handling Settings Changes
 
     /// This is where the tunnel owner has a chance to handle the settings change locally.
     ///
@@ -483,8 +517,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 guard let self, error == nil, fired else { return }
                 self.settings.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
             }
-
-        try await enableOnDemand(tunnelManager: tunnelManager)
     }
 
     /// Stops the VPN connection used for Network Protection
