@@ -96,6 +96,7 @@ import SubscriptionUI
     private var loggingMenu: NSMenu?
     let customConfigurationUrlMenuItem = NSMenuItem(title: "Last Update Time", action: nil)
     let configurationDateAndTimeMenuItem = NSMenuItem(title: "Configuration URL", action: nil)
+    let autofillDebugScriptMenuItem = NSMenuItem(title: "Autofill Debug Script", action: #selector(MainMenu.toggleAutofillScriptDebugSettingsAction))
 
     // MARK: - Help
 
@@ -385,6 +386,7 @@ import SubscriptionUI
         updateLoggingMenuItems()
         updateInternalUserItem()
         updateRemoteConfigurationInfo()
+        updateAutofillDebugScriptMenuItem()
     }
 
     // MARK: - Bookmarks
@@ -616,6 +618,9 @@ import SubscriptionUI
             menu.addItem(menuItem)
         }
 
+        menu.addItem(autofillDebugScriptMenuItem
+            .targetting(self))
+
         menu.addItem(.separator())
         let debugLoggingMenuItem = NSMenuItem(title: OSLog.isRunningInDebugEnvironment ? "Disable DEBUG level logging…" : "Enable DEBUG level logging…", action: #selector(debugLoggingMenuItemAction), target: self)
         menu.addItem(debugLoggingMenuItem)
@@ -642,6 +647,10 @@ import SubscriptionUI
 
             item.state = enabledCategories.contains(category) ? .on : .off
         }
+    }
+
+    private func updateAutofillDebugScriptMenuItem() {
+        autofillDebugScriptMenuItem.state = AutofillPreferences().debugScriptEnabled ? .on : .off
     }
 
     private func updateRemoteConfigurationInfo() {
@@ -672,6 +681,12 @@ import SubscriptionUI
 
     @objc private func disableAllLogsMenuItemAction(_ sender: NSMenuItem) {
         OSLog.loggingCategories = []
+    }
+
+    @objc private func toggleAutofillScriptDebugSettingsAction(_ sender: NSMenuItem) {
+        AutofillPreferences().debugScriptEnabled = !AutofillPreferences().debugScriptEnabled
+        NotificationCenter.default.post(name: .autofillScriptDebugSettingsDidChange, object: nil)
+        updateAutofillDebugScriptMenuItem()
     }
 
     @objc private func debugLoggingMenuItemAction(_ sender: NSMenuItem) {

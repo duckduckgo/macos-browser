@@ -58,7 +58,7 @@ final class NetworkProtectionAppEvents {
         let loginItemsManager = LoginItemsManager()
 
         Task { @MainActor in
-            guard featureVisibility.isNetworkProtectionVisible() else {
+            if featureVisibility.shouldUninstallAutomatically() {
                 featureVisibility.disableForAllUsers()
                 return
             }
