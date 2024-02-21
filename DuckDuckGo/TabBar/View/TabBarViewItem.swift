@@ -55,7 +55,6 @@ final class TabBarViewItem: NSCollectionViewItem {
     enum Constants {
         static let textFieldPadding: CGFloat = 28
         static let textFieldPaddingNoFavicon: CGFloat = 12
-        static let textFieldPaddingMuteIconPresent: CGFloat = 48
     }
 
     var widthStage: WidthStage {
@@ -97,6 +96,7 @@ final class TabBarViewItem: NSCollectionViewItem {
 
     @IBOutlet weak var titleTextField: NSTextField!
     @IBOutlet weak var titleTextFieldLeadingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var titleTextFieldLeadingMuteConstraint: NSLayoutConstraint!
     @IBOutlet weak var closeButton: MouseOverButton!
     @IBOutlet weak var rightSeparatorView: ColorView!
     @IBOutlet weak var mouseOverView: MouseOverView!
@@ -455,10 +455,18 @@ final class TabBarViewItem: NSCollectionViewItem {
     }
 
     private func setupMutedTabIconPosition() {
-        if !mutedTabIcon.isHidden {
-            titleTextFieldLeadingConstraint.constant = Constants.textFieldPaddingMuteIconPresent
-        } else {
+        if mutedTabIcon.isHidden {
+            titleTextFieldLeadingConstraint.priority = .defaultHigh
+            titleTextFieldLeadingMuteConstraint.priority = .defaultLow
             titleTextFieldLeadingConstraint.constant = faviconWrapperView.isHidden ? Constants.textFieldPaddingNoFavicon : Constants.textFieldPadding
+        } else {
+            if titleTextField.isHidden {
+                titleTextFieldLeadingMuteConstraint.priority = .defaultLow
+                titleTextFieldLeadingConstraint.priority = .defaultLow
+            } else {
+                titleTextFieldLeadingMuteConstraint.priority = .required
+                titleTextFieldLeadingConstraint.priority = .defaultLow
+            }
         }
     }
 }
