@@ -82,9 +82,7 @@ final class AddEditBookmarkDialogViewModel: AddEditBookmarkDialogViewModelProtoc
         case let .add(parentFolder):
             selectedFolder = parentFolder
         case let .edit(bookmark):
-            selectedFolder = mode.bookmark.flatMap { bookmark in
-                folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
-            }
+            selectedFolder = folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
         }
         bind()
     }
