@@ -282,12 +282,18 @@ final class AddressBarButtonsViewController: NSViewController {
         guard view.window?.isPopUpWindow == false else { return }
         bookmarkButton.setAccessibilityIdentifier("Bookmarks Button")
         let hasEmptyAddressBar = textFieldValue?.isEmpty ?? true
-        var isUrlBookmarked = false
-        if let url = tabCollectionViewModel.selectedTabViewModel?.tab.content.url,
-            bookmarkManager.isUrlBookmarked(url: url) {
-            isUrlBookmarked = true
+        var showBookmarkButton: Bool {
+            guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel,
+                  selectedTabViewModel.canBeBookmarked else { return false }
+
+            var isUrlBookmarked = false
+            if let url = selectedTabViewModel.tab.content.url,
+               bookmarkManager.isUrlBookmarked(url: url) {
+                isUrlBookmarked = true
+            }
+
+            return clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
         }
-        let showBookmarkButton = clearButton.isHidden && !hasEmptyAddressBar && (isMouseOverNavigationBar || bookmarkPopover?.isShown == true || isUrlBookmarked)
 
         bookmarkButton.isHidden = !showBookmarkButton
     }
@@ -612,15 +618,18 @@ final class AddressBarButtonsViewController: NSViewController {
 
         guard let selectedTabViewModel = tabCollectionViewModel.selectedTabViewModel else {
             updateBookmarkButtonImage()
-            updateBookmarkButtonVisibility()
+            updateButtons()
             return
         }
 
-        urlCancellable = selectedTabViewModel.tab.$content.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.stopAnimations()
-            self?.updateBookmarkButtonImage()
-            self?.updateBookmarkButtonVisibility()
-        }
+        urlCancellable = selectedTabViewModel.tab.$content
+            .combineLatest(selectedTabViewModel.tab.$error)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.stopAnimations()
+                self?.updateBookmarkButtonImage()
+                self?.updateButtons()
+            }
     }
 
     private func subscribeToPermissions() {
@@ -690,8 +699,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
     private func updatePermissionButtons() {
         permissionButtons.isHidden = isTextFieldEditorFirstResponder
-            || isAnyTrackerAnimationPlaying
-            || (tabCollectionViewModel.selectedTabViewModel?.errorViewState.isVisible ?? true)
+        || isAnyTrackerAnimationPlaying
+        || (tabCollectionViewModel.selectedTabViewModel?.isShowingErrorPage ?? true)
         defer {
             showOrHidePermissionPopoverIfNeeded()
         }
@@ -750,6 +759,8 @@ final class AddressBarButtonsViewController: NSViewController {
 
         // Image button
         switch controllerMode {
+        case .browsing where selectedTabViewModel.isShowingErrorPage:
+            imageButton.image = Self.webImage
         case .browsing:
             imageButton.image = selectedTabViewModel.favicon
         case .editing(isUrl: true):
@@ -774,12 +785,12 @@ final class AddressBarButtonsViewController: NSViewController {
         let isLocalUrl = selectedTabViewModel.tab.content.url?.isLocalURL ?? false
 
         // Privacy entry point button
-        privacyEntryPointButton.isHidden = isEditingMode ||
-            isTextFieldEditorFirstResponder ||
-            !isHypertextUrl ||
-            selectedTabViewModel.errorViewState.isVisible ||
-            isTextFieldValueText ||
-            isLocalUrl
+        privacyEntryPointButton.isHidden = isEditingMode
+        || isTextFieldEditorFirstResponder
+        || !isHypertextUrl
+        || selectedTabViewModel.isShowingErrorPage
+        || isTextFieldValueText
+        || isLocalUrl
         imageButtonWrapper.isHidden = view.window?.isPopUpWindow == true
             || !privacyEntryPointButton.isHidden
             || isAnyTrackerAnimationPlaying

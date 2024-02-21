@@ -558,11 +558,7 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Tab Preview
 
-    private var tabPreviewWindowController: TabPreviewWindowController = {
-        let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
-        // swiftlint:disable:next force_cast
-        return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
-    }()
+    private lazy var tabPreviewWindowController = TabPreviewWindowController()
 
     private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
