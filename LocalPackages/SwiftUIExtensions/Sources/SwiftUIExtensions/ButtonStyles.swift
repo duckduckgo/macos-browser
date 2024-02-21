@@ -55,8 +55,9 @@ public struct DefaultActionButtonStyle: ButtonStyle {
         let labelColor = enabled ? Color.white : Color.primary.opacity(0.3)
 
         configuration.label
-            .lineLimit(1)
             .font(.system(size: 13))
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
             .frame(minWidth: 44) // OK buttons will match the width of "Cancel" at least in English
             .padding(.top, 2.5)
             .padding(.bottom, 3)

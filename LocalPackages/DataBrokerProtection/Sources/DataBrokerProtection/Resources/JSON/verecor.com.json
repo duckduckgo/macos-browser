@@ -1,7 +1,8 @@
 {
-  "name": "verecor.com",
-  "version": "0.1.2",
-  "addedDatetime": 1677128400000,
+  "name": "Verecor",
+  "url": "verecor.com",
+  "version": "0.1.4",
+  "addedDatetime": 1677132000000,
   "steps": [
     {
       "stepType": "scan",
@@ -9,7 +10,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "6f53d146-af6a-4bce-970d-f1dcbc496037",
+          "id": "37fc63a6-e434-4ba0-9e9e-d80898e4dfa4",
           "url": "https://verecor.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -23,7 +24,7 @@
         },
         {
           "actionType": "extract",
-          "id": "e8c09200-030c-492a-8e54-22bc6bdb6829",
+          "id": "a955924c-7959-48c8-9511-3f843baed729",
           "selector": ".search-item",
           "profile": {
             "name": {
@@ -58,12 +59,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "f4bbe480-a6ff-40a5-aa25-8ff9ac40c9bf",
+          "id": "85cd9682-94d8-46ac-9999-e03dfa9f8d4e",
           "url": "https://verecor.com/ng/control/privacy"
         },
         {
           "actionType": "fillForm",
-          "id": "1e6302e1-daf9-49d6-951f-506ea5e266a0",
+          "id": "ed45c76b-e537-4072-9f46-9515c6e215be",
           "selector": ".ahm",
           "elements": [
             {
@@ -82,17 +83,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "6a3dc470-3bf7-4b8b-bb44-f77ef1a2c540",
+          "id": "0e1474f0-24fe-4f6a-8d2e-2dfd91cf574b",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "83157244-c5bf-44a9-979c-679e1404d67d",
+          "id": "52a858f5-7dc5-40aa-aaa7-7090e06ea55e",
           "selector": ".g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "15c50d7f-0e72-4509-be2b-40cde34b48e6",
+          "id": "759e0dd2-3a93-42a8-9a83-5e3408f5566b",
           "elements": [
             {
               "type": "button",
@@ -102,7 +103,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "2ed336a2-a7a9-4cbd-933c-cd463df4f553",
+          "id": "089924be-5ea3-48a9-a325-8976d262f39b",
           "expectations": [
             {
               "type": "text",
@@ -113,12 +114,12 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "88c09081-e848-4e75-a7b9-3ee28e95a459",
+          "id": "8094718e-412a-418f-b74d-cd4fc5e42c56",
           "pollingTime": 30
         },
         {
           "actionType": "expectation",
-          "id": "dd03cf9f-8227-4881-86bf-09ce158bf151",
+          "id": "af8fb89b-88d2-4901-b90c-eaac3c7566db",
           "expectations": [
             {
               "type": "text",
