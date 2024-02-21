@@ -38,44 +38,22 @@ struct AddBookmarkPopoverView: View {
 
     @MainActor
     private var addBookmarkView: some View {
-        BookmarkDialogContainerView(
+        AddEditBookmarkView(
             title: UserText.Bookmarks.Dialog.Title.addedBookmark,
-            middleSection: {
-                BookmarkDialogStackedContentView(
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.name,
-                        content: TextField("", text: $model.bookmarkTitle)
-                            .focusedOnAppear()
-                            .accessibilityIdentifier("bookmark.add.name.textfield")
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .font(.system(size: 14))
-                    ),
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.location,
-                        content: BookmarkDialogFolderManagementView(
-                            folders: model.folders,
-                            selectedFolder: $model.selectedFolder,
-                            onActionButton: model.addFolderButtonAction
-                        )
-                    )
-                )
-                BookmarkFavoriteView(isFavorite: $model.isBookmarkFavorite)
-            },
-            bottomSection: {
-                BookmarkDialogButtonsView(
-                    viewState: .expanded,
-                    otherButtonAction: .init(
-                        title: UserText.remove,
-                        action: model.removeButtonAction
-                    ),
-                    defaultButtonAction: .init(
-                        title: UserText.done,
-                        keyboardShortCut: .defaultAction,
-                        isDisabled: model.isDefaultActionButtonDisabled,
-                        action: model.doneButtonAction
-                    )
-                )
-            }
+            buttonsState: .compressed,
+            bookmarkName: $model.bookmarkTitle,
+            bookmarkURLPath: nil,
+            isBookmarkFavorite: $model.isBookmarkFavorite,
+            folders: model.folders,
+            selectedFolder: $model.selectedFolder,
+            isURLFieldHidden: true,
+            addFolderAction: model.addFolderButtonAction,
+            otherActionTitle: UserText.remove,
+            isOtherActionDisabled: false,
+            otherAction: model.removeButtonAction,
+            defaultActionTitle: UserText.done,
+            isDefaultActionDisabled: model.isDefaultActionButtonDisabled,
+            defaultAction: model.doneButtonAction
         )
         .padding(.vertical, 16.0)
         .font(.system(size: 13))
@@ -112,6 +90,7 @@ struct AddBookmarkPopoverView: View {
     let bkm = Bookmark(id: "n", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: false, parentFolderUUID: "1")
     let bkman = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [
         BookmarkFolder(id: "1", title: "Folder with a name that shouldn‘t fit into the picker", children: [])]))
+    bkman.loadBookmarks()
 
     return AddBookmarkPopoverView(model: AddBookmarkPopoverViewModel(bookmark: bkm, bookmarkManager: bkman))
         .preferredColorScheme(.dark)

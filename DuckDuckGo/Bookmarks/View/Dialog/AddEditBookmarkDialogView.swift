@@ -38,54 +38,22 @@ struct AddEditBookmarkDialogView: ModalView {
     }
 
     private var addEditBookmarkView: some View {
-        BookmarkDialogContainerView(
+        AddEditBookmarkView(
             title: viewModel.bookmarkModel.title,
-            middleSection: {
-                BookmarkDialogStackedContentView(
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.name,
-                        content: TextField("", text: $viewModel.bookmarkModel.bookmarkName)
-                            .focusedOnAppear()
-                            .accessibilityIdentifier("bookmark.add.name.textfield")
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .font(.system(size: 14))
-                    ),
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.url,
-                        content: TextField("", text: $viewModel.bookmarkModel.bookmarkURLPath)
-                            .accessibilityIdentifier("bookmark.add.url.textfield")
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .font(.system(size: 14))
-                    ),
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.location,
-                        content: BookmarkDialogFolderManagementView(
-                            folders: viewModel.bookmarkModel.folders,
-                            selectedFolder: $viewModel.bookmarkModel.selectedFolder,
-                            onActionButton: {
-                                viewModel.addFolderAction()
-                            }
-                        )
-                    )
-                )
-                BookmarkFavoriteView(isFavorite: $viewModel.bookmarkModel.isBookmarkFavorite)
-            },
-            bottomSection: {
-                BookmarkDialogButtonsView(
-                    viewState: .compressed,
-                    otherButtonAction: .init(
-                        title: UserText.cancel,
-                        keyboardShortCut: .cancelAction,
-                        isDisabled: viewModel.bookmarkModel.isOtherActionDisabled,
-                        action: viewModel.bookmarkModel.cancel
-                    ), defaultButtonAction: .init(
-                        title: viewModel.bookmarkModel.defaultActionTitle,
-                        keyboardShortCut: .defaultAction,
-                        isDisabled: viewModel.bookmarkModel.isDefaultActionDisabled,
-                        action: viewModel.bookmarkModel.addOrSave
-                    )
-                )
-            }
+            buttonsState: .compressed,
+            bookmarkName: $viewModel.bookmarkModel.bookmarkName,
+            bookmarkURLPath: $viewModel.bookmarkModel.bookmarkURLPath,
+            isBookmarkFavorite: $viewModel.bookmarkModel.isBookmarkFavorite,
+            folders: viewModel.bookmarkModel.folders,
+            selectedFolder: $viewModel.bookmarkModel.selectedFolder,
+            isURLFieldHidden: false,
+            addFolderAction: viewModel.addFolderAction,
+            otherActionTitle: viewModel.bookmarkModel.cancelActionTitle,
+            isOtherActionDisabled: viewModel.bookmarkModel.isOtherActionDisabled,
+            otherAction: viewModel.bookmarkModel.cancel,
+            defaultActionTitle: viewModel.bookmarkModel.defaultActionTitle,
+            isDefaultActionDisabled: viewModel.bookmarkModel.isDefaultActionDisabled,
+            defaultAction: viewModel.bookmarkModel.addOrSave
         )
         .frame(width: 448, height: 288)
     }
