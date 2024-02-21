@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
-        "revision" : "04c35220aa94bd005171086acccadd677400e7d5",
-        "version" : "111.0.2"
+        "branch" : "autofill/anya-delete-all-ios",
+        "revision" : "f087cf8389926b58692870bd5a459bad492ce66d"
       }
     },
     {

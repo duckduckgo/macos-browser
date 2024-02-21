@@ -3061,6 +3061,11 @@
 		BBDFDC5A2B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
 		BBDFDC5C2B2B8D7000F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
 		BBDFDC5D2B2B8E2100F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */; };
+		C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
+		C13909F02B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
+		C13909F12B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */; };
+		C13909F42B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */; };
+		C13909F52B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */; };
 		C168B9AC2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
 		C168B9AD2B31DC7F001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
 		C168B9AE2B31DC7F001AFAD9 /* AutofillNeverPromptWebsitesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */; };
@@ -4428,6 +4433,8 @@
 		B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyDashboardPopover.swift; sourceTree = "<group>"; };
 		BB5789712B2CA70F0009DFE2 /* DataBrokerProtectionSubscriptionEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionSubscriptionEventHandler.swift; sourceTree = "<group>"; };
 		BBDFDC592B2B8A0900F62D90 /* DataBrokerProtectionExternalWaitlistPixels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBrokerProtectionExternalWaitlistPixels.swift; sourceTree = "<group>"; };
+		C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillActionExecutor.swift; sourceTree = "<group>"; };
+		C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutofillDeleteAllPasswordsExecutorTests.swift; sourceTree = "<group>"; };
 		C168B9AB2B31DC7E001AFAD9 /* AutofillNeverPromptWebsitesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutofillNeverPromptWebsitesManager.swift; sourceTree = "<group>"; };
 		CB24F70B29A3D9CB006DCC58 /* AppConfigurationURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigurationURLProvider.swift; sourceTree = "<group>"; };
 		CB6BCDF827C6BEFF00CC76DC /* PrivacyFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyFeatures.swift; sourceTree = "<group>"; };
@@ -6140,6 +6147,7 @@
 				7B1E819B27C8874900FF0E60 /* ContentOverlayPopover.swift */,
 				7B1E819C27C8874900FF0E60 /* ContentOverlay.storyboard */,
 				7B1E819D27C8874900FF0E60 /* ContentOverlayViewController.swift */,
+				C13909EE2B85FD4E001626ED /* AutofillActionExecutor.swift */,
 			);
 			path = Autofill;
 			sourceTree = "<group>";
@@ -6817,6 +6825,7 @@
 		AA585D93248FD31400E9A3E2 /* UnitTests */ = {
 			isa = PBXGroup;
 			children = (
+				C13909F22B85FD60001626ED /* Autofill */,
 				5629846D2AC460DF00AC20EB /* Sync */,
 				B6A5A28C25B962CB00AA7ADA /* App */,
 				85F1B0C725EF9747004792B6 /* AppDelegate */,
@@ -8227,6 +8236,22 @@
 				B6FA8940269C425400588ECD /* PrivacyDashboardPopover.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		C13909F22B85FD60001626ED /* Autofill */ = {
+			isa = PBXGroup;
+			children = (
+				C13909F72B85FF76001626ED /* Tests */,
+			);
+			path = Autofill;
+			sourceTree = "<group>";
+		};
+		C13909F72B85FF76001626ED /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				C13909F32B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		CB6BCDF727C689FE00CC76DC /* Resources */ = {
@@ -10261,6 +10286,7 @@
 				3706FC7E293F65D500E42796 /* MainWindowController.swift in Sources */,
 				3706FC7F293F65D500E42796 /* Tab.swift in Sources */,
 				3706FC81293F65D500E42796 /* DispatchQueueExtensions.swift in Sources */,
+				C13909F02B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
 				3706FC82293F65D500E42796 /* PermissionAuthorizationPopover.swift in Sources */,
 				3706FC83293F65D500E42796 /* PopoverMessageViewController.swift in Sources */,
 				4BF97ADA2B43C5DC00EB4240 /* VPNFeedbackCategory.swift in Sources */,
@@ -10395,6 +10421,7 @@
 				3706FE1C293F661700E42796 /* ConnectBitwardenViewModelTests.swift in Sources */,
 				4B9DB0552A983B55000927DB /* MockWaitlistStorage.swift in Sources */,
 				3706FE1D293F661700E42796 /* PixelStoreTests.swift in Sources */,
+				C13909F52B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */,
 				857E44642A9F70F200ED77A7 /* CampaignVariantTests.swift in Sources */,
 				3706FE1E293F661700E42796 /* GeolocationProviderTests.swift in Sources */,
 				9F39106A2B68D87B00CB5112 /* ProgressExtensionTests.swift in Sources */,
@@ -11097,6 +11124,7 @@
 				4B957A7F2AC7AE700062CA31 /* NSApplicationExtension.swift in Sources */,
 				4B957A802AC7AE700062CA31 /* NSWindowExtension.swift in Sources */,
 				4B957A812AC7AE700062CA31 /* KeychainType+ClientDefault.swift in Sources */,
+				C13909F12B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
 				4B41EDA52B1543B9001EEDF4 /* VPNPreferencesModel.swift in Sources */,
 				4B957A822AC7AE700062CA31 /* SyncDebugMenu.swift in Sources */,
 				4B957A832AC7AE700062CA31 /* AddBookmarkPopover.swift in Sources */,
@@ -11990,6 +12018,7 @@
 				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,
 				B68458B025C7E76A00DC17B6 /* WindowManager+StateRestoration.swift in Sources */,
 				B68458C525C7EA0C00DC17B6 /* TabCollection+NSSecureCoding.swift in Sources */,
+				C13909EF2B85FD4E001626ED /* AutofillActionExecutor.swift in Sources */,
 				4BB88B5B25B7BA50006F6B06 /* Instruments.swift in Sources */,
 				9812D895276CEDA5004B6181 /* ContentBlockerRulesLists.swift in Sources */,
 				4B0511E2262CAA8600F6079C /* NSViewControllerExtension.swift in Sources */,
@@ -12278,6 +12307,7 @@
 				B6DA44232616CABC00DD1EC2 /* PixelArgumentsTests.swift in Sources */,
 				AAEC74BC2642F0F800C2EFBC /* History.xcdatamodeld in Sources */,
 				56B234BF2A84EFD200F2A1CC /* NavigationBarUrlExtensionsTests.swift in Sources */,
+				C13909F42B85FD79001626ED /* AutofillDeleteAllPasswordsExecutorTests.swift in Sources */,
 				37534C9E28104D9B002621E7 /* TabLazyLoaderTests.swift in Sources */,
 				B6619EF62B10DFF700CD9186 /* InstructionsFormatParserTests.swift in Sources */,
 				569277C429DEE09D00B633EF /* ContinueSetUpModelTests.swift in Sources */,
@@ -13554,8 +13584,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/duckduckgo/BrowserServicesKit";
 			requirement = {
-				kind = exactVersion;
-				version = 111.0.2;
+				branch = "autofill/anya-delete-all-ios";
+				kind = branch;
 			};
 		};
 		AA06B6B52672AF8100F541C5 /* XCRemoteSwiftPackageReference "Sparkle" */ = {

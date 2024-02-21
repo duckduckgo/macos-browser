@@ -81,6 +81,11 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
         storedCredentials[accountId] = nil
     }
 
+    func deleteAllWebsiteCredentials() throws {
+        storedAccounts.removeAll()
+        storedCredentials.removeAll()
+    }
+
     func neverPromptWebsites() throws -> [SecureVaultModels.NeverPromptWebsites] {
         return storedNeverPromptWebsites
     }
@@ -222,6 +227,24 @@ final class MockSecureVault<T: AutofillDatabaseProvider>: AutofillSecureVault {
 
 }
 
+extension MockSecureVault {
+    func addWebsiteCredentials(identifiers: [Int64]) {
+        var credentials = [Int64: SecureVaultModels.WebsiteCredentials]()
+
+        for identifier in identifiers {
+            let account = SecureVaultModels.WebsiteAccount(id: String(identifier),
+                                                           title: "title-\(identifier)",
+                                                           username: "user-\(identifier)",
+                                                           domain: "domain-\(identifier)")
+            let credential = SecureVaultModels.WebsiteCredentials(account: account, password: "password\"containing\"quotes".data(using: .utf8)!)
+            credentials[identifier] = credential
+        }
+
+        self.storedAccounts = credentials.map(\.value.account)
+        self.storedCredentials = credentials
+    }
+}
+
 // MARK: - Mock Providers
 
 class MockDatabaseProvider: AutofillDatabaseProvider {
@@ -273,6 +296,11 @@ class MockDatabaseProvider: AutofillDatabaseProvider {
 
     func deleteWebsiteCredentialsForAccountId(_ accountId: Int64) throws {
         self._accounts = self._accounts.filter { $0.id != String(accountId) }
+    }
+
+    func deleteAllWebsiteCredentials() throws {
+        self._accounts.removeAll()
+        self._credentialsDict.removeAll()
     }
 
     func accounts() throws -> [SecureVaultModels.WebsiteAccount] {
