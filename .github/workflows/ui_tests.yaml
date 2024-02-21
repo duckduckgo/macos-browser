@@ -58,6 +58,12 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
+    - name: Unlock keychains
+      run: |
+          security list-keychains
+          security unlock-keychain -p  "/Users/runner/Library/Keychains/login.keychain-db"
+          security unlock-keychain -p  "/Library/Keychains/System.keychain"
+
     - name: Build and run UI Testing
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
