@@ -56,10 +56,13 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Enable UI Automation
+    - name: Set up keychain
+      env:
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
-        sudo automationmodetool enable-automationmode-without-authentication
-        sudo security authorizationdb write com.apple.trust-settings.admin allow
+        security create-keychain -p "$KEYCHAIN_PASSWORD" ui-tests.keychain
+        security default-keychain -s ui-tests.keychain
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" ui-tests.keychain
 
     - name: Create test account for Sync and return the recovery code
       uses: duckduckgo/sync_crypto/action@main
