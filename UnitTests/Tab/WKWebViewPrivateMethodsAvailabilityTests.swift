@@ -16,8 +16,9 @@
 //  limitations under the License.
 //
 
-import XCTest
+import Navigation
 import WebKit
+import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
@@ -30,8 +31,22 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.fullScreenPlaceholderView))
     }
 
+    func testWebViewRespondsTo_loadAlternateHTMLString() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.loadAlternateHTMLString))
+    }
+
     func testWKBackForwardListRespondsTo_removeAllItems() {
         XCTAssertTrue(WKBackForwardList.instancesRespond(to: WKBackForwardList.removeAllItemsSelector))
+    }
+
+    func testWKWebpagePreferencesCustomHeaderFieldsSupported() {
+        XCTAssertTrue(NavigationPreferences.customHeadersSupported)
+        let testHeaders = ["X-CUSTOM-HEADER": "TEST"]
+        let customHeaderFields = CustomHeaderFields(fields: testHeaders, thirdPartyDomains: [URL.duckDuckGo.host!])
+        XCTAssertNotNil(customHeaderFields as? NSObject)
+        let pagePrefs = WKWebpagePreferences()
+        pagePrefs.customHeaderFields = customHeaderFields.map { [$0] }
+        XCTAssertEqual(pagePrefs.customHeaderFields, customHeaderFields.map { [$0] })
     }
 
 }

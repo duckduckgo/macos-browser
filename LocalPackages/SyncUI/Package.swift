@@ -1,10 +1,11 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "SyncUI",
+    defaultLocalization: "en",
     platforms: [ .macOS("11.4") ],
     products: [
         .library(
@@ -13,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "104.1.1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.0"),
     ],
     targets: [
         .target(

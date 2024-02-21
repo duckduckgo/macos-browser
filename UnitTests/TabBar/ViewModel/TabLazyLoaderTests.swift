@@ -18,6 +18,7 @@
 
 import XCTest
 import Combine
+import Navigation
 @testable import DuckDuckGo_Privacy_Browser
 
 private final class TabMock: LazyLoadable {
@@ -32,7 +33,8 @@ private final class TabMock: LazyLoadable {
     lazy var loadingFinishedPublisher: AnyPublisher<TabMock, Never> = loadingFinishedSubject.eraseToAnyPublisher()
 
     func isNewer(than other: TabMock) -> Bool { isNewerClosure(other) }
-    func reload() { reloadClosure(self) }
+    @discardableResult
+    func reload() -> ExpectedNavigation? { reloadClosure(self); return nil }
 
     var isNewerClosure: (TabMock) -> Bool = { _ in true }
     var reloadClosure: (TabMock) -> Void = { _ in }

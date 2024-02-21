@@ -35,7 +35,7 @@ final class ScanOperation: DataBrokerOperation {
     var actionsHandler: ActionsHandler?
     var continuation: CheckedContinuation<[ExtractedProfile], Error>?
     var extractedProfile: ExtractedProfile?
-    var stageCalculator: DataBrokerProtectionStageDurationCalculator?
+    var stageCalculator: StageDurationCalculator?
     private let operationAwaitTime: TimeInterval
     let shouldRunNextStep: () -> Bool
     var retriesCountOnError: Int = 0
@@ -60,7 +60,7 @@ final class ScanOperation: DataBrokerOperation {
     func run(inputValue: Void,
              webViewHandler: WebViewHandler? = nil,
              actionsHandler: ActionsHandler? = nil,
-             stageCalculator: DataBrokerProtectionStageDurationCalculator, // We do not need it for scans - for now.
+             stageCalculator: StageDurationCalculator, // We do not need it for scans - for now.
              showWebView: Bool) async throws -> [ExtractedProfile] {
         try await withCheckedThrowingContinuation { continuation in
             self.stageCalculator = stageCalculator

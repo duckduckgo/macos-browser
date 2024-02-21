@@ -27,6 +27,7 @@ import NetworkProtectionUI
 
 protocol NetworkProtectionFeatureVisibility {
     func isNetworkProtectionVisible() -> Bool
+    func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers()
     func disableForWaitlistUsers()
 }
@@ -65,7 +66,17 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
-        isEasterEggUser || waitlistIsOngoing
+        return isEasterEggUser || waitlistIsOngoing
+    }
+
+    /// Returns whether Network Protection should be uninstalled automatically.
+    /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
+    func shouldUninstallAutomatically() -> Bool {
+        let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
+        let isNotEasterEggUser = !isEasterEggUser
+        let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
+
+        return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
     }
 
     /// Whether the user is fully onboarded

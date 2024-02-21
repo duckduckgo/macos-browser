@@ -40,6 +40,18 @@ enum Preferences {
 
         @ObservedObject var model: PreferencesSidebarModel
 
+#if SUBSCRIPTION
+        var subscriptionModel: PreferencesSubscriptionModel?
+#endif
+
+        init(model: PreferencesSidebarModel) {
+            self.model = model
+
+#if SUBSCRIPTION
+            self.subscriptionModel = makeSubscriptionViewModel()
+#endif
+        }
+
         var body: some View {
             HStack(spacing: 0) {
                 Sidebar().environmentObject(model).frame(width: Const.sidebarWidth)
@@ -67,7 +79,7 @@ enum Preferences {
 
 #if SUBSCRIPTION
                             case .subscription:
-                                makeSubscriptionView()
+                                SubscriptionUI.PreferencesSubscriptionView(model: subscriptionModel!)
 #endif
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
@@ -94,77 +106,23 @@ enum Preferences {
                 .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color("InterfaceBackgroundColor"))
+            .background(Color.preferencesBackground)
         }
 
 #if SUBSCRIPTION
-        private func makeSubscriptionView() -> some View {
-            let actionHandler = PreferencesSubscriptionActionHandlers(openURL: { url in
-                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-            }, changePlanOrBilling: {
-                self.changePlanOrBilling()
-            }, openVPN: {
-                NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
-            }, openPersonalInformationRemoval: {
-                NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
-            }, openIdentityTheftRestoration: {
-                NotificationCenter.default.post(name: .openIdentityTheftRestoration, object: self, userInfo: nil)
-            })
-
-            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: {
-                self.restorePurchases()
-            }, openURLHandler: { url in
-                WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
-            }, goToSyncPreferences: {
-                self.model.selectPane(.sync)
-            })
-
-            let model = PreferencesSubscriptionModel(actionHandler: actionHandler, sheetActionHandler: sheetActionHandler)
-            return SubscriptionUI.PreferencesSubscriptionView(model: model)
-        }
-
-        private func changePlanOrBilling() {
-            switch SubscriptionPurchaseEnvironment.current {
-            case .appStore:
-                NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
-            case .stripe:
-                Task {
-                    guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
-                          case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
-                    guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
-
-                    WindowControllersManager.shared.show(url: customerPortalURL, source: .ui, newTab: true)
+        private func makeSubscriptionViewModel() -> PreferencesSubscriptionModel {
+            let openURL: (URL) -> Void = { url in
+                DispatchQueue.main.async {
+                    WindowControllersManager.shared.showTab(with: .subscription(url))
                 }
             }
-        }
 
-        private func restorePurchases() {
-            if #available(macOS 12.0, *) {
-                Task {
-                    let mainViewController = WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
-                    let progressViewController = ProgressViewController(title: "Restoring subscription...")
+            let sheetActionHandler = SubscriptionAccessActionHandlers(restorePurchases: { SubscriptionPagesUseSubscriptionFeature.startAppStoreRestoreFlow() },
+                                                                      openURLHandler: openURL,
+                                                                      goToSyncPreferences: { self.model.selectPane(.sync) })
 
-                    defer { mainViewController?.dismiss(progressViewController) }
-
-                    mainViewController?.presentAsSheet(progressViewController)
-
-                    guard case .success = await PurchaseManager.shared.syncAppleIDAccount() else { return }
-
-                    switch await AppStoreRestoreFlow.restoreAccountFromPastPurchase() {
-                    case .success:
-                        break
-                    case .failure(let error):
-                        switch error {
-                        case .missingAccountOrTransactions:
-                            WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionNotFoundAlert()
-                        case .subscriptionExpired:
-                            WindowControllersManager.shared.lastKeyMainWindowController?.showSubscriptionInactiveAlert()
-                        default:
-                            WindowControllersManager.shared.lastKeyMainWindowController?.showSomethingWentWrongAlert()
-                        }
-                    }
-                }
-            }
+            return PreferencesSubscriptionModel(openURLHandler: openURL,
+                                                sheetActionHandler: sheetActionHandler)
         }
 #endif
     }

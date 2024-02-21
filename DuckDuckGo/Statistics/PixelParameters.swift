@@ -224,7 +224,6 @@ extension Pixel.Event.Debug {
                 .webKitDidTerminate,
                 .removedInvalidBookmarkManagedObjects,
                 .bitwardenNotResponding,
-                .bitwardenRespondedCannotDecrypt,
                 .bitwardenRespondedCannotDecryptUnique,
                 .bitwardenHandshakeFailed,
                 .bitwardenDecryptionOfSharedKeyFailed,

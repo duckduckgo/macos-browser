@@ -16,30 +16,34 @@
 //  limitations under the License.
 //
 
-import Foundation
+import AppKit
 import Subscription
 
 public final class PreferencesSubscriptionModel: ObservableObject {
 
     @Published var isUserAuthenticated: Bool = false
-    @Published var hasEntitlements: Bool = false
+    @Published var cachedEntitlements: [AccountManager.Entitlement] = []
     @Published var subscriptionDetails: String?
+
+    private var subscriptionPlatform: SubscriptionService.GetSubscriptionDetailsResponse.Platform?
+
     lazy var sheetModel: SubscriptionAccessModel = makeSubscriptionAccessModel()
 
     private let accountManager: AccountManager
-    private var actionHandler: PreferencesSubscriptionActionHandlers
+    private let openURLHandler: (URL) -> Void
     private let sheetActionHandler: SubscriptionAccessActionHandlers
+
+    private var fetchSubscriptionDetailsTask: Task<(), Never>?
 
     private var signInObserver: Any?
     private var signOutObserver: Any?
 
-    public init(accountManager: AccountManager = AccountManager(), actionHandler: PreferencesSubscriptionActionHandlers, sheetActionHandler: SubscriptionAccessActionHandlers) {
+    public init(accountManager: AccountManager = AccountManager(), openURLHandler: @escaping (URL) -> Void, sheetActionHandler: SubscriptionAccessActionHandlers) {
         self.accountManager = accountManager
-        self.actionHandler = actionHandler
+        self.openURLHandler = openURLHandler
         self.sheetActionHandler = sheetActionHandler
 
         self.isUserAuthenticated = accountManager.isUserAuthenticated
-        self.hasEntitlements = self.isUserAuthenticated
 
         if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
             updateDescription(for: cachedDate)
@@ -79,12 +83,65 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func learnMoreAction() {
-        actionHandler.openURL(.purchaseSubscription)
+        openURLHandler(.subscriptionPurchase)
+    }
+
+    enum ChangePlanOrBillingAction {
+        case presentSheet(ManageSubscriptionSheet)
+        case navigateToManageSubscription(() -> Void)
     }
 
     @MainActor
-    func changePlanOrBillingAction() {
-        actionHandler.changePlanOrBilling()
+    func changePlanOrBillingAction() async -> ChangePlanOrBillingAction {
+        switch subscriptionPlatform {
+        case .apple:
+            if await confirmIfSignedInToSameAccount() {
+                return .navigateToManageSubscription { [weak self] in
+                    self?.changePlanOrBilling(for: .appStore)
+                }
+            } else {
+                return .presentSheet(.apple)
+            }
+        case .google:
+            return .presentSheet(.google)
+        case .stripe:
+            return .navigateToManageSubscription { [weak self] in
+                self?.changePlanOrBilling(for: .stripe)
+            }
+        default:
+            assertionFailure("Missing or unknown subscriptionPlatform")
+            return .navigateToManageSubscription { }
+        }
+    }
+
+    private func changePlanOrBilling(for environment: SubscriptionPurchaseEnvironment.Environment) {
+        switch environment {
+        case .appStore:
+            NSWorkspace.shared.open(.manageSubscriptionsInAppStoreAppURL)
+        case .stripe:
+            Task {
+                guard let accessToken = AccountManager().accessToken, let externalID = AccountManager().externalID,
+                      case let .success(response) = await SubscriptionService.getCustomerPortalURL(accessToken: accessToken, externalID: externalID) else { return }
+                guard let customerPortalURL = URL(string: response.customerPortalUrl) else { return }
+
+                openURLHandler(customerPortalURL)
+            }
+        }
+    }
+
+    private func confirmIfSignedInToSameAccount() async -> Bool {
+        if #available(macOS 12.0, *) {
+            guard let lastTransactionJWSRepresentation = await PurchaseManager.mostRecentTransaction() else { return false }
+
+            switch await AuthService.storeLogin(signature: lastTransactionJWSRepresentation) {
+            case .success(let response):
+                return response.externalID == AccountManager().externalID
+            case .failure:
+                return false
+            }
+        }
+
+        return false
     }
 
     @MainActor
@@ -94,32 +151,37 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-        actionHandler.openVPN()
+        NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-        actionHandler.openPersonalInformationRemoval()
+        NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
     }
 
     @MainActor
     func openIdentityTheftRestoration() {
-        actionHandler.openIdentityTheftRestoration()
+        openURLHandler(.identityTheftRestoration)
     }
 
     @MainActor
     func openFAQ() {
-        actionHandler.openURL(.subscriptionFAQ)
+        openURLHandler(.subscriptionFAQ)
     }
 
     @MainActor
     func fetchAndUpdateSubscriptionDetails() {
-        Task {
+        guard fetchSubscriptionDetailsTask == nil else { return }
+
+        fetchSubscriptionDetailsTask = Task {
             guard let token = accountManager.accessToken else { return }
 
             if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
                 updateDescription(for: cachedDate)
-                self.hasEntitlements = cachedDate.timeIntervalSinceNow > 0
+
+                if cachedDate.timeIntervalSinceNow > 0 {
+                    self.cachedEntitlements = []
+                }
             }
 
             if case .success(let response) = await SubscriptionService.getSubscriptionDetails(token: token) {
@@ -129,9 +191,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                 }
 
                 updateDescription(for: response.expiresOrRenewsAt)
+
+                subscriptionPlatform = response.platform
             }
 
-            self.hasEntitlements = await AccountManager().hasEntitlement(for: "dummy1")
+            if case let .success(entitlements) = await AccountManager().fetchEntitlements() {
+                self.cachedEntitlements = entitlements
+            }
         }
     }
 
@@ -148,18 +214,10 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     }()
 }
 
-public final class PreferencesSubscriptionActionHandlers {
-    var openURL: (URL) -> Void
-    var changePlanOrBilling: () -> Void
-    var openVPN: () -> Void
-    var openPersonalInformationRemoval: () -> Void
-    var openIdentityTheftRestoration: () -> Void
+enum ManageSubscriptionSheet: Identifiable {
+    case apple, google
 
-    public init(openURL: @escaping (URL) -> Void, changePlanOrBilling: @escaping () -> Void, openVPN: @escaping () -> Void, openPersonalInformationRemoval: @escaping () -> Void, openIdentityTheftRestoration: @escaping () -> Void) {
-        self.openURL = openURL
-        self.changePlanOrBilling = changePlanOrBilling
-        self.openVPN = openVPN
-        self.openPersonalInformationRemoval = openPersonalInformationRemoval
-        self.openIdentityTheftRestoration = openIdentityTheftRestoration
+    var id: Self {
+        return self
     }
 }
