@@ -23,6 +23,7 @@ import NetworkProtection
 import NetworkExtension
 import Networking
 import PixelKit
+import Subscription
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
@@ -241,6 +242,18 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         observeConnectionStatusChanges()
         observeServerChanges()
         observeStatusUpdateRequests()
+
+        os_log("[+] MacPacketTunnelProvider init()", log: .networkProtectionMemoryLog, type: .debug)
+
+        var token = ""
+        do {
+            token = try SubscriptionTokenKeychainStorage().getAccessToken() ?? ""
+        } catch {
+            os_log("[+] MacPacketTunnelProvider token: \(error)", log: .networkProtectionMemoryLog, type: .debug)
+            os_log("[+] MacPacketTunnelProvider token: \(error.localizedDescription)", log: .networkProtectionMemoryLog, type: .debug)
+        }
+
+        os_log("[+] MacPacketTunnelProvider token: \(token)", log: .networkProtectionMemoryLog, type: .debug)
     }
 
     // MARK: - Observing Changes & Requests
