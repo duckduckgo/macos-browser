@@ -70,19 +70,27 @@ final class NetworkProtectionNavBarPopoverManager {
                                                    statusReporter: statusReporter,
                                                    appLauncher: appLauncher,
                                                    menuItems: {
-                let menuItems = [
-                    NetworkProtectionStatusView.Model.MenuItem(
-                        name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
-                            await appLauncher.launchApp(withCommand: .showSettings)
-                        }),
-                    NetworkProtectionStatusView.Model.MenuItem(
-                        name: UserText.networkProtectionNavBarStatusViewShareFeedback,
-                        action: {
-                            await appLauncher.launchApp(withCommand: .shareFeedback)
-                        })
-                ]
-
-                return menuItems
+                if UserDefaults.netP.networkProtectionOnboardingStatus == .completed {
+                    return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusMenuVPNSettings, action: {
+                                await appLauncher.launchApp(withCommand: .showSettings)
+                            }),
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            action: {
+                                await appLauncher.launchApp(withCommand: .shareFeedback)
+                            })
+                    ]
+                } else {
+                    return [
+                        NetworkProtectionStatusView.Model.MenuItem(
+                            name: UserText.networkProtectionNavBarStatusViewShareFeedback,
+                            action: {
+                                await appLauncher.launchApp(withCommand: .shareFeedback)
+                            })
+                    ]
+                }
             },
                                                    agentLoginItem: LoginItem.vpnMenu
             )
