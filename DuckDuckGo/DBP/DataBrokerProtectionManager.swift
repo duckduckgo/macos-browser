@@ -41,8 +41,10 @@ public final class DataBrokerProtectionManager {
         return dataManager
     }()
 
+    private lazy var ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, pixelHandler: pixelHandler)
+
     lazy var scheduler: DataBrokerProtectionLoginItemScheduler = {
-        let ipcClient = DataBrokerProtectionIPCClient(machServiceName: Bundle.main.dbpBackgroundAgentBundleId, pixelHandler: pixelHandler)
+
         let ipcScheduler = DataBrokerProtectionIPCScheduler(ipcClient: ipcClient)
 
         return DataBrokerProtectionLoginItemScheduler(ipcScheduler: ipcScheduler, pixelHandler: pixelHandler)
@@ -56,6 +58,12 @@ public final class DataBrokerProtectionManager {
 
     public func shouldAskForInviteCode() -> Bool {
         redeemUseCase.shouldAskForInviteCode()
+    }
+
+    // MARK: - Debugging Features
+
+    public func showAgentIPAddress() {
+        ipcClient.openBrowser(domain: "https://www.whatismyip.com")
     }
 }
 

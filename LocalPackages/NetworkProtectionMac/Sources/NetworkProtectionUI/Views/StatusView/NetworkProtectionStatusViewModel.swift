@@ -143,9 +143,9 @@ extension NetworkProtectionStatusView {
             onboardingStatusPublisher
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] status in
-                self?.onboardingStatus = status
-            }
-            .store(in: &cancellables)
+                    self?.onboardingStatus = status
+                }
+                .store(in: &cancellables)
         }
 
         func refreshLoginItemStatus() {
@@ -184,14 +184,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.tunnelErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastTunnelErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastTunnelErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToControllerErrorMessages() {
@@ -199,14 +199,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.controllerErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastControllerErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastControllerErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToDebugInformationChanges() {

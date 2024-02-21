@@ -23,6 +23,7 @@ import Foundation
 import AppKit
 import Common
 import LoginItems
+import NetworkProtectionProxy
 
 @MainActor
 final class DataBrokerProtectionDebugMenu: NSMenu {
@@ -81,6 +82,11 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
                     .targetting(self)
 
                 NSMenuItem(title: "Restart", action: #selector(DataBrokerProtectionDebugMenu.backgroundAgentRestart))
+                    .targetting(self)
+
+                NSMenuItem.separator()
+
+                NSMenuItem(title: "Show agent IP address", action: #selector(DataBrokerProtectionDebugMenu.showAgentIPAddress))
                     .targetting(self)
             }
 
@@ -251,6 +257,10 @@ final class DataBrokerProtectionDebugMenu: NSMenu {
         databaseBrowserWindowController = NSWindowController(window: window)
         databaseBrowserWindowController?.showWindow(nil)
         window.delegate = self
+    }
+
+    @objc private func showAgentIPAddress() {
+        DataBrokerProtectionManager.shared.showAgentIPAddress()
     }
 
     @objc private func showForceOptOutWindow() {
