@@ -48,7 +48,7 @@ final class PasswordManagementViewController: NSViewController {
     @IBOutlet weak var lockMenuItem: NSMenuItem!
     @IBOutlet weak var importPasswordMenuItem: NSMenuItem!
     @IBOutlet weak var settingsMenuItem: NSMenuItem!
-
+    @IBOutlet weak var deleteAllPasswordsMenuItem: NSMenuItem!
     @IBOutlet weak var unlockYourAutofillLabel: FlatButton!
     @IBOutlet weak var autofillTitleLabel: NSTextField!
     @IBOutlet weak var unlockYourAutofillInfo: NSButtonCell!
@@ -198,6 +198,7 @@ final class PasswordManagementViewController: NSViewController {
     private func setupStrings() {
         importPasswordMenuItem.title = UserText.importPasswords
         exportLoginItem.title = UserText.exportLogins
+        deleteAllPasswordsMenuItem.title = UserText.deleteAllPasswords
         settingsMenuItem.title = UserText.settingsSuspended
         unlockYourAutofillLabel.title = UserText.passwordManagerUnlockAutofill
         autofillTitleLabel.stringValue = UserText.autofill
@@ -310,6 +311,17 @@ final class PasswordManagementViewController: NSViewController {
     @IBAction func onImportClicked(_ sender: NSButton) {
         self.dismiss()
         DataImportView().show()
+    }
+
+    @IBAction func onDeleteAllPasswordsClicked(_ sender: Any) {
+        guard let secureVault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
+        let syncService = NSApp.delegateTyped.syncService else { return }
+
+        let deleteAllExecutor = AutofillDeleteAllPasswordsExecutor(userAuthenticator: DeviceAuthenticator.shared,
+                                                                   secureVault: secureVault,
+                                                                   syncRequester: syncService)
+
+        AutofillActionPresenter().show(actionExecutor: deleteAllExecutor)
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
@@ -1063,4 +1075,23 @@ extension PasswordManagementViewController: NSTextViewDelegate {
         return NSRange(location: 0, length: 0)
     }
 
+}
+
+extension PasswordManagementViewController: NSMenuItemValidation {
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        switch menuItem.action {
+        case #selector(PasswordManagementViewController.onDeleteAllPasswordsClicked(_:)):
+            return areTherePasswords
+        default:
+            guard let appDelegate = NSApplication.shared.delegate as? AppDelegate else { return false }
+            return appDelegate.validateMenuItem(menuItem)
+        }
+    }
+
+    private var areTherePasswords: Bool {
+        guard let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared) else { return false }
+        let accounts = (try? vault.accounts()) ?? []
+        return !accounts.isEmpty
+    }
 }
