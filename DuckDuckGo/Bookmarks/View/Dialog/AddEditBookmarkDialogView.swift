@@ -19,31 +19,32 @@
 import SwiftUI
 
 struct AddEditBookmarkDialogView: ModalView {
-    @ObservedObject private var viewModel: AddEditBookmarkDialogViewModel
-    @EnvironmentObject private var addFolderViewModel: AddEditBookmarkFolderDialogViewModel
+    @ObservedObject private var viewModel: AddEditBookmarkDialogCoordinatorViewModel<AddEditBookmarkDialogViewModel, AddEditBookmarkFolderDialogViewModel>
 
-    @State private var isAddFolderPresented = false
-
-    init(viewModel: AddEditBookmarkDialogViewModel) {
+    init(viewModel: AddEditBookmarkDialogCoordinatorViewModel<AddEditBookmarkDialogViewModel, AddEditBookmarkFolderDialogViewModel>) {
         self.viewModel = viewModel
     }
 
     var body: some View {
-        if isAddFolderPresented {
-            addFolderView
-        } else {
-            addEditBookmarkView
+        Group {
+            switch viewModel.viewState {
+            case .bookmark:
+                addEditBookmarkView
+            case .folder:
+                addFolderView
+            }
         }
+        .font(.system(size: 13))
     }
 
     private var addEditBookmarkView: some View {
         BookmarkDialogContainerView(
-            title: viewModel.title,
+            title: viewModel.bookmarkModel.title,
             middleSection: {
                 BookmarkDialogStackedContentView(
                     .init(
                         title: UserText.Bookmarks.Dialog.Field.name,
-                        content: TextField("", text: $viewModel.bookmarkName)
+                        content: TextField("", text: $viewModel.bookmarkModel.bookmarkName)
                             .focusedOnAppear()
                             .accessibilityIdentifier("bookmark.add.name.textfield")
                             .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -51,7 +52,7 @@ struct AddEditBookmarkDialogView: ModalView {
                     ),
                     .init(
                         title: UserText.Bookmarks.Dialog.Field.url,
-                        content: TextField("", text: $viewModel.bookmarkURLPath)
+                        content: TextField("", text: $viewModel.bookmarkModel.bookmarkURLPath)
                             .accessibilityIdentifier("bookmark.add.url.textfield")
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .font(.system(size: 14))
@@ -59,15 +60,15 @@ struct AddEditBookmarkDialogView: ModalView {
                     .init(
                         title: UserText.Bookmarks.Dialog.Field.location,
                         content: BookmarkDialogFolderManagementView(
-                            folders: viewModel.folders,
-                            selectedFolder: $viewModel.selectedFolder,
+                            folders: viewModel.bookmarkModel.folders,
+                            selectedFolder: $viewModel.bookmarkModel.selectedFolder,
                             onActionButton: {
-                                isAddFolderPresented = true
+                                viewModel.addFolderAction()
                             }
                         )
                     )
                 )
-                BookmarkFavoriteView(isFavorite: $viewModel.isBookmarkFavorite)
+                BookmarkFavoriteView(isFavorite: $viewModel.bookmarkModel.isBookmarkFavorite)
             },
             bottomSection: {
                 BookmarkDialogButtonsView(
@@ -75,45 +76,41 @@ struct AddEditBookmarkDialogView: ModalView {
                     otherButtonAction: .init(
                         title: UserText.cancel,
                         keyboardShortCut: .cancelAction,
-                        action: viewModel.cancelAction
+                        isDisabled: viewModel.bookmarkModel.isOtherActionDisabled,
+                        action: viewModel.bookmarkModel.cancel
                     ), defaultButtonAction: .init(
-                        title: viewModel.defaultActionTitle,
+                        title: viewModel.bookmarkModel.defaultActionTitle,
                         keyboardShortCut: .defaultAction,
-                        isDisabled: viewModel.isDefaultActionButtonDisabled,
-                        action: viewModel.saveOrAddAction
+                        isDisabled: viewModel.bookmarkModel.isDefaultActionDisabled,
+                        action: viewModel.bookmarkModel.addOrSave
                     )
                 )
             }
         )
-        .font(.system(size: 13))
         .frame(width: 448, height: 288)
     }
 
     private var addFolderView: some View {
         AddEditBookmarkFolderView(
-            title: addFolderViewModel.title,
+            title: viewModel.folderModel.title,
             buttonsState: .compressed,
-            folders: addFolderViewModel.folders,
-            folderName: $addFolderViewModel.folderName,
-            selectedFolder: $addFolderViewModel.selectedFolder,
-            cancelActionTitle: addFolderViewModel.cancelActionTitle,
-            isCancelActionDisabled: addFolderViewModel.isCancelActionDisabled,
+            folders: viewModel.folderModel.folders,
+            folderName: $viewModel.folderModel.folderName,
+            selectedFolder: $viewModel.folderModel.selectedFolder,
+            cancelActionTitle: viewModel.folderModel.cancelActionTitle,
+            isCancelActionDisabled: viewModel.folderModel.isOtherActionDisabled,
             cancelAction: { _ in
-                isAddFolderPresented = false
+                viewModel.dismissAction()
             },
-            defaultActionTitle: addFolderViewModel.defaultActionTitle,
-            isDefaultActionDisabled: addFolderViewModel.isDefaultActionButtonDisabled,
+            defaultActionTitle: viewModel.folderModel.defaultActionTitle,
+            isDefaultActionDisabled: viewModel.folderModel.isDefaultActionDisabled,
             defaultAction: { _ in
-                addFolderViewModel.addOrSave {
-                    isAddFolderPresented = false
+                viewModel.folderModel.addOrSave {
+                    viewModel.dismissAction()
                 }
             }
         )
-        .font(.system(size: 13))
         .frame(width: 448, height: 210)
-        .onAppear {
-            addFolderViewModel.selectedFolder = viewModel.selectedFolder
-        }
     }
 }
 
@@ -123,24 +120,20 @@ struct AddEditBookmarkDialogView: ModalView {
 #Preview("Add Bookmark - Light Mode") {
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
     bookmarkManager.loadBookmarks()
-    let viewModel = AddEditBookmarkDialogViewModel(mode: .add, bookmarkManager: bookmarkManager)
-    let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager) { bookmarkFolder in
-        viewModel.selectedFolder = bookmarkFolder
-    }
+    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add, bookmarkManager: bookmarkManager)
+    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
     return AddEditBookmarkDialogView(viewModel: viewModel)
-        .environmentObject(addFolderViewModel)
         .preferredColorScheme(.light)
 }
 
 #Preview("Add Bookmark - Light Mode") {
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: []))
     bookmarkManager.loadBookmarks()
-    let viewModel = AddEditBookmarkDialogViewModel(mode: .add, bookmarkManager: bookmarkManager)
-    let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager) { bookmarkFolder in
-        viewModel.selectedFolder = bookmarkFolder
-    }
+    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .add, bookmarkManager: bookmarkManager)
+    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
     return AddEditBookmarkDialogView(viewModel: viewModel)
-        .environmentObject(addFolderViewModel)
         .preferredColorScheme(.dark)
 }
 
@@ -149,12 +142,10 @@ struct AddEditBookmarkDialogView: ModalView {
     let bookmark = Bookmark(id: "1", url: "www.duckduckgo.com", title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "7")
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [bookmark, parentFolder]))
     bookmarkManager.loadBookmarks()
-    let viewModel = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-    let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager) { bookmarkFolder in
-        viewModel.selectedFolder = bookmarkFolder
-    }
+    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
+    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
     return AddEditBookmarkDialogView(viewModel: viewModel)
-        .environmentObject(addFolderViewModel)
         .preferredColorScheme(.light)
 }
 
@@ -163,12 +154,10 @@ struct AddEditBookmarkDialogView: ModalView {
     let bookmark = Bookmark(id: "1", url: "www.duckduckgo.com", title: "DuckDuckGo", isFavorite: true, parentFolderUUID: "7")
     let bookmarkManager = LocalBookmarkManager(bookmarkStore: BookmarkStoreMock(bookmarks: [bookmark, parentFolder]))
     bookmarkManager.loadBookmarks()
-    let viewModel = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
-    let addFolderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager) { bookmarkFolder in
-        viewModel.selectedFolder = bookmarkFolder
-    }
+    let bookmarkViewModel = AddEditBookmarkDialogViewModel(mode: .edit(bookmark: bookmark), bookmarkManager: bookmarkManager)
+    let folderViewModel = AddEditBookmarkFolderDialogViewModel(mode: .add(parentFolder: nil), bookmarkManager: bookmarkManager)
+    let viewModel = AddEditBookmarkDialogCoordinatorViewModel(bookmarkModel: bookmarkViewModel, folderModel: folderViewModel)
     return AddEditBookmarkDialogView(viewModel: viewModel)
-        .environmentObject(addFolderViewModel)
         .preferredColorScheme(.dark)
 }
 #endif

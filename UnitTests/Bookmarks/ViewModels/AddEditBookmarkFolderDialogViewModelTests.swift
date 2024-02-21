@@ -220,7 +220,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
 
         // WHEN
-        let result = sut.isCancelActionDisabled
+        let result = sut.isOtherActionDisabled
 
         // THEN
         XCTAssertFalse(result)
@@ -231,7 +231,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: .mock, parentFolder: nil), bookmarkManager: bookmarkManager)
 
         // WHEN
-        let result = sut.isCancelActionDisabled
+        let result = sut.isOtherActionDisabled
 
         // THEN
         XCTAssertFalse(result)
@@ -243,7 +243,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         sut.folderName = ""
 
         // WHEN
-        let result = sut.isDefaultActionButtonDisabled
+        let result = sut.isDefaultActionDisabled
 
         // THEN
         XCTAssertTrue(result)
@@ -255,7 +255,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         sut.folderName = ""
 
         // WHEN
-        let result = sut.isDefaultActionButtonDisabled
+        let result = sut.isDefaultActionDisabled
 
         // THEN
         XCTAssertTrue(result)
@@ -267,7 +267,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         sut.folderName = " Test "
 
         // WHEN
-        let result = sut.isDefaultActionButtonDisabled
+        let result = sut.isDefaultActionDisabled
 
         // THEN
         XCTAssertFalse(result)
@@ -279,7 +279,7 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
         sut.folderName = " Test "
 
         // WHEN
-        let result = sut.isDefaultActionButtonDisabled
+        let result = sut.isDefaultActionDisabled
 
         // THEN
         XCTAssertFalse(result)
@@ -385,7 +385,6 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
     func testShouldAskBookmarkStoreToMoveFolderToRootFolderWhenSelectedFolderIsDifferentFromOriginalFolder() {
         // GIVEN
-        let location = BookmarkFolder(id: #file, title: #function)
         let folder = BookmarkFolder.mock
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: .mock), bookmarkManager: bookmarkManager)
         sut.selectedFolder = nil
@@ -405,7 +404,6 @@ final class AddEditBookmarkFolderDialogViewModelTests: XCTestCase {
 
     func testShouldNotAskBookmarkStoreToMoveFolderWhenSelectedFolderIsNotDifferentFromOriginalFolder() {
         // GIVEN
-        let location = BookmarkFolder(id: #file, title: #function)
         let folder = BookmarkFolder.mock
         let sut = AddEditBookmarkFolderDialogViewModel(mode: .edit(folder: folder, parentFolder: nil), bookmarkManager: bookmarkManager)
         sut.selectedFolder = nil

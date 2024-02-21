@@ -2435,6 +2435,12 @@
 		9FDA6C212B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		9FDA6C222B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
 		9FDA6C232B79A59D00E099A9 /* BookmarkFavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */; };
+		9FEE98692B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */; };
+		9FEE986A2B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */; };
+		9FEE986B2B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */; };
+		9FEE986D2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */; };
+		9FEE986E2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */; };
+		9FEE986F2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */; };
 		AA06B6B72672AF8100F541C5 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA06B6B62672AF8100F541C5 /* Sparkle */; };
 		AA0877B826D5160D00B05660 /* SafariVersionReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */; };
 		AA0877BA26D5161D00B05660 /* WebKitVersionProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */; };
@@ -3970,6 +3976,8 @@
 		9FA173E62B7B122E00EE4E6E /* BookmarkDialogStackedContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkDialogStackedContentView.swift; sourceTree = "<group>"; };
 		9FA173EA2B7B232200EE4E6E /* AddEditBookmarkDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogView.swift; sourceTree = "<group>"; };
 		9FDA6C202B79A59D00E099A9 /* BookmarkFavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkFavoriteView.swift; sourceTree = "<group>"; };
+		9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksDialogViewModel.swift; sourceTree = "<group>"; };
+		9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditBookmarkDialogCoordinatorViewModel.swift; sourceTree = "<group>"; };
 		AA0877B726D5160D00B05660 /* SafariVersionReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariVersionReaderTests.swift; sourceTree = "<group>"; };
 		AA0877B926D5161D00B05660 /* WebKitVersionProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebKitVersionProviderTests.swift; sourceTree = "<group>"; };
 		AA0F3DB6261A566C0077F2D9 /* SuggestionLoadingMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionLoadingMock.swift; sourceTree = "<group>"; };
@@ -7339,6 +7347,8 @@
 				B6F9BDDF2B45C1A800677B33 /* AddBookmarkFolderModalViewModel.swift */,
 				9F982F0C2B8224BE00231028 /* AddEditBookmarkFolderDialogViewModel.swift */,
 				9F56CFAC2B84326C00BB7F11 /* AddEditBookmarkDialogViewModel.swift */,
+				9FEE98682B85B869002E44E8 /* BookmarksDialogViewModel.swift */,
+				9FEE986C2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -9545,6 +9555,7 @@
 				3706FA89293F65D500E42796 /* CrashReportPromptPresenter.swift in Sources */,
 				3706FA8B293F65D500E42796 /* PreferencesRootView.swift in Sources */,
 				3706FA8C293F65D500E42796 /* AppStateChangedPublisher.swift in Sources */,
+				9FEE986E2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */,
 				3706FA8D293F65D500E42796 /* BookmarkTableCellView.swift in Sources */,
 				3706FA8E293F65D500E42796 /* BookmarkManagementSidebarViewController.swift in Sources */,
 				3706FA8F293F65D500E42796 /* NSStackViewExtension.swift in Sources */,
@@ -9809,6 +9820,7 @@
 				3706FB69293F65D500E42796 /* NavigationBarBadgeAnimationView.swift in Sources */,
 				1D1A334A2A6FEB170080ACED /* BurnerMode.swift in Sources */,
 				B603971B29BA084C00902A34 /* JSAlertController.swift in Sources */,
+				9FEE986A2B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */,
 				3706FB6A293F65D500E42796 /* AddressBarButton.swift in Sources */,
 				3706FB6B293F65D500E42796 /* HistoryEntry.swift in Sources */,
 				4B41EDA42B1543B9001EEDF4 /* VPNPreferencesModel.swift in Sources */,
@@ -10738,6 +10750,7 @@
 				4B95796E2AC7AE700062CA31 /* LegacyBookmarkStore.swift in Sources */,
 				4B95796F2AC7AE700062CA31 /* NSAlert+DataImport.swift in Sources */,
 				4B9579702AC7AE700062CA31 /* MainWindow.swift in Sources */,
+				9FEE986B2B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */,
 				4B9579712AC7AE700062CA31 /* CrashReportPromptViewController.swift in Sources */,
 				4B9579722AC7AE700062CA31 /* BookmarksCleanupErrorHandling.swift in Sources */,
 				4B9579732AC7AE700062CA31 /* ContextMenuManager.swift in Sources */,
@@ -10865,6 +10878,7 @@
 				4B9579E42AC7AE700062CA31 /* PopUpWindow.swift in Sources */,
 				4B9579E52AC7AE700062CA31 /* Favicons.xcdatamodeld in Sources */,
 				4B9579E62AC7AE700062CA31 /* Publisher.asVoid.swift in Sources */,
+				9FEE986F2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */,
 				4B9579E72AC7AE700062CA31 /* Waitlist.swift in Sources */,
 				3158B1582B0BF76000AF130C /* DataBrokerProtectionFeatureVisibility.swift in Sources */,
 				4B9579E82AC7AE700062CA31 /* NavigationButtonMenuDelegate.swift in Sources */,
@@ -11816,6 +11830,7 @@
 				3171D6BA288984D00068632A /* BadgeAnimationView.swift in Sources */,
 				1DB67F292B6FE4A6003DF243 /* WebViewSnapshotRenderer.swift in Sources */,
 				4B9292CE2667123700AD2C21 /* BrowserTabSelectionDelegate.swift in Sources */,
+				9FEE986D2B85BA17002E44E8 /* AddEditBookmarkDialogCoordinatorViewModel.swift in Sources */,
 				B6BCC53B2AFD15DF002C5499 /* DataImportProfilePicker.swift in Sources */,
 				3158B1562B0BF75D00AF130C /* DataBrokerProtectionFeatureVisibility.swift in Sources */,
 				56D6A3D629DB2BAB0055215A /* ContinueSetUpView.swift in Sources */,
@@ -11913,6 +11928,7 @@
 				4BE4005527CF3F19007D3161 /* SavePaymentMethodViewController.swift in Sources */,
 				1D2DC009290167A0008083A1 /* BWStatus.swift in Sources */,
 				AAFE068326C7082D005434CC /* WebKitVersionProvider.swift in Sources */,
+				9FEE98692B85B869002E44E8 /* BookmarksDialogViewModel.swift in Sources */,
 				B63D467A25BFC3E100874977 /* NSCoderExtensions.swift in Sources */,
 				1D2DC00B290167EC008083A1 /* RunningApplicationCheck.swift in Sources */,
 				B6A5A27125B9377300AA7ADA /* StatePersistenceService.swift in Sources */,

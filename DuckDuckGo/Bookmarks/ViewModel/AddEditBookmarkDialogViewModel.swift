@@ -20,7 +20,16 @@ import Foundation
 import Combine
 
 @MainActor
-final class AddEditBookmarkDialogViewModel: ObservableObject {
+protocol AddEditBookmarkDialogViewModelProtocol: BookmarksDialogViewModel {
+    var bookmarkName: String { get set }
+    var bookmarkURLPath: String { get set }
+    var isBookmarkFavorite: Bool { get set }
+
+    var isURLFieldHidden: Bool { get }
+}
+
+@MainActor
+final class AddEditBookmarkDialogViewModel: AddEditBookmarkDialogViewModelProtocol {
 
     enum Mode {
         case add
@@ -40,6 +49,12 @@ final class AddEditBookmarkDialogViewModel: ObservableObject {
         mode.title
     }
 
+    let isURLFieldHidden: Bool = false
+
+    var cancelActionTitle: String {
+        mode.cancelActionTitle
+    }
+
     var defaultActionTitle: String {
         mode.defaultActionTitle
     }
@@ -49,7 +64,9 @@ final class AddEditBookmarkDialogViewModel: ObservableObject {
         return !bookmarkName.trimmingWhitespace().isEmpty && url.isValid
     }
 
-    var isDefaultActionButtonDisabled: Bool { !hasValidInput }
+    let isOtherActionDisabled: Bool = false
+
+    var isDefaultActionDisabled: Bool { !hasValidInput }
 
     private let mode: Mode
     private let bookmarkManager: BookmarkManager
@@ -67,11 +84,11 @@ final class AddEditBookmarkDialogViewModel: ObservableObject {
         bind()
     }
 
-    func cancelAction(dismiss: () -> Void) {
+    func cancel(dismiss: () -> Void) {
         dismiss()
     }
 
-    func saveOrAddAction(dismiss: () -> Void) {
+    func addOrSave(dismiss: () -> Void) {
         guard let url = bookmarkURLPath.url else {
             assertionFailure("Invalid URL, default action button should be disabled.")
             return
@@ -112,7 +129,7 @@ private extension AddEditBookmarkDialogViewModel {
             bookmark.isFavorite = isBookmarkFavorite
             bookmarkManager.update(bookmark: bookmark)
         }
-        if bookmark.parentFolderUUID != selectedFolder?.parentFolderUUID {
+        if bookmark.parentFolderUUID != selectedFolder?.id {
             let parentFoler: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFoler, completion: { _ in })
         }
@@ -131,6 +148,13 @@ private extension AddEditBookmarkDialogViewModel.Mode {
             return UserText.Bookmarks.Dialog.Title.addBookmark
         case .edit:
             return UserText.Bookmarks.Dialog.Title.editBookmark
+        }
+    }
+
+    var cancelActionTitle: String {
+        switch self {
+        case .add, .edit:
+            return UserText.cancel
         }
     }
 

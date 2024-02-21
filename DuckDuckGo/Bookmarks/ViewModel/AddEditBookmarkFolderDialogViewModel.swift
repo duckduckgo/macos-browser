@@ -20,18 +20,13 @@ import Foundation
 import Combine
 
 @MainActor
-protocol BookmarkFolderDialogViewModel: ObservableObject {
-    var title: String { get }
-    var folderName: String { get }
-    var folders: [FolderViewModel] { get }
-    var selectedFolder: BookmarkFolder? { get }
-
-    func cancel()
-    func addOrSave()
+protocol AddEditBookmarkFolderDialogViewModelProtocol: BookmarksDialogViewModel {
+    var addFolderPublisher: AnyPublisher<BookmarkFolder, Never> { get }
+    var folderName: String { get set }
 }
 
 @MainActor
-final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
+final class AddEditBookmarkFolderDialogViewModel: AddEditBookmarkFolderDialogViewModelProtocol {
 
     /// The type of operation to perform on a folder
     enum Mode {
@@ -62,20 +57,23 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
         mode.defaultActionTitle
     }
 
-    let isCancelActionDisabled = false
+    let isOtherActionDisabled = false
 
-    var isDefaultActionButtonDisabled: Bool {
+    var isDefaultActionDisabled: Bool {
         folderName.trimmingWhitespace().isEmpty
+    }
+
+    var addFolderPublisher: AnyPublisher<BookmarkFolder, Never> {
+        addFolderSubject.eraseToAnyPublisher()
     }
 
     private let mode: Mode
     private let bookmarkManager: BookmarkManager
-    private let onFolderAdded: ((BookmarkFolder?) -> Void)?
+    private let addFolderSubject: PassthroughSubject<BookmarkFolder, Never> = .init()
 
-    init(mode: Mode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared, onFolderAdded: ((BookmarkFolder?) -> Void)? = nil) {
+    init(mode: Mode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.mode = mode
         self.bookmarkManager = bookmarkManager
-        self.onFolderAdded = onFolderAdded
         folderName = mode.folderName
         folders = .init(bookmarkManager.list)
         selectedFolder = mode.parentFolder
@@ -127,7 +125,7 @@ private extension AddEditBookmarkFolderDialogViewModel {
 
     func add(folderWithName name: String, to parent: BookmarkFolder?) {
         bookmarkManager.makeFolder(for: name, parent: parent) { [weak self] bookmarkFolder in
-            self?.onFolderAdded?(bookmarkFolder)
+            self?.addFolderSubject.send(bookmarkFolder)
         }
     }
 
