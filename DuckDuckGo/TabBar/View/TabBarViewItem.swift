@@ -613,7 +613,7 @@ extension TabBarViewItem: MouseClickViewDelegate {
 extension TabBarViewItem {
 
     enum Height: CGFloat {
-        case standard = 32
+        case standard = 34
     }
 
     enum Width: CGFloat {
