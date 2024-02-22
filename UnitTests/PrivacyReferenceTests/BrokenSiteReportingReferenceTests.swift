@@ -70,12 +70,8 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
             os_log("Testing [%s]", type: .info, test.name)
 
             var errors: [Error]?
-            var statusCodes: [Int]?
-            if let error = test.errorDescription {
-                errors = [MockError(error)]
-            }
-            if let httpStatusCode = test.httpStatusCode {
-                statusCodes = [httpStatusCode]
+            if let errs = test.errorDescriptions {
+                errors = errs.map { MockError($0) }
             }
 
             let breakage = WebsiteBreakage(siteUrl: test.siteURL,
@@ -93,7 +89,7 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
                                            protectionsState: test.protectionsEnabled,
                                            reportFlow: .appMenu,
                                            errors: errors,
-                                           httpStatusCodes: statusCodes)
+                                           httpStatusCodes: test.httpErrorCodes ?? [])
 
             let request = makeURLRequest(with: breakage.requestParameters)
 
@@ -121,9 +117,18 @@ final class BrokenSiteReportingReferenceTests: XCTestCase {
 
                 if param.name == "errorDescriptions" {
                     // `localizedDescription` adds class information to the error. The value is not standardized across platforms
-                    // so we'll just check for the content instead
-                    XCTAssert(absoluteURL.contains("\(param.name)="), "Param [\(param.name)] not found in [\(absoluteURL)]")
-                    XCTAssert(absoluteURL.contains(param.value.percentEncoded(withAllowedCharacters: .alphanumerics)), "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
+                    // so we'll just check the result is an array of strings
+                    guard let params = URLComponents(string: absoluteURL)?.queryItems else {
+                        XCTFail("Unable to parse query parameters from \(absoluteURL)")
+                        return
+                    }
+                    var errorsFound = false
+                    for queryItem in params {
+                        if queryItem.name != param.name { continue }
+                        errorsFound = true
+                        XCTAssert((queryItem.value?.split(separator: ",").count ?? 0) > 1, "Error descriptions should return an array of strings. Parsed: \(queryItem.value ?? "")")
+                    }
+                    XCTAssert(errorsFound, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
                 } else {
                     XCTAssertEqual(match.count, 1, "Param [\(param.name)] with value [\(param.value)] not found in [\(absoluteURL)]")
                 }
@@ -162,8 +167,8 @@ private struct Test: Codable {
     let manufacturer, model, os: String?
     let gpcEnabled: Bool?
     let protectionsEnabled: Bool
-    let errorDescription: String?
-    let httpStatusCode: Int?
+    let errorDescriptions: [String]?
+    let httpErrorCodes: [Int]?
 }
 
 // MARK: - ExpectReportURLParam
