@@ -36,6 +36,7 @@ import XCTest
         model = nil
         importTask = nil
         openPanelCallback = nil
+        NSError.disableSwizzledDescription = false
     }
 
     // MARK: - Tests
@@ -1514,6 +1515,8 @@ import XCTest
     // MARK: - Feedback
 
     func testFeedbackSending() {
+        NSError.disableSwizzledDescription = true
+
         let summary: [DataImportViewModel.DataTypeImportResult] = [
             .init(.bookmarks, .success(.empty)),
             .init(.bookmarks, .failure(Failure(.passwords, .dataCorrupted))),

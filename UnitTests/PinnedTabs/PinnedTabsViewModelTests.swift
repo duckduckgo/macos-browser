@@ -149,17 +149,19 @@ class PinnedTabsViewModelTests: XCTestCase {
         model.fireproof(tabA)
         model.removeFireproofing(tabB)
         model.close(tabA)
+        model.muteOrUmute(tabB)
 
         cancellable.cancel()
 
-        XCTAssertEqual(events.count, 6)
+        XCTAssertEqual(events.count, 7)
 
         guard case .bookmark(tabA) = events[0],
               case .unpin(1) = events[1],
               case .duplicate(0) = events[2],
               case .fireproof(tabA) = events[3],
               case .removeFireproofing(tabB) = events[4],
-              case .close(0) = events[5]
+              case .close(0) = events[5],
+              case .muteOrUnmute(tabB) = events[6]
         else {
             XCTFail("Incorrect context menu action")
             return

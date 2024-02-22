@@ -1,6 +1,7 @@
 {
   "name": "backgroundcheck.run",
-  "version": "0.1.1",
+  "url": "backgroundcheck.run",
+  "version": "0.1.4",
   "parent": "verecor.com",
   "addedDatetime": 1677736800000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "aa12b430-8e5d-4c64-bb77-2961f19a1bc8",
+          "id": "5f90e39f-cb94-4b8d-94ed-48ba0060dc08",
           "url": "https://backgroundcheck.run/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}"
         },
         {
           "actionType": "extract",
-          "id": "75fd2e16-d84a-4bbe-9cf1-79c6d1cc4dec",
+          "id": "3225fa15-4e00-4e6a-bfc7-a85dfb504c86",
           "selector": ".b-pfl-list",
           "profile": {
             "name": {

@@ -27,6 +27,7 @@ import NetworkProtectionUI
 
 protocol NetworkProtectionFeatureVisibility {
     func isNetworkProtectionVisible() -> Bool
+    func shouldUninstallAutomatically() -> Bool
     func disableForAllUsers()
     func disableForWaitlistUsers()
 }
@@ -65,30 +66,17 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
     ///
     /// Once the waitlist beta has ended, we can trigger a remote change that removes the user's auth token and turn off the waitlist flag, hiding Network Protection from the user.
     func isNetworkProtectionVisible() -> Bool {
-        #if APPSTORE
-        return isEasterEggUser || (isUserLocaleAllowed && waitlistIsOngoing)
-        #else
         return isEasterEggUser || waitlistIsOngoing
-        #endif
     }
 
-    var isUserLocaleAllowed: Bool {
-        var regionCode: String?
-        if #available(macOS 13, *) {
-            regionCode = Locale.current.region?.identifier
-        } else {
-            regionCode = Locale.current.regionCode
-        }
+    /// Returns whether Network Protection should be uninstalled automatically.
+    /// This is only true when the user is not an Easter Egg user, the waitlist test has ended, and the user is onboarded.
+    func shouldUninstallAutomatically() -> Bool {
+        let waitlistAccessEnded = isWaitlistUser && !waitlistIsOngoing
+        let isNotEasterEggUser = !isEasterEggUser
+        let isOnboarded = UserDefaults.netP.networkProtectionOnboardingStatus != .default
 
-        if isInternalUser {
-            regionCode = "US"
-        }
-
-        #if DEBUG // Always assume US for debug builds
-        regionCode = "US"
-        #endif
-
-        return (regionCode ?? "US") == "US"
+        return isNotEasterEggUser && waitlistAccessEnded && isOnboarded
     }
 
     /// Whether the user is fully onboarded
@@ -150,10 +138,6 @@ struct DefaultNetworkProtectionVisibility: NetworkProtectionFeatureVisibility {
         case .off:
             return false
         }
-    }
-
-    private var isInternalUser: Bool {
-        NSApp.delegateTyped.internalUserDecider.isInternalUser
     }
 
     func disableForAllUsers() {
