@@ -265,29 +265,42 @@ extension NSAlert {
         return alert
     }
 
-    static func deleteAllPasswordAlert(count: Int) -> NSAlert {
-        autofillActionAlert(messageText: UserText.deleteAllPasswordsDialogMessageText(count: count),
-                            informationText: UserText.deleteAllPasswordsDialogInformationText,
-                            confirmButtonText: UserText.passwordManagerAlerDeleteButton,
-                            style: .warning,
-                            icon: NSImage(named: "PasswordsDDG")!)
+    static func deleteAllPasswordsConfirmationAlert(count: Int) -> NSAlert {
+        autofillActionConfirmationAlert(messageText: UserText.deleteAllPasswordsDialogMessageText(count: count),
+                                        informationText: UserText.deleteAllPasswordsDialogInformationText,
+                                        confirmButtonText: UserText.passwordManagerAlerDeleteButton,
+                                        icon: NSImage(named: "PasswordsDDG")!)
     }
 
-    private static func autofillActionAlert(messageText: String,
-                                            informationText: String,
-                                            confirmButtonText: String,
-                                            style: NSAlert.Style,
-                                            icon: NSImage) -> NSAlert {
+    private static func autofillActionConfirmationAlert(messageText: String,
+                                                        informationText: String,
+                                                        confirmButtonText: String,
+                                                        icon: NSImage) -> NSAlert {
         let alert = AutofillActionAlert()
         alert.messageText = messageText
         alert.informativeText = informationText
-        alert.alertStyle = style
+        alert.alertStyle = .warning
         alert.icon = icon
         alert.confirmButton = alert.addButton(withTitle: confirmButtonText)
         alert.confirmButton?.isEnabled = false
         alert.addButton(withTitle: UserText.cancel)
         let checkbox = NSButton(checkboxWithTitle: "Click to confirm", target: alert, action: #selector(AutofillActionAlert.checkboxChanged(_:)))
         alert.accessoryView = checkbox
+        return alert
+    }
+
+    static func deleteAllPasswordsCompletionAlert(count: Int) -> NSAlert {
+        autofillActionCompletionAlert(messageText: UserText.deleteAllPasswordsCompletionMessageText(count: count),
+                                      informationText: UserText.deleteAllPasswordsCompletionInformationText,
+                                      icon: NSImage(named: "PasswordsDDG")!)
+    }
+
+    private static func autofillActionCompletionAlert(messageText: String, informationText: String, icon: NSImage) -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = messageText
+        alert.informativeText = informationText
+        alert.icon = icon
+        alert.addButton(withTitle: UserText.ok)
         return alert
     }
 

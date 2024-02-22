@@ -661,30 +661,6 @@
         }
       }
     },
-    "autofill.dialog.delete-all-passwords-dialog-information-text" : {
-      "comment" : "Information message displayed on dialog asking user to confirm deletion of all passwords",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts."
-          }
-        }
-      }
-    },
-    "autofill.dialog.delete-all-passwords-dialog-message-text" : {
-      "comment" : "Message displayed on dialog asking user to confirm deletion of all passwords",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Are you sure you want to delete %d passwords"
-          }
-        }
-      }
-    },
     "autofill.excluded-sites" : {
       "comment" : "Autofill settings section title",
       "extractionState" : "extracted_with_value",
@@ -757,6 +733,78 @@
         }
       }
     },
+    "autofill.items.delete-all-passwords" : {
+      "comment" : "Opens Delete All Passwords dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Delete All Passwords…"
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-confirmation-information-text" : {
+      "comment" : "Information message displayed on completion of password deletion",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your passwords have been deleted from all synced devices."
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-confirmation-message-text" : {
+      "comment" : "Message displayed on completion of multiple password deletion\n   Message displayed on dialog asking user to confirm deletion of all passwords",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete %d passwords"
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-dialog-information-text" : {
+      "comment" : "Information message displayed on dialog asking user to confirm deletion of all passwords",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts."
+          }
+        }
+      }
+    },
+    "autofill.items.delete-all-passwords-permisson-text" : {
+      "comment" : "Message displayed in system authentication dialog",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Authenticate to confirm you want to delete all passwords."
+          }
+        }
+      }
+    },
+    "autofill.items.delete-one-password-confirmation-message-text" : {
+      "comment" : "Message displayed on completion of single password deletion\n   Message displayed on dialog asking user to confirm deletion of one password",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Are you sure you want to delete %d password"
+          }
+        }
+      }
+    },
     "autofill.lock-when-idle" : {
       "comment" : "Autofill auto-lock setting",
       "extractionState" : "extracted_with_value",
@@ -801,18 +849,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Unlocked"
-          }
-        }
-      }
-    },
-    "autofill.menu.delete-all-passwords" : {
-      "comment" : "Opens Delete All Passwords dialog",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Delete All Passwords…"
           }
         }
       }

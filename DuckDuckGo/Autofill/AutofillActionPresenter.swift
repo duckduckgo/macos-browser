@@ -19,22 +19,44 @@
 import Foundation
 import AppKit
 
+/// Conforming types handles presentation of `NSAlert`s associated with an `AutofillActionExecutor`
+protocol AutofillActionPresenter {
+    func show(actionExecutor: AutofillActionExecutor)
+}
+
 /// Handles presentation of an alert associated with an `AutofillActionExecutor`
-struct AutofillActionPresenter {
+struct DefaultAutofillActionPresenter: AutofillActionPresenter {
 
     @MainActor
     func show(actionExecutor: AutofillActionExecutor) {
-        guard let window = WindowControllersManager.shared.lastKeyMainWindowController?.window else { return }
+        guard let window else { return }
 
-        let alert = actionExecutor.associatedAlert
-        alert.beginSheetModal(for: window) { response in
+        let confirmationAlert = actionExecutor.confirmationAlert
+        let completionAlert = actionExecutor.completionAlert
 
+        confirmationAlert.beginSheetModal(for: window) { response in
             switch response {
             case .alertFirstButtonReturn:
-                actionExecutor.execute()
+                actionExecutor.execute {
+                    show(completionAlert)
+                }
             default:
                 break
             }
         }
+    }
+}
+
+private extension DefaultAutofillActionPresenter {
+
+    @MainActor
+    func show(_ alert: NSAlert) {
+        guard let window else { return }
+        alert.beginSheetModal(for: window)
+    }
+
+    @MainActor
+    var window: NSWindow? {
+        WindowControllersManager.shared.lastKeyMainWindowController?.window
     }
 }

@@ -21,22 +21,28 @@ import BrowserServicesKit
 import DDGSync
 import AppKit
 
-
 /// Conforming types provide an `execute` method which performs some action on autofill types (e.g delete all passwords)
 protocol AutofillActionExecutor {
     init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncRequester: DDGSyncing)
-    /// NSAlert associated with the autofill action
-    var associatedAlert: NSAlert { get }
+    /// NSAlert to display asking a user to confirm the action
+    var confirmationAlert: NSAlert { get }
+    /// NSAlert to display when the action is complete
+    var completionAlert: NSAlert { get }
     /// Executes the action
-    func execute()
+    func execute(_ onSuccess: (() -> Void)?)
 }
 
 /// Concrete `AutofillActionExecutor` for deletion of all autofill passwords
 struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
 
-    var associatedAlert: NSAlert {
+    var confirmationAlert: NSAlert {
         let accounts = (try? secureVault.accounts()) ?? []
-        return NSAlert.deleteAllPasswordAlert(count: accounts.count)
+        return NSAlert.deleteAllPasswordsConfirmationAlert(count: accounts.count)
+    }
+
+    var completionAlert: NSAlert {
+        let accounts = (try? secureVault.accounts()) ?? []
+        return NSAlert.deleteAllPasswordsCompletionAlert(count: accounts.count)
     }
 
     private var userAuthenticator: UserAuthenticating
@@ -49,17 +55,20 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
         self.syncRequester = syncRequester
     }
 
-    func execute() {
-        Task { @MainActor in
-            let authenticationResult = await userAuthenticator.authenticateUser(reason: .syncSettings)
+    func execute(_ onSuccess: (() -> Void)? = nil) {
+        userAuthenticator.authenticateUser(reason: .deleteAllPasswords) { authenticationResult in
             guard authenticationResult.authenticated else { return }
 
             do {
                 try secureVault.deleteAllWebsiteCredentials()
                 syncRequester.scheduler.notifyDataChanged()
+                NotificationCenter.default.post(name: .AutofillDataChanged, object: nil)
+                onSuccess?()
             } catch {
                 Pixel.fire(.debug(event: .secureVaultError, error: error))
             }
+
+            return
         }
     }
 }

@@ -1060,16 +1060,32 @@ struct UserText {
     }
 
     // MARK: Autofill Item Deletion (Autofill -> More Menu, Settings -> Autofill)
-    static let deleteAllPasswords = NSLocalizedString("autofill.menu.delete-all-passwords", value: "Delete All Passwords…", comment: "Opens Delete All Passwords dialog")
+    static let deleteAllPasswords = NSLocalizedString("autofill.items.delete-all-passwords", value: "Delete All Passwords…", comment: "Opens Delete All Passwords dialog")
     static func deleteAllPasswordsDialogMessageText(count: Int) -> String {
-        guard count > 1 else { return UserText.passwordManagerAlertRemovePasswordConfirmation }
-
-        let localized = NSLocalizedString("autofill.dialog.delete-all-passwords-dialog-message-text", value: "Are you sure you want to delete %d passwords", comment: "Message displayed on dialog asking user to confirm deletion of all passwords")
+        var localized: String!
+        if count == 1 {
+            localized = NSLocalizedString("autofill.items.delete-one-password-confirmation-message-text", value: "Are you sure you want to delete %d password", comment: "Message displayed on dialog asking user to confirm deletion of one password")
+        } else {
+            localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "Are you sure you want to delete %d passwords", comment: "Message displayed on dialog asking user to confirm deletion of all passwords")
+        }
         return String(format: localized, count)
     }
-    static let deleteAllPasswordsDialogInformationText = NSLocalizedString("autofill.dialog.delete-all-passwords-dialog-information-text",
+    static let deleteAllPasswordsDialogInformationText = NSLocalizedString("autofill.items.delete-all-passwords-dialog-information-text",
                                                                            value: "Your passwords will be deleted from all synced devices. Make sure you still have a way to access your accounts.",
                                                                            comment: "Information message displayed on dialog asking user to confirm deletion of all passwords")
+    static func deleteAllPasswordsCompletionMessageText(count: Int) -> String {
+        var localized: String!
+        if count == 1 {
+            localized = NSLocalizedString("autofill.items.delete-one-password-confirmation-message-text", value: "%d password deleted", comment: "Message displayed on completion of single password deletion")
+        } else {
+            localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "%d passwords deleted", comment: "Message displayed on completion of multiple password deletion")
+        }
+        return String(format: localized, count)
+    }
+    static let deleteAllPasswordsCompletionInformationText = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-information-text",
+                                                                           value: "Your passwords have been deleted from all synced devices.",
+                                                                           comment: "Information message displayed on completion of password deletion")
+    static let deleteAllPasswordsPermissionText = NSLocalizedString("autofill.items.delete-all-passwords-permisson-text", value: "Authenticate to confirm you want to delete all passwords.", comment: "Message displayed in system authentication dialog")
 
 #if SUBSCRIPTION
     // Key: "subscription.menu.item"
