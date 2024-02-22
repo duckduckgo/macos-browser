@@ -525,7 +525,7 @@ struct UserText {
     static let syncUnavailableMessageUpgradeRequired = NSLocalizedString("alert.sync.warning.data-syncing-disabled-upgrade-required", value: "Sorry, but Sync & Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.", comment: "Data syncing unavailable warning message")
     static let defaultBrowser = NSLocalizedString("preferences.default-browser", value: "Default Browser", comment: "Show default browser preferences")
     static let appearance = NSLocalizedString("preferences.appearance", value: "Appearance", comment: "Show appearance preferences")
-    static let privacy = NSLocalizedString("preferences.privacy", value: "Privacy", comment: "Show privacy browser preferences")
+    static let fireButton = NSLocalizedString("preferences.fire.button", value: "Fire Button", comment: "Show Fire Button browser preferences")
     static let vpn = NSLocalizedString("preferences.vpn", value: "VPN", comment: "Show VPN preferences")
     static let duckPlayer = NSLocalizedString("preferences.duck-player", value: "Duck Player", comment: "Show Duck Player browser preferences")
     static let about = NSLocalizedString("preferences.about", value: "About", comment: "Show about screen")

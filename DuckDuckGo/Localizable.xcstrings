@@ -8140,6 +8140,18 @@
         }
       }
     },
+    "preferences.fire.button" : {
+      "comment" : "Show Fire Button browser preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Fire Button"
+          }
+        }
+      }
+    },
     "preferences.general" : {
       "comment" : "Show general preferences",
       "extractionState" : "extracted_with_value",
@@ -8160,18 +8172,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "On Startup"
-          }
-        }
-      }
-    },
-    "preferences.privacy" : {
-      "comment" : "Show privacy browser preferences",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy"
           }
         }
       }

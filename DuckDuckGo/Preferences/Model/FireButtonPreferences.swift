@@ -1,5 +1,5 @@
 //
-//  PrivacyPreferencesModel.swift
+//  FireButtonPreferences.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -18,12 +18,14 @@
 
 import Foundation
 
-final class PrivacyPreferencesModel: ObservableObject {
+final class FireButtonPreferences: ObservableObject {
+
+    static let shared = FireButtonPreferences()
 
     @Published
     var isLoginDetectionEnabled: Bool {
         didSet {
-            privacySecurityPreferences.loginDetectionEnabled = isLoginDetectionEnabled
+            persistor.loginDetectionEnabled = isLoginDetectionEnabled
         }
     }
 
@@ -41,15 +43,21 @@ final class PrivacyPreferencesModel: ObservableObject {
         parentWindowController.window?.beginSheet(fireproofDomainsWindow)
     }
 
-    @MainActor
-    func openURL(_ url: URL) {
-        WindowControllersManager.shared.show(url: url, source: .ui, newTab: true)
+    init(persistor: FireButtonPreferencesPersistor = FireButtonPreferencesUserDefaultsPersistor()) {
+        self.persistor = persistor
+        isLoginDetectionEnabled = persistor.loginDetectionEnabled
     }
 
-    init(privacySecurityPreferences: PrivacySecurityPreferences = .shared) {
-        self.privacySecurityPreferences = privacySecurityPreferences
-        isLoginDetectionEnabled = privacySecurityPreferences.loginDetectionEnabled
-    }
+    private var persistor: FireButtonPreferencesPersistor
+}
 
-    private let privacySecurityPreferences: PrivacySecurityPreferences
+protocol FireButtonPreferencesPersistor {
+    var loginDetectionEnabled: Bool { get set }
+}
+
+struct FireButtonPreferencesUserDefaultsPersistor: FireButtonPreferencesPersistor {
+
+    @UserDefaultsWrapper(key: .loginDetectionEnabled, defaultValue: false)
+    var loginDetectionEnabled: Bool
+
 }

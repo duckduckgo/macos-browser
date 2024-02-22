@@ -1,5 +1,5 @@
 //
-//  PreferencesPrivacyView.swift
+//  PreferencesFireButtonView.swift
 //
 //  Copyright © 2022 DuckDuckGo. All rights reserved.
 //
@@ -22,11 +22,11 @@ import SwiftUIExtensions
 
 extension Preferences {
 
-    struct PrivacyView: View {
-        @ObservedObject var model: PrivacyPreferencesModel
+    struct FireButtonView: View {
+        @ObservedObject var model: FireButtonPreferences
 
         var body: some View {
-            PreferencePane(UserText.privacy) {
+            PreferencePane("Fire Button") {
 
                 // SECTION 1: Fireproof Site
                 PreferencePaneSection(UserText.fireproofSites) {
@@ -36,7 +36,9 @@ extension Preferences {
                         VStack(alignment: .leading, spacing: 0) {
                             TextMenuItemCaption(UserText.fireproofExplanation)
                             TextButton(UserText.learnMore) {
-                                model.openURL(.theFireButton)
+                                WindowControllersManager.shared.show(url: .theFireButton,
+                                                                     source: .ui,
+                                                                     newTab: true)
                             }
                         }
                     }

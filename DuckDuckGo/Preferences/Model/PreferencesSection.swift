@@ -33,7 +33,7 @@ struct PreferencesSection: Hashable, Identifiable {
 
         let regularPanes: [PreferencePaneIdentifier] = {
 #if SUBSCRIPTION
-            var panes: [PreferencePaneIdentifier] = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
+            var panes: [PreferencePaneIdentifier] = [.fireButton, .subscription, .general, .appearance, .autofill, .downloads]
 
             if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 if let generalIndex = panes.firstIndex(of: .general) {
@@ -47,7 +47,7 @@ struct PreferencesSection: Hashable, Identifiable {
                 }
             }
 #else
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .downloads, .fireButton]
 
             if includingSync {
                 panes.insert(.sync, at: 1)
@@ -102,7 +102,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case general
     case sync
     case appearance
-    case privacy
+    case fireButton
 #if NETWORK_PROTECTION
     case vpn
 #endif
@@ -157,8 +157,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.sync
         case .appearance:
             return UserText.appearance
-        case .privacy:
-            return UserText.privacy
+        case .fireButton:
+            return UserText.fireButton
 #if NETWORK_PROTECTION
         case .vpn:
             return UserText.vpn
@@ -196,8 +196,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "Sync"
         case .appearance:
             return "Appearance"
-        case .privacy:
-            return "Privacy"
+        case .fireButton:
+            return "FireSettings"
 #if NETWORK_PROTECTION
         case .vpn:
             return "VPN"

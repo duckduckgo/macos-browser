@@ -71,7 +71,6 @@ extension HomePage.Models {
         private let dataImportProvider: DataImportStatusProviding
         private let tabCollectionViewModel: TabCollectionViewModel
         private let emailManager: EmailManager
-        private let privacyPreferences: PrivacySecurityPreferences
         private let duckPlayerPreferences: DuckPlayerPreferencesPersistor
 
         @UserDefaultsWrapper(key: .homePageShowAllFeatures, defaultValue: false)
@@ -135,7 +134,6 @@ extension HomePage.Models {
              dataImportProvider: DataImportStatusProviding,
              tabCollectionViewModel: TabCollectionViewModel,
              emailManager: EmailManager = EmailManager(),
-             privacyPreferences: PrivacySecurityPreferences = PrivacySecurityPreferences.shared,
              duckPlayerPreferences: DuckPlayerPreferencesPersistor,
              homePageRemoteMessaging: HomePageRemoteMessaging,
              privacyConfigurationManager: PrivacyConfigurationManaging = AppPrivacyFeatures.shared.contentBlocking.privacyConfigurationManager) {
@@ -143,7 +141,6 @@ extension HomePage.Models {
             self.dataImportProvider = dataImportProvider
             self.tabCollectionViewModel = tabCollectionViewModel
             self.emailManager = emailManager
-            self.privacyPreferences = privacyPreferences
             self.duckPlayerPreferences = duckPlayerPreferences
             self.homePageRemoteMessaging = homePageRemoteMessaging
             self.privacyConfigurationManager = privacyConfigurationManager

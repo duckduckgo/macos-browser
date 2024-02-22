@@ -50,14 +50,13 @@ final class UserContentUpdating {
          privacyConfigurationManager: PrivacyConfigurationManaging,
          trackerDataManager: TrackerDataManager,
          configStorage: ConfigurationStoring,
-         privacySecurityPreferences: PrivacySecurityPreferences,
          webTrackingProtectionPreferences: WebTrackingProtectionPreferences,
          tld: TLD) {
 
         let makeValue: (Update) -> NewContent = { rulesUpdate in
             let sourceProvider = ScriptSourceProvider(configStorage: configStorage,
                                                       privacyConfigurationManager: privacyConfigurationManager,
-                                                      privacySettings: privacySecurityPreferences, webTrackingProtectionPreferences: webTrackingProtectionPreferences,
+                                                      webTrackingProtectionPreferences: webTrackingProtectionPreferences,
                                                       contentBlockingManager: contentBlockerRulesManager,
                                                       trackerDataManager: trackerDataManager,
                                                       tld: tld)
