@@ -507,13 +507,16 @@ final class BrowserTabViewController: NSViewController {
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
         case let .settings(pane):
-            removeAllTabContent()
             let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
+            if preferencesViewController.parent !== self {
+                removeAllTabContent()
+            }
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
                 preferencesViewController.model.selectPane(pane)
             }
-            addAndLayoutChild(preferencesViewController)
-
+            if preferencesViewController.parent !== self {
+                addAndLayoutChild(preferencesViewController)
+            }
         case .onboarding:
             removeAllTabContent()
             if !OnboardingViewModel.isOnboardingFinished {
