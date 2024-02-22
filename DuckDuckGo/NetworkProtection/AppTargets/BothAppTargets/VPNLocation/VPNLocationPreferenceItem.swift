@@ -51,8 +51,7 @@ struct VPNLocationPreferenceItem: View {
                     isShowingLocationSheet = true
                 }
                 .sheet(isPresented: $isShowingLocationSheet) {
-                    Text("Hello!")
-                    //VPNLocationView(model: model.locationsViewModel, isPresented: $isShowingLocationSheet)
+                    VPNLocationView(model: model.locationsViewModel, isPresented: $isShowingLocationSheet)
                 }
             }
         }
