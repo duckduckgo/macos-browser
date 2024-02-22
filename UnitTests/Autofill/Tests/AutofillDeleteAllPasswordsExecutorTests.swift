@@ -1,5 +1,5 @@
 //
-//  AutofillActionExecutorTests.swift
+//  AutofillDeleteAllPasswordsExecutorTests.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -31,7 +31,6 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
 
     override func setUpWithError() throws {
         secureVault = try MockSecureVaultFactory.makeVault(errorReporter: nil)
-        secureVault = try MockSecureVaultFactory.makeVault(errorReporter: nil)
         syncRequester = MockDDGSyncing(authState: .inactive, scheduler: scheduler, isSyncInProgress: false)
         sut = .init(userAuthenticator: mockAuthenticator, secureVault: secureVault, syncRequester: syncRequester)
     }
@@ -42,8 +41,7 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
         XCTAssertFalse(mockAuthenticator.didCallAuthenticate)
 
         // When
-        Task { @MainActor in
-            sut.execute()
+        sut.execute {
             expectation.fulfill()
         }
 
@@ -59,8 +57,7 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
         XCTAssert(secureVault.storedCredentials.count == 1)
 
         // When
-        Task { @MainActor in
-            sut.execute()
+        sut.execute {
             expectation.fulfill()
         }
 
@@ -75,13 +72,23 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
         XCTAssertFalse(scheduler.notifyDataChangedCalled)
 
         // When
-        Task { @MainActor in
-            sut.execute()
+        sut.execute {
             expectation.fulfill()
         }
 
         // Then
         await fulfillment(of: [expectation], timeout: 3)
         XCTAssertTrue(scheduler.notifyDataChangedCalled)
+    }
+
+    func testExecutePostsAutofillDataChangedNotification() async throws {
+        // Given
+        let expectation = expectation(forNotification: .AutofillDataChanged, object: nil, handler: nil)
+
+        // When
+        sut.execute()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2)
     }
 }
