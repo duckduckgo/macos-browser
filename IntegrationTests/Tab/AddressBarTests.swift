@@ -154,6 +154,9 @@ class AddressBarTests: XCTestCase {
             let str = String(UnicodeScalar(UInt8(currentCharIdx)))
             type(str)
             currentCharIdx += 1
+            if currentCharIdx > Character("z").unicodeScalars.first!.value {
+                currentCharIdx = Character("a").unicodeScalars.first!.value
+            }
             resultingString += str
         }
 

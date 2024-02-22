@@ -250,7 +250,7 @@ final class AddressBarTextField: NSTextField {
         clearUndoManager()
     }
 
-    /// don‘t update value when the addressisis
+    // don‘t update Value when the address bar is being edited
     private func updateValueIfNeeded(selectedTabViewModel: TabViewModel?, addressBarString: String) {
         var shouldUpdateValue: Bool {
             switch self.value {
