@@ -649,14 +649,8 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
             return
         }
 
-        if let contextMenu = ContextualMenu.menu(for: [bookmark]), let cursorLocation = self.view.window?.mouseLocationOutsideOfEventStream {
-            let convertedLocation = self.view.convert(cursorLocation, from: nil)
-            contextMenu.items.forEach { item in
-                item.target = self
-            }
-
-            contextMenu.popUp(positioning: nil, at: convertedLocation, in: self.view)
-        }
+        guard let contextMenu = ContextualMenu.menu(for: [bookmark], target: self) else { return }
+        contextMenu.popUpAtMouseLocation(in: view)
     }
 
     func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView) {

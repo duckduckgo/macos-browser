@@ -64,6 +64,7 @@ final class BookmarkListViewController: NSViewController {
             bookmarkManager: bookmarkManager,
             treeController: treeController,
             onMenuRequestedAction: { [weak self] cell in
+                self?.showContextMenu(for: cell)
             },
             presentFaviconsFetcherOnboarding: { [weak self] in
                 guard let self, let window = self.view.window else {
@@ -427,6 +428,18 @@ final class BookmarkListViewController: NSViewController {
         outlineView.selectRowIndexes(indexes, byExtendingSelection: false)
     }
 
+    private func showContextMenu(for cell: BookmarkOutlineCellView) {
+        let row = outlineView.row(for: cell)
+        guard
+            let item = outlineView.item(atRow: row),
+            let contextMenu = ContextualMenu.menu(for: [item])
+        else {
+            return
+        }
+
+        contextMenu.popUpAtMouseLocation(in: view)
+    }
+
 }
 
 // MARK: - Menu Item Selectors
@@ -500,7 +513,11 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
     func editBookmark(_ sender: NSMenuItem) {
-        // Unsupported in the list view for the initial release.
+        if let folder = sender.representedObject as? BookmarkFolder {
+            print("~~~EDIT FOLDER")
+        } else if let bookmark = sender.representedObject as? Bookmark {
+            print("~~~EDIT BOOKMARK")
+        }
     }
 
     func copyBookmark(_ sender: NSMenuItem) {

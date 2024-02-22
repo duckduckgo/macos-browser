@@ -22,6 +22,17 @@ struct ContextualMenu {
 
     // Not all contexts support an editing option for bookmarks. The option is displayed by default, but `includeBookmarkEditMenu` can disable it.
     static func menu(for objects: [Any]?, includeBookmarkEditMenu: Bool = true) -> NSMenu? {
+        menu(for: objects, target: nil, includeBookmarkEditMenu: includeBookmarkEditMenu)
+    }
+    
+    /// Creates an instance of NSMenu for the specified Objects and target.
+    /// - Parameters:
+    ///   - objects: The objects to create the menu for
+    ///   - target: The target to associate to the `NSMenuItem`
+    ///   - includeBookmarkEditMenu: True if menu should return edit bookmark option. False otherwise. Default is true
+    /// - Returns: An instance of NSMenu or nil if `objects` is not a `Bookmark` or a `Folder`.
+    static func menu(for objects: [Any]?, target: AnyObject?, includeBookmarkEditMenu: Bool = true) -> NSMenu? {
+
         guard let objects = objects, objects.count > 0 else {
             return menuForNoSelection()
         }
@@ -33,13 +44,23 @@ struct ContextualMenu {
         let node = objects.first as? BookmarkNode
         let object = node?.representedObject ?? objects.first as? BaseBookmarkEntity
 
+        let menu: NSMenu?
+
         if let bookmark = object as? Bookmark {
-            return menu(for: bookmark, includeBookmarkEditMenu: includeBookmarkEditMenu)
+            menu = self.menu(for: bookmark, includeBookmarkEditMenu: includeBookmarkEditMenu)
         } else if let folder = object as? BookmarkFolder {
-            return menu(for: folder)
+            menu = self.menu(for: folder)
         } else {
-            return nil
+            menu = nil
         }
+
+        guard let menu else { return nil }
+
+        menu.items.forEach { item in
+            item.target = target
+        }
+
+        return menu
     }
 
     // MARK: - Single Item Menu Creation
