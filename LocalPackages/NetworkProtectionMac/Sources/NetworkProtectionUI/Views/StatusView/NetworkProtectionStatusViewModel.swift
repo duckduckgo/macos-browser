@@ -82,6 +82,7 @@ extension NetworkProtectionStatusView {
         var showDebugInformation: Bool
 
         public let agentLoginItem: LoginItem?
+        private let isMenuBarStatusView: Bool
 
         // MARK: - Extra Menu Items
 
@@ -111,6 +112,7 @@ extension NetworkProtectionStatusView {
                     appLauncher: AppLaunching,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
+                    isMenuBarStatusView: Bool,
                     runLoopMode: RunLoop.Mode? = nil) {
 
             self.tunnelController = controller
@@ -119,6 +121,7 @@ extension NetworkProtectionStatusView {
             self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
             self.agentLoginItem = agentLoginItem
+            self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
 
             tunnelControllerViewModel = TunnelControllerViewModel(controller: tunnelController,
@@ -303,7 +306,7 @@ extension NetworkProtectionStatusView {
                 switch step {
 
                 case .userNeedsToAllowExtension, .userNeedsToAllowVPNConfiguration:
-                    return PromptActionView.Model(presentationData: step) { [weak self] in
+                    return PromptActionView.Model(onboardingStep: step, isMenuBar: self.isMenuBarStatusView) { [weak self] in
                         self?.tunnelControllerViewModel.startNetworkProtection()
                     }
                 }

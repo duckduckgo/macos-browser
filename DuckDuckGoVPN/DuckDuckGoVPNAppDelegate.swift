@@ -159,7 +159,8 @@ final class DuckDuckGoVPNAppDelegate: NSObject, NSApplicationDelegate {
                     })
                 ]
             },
-            agentLoginItem: nil)
+            agentLoginItem: nil,
+            isMenuBarStatusView: true)
     }
 
     @MainActor
