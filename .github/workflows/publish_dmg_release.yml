@@ -93,7 +93,7 @@ jobs:
         run: |
           # Public release doesn't need fetching a DMG (it's already uploaded to S3)
           if [[ "${{ github.event.inputs.release-type }}" != 'public' ]]; then
-            DMG_URL="${{ vars.DMG_URL_ROOT }}${DMG_NAME}"
+            DMG_URL="${{ vars.TEST_DMG_URL_ROOT }}${DMG_NAME}"
             curl -fLSs -o "$DMG_NAME" "$DMG_URL"
           fi
           echo "dmg-name=$DMG_NAME" >> $GITHUB_OUTPUT
@@ -166,16 +166,16 @@ jobs:
       - name: Upload to S3
         id: upload
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
-          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+          AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
           VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           # Back up existing appcast2.xml
           OLD_APPCAST_NAME=appcast2_old.xml
           echo "OLD_APPCAST_NAME=${OLD_APPCAST_NAME}" >> $GITHUB_ENV
-          curl -fLSs "${{ vars.DMG_URL_ROOT }}appcast2.xml" --output "${OLD_APPCAST_NAME}"
+          curl -fLSs "${{ vars.TEST_DMG_URL_ROOT }}appcast2.xml" --output "${OLD_APPCAST_NAME}"
 
           # Upload files to S3
           if [[ "${RELEASE_TYPE}" == "internal" ]]; then
@@ -201,7 +201,7 @@ jobs:
           version="$(cut -d '/' -f 2 <<< "$BRANCH")"
           ./scripts/update_asana_for_release.sh public \
             ${{ steps.task-id.outputs.task-id }} \
-            ${{ vars.MACOS_APP_BOARD_DONE_SECTION_ID }} \
+            ${{ vars.TEST_MACOS_APP_BOARD_DONE_SECTION_ID }} \
             "${version}" \
             announcement-task-contents.txt
           echo "announcement-task-contents=$(<announcement-task-contents.txt)" >> $GITHUB_OUTPUT
@@ -213,9 +213,9 @@ jobs:
         run: |
           echo "APPCAST_PATCH_NAME=${{ steps.appcast.outputs.appcast-patch-name }}" >> $GITHUB_ENV
           echo "DMG_NAME=${DMG_NAME}" >> $GITHUB_ENV
-          echo "DMG_URL=${{ vars.DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
-          echo "RELEASE_BUCKET_NAME=${{ vars.RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
-          echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
+          echo "DMG_URL=${{ vars.TEST_DMG_URL_ROOT }}${DMG_NAME}" >> $GITHUB_ENV
+          echo "RELEASE_BUCKET_NAME=${{ vars.TEST_RELEASE_BUCKET_NAME }}" >> $GITHUB_ENV
+          echo "RELEASE_BUCKET_PREFIX=${{ vars.TEST_RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
           echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
           echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
@@ -256,7 +256,7 @@ jobs:
         if: always() && ${{ steps.update-asana.outcome == 'failure' }}
         uses: ./.github/actions/asana-create-action-item
         env:
-          APP_BOARD_ASANA_PROJECT_ID: ${{ vars.MACOS_APP_BOARD_ASANA_PROJECT_ID }}
+          APP_BOARD_ASANA_PROJECT_ID: ${{ vars.TEST_MACOS_APP_BOARD_ASANA_PROJECT_ID }}
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           release-task-url: ${{ github.event.inputs.asana-task-url }}
@@ -349,5 +349,5 @@ jobs:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       MM_HANDLES_BASE64: ${{ secrets.MM_HANDLES_BASE64 }}
       MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
-      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
-      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
+      AWS_ACCESS_KEY_ID_RELEASE_S3: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+      AWS_SECRET_ACCESS_KEY_RELEASE_S3: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
