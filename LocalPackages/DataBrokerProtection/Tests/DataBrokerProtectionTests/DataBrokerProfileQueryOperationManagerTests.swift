@@ -98,8 +98,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
             let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
-            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
-            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz")
+            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc", identifier: "abc")
+            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz", identifier: "zxz")
 
             let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
                               OptOutOperationData.mock(with: extractedProfileSaved2)]
@@ -915,7 +915,7 @@ extension ExtractedProfile {
     }
 
     static var mockWithoutId: ExtractedProfile {
-        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL")
+        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL", identifier: "ABC")
     }
 
     static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {

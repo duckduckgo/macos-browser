@@ -134,7 +134,7 @@ struct ExtractedProfile: Codable, Sendable {
         addresses = try container.decodeIfPresent([AddressCityState].self, forKey: .addresses)
         phoneNumbers = try container.decodeIfPresent([String].self, forKey: .phoneNumbers)
         relatives = try container.decodeIfPresent([String].self, forKey: .relatives)
-        profileUrl = try container.decode(String.self, forKey: .profileUrl)
+        profileUrl = try container.decodeIfPresent(String.self, forKey: .profileUrl)
         reportId = try container.decodeIfPresent(String.self, forKey: .reportId)
         age = try container.decodeIfPresent(String.self, forKey: .age)
         email = try container.decodeIfPresent(String.self, forKey: .email)
