@@ -1,5 +1,5 @@
 data:
-  name: Merging ${BRANCH} to ${BASE_BRANCH} failed
+  name: Tag ${BRANCH} branch and create GitHub release
   assignee: "${ASSIGNEE_ID}"
   html_notes: |
     <body>
