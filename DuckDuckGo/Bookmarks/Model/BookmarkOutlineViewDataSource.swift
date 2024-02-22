@@ -34,6 +34,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
 
     private let contentMode: ContentMode
     private let bookmarkManager: BookmarkManager
+    private let onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)?
     private let presentFaviconsFetcherOnboarding: (() -> Void)?
 
     private var favoritesPseudoFolder = PseudoFolder.favorites
@@ -43,11 +44,13 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         contentMode: ContentMode,
         bookmarkManager: BookmarkManager,
         treeController: BookmarkTreeController,
+        onMenuRequestedAction: ((BookmarkOutlineCellView) -> Void)? = nil,
         presentFaviconsFetcherOnboarding: (() -> Void)? = nil
     ) {
         self.contentMode = contentMode
         self.bookmarkManager = bookmarkManager
         self.treeController = treeController
+        self.onMenuRequestedAction = onMenuRequestedAction
         self.presentFaviconsFetcherOnboarding = presentFaviconsFetcherOnboarding
 
         super.init()
@@ -123,6 +126,7 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         }
         let cell = outlineView.makeView(withIdentifier: .init(BookmarkOutlineCellView.className()), owner: self) as? BookmarkOutlineCellView
             ?? BookmarkOutlineCellView(identifier: .init(BookmarkOutlineCellView.className()))
+        cell.delegate = self
 
         if let bookmark = node.representedObject as? Bookmark {
             cell.update(from: bookmark)
@@ -328,4 +332,12 @@ final class BookmarkOutlineViewDataSource: NSObject, NSOutlineViewDataSource, NS
         return contentMode == .foldersOnly
     }
 
+}
+
+// MARK: - BookmarkOutlineCellViewDelegate
+
+extension BookmarkOutlineViewDataSource: BookmarkOutlineCellViewDelegate {
+    func outlineCellViewRequestedMenu(_ cell: BookmarkOutlineCellView) {
+        onMenuRequestedAction?(cell)
+    }
 }

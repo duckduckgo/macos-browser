@@ -63,6 +63,8 @@ final class BookmarkListViewController: NSViewController {
             contentMode: .bookmarksAndFolders,
             bookmarkManager: bookmarkManager,
             treeController: treeController,
+            onMenuRequestedAction: { [weak self] cell in
+            },
             presentFaviconsFetcherOnboarding: { [weak self] in
                 guard let self, let window = self.view.window else {
                     return
