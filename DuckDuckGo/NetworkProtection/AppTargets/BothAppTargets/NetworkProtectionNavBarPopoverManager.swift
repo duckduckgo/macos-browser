@@ -92,7 +92,8 @@ final class NetworkProtectionNavBarPopoverManager {
                     ]
                 }
             },
-                                                   agentLoginItem: LoginItem.vpnMenu
+                                                   agentLoginItem: LoginItem.vpnMenu,
+                                                   isMenuBarStatusView: false
             )
             popover.delegate = delegate
 
