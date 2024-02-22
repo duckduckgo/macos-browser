@@ -114,7 +114,7 @@ final class DataBrokerProtectionEngagementPixels {
 
     func fireEngagementPixel(currentDate: Date = Date()) {
         guard database.fetchProfile() != nil else {
-            print("No profile. We do not fire any pixel because we do not consider it an engaged user.")
+            os_log("No profile. We do not fire any pixel because we do not consider it an engaged user.", log: .dataBrokerProtection)
             return
         }
 
