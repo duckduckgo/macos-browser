@@ -984,13 +984,14 @@ protocol NewWindowPolicyDecisionMaker {
 
     @MainActor
     private func shouldReload(_ url: URL, shouldLoadInBackground: Bool) -> Bool {
-        var isNativeUI: Bool {
+        var isSessionRestoredNativeUI: Bool {
+            guard case .loadCachedFromTabContent = self.interactionState else { return false }
             let content = TabContent.contentFromURL(url, source: .ui)
             return !content.isUrl && content.urlForWebView != nil
         }
         // don‘t reload in background unless shouldLoadInBackground
         guard url.isValid,
-              webView.superview != nil || shouldLoadInBackground || isNativeUI,
+              webView.superview != nil || shouldLoadInBackground || isSessionRestoredNativeUI,
               // don‘t reload when already loaded
               webView.url != url || error != nil else { return false }
 
