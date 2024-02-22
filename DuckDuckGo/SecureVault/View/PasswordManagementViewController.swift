@@ -314,14 +314,13 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     @IBAction func onDeleteAllPasswordsClicked(_ sender: Any) {
-        guard let secureVault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared),
-        let syncService = NSApp.delegateTyped.syncService else { return }
+        let builder = AutofillDeleteAllPasswordsBuilder()
+        guard let autofillDeleteAllPasswordsExecutor = builder.buildExecutor() else { return }
+        let presenter = builder.buildPresenter()
 
-        let deleteAllExecutor = AutofillDeleteAllPasswordsExecutor(userAuthenticator: DeviceAuthenticator.shared,
-                                                                   secureVault: secureVault,
-                                                                   syncRequester: syncService)
+        self.dismiss()
 
-        AutofillActionPresenter().show(actionExecutor: deleteAllExecutor)
+        presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor)
     }
 
     @IBAction func deviceAuthenticationRequested(_ sender: NSButton) {
@@ -364,7 +363,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func postChange() {
-        NotificationCenter.default.post(name: .PasswordManagerChanged, object: isDirty)
+        NotificationCenter.default.post(name: .AutofillDataChanged, object: isDirty)
     }
 
     func clear() {
