@@ -29,11 +29,18 @@ struct PreferencesSection: Hashable, Identifiable {
 
     @MainActor
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
-        let privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
+        var privacyPanes: [PreferencePaneIdentifier] = [.defaultBrowser, .privateSearch, .webTrackingProtection, .cookiePopupProtection, .emailProtection]
+
+#if NETWORK_PROTECTION
+        if includingVPN {
+            privacyPanes.append(.vpn)
+        }
+#endif
 
         let regularPanes: [PreferencePaneIdentifier] = {
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .downloads, .fireButton]
+
 #if SUBSCRIPTION
-            var panes: [PreferencePaneIdentifier] = [.fireButton, .subscription, .general, .appearance, .autofill, .downloads]
 
             if NSApp.delegateTyped.internalUserDecider.isInternalUser {
                 if let generalIndex = panes.firstIndex(of: .general) {
@@ -41,13 +48,7 @@ struct PreferencesSection: Hashable, Identifiable {
                 }
             }
 
-            if !AccountManager().isUserAuthenticated && !SubscriptionPurchaseEnvironment.canPurchase {
-                if let subscriptionIndex = panes.firstIndex(of: .subscription) {
-                    panes.remove(at: subscriptionIndex)
-                }
-            }
 #else
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .downloads, .fireButton]
 
             if includingSync {
                 panes.insert(.sync, at: 1)
@@ -57,25 +58,28 @@ struct PreferencesSection: Hashable, Identifiable {
                 panes.append(.duckPlayer)
             }
 
-#if NETWORK_PROTECTION
-            if includingVPN {
-                panes.append(.vpn)
-            }
-#endif
-
             return panes
         }()
 
+        var shouldIncludeSubscriptionPane = false
+#if SUBSCRIPTION
+        if AccountManager().isUserAuthenticated || SubscriptionPurchaseEnvironment.canPurchase {
+            shouldIncludeSubscriptionPane = true
+        }
+#endif
+
         return [
             .init(id: .privacyProtections, panes: privacyPanes),
+            (shouldIncludeSubscriptionPane ? .init(id: .privacyPro, panes: [.subscription]) : nil),
             .init(id: .regularPreferencePanes, panes: regularPanes),
             .init(id: .about, panes: [.about])
-        ]
+        ].compactMap { $0 }
     }
 }
 
 enum PreferencesSectionIdentifier: Hashable, CaseIterable {
     case privacyProtections
+    case privacyPro
     case regularPreferencePanes
     case about
 
@@ -83,6 +87,8 @@ enum PreferencesSectionIdentifier: Hashable, CaseIterable {
         switch self {
         case .privacyProtections:
             return "Privacy Protections"
+        case .privacyPro:
+            return nil
         case .regularPreferencePanes:
             return "Main Settings"
         case .about:
