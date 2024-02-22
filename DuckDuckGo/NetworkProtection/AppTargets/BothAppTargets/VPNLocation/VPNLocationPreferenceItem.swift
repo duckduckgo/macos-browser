@@ -50,8 +50,9 @@ struct VPNLocationPreferenceItem: View {
                 Button(UserText.vpnLocationChangeButtonTitle) {
                     isShowingLocationSheet = true
                 }
-                .sheet(isPresented: $isShowingLocationSheet) { [model] in
-                    VPNLocationView(model: model.locationsViewModel, isPresented: $isShowingLocationSheet)
+                .sheet(isPresented: $isShowingLocationSheet) {
+                    Text("Hello!")
+                    //VPNLocationView(model: model.locationsViewModel, isPresented: $isShowingLocationSheet)
                 }
             }
         }
