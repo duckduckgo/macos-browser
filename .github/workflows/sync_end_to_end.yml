@@ -20,7 +20,7 @@ jobs:
 
     - name: Setup vnc
       env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_TOKEN }}
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SYNC_TESTS_AUTH_TOKEN }}
         VNC_USER_PASSWORD: ${{ secrets.VNC_USER_PASSWORD }}
         VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
       run: | 
