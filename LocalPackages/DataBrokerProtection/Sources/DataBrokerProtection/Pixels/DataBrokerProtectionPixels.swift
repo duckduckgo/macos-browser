@@ -279,7 +279,6 @@ public enum DataBrokerProtectionPixels {
 }
 
 extension DataBrokerProtectionPixels: PixelKitEvent {
-
     public var name: String {
         switch self {
         case .parentChildMatches: return "m_mac_dbp_macos_parent-child-broker-matches"

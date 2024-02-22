@@ -106,7 +106,6 @@ final class DataBrokerProtectionProcessor {
                                completion: @escaping () -> Void) {
 
         // Before running new operations we check if there is any updates to the broker files.
-        // This runs only once per 24 hours.
         if let vault = try? DataBrokerProtectionSecureVaultFactory.makeVault(errorReporter: nil) {
             let brokerUpdater = DataBrokerProtectionBrokerUpdater(vault: vault)
             brokerUpdater.checkForUpdatesInBrokerJSONFiles()

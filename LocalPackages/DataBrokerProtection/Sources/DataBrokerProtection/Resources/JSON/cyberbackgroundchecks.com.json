@@ -1,6 +1,7 @@
 {
-  "name": "cyberbackgroundchecks.com",
-  "version": "0.1.1",
+  "name": "Cyber Background Checks",
+  "url": "cyberbackgroundchecks.com",
+  "version": "0.1.4",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705644000000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "4b7037f3-9c6a-42b5-929e-621256e0a044",
+          "id": "d8c84470-d8b3-4c46-a645-01cc6b139b3b",
           "url": "https://www.cyberbackgroundchecks.com/people/${firstName}-${lastName}/${state}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "f36a73d7-9efb-452e-8c60-6d9df2964bcf",
+          "id": "b4c12cf2-0fd6-4209-8816-3bf2cce23cde",
           "selector": ".card",
           "profile": {
             "name": {
