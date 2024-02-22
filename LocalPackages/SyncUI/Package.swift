@@ -23,6 +23,9 @@ let package = Package(
                 .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
             ],
+            resources: [
+                .process("Resources")
+            ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))
             ],
