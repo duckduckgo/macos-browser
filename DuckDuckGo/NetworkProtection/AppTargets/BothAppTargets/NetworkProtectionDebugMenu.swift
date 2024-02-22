@@ -22,12 +22,17 @@ import AppKit
 import Common
 import Foundation
 import NetworkProtection
+import NetworkProtectionProxy
 import SwiftUI
 
 /// Controller for the Network Protection debug menu.
 ///
 @MainActor
 final class NetworkProtectionDebugMenu: NSMenu {
+
+    private let transparentProxySettings = TransparentProxySettings(defaults: .netP)
+
+    // MARK: - Menus
 
     private let environmentMenu = NSMenu()
 
@@ -39,7 +44,9 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     private let resetToDefaults = NSMenuItem(title: "Reset Settings to defaults", action: #selector(NetworkProtectionDebugMenu.resetSettings))
 
-    private let exclusionsMenu = NSMenu()
+    private let excludedRoutesMenu = NSMenu()
+    private let excludeDDGBrowserTrafficFromVPN = NSMenuItem(title: "DDG Browser", action: #selector(toggleExcludeDDGBrowser))
+    private let excludeDBPTrafficFromVPN = NSMenuItem(title: "DBP Background Agent", action: #selector(toggleExcludeDBPBackgroundAgent))
 
     private let shouldEnforceRoutesMenuItem = NSMenuItem(title: "Kill Switch (enforceRoutes)", action: #selector(NetworkProtectionDebugMenu.toggleEnforceRoutesAction))
     private let shouldIncludeAllNetworksMenuItem = NSMenuItem(title: "includeAllNetworks", action: #selector(NetworkProtectionDebugMenu.toggleIncludeAllNetworks))
@@ -89,7 +96,6 @@ final class NetworkProtectionDebugMenu: NSMenu {
                 .targetting(self)
             shouldEnforceRoutesMenuItem
                 .targetting(self)
-            NSMenuItem(title: "Excluded Routes").submenu(exclusionsMenu)
             NSMenuItem.separator()
 
             NSMenuItem(title: "Send Test Notification", action: #selector(NetworkProtectionDebugMenu.sendTestNotification))
@@ -103,6 +109,14 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
             NSMenuItem(title: "Environment")
                 .submenu(environmentMenu)
+
+            NSMenuItem(title: "Exclusions") {
+                NSMenuItem(title: "Excluded Apps") {
+                    excludeDDGBrowserTrafficFromVPN.targetting(self)
+                    excludeDBPTrafficFromVPN.targetting(self)
+                }
+                NSMenuItem(title: "Excluded Routes").submenu(excludedRoutesMenu)
+            }
 
             NSMenuItem(title: "Preferred Server").submenu(preferredServerMenu)
 
@@ -172,8 +186,8 @@ final class NetworkProtectionDebugMenu: NSMenu {
         populateNetworkProtectionServerListMenuItems()
         populateNetworkProtectionRegistrationKeyValidityMenuItems()
 
-        exclusionsMenu.delegate = self
-        exclusionsMenu.autoenablesItems = false
+        excludedRoutesMenu.delegate = self
+        excludedRoutesMenu.autoenablesItems = false
         populateExclusionsMenuItems()
     }
 
@@ -391,7 +405,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     private func populateExclusionsMenuItems() {
-        exclusionsMenu.removeAllItems()
+        excludedRoutesMenu.removeAllItems()
 
         for item in settings.excludedRoutes {
             let menuItem: NSMenuItem
@@ -406,7 +420,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
                                       target: self,
                                       representedObject: range.stringRepresentation)
             }
-            exclusionsMenu.addItem(menuItem)
+            excludedRoutesMenu.addItem(menuItem)
         }
 
         // Only allow testers to enter a custom code if they're on the waitlist, to simulate the correct path through the flow
@@ -419,6 +433,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
 
     override func update() {
         updateEnvironmentMenu()
+        updateExclusionsMenu()
         updatePreferredServerMenu()
         updateRekeyValidityMenu()
         updateNetworkProtectionMenuItemsState()
@@ -588,6 +603,7 @@ final class NetworkProtectionDebugMenu: NSMenu {
     }
 
     // MARK: Environment
+
     @objc func setSelectedEnvironment(_ menuItem: NSMenuItem) {
         let title = menuItem.title
         let selectedEnvironment: VPNSettings.SelectedEnvironment
@@ -607,6 +623,24 @@ final class NetworkProtectionDebugMenu: NSMenu {
             }
             settings.selectedServer = .automatic
         }
+    }
+
+    // MARK: - Exclusions
+
+    private let dbpBackgroundAppIdentifier = Bundle.main.dbpBackgroundAgentBundleId
+    private let ddgBrowserAppIdentifier = Bundle.main.bundleIdentifier!
+
+    private func updateExclusionsMenu() {
+        excludeDBPTrafficFromVPN.state = transparentProxySettings.isExcluding(dbpBackgroundAppIdentifier) ? .on : .off
+        excludeDDGBrowserTrafficFromVPN.state = transparentProxySettings.isExcluding(ddgBrowserAppIdentifier) ? .on : .off
+    }
+
+    @objc private func toggleExcludeDBPBackgroundAgent() {
+        transparentProxySettings.toggleExclusion(for: dbpBackgroundAppIdentifier)
+    }
+
+    @objc private func toggleExcludeDDGBrowser() {
+        transparentProxySettings.toggleExclusion(for: ddgBrowserAppIdentifier)
     }
 }
 

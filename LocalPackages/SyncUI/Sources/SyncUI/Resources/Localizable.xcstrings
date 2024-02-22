@@ -209,7 +209,7 @@
       }
     },
     "paste-from-clipboard" : {
-      "comment" : "Paste button",
+      "comment" : "Paste from Clipboard button",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -245,7 +245,7 @@
       }
     },
     "preferences.begin-sync.card-footer" : {
-      "comment" : "Footer / captoin on the Begin Syncing card in sync settings",
+      "comment" : "Footer / caption on the Begin Syncing card in sync settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -353,7 +353,7 @@
       }
     },
     "preferences.preparing-to-sync.dialog-title" : {
-      "comment" : "Peparing to sync dialog title during sync set up",
+      "comment" : "Preparing to sync dialog title during sync set up",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -389,7 +389,7 @@
       }
     },
     "preferences.recover-synced-data.dialog-subtitle" : {
-      "comment" : "Recover synced data during Sync revoery process dialog subtitle",
+      "comment" : "Recover synced data during Sync recovery process dialog subtitle",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
