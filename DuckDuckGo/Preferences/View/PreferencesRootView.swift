@@ -21,6 +21,7 @@ import PreferencesViews
 import SwiftUI
 import SwiftUIExtensions
 import SyncUI
+import BrowserServicesKit
 
 #if SUBSCRIPTION
 import Subscription
@@ -60,7 +61,7 @@ enum Preferences {
                             case .cookiePopupProtection:
                                 CookiePopupProtectionView(model: CookiePopupProtectionPreferences.shared)
                             case .emailProtection:
-                                GeneralView(startupModel: StartupPreferences.shared)
+                                EmailProtectionView(emailManager: EmailManager())
                             case .general:
                                 GeneralView(startupModel: StartupPreferences.shared)
                             case .sync:

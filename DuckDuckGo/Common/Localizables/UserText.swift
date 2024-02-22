@@ -329,6 +329,7 @@ struct UserText {
     static let privateSearchExplenation = NSLocalizedString("private.search.explenation", value: "DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.", comment: "feature explanation in settings")
     static let webTrackingProtectionExplanation = NSLocalizedString("web.tracking.protection.explanation", value: "DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default.", comment: "feature explanation in settings")
     static let cookiePopupProtectionExplanation = NSLocalizedString("cookie.popup.protection.explanation", value: "When DuckDuckGo detects cookie pop-ups on sites you visit, we can automatically set your cookie preferences to minimize cookies and maximize privacy, then close pop-ups.", comment: "feature explanation in settings")
+    static let emailProtectionExplanation = NSLocalizedString("email.protection.explanation", value: "Block email trackers and hide your address without switching your email provider", comment: "feature explanation in settings")
 
     // Misc
 

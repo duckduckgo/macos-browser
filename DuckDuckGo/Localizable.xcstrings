@@ -565,18 +565,6 @@
         }
       }
     },
-    "autoconsent.title" : {
-      "comment" : "Autoconsent settings section title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Cookie Pop-ups"
-          }
-        }
-      }
-    },
     "autofill.addresses" : {
       "comment" : "Autofill autosaved data type",
       "extractionState" : "extracted_with_value",
@@ -2887,6 +2875,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Enable Email Protection"
+          }
+        }
+      }
+    },
+    "email.protection.explanation" : {
+      "comment" : "feature explanation in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Block email trackers and hide your address without switching your email provider"
           }
         }
       }
