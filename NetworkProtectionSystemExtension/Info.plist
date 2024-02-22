@@ -14,6 +14,8 @@
 		<dict>
 			<key>com.apple.networkextension.packet-tunnel</key>
 			<string>$(PRODUCT_MODULE_NAME).MacPacketTunnelProvider</string>
+			<key>com.apple.networkextension.app-proxy</key>
+			<string>$(PRODUCT_MODULE_NAME).MacTransparentProxyProvider</string>
 		</dict>
 		<key>MAIN_BUNDLE_IDENTIFIER</key>
 		<string>$(MAIN_BUNDLE_IDENTIFIER)</string>

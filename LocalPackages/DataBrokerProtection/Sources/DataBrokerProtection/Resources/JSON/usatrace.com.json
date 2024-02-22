@@ -1,6 +1,7 @@
 {
-  "name": "usatrace.com",
-  "version": "0.1.1",
+  "name": "USA Trace",
+  "url": "usatrace.com",
+  "version": "0.1.4",
   "parent": "peoplefinders.com",
   "addedDatetime": 1674540000000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "5071e480-88ae-49b5-91b6-1daf26c55acf",
+          "id": "17217b04-28ae-4262-aa33-ee3695bb6bd6",
           "url": "https://www.usatrace.com/people-search/${firstName}-${lastName}/${city}-${state|upcase}"
         },
         {
           "actionType": "extract",
-          "id": "3237fc09-247c-4942-9920-9bbb937f6ac2",
+          "id": "426d8e8a-2f32-46f3-9d1d-e7f6e2fddadb",
           "selector": "//table/tbody/tr[position() > 1]",
           "profile": {
             "name": {
