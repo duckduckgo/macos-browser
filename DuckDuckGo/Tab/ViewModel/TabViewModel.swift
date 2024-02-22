@@ -99,24 +99,47 @@ final class TabViewModel {
     }
 
     private func subscribeToUrl() {
+        enum Event {
+            case instant
+            case didCommit
+        }
         tab.$content
-            .map { [tab] content in
-                if case .url = content {
-                    // Update the address bar only after the tab did commit navigation
-                    // to prevent Address Bar Spoofing
-                    return tab.webViewDidCommitNavigationPublisher.eraseToAnyPublisher()
-                } else {
-                    // Update the address bar instantly for built-in content types
-                    return Just( () ).eraseToAnyPublisher()
+            .map { [tab] content -> AnyPublisher<Event, Never> in
+                switch content {
+                case .url(_, _, source: .webViewUpdated),
+                     .url(_, _, source: .link):
+
+                    // Update the address bar only after the tab did commit navigation to prevent Address Bar Spoofing
+                    return tab.webViewDidCommitNavigationPublisher.map { .didCommit }.eraseToAnyPublisher()
+
+                case .url(_, _, source: .pendingStateRestoration),
+                     .url(_, _, source: .loadedByStateRestoration),
+                     .url(_, _, source: .userEntered),
+                     .url(_, _, source: .historyEntry),
+                     .url(_, _, source: .bookmark),
+                     .url(_, _, source: .ui),
+                     .url(_, _, source: .appOpenUrl),
+                     .url(_, _, source: .reload),
+                     .newtab,
+                     .settings,
+                     .bookmarks,
+                     .onboarding,
+                     .none,
+                     .dataBrokerProtection,
+                     .subscription:
+                    // Update the address bar instantly for built-in content types or user-initiated navigations
+                    return Just( .instant ).eraseToAnyPublisher()
                 }
             }
             .switchToLatest()
-            .sink { [weak self] _ in
+            .sink { [weak self] event in
                 guard let self else { return }
 
                 updateAddressBarStrings()
-                updateCanBeBookmarked()
-                updateFavicon()
+                if case .didCommit = event {
+                    updateCanBeBookmarked()
+                    updateFavicon()
+                }
             }
             .store(in: &cancellables)
     }
@@ -161,10 +184,13 @@ final class TabViewModel {
     }
 
     private func subscribeToTabError() {
-        tab.$error.sink { [weak self] _ in
-            self?.updateTitle()
-            self?.updateFavicon()
-        }.store(in: &cancellables)
+        tab.$error
+            .map { $0 != nil }
+            .removeDuplicates()
+            .sink { [weak self] _ in
+                self?.updateTitle()
+                self?.updateFavicon()
+            }.store(in: &cancellables)
     }
 
     private func subscribeToPermissions() {
@@ -204,7 +230,7 @@ final class TabViewModel {
         return tabURL?.root
     }
 
-    func updateAddressBarStrings() {
+    private func updateAddressBarStrings() {
         guard tab.content.isUrl, let url = tabURL else {
             addressBarString = ""
             passiveAddressBarString = ""

@@ -112,7 +112,6 @@ final class AddressBarTextField: NSTextField {
             .sink { [weak self] selectedTabViewModel in
                 guard let self else { return }
                 hideSuggestionWindow()
-                restoreValueIfPossible(newSelectedTabViewModel: selectedTabViewModel)
                 subscribeToAddressBarString(selectedTabViewModel: selectedTabViewModel)
                 subscribeToContentType(selectedTabViewModel: selectedTabViewModel)
             }
@@ -127,10 +126,12 @@ final class AddressBarTextField: NSTextField {
 
     private func subscribeToAddressBarString(selectedTabViewModel: TabViewModel) {
         addressBarStringCancellable = selectedTabViewModel.$addressBarString
+            .dropFirst()
             .sink { [weak self, weak selectedTabViewModel] addressBarString in
                 guard let self, let selectedTabViewModel else { return }
                 updateValueIfNeeded(selectedTabViewModel: selectedTabViewModel, addressBarString: addressBarString)
             }
+        restoreValueIfPossible(newSelectedTabViewModel: selectedTabViewModel)
     }
 
     // MARK: - Value
@@ -310,8 +311,15 @@ final class AddressBarTextField: NSTextField {
             return
         }
 
+        // reset to actual value
+        let oldValue = value
         clearValue()
         updateValue(selectedTabViewModel: nil, addressBarString: nil)
+
+        if oldValue == value {
+            // resign first responder if nothing has changed
+            self.window?.makeFirstResponder(nil)
+        }
     }
 
     private func updateTabUrlWithUrl(_ providedUrl: URL, userEnteredValue: String, suggestion: Suggestion?) {
@@ -338,16 +346,14 @@ final class AddressBarTextField: NSTextField {
 
 #if SUBSCRIPTION
         if providedUrl.isChild(of: URL.subscriptionBaseURL) || providedUrl.isChild(of: URL.identityTheftRestoration) {
-            selectedTabViewModel.updateAddressBarStrings()
+            self.updateValue(selectedTabViewModel: nil, addressBarString: nil) // reset
             self.window?.makeFirstResponder(nil)
             return
         }
 #endif
 
-        selectedTabViewModel.tab.setUrl(providedUrl, source: .userEntered(userEnteredValue))
-        selectedTabViewModel.updateAddressBarStrings()
-
         self.window?.makeFirstResponder(nil)
+        selectedTabViewModel.tab.setUrl(providedUrl, source: .userEntered(userEnteredValue))
     }
 
     private func updateTabUrl(suggestion: Suggestion?) {
@@ -855,7 +861,7 @@ extension AddressBarTextField: NSTextFieldDelegate {
         // if user continues typing letters from displayed Suggestion
         // don't blink and keep the Suggestion displayed
         if case .userAppendingTextToTheEnd = currentTextDidChangeEvent,
-            let suggestion = autocompleteSuggestionBeingTypedOverByUser(with: stringValueWithoutSuffix) {
+           let suggestion = autocompleteSuggestionBeingTypedOverByUser(with: stringValueWithoutSuffix) {
             self.value = .suggestion(SuggestionViewModel(isHomePage: isHomePage, suggestion: suggestion.suggestion, userStringValue: stringValueWithoutSuffix))
 
         } else {
@@ -884,12 +890,12 @@ extension AddressBarTextField: NSTextFieldDelegate {
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if NSApp.isReturnOrEnterPressed {
+        if commandSelector == #selector(insertNewline)
+           || commandSelector == #selector(insertNewlineIgnoringFieldEditor)
+           || commandSelector == Selector(("noop:")) && NSApp.isReturnOrEnterPressed {
             self.addressBarEnterPressed()
             return true
-        }
-
-        if commandSelector == #selector(NSResponder.insertTab(_:)) {
+        } else if commandSelector == #selector(NSResponder.insertTab(_:)) {
             window?.makeFirstResponder(nextKeyView)
             return false
 
@@ -1049,7 +1055,7 @@ extension AddressBarTextField: NSTextViewDelegate {
         // filter out menu items with action from `selectorsToRemove` or containing submenu items with action from the list
         menu.items = menu.items.filter { menuItem in
             menuItem.action.map { action in  Self.selectorsToRemove.contains(action) } != true
-                && Self.selectorsToRemove.isDisjoint(with: menuItem.submenu?.items.compactMap(\.action) ?? [])
+            && Self.selectorsToRemove.isDisjoint(with: menuItem.submenu?.items.compactMap(\.action) ?? [])
         }
     }
 

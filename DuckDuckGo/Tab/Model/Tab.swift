@@ -679,17 +679,16 @@ protocol NewWindowPolicyDecisionMaker {
             }
             return
         }
-        var title = webView.title?.trimmingWhitespace()
-        if title?.isEmpty ?? true {
-            title = webView.url?.host?.droppingWwwPrefix()
-        }
 
+        let title = webView.title?.trimmingWhitespace()
         if title != self.title {
             self.title = title
         }
 
         if let wkBackForwardListItem = webView.backForwardList.currentItem,
-           content.urlForWebView == wkBackForwardListItem.url {
+           content.urlForWebView == wkBackForwardListItem.url,
+           !webView.isLoading,
+           title?.isEmpty == false {
             wkBackForwardListItem.tabTitle = title
         }
     }
@@ -830,7 +829,15 @@ protocol NewWindowPolicyDecisionMaker {
         }
 
         userInteractionDialog = nil
-        return webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
+        let navigation = webView.navigator()?.goBack(withExpectedNavigationType: .backForward(distance: -1))
+        // update TabContent source to .historyEntry on navigation
+        navigation?.appendResponder(willStart: { [weak self] navigation in
+            guard let self,
+                  case .url(let url, credential: let credential, .webViewUpdated) = self.content,
+                  url == navigation.url else { return }
+            self.content = .url(url, credential: credential, source: .historyEntry)
+        })
+        return navigation
     }
 
     @MainActor
@@ -839,7 +846,15 @@ protocol NewWindowPolicyDecisionMaker {
         guard canGoForward else { return nil }
 
         userInteractionDialog = nil
-        return webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
+        let navigation = webView.navigator()?.goForward(withExpectedNavigationType: .backForward(distance: 1))
+        // update TabContent source to .historyEntry on navigation
+        navigation?.appendResponder(willStart: { [weak self] navigation in
+            guard let self,
+                  case .url(let url, credential: let credential, _) = self.content,
+                  url == navigation.url else { return }
+            self.content = .url(url, credential: credential, source: .historyEntry)
+        })
+        return navigation
     }
 
     @MainActor
@@ -886,8 +901,16 @@ protocol NewWindowPolicyDecisionMaker {
             return nil
         }
 
-        return webView.navigator()?.go(to: backForwardNavigation.item,
-                                       withExpectedNavigationType: .backForward(distance: backForwardNavigation.distance))
+        let navigation = webView.navigator()?.go(to: backForwardNavigation.item,
+                                                 withExpectedNavigationType: .backForward(distance: backForwardNavigation.distance))
+        // update TabContent source to .historyEntry on navigation
+        navigation?.appendResponder(willStart: { [weak self] navigation in
+            guard let self,
+                  case .url(let url, credential: let credential, _) = self.content,
+                  url == navigation.url else { return }
+            self.content = .url(url, credential: credential, source: .historyEntry)
+        })
+        return navigation
     }
 
     func openHomePage() {
@@ -895,9 +918,9 @@ protocol NewWindowPolicyDecisionMaker {
 
         if startupPreferences.launchToCustomHomePage,
            let customURL = URL(string: startupPreferences.formattedCustomHomePageURL) {
-            webView.load(URLRequest(url: customURL))
+            setContent(.url(customURL, credential: nil, source: .ui))
         } else {
-            webView.load(URLRequest(url: .newtab))
+            setContent(.newtab)
         }
     }
 
@@ -921,12 +944,13 @@ protocol NewWindowPolicyDecisionMaker {
            // interpreting the action as user-initiated link navigation causing a new tab opening when Cmd is pressed
            let redirectUrl = URL(string: "javascript:location.replace('\(failingUrl.absoluteString.escapedJavaScriptString())')") {
 
+            self.content = .url(failingUrl, credential: nil, source: .reload)
             webView.load(URLRequest(url: redirectUrl))
             return nil
         }
 
+        self.content = content.forceReload()
         if webView.url == nil, content.isUrl {
-            self.content = content.forceReload()
             // load from cache or interactionStateData when called by lazy loader
             return reloadIfNeeded(shouldLoadInBackground: true)
         } else {
@@ -966,7 +990,6 @@ protocol NewWindowPolicyDecisionMaker {
             if #available(macOS 12.0, *), content.isUserEnteredUrl {
                 request.attribution = .user
             }
-
             return webView.navigator(distributedNavigationDelegate: navigationDelegate)
                 .load(request, withExpectedNavigationType: source.navigationType)
         }
