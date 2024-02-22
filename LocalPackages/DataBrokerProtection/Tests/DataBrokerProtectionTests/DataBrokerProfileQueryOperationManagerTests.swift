@@ -907,19 +907,19 @@ extension ProfileQuery {
 extension ExtractedProfile {
 
     static var mockWithRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date())
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date(), identifier: "someURL")
     }
 
     static var mockWithoutRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL")
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", identifier: "someURL")
     }
 
     static var mockWithoutId: ExtractedProfile {
-        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL", identifier: "ABC")
+        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL", identifier: "someOtherURL")
     }
 
     static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date)
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date, identifier: "someURL")
     }
 }
 
