@@ -30,7 +30,7 @@ let package = Package(
         .library(name: "XPCHelper", targets: ["XPCHelper"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "5e323aaa1fb1e2a41b331704f021850b9421afd1"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", revision: "aea703f144eca1116a8019fb5bd4f1fcbdb4b45c"),
     ],
     targets: [
         .target(
