@@ -1,6 +1,7 @@
 {
-  "name": "peoplesearchnow.com",
-  "version": "0.1.1",
+  "name": "People Search Now",
+  "url": "peoplesearchnow.com",
+  "version": "0.1.4",
   "parent": "peoplefinders.com",
   "addedDatetime": 1705989600000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "b6994b26-9904-407b-9bcf-0fd6f809771d",
+          "id": "db9e093d-68c2-45e1-a529-29a2dc67dfab",
           "url": "https://peoplesearchnow.com/person/${firstName}-${lastName}_${city}_${state}/"
         },
         {
           "actionType": "extract",
-          "id": "4e7f0e9a-1d24-47c0-886f-a08d88074878",
+          "id": "78912133-761b-4971-9780-4e16c8dd43b2",
           "selector": ".result-search-block",
           "profile": {
             "name": {
