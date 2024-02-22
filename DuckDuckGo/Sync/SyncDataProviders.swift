@@ -41,11 +41,11 @@ final class SyncDataProviders: DataProvidersSource {
             metadataStore: syncMetadata,
             metricsEventsHandler: metricsEventsHandler
         )
-        credentialsAdapter.setUpProviderIfNeeded(
-            secureVaultFactory: secureVaultFactory,
-            metadataStore: syncMetadata,
-            metricsEventsHandler: metricsEventsHandler
-        )
+//        credentialsAdapter.setUpProviderIfNeeded(
+//            secureVaultFactory: secureVaultFactory,
+//            metadataStore: syncMetadata,
+//            metricsEventsHandler: metricsEventsHandler
+//        )
         settingsAdapter.setUpProviderIfNeeded(
             metadataDatabase: syncMetadataDatabase.db,
             metadataStore: syncMetadata,
@@ -54,7 +54,7 @@ final class SyncDataProviders: DataProvidersSource {
 
         let providers: [Any] = [
             bookmarksAdapter.provider as Any,
-            credentialsAdapter.provider as Any,
+//            credentialsAdapter.provider as Any,
             settingsAdapter.provider as Any
         ]
 
