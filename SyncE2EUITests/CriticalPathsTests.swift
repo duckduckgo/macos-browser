@@ -30,38 +30,30 @@ final class CriticalPathsTests: XCTestCase {
         app = XCUIApplication(bundleIdentifier: "com.duckduckgo.macos.browser.review")
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
-        skipOnboardingIfNeeded()
+        toggleInternalUserState()
     }
-
-    private func skipOnboardingIfNeeded() {
-        let welcomeWindow = app.windows["Welcome"]
-        _ = welcomeWindow.waitForExistence(timeout: 3)
-        if welcomeWindow.exists {
-            let getStartedButton = welcomeWindow.buttons["Get Started"]
-            _ = getStartedButton.waitForExistence(timeout: 5)
-            getStartedButton.click()
-
-            let maybeLaterButton = welcomeWindow.buttons["Maybe Later"]
-            maybeLaterButton.click()
-            _ = maybeLaterButton.waitForExistence(timeout: 5)
-            maybeLaterButton.click()
-
-            let menuBarsQuery = app.menuBars
-            let fileMenuBarItem = menuBarsQuery.menuBarItems["File"]
-            fileMenuBarItem.click()
-            let newTabMenuItem = menuBarsQuery.menuItems["New Tab"]
-            newTabMenuItem.click()
-        }
+    
+    override func tearDown() {
+        toggleInternalUserState()
     }
-
+    
+    private func accessSettings() {
+        let newTabWindow = app.windows["New Tab"]
+        app.buttons["Options Button"].click()
+        newTabWindow.menuItems["openPreferences:"].click()
+    }
+    
+    private func toggleInternalUserState() {
+        let menuBarsQuery = app.menuBars
+        debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
+        debugMenuBarItem.click()
+        internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
+        internaluserstateMenuItem.click()
+    }
+    
     func testCanCreateSyncAccount() throws {
         // Go to Sync Set up
-        let menuBarsQuery = app.menuBars
-        let duckDuckGoMenuBarItem = menuBarsQuery.menuBarItems.element(boundBy: 1)
-        duckDuckGoMenuBarItem.click()
-        menuBarsQuery.menuItems["openPreferences:"].click()
-
-        skipOnboardingIfNeeded()
+        accessSettings()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -86,9 +78,7 @@ final class CriticalPathsTests: XCTestCase {
 
     func testCanRecoverSyncAccount() throws {
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        accessSettings()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -119,16 +109,15 @@ final class CriticalPathsTests: XCTestCase {
         sheetsQuery.buttons["Delete Data"].click()
         let beginSync = settingsWindow.staticTexts["Begin Syncing"]
         beginSync.click()
-        XCTAssertTrue(beginSync.exists, "Begyn Sync text is not visible")
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
+        XCTAssertTrue(beginSync.exists, "Begin Sync text is not visible")
+        
     }
 
     func testCanRemoveData() {
+        
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        accessSettings()
+
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -159,9 +148,6 @@ final class CriticalPathsTests: XCTestCase {
         alertSheet.staticTexts["Sync & Backup Error"].click()
         XCTAssertTrue(alertSheet.exists, "Sync Error text is not visible")
 
-        // Clean Up
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
     }
 
     func testCanLoginToExistingSyncAccount() {
@@ -171,9 +157,7 @@ final class CriticalPathsTests: XCTestCase {
         }
 
         // Go to Sync Set up
-        let newTabWindow = app.windows["New Tab"]
-        newTabWindow.children(matching: .button).element(boundBy: 4).click()
-        newTabWindow.menuItems["openPreferences:"].click()
+        accessSettings()
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
 
@@ -185,8 +169,6 @@ final class CriticalPathsTests: XCTestCase {
 
         // Clean Up
         logOut()
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
     }
 
     func testCanSyncData() {
@@ -239,12 +221,8 @@ final class CriticalPathsTests: XCTestCase {
 
         // Check Logins
         checkLogins()
-
-        // Clean Up
-        debugMenuBarItem.click()
-        internaluserstateMenuItem.click()
     }
-
+    
     private func logIn() {
         let settingsWindow = app.windows["Settings"]
         settingsWindow.buttons["Sync & Backup"].click()
