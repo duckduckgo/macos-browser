@@ -18,40 +18,40 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Setup vnc
-      env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SYNC_TESTS_AUTH_TOKEN }}
-        VNC_USER_PASSWORD: ${{ secrets.VNC_USER_PASSWORD }}
-        VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
-      run: | 
-        sudo mdutil -i off -a
-        sudo dscl . -create /Users/vncuser
-        sudo dscl . -create /Users/vncuser UserShell /bin/bash
-        sudo dscl . -create /Users/vncuser RealName "VNC User"
-        sudo dscl . -create /Users/vncuser UniqueID 1001
-        sudo dscl . -create /Users/vncuser PrimaryGroupID 80
-        sudo dscl . -create /Users/vncuser NFSHomeDirectory /Users/vncuser
-        sudo dscl . -passwd /Users/vncuser ${{ env.VNC_USER_PASSWORD }}
-        sudo dscl . -passwd /Users/vncuser ${{ env.VNC_USER_PASSWORD }}
-        sudo createhomedir -c -u vncuser > /dev/null
+    # - name: Setup vnc
+    #   env:
+    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SYNC_TESTS_AUTH_TOKEN }}
+    #     VNC_USER_PASSWORD: ${{ secrets.VNC_USER_PASSWORD }}
+    #     VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
+    #   run: | 
+    #     sudo mdutil -i off -a
+    #     sudo dscl . -create /Users/vncuser
+    #     sudo dscl . -create /Users/vncuser UserShell /bin/bash
+    #     sudo dscl . -create /Users/vncuser RealName "VNC User"
+    #     sudo dscl . -create /Users/vncuser UniqueID 1001
+    #     sudo dscl . -create /Users/vncuser PrimaryGroupID 80
+    #     sudo dscl . -create /Users/vncuser NFSHomeDirectory /Users/vncuser
+    #     sudo dscl . -passwd /Users/vncuser ${{ env.VNC_USER_PASSWORD }}
+    #     sudo dscl . -passwd /Users/vncuser ${{ env.VNC_USER_PASSWORD }}
+    #     sudo createhomedir -c -u vncuser > /dev/null
 
-        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -allowAccessFor -allUsers -privs -all
-        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -clientopts -setvnclegacy -vnclegacy yes 
+    #     sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -allowAccessFor -allUsers -privs -all
+    #     sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -clientopts -setvnclegacy -vnclegacy yes 
 
-        echo ${{ env.VNC_PASSWORD }} | perl -we 'BEGIN { @k = unpack "C*", pack "H*", "1734516E8BA8C5E2FF1C39567390ADCA"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack "C*", $_; foreach (@k) { printf "%02X", $_ ^ (shift @p || 0) }; print "\n"' | sudo tee /Library/Preferences/com.apple.VNCSettings.txt
+    #     echo ${{ env.VNC_PASSWORD }} | perl -we 'BEGIN { @k = unpack "C*", pack "H*", "1734516E8BA8C5E2FF1C39567390ADCA"}; $_ = <>; chomp; s/^(.{8}).*/$1/; @p = unpack "C*", $_; foreach (@k) { printf "%02X", $_ ^ (shift @p || 0) }; print "\n"' | sudo tee /Library/Preferences/com.apple.VNCSettings.txt
 
-        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -restart -agent -console
-        sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate
+    #     sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -restart -agent -console
+    #     sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate
 
-        brew install --cask ngrok
-        ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }} 
-        ngrok tcp 5900 &
+    #     brew install --cask ngrok
+    #     ngrok authtoken ${{ env.NGROK_AUTH_TOKEN }} 
+    #     ngrok tcp 5900 &
 
-    - name: NGROK URL
-      run: curl --silent http://127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url'
+    # - name: NGROK URL
+    #   run: curl --silent http://127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url'
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v3
 
     - name: Set cache key hash
       run: |
@@ -91,14 +91,6 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
-    - name: Set up keychain
-      env:
-        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-      run: |
-        security create-keychain -p "$KEYCHAIN_PASSWORD" ui-tests.keychain
-        security default-keychain -s ui-tests.keychain
-        security unlock-keychain -p "$KEYCHAIN_PASSWORD" ui-tests.keychain
-
     - name: Create test account for Sync and return the recovery code
       uses: duckduckgo/sync_crypto/action@main
       id: sync-recovery-code
@@ -110,6 +102,7 @@ jobs:
         CODE: ${{ steps.sync-recovery-code.outputs.recovery-code }}
       run: |
         defaults write com.duckduckgo.macos.browser.review moveToApplicationsFolderAlertSuppress 1
+        defaults write com.duckduckgo.macos.browser.review onboarding.finished -bool true
         set -o pipefail && xcodebuild test \
           -scheme "Sync End-to-End UI Tests" \
           -configuration Review \
