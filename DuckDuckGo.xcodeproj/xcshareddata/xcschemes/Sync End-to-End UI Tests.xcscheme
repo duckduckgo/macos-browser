@@ -67,15 +67,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "CriticalPathsTests/testCanLoginToExistingSyncAccount()">
-               </Test>
-               <Test
-                  Identifier = "CriticalPathsTests/testCanRecoverSyncAccount()">
-               </Test>
-               <Test
-                  Identifier = "CriticalPathsTests/testCanRemoveData()">
-               </Test>
-               <Test
                   Identifier = "CriticalPathsTests/testCanSyncData()">
                </Test>
             </SkippedTests>
