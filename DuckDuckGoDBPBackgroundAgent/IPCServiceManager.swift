@@ -17,10 +17,10 @@
 //
 
 import Combine
-import Foundation
-import DataBrokerProtection
-import PixelKit
 import Common
+import DataBrokerProtection
+import Foundation
+import PixelKit
 
 /// Manages the IPC service for the Agent app
 ///
@@ -28,6 +28,7 @@ import Common
 /// demand interaction with.
 ///
 final class IPCServiceManager {
+    private var browserWindowManager: BrowserWindowManager
     private let ipcServer: DataBrokerProtectionIPCServer
     private let scheduler: DataBrokerProtectionScheduler
     private let pixelHandler: EventMapping<DataBrokerProtectionPixels>
@@ -40,6 +41,8 @@ final class IPCServiceManager {
         self.ipcServer = ipcServer
         self.scheduler = scheduler
         self.pixelHandler = pixelHandler
+
+        browserWindowManager = BrowserWindowManager()
 
         ipcServer.serverDelegate = self
         ipcServer.activate()
@@ -101,5 +104,11 @@ extension IPCServiceManager: IPCServerInterface {
     func runAllOperations(showWebView: Bool) {
         pixelHandler.fire(.ipcServerRunAllOperations)
         scheduler.runAllOperations(showWebView: showWebView)
+    }
+
+    func openBrowser(domain: String) {
+        Task { @MainActor in
+            browserWindowManager.show(domain: domain)
+        }
     }
 }

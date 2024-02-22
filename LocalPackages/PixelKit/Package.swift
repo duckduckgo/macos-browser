@@ -20,7 +20,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", branch: "bhall/bump-css"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.1"),
     ],
     targets: [
         .target(

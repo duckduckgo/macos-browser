@@ -224,7 +224,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         let tunnelHealthStore = NetworkProtectionTunnelHealthStore(notificationCenter: notificationCenter)
         let controllerErrorStore = NetworkProtectionTunnelErrorStore(notificationCenter: notificationCenter)
         let debugEvents = Self.networkProtectionDebugEvents(controllerErrorStore: controllerErrorStore)
-        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: NetworkProtectionBundle.keychainType,
+        let tokenStore = NetworkProtectionKeychainTokenStore(keychainType: Bundle.keychainType,
                                                              serviceName: Self.tokenServiceName,
                                                              errorEvents: debugEvents)
         let notificationsPresenter = NetworkProtectionNotificationsPresenterFactory().make(settings: settings)
@@ -232,7 +232,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         super.init(notificationsPresenter: notificationsPresenter,
                    tunnelHealthStore: tunnelHealthStore,
                    controllerErrorStore: controllerErrorStore,
-                   keychainType: NetworkProtectionBundle.keychainType,
+                   keychainType: Bundle.keychainType,
                    tokenStore: tokenStore,
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
@@ -323,13 +323,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         case missingPixelHeaders
     }
 
-    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
-        super.prepareToConnect(using: provider)
-
-        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
-        try? loadDefaultPixelHeaders(from: options)
-    }
-
     public override func loadVendorOptions(from provider: NETunnelProviderProtocol?) throws {
         try super.loadVendorOptions(from: provider)
 
@@ -348,6 +341,15 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
 
         setupPixels(defaultHeaders: defaultPixelHeaders)
+    }
+
+    // MARK: - Overrideable Connection Events
+
+    override func prepareToConnect(using provider: NETunnelProviderProtocol?) {
+        super.prepareToConnect(using: provider)
+
+        guard PixelKit.shared == nil, let options = provider?.providerConfiguration else { return }
+        try? loadDefaultPixelHeaders(from: options)
     }
 
     // MARK: - Start/Stop Tunnel
