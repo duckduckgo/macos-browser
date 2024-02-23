@@ -23,45 +23,18 @@ struct AddBookmarkFolderPopoverView: ModalView {
     @ObservedObject var model: AddBookmarkFolderPopoverViewModel
 
     var body: some View {
-        BookmarkDialogContainerView(
-            title: UserText.Bookmarks.Dialog.Title.addFolder,
-            middleSection: {
-                BookmarkDialogStackedContentView(
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.name,
-                        content: TextField("", text: $model.folderName)
-                            .focusedOnAppear()
-                            .accessibilityIdentifier("bookmark.folder.name.textfield")
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .font(.system(size: 14))
-                            .disabled(model.isDisabled)
-                    ),
-                    .init(
-                        title: UserText.Bookmarks.Dialog.Field.location,
-                        content: BookmarkFolderPicker(folders: model.folders, selectedFolder: $model.parent)
-                            .accessibilityIdentifier("bookmark.folder.folder.dropdown")
-                            .disabled(model.isDisabled)
-                    )
-                )
-            },
-            bottomSection: {
-                BookmarkDialogButtonsView(
-                    viewState: .expanded,
-                    otherButtonAction: .init(
-                        title: UserText.cancel,
-                        accessibilityIdentifier: "bookmark.add.cancel.button",
-                        isDisabled: model.isDisabled,
-                        action: { _ in model.cancel() }
-                    ),
-                    defaultButtonAction: .init(
-                        title: UserText.Bookmarks.Dialog.Action.addFolder,
-                        accessibilityIdentifier: "bookmark.add.add.folder.button",
-                        keyboardShortCut: .defaultAction,
-                        isDisabled: model.isAddFolderButtonDisabled || model.isDisabled,
-                        action: { _ in model.addFolder() }
-                    )
-                )
-            }
+        AddEditBookmarkFolderView(
+            title: model.title,
+            buttonsState: .expanded,
+            folders: model.folders,
+            folderName: $model.folderName,
+            selectedFolder: $model.parent,
+            cancelActionTitle: model.cancelActionTitle,
+            isCancelActionDisabled: model.isCancelActionDisabled,
+            cancelAction: { _ in model.cancel() },
+            defaultActionTitle: model.defaultActionTitle,
+            isDefaultActionDisabled: model.isDefaultActionButtonDisabled,
+            defaultAction: { _ in model.addFolder() }
         )
         .padding(.vertical, 16.0)
         .font(.system(size: 13))
