@@ -38,7 +38,7 @@ extension Preferences {
 
                         PreferencePaneSubSection {
                             if emailManager.isSignedIn {
-                                Button(UserText.emailOptionsMenuManageAccountSubItem) {
+                                Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
                                     WindowControllersManager.shared.show(url: EmailUrls().emailProtectionAccountLink,
                                                                          source: .ui,
                                                                          newTab: true)
@@ -52,7 +52,7 @@ extension Preferences {
                                     }
                                 }
                             } else {
-                                Button(UserText.emailOptionsMenuTurnOnSubItem) {
+                                Button(UserText.emailOptionsMenuTurnOnSubItem + "…") {
                                     WindowControllersManager.shared.show(url: EmailUrls().emailProtectionLink,
                                                                          source: .ui,
                                                                          newTab: true)
