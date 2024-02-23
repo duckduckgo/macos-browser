@@ -31,10 +31,12 @@ final class CriticalPathsTests: XCTestCase {
         app.launchEnvironment["UITEST_MODE"] = "1"
         app.launch()
         toggleInternalUserState()
+        cleanupAndResetData()
     }
     
     override func tearDown() {
         toggleInternalUserState()
+        cleanupAndResetData()
     }
     
     private func accessSettings() {
@@ -43,12 +45,28 @@ final class CriticalPathsTests: XCTestCase {
         newTabWindow.menuItems["openPreferences:"].click()
     }
     
-    private func toggleInternalUserState() {
+    private toggleInternalUserState() {
         let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
         debugMenuBarItem.click()
         internaluserstateMenuItem = menuBarsQuery.menuItems["internalUserState:"]
         internaluserstateMenuItem.click()
+    }
+
+    private func cleanupAndResetData() {
+        let menuBarsQuery = app.menuBars
+        debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
+
+        debugMenuBarItem.click()
+        let resetDataMenuItem = menuBarsQuery.menuItems["Reset Data"]
+        resetDataMenuItem.hover()
+        let resetBookMarksData = resetDataMenuItem.menuItems["Reset Bookmarks"]
+        resetBookMarksData.click()
+        
+        debugMenuBarItem.click()
+        resetDataMenuItem.hover()
+        let resetAutofillData = resetDataMenuItem.menuItems["Reset Autofill Data"]
+        resetAutofillData.click()
     }
     
     func testCanCreateSyncAccount() throws {
@@ -195,6 +213,7 @@ final class CriticalPathsTests: XCTestCase {
         // Log Out
         logOut()
 
+        // Check Favorites not unified
         checkFavoriteNonUnified()
 
         // Remove Bookmarks
@@ -260,7 +279,7 @@ final class CriticalPathsTests: XCTestCase {
         settingsWindow.menuItems["Bookmarks"].click()
         let bookmarksWindow = app.windows["Bookmarks"]
         bookmarksWindow.buttons["  New Bookmark"].click()
-        let sheetsQuery = XCUIApplication().windows["Bookmarks"].sheets
+        let sheetsQuery = app.windows["Bookmarks"].sheets
         sheetsQuery.textFields["Title Text Field"].click()
         sheetsQuery.textFields["Title Text Field"].typeText("www.duckduckgo.com")
         sheetsQuery.textFields["URL Text Field"].click()
