@@ -604,25 +604,27 @@ final class NavigationBarViewController: NSViewController {
         downloadListCoordinator.updates
             .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] update in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 let shouldShowPopover = update.kind == .updated
+                    && DownloadsPreferences().shouldOpenPopupOnCompletion
                     && update.item.destinationURL != nil
                     && update.item.tempURL == nil
                     && !update.item.isBurner
-                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === self.downloadsButton.window
+                    && !downloadListCoordinator.hasActiveDownloads
+                    && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
 
                 if shouldShowPopover {
-                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: self.downloadsButton,
+                    self.popovers.showDownloadsPopoverAndAutoHide(usingView: downloadsButton,
                                                                   popoverDelegate: self,
                                                                   downloadsDelegate: self)
                 } else {
                     if update.item.isBurner {
-                        self.invalidateDownloadButtonHidingTimer()
-                        self.updateDownloadsButton(updatingFromPinnedViewsNotification: false)
+                        invalidateDownloadButtonHidingTimer()
+                        updateDownloadsButton(updatingFromPinnedViewsNotification: false)
                     }
                 }
-                self.updateDownloadsButton()
+                updateDownloadsButton()
             }
             .store(in: &downloadsCancellables)
         downloadListCoordinator.progress

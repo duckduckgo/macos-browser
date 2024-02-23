@@ -372,6 +372,8 @@ struct UserText {
     static let downloadsAlwaysAsk = NSLocalizedString("downloads.always-ask", value: "Always ask where to save files", comment: "Downloads preferences checkbox")
     static let downloadsChangeDirectory = NSLocalizedString("downloads.change", value: "Change…", comment: "Change downloads directory button")
 
+    static let downloadsOpenPopupOnCompletion = NSLocalizedString("downloads.open.on.completion", value: "Show Downloads popup when downloads are completed", comment: "Checkbox to open a Download Manager popover when downloads are completed")
+
     // MARK: Password Manager
     static let passwordManagement = NSLocalizedString("passsword.management", value: "Autofill", comment: "Used as title for password management user interface")
     static let passwordManagementAllItems = NSLocalizedString("passsword.management.all-items", value: "All Items", comment: "Used as title for the Autofill All Items option")
