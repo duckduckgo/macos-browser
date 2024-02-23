@@ -112,18 +112,4 @@ final class AutofillPreferencesModelTests: XCTestCase {
         XCTAssertNotEqual(model.autoLockThreshold, .oneHour)
         XCTAssertEqual(persistor.autoLockThreshold, model.autoLockThreshold)
     }
-
-    func testOpenDeleteAllPasswordsCallsPresenterShow() {
-        // Given
-        let builder = MockAutofillActionBuilder()
-        let persistor = AutofillPreferencesPersistorMock()
-        let userAuthenticator = UserAuthenticatorMock()
-        let sut = AutofillPreferencesModel(persistor: persistor, userAuthenticator: userAuthenticator, autofillDeleteAllPasswordsBuilder: builder)
-
-        // When
-        sut.openDeletePasswords()
-
-        // Then
-        XCTAssertTrue(builder.mockPresenter!.didCallShow)
-    }
 }

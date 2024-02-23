@@ -70,46 +70,37 @@ extension Preferences {
                         model.showAutofillPopover()
                     }
 #if APPSTORE
-                    deleteAllPasswordsHStack {
-                        Button(UserText.importPasswords) {
-                            model.openImportBrowserDataWindow()
-                        }
+                    Button(UserText.importPasswords) {
+                        model.openImportBrowserDataWindow()
                     }
                     Button(UserText.exportLogins) {
                         model.openExportLogins()
                     }
 #endif
-                }
-#if !APPSTORE
 
+                }
+
+#if !APPSTORE
                 // SECTION 1: Password Manager
                 PreferencePaneSection(UserText.autofillPasswordManager) {
 
-                    deleteAllPasswordsHStack {
-                        VStack(alignment: .leading, spacing: 6) {
-                            passwordManagerPicker(passwordManagerBinding) {
-                                Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
-                            }
-                        }
-                    }
-
-                    VStack {
-                        Button(UserText.importPasswords) {
-                            model.openImportBrowserDataWindow()
-                        }
-                        Button(UserText.exportLogins) {
-                            model.openExportLogins()
-                        }
-                    }
-                    .padding(.leading, 15)
-
                     VStack(alignment: .leading, spacing: 6) {
-                        passwordManagerPicker(passwordManagerBinding) {
+                        Picker(selection: passwordManagerBinding, content: {
+                            Text(UserText.autofillPasswordManagerDuckDuckGo).tag(PasswordManager.duckduckgo)
                             Text(UserText.autofillPasswordManagerBitwarden).tag(PasswordManager.bitwarden)
-                        }
+                        }, label: {})
+                        .pickerStyle(.radioGroup)
+                        .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
                         if model.passwordManager == .bitwarden && !model.isBitwardenSetupFlowPresented {
                             bitwardenStatusView(for: bitwardenManager.status)
                         }
+                    }
+                    Spacer()
+                    Button(UserText.importPasswords) {
+                        model.openImportBrowserDataWindow()
+                    }
+                    Button(UserText.exportLogins) {
+                        model.openExportLogins()
                     }
                 }
 #endif
@@ -175,30 +166,6 @@ extension Preferences {
                     TextMenuItemCaption(UserText.autofillNeverLockWarning)
                 }
             }
-        }
-
-        @ViewBuilder
-        private func deleteAllPasswordsHStack(@ViewBuilder content: @escaping () -> some View) -> some View {
-            HStack {
-                content()
-                Spacer()
-                Button(action: {
-                    model.openDeletePasswords()
-                }) {
-                    Text(UserText.deleteAllPasswords)
-                        .foregroundColor(model.hasDuckDuckGoPasswords ? .alertRedLightDefaultText : .gray)
-                        .opacity(model.hasDuckDuckGoPasswords ? 1 : 0.5)
-                }.disabled(!model.hasDuckDuckGoPasswords)
-            }
-        }
-
-        @ViewBuilder
-        private func passwordManagerPicker(_ binding: Binding<PasswordManager>, @ViewBuilder content: @escaping () -> some View) -> some View {
-            Picker(selection: binding, content: {
-                content()
-            }, label: {})
-            .pickerStyle(.radioGroup)
-            .offset(x: PreferencesViews.Const.pickerHorizontalOffset)
         }
 
         // swiftlint:disable cyclomatic_complexity

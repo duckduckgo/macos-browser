@@ -19,5 +19,5 @@
 import Foundation
 
 extension NSNotification.Name {
-    static let AutofillDataChanged = NSNotification.Name("AutofillDataChanged")
+    static let PasswordManagerChanged = NSNotification.Name("PasswordManagerChanged")
 }

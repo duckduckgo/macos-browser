@@ -83,7 +83,7 @@ final class AutofillDeleteAllPasswordsExecutorTests: XCTestCase {
 
     func testExecutePostsAutofillDataChangedNotification() async throws {
         // Given
-        let expectation = expectation(forNotification: .AutofillDataChanged, object: nil, handler: nil)
+        let expectation = expectation(forNotification: .PasswordManagerChanged, object: nil, handler: nil)
 
         // When
         sut.execute()

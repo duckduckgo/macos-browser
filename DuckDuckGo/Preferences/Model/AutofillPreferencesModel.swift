@@ -16,9 +16,7 @@
 //  limitations under the License.
 //
 
-import Combine
 import Foundation
-import BrowserServicesKit
 
 final class AutofillPreferencesModel: ObservableObject {
 
@@ -78,8 +76,6 @@ final class AutofillPreferencesModel: ObservableObject {
 
     @Published private(set) var hasNeverPromptWebsites: Bool = false
 
-    @Published private(set) var hasDuckDuckGoPasswords = false
-
     func authorizeAutoLockSettingsChange(
         isEnabled isAutoLockEnabledNewValue: Bool? = nil,
         threshold autoLockThresholdNewValue: AutofillAutoLockThreshold? = nil
@@ -125,15 +121,6 @@ final class AutofillPreferencesModel: ObservableObject {
     }
 
     @MainActor
-    func openDeletePasswords() {
-        guard let autofillDeleteAllPasswordsExecutor = autofillDeleteAllPasswordsBuilder.buildExecutor() else { return }
-
-        let presenter = autofillDeleteAllPasswordsBuilder.buildPresenter()
-
-        presenter.show(actionExecutor: autofillDeleteAllPasswordsExecutor)
-    }
-
-    @MainActor
     func showAutofillPopover(_ selectedCategory: SecureVaultSorting.Category = .allItems) {
         guard let parentWindowController = WindowControllersManager.shared.lastKeyMainWindowController else { return }
         let navigationViewController = parentWindowController.mainViewController.navigationBarViewController
@@ -150,14 +137,12 @@ final class AutofillPreferencesModel: ObservableObject {
         persistor: AutofillPreferencesPersistor = AutofillPreferences(),
         userAuthenticator: UserAuthenticating = DeviceAuthenticator.shared,
         bitwardenInstallationService: BWInstallationService = LocalBitwardenInstallationService(),
-        neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager = AutofillNeverPromptWebsitesManager.shared,
-        autofillDeleteAllPasswordsBuilder: AutofillActionBuilder = AutofillDeleteAllPasswordsBuilder()
+        neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager = AutofillNeverPromptWebsitesManager.shared
     ) {
         self.persistor = persistor
         self.userAuthenticator = userAuthenticator
         self.bitwardenInstallationService = bitwardenInstallationService
         self.neverPromptWebsitesManager = neverPromptWebsitesManager
-        self.autofillDeleteAllPasswordsBuilder = autofillDeleteAllPasswordsBuilder
 
         isAutoLockEnabled = persistor.isAutoLockEnabled
         autoLockThreshold = persistor.autoLockThreshold
@@ -168,17 +153,12 @@ final class AutofillPreferencesModel: ObservableObject {
         autolockLocksFormFilling = persistor.autolockLocksFormFilling
         passwordManager = persistor.passwordManager
         hasNeverPromptWebsites = !neverPromptWebsitesManager.neverPromptWebsites.isEmpty
-
-        setHasDuckDuckGoPasswordsState()
-        listenToAutofillDataChangedNotifications()
     }
 
     private var persistor: AutofillPreferencesPersistor
     private var userAuthenticator: UserAuthenticating
     private let bitwardenInstallationService: BWInstallationService
     private let neverPromptWebsitesManager: AutofillNeverPromptWebsitesManager
-    private var autofillDataChangeCancellables: Set<AnyCancellable> = []
-    private var autofillDeleteAllPasswordsBuilder: AutofillActionBuilder
 
     // MARK: - Password Manager
 
@@ -215,25 +195,5 @@ final class AutofillPreferencesModel: ObservableObject {
         }
         NSWorkspace.shared.open(link)
     }
-}
 
-private extension AutofillPreferencesModel {
-
-    // MARK: - Autofill Data Change
-
-    func listenToAutofillDataChangedNotifications() {
-        NotificationCenter.default.publisher(for: .AutofillDataChanged).sink { [weak self] _ in
-            self?.setHasDuckDuckGoPasswordsState()
-        }.store(in: &autofillDataChangeCancellables)
-
-        NotificationCenter.default.publisher(for: .dataImportComplete).sink { [weak self] _ in
-            self?.setHasDuckDuckGoPasswordsState()
-        }.store(in: &autofillDataChangeCancellables)
-    }
-
-    func setHasDuckDuckGoPasswordsState() {
-        guard let vault = try? AutofillSecureVaultFactory.makeVault(errorReporter: SecureVaultErrorReporter.shared) else { return }
-        let accounts = (try? vault.accounts()) ?? []
-        hasDuckDuckGoPasswords = !accounts.isEmpty
-    }
 }

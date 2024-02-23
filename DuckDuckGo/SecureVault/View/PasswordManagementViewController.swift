@@ -363,7 +363,7 @@ final class PasswordManagementViewController: NSViewController {
     }
 
     func postChange() {
-        NotificationCenter.default.post(name: .AutofillDataChanged, object: isDirty)
+        NotificationCenter.default.post(name: .PasswordManagerChanged, object: isDirty)
     }
 
     func clear() {
