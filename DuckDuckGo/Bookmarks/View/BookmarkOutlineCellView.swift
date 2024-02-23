@@ -29,6 +29,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
     private lazy var titleLabel = NSTextField(string: "Bookmark/Folder")
     private lazy var countLabel = NSTextField(string: "42")
     private lazy var menuButton = NSButton(title: "", image: .settings, target: self, action: #selector(cellMenuButtonClicked))
+    private lazy var favoriteImageView = NSImageView()
     private lazy var trackingArea: NSTrackingArea = {
         NSTrackingArea(rect: .zero, options: [.inVisibleRect, .activeAlways, .mouseEnteredAndExited], owner: self, userInfo: nil)
     }()
@@ -53,12 +54,14 @@ final class BookmarkOutlineCellView: NSTableCellView {
 
     override func mouseEntered(with event: NSEvent) {
         countLabel.isHidden = true
+        favoriteImageView.isHidden = true
         menuButton.isHidden = false
     }
 
     override func mouseExited(with event: NSEvent) {
         menuButton.isHidden = true
         countLabel.isHidden = false
+        favoriteImageView.isHidden = false
     }
 
     // MARK: - Private
@@ -68,6 +71,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         addSubview(titleLabel)
         addSubview(countLabel)
         addSubview(menuButton)
+        addSubview(favoriteImageView)
 
         faviconImageView.translatesAutoresizingMaskIntoConstraints = false
         faviconImageView.image = .bookmarkDefaultFavicon
@@ -100,6 +104,8 @@ final class BookmarkOutlineCellView: NSTableCellView {
         menuButton.isBordered = false
         menuButton.isHidden = true
 
+        favoriteImageView.translatesAutoresizingMaskIntoConstraints = false
+        favoriteImageView.imageScaling = .scaleProportionallyDown
         setupLayout()
     }
 
@@ -119,11 +125,17 @@ final class BookmarkOutlineCellView: NSTableCellView {
             trailingAnchor.constraint(equalTo: countLabel.trailingAnchor),
 
             menuButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
-            menuButton.leadingAnchor.constraint(lessThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
+           menuButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
             menuButton.trailingAnchor.constraint(equalTo: trailingAnchor),
             menuButton.topAnchor.constraint(equalTo: topAnchor),
             menuButton.bottomAnchor.constraint(equalTo: bottomAnchor),
             menuButton.widthAnchor.constraint(equalToConstant: 28),
+
+            favoriteImageView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+            favoriteImageView.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 5),
+            favoriteImageView.trailingAnchor.constraint(equalTo: menuButton.trailingAnchor),
+            favoriteImageView.heightAnchor.constraint(equalToConstant: 15),
+            favoriteImageView.widthAnchor.constraint(equalToConstant: 15),
         ])
 
         faviconImageView.setContentHuggingPriority(NSLayoutConstraint.Priority(rawValue: 251), for: .horizontal)
@@ -147,11 +159,13 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.image = bookmark.favicon(.small) ?? .bookmarkDefaultFavicon
         titleLabel.stringValue = bookmark.title
         countLabel.stringValue = ""
+        favoriteImageView.image = bookmark.isFavorite ? .favoriteFilledBorder : nil
     }
 
     func update(from folder: BookmarkFolder) {
         faviconImageView.image = .folder
         titleLabel.stringValue = folder.title
+        favoriteImageView.image = nil
 
         let totalChildBookmarks = folder.totalChildBookmarks
         if totalChildBookmarks > 0 {
@@ -165,6 +179,7 @@ final class BookmarkOutlineCellView: NSTableCellView {
         faviconImageView.image = pseudoFolder.icon
         titleLabel.stringValue = pseudoFolder.name
         countLabel.stringValue = pseudoFolder.count > 0 ? String(pseudoFolder.count) : ""
+        favoriteImageView.image = nil
     }
 
 }
