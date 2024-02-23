@@ -113,7 +113,7 @@ jobs:
         TAG: ${{ steps.create-tag.outputs.tag }}
       run: |
         echo "TAG=$TAG" >> $GITHUB_ENV
-        if [[ ${prerelase} == "true" ]]; then
+        if [[ "${prerelease}" == "true" ]]; then
           DMG_VERSION=${TAG//-/.}
         else
           # For public release, tag is x.y.z, but we need DMG version as x.y.z-N
