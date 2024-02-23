@@ -61,12 +61,11 @@ struct PreferencesSection: Hashable, Identifiable {
             return panes
         }()
 
-        var shouldIncludeSubscriptionPane = false
 #if SUBSCRIPTION
+        var shouldIncludeSubscriptionPane = false
         if AccountManager().isUserAuthenticated || SubscriptionPurchaseEnvironment.canPurchase {
             shouldIncludeSubscriptionPane = true
         }
-#endif
 
         return [
             .init(id: .privacyProtections, panes: privacyPanes),
@@ -74,6 +73,13 @@ struct PreferencesSection: Hashable, Identifiable {
             .init(id: .regularPreferencePanes, panes: regularPanes),
             .init(id: .about, panes: [.about])
         ].compactMap { $0 }
+#else
+        return [
+            .init(id: .privacyProtections, panes: privacyPanes),
+            .init(id: .regularPreferencePanes, panes: regularPanes),
+            .init(id: .about, panes: [.about])
+        ].compactMap { $0 }
+#endif
     }
 }
 
