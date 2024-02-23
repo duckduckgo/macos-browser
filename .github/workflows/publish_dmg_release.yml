@@ -19,16 +19,33 @@ on:
         - internal
         - public
         - hotfix
-
+  workflow_call:
+    inputs:
+      asana-task-url:
+        description: "Asana release task URL"
+        required: true
+        type: string
+    secrets:
+      ASANA_ACCESS_TOKEN:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      GHA_ELEVATED_PERMISSIONS_TOKEN:
+        required: true
+      SPARKLE_PRIVATE_KEY:
+        required: true
+      
 jobs:
 
-  # This is only run for public and hotfix releases
+  # This is only run for public and hotfix releases, so only when it's triggered manually.
   # Internal release has been tagged as part of code_freeze or bump_interal_release workflows
   tag-public-release:
 
     name: Tag public release
 
-    if: ${{ github.event.inputs.release-type != 'internal' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release-type != 'internal' }}
 
     uses: ./.github/workflows/tag_release.yml
     with:
@@ -43,6 +60,10 @@ jobs:
 
     name: Publish a release to Sparkle
 
+    env:
+      RELEASE_TYPE: ${{ github.event.inputs.release-type || 'internal' }}
+      SPARKLE_DIR: ${{ github.workspace }}/sparkle-updates
+
     needs: [tag-public-release]
 
     # Allow to run even if the tag-public-release job was skipped (e.g. for internal releases)
@@ -52,15 +73,25 @@ jobs:
     runs-on: macos-13-xlarge
     timeout-minutes: 10
 
-    env:
-      SPARKLE_DIR: ${{ github.workspace }}/sparkle-updates
-
     steps:
+
+      - name: Download tag artifact
+        if: ${{ github.event_name == 'workflow_call' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: tag
+          path: .github
+    
+      - name: Set tag variable
+        run: |
+          if [[ "${{ github.event_name }}" == 'workflow_call' ]]; then
+            echo "tag=$(<.github/tag)" >> $GITHUB_ENV
+          else
+            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          fi
 
       - name: Verify the tag
         id: verify-tag
-        env:
-          tag: ${{ github.event.inputs.tag }}
         run: |
           tag_regex='^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$'
 
@@ -87,12 +118,11 @@ jobs:
 
       - name: Fetch DMG
         id: fetch-dmg
-        if: ${{ github.event.inputs.release-type != 'public' }}
         env:
           DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.release-version }}.dmg
         run: |
           # Public release doesn't need fetching a DMG (it's already uploaded to S3)
-          if [[ "${{ github.event.inputs.release-type }}" != 'public' ]]; then
+          if [[ "${RELEASE_TYPE}" != 'public' ]]; then
             DMG_URL="${{ vars.TEST_DMG_URL_ROOT }}${DMG_NAME}"
             curl -fLSs -o "$DMG_NAME" "$DMG_URL"
           fi
@@ -121,7 +151,6 @@ jobs:
         env:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
           VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           echo -n "$SPARKLE_PRIVATE_KEY" > sparkle_private_key
@@ -169,7 +198,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.TEST_AWS_ACCESS_KEY_ID_RELEASE_S3 }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
           AWS_DEFAULT_REGION: ${{ vars.TEST_AWS_DEFAULT_REGION }}
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
           VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           # Back up existing appcast2.xml
@@ -208,8 +236,6 @@ jobs:
       - name: Set up Asana templates
         if: always()
         id: asana-templates
-        env:
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
         run: |
           if [[ ${{ steps.upload.outcome }} == "success" ]]; then  
             if [[ "${RELEASE_TYPE}" == "internal" ]]; then
