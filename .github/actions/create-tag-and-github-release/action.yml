@@ -12,10 +12,10 @@ inputs:
     type: string
 outputs:
   promoted-tag:
-    description: "Pre-release tag that has been promoted to a release tag"
+    description: "Pre-release tag (x.y.z-N) that has been promoted to a release tag (x.y.z)"
     value: ${{ steps.compute-tag.outputs.promoted-tag }}
   tag:
-    description: "Tag that has been added"
+    description: "Tag that has been added (x.y.z-N for internal, x.y.z for public and hotfixes)"
     value: ${{ steps.compute-tag.outputs.tag }}
   tag-created:
     description: "Whether the tag has been created"
