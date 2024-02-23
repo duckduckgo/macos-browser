@@ -31,8 +31,14 @@ protocol BookmarkDialogEditing: BookmarksDialogViewModel {
 @MainActor
 final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
 
+    /// The type of operation to perform on a bookmark.
     enum Mode {
+        /// Add a new bookmark. Bookmarks can have a parent folder but not necessarily.
+        /// If the users add a bookmark to the root `Bookmarks` folder, then the parent folder is `nil`.
+        /// If the users add a bookmark to a different folder then the parent folder is not `nil`.
+        /// If the users add a bookmark from the bookmark shortcut and `Tab` has a page loaded, then the `tabWebsite` is not `nil`.
         case add(tabWebsite: WebsiteInfo? = nil, parentFolder: BookmarkFolder? = nil)
+        /// Edit an existing bookmark.
         case edit(bookmark: Bookmark)
     }
 
@@ -126,12 +132,13 @@ private extension AddEditBookmarkDialogViewModel {
         if bookmark.url != url.absoluteString {
             bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
         }
-
+        // If the title or isFavorite changed, update the Bookmark
         if bookmark.title != name || bookmark.isFavorite != isBookmarkFavorite {
             bookmark.title = name
             bookmark.isFavorite = isBookmarkFavorite
             bookmarkManager.update(bookmark: bookmark)
         }
+        // If the bookmark changed parent location, move it.
         if bookmark.parentFolderUUID != selectedFolder?.id {
             let parentFoler: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFoler, completion: { _ in })
