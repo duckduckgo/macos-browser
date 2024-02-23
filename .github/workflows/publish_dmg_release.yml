@@ -45,7 +45,7 @@ jobs:
 
     name: Tag public release
 
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release-type != 'internal' }}
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.release-type != 'internal'
 
     uses: ./.github/workflows/tag_release.yml
     with:
@@ -81,7 +81,7 @@ jobs:
         with:
           name: tag
           path: .github
-    
+
       - name: Set tag variable
         run: |
           if [[ "${{ github.event_name }}" == 'workflow_call' ]]; then
