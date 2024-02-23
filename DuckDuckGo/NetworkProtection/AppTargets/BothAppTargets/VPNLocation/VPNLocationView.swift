@@ -57,7 +57,7 @@ struct VPNLocationView: View {
                 }
             }
         }
-        .frame(minWidth: 624, maxWidth: nil, minHeight: 640, maxHeight: nil, alignment: .top)
+        .frame(width: 624, height: 640, alignment: .top)
     }
 
     @ViewBuilder
