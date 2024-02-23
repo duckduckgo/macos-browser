@@ -112,17 +112,16 @@ jobs:
         PROMOTED_TAG: ${{ steps.create-tag.outputs.promoted-tag }}
         TAG: ${{ steps.create-tag.outputs.tag }}
       run: |
-        # We want to always use the long tag (x.y.z-N) in Asana communication
+        echo "TAG=$TAG" >> $GITHUB_ENV
         if [[ ${prerelase} == "true" ]]; then
-          echo "TAG=$TAG" >> $GITHUB_ENV
           DMG_VERSION=${TAG//-/.}
         else
-          echo "TAG=$PROMOTED_TAG" >> $GITHUB_ENV
+          # For public release, tag is x.y.z, but we need DMG version as x.y.z-N
           DMG_VERSION=${PROMOTED_TAG//-/.}
         fi
         echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
         echo "DMG_URL=${{ vars.DMG_URL_ROOT }}duckduckgo-${DMG_VERSION}.dmg" >> $GITHUB_ENV
-        echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}" >> $GITHUB_ENV
+        echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${TAG}" >> $GITHUB_ENV
         if [[ ${{ steps.create-tag.outputs.tag-created }} == "false" ]]; then
           last_release_tag=$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')
           echo "LAST_RELEASE_TAG=${last_release_tag}" >> $GITHUB_ENV

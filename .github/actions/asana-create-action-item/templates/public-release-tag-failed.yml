@@ -8,7 +8,7 @@ data:
       Please follow instructions below to tag the branch, make GitHub release and delete the release branch manually.
       <ul>
         <li>If the tag has already been created, please proceed with creating GitHub release and deleting the branch.</li>
-        <li>If both tag and GitHub release have already been created, please close this task.</li>
+        <li>If both tag and GitHub release have already been created, please close this task already.</li>
       </ul>
 
       Issue the following git commands to tag the release and delete the branch:
