@@ -1,0 +1,15 @@
+data:
+  # yq -o=j | sed -E 's/\\n( *)([^\\n])/\2/g'
+  html_text: |
+    <body>
+      <h2>Public release ${TAG} has been tagged ✅</h2>
+      <ul>
+        <li>📥 DMG is available from <a href='${DMG_URL}'>${DMG_URL}</a>.</li>
+        <li>🏷️ Repository is tagged with <code>${TAG}</code> tag.</li>
+        <li>🚢 GitHub <a href='${RELEASE_URL}'>${TAG} release</a> is created.</li>
+        <li>🔱 <code>${BRANCH}</code> branch has been deleted.</li>
+        <li>🚀 The relase will be published to Sparkle in a few minutes (you'll get notified).</li>
+      </ul>
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>
