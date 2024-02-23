@@ -24,7 +24,7 @@ struct ContextualMenu {
     static func menu(for objects: [Any]?, includeBookmarkEditMenu: Bool = true) -> NSMenu? {
         menu(for: objects, target: nil, includeBookmarkEditMenu: includeBookmarkEditMenu)
     }
-    
+
     /// Creates an instance of NSMenu for the specified Objects and target.
     /// - Parameters:
     ///   - objects: The objects to create the menu for
@@ -49,14 +49,14 @@ struct ContextualMenu {
         if let bookmark = object as? Bookmark {
             menu = self.menu(for: bookmark, includeBookmarkEditMenu: includeBookmarkEditMenu)
         } else if let folder = object as? BookmarkFolder {
-            menu = self.menu(for: folder)
+            // When the user edits a folder we need to show the parent in the folder picker. Folders directly child of PseudoFolder `Bookmarks` have nil parent because their parent is not an instance of `BookmarkFolder`
+            let parent = node?.parent?.representedObject as? BookmarkFolder
+            menu = self.menu(for: folder, parent: parent)
         } else {
             menu = nil
         }
 
-        guard let menu else { return nil }
-
-        menu.items.forEach { item in
+        menu?.items.forEach { item in
             item.target = target
         }
 
@@ -96,10 +96,11 @@ struct ContextualMenu {
         return menu
     }
 
-    private static func menu(for folder: BookmarkFolder) -> NSMenu {
+    private static func menu(for folder: BookmarkFolder, parent: BookmarkFolder?) -> NSMenu {
         let menu = NSMenu(title: "")
 
         menu.addItem(renameFolderMenuItem(folder: folder))
+        menu.addItem(editFolderMenuItem(folder: folder, parent: parent))
         menu.addItem(deleteFolderMenuItem(folder: folder))
         menu.addItem(NSMenuItem.separator())
 
@@ -116,6 +117,10 @@ struct ContextualMenu {
 
     static func renameFolderMenuItem(folder: BookmarkFolder) -> NSMenuItem {
         return menuItem(UserText.renameFolder, #selector(FolderMenuItemSelectors.renameFolder(_:)), folder)
+    }
+
+    static func editFolderMenuItem(folder: BookmarkFolder, parent: BookmarkFolder?) -> NSMenuItem {
+        menuItem(UserText.editBookmark, #selector(FolderMenuItemSelectors.editFolder(_:)), (folder, parent))
     }
 
     static func deleteFolderMenuItem(folder: BookmarkFolder) -> NSMenuItem {

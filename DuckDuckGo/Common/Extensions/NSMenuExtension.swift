@@ -57,7 +57,7 @@ extension NSMenu {
         removeItem(at: index)
         insertItem(newItem, at: index)
     }
-    
+
     /// Pops up the menu at the current mouse location.
     ///
     /// - Parameter view: The view to display the menu item over.

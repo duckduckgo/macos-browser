@@ -337,18 +337,13 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
-        delegate?.popover(shouldPreventClosure: true)
-        AddBookmarkModalView(model: AddBookmarkModalViewModel(currentTabWebsite: currentTabWebsite) { [weak delegate] _ in
-            delegate?.popover(shouldPreventClosure: false)
-        }).show(in: parent?.view.window)
+        let view = BookmarksDialogViewFactory.makeAddBookmarkView()
+        showDialog(view: view)
     }
 
     @objc func newFolderButtonClicked(_ sender: AnyObject) {
-        delegate?.popover(shouldPreventClosure: true)
-        AddBookmarkFolderModalView()
-            .show(in: parent?.view.window) { [weak delegate] in
-                delegate?.popover(shouldPreventClosure: false)
-            }
+        let view = BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: nil)
+        showDialog(view: view)
     }
 
     @objc func openManagementInterface(_ sender: NSButton) {
@@ -442,6 +437,18 @@ final class BookmarkListViewController: NSViewController {
 
 }
 
+private extension BookmarkListViewController {
+
+    func showDialog(view: any ModalView) {
+        delegate?.popover(shouldPreventClosure: true)
+
+        view.show(in: parent?.view.window) { [weak delegate] in
+            delegate?.popover(shouldPreventClosure: false)
+        }
+    }
+
+}
+
 // MARK: - Menu Item Selectors
 
 extension BookmarkListViewController: NSMenuDelegate {
@@ -454,11 +461,11 @@ extension BookmarkListViewController: NSMenuDelegate {
         }
 
         if outlineView.selectedRowIndexes.contains(row) {
-            return ContextualMenu.menu(for: outlineView.selectedItems, includeBookmarkEditMenu: false)
+            return ContextualMenu.menu(for: outlineView.selectedItems)
         }
 
         if let item = outlineView.item(atRow: row) {
-            return ContextualMenu.menu(for: [item], includeBookmarkEditMenu: false)
+            return ContextualMenu.menu(for: [item])
         } else {
             return nil
         }
@@ -513,11 +520,13 @@ extension BookmarkListViewController: BookmarkMenuItemSelectors {
     }
 
     func editBookmark(_ sender: NSMenuItem) {
-        if let folder = sender.representedObject as? BookmarkFolder {
-            print("~~~EDIT FOLDER")
-        } else if let bookmark = sender.representedObject as? Bookmark {
-            print("~~~EDIT BOOKMARK")
+        guard let bookmark = sender.representedObject as? Bookmark else {
+            assertionFailure("Failed to retrieve Bookmark from Edit Bookmark context menu item")
+            return
         }
+
+        let view = BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
+        showDialog(view: view)
     }
 
     func copyBookmark(_ sender: NSMenuItem) {
@@ -566,6 +575,16 @@ extension BookmarkListViewController: FolderMenuItemSelectors {
             .show(in: parent?.view.window) { [weak delegate] in
                 delegate?.popover(shouldPreventClosure: false)
             }
+    }
+
+    func editFolder(_ sender: NSMenuItem) {
+        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+            assertionFailure("Failed to retrieve Bookmark from Edit Folder context menu item")
+            return
+        }
+
+        let view = BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+        showDialog(view: view)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {

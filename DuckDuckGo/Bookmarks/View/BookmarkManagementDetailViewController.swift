@@ -744,6 +744,10 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
             .show(in: view.window)
     }
 
+    func editFolder(_ sender: NSMenuItem) {
+        // TODO: https://app.asana.com/0/0/1206531304671952/f
+    }
+
     func deleteFolder(_ sender: NSMenuItem) {
         guard let folder = sender.representedObject as? BookmarkFolder else {
             assertionFailure("Failed to retrieve Bookmark from Delete Folder context menu item")
