@@ -1,6 +1,7 @@
 {
-  "name": "virtory.com",
-  "version": "0.1.1",
+  "name": "Virtory",
+  "url": "virtory.com",
+  "version": "0.1.4",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -10,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "99465bd6-ce87-4fc6-96a2-eea8137e4a30",
+          "id": "0568e4f5-73c2-4b1a-9eb6-ac3571b1a01e",
           "url": "https://virtory.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -24,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "8d66ac98-f788-4fbd-acec-56034682b4b1",
+          "id": "df2216f3-0890-4d13-b2aa-233084167720",
           "selector": ".card",
           "profile": {
             "name": {

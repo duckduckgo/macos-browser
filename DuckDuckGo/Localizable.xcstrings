@@ -5092,6 +5092,18 @@
         }
       }
     },
+    "mute.tab" : {
+      "comment" : "Menu item. Mute tab",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mute Tab"
+          }
+        }
+      }
+    },
     "n.more.tabs" : {
       "comment" : "String in Recently Closed menu item for recently closed browser window and number of tabs contained in the closed window",
       "extractionState" : "extracted_with_value",
@@ -9096,6 +9108,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Uninstall"
+          }
+        }
+      }
+    },
+    "unmute.tab" : {
+      "comment" : "Menu item. Unmute tab",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unmute Tab"
           }
         }
       }
