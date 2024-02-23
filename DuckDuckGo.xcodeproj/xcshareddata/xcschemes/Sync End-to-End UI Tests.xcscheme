@@ -65,20 +65,6 @@
                BlueprintName = "SyncE2EUITests"
                ReferencedContainer = "container:DuckDuckGo.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "CriticalPathsTests/testCanCreateSyncAccount()">
-               </Test>
-               <Test
-                  Identifier = "CriticalPathsTests/testCanLoginToExistingSyncAccount()">
-               </Test>
-               <Test
-                  Identifier = "CriticalPathsTests/testCanRecoverSyncAccount()">
-               </Test>
-               <Test
-                  Identifier = "CriticalPathsTests/testCanRemoveData()">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>

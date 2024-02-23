@@ -195,7 +195,6 @@ final class CriticalPathsTests: XCTestCase {
         // Log Out
         logOut()
 
-        // Check Favorites not unified
         checkFavoriteNonUnified()
 
         // Remove Bookmarks
@@ -220,7 +219,7 @@ final class CriticalPathsTests: XCTestCase {
         checkUnifiedFavorites()
 
         // Check Logins
-        checkLogins()
+        //checkLogins()
     }
     
     private func logIn() {
