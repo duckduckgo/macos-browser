@@ -139,7 +139,12 @@ private extension AddEditBookmarkDialogViewModel {
     }
 
     func addBookmark(withURL url: URL, name: String, isFavorite: Bool, to parent: BookmarkFolder?) {
-        bookmarkManager.makeBookmark(for: url, title: name, isFavorite: isFavorite, index: nil, parent: parent)
+        // If a bookmark already exist with the new URL, update it
+        if let existingBookmark = bookmarkManager.getBookmark(for: url) {
+            updateBookmark(existingBookmark, url: url, name: name, isFavorite: isFavorite, location: parent)
+        } else {
+            bookmarkManager.makeBookmark(for: url, title: name, isFavorite: isFavorite, index: nil, parent: parent)
+        }
     }
 }
 

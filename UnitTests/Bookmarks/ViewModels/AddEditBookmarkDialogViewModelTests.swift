@@ -296,8 +296,6 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    // -------
-
     func testReturnIsDefaultActionButtonDisabledTrueWhenBookmarURLIsEmptyAndModeIsAdd() {
         // GIVEN
         let sut = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
@@ -380,7 +378,36 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
         XCTAssertTrue(didCallDismiss)
     }
 
-    func testShouldAskBookmarkStoreToSaveBookmarkWhenModeIsAdd() {
+    func testShouldAskBookmarkStoreToSaveBookmarkWhenModeIsAddAndURLIsNotAnExistingBookmark() {
+        // GIVEN
+        let folder = BookmarkFolder(id: #file, title: #function)
+        let existingBookmark = Bookmark(id: "1", url: URL.duckDuckGo.absoluteString, title: "DuckDuckGo", isFavorite: true)
+        bookmarkStoreMock.bookmarks = [existingBookmark]
+        bookmarkManager.loadBookmarks()
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(parentFolder: folder), bookmarkManager: bookmarkManager)
+        sut.bookmarkName = "DDG"
+        sut.bookmarkURLPath = URL.duckDuckGo.absoluteString
+        XCTAssertFalse(bookmarkStoreMock.updateBookmarkCalled)
+        XCTAssertFalse(bookmarkStoreMock.moveObjectUUIDCalled)
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
+        XCTAssertNil(bookmarkStoreMock.capturedBookmark)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolder)
+
+        // WHEN
+        sut.addOrSave {}
+
+        // THEN
+        XCTAssertTrue(bookmarkStoreMock.updateBookmarkCalled)
+        XCTAssertTrue(bookmarkStoreMock.moveObjectUUIDCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedObjectUUIDs, [existingBookmark.id])
+        XCTAssertEqual(bookmarkStoreMock.capturedParentFolderType, .parent(uuid: folder.id))
+        XCTAssertFalse(bookmarkStoreMock.saveBookmarkCalled)
+        XCTAssertEqual(bookmarkStoreMock.capturedBookmark?.title, "DDG")
+        XCTAssertEqual(bookmarkStoreMock.capturedBookmark?.url, URL.duckDuckGo.absoluteString)
+        XCTAssertNil(bookmarkStoreMock.capturedParentFolder)
+    }
+
+    func testShouldAskBookmarkStoreToUpdateBookmarkWhenModeIsAddAndURLIsAnExistingBookmark() {
         // GIVEN
         let folder = BookmarkFolder(id: #file, title: #function)
         let sut = AddEditBookmarkDialogViewModel(mode: .add(parentFolder: folder), bookmarkManager: bookmarkManager)
