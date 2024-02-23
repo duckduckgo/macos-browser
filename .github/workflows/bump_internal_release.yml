@@ -123,11 +123,12 @@ jobs:
   tag_and_merge:
     name: Tag and Merge Branch
     needs: [ prepare_release ]
-    uses: ./.github/workflows/tag_and_merge.yml
+    uses: ./.github/workflows/tag_release.yml
     with:
       asana-task-url: ${{ github.event.inputs.asana-task-url }}
       branch: ${{ github.ref_name }}
       base-branch: ${{ github.event.inputs.base-branch || 'main' }}
+      prerelease: true
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
