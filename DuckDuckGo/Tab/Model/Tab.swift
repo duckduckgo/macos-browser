@@ -977,7 +977,7 @@ protocol NewWindowPolicyDecisionMaker {
         if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
             return reload()
         }
-        if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
+        if restoreInteractionStateIfNeeded() { return nil /* session restored */ }
         invalidateInteractionStateData()
 
         if url.isFileURL {
@@ -1016,28 +1016,34 @@ protocol NewWindowPolicyDecisionMaker {
     }
 
     @MainActor
-    private func restoreInteractionStateDataIfNeeded() -> Bool {
+    private func restoreInteractionStateIfNeeded() -> Bool {
         // only restore session from interactionStateData passed to Tab.init
         guard case .loadCachedFromTabContent(let interactionStateData) = self.interactionState else { return false }
 
         if let url = content.urlForWebView, url.isFileURL {
             // request file system access before restoration
-            _ = webView.loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"))
+            webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .loadFileURL(url, allowingReadAccessTo: url)?
+                .overrideResponders(navigationDidFinish: { [weak self] _ in
+                    self?.restoreInteractionState(with: interactionStateData)
+                }, navigationDidFail: { [weak self] _, _ in
+                    self?.restoreInteractionState(with: interactionStateData)
+                })
+        } else {
+            restoreInteractionState(with: interactionStateData)
         }
 
-        if #available(macOS 12.0, *) {
-            webView.interactionState = interactionStateData
-        } else {
-            do {
-                try webView.restoreSessionState(from: interactionStateData)
-            } catch {
-                os_log("Tab:setupWebView could not restore session state %s", type: .error, "\(error)")
-                return false
-            }
-        }
         invalidateInteractionStateData()
 
         return true
+    }
+
+    private func restoreInteractionState(with interactionStateData: Data) {
+        guard #available(macOS 12.0, *) else {
+            try? webView.restoreSessionState(from: interactionStateData)
+            return
+        }
+        webView.interactionState = interactionStateData
     }
 
     private func addHomePageToWebViewIfNeeded() {
