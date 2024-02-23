@@ -35,16 +35,6 @@ extension Preferences {
                 PreferencePane("Email Protection") {
                     // SECTION 1: Email
                     PreferencePaneSection {
-                        PreferencePaneSubSection {
-                            VStack(alignment: .leading, spacing: 0) {
-                                TextMenuItemCaption(UserText.emailProtectionExplanation)
-                                TextButton(UserText.learnMore) {
-                                    WindowControllersManager.shared.show(url: .duckDuckGoEmail,
-                                                                         source: .ui,
-                                                                         newTab: true)
-                                }
-                            }
-                        }
 
                         PreferencePaneSubSection {
                             if emailManager.isSignedIn {
@@ -64,6 +54,17 @@ extension Preferences {
                             } else {
                                 Button(UserText.emailOptionsMenuTurnOnSubItem) {
                                     WindowControllersManager.shared.show(url: EmailUrls().emailProtectionLink,
+                                                                         source: .ui,
+                                                                         newTab: true)
+                                }
+                            }
+                        }
+
+                        PreferencePaneSubSection {
+                            VStack(alignment: .leading, spacing: 0) {
+                                TextMenuItemCaption(UserText.emailProtectionExplanation)
+                                TextButton(UserText.learnMore) {
+                                    WindowControllersManager.shared.show(url: .duckDuckGoEmail,
                                                                          source: .ui,
                                                                          newTab: true)
                                 }

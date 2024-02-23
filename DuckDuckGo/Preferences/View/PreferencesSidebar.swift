@@ -43,7 +43,14 @@ extension Preferences {
         let pane: PreferencePaneIdentifier
         let isSelected: Bool
         let action: () -> Void
-        var statusIndicator: StatusIndicator?
+        @ObservedObject var paneStatus: PaneStatus
+
+        init(pane: PreferencePaneIdentifier, isSelected: Bool, action: @escaping () -> Void) {
+            self.pane = pane
+            self.isSelected = isSelected
+            self.action = action
+            self.paneStatus = PaneStatus.status(for: pane)
+        }
 
         var body: some View {
             Button(action: action) {
@@ -53,7 +60,7 @@ extension Preferences {
 
                     Spacer()
 
-                    if let status = statusIndicator {
+                    if let status = paneStatus.status {
                         StatusIndicatorView(status: status, isSelected: isSelected)
                     }
                 }
@@ -150,8 +157,7 @@ extension Preferences {
                             ForEach(section.panes) { pane in
                                 PaneSidebarItem(pane: pane,
                                                 isSelected: model.selectedPane == pane,
-                                                action: { model.selectPane(pane) },
-                                                statusIndicator: section.id == .privacyProtections ? .on : nil)
+                                                action: { model.selectPane(pane) })
                             }
                             if section != model.sections.last {
                                 Color(NSColor.separatorColor)
