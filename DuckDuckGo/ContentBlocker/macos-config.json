@@ -1,6 +1,6 @@
 {
     "readme": "https://github.com/duckduckgo/privacy-configuration",
-    "version": 1708360600128,
+    "version": 1708605538272,
     "features": {
         "adClickAttribution": {
             "readme": "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/#3rd-party-tracker-loading-protection",
@@ -6168,6 +6168,7 @@
                             {
                                 "rule": "www.googletagservices.com/tag/js/gpt.js",
                                 "domains": [
+                                    "idahonews.com",
                                     "wp.pl"
                                 ]
                             },
@@ -7819,7 +7820,7 @@
                     "domain": "sundancecatalog.com"
                 }
             ],
-            "hash": "63057921f3dafa389fd7c132ea62393d"
+            "hash": "a2128d54a6fe4247b302d37733c6a88b"
         },
         "trackingCookies1p": {
             "settings": {
