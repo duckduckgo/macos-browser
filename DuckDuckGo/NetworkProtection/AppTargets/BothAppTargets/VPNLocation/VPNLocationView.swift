@@ -56,6 +56,11 @@ struct VPNLocationView: View {
                     await model.onViewAppeared()
                 }
             }
+            .onDisappear {
+                Task {
+                    await model.onViewDisappered()
+                }
+            }
         }
         .frame(width: 624, height: 640, alignment: .top)
     }
