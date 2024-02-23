@@ -45,7 +45,7 @@ final class CriticalPathsTests: XCTestCase {
         newTabWindow.menuItems["openPreferences:"].click()
     }
     
-    private toggleInternalUserState() {
+    private func toggleInternalUserState() {
         let menuBarsQuery = app.menuBars
         debugMenuBarItem = menuBarsQuery.menuBarItems["Debug"]
         debugMenuBarItem.click()
