@@ -1,5 +1,5 @@
 //
-//  Bundle+Configuration.swift
+//  PixelFireExpectations.swift
 //
 //  Copyright © 2023 DuckDuckGo. All rights reserved.
 //
@@ -18,14 +18,19 @@
 
 import Foundation
 
-extension Bundle {
-    private static let networkExtensionBundleIDKey = "SYSEX_BUNDLE_ID"
+/// Structure containing information about a pixel fire event.
+///
+/// This is useful for test validation for libraries that rely on PixelKit, to make sure the pixels contain
+/// all of the fields they are supposed to contain..
+///
+public struct PixelFireExpectations {
+    let pixelName: String
+    var error: Error?
+    var underlyingError: Error?
 
-    var networkExtensionBundleID: String {
-        guard let bundleID = object(forInfoDictionaryKey: Self.networkExtensionBundleIDKey) as? String else {
-            fatalError("Info.plist is missing \(Self.networkExtensionBundleIDKey)")
-        }
-
-        return bundleID
+    public init(pixelName: String, error: Error? = nil, underlyingError: Error? = nil) {
+        self.pixelName = pixelName
+        self.error = error
+        self.underlyingError = underlyingError
     }
 }

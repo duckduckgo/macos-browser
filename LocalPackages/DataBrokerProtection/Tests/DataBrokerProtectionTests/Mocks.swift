@@ -27,6 +27,7 @@ import GRDB
 extension BrokerProfileQueryData {
     static func mock(with steps: [Step] = [Step](),
                      dataBrokerName: String = "test",
+                     url: String = "test.com",
                      lastRunDate: Date? = nil,
                      preferredRunDate: Date? = nil,
                      extractedProfile: ExtractedProfile? = nil,
@@ -36,6 +37,7 @@ extension BrokerProfileQueryData {
         BrokerProfileQueryData(
             dataBroker: DataBroker(
                 name: dataBrokerName,
+                url: url,
                 steps: steps,
                 version: "1.0.0",
                 schedulingConfig: DataBrokerScheduleConfig.mock,
@@ -232,7 +234,7 @@ final class EmailServiceMock: EmailServiceProtocol {
 
     var shouldThrow: Bool = false
 
-    func getEmail(dataBrokerName: String?) async throws -> String {
+    func getEmail(dataBrokerURL: String?) async throws -> String {
         if shouldThrow {
             throw DataBrokerProtectionError.emailError(nil)
         }
@@ -491,9 +493,9 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
     func fetchBroker(with name: String) throws -> DataBroker? {
         if shouldReturnOldVersionBroker {
-            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.0", schedulingConfig: .mock)
         } else if shouldReturnNewVersionBroker {
-            return .init(id: 1, name: "Broker", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
+            return .init(id: 1, name: "Broker", url: "broker.com", steps: [Step](), version: "1.0.1", schedulingConfig: .mock)
         }
 
         return nil
@@ -618,11 +620,11 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
 public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
-    static var lastPixelFired: DataBrokerProtectionPixels?
+    static var lastPixelsFired = [DataBrokerProtectionPixels]()
 
     public init() {
         super.init { event, _, _, _ in
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired = event
+            MockDataBrokerProtectionPixelsHandler.lastPixelsFired.append(event)
         }
     }
 
@@ -631,7 +633,7 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
     }
 
     func clear() {
-        MockDataBrokerProtectionPixelsHandler.lastPixelFired = nil
+        MockDataBrokerProtectionPixelsHandler.lastPixelsFired.removeAll()
     }
 }
 
@@ -660,6 +662,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastParentBrokerWhereChildSitesWhereFetched: String?
     var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
+    var profile: DataBrokerProtectionProfile?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -688,7 +691,11 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func fetchProfile() -> DataBrokerProtectionProfile? {
         wasFetchProfileCalled = true
-        return nil
+        return profile
+    }
+
+    func setFetchedProfile(_ profile: DataBrokerProtectionProfile?) {
+        self.profile = profile
     }
 
     func deleteProfileData() {
@@ -800,6 +807,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastParentBrokerWhereChildSitesWhereFetched = nil
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
+        profile = nil
     }
 }
 

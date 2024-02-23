@@ -22,6 +22,7 @@ import Foundation
 class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     var hasItemsToTheRight = false
+    var audioState: WKWebView.AudioState = .notSupported
 
     func tabBarViewItem(_ tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem, isMouseOver: Bool) {
 
@@ -75,8 +76,20 @@ class MockTabViewItemDelegate: TabBarViewItemDelegate {
 
     }
 
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState {
+        return audioState
+    }
+
+    func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
+
+    }
+
     func otherTabBarViewItemsState(for tabBarViewItem: DuckDuckGo_Privacy_Browser.TabBarViewItem) -> DuckDuckGo_Privacy_Browser.OtherTabBarViewItemsState {
         OtherTabBarViewItemsState(hasItemsToTheLeft: false, hasItemsToTheRight: hasItemsToTheRight)
+    }
+
+    func clear() {
+        self.audioState = .notSupported
     }
 
 }

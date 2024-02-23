@@ -314,6 +314,8 @@ final class TabBarViewController: NSViewController {
             removeFireproofing(from: tab)
         case let .close(index):
             tabCollectionViewModel.remove(at: .pinned(index))
+        case let .muteOrUnmute(tab):
+            tab.muteUnmuteTab()
         }
     }
 
@@ -558,11 +560,7 @@ final class TabBarViewController: NSViewController {
 
     // MARK: - Tab Preview
 
-    private var tabPreviewWindowController: TabPreviewWindowController = {
-        let storyboard = NSStoryboard(name: "TabPreview", bundle: nil)
-        // swiftlint:disable:next force_cast
-        return storyboard.instantiateController(withIdentifier: "TabPreviewWindowController") as! TabPreviewWindowController
-    }()
+    private lazy var tabPreviewWindowController = TabPreviewWindowController()
 
     private func showTabPreview(for tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
@@ -1105,6 +1103,17 @@ extension TabBarViewController: TabBarViewItemDelegate {
         fireproof(tab)
     }
 
+    func tabBarViewItemMuteUnmuteSite(_ tabBarViewItem: TabBarViewItem) {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
+        else {
+            assertionFailure("TabBarViewController: Failed to get tab from tab bar view item")
+            return
+        }
+
+        tab.muteUnmuteTab()
+    }
+
     func tabBarViewItemRemoveFireproofing(_ tabBarViewItem: TabBarViewItem) {
         guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
               let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
@@ -1114,6 +1123,16 @@ extension TabBarViewController: TabBarViewItemDelegate {
         }
 
         removeFireproofing(from: tab)
+    }
+
+    func tabBarViewItemAudioState(_ tabBarViewItem: TabBarViewItem) -> WKWebView.AudioState {
+        guard let indexPath = collectionView.indexPath(for: tabBarViewItem),
+              let tab = tabCollectionViewModel.tabCollection.tabs[safe: indexPath.item]
+        else {
+            return .notSupported
+        }
+
+        return tab.audioState
     }
 
     func otherTabBarViewItemsState(for tabBarViewItem: TabBarViewItem) -> OtherTabBarViewItemsState {

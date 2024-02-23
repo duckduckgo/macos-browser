@@ -488,6 +488,7 @@ protocol NewWindowPolicyDecisionMaker {
             }
 #endif
 
+        self.audioState = webView.audioState()
         addDeallocationChecks(for: webView)
     }
 
@@ -904,7 +905,7 @@ protocol NewWindowPolicyDecisionMaker {
     func startOnboarding() {
         userInteractionDialog = nil
 
-        webView.load(URLRequest(url: .welcome))
+        setContent(.onboarding)
     }
 
     @MainActor(unsafe)
@@ -934,43 +935,63 @@ protocol NewWindowPolicyDecisionMaker {
         }
     }
 
+    @Published private(set) var audioState: WKWebView.AudioState = .notSupported
+
+    func muteUnmuteTab() {
+        webView.muteOrUnmute()
+
+        audioState = webView.audioState()
+    }
+
+    private func tabContentReloadInfo(for content: TabContent, shouldLoadInBackground: Bool) -> (url: URL, source: TabContent.URLSource, forceReload: Bool)? {
+        switch content {
+        case .url(let url, _, source: let source):
+            let forceReload = url.absoluteString == source.userEnteredValue ? shouldLoadInBackground : (source == .reload)
+            return (url, source, forceReload: forceReload)
+
+        case .subscription(let url):
+            return (url, .ui, forceReload: false)
+
+        case .newtab, .bookmarks, .onboarding, .dataBrokerProtection, .settings:
+            guard let contentUrl = content.urlForWebView, webView.url != contentUrl else { return nil }
+
+            return (contentUrl, .ui, forceReload: true) // always navigate built-in ui (duck://) urls
+
+        case .none:
+            return nil
+        }
+    }
+
     @MainActor(unsafe)
     @discardableResult
     private func reloadIfNeeded(shouldLoadInBackground: Bool = false) -> ExpectedNavigation? {
-        let source: TabContent.URLSource
-        let url: URL
-        if case .url(let contentUrl, _, source: let urlSource) = content {
-            url = contentUrl
-            source = urlSource
-        } else if let contentUrl = content.urlForWebView {
-            url = contentUrl
-            source = .ui
-        } else {
+        guard let (url, source, forceReload) = tabContentReloadInfo(for: content, shouldLoadInBackground: shouldLoadInBackground),
+              forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) else { return nil }
+
+        if case .settings = content, case .settings = webView.url.flatMap({ TabContent.contentFromURL($0, source: .ui) }) {
+            // replace WebView URL without adding a new history item if switching settings panes
+            webView.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: nil, in: .defaultClient)
             return nil
         }
 
-        let forceReload = (url.absoluteString == content.userEnteredValue) ? shouldLoadInBackground : (source == .reload)
-        if forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) {
-            if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
-                return reload()
-            }
-            if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
-            invalidateInteractionStateData()
-
-            if url.isFileURL {
-                return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                    .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
-            }
-
-            var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
-            if #available(macOS 12.0, *), content.isUserEnteredUrl {
-                request.attribution = .user
-            }
-
-            return webView.navigator(distributedNavigationDelegate: navigationDelegate)
-                .load(request, withExpectedNavigationType: source.navigationType)
+        if webView.url == url, webView.backForwardList.currentItem?.url == url, !webView.isLoading {
+            return reload()
         }
-        return nil
+        if restoreInteractionStateDataIfNeeded() { return nil /* session restored */ }
+        invalidateInteractionStateData()
+
+        if url.isFileURL {
+            return webView.navigator(distributedNavigationDelegate: navigationDelegate)
+                .loadFileURL(url, allowingReadAccessTo: URL(fileURLWithPath: "/"), withExpectedNavigationType: source.navigationType)
+        }
+
+        var request = URLRequest(url: url, cachePolicy: source.cachePolicy)
+        if #available(macOS 12.0, *), content.isUserEnteredUrl {
+            request.attribution = .user
+        }
+
+        return webView.navigator(distributedNavigationDelegate: navigationDelegate)
+            .load(request, withExpectedNavigationType: source.navigationType)
     }
 
     @MainActor

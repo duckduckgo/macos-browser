@@ -1,12 +1,33 @@
 {
-  "name": "spokeo.com",
-  "version": "0.1.3",
+  "name": "Spokeo",
+  "url": "spokeo.com",
+  "version": "0.1.4",
   "addedDatetime": 1692594000000,
   "mirrorSites": [
-    { "name": "callersmart.com", "addedAt": 1705599286529, "removedAt": null },
-    { "name": "selfie.network", "addedAt": 1705599286529, "removedAt": null },
-    { "name": "selfie.systems", "addedAt": 1705599286529, "removedAt": null },
-    { "name": "peoplewin.com", "addedAt": 1705599286529, "removedAt": null }
+    {
+      "name": "CallerSmart",
+      "url": "callersmart.com",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    },
+    {
+      "name": "Selfie Network",
+      "url": "selfie.network",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    },
+    {
+      "name": "Selfie Systems",
+      "url": "selfie.systems",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    },
+    {
+      "name": "PeopleWin",
+      "url": "peoplewin.com",
+      "addedAt": 1705599286529,
+      "removedAt": null
+    }
   ],
   "steps": [
     {
@@ -15,12 +36,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "d3174bd8-3253-45e3-88f0-1366882a2df7",
+          "id": "9b617d27-b330-46fc-bdb0-6239c0873897",
           "url": "https://www.spokeo.com/${firstName}-${lastName}/${state|stateFull}/${city}"
         },
         {
           "actionType": "extract",
-          "id": "e47f5f27-dfbf-4f2c-8d7a-43f581abdaa2",
+          "id": "4f7124c2-bd8c-4649-84f2-04f0962225b5",
           "selector": ".single-column-list-item",
           "profile": {
             "name": {
@@ -52,12 +73,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "dba8f444-a433-4ad2-9819-3c555bfedd9c",
+          "id": "df75e4fb-f14b-4b65-afe2-82e03b71c6a9",
           "url": "https://www.spokeo.com/optout"
         },
         {
           "actionType": "fillForm",
-          "id": "b1145fca-3e35-4ee9-86f2-e35c393846d3",
+          "id": "42cbfc2b-d96b-4bd6-8d16-0542a672d869",
           "selector": ".optout_container",
           "elements": [
             {
@@ -72,17 +93,17 @@
         },
         {
           "actionType": "getCaptchaInfo",
-          "id": "8f9608b4-bbf7-4540-8b22-5c381225cd02",
+          "id": "e1581b9e-7460-4bbd-a010-634c2db12ca1",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "solveCaptcha",
-          "id": "a5a884b8-12f6-4029-aa80-244f1a163f67",
+          "id": "01ca39d9-e842-41cf-b0f9-a7d517bc0dd6",
           "selector": "#g-recaptcha"
         },
         {
           "actionType": "click",
-          "id": "a7d4fdd4-30b8-46f7-8700-67c633da1f91",
+          "id": "7556edd5-570b-4c4a-acc7-f1066138d513",
           "elements": [
             {
               "type": "button",
@@ -92,7 +113,7 @@
         },
         {
           "actionType": "expectation",
-          "id": "d4a804a3-de62-4f66-a56e-e9d7e65fb8bb",
+          "id": "f7b5125e-0dda-4a14-8943-8c20c09125bc",
           "expectations": [
             {
               "type": "text",
@@ -103,12 +124,12 @@
         },
         {
           "actionType": "emailConfirmation",
-          "id": "5138062c-99d3-4523-b222-8123b13bc524",
+          "id": "dbd875b6-bdc7-48ca-962b-885941e6284a",
           "pollingTime": 30
         },
         {
           "actionType": "expectation",
-          "id": "cc14f3ea-35f8-4d31-a280-dc97526de12a",
+          "id": "b2f1c371-d779-4b3b-8516-0d13169cf873",
           "expectations": [
             {
               "type": "text",

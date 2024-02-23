@@ -14,10 +14,7 @@
 //
 
 #include "../ExtensionBase.xcconfig"
-
-// Since we're using nonstandard bundle IDs we'll just define them here, but we should consider
-// standardizing the bundle IDs so we can just define BUNDLE_IDENTIFIER_PREFIX
-BUNDLE_IDENTIFIER_PREFIX = com.duckduckgo.mobile.ios.vpn.agent
+#include "../../AppStore.xcconfig"
 
 CODE_SIGN_ENTITLEMENTS[config=CI][sdk=macosx*] =
 CODE_SIGN_ENTITLEMENTS[config=Debug][sdk=macosx*] = DuckDuckGo/NetworkProtectionAppExtension.entitlements
@@ -38,17 +35,11 @@ FEATURE_FLAGS[config=CI][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Debug][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 FEATURE_FLAGS[config=Review][arch=*][sdk=*] = NETWORK_EXTENSION NETWORK_PROTECTION
 
-NETP_BASE_APP_GROUP = $(DEVELOPMENT_TEAM).com.duckduckgo.macos.browser.network-protection
-NETP_APP_GROUP[config=CI][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
-NETP_APP_GROUP[config=Review][sdk=macos*] = $(NETP_BASE_APP_GROUP).review
-NETP_APP_GROUP[config=Debug][sdk=macos*] = $(NETP_BASE_APP_GROUP).debug
-NETP_APP_GROUP[config=Release][sdk=macos*] = $(NETP_BASE_APP_GROUP)
-
 PRODUCT_BUNDLE_IDENTIFIER[sdk=*] =
-PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).debug.network-protection-extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).network-protection-extension
-PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(BUNDLE_IDENTIFIER_PREFIX).review.network-protection-extension
+PRODUCT_BUNDLE_IDENTIFIER[config=CI][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Debug][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Release][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
+PRODUCT_BUNDLE_IDENTIFIER[config=Review][sdk=*] = $(TUNNEL_EXTENSION_BUNDLE_ID)
 
 PROVISIONING_PROFILE_SPECIFIER[config=CI][sdk=macosx*] =
 PROVISIONING_PROFILE_SPECIFIER[config=Release][sdk=macosx*] = match AppStore com.duckduckgo.mobile.ios.vpn.agent.network-protection-extension macos
@@ -59,24 +50,3 @@ SKIP_INSTALL = YES
 SWIFT_EMIT_LOC_STRINGS = YES
 
 LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks @executable_path/../../../../Frameworks
-
-// Distributed Notifications:
-
-AGENT_BUNDLE_ID_BASE[sdk=*] = com.duckduckgo.mobile.ios.vpn.agent
-AGENT_BUNDLE_ID[sdk=*] = $(AGENT_BUNDLE_ID_BASE)
-AGENT_BUNDLE_ID[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
-AGENT_BUNDLE_ID[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).debug
-AGENT_BUNDLE_ID[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).review
-
-SYSEX_BUNDLE_ID_BASE[sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
-SYSEX_BUNDLE_ID_BASE[config=Debug][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
-SYSEX_BUNDLE_ID_BASE[config=CI][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
-SYSEX_BUNDLE_ID_BASE[config=Review][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
-SYSEX_BUNDLE_ID_BASE[config=Release][sdk=*] = $(AGENT_BUNDLE_ID_BASE).network-extension
-
-DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE = $(SYSEX_BUNDLE_ID_BASE)
-
-DISTRIBUTED_NOTIFICATIONS_PREFIX[config=CI][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).ci
-DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Review][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).review
-DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Debug][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE).debug
-DISTRIBUTED_NOTIFICATIONS_PREFIX[config=Release][sdk=*] = $(DISTRIBUTED_NOTIFICATIONS_PREFIX_BASE)
