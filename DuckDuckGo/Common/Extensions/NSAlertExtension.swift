@@ -21,16 +21,6 @@ import Cocoa
 
 extension NSAlert {
 
-    // Tiny class to enable an Alert to respond to checkbox changed events (e.g enabling/disabling a button)
-    final class AutofillActionAlert: NSAlert {
-        var confirmButton: NSButton?
-
-        @objc
-        public func checkboxChanged(_ sender: NSButton) {
-            confirmButton?.isEnabled = (sender.state == .on)
-        }
-    }
-
     static var cautionImage = NSImage(named: "NSCaution")
 
     static func javascriptAlert(with message: String) -> NSAlert {
@@ -268,38 +258,30 @@ extension NSAlert {
     static func deleteAllPasswordsConfirmationAlert(count: Int, syncEnabled: Bool) -> NSAlert {
         autofillActionConfirmationAlert(messageText: UserText.deleteAllPasswordsDialogMessageText(count: count),
                                         informationText: UserText.deleteAllPasswordsDialogInformationText,
-                                        confirmButtonText: UserText.passwordManagerAlerDeleteButton,
-                                        icon: NSImage(named: "PasswordsDDG")!)
+                                        confirmButtonText: UserText.passwordManagerAlerDeleteButton)
     }
 
     private static func autofillActionConfirmationAlert(messageText: String,
                                                         informationText: String,
-                                                        confirmButtonText: String,
-                                                        icon: NSImage) -> NSAlert {
-        let alert = AutofillActionAlert()
+                                                        confirmButtonText: String) -> NSAlert {
+        let alert = NSAlert()
         alert.messageText = messageText
         alert.informativeText = informationText
         alert.alertStyle = .warning
-        alert.icon = icon
-        alert.confirmButton = alert.addButton(withTitle: confirmButtonText)
-        alert.confirmButton?.isEnabled = false
+        alert.addButton(withTitle: confirmButtonText)
         alert.addButton(withTitle: UserText.cancel)
-        let checkbox = NSButton(checkboxWithTitle: "Click to confirm", target: alert, action: #selector(AutofillActionAlert.checkboxChanged(_:)))
-        alert.accessoryView = checkbox
         return alert
     }
 
     static func deleteAllPasswordsCompletionAlert(count: Int, syncEnabled: Bool) -> NSAlert {
         autofillActionCompletionAlert(messageText: UserText.deleteAllPasswordsCompletionMessageText(count: count),
-                                      informationText: UserText.deleteAllPasswordsCompletionInformationText,
-                                      icon: NSImage(named: "PasswordsDDG")!)
+                                      informationText: UserText.deleteAllPasswordsCompletionInformationText)
     }
 
-    private static func autofillActionCompletionAlert(messageText: String, informationText: String, icon: NSImage) -> NSAlert {
+    private static func autofillActionCompletionAlert(messageText: String, informationText: String) -> NSAlert {
         let alert = NSAlert()
         alert.messageText = messageText
         alert.informativeText = informationText
-        alert.icon = icon
         alert.addButton(withTitle: UserText.ok)
         return alert
     }
