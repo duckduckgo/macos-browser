@@ -20,10 +20,12 @@ import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
 struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
+
     var selectedDownloadLocation: String?
     var alwaysRequestDownloadLocation: Bool
     var defaultDownloadLocation: URL?
     var lastUsedCustomDownloadLocation: String?
+    var shouldOpenPopupOnCompletion: Bool
 
     var _isDownloadLocationValid: (URL) -> Bool
 
@@ -34,12 +36,14 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
     init(
         selectedDownloadLocation: String? = nil,
         alwaysRequestDownloadLocation: Bool = false,
+        shouldOpenPopupOnCompletion: Bool = true,
         defaultDownloadLocation: URL? = FileManager.default.temporaryDirectory,
         lastUsedCustomDownloadLocation: String? = nil,
         isDownloadLocationValid: @escaping (URL) -> Bool = { _ in true }
     ) {
         self.selectedDownloadLocation = selectedDownloadLocation
         self.alwaysRequestDownloadLocation = alwaysRequestDownloadLocation
+        self.shouldOpenPopupOnCompletion = shouldOpenPopupOnCompletion
         self.defaultDownloadLocation = defaultDownloadLocation
         self.lastUsedCustomDownloadLocation = lastUsedCustomDownloadLocation
         self._isDownloadLocationValid = isDownloadLocationValid
