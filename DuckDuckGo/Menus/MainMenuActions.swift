@@ -265,7 +265,16 @@ extension MainViewController {
 
     /// Finds currently active Tab even if it‘s playing a Full Screen video
     private func getActiveTabAndIndex() -> (tab: Tab, index: TabIndex)? {
-        guard let tab = WindowControllersManager.shared.lastKeyMainWindowController?.activeTab else {
+        var tab: Tab? {
+            if let window = self.view.window,
+               window.isKeyWindow,
+               let mainWindowController = window.nextResponder as? MainWindowController,
+               let tab = mainWindowController.activeTab {
+                return tab
+            }
+            return WindowControllersManager.shared.lastKeyMainWindowController?.activeTab
+        }
+        guard let tab else {
             assertionFailure("Could not get currently active Tab")
             return nil
         }
