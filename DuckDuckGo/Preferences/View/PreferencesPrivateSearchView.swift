@@ -48,16 +48,6 @@ extension Preferences {
                 PreferencePaneSection("Search Settings") {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
-
-                // SECTION 3: More Search Settings
-                PreferencePaneSection {
-                    TextButton("More Search Settings", weight: .semibold) {
-                        WindowControllersManager.shared.show(url: .searchSettings,
-                                                             source: .ui,
-                                                             newTab: true)
-                    }
-                    TextMenuItemCaption("Customize your search language, region, and more")
-                }
             }
         }
     }
