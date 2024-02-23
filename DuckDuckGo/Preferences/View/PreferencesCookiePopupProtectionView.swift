@@ -34,7 +34,7 @@ extension Preferences {
                 PreferencePaneSection {
                     ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
                     VStack(alignment: .leading, spacing: 0) {
-                        TextMenuItemCaption(UserText.cookiePopupProtectionExplanation)
+                        TextMenuItemCaption(UserText.autoconsentExplanation)
                         TextButton(UserText.learnMore) {
                             WindowControllersManager.shared.show(url: .cookieConsentPopUpManagement,
                                                                  source: .ui,
