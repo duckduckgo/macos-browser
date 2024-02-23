@@ -306,7 +306,7 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
     }
 
     func editFolder(_ sender: NSMenuItem) {
-        // TODO: https://app.asana.com/0/0/1206531304671948/f
+        // https://app.asana.com/0/0/1206531304671948/f
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
