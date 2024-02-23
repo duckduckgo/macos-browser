@@ -23,7 +23,7 @@ import AppKit
 
 /// Conforming types provide an `execute` method which performs some action on autofill types (e.g delete all passwords)
 protocol AutofillActionExecutor {
-    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncRequester: DDGSyncing)
+    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncService: DDGSyncing)
     /// NSAlert to display asking a user to confirm the action
     var confirmationAlert: NSAlert { get }
     /// NSAlert to display when the action is complete
@@ -37,22 +37,24 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
 
     var confirmationAlert: NSAlert {
         let accounts = (try? secureVault.accounts()) ?? []
-        return NSAlert.deleteAllPasswordsConfirmationAlert(count: accounts.count)
+        let syncEnabled = syncService.account != nil
+        return NSAlert.deleteAllPasswordsConfirmationAlert(count: accounts.count, syncEnabled: syncEnabled)
     }
 
     var completionAlert: NSAlert {
         let accounts = (try? secureVault.accounts()) ?? []
-        return NSAlert.deleteAllPasswordsCompletionAlert(count: accounts.count)
+        let syncEnabled = syncService.account != nil
+        return NSAlert.deleteAllPasswordsCompletionAlert(count: accounts.count, syncEnabled: syncEnabled)
     }
 
     private var userAuthenticator: UserAuthenticating
     private var secureVault: any AutofillSecureVault
-    private var syncRequester: DDGSyncing
+    private var syncService: DDGSyncing
 
-    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncRequester: DDGSyncing) {
+    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncService: DDGSyncing) {
         self.userAuthenticator = userAuthenticator
         self.secureVault = secureVault
-        self.syncRequester = syncRequester
+        self.syncService = syncService
     }
 
     func execute(_ onSuccess: (() -> Void)? = nil) {
@@ -61,7 +63,7 @@ struct AutofillDeleteAllPasswordsExecutor: AutofillActionExecutor {
 
             do {
                 try secureVault.deleteAllWebsiteCredentials()
-                syncRequester.scheduler.notifyDataChanged()
+                syncService.scheduler.notifyDataChanged()
                 NotificationCenter.default.post(name: .PasswordManagerChanged, object: nil)
                 onSuccess?()
             } catch {

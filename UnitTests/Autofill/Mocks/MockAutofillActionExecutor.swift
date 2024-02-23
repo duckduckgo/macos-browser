@@ -28,8 +28,8 @@ final class MockAutofillActionBuilder: AutofillActionBuilder {
 
     func buildExecutor() -> AutofillActionExecutor? {
         guard let secureVault = try? MockSecureVaultFactory.makeVault(errorReporter: nil) else { return nil }
-        let syncRequester = MockDDGSyncing(authState: .inactive, scheduler: CapturingScheduler(), isSyncInProgress: false)
-        let executor = MockAutofillActionExecutor(userAuthenticator: UserAuthenticatorMock(), secureVault: secureVault, syncRequester: syncRequester)
+        let syncService = MockDDGSyncing(authState: .inactive, scheduler: CapturingScheduler(), isSyncInProgress: false)
+        let executor = MockAutofillActionExecutor(userAuthenticator: UserAuthenticatorMock(), secureVault: secureVault, syncService: syncService)
         self.mockExecutor = executor
         return executor
     }
@@ -45,7 +45,7 @@ final class MockAutofillActionExecutor: AutofillActionExecutor {
 
     var didExecute = false
 
-    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncRequester: DDGSyncing) { }
+    init(userAuthenticator: UserAuthenticating, secureVault: any AutofillSecureVault, syncService: DDGSyncing) { }
 
     var confirmationAlert: NSAlert {
         NSAlert()

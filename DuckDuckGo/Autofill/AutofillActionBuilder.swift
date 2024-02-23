@@ -40,6 +40,6 @@ struct AutofillDeleteAllPasswordsBuilder: AutofillActionBuilder {
 
         return AutofillDeleteAllPasswordsExecutor(userAuthenticator: DeviceAuthenticator.shared,
                                                   secureVault: secureVault,
-                                                  syncRequester: syncService)
+                                                  syncService: syncService)
     }
 }

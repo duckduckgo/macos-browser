@@ -265,7 +265,7 @@ extension NSAlert {
         return alert
     }
 
-    static func deleteAllPasswordsConfirmationAlert(count: Int) -> NSAlert {
+    static func deleteAllPasswordsConfirmationAlert(count: Int, syncEnabled: Bool) -> NSAlert {
         autofillActionConfirmationAlert(messageText: UserText.deleteAllPasswordsDialogMessageText(count: count),
                                         informationText: UserText.deleteAllPasswordsDialogInformationText,
                                         confirmButtonText: UserText.passwordManagerAlerDeleteButton,
@@ -289,7 +289,7 @@ extension NSAlert {
         return alert
     }
 
-    static func deleteAllPasswordsCompletionAlert(count: Int) -> NSAlert {
+    static func deleteAllPasswordsCompletionAlert(count: Int, syncEnabled: Bool) -> NSAlert {
         autofillActionCompletionAlert(messageText: UserText.deleteAllPasswordsCompletionMessageText(count: count),
                                       informationText: UserText.deleteAllPasswordsCompletionInformationText,
                                       icon: NSImage(named: "PasswordsDDG")!)
