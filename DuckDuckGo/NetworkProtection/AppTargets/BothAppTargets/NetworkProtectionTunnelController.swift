@@ -63,8 +63,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
-    private let notificationCenter: NotificationCenter
-
     // MARK: - VPN Tunnel & Configuration
 
     /// Auth token store
