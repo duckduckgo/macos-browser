@@ -241,7 +241,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
-                   subscriptionConfiguration: .init(isSubscriptionEnabled: false, isEntitlementValid: { true }))
+                   subscriptionConfiguration: .makeConfiguration())
 
         observeConnectionStatusChanges()
         observeServerChanges()
@@ -415,4 +415,27 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
         }
     }
 
+}
+
+extension PacketTunnelProvider.SubscriptionConfiguration {
+#if SUBSCRIPTION
+    static func makeConfiguration() -> PacketTunnelProvider.SubscriptionConfiguration {
+        .init(
+            isSubscriptionEnabled: true,
+            isEntitlementValid: Self.isEntitlementValid
+        )
+    }
+
+    static func isEntitlementValid() async -> Bool {
+        // todo - https://app.asana.com/0/0/1206470585910128/f
+        await AccountManager().hasEntitlement(for: "dummy1")
+    }
+#else
+    static func makeConfiguration() -> PacketTunnelProvider.SubscriptionConfiguration {
+        .init(
+            isSubscriptionEnabled: false,
+            isEntitlementValid: { true }
+        )
+    }
+#endif
 }
