@@ -77,6 +77,7 @@ struct ExtractedProfile: Codable, Sendable {
     var email: String?
     var removedDate: Date?
     let fullName: String?
+    let identifier: String?
 
     enum CodingKeys: CodingKey {
         case id
@@ -92,6 +93,7 @@ struct ExtractedProfile: Codable, Sendable {
         case email
         case removedDate
         case fullName
+        case identifier
     }
 
     init(id: Int64? = nil,
@@ -105,7 +107,8 @@ struct ExtractedProfile: Codable, Sendable {
          reportId: String? = nil,
          age: String? = nil,
          email: String? = nil,
-         removedDate: Date? = nil) {
+         removedDate: Date? = nil,
+         identifier: String? = nil) {
         self.id = id
         self.name = name
         self.alternativeNames = alternativeNames
@@ -119,6 +122,29 @@ struct ExtractedProfile: Codable, Sendable {
         self.email = email
         self.removedDate = removedDate
         self.fullName = name
+        self.identifier = identifier
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(Int64.self, forKey: .id)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        alternativeNames = try container.decodeIfPresent([String].self, forKey: .alternativeNames)
+        addressFull = try container.decodeIfPresent(String.self, forKey: .addressFull)
+        addresses = try container.decodeIfPresent([AddressCityState].self, forKey: .addresses)
+        phoneNumbers = try container.decodeIfPresent([String].self, forKey: .phoneNumbers)
+        relatives = try container.decodeIfPresent([String].self, forKey: .relatives)
+        profileUrl = try container.decodeIfPresent(String.self, forKey: .profileUrl)
+        reportId = try container.decodeIfPresent(String.self, forKey: .reportId)
+        age = try container.decodeIfPresent(String.self, forKey: .age)
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+        removedDate = try container.decodeIfPresent(Date.self, forKey: .removedDate)
+        fullName = try container.decodeIfPresent(String.self, forKey: .fullName)
+        if let identifier = try container.decodeIfPresent(String.self, forKey: .identifier) {
+            self.identifier = identifier
+        } else {
+            self.identifier = profileUrl
+        }
     }
 
     func merge(with profile: ProfileQuery) -> ExtractedProfile {
@@ -134,7 +160,8 @@ struct ExtractedProfile: Codable, Sendable {
             reportId: self.reportId,
             age: self.age ?? String(profile.age),
             email: self.email,
-            removedDate: self.removedDate
+            removedDate: self.removedDate,
+            identifier: self.identifier
         )
     }
 }

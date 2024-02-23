@@ -34,7 +34,7 @@ public final class DebugEvent: PixelKitEvent {
     }
 
     public let eventType: EventType
-    private let error: Error?
+    public let error: Error?
 
     public init(eventType: EventType, error: Error? = nil) {
         self.eventType = eventType

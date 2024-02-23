@@ -1,6 +1,7 @@
 {
-  "name": "newenglandfacts.com",
-  "version": "0.1.1",
+  "name": "New England Facts",
+  "url": "newenglandfacts.com",
+  "version": "0.1.4",
   "parent": "verecor.com",
   "addedDatetime": 1703052000000,
   "steps": [
@@ -10,7 +11,7 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "8bd7953c-ee22-49be-8937-a1798046a0c1",
+          "id": "05725a5a-ec3f-49c8-875b-ab9787b9385f",
           "url": "https://newenglandfacts.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}&fage=${age|ageRange}",
           "ageRange": [
             "18-30",
@@ -24,7 +25,7 @@
         },
         {
           "actionType": "extract",
-          "id": "4012d312-2f7f-4cc1-bf7a-b7655f550c1a",
+          "id": "7f41b78a-bb65-4bb2-a6ca-1a6ab55890ce",
           "selector": ".b-pfl-list",
           "profile": {
             "name": {

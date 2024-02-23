@@ -103,10 +103,22 @@ struct DBPUIAddressAtIndex: Codable {
 /// Message Object representing a data broker
 struct DBPUIDataBroker: Codable, Hashable {
     let name: String
+    let url: String
+    let date: Double?
+
+    init(name: String, url: String, date: Double? = nil) {
+        self.name = name
+        self.url = url
+        self.date = date
+    }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(name)
     }
+}
+
+struct DBPUIDataBrokerList: DBPUISendableMessage {
+    let dataBrokers: [DBPUIDataBroker]
 }
 
 /// Message Object representing a requested change to the user profile's brith year
@@ -123,6 +135,7 @@ struct DBPUIDataBrokerProfileMatch: Codable {
     let addresses: [DBPUIUserProfileAddress]
     let alternativeNames: [String]
     let relatives: [String]
+    let date: Double? // Used in some methods to set the removedDate or found date
 }
 
 /// Protocol to represent a message that can be passed from the host to the UI
@@ -139,6 +152,10 @@ struct DBPUIScanAndOptOutMaintenanceState: DBPUISendableMessage {
 struct DBPUIOptOutMatch: DBPUISendableMessage {
     let dataBroker: DBPUIDataBroker
     let matches: Int
+    let name: String
+    let alternativeNames: [String]
+    let addresses: [DBPUIUserProfileAddress]
+    let date: Double
 }
 
 /// Data representing the initial scan progress

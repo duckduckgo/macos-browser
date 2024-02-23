@@ -173,14 +173,18 @@ public final class PreferencesSubscriptionModel: ObservableObject {
     func fetchAndUpdateSubscriptionDetails() {
         guard fetchSubscriptionDetailsTask == nil else { return }
 
-        fetchSubscriptionDetailsTask = Task {
-            guard let token = accountManager.accessToken else { return }
+        fetchSubscriptionDetailsTask = Task { [weak self] in
+            defer {
+                self?.fetchSubscriptionDetailsTask = nil
+            }
+
+            guard let token = self?.accountManager.accessToken else { return }
 
             if let cachedDate = SubscriptionService.cachedSubscriptionDetailsResponse?.expiresOrRenewsAt {
-                updateDescription(for: cachedDate)
+                self?.updateDescription(for: cachedDate)
 
-                if cachedDate.timeIntervalSinceNow > 0 {
-                    self.cachedEntitlements = []
+                if cachedDate.timeIntervalSinceNow < 0 {
+                    self?.cachedEntitlements = []
                 }
             }
 
@@ -190,13 +194,13 @@ public final class PreferencesSubscriptionModel: ObservableObject {
                     return
                 }
 
-                updateDescription(for: response.expiresOrRenewsAt)
+                self?.updateDescription(for: response.expiresOrRenewsAt)
 
-                subscriptionPlatform = response.platform
+                self?.subscriptionPlatform = response.platform
             }
 
             if case let .success(entitlements) = await AccountManager().fetchEntitlements() {
-                self.cachedEntitlements = entitlements
+                self?.cachedEntitlements = entitlements
             }
         }
     }

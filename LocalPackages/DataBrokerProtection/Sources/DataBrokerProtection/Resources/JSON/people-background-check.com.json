@@ -1,6 +1,7 @@
 {
-  "name": "people-background-check.com",
-  "version": "0.1.1",
+  "name": "People Background Check",
+  "url": "people-background-check.com",
+  "version": "0.1.4",
   "parent": "verecor.com",
   "addedDatetime": 1702965600000,
   "steps": [
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "18e35c3b-b837-40e9-b353-20230d36bc4d",
+          "id": "6fee90c5-5f7e-4fd0-badf-069e2b94a65d",
           "url": "https://people-background-check.com/profile/search?fname=${firstName}&lname=${lastName}&state=${state}&city=${city}"
         },
         {
           "actionType": "extract",
-          "id": "7a23b927-acfc-4d29-b4b6-3f204687619c",
+          "id": "ee03ba42-e9a5-4489-a7d6-d50bf21238aa",
           "selector": ".b-pfl-list",
           "profile": {
             "name": {

@@ -27,10 +27,11 @@ let package = Package(
     ],
     products: [
         .library(name: "NetworkProtectionIPC", targets: ["NetworkProtectionIPC"]),
+        .library(name: "NetworkProtectionProxy", targets: ["NetworkProtectionProxy"]),
         .library(name: "NetworkProtectionUI", targets: ["NetworkProtectionUI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.2"),
         .package(path: "../XPCHelper"),
         .package(path: "../SwiftUIExtensions"),
         .package(path: "../LoginItems")
@@ -43,6 +44,19 @@ let package = Package(
             dependencies: [
                 .product(name: "NetworkProtection", package: "BrowserServicesKit"),
                 .product(name: "XPCHelper", package: "XPCHelper")
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
+            ],
+            plugins: [.plugin(name: "SwiftLintPlugin", package: "BrowserServicesKit")]
+        ),
+
+        // MARK: - NetworkProtectionProxy
+
+        .target(
+            name: "NetworkProtectionProxy",
+            dependencies: [
+                .product(name: "NetworkProtection", package: "BrowserServicesKit")
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))

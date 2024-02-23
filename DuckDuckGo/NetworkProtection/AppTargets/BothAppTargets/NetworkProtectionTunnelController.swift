@@ -24,6 +24,7 @@ import SwiftUI
 import Common
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionProxy
 import NetworkProtectionUI
 import Networking
 import PixelKit
@@ -37,6 +38,8 @@ typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionSt
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
+
+    // MARK: - Settings
 
     let settings: VPNSettings
 
@@ -59,6 +62,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// Stores the last controller error for the purpose of updating the UI as needed.
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
+
+    private let notificationCenter: NotificationCenter
 
     // MARK: - VPN Tunnel & Configuration
 
@@ -99,6 +104,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     /// Loads the configuration matching our ``extensionID``.
     ///
+    @MainActor
     public var manager: NETunnelProviderManager? {
         get async {
             if let internalManager {
@@ -143,8 +149,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
          settings: VPNSettings,
-         notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
+         notificationCenter: NotificationCenter = .default,
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
@@ -288,7 +294,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         tunnelManager.protocolConfiguration = {
             let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
             protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
-            protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
+            protocolConfiguration.providerBundleIdentifier = Bundle.tunnelExtensionBundleID
             protocolConfiguration.providerConfiguration = [
                 NetworkProtectionOptionKey.defaultPixelHeaders: APIRequest.Headers().httpHeaders,
                 NetworkProtectionOptionKey.includedRoutes: includedRoutes().map(\.stringRepresentation) as NSArray
@@ -335,6 +341,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
 
             return session
+        }
+    }
+
+    // MARK: - Connection
+
+    public var status: NEVPNStatus {
+        get async {
+            await connection?.status ?? .disconnected
         }
     }
 
