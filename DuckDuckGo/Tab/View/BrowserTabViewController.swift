@@ -974,12 +974,12 @@ extension BrowserTabViewController: TabDownloadsDelegate {
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
     func selectedTabContent(_ content: Tab.TabContent) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(content)
-        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
+        tabViewModel?.tab.setContent(content)
+        showTabContent(of: tabViewModel)
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
-        guard let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+        guard let selectedTab = tabViewModel?.tab else {
             return
         }
 
@@ -1100,7 +1100,7 @@ extension BrowserTabViewController {
                 if isWebViewFirstResponder {
                     self.setFirstResponderAfterAdding = true
                 }
-                self.showTabContent(of: self.tabCollectionViewModel.selectedTabViewModel)
+                self.showTabContent(of: self.tabViewModel)
                 self.webViewSnapshot?.removeFromSuperview()
             }
         }
