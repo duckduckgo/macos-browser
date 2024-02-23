@@ -130,24 +130,6 @@ extension Preferences {
                         .disabled(!model.showBookmarksBar)
                     }
                 }
-
-                // SECTION 5: Zoom Setting
-                PreferencePaneSection(UserText.zoomSettingTitle) {
-
-                    HStack {
-                        Text(UserText.zoomPickerTitle)
-                        NSPopUpButtonView(selection: $model.defaultPageZoom) {
-                            let button = NSPopUpButton()
-                            button.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-                            for value in DefaultZoomValue.allCases {
-                                let item = button.menu?.addItem(withTitle: value.displayString, action: nil, keyEquivalent: "")
-                                item?.representedObject = value
-                            }
-                            return button
-                        }
-                    }
-                }
             }
         }
     }

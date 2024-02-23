@@ -82,6 +82,8 @@ enum Preferences {
 #endif
                             case .autofill:
                                 AutofillView(model: AutofillPreferencesModel())
+                            case .accessibility:
+                                AccessibilityView(model: AccessibilityPreferences.shared)
                             case .downloads:
                                 DownloadsView(model: DownloadsPreferences())
                             case .duckPlayer:
@@ -93,6 +95,7 @@ enum Preferences {
 #else
                                 AboutView(model: AboutModel())
 #endif
+
                             }
                         }
                         .frame(maxWidth: Const.paneContentWidth, maxHeight: .infinity, alignment: .topLeading)

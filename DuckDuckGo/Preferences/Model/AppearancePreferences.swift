@@ -24,7 +24,6 @@ import Common
 protocol AppearancePreferencesPersistor {
     var showFullURL: Bool { get set }
     var currentThemeName: String { get set }
-    var defaultPageZoom: CGFloat { get set }
     var favoritesDisplayMode: String? { get set }
     var isFavoriteVisible: Bool { get set }
     var isContinueSetUpVisible: Bool { get set }
@@ -40,9 +39,6 @@ struct AppearancePreferencesUserDefaultsPersistor: AppearancePreferencesPersisto
 
     @UserDefaultsWrapper(key: .currentThemeName, defaultValue: ThemeName.systemDefault.rawValue)
     var currentThemeName: String
-
-    @UserDefaultsWrapper(key: .defaultPageZoom, defaultValue: DefaultZoomValue.percent100.rawValue)
-    var defaultPageZoom: CGFloat
 
     @UserDefaultsWrapper(key: .favoritesDisplayMode, defaultValue: FavoritesDisplayMode.displayNative(.desktop).description)
     var favoritesDisplayMode: String?
@@ -79,27 +75,6 @@ enum HomeButtonPosition: String, CaseIterable {
     case hidden
     case left
     case right
-}
-
-enum DefaultZoomValue: CGFloat, CaseIterable {
-    case percent50 = 0.5
-    case percent75 = 0.75
-    case percent85 = 0.85
-    case percent100 = 1.0
-    case percent115 = 1.15
-    case percent125 = 1.25
-    case percent150 = 1.50
-    case percent175 = 1.75
-    case percent200 = 2.0
-    case percent250 = 2.5
-    case percent300 = 3.0
-
-    var displayString: String {
-        let percentage = (self.rawValue * 100).rounded()
-        return String(format: "%.0f%%", percentage)
-    }
-
-    var index: Int {DefaultZoomValue.allCases.firstIndex(of: self) ?? 3}
 }
 
 enum ThemeName: String, Equatable, CaseIterable {
@@ -183,12 +158,6 @@ final class AppearancePreferences: ObservableObject {
         }
     }
 
-    @Published var defaultPageZoom: DefaultZoomValue {
-        didSet {
-            persistor.defaultPageZoom = defaultPageZoom.rawValue
-        }
-    }
-
     @Published var isFavoriteVisible: Bool {
         didSet {
             persistor.isFavoriteVisible = isFavoriteVisible
@@ -254,7 +223,6 @@ final class AppearancePreferences: ObservableObject {
         isFavoriteVisible = persistor.isFavoriteVisible
         isRecentActivityVisible = persistor.isRecentActivityVisible
         isContinueSetUpVisible = persistor.isContinueSetUpVisible
-        defaultPageZoom =  .init(rawValue: persistor.defaultPageZoom) ?? .percent100
         showBookmarksBar = persistor.showBookmarksBar
         bookmarksBarAppearance = persistor.bookmarksBarAppearance
         homeButtonPosition = persistor.homeButtonPosition

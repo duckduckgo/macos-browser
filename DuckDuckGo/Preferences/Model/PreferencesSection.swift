@@ -38,7 +38,7 @@ struct PreferencesSection: Hashable, Identifiable {
 #endif
 
         let regularPanes: [PreferencePaneIdentifier] = {
-            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .downloads, .fireButton]
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .autofill, .downloads, .accessibility, .fireButton]
 
 #if SUBSCRIPTION
 
@@ -122,6 +122,7 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
     case subscription
 #endif
     case autofill
+    case accessibility
     case downloads
     case duckPlayer = "duckplayer"
     case about
@@ -183,6 +184,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return UserText.autofill
         case .downloads:
             return UserText.downloads
+        case .accessibility:
+            return UserText.accessibility
         case .duckPlayer:
             return UserText.duckPlayer
         case .about:
@@ -226,6 +229,8 @@ enum PreferencePaneIdentifier: String, Equatable, Hashable, Identifiable {
             return "DuckPlayerSettings"
         case .about:
             return "About"
+        case .accessibility:
+            return "Accessibility"
         }
     }
 }

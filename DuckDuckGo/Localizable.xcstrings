@@ -7925,6 +7925,18 @@
         }
       }
     },
+    "preferences.accessibility" : {
+      "comment" : "Show accessibility browser preferences",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Accessibility"
+          }
+        }
+      }
+    },
     "preferences.appearance" : {
       "comment" : "Show appearance preferences",
       "extractionState" : "extracted_with_value",
