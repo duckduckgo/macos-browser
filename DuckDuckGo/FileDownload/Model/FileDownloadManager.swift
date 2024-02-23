@@ -87,7 +87,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
             switch self {
             case .prompt: return true
             case .preset: return false
-            case .auto: return (url?.isFileURL ?? true || url?.isLocalURL ?? true) // always prompt when "downloading" a local file
+            case .auto: return url?.isFileURL ?? true // always prompt when "downloading" a local file
             }
         }
     }

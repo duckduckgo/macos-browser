@@ -27,6 +27,7 @@ class DownloadsTabExtensionMock: NSObject, DownloadsTabExtensionProtocol {
     private(set) var didCallSaveWebViewContent = false
     private(set) var capturedWebView: WKWebView?
 
+    @Published
     private(set) var didCallSaveDownloadedData = false
     private(set) var capturedSavedDownloadData: Data?
     private(set) var capturedSuggestedFilename: String?
