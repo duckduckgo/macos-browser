@@ -64,7 +64,7 @@ extension Preferences {
                             VStack(alignment: .leading, spacing: 0) {
                                 TextMenuItemCaption(UserText.emailProtectionExplanation)
                                 TextButton(UserText.learnMore) {
-                                    WindowControllersManager.shared.show(url: .duckDuckGoEmail,
+                                    WindowControllersManager.shared.show(url: .duckDuckGoEmailInfo,
                                                                          source: .ui,
                                                                          newTab: true)
                                 }
