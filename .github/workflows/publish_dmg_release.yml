@@ -45,7 +45,7 @@ jobs:
 
     name: Tag public release
 
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.release-type != 'internal'
+    if: github.event.inputs.release-type != 'internal'
 
     uses: ./.github/workflows/tag_release.yml
     with:
@@ -76,7 +76,8 @@ jobs:
     steps:
 
       - name: Download tag artifact
-        if: github.event_name == 'workflow_call'
+        id: download-tag
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: tag
@@ -84,7 +85,7 @@ jobs:
 
       - name: Set tag variable
         run: |
-          if [[ "${{ github.event_name }}" == 'workflow_call' ]]; then
+          if [[ "${{ steps.download-tag.outcome }}" == 'success' ]]; then
             echo "tag=$(<.github/tag)" >> $GITHUB_ENV
           else
             echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
