@@ -621,13 +621,34 @@ extension MainViewController {
     // MARK: - Printing
 
     @objc func printWebView(_ sender: Any?) {
-        getActiveTabAndIndex()?.tab.print()
+        var pdfHUD: WKPDFHUDViewWrapper?
+        // if saving a PDF (may be from a frame)
+        if let menuItem = sender as? NSMenuItem,
+           let representedObject = menuItem.representedObject {
+
+            pdfHUD = representedObject as? WKPDFHUDViewWrapper ?? {
+                assertionFailure("Unexpected Save As menu item represented object: \(representedObject)")
+                return nil
+            }()
+        }
+
+        getActiveTabAndIndex()?.tab.print(pdfHUD: pdfHUD)
     }
 
     // MARK: - Saving
 
     @objc func saveAs(_ sender: Any) {
-        getActiveTabAndIndex()?.tab.saveWebContentAs()
+        var pdfHUD: WKPDFHUDViewWrapper?
+        // if saving a PDF (may be from a frame)
+        if let menuItem = sender as? NSMenuItem,
+           let representedObject = menuItem.representedObject {
+
+            pdfHUD = representedObject as? WKPDFHUDViewWrapper ?? {
+                assertionFailure("Unexpected Save As menu item represented object: \(representedObject)")
+                return nil
+            }()
+        }
+        getActiveTabAndIndex()?.tab.saveWebContent(pdfHUD: pdfHUD, location: .prompt)
     }
 
     // MARK: - Debug

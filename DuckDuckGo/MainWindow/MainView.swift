@@ -109,6 +109,7 @@ final class MainView: NSView {
     // PDF Plugin context menu
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         setupSearchContextMenuItem(menu: menu)
+        setupSaveAsAndPrintMenuItems(menu: menu, with: event)
     }
 
     private func setupSearchContextMenuItem(menu: NSMenu) {
@@ -130,6 +131,31 @@ final class MainView: NSView {
                 break
             }
         }
+    }
+
+    private func setupSaveAsAndPrintMenuItems(menu: NSMenu, with event: NSEvent) {
+        let hudView: WKPDFHUDViewWrapper? = withMouseLocationInViewCoordinates(event.locationInWindow) { point in
+            guard let view = self.hitTest(point) else { return nil }
+            if let hudView = WKPDFHUDViewWrapper(view: view) {
+                return hudView
+            } else if let webView = view as? WKWebView {
+                return webView.hudView(at: webView.convert(point, from: self))
+            }
+            return nil
+        }
+
+        // Insert Save As… and Print… items
+        let copyItemIdx = menu.indexOfItem(withTitle: UserText.copy)
+        let separatorAfterCopyItemIdx = (
+            menu.items.indices.contains(copyItemIdx)
+            ? (copyItemIdx..<menu.items.endIndex).first(where: { menu.items[$0].isSeparatorItem }) //  after Separator below the Copy item
+            : nil
+        ) ?? -1 // or at the beginning
+
+        menu.insertItem(NSMenuItem(title: UserText.mainMenuFileSaveAs, action: #selector(MainViewController.saveAs), representedObject: hudView),
+                        at: separatorAfterCopyItemIdx + 1)
+        menu.insertItem(NSMenuItem(title: UserText.printMenuItem, action: #selector(MainViewController.printWebView), representedObject: hudView),
+                        at: separatorAfterCopyItemIdx + 2)
     }
 
     // MARK: - NSDraggingDestination

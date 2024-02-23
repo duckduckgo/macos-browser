@@ -83,10 +83,11 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
             return url
         }
 
-        var promptForLocation: Bool {
+        func shouldPromptForLocation(for url: URL?) -> Bool {
             switch self {
             case .prompt: return true
-            case .preset, .auto: return false
+            case .preset: return false
+            case .auto: return (url?.isFileURL ?? true || url?.isLocalURL ?? true) // always prompt when "downloading" a local file
             }
         }
     }
@@ -96,7 +97,7 @@ final class FileDownloadManager: FileDownloadManagerProtocol {
         dispatchPrecondition(condition: .onQueue(.main))
 
         let task = WebKitDownloadTask(download: download,
-                                      promptForLocation: location.promptForLocation,
+                                      promptForLocation: location.shouldPromptForLocation(for: download.originalRequest?.url),
                                       destinationURL: location.destinationURL,
                                       tempURL: location.tempURL,
                                       isBurner: fromBurnerWindow)

@@ -325,6 +325,16 @@ extension WKWebView {
         return self.printOperation(with: printInfo)
     }
 
+    func hudView(at point: NSPoint? = nil) -> WKPDFHUDViewWrapper? {
+        WKPDFHUDViewWrapper(webView: self, location: point)
+    }
+
+    func savePDF(_ pdfHUD: WKPDFHUDViewWrapper? = nil) -> Bool {
+        guard let hudView = pdfHUD ?? hudView() else { return false }
+        hudView.savePDF()
+        return true
+    }
+
     var fullScreenPlaceholderView: NSView? {
         guard self.responds(to: Selector.fullScreenPlaceholderView) else { return nil }
         return self.value(forKey: NSStringFromSelector(Selector.fullScreenPlaceholderView)) as? NSView
