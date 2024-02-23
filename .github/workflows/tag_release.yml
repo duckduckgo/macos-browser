@@ -1,4 +1,4 @@
-name: Tag and Merge
+name: Tag Release
 
 on:
   workflow_dispatch:
@@ -8,13 +8,17 @@ on:
         required: true
         type: string
       base-branch:
-        description: "Base branch name"
+        description: "Base branch name (defaults to main, only override for testing)"
         required: false
         type: string
       branch:
         description: "Branch name"
         required: false
         type: string
+      prerelease:
+        description: "Is this a pre-release? (a.k.a. internal release)"
+        required: true
+        type: boolean
   workflow_call:
     inputs:
       asana-task-url:
@@ -22,13 +26,17 @@ on:
         required: true
         type: string
       base-branch:
-        description: "Base branch name"
+        description: "Base branch name (defaults to main, only override for testing)"
         required: false
         type: string
       branch:
         description: "Branch name"
         required: false
         type: string
+      prerelease:
+        description: "Is this a pre-release? (a.k.a. internal release)"
+        required: true
+        type: boolean
     secrets:
       ASANA_ACCESS_TOKEN:
         required: true
@@ -36,23 +44,31 @@ on:
         required: true
 
 jobs:
-  tag-and-merge:
+  tag-release:
 
-    name: Tag and Merge
+    name: Tag Release
 
-    # This doesn't need Xcode, so could technically run on Ubuntu, but actions add comments and tasks in Asana
-    # use BSD-specific sed syntax, that doesn't work with GNU sed (available on Linux).
+    # This doesn't need Xcode, so could technically run on Ubuntu, but actions that add comments and tasks
+    # in Asana use BSD-specific sed syntax, that doesn't work with GNU sed (available on Linux).
     runs-on: macos-13
 
     env:
       asana-task-url: ${{ github.event.inputs.asana-task-url || inputs.asana-task-url }}
       BASE_BRANCH: ${{ inputs.base-branch || 'main' }}
       BRANCH: ${{ inputs.branch || github.ref_name }}
+      prerelease: ${{ github.event.inputs.prerelease || inputs.prerelease }}
 
     outputs:
       tag: ${{ steps.create-tag.outputs.tag }}
 
     steps:
+
+    - name: Assert release branch
+      run: |
+        case "${{ env.BRANCH }}" in
+          release/*) ;;
+          *) echo "👎 Not a release branch"; exit 1 ;;
+        esac
 
     - name: Check out the code
       uses: actions/checkout@v4
@@ -64,11 +80,12 @@ jobs:
       id: create-tag
       uses: ./.github/actions/create-tag-and-github-release
       with:
-        prerelease: true
+        prerelease: ${{ env.prerelease }}
         github-token: ${{ github.token }}
 
     - name: Merge to base branch
       id: merge
+      if: ${{ env.prerelease == 'true' }}
       uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
@@ -80,31 +97,66 @@ jobs:
             head: "${{ env.BRANCH }}"
           })
 
+    - name: Delete release branch
+      id: delete
+      if: ${{ env.prerelease == 'false' }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh api --method DELETE /repos/${{ github.repository }}/git/refs/heads/${{ env.BRANCH}}
+
     - name: Set common environment variables
       if: always()
       env:
         GH_TOKEN: ${{ github.token }}
+        PROMOTED_TAG: ${{ steps.create-tag.outputs.promoted-tag }}
         TAG: ${{ steps.create-tag.outputs.tag }}
       run: |
         echo "TAG=$TAG" >> $GITHUB_ENV
+        if [[ ${prerelase} == "true" ]]; then
+          DMG_VERSION=${TAG//-/.}
+        else
+          # For public release, tag is x.y.z, but we need DMG version as x.y.z-N
+          DMG_VERSION=${PROMOTED_TAG//-/.}
+        fi
         echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
-        echo "DMG_URL=${{ vars.DMG_URL_ROOT }}duckduckgo-${TAG//-/.}.dmg" >> $GITHUB_ENV
-        echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${{ steps.create-tag.outputs.tag }}" >> $GITHUB_ENV
+        echo "DMG_URL=${{ vars.DMG_URL_ROOT }}duckduckgo-${DMG_VERSION}.dmg" >> $GITHUB_ENV
+        echo "RELEASE_URL=https://github.com/${{ github.repository }}/releases/tag/${TAG}" >> $GITHUB_ENV
         if [[ ${{ steps.create-tag.outputs.tag-created }} == "false" ]]; then
           last_release_tag=$(gh api /repos/${{ github.repository }}/releases/latest --jq '.tag_name')
           echo "LAST_RELEASE_TAG=${last_release_tag}" >> $GITHUB_ENV
         fi
 
+    - name: Set up Asana success comment template
+      if: success()
+      id: asana-success-template
+      run: |
+        if [[ "${prerelease}" == "true" ]]; then
+          echo "comment-template=internal-release-ready" >> $GITHUB_OUTPUT
+        else
+          echo "comment-template=public-release-tagged" >> $GITHUB_OUTPUT
+        fi
+
     - name: Set up Asana templates
       if: failure()
-      id: asana-templates
+      id: asana-failure-templates
       run: |
         if [[ ${{ steps.create-tag.outputs.tag-created }} == "true" ]]; then
-          echo "task-template=merge-failed" >> $GITHUB_OUTPUT
-          echo "comment-template=internal-release-ready-merge-failed" >> $GITHUB_OUTPUT
+          if [[ "${prerelease}" == "true" ]]; then
+            echo "task-template=merge-failed" >> $GITHUB_OUTPUT
+            echo "comment-template=internal-release-ready-merge-failed" >> $GITHUB_OUTPUT
+          else
+            echo "task-template=delete-branch-failed" >> $GITHUB_OUTPUT
+            echo "comment-template=public-release-tagged-delete-branch-failed" >> $GITHUB_OUTPUT
+          fi
         else
-          echo "task-template=tag-failed" >> $GITHUB_OUTPUT
-          echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
+          if [[ "${prerelease}" == "true" ]]; then
+            echo "task-template=internal-release-tag-failed" >> $GITHUB_OUTPUT
+            echo "comment-template=internal-release-ready-tag-failed" >> $GITHUB_OUTPUT
+          else
+            echo "task-template=public-release-tag-failed" >> $GITHUB_OUTPUT
+            echo "comment-template=public-release-tag-failed" >> $GITHUB_OUTPUT
+          fi
         fi
 
     - name: Create Asana task on failure
@@ -114,7 +166,7 @@ jobs:
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         release-task-url: ${{ env.asana-task-url }}
-        template-name: ${{ steps.asana-templates.outputs.task-template }}
+        template-name: ${{ steps.asana-failure-templates.outputs.task-template }}
 
     - name: Report failure
       if: failure()
@@ -125,7 +177,7 @@ jobs:
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-url: ${{ env.asana-task-url }}
-        template-name: ${{ steps.asana-templates.outputs.comment-template }}
+        template-name: ${{ steps.asana-failure-templates.outputs.comment-template }}
 
     - name: Report success
       if: success()
@@ -133,4 +185,4 @@ jobs:
       with:
         access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
         task-url: ${{ env.asana-task-url }}
-        template-name: internal-release-ready
+        template-name: ${{ steps.asana-success-template.outputs.comment-template }}
