@@ -41,16 +41,27 @@ final class Database {
 
     static func makeDatabase() -> (CoreDataDatabase?, Error?) {
         func makeDatabase(keyStore: EncryptionKeyStoring, containerLocation: URL) -> (CoreDataDatabase?, Error?) {
-            do {
-                try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
-                try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
-            } catch {
-                return (nil, error)
+            let useEncryptedValueTransformers: Bool = {
+#if REVIEW
+                return ProcessInfo.processInfo.environment["UITEST_MODE"] == nil
+#else
+                return true
+#endif
+            }()
+
+            if useEncryptedValueTransformers {
+                do {
+                    try EncryptedValueTransformer<NSImage>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSString>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSURL>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSNumber>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSError>.registerTransformer(keyStore: keyStore)
+                    try EncryptedValueTransformer<NSData>.registerTransformer(keyStore: keyStore)
+                } catch {
+                    return (nil, error)
+                }
             }
+
             let mainModel = NSManagedObjectModel.mergedModel(from: [.main])!
             let httpsUpgradeModel = HTTPSUpgrade.managedObjectModel
 
