@@ -968,7 +968,7 @@ protocol NewWindowPolicyDecisionMaker {
         guard let (url, source, forceReload) = tabContentReloadInfo(for: content, shouldLoadInBackground: shouldLoadInBackground),
               forceReload || shouldReload(url, shouldLoadInBackground: shouldLoadInBackground) else { return nil }
 
-        if case .settings = webView.url.flatMap({ TabContent.contentFromURL($0, source: .ui) }) {
+        if case .settings = content, case .settings = webView.url.flatMap({ TabContent.contentFromURL($0, source: .ui) }) {
             // replace WebView URL without adding a new history item if switching settings panes
             webView.evaluateJavaScript("location.replace('\(url.absoluteString.escapedJavaScriptString())')", in: nil, in: .defaultClient)
             return nil
