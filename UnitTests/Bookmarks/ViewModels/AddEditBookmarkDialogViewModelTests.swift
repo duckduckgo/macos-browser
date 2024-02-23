@@ -108,7 +108,7 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
 
     // MARK: State
 
-    func testShouldSetBookmarkNameToEmptyWhenInitAndModeIsAdd() {
+    func testShouldSetBookmarkNameToEmptyWhenInitModeIsAddAndTabInfoIsNil() {
         // GIVEN
         let sut = AddEditBookmarkDialogViewModel(mode: .add(), bookmarkManager: bookmarkManager)
 
@@ -117,6 +117,20 @@ final class AddEditBookmarkDialogViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertTrue(result.isEmpty)
+    }
+
+    func testShouldSetNameAndURLToValueWhenInitModeIsAddAndTabInfoIsNotNil() {
+        // GIVEN
+        let tab = Tab(content: .url(URL.duckDuckGo, source: .link), title: "Test")
+        let sut = AddEditBookmarkDialogViewModel(mode: .add(tabWebsite: WebsiteInfo(tab)), bookmarkManager: bookmarkManager)
+
+        // WHEN
+        let name = sut.bookmarkName
+        let url = sut.bookmarkURLPath
+
+        // THEN
+        XCTAssertEqual(name, "Test")
+        XCTAssertEqual(url, URL.duckDuckGo.absoluteString)
     }
 
     func testShouldSetBookmarkNameToValueWhenInitAndModeIsEdit() {

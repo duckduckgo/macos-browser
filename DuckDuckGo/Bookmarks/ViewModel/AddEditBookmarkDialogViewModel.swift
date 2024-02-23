@@ -32,7 +32,7 @@ protocol BookmarkDialogEditing: BookmarksDialogViewModel {
 final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
 
     enum Mode {
-        case add(parentFolder: BookmarkFolder? = nil)
+        case add(tabWebsite: WebsiteInfo? = nil, parentFolder: BookmarkFolder? = nil)
         case edit(bookmark: Bookmark)
     }
 
@@ -74,12 +74,12 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
     init(mode: Mode, bookmarkManager: LocalBookmarkManager = .shared) {
         self.mode = mode
         self.bookmarkManager = bookmarkManager
-        bookmarkName = mode.bookmark?.title ?? ""
-        bookmarkURLPath = mode.bookmark?.url ?? ""
-        isBookmarkFavorite = mode.bookmark?.isFavorite ?? false
+        bookmarkName = mode.bookmarkName ?? ""
+        bookmarkURLPath = mode.bookmarkURLPath?.absoluteString ?? ""
+        isBookmarkFavorite = mode.bookmarkURLPath.flatMap(bookmarkManager.isUrlFavorited) ?? false
         folders = .init(bookmarkManager.list)
         switch mode {
-        case let .add(parentFolder):
+        case let .add(_, parentFolder):
             selectedFolder = parentFolder
         case let .edit(bookmark):
             selectedFolder = folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
@@ -175,12 +175,21 @@ private extension AddEditBookmarkDialogViewModel.Mode {
         }
     }
 
-    var bookmark: Bookmark? {
+    var bookmarkName: String? {
         switch self {
-        case .add:
-            return nil
+        case let .add(tabInfo, _):
+            return tabInfo?.title
         case let .edit(bookmark):
-            return bookmark
+            return bookmark.title
+        }
+    }
+
+    var bookmarkURLPath: URL? {
+        switch self {
+        case let .add(tabInfo, _):
+            return tabInfo?.url
+        case let .edit(bookmark):
+            return bookmark.urlObject
         }
     }
 

@@ -337,7 +337,7 @@ final class BookmarkListViewController: NSViewController {
     }
 
     @objc func newBookmarkButtonClicked(_ sender: AnyObject) {
-        let view = BookmarksDialogViewFactory.makeAddBookmarkView()
+        let view = BookmarksDialogViewFactory.makeAddBookmarkView(currentTab: currentTabWebsite)
         showDialog(view: view)
     }
 
