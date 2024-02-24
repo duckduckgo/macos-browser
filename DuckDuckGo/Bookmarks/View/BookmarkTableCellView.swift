@@ -213,7 +213,7 @@ final class BookmarkTableCellView: NSTableCellView {
             accessoryImageView.isHidden = false
         }
 
-        accessoryImageView.image = bookmark.isFavorite ? .favorite : nil
+        accessoryImageView.image = bookmark.isFavorite ? .favoriteFilledBorder : nil
         titleLabel.stringValue = bookmark.title
         primaryTitleLabelValue = bookmark.title
         tertiaryTitleLabelValue = bookmark.url
