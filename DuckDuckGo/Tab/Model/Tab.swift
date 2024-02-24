@@ -702,6 +702,9 @@ protocol NewWindowPolicyDecisionMaker {
     }
     let permissions: PermissionModel
 
+    @Published private(set) var lastWebError: Error?
+    @Published private(set) var lastHttpStatusCode: Int?
+
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var loadingProgress: Double = 0.0
 
@@ -1281,6 +1284,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     @MainActor
     func willStart(_ navigation: Navigation) {
         if error != nil { error = nil }
+        if lastWebError != nil { lastWebError = nil }
 
         delegate?.tabWillStartNavigation(self, isUserInitiated: navigation.navigationAction.isUserInitiated)
     }
@@ -1289,6 +1293,8 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
         internalUserDecider?.markUserAsInternalIfNeeded(forUrl: webView.url,
                                                         response: navigationResponse.response as? HTTPURLResponse)
+
+        lastHttpStatusCode = navigationResponse.httpStatusCode
 
         return .next
     }
@@ -1300,6 +1306,7 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
         userInteractionDialog = nil
 
         // Unnecessary assignment triggers publishing
+        if lastWebError != nil { lastWebError = nil }
         if error != nil,
            navigation.navigationAction.navigationType != .alternateHtmlLoad { // error page navigation
             error = nil
@@ -1337,6 +1344,11 @@ extension Tab/*: NavigationResponder*/ { // to be moved to Tab+Navigation.swift
             let shouldPerformAlternateNavigation = navigation.url != webView.url || navigation.navigationAction.targetFrame?.url != .error
             loadErrorHTML(error, header: UserText.errorPageHeader, forUnreachableURL: url, alternate: shouldPerformAlternateNavigation)
         }
+    }
+
+    @MainActor
+    func didFailProvisionalLoad(with request: URLRequest, in frame: WKFrameInfo, with error: Error) {
+        lastWebError = error
     }
 
     @MainActor
