@@ -679,6 +679,9 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
 
     func editBookmark(_ sender: NSMenuItem) {
         guard let bookmark = sender.representedObject as? Bookmark, let bookmarkIndex = index(for: bookmark) else { return }
+
+        BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
+            .show(in: view.window)
     }
 
     func copyBookmark(_ sender: NSMenuItem) {
