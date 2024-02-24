@@ -25,32 +25,47 @@ extension PromptActionView {
     ///
     final class Model: ObservableObject {
 
-        private let presentationData: PromptPresentable
+        private(set) var icon: NetworkProtectionAsset
+        private(set) var title: String
+        private(set) var description: [StyledTextFragment]
+        private(set) var actionTitle: String
+        private(set) var actionScreenshot: NetworkProtectionAsset?
         let action: () -> Void
 
-        init(presentationData: PromptPresentable, action: @escaping () -> Void) {
-            self.presentationData = presentationData
+        convenience init(onboardingStep: OnboardingStep, isMenuBar: Bool, action: @escaping () -> Void) {
+            self.init(
+                icon: onboardingStep.icon,
+                title: onboardingStep.title,
+                description: onboardingStep.description(isMenuBar: isMenuBar),
+                actionTitle: onboardingStep.actionTitle,
+                actionScreenshot: onboardingStep.actionScreenshot,
+                action: action
+            )
+        }
+
+        convenience init(presentationData data: PromptPresentable, action: @escaping () -> Void) {
+            self.init(
+                icon: data.icon,
+                title: data.title,
+                description: data.description,
+                actionTitle: data.actionTitle,
+                actionScreenshot: data.actionScreenshot,
+                action: action
+            )
+        }
+
+        init(icon: NetworkProtectionAsset,
+             title: String,
+             description: [StyledTextFragment],
+             actionTitle: String,
+             actionScreenshot: NetworkProtectionAsset? = nil,
+             action: @escaping () -> Void) {
+            self.icon = icon
+            self.title = title
+            self.description = description
+            self.actionTitle = actionTitle
+            self.actionScreenshot = actionScreenshot
             self.action = action
-        }
-
-        var icon: NetworkProtectionAsset {
-            presentationData.icon
-        }
-
-        var title: String {
-            presentationData.title
-        }
-
-        var description: [StyledTextFragment] {
-            presentationData.description
-        }
-
-        var actionTitle: String {
-            presentationData.actionTitle
-        }
-
-        var actionScreenshot: NetworkProtectionAsset? {
-            presentationData.actionScreenshot
         }
     }
 }
@@ -77,7 +92,7 @@ struct StyledTextFragment {
     }
 }
 
-extension OnboardingStep: PromptPresentable {
+extension OnboardingStep {
     var icon: NetworkProtectionAsset {
         switch self {
         case .userNeedsToAllowExtension:
@@ -96,7 +111,7 @@ extension OnboardingStep: PromptPresentable {
         }
     }
 
-    var description: [StyledTextFragment] {
+    func description(isMenuBar: Bool) -> [StyledTextFragment] {
         switch self {
         case .userNeedsToAllowExtension:
             return [
@@ -105,11 +120,19 @@ extension OnboardingStep: PromptPresentable {
                 .init(text: UserText.networkProtectionOnboardingAllowExtensionDescSuffix),
             ]
         case .userNeedsToAllowVPNConfiguration:
-            return [
-                .init(text: UserText.networkProtectionOnboardingAllowVPNDescPrefix),
-                .init(text: UserText.networkProtectionOnboardingAllowVPNDescAllow, isEmphasized: true),
-                .init(text: UserText.networkProtectionOnboardingAllowVPNDescSuffix),
-            ]
+            if isMenuBar {
+                return [
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescPrefix),
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescAllow, isEmphasized: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescSuffix)
+                ]
+            } else {
+                return [
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescPrefix),
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescAllow, isEmphasized: true),
+                    .init(text: UserText.networkProtectionOnboardingAllowVPNDescExpandedSuffix)
+                ]
+            }
         }
     }
 

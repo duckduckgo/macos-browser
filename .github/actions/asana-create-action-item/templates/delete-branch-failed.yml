@@ -1,0 +1,15 @@
+data:
+  name: Delete ${BRANCH} branch
+  assignee: "${ASSIGNEE_ID}"
+  html_notes: |
+    <body>
+      The <code>${TAG}</code> public release has been successfully tagged and published in GitHub releases, 
+      but deleting <code>${BRANCH}</code> branch failed. Please delete it manually:
+      <ul>
+        <li><code>git push origin --delete ${BRANCH}</code></li>
+      </ul>
+      Complete this task when ready, or if the release branch has already been deleted.
+
+
+      🔗 Workflow URL: <a href='${WORKFLOW_URL}'>${WORKFLOW_URL}</a>.
+    </body>
