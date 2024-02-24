@@ -93,8 +93,11 @@ final class PrivacyDashboardViewController: NSViewController {
         }
     }
 
-    public override func viewDidLoad() {
+    public override func viewDidDisappear() {
+        self.privacyDashboardController.viewDidDisappear()
+    }
 
+    public override func viewDidLoad() {
         super.viewDidLoad()
         initWebView()
         privacyDashboardController.setup(for: webView, reportBrokenSiteOnly: initMode == .reportBrokenSite ? true : false)
