@@ -25,7 +25,7 @@ final class PrivacyProtectionStatus: ObservableObject {
     static func status(for preferencePane: PreferencePaneIdentifier) -> PrivacyProtectionStatus {
         switch preferencePane {
         case .defaultBrowser:
-            return PrivacyProtectionStatus(statusPublisher: DefaultBrowserPreferences().$isDefault) { isDefault in
+            return PrivacyProtectionStatus(statusPublisher: DefaultBrowserPreferences.shared.$isDefault) { isDefault in
                 isDefault ? .on : .off
             }
         case .privateSearch:
@@ -43,10 +43,6 @@ final class PrivacyProtectionStatus: ObservableObject {
             )
             return PrivacyProtectionStatus(statusPublisher: publisher, initialValue: EmailManager().isSignedIn ? .on : .off) { _ in
                 EmailManager().isSignedIn ? .on : .off
-            }
-        case .vpn:
-            return PrivacyProtectionStatus(statusPublisher: VPNPreferencesModel().$showUninstallVPN) { showUninstallVPN in
-                showUninstallVPN ? .on : .off
             }
         default:
             return PrivacyProtectionStatus()

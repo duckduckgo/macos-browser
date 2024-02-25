@@ -71,6 +71,8 @@ struct SystemDefaultBrowserProvider: DefaultBrowserProvider {
 
 final class DefaultBrowserPreferences: ObservableObject {
 
+    static let shared = DefaultBrowserPreferences()
+
     @Published private(set) var isDefault: Bool = false {
         didSet {
             // Temporary pixel for first time user import data
