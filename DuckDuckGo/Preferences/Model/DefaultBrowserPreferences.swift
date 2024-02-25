@@ -115,8 +115,33 @@ final class DefaultBrowserPreferences: ObservableObject {
 
         do {
             try defaultBrowserProvider.presentDefaultBrowserPrompt()
+            repeatCheckIfDefault()
         } catch {
             defaultBrowserProvider.openSystemPreferences()
+        }
+    }
+
+    var executionCount = 0
+    let maxNumberOfExecutions = 60
+    var timer: Timer?
+
+    // Monitors for changes in default browser setting over the next minute
+    private func repeatCheckIfDefault() {
+        timer?.invalidate()
+        executionCount = 0
+        timer = Timer.scheduledTimer(timeInterval: 1.0,
+                                     target: self,
+                                     selector: #selector(timerFired),
+                                     userInfo: nil,
+                                     repeats: true)
+    }
+
+    @objc private func timerFired() {
+        checkIfDefault()
+
+        executionCount += 1
+        if executionCount >= maxNumberOfExecutions {
+            timer?.invalidate()
         }
     }
 
