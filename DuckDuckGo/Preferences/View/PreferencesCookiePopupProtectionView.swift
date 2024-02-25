@@ -30,18 +30,13 @@ extension Preferences {
         var body: some View {
             PreferencePane("Cookie Pop-up Protection") {
 
-                // SECTION 1: Cookie Popup Protection
-                PreferencePaneSection {
-                    ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
-                    VStack(alignment: .leading, spacing: 0) {
-                        TextMenuItemCaption(UserText.autoconsentExplanation)
-                        TextButton(UserText.learnMore) {
-                            WindowControllersManager.shared.show(url: .cookieConsentPopUpManagement,
-                                                                 source: .ui,
-                                                                 newTab: true)
-                        }
-                    }
-                }
+                // SECTION 1: Description
+                DescriptionView(imageName: "CookiePopupProtection",
+                                header: "Cookie Pop-up Protection",
+                                description: UserText.autoconsentExplanation,
+                                learnMoreUrl: .cookieConsentPopUpManagement,
+                                status: model.isAutoconsentEnabled ? .on : .off)
+                ToggleMenuItem(UserText.autoconsentCheckboxTitle, isOn: $model.isAutoconsentEnabled)
             }
         }
     }

@@ -43,13 +43,13 @@ extension Preferences {
         let pane: PreferencePaneIdentifier
         let isSelected: Bool
         let action: () -> Void
-        @ObservedObject var paneStatus: PaneStatus
+        @ObservedObject var protectionStatus: PrivacyProtectionStatus
 
         init(pane: PreferencePaneIdentifier, isSelected: Bool, action: @escaping () -> Void) {
             self.pane = pane
             self.isSelected = isSelected
             self.action = action
-            self.paneStatus = PaneStatus.status(for: pane)
+            self.protectionStatus = PrivacyProtectionStatus.status(for: pane)
         }
 
         var body: some View {
@@ -60,8 +60,8 @@ extension Preferences {
 
                     Spacer()
 
-                    if let status = paneStatus.status {
-                        StatusIndicatorView(status: status, isSelected: isSelected)
+                    if let status = protectionStatus.status {
+                        StatusIndicatorView(status: status)
                     }
                 }
             }
@@ -70,12 +70,15 @@ extension Preferences {
     }
 
     enum StatusIndicator {
+        case alwaysOn
         case on
         case off
         case custom(String)
 
         var text: String {
             switch self {
+            case .alwaysOn:
+                return "Always On"
             case .on:
                 return "On"
             case .off:
@@ -88,7 +91,6 @@ extension Preferences {
 
     struct StatusIndicatorView: View {
         var status: StatusIndicator
-        var isSelected: Bool
 
         var body: some View {
             HStack(spacing: 4) {
@@ -104,7 +106,7 @@ extension Preferences {
 
         private func colorForStatus(_ status: StatusIndicator) -> Color {
             switch status {
-            case .on:
+            case .on, .alwaysOn:
                 return .alertGreen
             case .off:
                 return Color.secondary.opacity(0.33)

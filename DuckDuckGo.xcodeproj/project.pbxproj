@@ -38,9 +38,9 @@
 		1D220BF82B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BF72B86192200F8BBC6 /* PreferencesEmailProtectionView.swift */; };
 		1D220BF92B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BF72B86192200F8BBC6 /* PreferencesEmailProtectionView.swift */; };
 		1D220BFA2B86192200F8BBC6 /* PreferencesEmailProtectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BF72B86192200F8BBC6 /* PreferencesEmailProtectionView.swift */; };
-		1D220BFC2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift */; };
-		1D220BFD2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift */; };
-		1D220BFE2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift */; };
+		1D220BFC2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift */; };
+		1D220BFD2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift */; };
+		1D220BFE2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D220BFB2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift */; };
 		1D26EBAC2B74BECB0002A93F /* NSImageSendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D26EBAB2B74BECB0002A93F /* NSImageSendable.swift */; };
 		1D26EBAD2B74BECB0002A93F /* NSImageSendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D26EBAB2B74BECB0002A93F /* NSImageSendable.swift */; };
 		1D26EBAE2B74BECB0002A93F /* NSImageSendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D26EBAB2B74BECB0002A93F /* NSImageSendable.swift */; };
@@ -3310,7 +3310,7 @@
 		1D1C36E229FAE8DA001FA40C /* FaviconManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaviconManagerTests.swift; sourceTree = "<group>"; };
 		1D1C36E529FB019C001FA40C /* HistoryTabExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTabExtensionTests.swift; sourceTree = "<group>"; };
 		1D220BF72B86192200F8BBC6 /* PreferencesEmailProtectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesEmailProtectionView.swift; sourceTree = "<group>"; };
-		1D220BFB2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesPaneStatus.swift; sourceTree = "<group>"; };
+		1D220BFB2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesProtectionStatus.swift; sourceTree = "<group>"; };
 		1D26EBAB2B74BECB0002A93F /* NSImageSendable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImageSendable.swift; sourceTree = "<group>"; };
 		1D26EBAF2B74DB600002A93F /* TabSnapshotCleanupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabSnapshotCleanupService.swift; sourceTree = "<group>"; };
 		1D36E657298AA3BA00AA485D /* InternalUserDeciderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternalUserDeciderStore.swift; sourceTree = "<group>"; };
@@ -5234,15 +5234,15 @@
 				37AFCE8027DA2CA600471A10 /* PreferencesViewController.swift */,
 				37AFCE8627DA334800471A10 /* PreferencesRootView.swift */,
 				37AFCE8427DA2D3900471A10 /* PreferencesSidebar.swift */,
-				1D220BFB2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift */,
+				1D220BFB2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift */,
 				37AFCE8A27DB69BC00471A10 /* PreferencesGeneralView.swift */,
 				1D01A3D72B88DF8B00FE8150 /* PreferencesSyncView.swift */,
 				1DDC84FA2B8356CE00670238 /* PreferencesDefaultBrowserView.swift */,
 				1DDC84F62B83558F00670238 /* PreferencesPrivateSearchView.swift */,
 				1DDC85022B83903E00670238 /* PreferencesWebTrackingProtectionView.swift */,
 				1DDD3EBF2B84F5D5004CBF2B /* PreferencesCookiePopupProtectionView.swift */,
-				4B41EDA62B1543C9001EEDF4 /* PreferencesVPNView.swift */,
 				1D220BF72B86192200F8BBC6 /* PreferencesEmailProtectionView.swift */,
+				4B41EDA62B1543C9001EEDF4 /* PreferencesVPNView.swift */,
 				37D2771427E870D4003365FD /* PreferencesAppearanceView.swift */,
 				379DE4BC27EA31AC002CC3DE /* PreferencesAutofillView.swift */,
 				1D01A3CF2B88CEC600FE8150 /* PreferencesAccessibilityView.swift */,
@@ -9999,7 +9999,7 @@
 				1D26EBAD2B74BECB0002A93F /* NSImageSendable.swift in Sources */,
 				3706FBF4293F65D500E42796 /* Visit.swift in Sources */,
 				3706FBF5293F65D500E42796 /* PixelDataStore.swift in Sources */,
-				1D220BFD2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift in Sources */,
+				1D220BFD2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift in Sources */,
 				3706FBF6293F65D500E42796 /* Pixel.swift in Sources */,
 				3706FBF7293F65D500E42796 /* PixelEvent.swift in Sources */,
 				3706FBF8293F65D500E42796 /* TabBarFooter.swift in Sources */,
@@ -10847,7 +10847,7 @@
 				4B9579E02AC7AE700062CA31 /* BookmarkExtension.swift in Sources */,
 				4B9579E12AC7AE700062CA31 /* PasswordManagementCreditCardModel.swift in Sources */,
 				B677FC522B06376B0099EB04 /* ReportFeedbackView.swift in Sources */,
-				1D220BFE2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift in Sources */,
+				1D220BFE2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift in Sources */,
 				4B9579E22AC7AE700062CA31 /* NSEventExtension.swift in Sources */,
 				1D26EBB22B74DB600002A93F /* TabSnapshotCleanupService.swift in Sources */,
 				4B9579E32AC7AE700062CA31 /* Onboarding.swift in Sources */,
@@ -11638,7 +11638,7 @@
 				98779A0029999B64005D8EB6 /* Bookmark.xcdatamodeld in Sources */,
 				85589E9E27BFE4500038AD11 /* DefaultBrowserPromptView.swift in Sources */,
 				4B4032842AAAC24400CCA602 /* WaitlistActivationDateStore.swift in Sources */,
-				1D220BFC2B87AACF00F8BBC6 /* PreferencesPaneStatus.swift in Sources */,
+				1D220BFC2B87AACF00F8BBC6 /* PreferencesProtectionStatus.swift in Sources */,
 				AA512D1424D99D9800230283 /* FaviconManager.swift in Sources */,
 				7BB108592A43375D000AB95F /* PFMoveApplication.m in Sources */,
 				4B0AACAC28BC63ED001038AC /* ChromiumFaviconsReader.swift in Sources */,

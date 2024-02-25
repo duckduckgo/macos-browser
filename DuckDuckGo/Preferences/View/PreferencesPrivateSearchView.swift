@@ -30,25 +30,53 @@ extension Preferences {
         var body: some View {
             PreferencePane("Private Search") {
 
-                // SECTION 1: Private Search
-                PreferencePaneSection {
-                    ToggleMenuItem("Always On", isOn: .constant(true))
-                        .disabled(true)
-                    VStack(alignment: .leading, spacing: 0) {
-                        TextMenuItemCaption(UserText.privateSearchExplenation)
-                        TextButton(UserText.learnMore) {
-                            WindowControllersManager.shared.show(url: .privateSearchLearnMore,
-                                                                 source: .ui,
-                                                                 newTab: true)
-                        }
-                    }
-                }
+                // SECTION 1: Description
+                DescriptionView(imageName: "PrivateSearch",
+                                header: "Private Search",
+                                description: UserText.privateSearchExplenation,
+                                learnMoreUrl: .privateSearchLearnMore,
+                                status: .alwaysOn)
 
                 // SECTION 2: Search Settings
                 PreferencePaneSection("Search Settings") {
                     ToggleMenuItem(UserText.showAutocompleteSuggestions, isOn: $model.showAutocompleteSuggestions)
                 }
             }
+        }
+    }
+}
+
+extension Preferences {
+
+    struct DescriptionView: View {
+        let imageName: String
+        let header: String
+        let description: String
+        let learnMoreUrl: URL
+        let status: StatusIndicator
+
+        var body: some View {
+            VStack(alignment: .center, spacing: 16) {
+                Image(imageName)
+                VStack(alignment: .center, spacing: 4) {
+                    Text(header)
+                    StatusIndicatorView(status: status)
+                }
+                VStack(alignment: .center, spacing: 1) {
+                    Text(description)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.secondary)
+                    TextButton(UserText.learnMore) {
+                        WindowControllersManager.shared.show(url: learnMoreUrl,
+                                                             source: .ui,
+                                                             newTab: true)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 254)
+            .roundedBorder()
         }
     }
 }

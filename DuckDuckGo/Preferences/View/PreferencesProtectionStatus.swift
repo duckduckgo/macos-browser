@@ -1,5 +1,5 @@
 //
-//  PreferencesPaneStatus.swift
+//  PreferencesProtectionStatus.swift
 //
 //  Copyright © 2024 DuckDuckGo. All rights reserved.
 //
@@ -20,20 +20,20 @@ import SwiftUI
 import Combine
 import BrowserServicesKit
 
-final class PaneStatus: ObservableObject {
+final class PrivacyProtectionStatus: ObservableObject {
 
-    static func status(for preferencePane: PreferencePaneIdentifier) -> PaneStatus {
+    static func status(for preferencePane: PreferencePaneIdentifier) -> PrivacyProtectionStatus {
         switch preferencePane {
         case .defaultBrowser:
-            return PaneStatus(statusPublisher: DefaultBrowserPreferences().$isDefault) { isDefault in
+            return PrivacyProtectionStatus(statusPublisher: DefaultBrowserPreferences().$isDefault) { isDefault in
                 isDefault ? .on : .off
             }
         case .privateSearch:
-            return PaneStatus(statusIndicator: .on)
+            return PrivacyProtectionStatus(statusIndicator: .on)
         case .webTrackingProtection:
-            return PaneStatus(statusIndicator: .on)
+            return PrivacyProtectionStatus(statusIndicator: .on)
         case .cookiePopupProtection:
-            return PaneStatus(statusPublisher: CookiePopupProtectionPreferences.shared.$isAutoconsentEnabled) { isAutoconsentEnabled in
+            return PrivacyProtectionStatus(statusPublisher: CookiePopupProtectionPreferences.shared.$isAutoconsentEnabled) { isAutoconsentEnabled in
                 isAutoconsentEnabled ? .on : .off
             }
         case .emailProtection:
@@ -41,15 +41,15 @@ final class PaneStatus: ObservableObject {
                 NotificationCenter.default.publisher(for: .emailDidSignIn),
                 NotificationCenter.default.publisher(for: .emailDidSignOut)
             )
-            return PaneStatus(statusPublisher: publisher, initialValue: EmailManager().isSignedIn ? .on : .off) { _ in
+            return PrivacyProtectionStatus(statusPublisher: publisher, initialValue: EmailManager().isSignedIn ? .on : .off) { _ in
                 EmailManager().isSignedIn ? .on : .off
             }
         case .vpn:
-            return PaneStatus(statusPublisher: VPNPreferencesModel().$showUninstallVPN) { showUninstallVPN in
+            return PrivacyProtectionStatus(statusPublisher: VPNPreferencesModel().$showUninstallVPN) { showUninstallVPN in
                 showUninstallVPN ? .on : .off
             }
         default:
-            return PaneStatus()
+            return PrivacyProtectionStatus()
         }
     }
 
@@ -57,7 +57,7 @@ final class PaneStatus: ObservableObject {
     @Published var status: Preferences.StatusIndicator?
 
     // Initializer for observable properties
-    init<T: Publisher>(statusPublisher: T, 
+    init<T: Publisher>(statusPublisher: T,
                        initialValue: Preferences.StatusIndicator? = nil,
                        transform: @escaping (T.Output) -> Preferences.StatusIndicator?) where T.Failure == Never {
         self.status = initialValue

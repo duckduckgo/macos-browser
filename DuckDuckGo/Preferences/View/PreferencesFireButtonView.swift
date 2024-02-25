@@ -33,7 +33,7 @@ extension Preferences {
 
                     PreferencePaneSubSection {
                         ToggleMenuItem(UserText.fireproofCheckboxTitle, isOn: $model.isLoginDetectionEnabled)
-                        VStack(alignment: .leading, spacing: 0) {
+                        VStack(alignment: .leading, spacing: 1) {
                             TextMenuItemCaption(UserText.fireproofExplanation)
                             TextButton(UserText.learnMore) {
                                 WindowControllersManager.shared.show(url: .theFireButton,

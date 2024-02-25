@@ -382,6 +382,9 @@
     "also applies here." : {
 
     },
+    "Always On" : {
+
+    },
     "Always Show" : {
       "comment" : "Preference for always showing the bookmarks bar"
     },
@@ -8263,6 +8266,9 @@
     "Privacy Policy " : {
 
     },
+    "Private Search" : {
+
+    },
     "private.search.explenation" : {
       "comment" : "feature explanation in settings",
       "extractionState" : "extracted_with_value",
@@ -9245,6 +9251,9 @@
     },
     "We were unable to import passwords directly from %@." : {
       "comment" : "Message when data import fails from a browser. %@ - a browser name"
+    },
+    "Web Tracking Protection" : {
+
     },
     "web.tracking.protection.explanation" : {
       "comment" : "feature explanation in settings",

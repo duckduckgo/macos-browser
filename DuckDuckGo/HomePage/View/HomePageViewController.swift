@@ -42,6 +42,7 @@ final class HomePageViewController: NSViewController {
     var recentlyVisitedModel: HomePage.Models.RecentlyVisitedModel!
     var featuresModel: HomePage.Models.ContinueSetUpModel!
     var accessibilityPreferences: AccessibilityPreferences!
+    var appearancePreferences: AppearancePreferences!
     var cancellables = Set<AnyCancellable>()
 
     @UserDefaultsWrapper(key: .defaultBrowserDismissed, defaultValue: false)
@@ -72,6 +73,7 @@ final class HomePageViewController: NSViewController {
         recentlyVisitedModel = createRecentlyVisitedModel()
         featuresModel = createFeatureModel()
         accessibilityPreferences = AccessibilityPreferences.shared
+        appearancePreferences = AppearancePreferences.shared
 
         refreshModels()
 
@@ -81,6 +83,7 @@ final class HomePageViewController: NSViewController {
             .environmentObject(recentlyVisitedModel)
             .environmentObject(featuresModel)
             .environmentObject(accessibilityPreferences)
+            .environmentObject(appearancePreferences)
             .onTapGesture { [weak self] in
                 // Remove focus from the address bar if interacting with this view.
                 self?.view.makeMeFirstResponder()

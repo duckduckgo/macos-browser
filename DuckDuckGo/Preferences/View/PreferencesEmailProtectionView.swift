@@ -25,69 +25,42 @@ import BrowserServicesKit
 
 extension Preferences {
     struct EmailProtectionView: View {
-            var emailManager: EmailManager
-
-            // Local state to trigger the view refresh
-            @State private var needsRefresh: Bool = false
-            @State private var notificationToken: AnyCancellable?
+        var emailManager: EmailManager
+        @ObservedObject var protectionStatus: PrivacyProtectionStatus = PrivacyProtectionStatus.status(for: .emailProtection)
 
             var body: some View {
                 PreferencePane("Email Protection") {
-                    // SECTION 1: Email
-                    PreferencePaneSection {
 
-                        PreferencePaneSubSection {
-                            if emailManager.isSignedIn {
-                                Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
-                                    WindowControllersManager.shared.show(url: EmailUrls().emailProtectionAccountLink,
-                                                                         source: .ui,
-                                                                         newTab: true)
-                                }
-                                Button(UserText.emailOptionsMenuTurnOffSubItem) {
-                                    let alert = NSAlert.disableEmailProtection()
-                                    let response = alert.runModal()
-                                    if response == .alertFirstButtonReturn {
-                                        try? emailManager.signOut()
-                                        needsRefresh.toggle() // Toggle to refresh the view
-                                    }
-                                }
-                            } else {
-                                Button(UserText.emailOptionsMenuTurnOnSubItem + "…") {
-                                    WindowControllersManager.shared.show(url: EmailUrls().emailProtectionLink,
-                                                                         source: .ui,
-                                                                         newTab: true)
+                    // SECTION 1: Description
+                    DescriptionView(imageName: "WebTrackingProtection",
+                                    header: "Email Protection",
+                                    description: UserText.emailProtectionExplanation,
+                                    learnMoreUrl: .duckDuckGoEmailInfo,
+                                    status: protectionStatus.status ?? .off)
+
+                    PreferencePaneSubSection {
+                        if emailManager.isSignedIn {
+                            Button(UserText.emailOptionsMenuManageAccountSubItem + "…") {
+                                WindowControllersManager.shared.show(url: EmailUrls().emailProtectionAccountLink,
+                                                                     source: .ui,
+                                                                     newTab: true)
+                            }
+                            Button(UserText.emailOptionsMenuTurnOffSubItem) {
+                                let alert = NSAlert.disableEmailProtection()
+                                let response = alert.runModal()
+                                if response == .alertFirstButtonReturn {
+                                    try? emailManager.signOut()
                                 }
                             }
-                        }
-
-                        PreferencePaneSubSection {
-                            VStack(alignment: .leading, spacing: 0) {
-                                TextMenuItemCaption(UserText.emailProtectionExplanation)
-                                TextButton(UserText.learnMore) {
-                                    WindowControllersManager.shared.show(url: .duckDuckGoEmailInfo,
-                                                                         source: .ui,
-                                                                         newTab: true)
-                                }
+                        } else {
+                            Button(UserText.emailOptionsMenuTurnOnSubItem + "…") {
+                                WindowControllersManager.shared.show(url: EmailUrls().emailProtectionLink,
+                                                                     source: .ui,
+                                                                     newTab: true)
                             }
                         }
                     }
                 }
-                .onAppear {
-                    subscribeToNotifications()
-                }
-
             }
-
-        private func subscribeToNotifications() {
-            notificationToken = Publishers.Merge(
-                NotificationCenter.default.publisher(for: .emailDidSignIn),
-                NotificationCenter.default.publisher(for: .emailDidSignOut)
-            )
-            .receive(on: RunLoop.main)
-            .sink { _ in
-                // Refresh the view
-                self.needsRefresh.toggle()
-            }
-        }
     }
 }

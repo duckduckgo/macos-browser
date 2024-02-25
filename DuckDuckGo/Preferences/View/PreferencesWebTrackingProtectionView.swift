@@ -30,25 +30,18 @@ extension Preferences {
         var body: some View {
             PreferencePane("Web Tracking Protection") {
 
-                // SECTION 1: Web Tracking Protection Section
-                PreferencePaneSection {
-                    ToggleMenuItem("Always On", isOn: .constant(true))
-                        .disabled(true)
-                    VStack(alignment: .leading, spacing: 0) {
-                        TextMenuItemCaption(UserText.webTrackingProtectionExplanation)
-                        TextButton(UserText.learnMore) {
-                            WindowControllersManager.shared.show(url: .webTrackingProtection,
-                                                                 source: .ui,
-                                                                 newTab: true)
-                        }
-                    }
-                }
+                // SECTION 1: Description
+                DescriptionView(imageName: "WebTrackingProtection",
+                                header: "Web Tracking Protection",
+                                description: UserText.webTrackingProtectionExplanation,
+                                learnMoreUrl: .webTrackingProtection,
+                                status: .alwaysOn)
 
                 // SECTION 2: Global privacy control
                 PreferencePaneSection(UserText.gpcSettingsTitle) {
 
                     ToggleMenuItem(UserText.gpcCheckboxTitle, isOn: $model.isGPCEnabled)
-                    VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 1) {
                         TextMenuItemCaption(UserText.gpcExplanation)
                         TextButton(UserText.learnMore) {
                             WindowControllersManager.shared.show(url: .gpcLearnMore,
