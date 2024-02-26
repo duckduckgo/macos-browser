@@ -306,7 +306,13 @@ extension BookmarkManagementSidebarViewController: FolderMenuItemSelectors {
     }
 
     func editFolder(_ sender: NSMenuItem) {
-        // https://app.asana.com/0/0/1206531304671948/f
+        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+            assertionFailure("Failed to cast menu represented object to BookmarkFolder")
+            return
+        }
+
+        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+            .show(in: view.window)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {

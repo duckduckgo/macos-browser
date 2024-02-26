@@ -290,12 +290,12 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     @objc func presentAddBookmarkModal(_ sender: Any) {
-        AddBookmarkModalView(model: AddBookmarkModalViewModel(parent: selectionState.folder))
+        BookmarksDialogViewFactory.makeAddBookmarkView(parent: selectionState.folder)
             .show(in: view.window)
     }
 
     @objc func presentAddFolderModal(_ sender: Any) {
-        AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(parent: selectionState.folder))
+        BookmarksDialogViewFactory.makeAddBookmarkFolderView(parentFolder: selectionState.folder)
             .show(in: view.window)
     }
 
@@ -625,7 +625,13 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
     }
 
     func editFolder(_ sender: NSMenuItem) {
-        // https://app.asana.com/0/0/1206531304671952/f
+        guard let (folder, parent) = sender.representedObject as? (BookmarkFolder, BookmarkFolder?) else {
+            assertionFailure("Failed to cast menu represented object to BookmarkFolder")
+            return
+        }
+
+        BookmarksDialogViewFactory.makeEditBookmarkFolderView(folder: folder, parentFolder: parent)
+            .show(in: view.window)
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
