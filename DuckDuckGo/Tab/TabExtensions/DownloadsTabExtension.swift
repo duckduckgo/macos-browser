@@ -43,7 +43,7 @@ final class DownloadsTabExtension: NSObject {
     @Published
     private(set) var savePanelDialogRequest: SavePanelDialogRequest? {
         willSet {
-            newValue?.addCompletionHandler { [weak self, weak savePanelDialogRequest] _ in
+            newValue?.addCompletionHandler { [weak self, weak savePanelDialogRequest=newValue] _ in
                 if let self,
                     let savePanelDialogRequest,
                     self.savePanelDialogRequest === savePanelDialogRequest {
@@ -241,8 +241,7 @@ extension DownloadsTabExtension: DownloadTaskDelegate {
 
     @MainActor
     func chooseDestination(suggestedFilename: String?, directoryURL: URL?, fileTypes: [UTType], callback: @escaping @MainActor (URL?, UTType?) -> Void) {
-        savePanelDialogRequest = SavePanelDialogRequest(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { [weak self] result in
-            self?.savePanelDialogRequest = nil
+        savePanelDialogRequest = SavePanelDialogRequest(SavePanelParameters(suggestedFilename: suggestedFilename, fileTypes: fileTypes)) { result in
             guard case let .success(.some( (url: url, fileType: fileType) )) = result else {
                 callback(nil, nil)
                 return
