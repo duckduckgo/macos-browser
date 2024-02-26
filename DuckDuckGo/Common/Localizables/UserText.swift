@@ -1114,7 +1114,7 @@ struct UserText {
         }
     }
 
-    static let deleteAllPasswordsPermissionText = NSLocalizedString("autofill.items.delete-all-passwords-permisson-text", value: "Authenticate to confirm you want to delete all passwords.", comment: "Message displayed in system authentication dialog")
+    static let deleteAllPasswordsPermissionText = NSLocalizedString("autofill.items.delete-all-passwords-permisson-text", value: "Authenticate to confirm you want to delete all passwords", comment: "Message displayed in system authentication dialog")
 
 #if SUBSCRIPTION
     // Key: "subscription.menu.item"
