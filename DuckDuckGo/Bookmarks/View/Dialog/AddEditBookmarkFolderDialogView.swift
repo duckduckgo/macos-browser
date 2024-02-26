@@ -33,10 +33,10 @@ struct AddEditBookmarkFolderDialogView: ModalView {
             folderName: $viewModel.folderName,
             selectedFolder: $viewModel.selectedFolder,
             cancelActionTitle: viewModel.cancelActionTitle,
-            isCancelActionDisabled: viewModel.isCancelActionDisabled,
+            isCancelActionDisabled: viewModel.isOtherActionDisabled,
             cancelAction: viewModel.cancel,
             defaultActionTitle: viewModel.defaultActionTitle,
-            isDefaultActionDisabled: viewModel.isDefaultActionButtonDisabled,
+            isDefaultActionDisabled: viewModel.isDefaultActionDisabled,
             defaultAction: viewModel.addOrSave
         )
         .font(.system(size: 13))
