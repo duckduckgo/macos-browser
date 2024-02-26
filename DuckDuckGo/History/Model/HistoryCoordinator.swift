@@ -146,6 +146,8 @@ final class HistoryCoordinator: HistoryCoordinating {
     func commitChanges(url: URL) {
         guard let historyDictionary = historyDictionary,
               let entry = historyDictionary[url] else {
+
+            addVisit(of: url)
             return
         }
 
