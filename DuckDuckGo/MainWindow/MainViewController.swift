@@ -141,7 +141,7 @@ final class MainViewController: NSViewController {
             updateBookmarksBarViewVisibility(visible: bookmarksBarVisible)
         }
 
-        updateDividerColor()
+        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
     }
 
     override func viewDidLayout() {
@@ -242,12 +242,11 @@ final class MainViewController: NSViewController {
         mainView.layoutSubtreeIfNeeded()
         mainView.updateTrackingAreas()
 
-        updateDividerColor()
+        updateDividerColor(isShowingHomePage: tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab)
     }
 
-    private func updateDividerColor() {
+    private func updateDividerColor(isShowingHomePage isHomePage: Bool) {
         NSAppearance.withAppAppearance {
-            let isHomePage = tabCollectionViewModel.selectedTabViewModel?.tab.content == .newtab
             let backgroundColor: NSColor = (bookmarksBarIsVisible || isHomePage) ? .bookmarkBarBackground : .addressBarSolidSeparatorColor
             mainView.divider.backgroundColor = backgroundColor
         }
@@ -293,7 +292,7 @@ final class MainViewController: NSViewController {
     }
 
     private func resizeNavigationBarForHomePage(_ homePage: Bool, animated: Bool) {
-        updateDividerColor()
+        updateDividerColor(isShowingHomePage: homePage)
         navigationBarViewController.resizeAddressBar(for: homePage ? .homePage : (isInPopUpWindow ? .popUpWindow : .default), animated: animated)
     }
 
