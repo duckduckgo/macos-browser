@@ -326,7 +326,7 @@ extension WKWebView {
     }
 
     func hudView(at point: NSPoint? = nil) -> WKPDFHUDViewWrapper? {
-        WKPDFHUDViewWrapper(webView: self, location: point)
+        WKPDFHUDViewWrapper.getPdfHudView(in: self, at: point)
     }
 
     func savePDF(_ pdfHUD: WKPDFHUDViewWrapper? = nil) -> Bool {

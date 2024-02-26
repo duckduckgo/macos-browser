@@ -41,6 +41,9 @@ struct WKPDFHUDViewWrapper {
         }
     }
 
+    /// Create a wrapper over the PDF HUD view validating its class is `WKPDFHUDView`
+    /// - parameter view: the WKPDFHUDView to wrap
+    /// - returns nil if the view
     init?(view: NSView) {
         guard type(of: view) == Self.WKPDFHUDViewClass else { return nil }
 
@@ -51,7 +54,10 @@ struct WKPDFHUDViewWrapper {
         self.hudView = view
     }
 
-    init?(webView: WKWebView, location: NSPoint? = nil) {
+    /// Find WebView‘s PDF HUD view at a clicked point
+    /// 
+    /// Used to get PDF controls view of a clicked WebView frame for `Print…` and `Save As…` PDF context menu commands
+    static func getPdfHudView(in webView: WKWebView, at location: NSPoint? = nil) -> Self? {
         guard let hudView = webView.subviews.last(where: { type(of: $0) == Self.WKPDFHUDViewClass && $0.frame.contains(location ?? $0.frame.origin) }) else {
 #if DEBUG
             Task {
@@ -62,7 +68,7 @@ struct WKPDFHUDViewWrapper {
 #endif
             return nil
         }
-        self.init(view: hudView)
+        return self.init(view: hudView)
     }
 
     func savePDF() {

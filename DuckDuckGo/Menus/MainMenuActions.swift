@@ -630,33 +630,14 @@ extension MainViewController {
     // MARK: - Printing
 
     @objc func printWebView(_ sender: Any?) {
-        var pdfHUD: WKPDFHUDViewWrapper?
-        // if saving a PDF (may be from a frame)
-        if let menuItem = sender as? NSMenuItem,
-           let representedObject = menuItem.representedObject {
-
-            pdfHUD = representedObject as? WKPDFHUDViewWrapper ?? {
-                assertionFailure("Unexpected Save As menu item represented object: \(representedObject)")
-                return nil
-            }()
-        }
-
+        let pdfHUD = (sender as? NSMenuItem)?.pdfHudRepresentedObject // if printing a PDF (may be from a frame context menu)
         getActiveTabAndIndex()?.tab.print(pdfHUD: pdfHUD)
     }
 
     // MARK: - Saving
 
     @objc func saveAs(_ sender: Any) {
-        var pdfHUD: WKPDFHUDViewWrapper?
-        // if saving a PDF (may be from a frame)
-        if let menuItem = sender as? NSMenuItem,
-           let representedObject = menuItem.representedObject {
-
-            pdfHUD = representedObject as? WKPDFHUDViewWrapper ?? {
-                assertionFailure("Unexpected Save As menu item represented object: \(representedObject)")
-                return nil
-            }()
-        }
+        let pdfHUD = (sender as? NSMenuItem)?.pdfHudRepresentedObject // if saving a PDF (may be from a frame context menu)
         getActiveTabAndIndex()?.tab.saveWebContent(pdfHUD: pdfHUD, location: .prompt)
     }
 
@@ -1046,4 +1027,17 @@ extension AppDelegate: PrivacyDashboardViewControllerSizeDelegate {
     func privacyDashboardViewControllerDidChange(size: NSSize) {
         privacyDashboardWindow?.setFrame(NSRect(origin: .zero, size: size), display: true, animate: true)
     }
+}
+
+private extension NSMenuItem {
+
+    var pdfHudRepresentedObject: WKPDFHUDViewWrapper? {
+        guard let representedObject = representedObject else { return nil }
+
+        return representedObject as? WKPDFHUDViewWrapper ?? {
+            assertionFailure("Unexpected SaveAs/Print menu item represented object: \(representedObject)")
+            return nil
+        }()
+    }
+
 }
