@@ -174,14 +174,20 @@ final class SaveCredentialsViewController: NSViewController {
             titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
             view.window?.makeFirstResponder(nil)
         }
-        let trailingToOpenPasswordConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
-        let trailingToSaveButtonConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12)
+        let notNowRrailingToOpenPasswordConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
+        let notNowTrailingToSaveButtonConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12)
+        let dontUpdateRrailingToOpenPasswordConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
+        let sontUpdateTrailingToUpdateButtonConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: updateButton.leadingAnchor, constant: -12)
         if openPasswordManagerButton.isHidden {
-            trailingToOpenPasswordConstraint.isActive = false
-            trailingToSaveButtonConstraint.isActive = true
+            notNowRrailingToOpenPasswordConstraint.isActive = false
+            dontUpdateRrailingToOpenPasswordConstraint.isActive = false
+            notNowTrailingToSaveButtonConstraint.isActive = true
+            sontUpdateTrailingToUpdateButtonConstraint.isActive = true
         } else {
-            trailingToSaveButtonConstraint.isActive = false
-            trailingToOpenPasswordConstraint.isActive = true
+            notNowTrailingToSaveButtonConstraint.isActive = false
+            sontUpdateTrailingToUpdateButtonConstraint.isActive = false
+            notNowRrailingToOpenPasswordConstraint.isActive = true
+            dontUpdateRrailingToOpenPasswordConstraint.isActive = true
         }
     }
 
