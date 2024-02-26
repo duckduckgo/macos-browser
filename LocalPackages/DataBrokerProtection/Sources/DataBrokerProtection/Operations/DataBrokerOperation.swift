@@ -167,7 +167,6 @@ extension DataBrokerOperation {
     func loadURL(url: URL) async {
         do {
             try await webViewHandler?.load(url: url)
-            try await webViewHandler?.takeSnaphost()
             await executeNextStep()
         } catch {
            await onError(error: error)

@@ -28,26 +28,37 @@ struct DataBrokerRunCustomJSONView: View {
         if viewModel.results.isEmpty {
             VStack(alignment: .leading) {
                 Text("macOS App version: \(viewModel.appVersion())")
-                Text("C-S-S version: \(viewModel.contentScopeScriptsVersion())")
 
                 Divider()
 
-                HStack {
-                    TextField("First name", text: $viewModel.firstName)
-                        .padding()
-                    TextField("Last name", text: $viewModel.lastName)
-                        .padding()
-                    TextField("Middle", text: $viewModel.middle)
-                        .padding()
+                ForEach(viewModel.names.indices, id: \.self) { index in
+                    HStack {
+                        TextField("First name", text: $viewModel.names[index].first)
+                            .padding()
+                        TextField("Last name", text: $viewModel.names[index].last)
+                            .padding()
+                        TextField("Middle", text: $viewModel.names[index].middle)
+                            .padding()
+                    }
+                }
+
+                Button("Add other name") {
+                    viewModel.names.append(.empty())
                 }
 
                 Divider()
 
-                HStack {
-                    TextField("City", text: $viewModel.city)
-                        .padding()
-                    TextField("State", text: $viewModel.state)
-                        .padding()
+                ForEach(viewModel.addresses.indices, id: \.self) { index in
+                    HStack {
+                        TextField("City", text: $viewModel.addresses[index].city)
+                            .padding()
+                        TextField("State", text: $viewModel.addresses[index].state)
+                            .padding()
+                    }
+                }
+
+                Button("Add other address") {
+                    viewModel.addresses.append(.empty())
                 }
 
                 Divider()
@@ -76,6 +87,14 @@ struct DataBrokerRunCustomJSONView: View {
                 Button("Run") {
                     viewModel.runJSON(jsonString: jsonText)
                 }
+
+                if viewModel.isRunningOnAllBrokers {
+                    ProgressView("Scanning...")
+                } else {
+                    Button("Run all brokers") {
+                        viewModel.runAllBrokers()
+                    }
+                }
             }
             .padding()
             .frame(minWidth: 600, minHeight: 800)
@@ -88,19 +107,19 @@ struct DataBrokerRunCustomJSONView: View {
         } else {
             VStack {
                 VStack {
-                    List(viewModel.results, id: \.name) { extractedProfile in
+                    List(viewModel.results, id: \.id) { scanResult in
                         HStack {
-                            Text(extractedProfile.name ?? "No name")
+                            Text(scanResult.extractedProfile.name ?? "No name")
                                 .padding(.horizontal, 10)
                             Divider()
-                            Text(extractedProfile.addresses?.first?.fullAddress ?? "No address")
+                            Text(scanResult.extractedProfile.addresses?.first?.fullAddress ?? "No address")
                                 .padding(.horizontal, 10)
                             Divider()
-                            Text(extractedProfile.relatives?.joined(separator: ",") ?? "No relatives")
+                            Text(scanResult.extractedProfile.relatives?.joined(separator: ",") ?? "No relatives")
                                 .padding(.horizontal, 10)
                             Divider()
                             Button("Opt-out") {
-                                viewModel.runOptOut(extractedProfile: extractedProfile)
+                                viewModel.runOptOut(scanResult: scanResult)
                             }
                         }
                     }.navigationTitle("Results")
