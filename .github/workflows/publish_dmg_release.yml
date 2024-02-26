@@ -11,12 +11,43 @@ on:
         description: "Tag to publish"
         required: true
         type: string
+      release-type:
+        description: "Release type"
+        required: true
+        type: choice
+        options:
+        - internal
+        - public
+        - hotfix
 
 jobs:
 
+  # This is only run for public and hotfix releases
+  # Internal release has been tagged as part of code_freeze or bump_interal_release workflows
+  tag-public-release:
+
+    name: Tag public release
+
+    if: ${{ github.event.inputs.release-type != 'internal' }}
+
+    uses: ./.github/workflows/tag_release.yml
+    with:
+      asana-task-url: ${{ github.event.inputs.asana-task-url }}
+      branch: ${{ github.ref_name }}
+      prerelease: false
+    secrets:
+      ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+      GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}
+
   publish-to-sparkle:
 
-    name: Publish internal release to Sparkle
+    name: Publish a release to Sparkle
+
+    needs: [tag-public-release]
+
+    # Allow to run even if the tag-public-release job was skipped (e.g. for internal releases)
+    # or failed (for public releases or hotfixes), because tagging doesn't block publishing the release
+    if: always()
 
     runs-on: macos-13-xlarge
     timeout-minutes: 10
@@ -37,12 +68,15 @@ jobs:
             echo "::error::The provided tag ($tag) has incorrect format (attempted to match ${tag_regex})."
             exit 1
           fi
-          echo "tag-in-filename=${tag//-/.}" >> $GITHUB_OUTPUT
+          echo "release-version=${tag//-/.}" >> $GITHUB_OUTPUT
 
       - name: Check out the code
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
 
       - name: Set up Sparkle tools
         env:
@@ -53,11 +87,15 @@ jobs:
 
       - name: Fetch DMG
         id: fetch-dmg
+        if: ${{ github.event.inputs.release-type != 'public' }}
         env:
-          DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.tag-in-filename }}.dmg
+          DMG_NAME: duckduckgo-${{ steps.verify-tag.outputs.release-version }}.dmg
         run: |
-          DMG_URL="${{ vars.DMG_URL_ROOT }}${DMG_NAME}"
-          curl -fLSs -o "$DMG_NAME" "$DMG_URL"
+          # Public release doesn't need fetching a DMG (it's already uploaded to S3)
+          if [[ "${{ github.event.inputs.release-type }}" != 'public' ]]; then
+            DMG_URL="${{ vars.DMG_URL_ROOT }}${DMG_NAME}"
+            curl -fLSs -o "$DMG_NAME" "$DMG_URL"
+          fi
           echo "dmg-name=$DMG_NAME" >> $GITHUB_OUTPUT
           echo "dmg-path=$DMG_NAME" >> $GITHUB_OUTPUT
 
@@ -78,25 +116,44 @@ jobs:
             | ./scripts/extract_release_notes.sh > release_notes.txt
           echo "RELEASE_NOTES_FILE=release_notes.txt" >> $GITHUB_ENV
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_$(<.xcode-version).app/Contents/Developer
-
       - name: Generate appcast
         id: appcast
         env:
           DMG_PATH: ${{ steps.fetch-dmg.outputs.dmg-path }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+          VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           echo -n "$SPARKLE_PRIVATE_KEY" > sparkle_private_key
           chmod 600 sparkle_private_key
 
-          ./scripts/appcast_manager/appcastManager.swift \
-            --release-to-internal-channel \
-            --dmg ${DMG_PATH} \
-            --release-notes release_notes.txt \
-            --key sparkle_private_key
+          case "$RELEASE_TYPE" in
+            "internal")
+              ./scripts/appcast_manager/appcastManager.swift \
+                --release-to-internal-channel \
+                --dmg ${DMG_PATH} \
+                --release-notes release_notes.txt \
+                --key sparkle_private_key
+              ;;
+            "public")
+              ./scripts/appcast_manager/appcastManager.swift \
+                --release-to-public-channel \
+                --version ${VERSION} \
+                --release-notes release_notes.txt \
+                --key sparkle_private_key
+              ;;
+            "hotfix")
+              ./scripts/appcast_manager/appcastManager.swift \
+                --release-hotfix-to-public-channel \
+                --dmg ${DMG_PATH} \
+                --release-notes release_notes.txt \
+                --key sparkle_private_key
+              ;;
+            *)
+              ;;
+          esac
 
-          appcast_patch_name="appcast2-${{ steps.verify-tag.outputs.tag-in-filename }}.patch"
+          appcast_patch_name="appcast2-${VERSION}.patch"
           mv -f ${{ env.SPARKLE_DIR }}/appcast_diff.txt ${{ env.SPARKLE_DIR }}/${appcast_patch_name}
           echo "appcast-patch-name=${appcast_patch_name}" >> $GITHUB_OUTPUT
           
@@ -109,9 +166,11 @@ jobs:
       - name: Upload to S3
         id: upload
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_RELEASE_S3 }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_RELEASE_S3 }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+          VERSION: ${{ steps.verify-tag.outputs.release-version }}
         run: |
           # Back up existing appcast2.xml
           OLD_APPCAST_NAME=appcast2_old.xml
@@ -119,7 +178,11 @@ jobs:
           curl -fLSs "${{ vars.DMG_URL_ROOT }}appcast2.xml" --output "${OLD_APPCAST_NAME}"
 
           # Upload files to S3
-          ./scripts/upload_to_s3/upload_to_s3.sh --run --force
+          if [[ "${RELEASE_TYPE}" == "internal" ]]; then
+            ./scripts/upload_to_s3/upload_to_s3.sh --run --force
+          else
+            ./scripts/upload_to_s3/upload_to_s3.sh --run --force --overwrite-duckduckgo-dmg "${VERSION}"
+          fi
 
           if [[ -f "${{ env.SPARKLE_DIR }}/uploaded_files_list.txt" ]]; then
             echo "FILES_UPLOADED=$(awk '{ print "<li><code>"$1"</code></li>"; }' < ${{ env.SPARKLE_DIR }}/uploaded_files_list.txt | tr '\n' ' ')" >> $GITHUB_ENV
@@ -139,19 +202,28 @@ jobs:
           echo "RELEASE_BUCKET_PREFIX=${{ vars.RELEASE_BUCKET_PREFIX }}" >> $GITHUB_ENV
           echo "RELEASE_TASK_ID=${{ steps.task-id.outputs.task-id }}" >> $GITHUB_ENV
           echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          echo "VERSION=${{ steps.verify-tag.outputs.release-version }}" >> $GITHUB_ENV
           echo "WORKFLOW_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
 
       - name: Set up Asana templates
         if: always()
         id: asana-templates
+        env:
+          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
         run: |
-          if [[ ${{ steps.upload.outcome }} == "success" ]]; then
-            echo "task-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
-            echo "comment-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
-            echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
+          if [[ ${{ steps.upload.outcome }} == "success" ]]; then  
+            if [[ "${RELEASE_TYPE}" == "internal" ]]; then
+              echo "task-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
+              echo "comment-template=validate-check-for-updates-internal" >> $GITHUB_OUTPUT
+              echo "release-task-comment-template=internal-release-complete" >> $GITHUB_OUTPUT
+            else
+              echo "task-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
+              echo "comment-template=validate-check-for-updates-public" >> $GITHUB_OUTPUT
+              echo "release-task-comment-template=public-release-complete" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "task-template=appcast-failed" >> $GITHUB_OUTPUT
-            echo "comment-template=appcast-failed" >> $GITHUB_OUTPUT
+            echo "task-template=appcast-failed-${RELEASE_TYPE}" >> $GITHUB_OUTPUT
+            echo "comment-template=appcast-failed-${RELEASE_TYPE}" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Asana task
@@ -207,4 +279,4 @@ jobs:
         with:
           access-token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           task-url: ${{ github.event.inputs.asana-task-url }}
-          template-name: internal-release-complete
+          template-name: ${{ steps.asana-templates.outputs.release-task-comment-template }}

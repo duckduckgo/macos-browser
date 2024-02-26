@@ -14,7 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../SwiftUIExtensions"),
-        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "109.0.0"),
+        .package(url: "https://github.com/duckduckgo/BrowserServicesKit", exact: "111.0.0"),
     ],
     targets: [
         .target(
@@ -22,6 +22,9 @@ let package = Package(
             dependencies: [
                 .product(name: "PreferencesViews", package: "SwiftUIExtensions"),
                 .product(name: "SwiftUIExtensions", package: "SwiftUIExtensions")
+            ],
+            resources: [
+                .process("Resources")
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug))

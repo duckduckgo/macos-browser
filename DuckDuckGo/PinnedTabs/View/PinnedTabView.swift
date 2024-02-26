@@ -21,8 +21,8 @@ import SwiftUIExtensions
 
 struct PinnedTabView: View {
     enum Const {
-        static let dimension: CGFloat = 32
-        static let cornerRadius: CGFloat = 6
+        static let dimension: CGFloat = 34
+        static let cornerRadius: CGFloat = 10
     }
 
     @ObservedObject var model: Tab
@@ -96,7 +96,17 @@ struct PinnedTabView: View {
 
         fireproofAction
         Divider()
-
+        switch collectionModel.audioStateView {
+        case .muted, .unmuted:
+            let audioStateText = collectionModel.audioStateView == .muted ? UserText.unmuteTab : UserText.muteTab
+            Button(audioStateText) { [weak collectionModel, weak model] in
+                guard let model = model else { return }
+                collectionModel?.muteOrUmute(model)
+            }
+            Divider()
+        case .notSupported:
+            EmptyView()
+        }
         Button(UserText.closeTab) { [weak collectionModel, weak model] in
             guard let model = model else { return }
             collectionModel?.close(model)
@@ -163,6 +173,7 @@ struct PinnedTabInnerView: View {
     var foregroundColor: Color
     var drawSeparator: Bool = true
 
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: Tab
     @Environment(\.controlActiveState) private var controlActiveState
 
@@ -188,10 +199,31 @@ struct PinnedTabInnerView: View {
     }
 
     @ViewBuilder
+    var mutedTabIndicator: some View {
+        switch model.audioState {
+        case .muted:
+            ZStack {
+                Circle()
+                    .stroke(Color.gray.opacity(0.5), lineWidth: 0.5)
+                    .background(Circle().foregroundColor(Color("PinnedTabMuteStateCircleColor")))
+                    .frame(width: 16, height: 16)
+                Image("Audio-Mute")
+                    .resizable()
+                    .renderingMode(.template)
+                    .frame(width: 12, height: 12)
+            }.offset(x: 8, y: -8)
+        default: EmptyView()
+        }
+    }
+
+    @ViewBuilder
     var favicon: some View {
         if let favicon = model.favicon {
-            Image(nsImage: favicon)
-                .resizable()
+            ZStack(alignment: .topTrailing) {
+                Image(nsImage: favicon)
+                    .resizable()
+                mutedTabIndicator
+            }
         } else if let domain = model.content.url?.host, let eTLDplus1 = ContentBlocking.shared.tld.eTLDplus1(domain), let firstLetter = eTLDplus1.capitalized.first.flatMap(String.init) {
             ZStack {
                 Rectangle()
@@ -199,11 +231,15 @@ struct PinnedTabInnerView: View {
                 Text(firstLetter)
                     .font(.caption)
                     .foregroundColor(.white)
+                mutedTabIndicator
             }
             .cornerRadius(4.0)
         } else {
-            Image(nsImage: #imageLiteral(resourceName: "Web"))
-                .resizable()
+            ZStack {
+                Image(nsImage: #imageLiteral(resourceName: "Web"))
+                    .resizable()
+                mutedTabIndicator
+            }
         }
     }
 }

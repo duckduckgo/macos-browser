@@ -24,6 +24,7 @@ import SwiftUI
 import Common
 import NetworkExtension
 import NetworkProtection
+import NetworkProtectionProxy
 import NetworkProtectionUI
 import Networking
 import PixelKit
@@ -37,6 +38,8 @@ typealias NetworkProtectionStatusChangeHandler = (NetworkProtection.ConnectionSt
 typealias NetworkProtectionConfigChangeHandler = () -> Void
 
 final class NetworkProtectionTunnelController: TunnelController, TunnelSessionProvider {
+
+    // MARK: - Settings
 
     let settings: VPNSettings
 
@@ -70,6 +73,10 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     private let networkExtensionBundleID: String
     private let networkExtensionController: NetworkExtensionController
 
+    // MARK: - Notification Center
+
+    private let notificationCenter: NotificationCenter
+
     /// The proxy manager
     ///
     /// We're keeping a reference to this because we don't want to be calling `loadAllFromPreferences` more than
@@ -78,6 +85,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// For reference read: https://app.asana.com/0/1203137811378537/1206513608690551/f
     ///
     private var internalManager: NETunnelProviderManager?
+
+    /// The last known VPN status.
+    ///
+    /// Should not be used for checking the current status.
+    ///
+    private var previousStatus: NEVPNStatus = .invalid
 
     // MARK: - User Defaults
 
@@ -95,6 +108,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     /// Loads the configuration matching our ``extensionID``.
     ///
+    @MainActor
     public var manager: NETunnelProviderManager? {
         get async {
             if let internalManager {
@@ -139,20 +153,51 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     init(networkExtensionBundleID: String,
          networkExtensionController: NetworkExtensionController,
          settings: VPNSettings,
-         notificationCenter: NotificationCenter = .default,
          tokenStore: NetworkProtectionTokenStore = NetworkProtectionKeychainTokenStore(),
+         notificationCenter: NotificationCenter = .default,
          logger: NetworkProtectionLogger = DefaultNetworkProtectionLogger()) {
 
         self.logger = logger
         self.networkExtensionBundleID = networkExtensionBundleID
         self.networkExtensionController = networkExtensionController
+        self.notificationCenter = notificationCenter
         self.settings = settings
         self.tokenStore = tokenStore
 
         subscribeToSettingsChanges()
+        subscribeToStatusChanges()
     }
 
-    // MARK: - Tunnel Settings
+    // MARK: - Observing Status Changes
+
+    private func subscribeToStatusChanges() {
+        notificationCenter.publisher(for: .NEVPNStatusDidChange)
+            .sink(receiveValue: handleStatusChange(_:))
+            .store(in: &cancellables)
+    }
+
+    private func handleStatusChange(_ notification: Notification) {
+        guard let session = (notification.object as? NETunnelProviderSession),
+              session.status != previousStatus,
+              let manager = session.manager as? NETunnelProviderManager else {
+
+            return
+        }
+
+        Task { @MainActor in
+            previousStatus = session.status
+
+            switch session.status {
+            case .connected:
+                try await enableOnDemand(tunnelManager: manager)
+            default:
+                break
+            }
+
+        }
+    }
+
+    // MARK: - Subscriptions
 
     private func subscribeToSettingsChanges() {
         settings.changePublisher
@@ -170,6 +215,8 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
             .store(in: &cancellables)
     }
+
+    // MARK: - Handling Settings Changes
 
     /// This is where the tunnel owner has a chance to handle the settings change locally.
     ///
@@ -254,7 +301,7 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
         tunnelManager.protocolConfiguration = {
             let protocolConfiguration = tunnelManager.protocolConfiguration as? NETunnelProviderProtocol ?? NETunnelProviderProtocol()
             protocolConfiguration.serverAddress = "127.0.0.1" // Dummy address... the NetP service will take care of grabbing a real server
-            protocolConfiguration.providerBundleIdentifier = NetworkProtectionBundle.extensionBundle().bundleIdentifier
+            protocolConfiguration.providerBundleIdentifier = Bundle.tunnelExtensionBundleID
             protocolConfiguration.providerConfiguration = [
                 NetworkProtectionOptionKey.defaultPixelHeaders: APIRequest.Headers().httpHeaders,
                 NetworkProtectionOptionKey.includedRoutes: includedRoutes().map(\.stringRepresentation) as NSArray
@@ -301,6 +348,14 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
             }
 
             return session
+        }
+    }
+
+    // MARK: - Connection
+
+    public var status: NEVPNStatus {
+        get async {
+            await connection?.status ?? .disconnected
         }
     }
 
@@ -483,8 +538,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
                 guard let self, error == nil, fired else { return }
                 self.settings.vpnFirstEnabled = PixelKit.pixelLastFireDate(event: NetworkProtectionPixelEvent.networkProtectionNewUser)
             }
-
-        try await enableOnDemand(tunnelManager: tunnelManager)
     }
 
     /// Stops the VPN connection used for Network Protection
