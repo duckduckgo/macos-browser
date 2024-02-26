@@ -32,8 +32,10 @@ private struct EditedBookmarkMetadata {
 
 final class BookmarkManagementDetailViewController: NSViewController, NSMenuItemValidation {
 
+    private let toolbarButtonsStackView = NSStackView()
     private lazy var newBookmarkButton = MouseOverButton(title: "  " + UserText.newBookmark, target: self, action: #selector(presentAddBookmarkModal))
     private lazy var newFolderButton = MouseOverButton(title: "  " + UserText.newFolder, target: self, action: #selector(presentAddFolderModal))
+    private lazy var deleteItemsButton = MouseOverButton(title: "  " + UserText.bookmarksBarContextMenuDelete, target: self, action: #selector(delete))
 
     private lazy var separator = NSBox()
     private lazy var scrollView = NSScrollView()
@@ -75,34 +77,17 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         view.addSubview(separator)
         view.addSubview(scrollView)
         view.addSubview(emptyState)
-        view.addSubview(newBookmarkButton)
-        view.addSubview(newFolderButton)
+        view.addSubview(toolbarButtonsStackView)
+        toolbarButtonsStackView.addArrangedSubview(newBookmarkButton)
+        toolbarButtonsStackView.addArrangedSubview(newFolderButton)
+        toolbarButtonsStackView.addArrangedSubview(deleteItemsButton)
 
-        newBookmarkButton.bezelStyle = .shadowlessSquare
-        newBookmarkButton.cornerRadius = 4
-        newBookmarkButton.normalTintColor = .button
-        newBookmarkButton.mouseDownColor = .buttonMouseDownColor
-        newBookmarkButton.mouseOverColor = .buttonMouseOverColor
-        newBookmarkButton.imageHugsTitle = true
-        newBookmarkButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        newBookmarkButton.translatesAutoresizingMaskIntoConstraints = false
-        newBookmarkButton.alignment = .center
-        newBookmarkButton.font = .systemFont(ofSize: 13)
-        newBookmarkButton.image = .addBookmark
-        newBookmarkButton.imagePosition = .imageLeading
+        toolbarButtonsStackView.translatesAutoresizingMaskIntoConstraints = false
+        toolbarButtonsStackView.distribution = .fill
 
-        newFolderButton.bezelStyle = .shadowlessSquare
-        newFolderButton.cornerRadius = 4
-        newFolderButton.normalTintColor = .button
-        newFolderButton.mouseDownColor = .buttonMouseDownColor
-        newFolderButton.mouseOverColor = .buttonMouseOverColor
-        newFolderButton.imageHugsTitle = true
-        newFolderButton.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        newFolderButton.translatesAutoresizingMaskIntoConstraints = false
-        newFolderButton.alignment = .center
-        newFolderButton.font = .systemFont(ofSize: 13)
-        newFolderButton.image = .addFolder
-        newFolderButton.imagePosition = .imageLeading
+        configureToolbar(button: newBookmarkButton, image: .addBookmark, isHidden: false)
+        configureToolbar(button: newFolderButton, image: .addFolder, isHidden: false)
+        configureToolbar(button: deleteItemsButton, image: .trash, isHidden: true)
 
         emptyState.addSubview(emptyStateImageView)
         emptyState.addSubview(emptyStateTitle)
@@ -182,29 +167,25 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
     }
 
     private func setupLayout() {
-        newBookmarkButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48).isActive = true
+        toolbarButtonsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48).isActive = true
         view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: 48).isActive = true
-        separator.topAnchor.constraint(equalTo: newBookmarkButton.bottomAnchor, constant: 24).isActive = true
+        separator.topAnchor.constraint(equalTo: toolbarButtonsStackView.bottomAnchor, constant: 24).isActive = true
         emptyState.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 20).isActive = true
         scrollView.topAnchor.constraint(equalTo: separator.bottomAnchor).isActive = true
 
         view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        view.trailingAnchor.constraint(greaterThanOrEqualTo: newFolderButton.trailingAnchor, constant: 20).isActive = true
+        view.trailingAnchor.constraint(greaterThanOrEqualTo: toolbarButtonsStackView.trailingAnchor, constant: 20).isActive = true
         view.trailingAnchor.constraint(equalTo: separator.trailingAnchor, constant: 58).isActive = true
-        newFolderButton.leadingAnchor.constraint(equalTo: newBookmarkButton.trailingAnchor, constant: 16).isActive = true
         emptyState.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        newFolderButton.centerYAnchor.constraint(equalTo: newBookmarkButton.centerYAnchor).isActive = true
         separator.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 58).isActive = true
-        newBookmarkButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
+        toolbarButtonsStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
         emptyState.topAnchor.constraint(greaterThanOrEqualTo: separator.bottomAnchor, constant: 8).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 48).isActive = true
         emptyState.centerXAnchor.constraint(equalTo: separator.centerXAnchor).isActive = true
 
         newBookmarkButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        newBookmarkButton.widthAnchor.constraint(equalToConstant: 130).isActive = true
-
-        newFolderButton.widthAnchor.constraint(equalToConstant: 110).isActive = true
         newFolderButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        deleteItemsButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
 
         emptyStateMessage.centerXAnchor.constraint(equalTo: emptyState.centerXAnchor).isActive = true
 
@@ -523,12 +504,28 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
     }
 
     func onSelectionChanged() {
-        resetSelections()
-        let indexes = tableView.selectedRowIndexes
-        indexes.forEach {
-            let cell = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
-            cell?.isSelected = true
+        func updateCellSelections() {
+            resetSelections()
+            indexes.forEach {
+                let cell = self.tableView.view(atColumn: 0, row: $0, makeIfNecessary: false) as? BookmarkTableCellView
+                cell?.isSelected = true
+            }
         }
+
+        func updateToolbarButtons() {
+            toolbarButtonsStackView.layoutSubtreeIfNeeded()
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.25
+                deleteItemsButton.animator().isHidden = indexes.count <= 1
+                newBookmarkButton.animator().isHidden = !deleteItemsButton.isHidden
+                newFolderButton.animator().isHidden = !deleteItemsButton.isHidden
+                toolbarButtonsStackView.layoutSubtreeIfNeeded()
+            }
+        }
+
+        let indexes = tableView.selectedRowIndexes
+        updateCellSelections()
+        updateToolbarButtons()
     }
 
     fileprivate func openBookmarksInNewTabs(_ bookmarks: [Bookmark]) {
@@ -544,6 +541,28 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
         tabCollection.append(tabs: tabs)
     }
+}
+
+// MARK: - Private
+
+private extension BookmarkManagementDetailViewController {
+
+    func configureToolbar(button: MouseOverButton, image: NSImage, isHidden: Bool) {
+        button.bezelStyle = .shadowlessSquare
+        button.cornerRadius = 4
+        button.normalTintColor = .button
+        button.mouseDownColor = .buttonMouseDownColor
+        button.mouseOverColor = .buttonMouseOverColor
+        button.imageHugsTitle = true
+        button.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.alignment = .center
+        button.font = .systemFont(ofSize: 13)
+        button.image = image
+        button.imagePosition = .imageLeading
+        button.isHidden = isHidden
+    }
+
 }
 
 // MARK: - BookmarkTableCellViewDelegate
