@@ -144,29 +144,31 @@ final class DownloadsViewController: NSViewController {
     @IBAction func openDownloadsFolderAction(_ sender: Any) {
         let prefs = DownloadsPreferences()
         var url: URL?
+        var itemToSelect: URL?
+
         if prefs.alwaysRequestDownloadLocation {
             url = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+
+            if let lastDownloaded = viewModel.items.first/* last added */(where: {
+                // should still exist
+                $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
+            }),
+               let localURL = lastDownloaded.localURL {
+                // if no downloads are from the preferred Downloads folder - open the last downloaded item folder
+                if url == nil || !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) {
+                    url = localURL.deletingLastPathComponent()
+                }
+                // select last downloaded item
+                itemToSelect = localURL
+            }
         } else {
             url = prefs.effectiveDownloadLocation ?? FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
         }
 
-        var itemToSelect: URL?
-        if let lastDownloaded = viewModel.items.first/* last added */(where: {
-               // should still exist
-               $0.localURL != nil && FileManager.default.fileExists(atPath: $0.localURL!.deletingLastPathComponent().path)
-           }),
-           let localURL = lastDownloaded.localURL {
-            // if no downloads are from the preferred Downloads folder - open the last downloaded item folder
-            if url == nil || !viewModel.items.contains(where: { $0.localURL?.deletingLastPathComponent().path == url?.path  }) {
-                url = localURL.deletingLastPathComponent()
-            }
-            // select last downloaded item
-            itemToSelect = localURL
-        }
         guard let url else { return }
 
         self.dismiss()
-        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
+        NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: url.path)
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {
