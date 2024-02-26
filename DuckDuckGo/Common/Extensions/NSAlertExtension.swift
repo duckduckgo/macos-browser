@@ -256,8 +256,10 @@ extension NSAlert {
     }
 
     static func deleteAllPasswordsConfirmationAlert(count: Int, syncEnabled: Bool) -> NSAlert {
-        autofillActionConfirmationAlert(messageText: UserText.deleteAllPasswordsDialogMessageText(count: count),
-                                        informationText: UserText.deleteAllPasswordsDialogInformationText,
+        let messageText = UserText.deleteAllPasswordsConfirmationMessageText(count: count)
+        let informationText = UserText.deleteAllPasswordsConfirmationInformationText(count: count, syncEnabled: syncEnabled)
+        return autofillActionConfirmationAlert(messageText: messageText,
+                                        informationText: informationText,
                                         confirmButtonText: UserText.passwordManagerAlerDeleteButton)
     }
 
@@ -274,8 +276,10 @@ extension NSAlert {
     }
 
     static func deleteAllPasswordsCompletionAlert(count: Int, syncEnabled: Bool) -> NSAlert {
-        autofillActionCompletionAlert(messageText: UserText.deleteAllPasswordsCompletionMessageText(count: count),
-                                      informationText: UserText.deleteAllPasswordsCompletionInformationText)
+        let messageText = UserText.deleteAllPasswordsCompletionMessageText(count: count)
+        let informationText = UserText.deleteAllPasswordsCompletionInformationText(count: count, syncEnabled: syncEnabled)
+        return autofillActionCompletionAlert(messageText: messageText,
+                                      informationText: informationText)
     }
 
     private static func autofillActionCompletionAlert(messageText: String, informationText: String) -> NSAlert {
