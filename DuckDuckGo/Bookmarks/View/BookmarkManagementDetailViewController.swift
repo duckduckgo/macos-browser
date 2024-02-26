@@ -354,8 +354,6 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         let rowView = BookmarkTableRowView()
         rowView.onSelectionChanged = onSelectionChanged
 
-        let entity = fetchEntity(at: row)
-
         return rowView
     }
 
@@ -697,7 +695,7 @@ extension BookmarkManagementDetailViewController: BookmarkMenuItemSelectors {
     }
 
     func editBookmark(_ sender: NSMenuItem) {
-        guard let bookmark = sender.representedObject as? Bookmark, let bookmarkIndex = index(for: bookmark) else { return }
+        guard let bookmark = sender.representedObject as? Bookmark else { return }
 
         BookmarksDialogViewFactory.makeEditBookmarkView(bookmark: bookmark)
             .show(in: view.window)

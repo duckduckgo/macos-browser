@@ -55,7 +55,7 @@ struct ContextualMenu {
 
         return menu
     }
-    
+
     /// Creates an instance of NSMenu for the specified `BaseBookmarkEntity`and parent `BookmarkFolder`.
     ///
     /// - Parameters:
