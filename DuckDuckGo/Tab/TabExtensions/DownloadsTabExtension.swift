@@ -117,6 +117,8 @@ extension DownloadsTabExtension: NavigationResponder {
     func decidePolicy(for navigationResponse: NavigationResponse) async -> NavigationResponsePolicy? {
         guard navigationResponse.httpResponse?.isSuccessful == true,
               !navigationResponse.canShowMIMEType || navigationResponse.shouldDownload
+                // if user pressed Opt+Enter in the Address bar to download from a URL
+                || (navigationResponse.mainFrameNavigation?.redirectHistory.last ?? navigationResponse.mainFrameNavigation?.navigationAction)?.navigationType == .custom(.userRequestedPageDownload)
         else {
             return .next
         }
