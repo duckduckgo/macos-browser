@@ -144,18 +144,23 @@ final class MainView: NSView {
             return nil
         }
 
-        // Insert Save As… and Print… items
-        let copyItemIdx = menu.indexOfItem(withTitle: UserText.copy)
-        let separatorAfterCopyItemIdx = (
-            menu.items.indices.contains(copyItemIdx)
-            ? (copyItemIdx..<menu.items.endIndex).first(where: { menu.items[$0].isSeparatorItem }) //  after Separator below the Copy item
-            : nil
-        ) ?? -1 // or at the beginning
+        // insert Save As… and Print… items after `Open with Preview`
+        // 1. find `Copy`
+        let idxAfterCopy = menu.indexOfItem(withTitle: UserText.copy) + /* will become 0 if no copy (-1 + 1) */ 1
+        let insertionIdx: Int
+        if idxAfterCopy > 0 {
+            // 2. find separator below `Copy`
+            let separatorIdx = (idxAfterCopy..<menu.items.endIndex).first(where: { menu.items[$0].isSeparatorItem }) ?? idxAfterCopy //  separator
+            // 3. descend 2 items down: the separator, `Open with Preview`
+            insertionIdx = min(separatorIdx + 2, menu.items.count /* just in case… */)
+        } else {
+            insertionIdx = min(1, menu.items.count /* just in case… */)
+        }
 
         menu.insertItem(NSMenuItem(title: UserText.mainMenuFileSaveAs, action: #selector(MainViewController.saveAs), representedObject: hudView),
-                        at: separatorAfterCopyItemIdx + 1)
+                        at: insertionIdx)
         menu.insertItem(NSMenuItem(title: UserText.printMenuItem, action: #selector(MainViewController.printWebView), representedObject: hudView),
-                        at: separatorAfterCopyItemIdx + 2)
+                        at: insertionIdx)
     }
 
     // MARK: - NSDraggingDestination
