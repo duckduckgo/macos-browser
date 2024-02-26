@@ -148,7 +148,7 @@ final class DownloadsViewController: NSViewController {
             return
         }
         self.dismiss()
-        NSWorkspace.shared.selectFile(itemToSelect?.path, inFileViewerRootedAtPath: url.path)
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: url.path)
     }
 
     @IBAction func clearDownloadsAction(_ sender: Any) {
