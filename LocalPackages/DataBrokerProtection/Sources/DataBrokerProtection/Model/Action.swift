@@ -42,11 +42,6 @@ protocol Action: Codable, Sendable {
 }
 
 extension Action {
-    var needsEmail: Bool {
-        return false
-    }
-
-    var dataSource: DataSource {
-        return .userProfile
-    }
+    var needsEmail: Bool { false }
+    var dataSource: DataSource { .userProfile }
 }
