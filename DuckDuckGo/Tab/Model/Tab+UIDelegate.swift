@@ -348,7 +348,9 @@ extension Tab: WKUIDelegate, PrintingUserScriptDelegate {
                     return
                 }
 
-                self.runPrintOperation(printOperation)
+                self.runPrintOperation(printOperation) { _ in
+                    try? FileManager.default.removeItem(at: url)
+                }
             }
             saveWebContent(pdfHUD: pdfHUD, location: .temporary)
             return
