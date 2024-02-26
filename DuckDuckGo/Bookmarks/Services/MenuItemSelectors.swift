@@ -34,6 +34,7 @@ import AppKit
 
     func newFolder(_ sender: NSMenuItem)
     func renameFolder(_ sender: NSMenuItem)
+    func editFolder(_ sender: NSMenuItem)
     func deleteFolder(_ sender: NSMenuItem)
     func openInNewTabs(_ sender: NSMenuItem)
 

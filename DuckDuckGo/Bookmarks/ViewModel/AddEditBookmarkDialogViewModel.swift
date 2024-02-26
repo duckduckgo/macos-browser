@@ -31,8 +31,14 @@ protocol BookmarkDialogEditing: BookmarksDialogViewModel {
 @MainActor
 final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
 
+    /// The type of operation to perform on a bookmark.
     enum Mode {
-        case add(parentFolder: BookmarkFolder? = nil)
+        /// Add a new bookmark. Bookmarks can have a parent folder but not necessarily.
+        /// If the users add a bookmark to the root `Bookmarks` folder, then the parent folder is `nil`.
+        /// If the users add a bookmark to a different folder then the parent folder is not `nil`.
+        /// If the users add a bookmark from the bookmark shortcut and `Tab` has a page loaded, then the `tabWebsite` is not `nil`.
+        case add(tabWebsite: WebsiteInfo? = nil, parentFolder: BookmarkFolder? = nil)
+        /// Edit an existing bookmark.
         case edit(bookmark: Bookmark)
     }
 
@@ -74,12 +80,12 @@ final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
     init(mode: Mode, bookmarkManager: LocalBookmarkManager = .shared) {
         self.mode = mode
         self.bookmarkManager = bookmarkManager
-        bookmarkName = mode.bookmark?.title ?? ""
-        bookmarkURLPath = mode.bookmark?.url ?? ""
-        isBookmarkFavorite = mode.bookmark?.isFavorite ?? false
+        bookmarkName = mode.bookmarkName ?? ""
+        bookmarkURLPath = mode.bookmarkURLPath?.absoluteString ?? ""
+        isBookmarkFavorite = mode.bookmarkURLPath.flatMap(bookmarkManager.isUrlFavorited) ?? false
         folders = .init(bookmarkManager.list)
         switch mode {
-        case let .add(parentFolder):
+        case let .add(_, parentFolder):
             selectedFolder = parentFolder
         case let .edit(bookmark):
             selectedFolder = folders.first(where: { $0.id == bookmark.parentFolderUUID })?.entity
@@ -126,12 +132,13 @@ private extension AddEditBookmarkDialogViewModel {
         if bookmark.url != url.absoluteString {
             bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
         }
-
+        // If the title or isFavorite changed, update the Bookmark
         if bookmark.title != name || bookmark.isFavorite != isBookmarkFavorite {
             bookmark.title = name
             bookmark.isFavorite = isBookmarkFavorite
             bookmarkManager.update(bookmark: bookmark)
         }
+        // If the bookmark changed parent location, move it.
         if bookmark.parentFolderUUID != selectedFolder?.id {
             let parentFoler: ParentFolderType = selectedFolder.flatMap { .parent(uuid: $0.id) } ?? .root
             bookmarkManager.move(objectUUIDs: [bookmark.id], toIndex: nil, withinParentFolder: parentFoler, completion: { _ in })
@@ -139,7 +146,12 @@ private extension AddEditBookmarkDialogViewModel {
     }
 
     func addBookmark(withURL url: URL, name: String, isFavorite: Bool, to parent: BookmarkFolder?) {
-        bookmarkManager.makeBookmark(for: url, title: name, isFavorite: isFavorite, index: nil, parent: parent)
+        // If a bookmark already exist with the new URL, update it
+        if let existingBookmark = bookmarkManager.getBookmark(for: url) {
+            updateBookmark(existingBookmark, url: url, name: name, isFavorite: isFavorite, location: parent)
+        } else {
+            bookmarkManager.makeBookmark(for: url, title: name, isFavorite: isFavorite, index: nil, parent: parent)
+        }
     }
 }
 
@@ -170,12 +182,21 @@ private extension AddEditBookmarkDialogViewModel.Mode {
         }
     }
 
-    var bookmark: Bookmark? {
+    var bookmarkName: String? {
         switch self {
-        case .add:
-            return nil
+        case let .add(tabInfo, _):
+            return tabInfo?.title
         case let .edit(bookmark):
-            return bookmark
+            return bookmark.title
+        }
+    }
+
+    var bookmarkURLPath: URL? {
+        switch self {
+        case let .add(tabInfo, _):
+            return tabInfo?.url
+        case let .edit(bookmark):
+            return bookmark.urlObject
         }
     }
 
