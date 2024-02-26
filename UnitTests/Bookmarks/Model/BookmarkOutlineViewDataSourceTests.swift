@@ -159,6 +159,28 @@ class BookmarkOutlineViewDataSourceTests: XCTestCase {
         XCTAssertEqual(result, .none)
     }
 
+    func testWhenCellFiresDelegate_ThenOnMenuRequestedActionShouldFire() throws {
+        // GIVEN
+        let mockFolder = BookmarkFolder.mock
+        let mockOutlineView = NSOutlineView(frame: .zero)
+        let treeController = createTreeController(with: [mockFolder])
+        let mockFolderNode = treeController.node(representing: mockFolder)!
+        var didFireClosure = false
+        var capturedCell: BookmarkOutlineCellView?
+        let dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: LocalBookmarkManager(), treeController: treeController) { cell in
+            didFireClosure = true
+            capturedCell = cell
+        }
+        let cell = try XCTUnwrap(dataSource.outlineView(mockOutlineView, viewFor: nil, item: mockFolderNode) as? BookmarkOutlineCellView)
+
+        // WHEN
+        cell.delegate?.outlineCellViewRequestedMenu(cell)
+
+        // THEN
+        XCTAssertTrue(didFireClosure)
+        XCTAssertEqual(cell, capturedCell)
+    }
+
     // MARK: - Private
 
     private func createTreeController(with bookmarks: [BaseBookmarkEntity]) -> BookmarkTreeController {

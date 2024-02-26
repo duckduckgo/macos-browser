@@ -58,4 +58,14 @@ extension NSMenu {
         insertItem(newItem, at: index)
     }
 
+    /// Pops up the menu at the current mouse location.
+    ///
+    /// - Parameter view: The view to display the menu item over.
+    /// - Attention: If the view is not currently installed in a window, this function does not show any pop up menu.
+    func popUpAtMouseLocation(in view: NSView) {
+        guard let cursorLocation = view.window?.mouseLocationOutsideOfEventStream else { return }
+        let convertedLocation = view.convert(cursorLocation, from: nil)
+        popUp(positioning: nil, at: convertedLocation, in: view)
+    }
+
 }
