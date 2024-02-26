@@ -27,9 +27,9 @@ struct ContextualMenu {
 
     /// Creates an instance of NSMenu for the specified Objects and target.
     /// - Parameters:
-    ///   - objects: The objects to create the menu for
+    ///   - objects: The objects to create the menu for.
     ///   - target: The target to associate to the `NSMenuItem`
-    ///   - includeBookmarkEditMenu: True if menu should return edit bookmark option. False otherwise. Default is true
+    ///   - includeBookmarkEditMenu: True if menu should return edit bookmark option. False otherwise. Default is true.
     /// - Returns: An instance of NSMenu or nil if `objects` is not a `Bookmark` or a `Folder`.
     static func menu(for objects: [Any]?, target: AnyObject?, includeBookmarkEditMenu: Bool = true) -> NSMenu? {
 
@@ -42,22 +42,36 @@ struct ContextualMenu {
         }
 
         let node = objects.first as? BookmarkNode
-        let object = node?.representedObject ?? objects.first as? BaseBookmarkEntity
+        let object = node?.representedObject as? BaseBookmarkEntity ?? objects.first as? BaseBookmarkEntity
+        let parentFolder = node?.parent?.representedObject as? BookmarkFolder
 
-        let menu: NSMenu?
+        guard let object else { return nil }
 
-        if let bookmark = object as? Bookmark {
-            menu = self.menu(for: bookmark, includeBookmarkEditMenu: includeBookmarkEditMenu)
-        } else if let folder = object as? BookmarkFolder {
-            // When the user edits a folder we need to show the parent in the folder picker. Folders directly child of PseudoFolder `Bookmarks` have nil parent because their parent is not an instance of `BookmarkFolder`
-            let parent = node?.parent?.representedObject as? BookmarkFolder
-            menu = self.menu(for: folder, parent: parent)
-        } else {
-            menu = nil
-        }
+        let menu = menu(for: object, parentFolder: parentFolder, includeBookmarkEditMenu: includeBookmarkEditMenu)
 
         menu?.items.forEach { item in
             item.target = target
+        }
+
+        return menu
+    }
+    
+    /// Creates an instance of NSMenu for the specified `BaseBookmarkEntity`and parent `BookmarkFolder`.
+    ///
+    /// - Parameters:
+    ///   - entity: The bookmark entity to create the menu for.
+    ///   - parentFolder: An optional `BookmarkFolder`.
+    ///   - includeBookmarkEditMenu: True if menu should return edit bookmark option. False otherwise. Default is true.
+    /// - Returns: An instance of NSMenu or nil if `entity` is not a `Bookmark` or a `Folder`.
+    static func menu(for entity: BaseBookmarkEntity, parentFolder: BookmarkFolder?, includeBookmarkEditMenu: Bool = true) -> NSMenu? {
+        let menu: NSMenu?
+        if let bookmark = entity as? Bookmark {
+            menu = self.menu(for: bookmark, includeBookmarkEditMenu: includeBookmarkEditMenu)
+        } else if let folder = entity as? BookmarkFolder {
+            // When the user edits a folder we need to show the parent in the folder picker. Folders directly child of PseudoFolder `Bookmarks` have nil parent because their parent is not an instance of `BookmarkFolder`
+            menu = self.menu(for: folder, parent: parentFolder)
+        } else {
+            menu = nil
         }
 
         return menu

@@ -477,6 +477,17 @@ extension BookmarkManagementDetailViewController: NSTableViewDelegate, NSTableVi
         }
     }
 
+    private func fetchEntityAndParent(at row: Int) -> (entity: BaseBookmarkEntity?, parentFolder: BookmarkFolder?) {
+        switch selectionState {
+        case .empty:
+            return (bookmarkManager.list?.topLevelEntities[safe: row], nil)
+        case .folder(let folder):
+            return (folder.children[safe: row], folder)
+        case .favorites:
+            return (bookmarkManager.list?.favoriteBookmarks[safe: row], nil)
+        }
+    }
+
     private func index(for entity: Bookmark) -> Int? {
         switch selectionState {
         case .empty:
@@ -570,8 +581,10 @@ extension BookmarkManagementDetailViewController: NSMenuDelegate {
             return ContextualMenu.menu(for: self.selectedItems())
         }
 
-        if let item = fetchEntity(at: row) {
-            return ContextualMenu.menu(for: [item])
+        let (item, parent) = fetchEntityAndParent(at: row)
+
+        if let item {
+            return ContextualMenu.menu(for: item, parentFolder: parent)
         } else {
             return nil
         }
