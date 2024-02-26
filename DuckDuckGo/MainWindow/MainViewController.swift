@@ -474,6 +474,7 @@ extension MainViewController {
         }.store(in: &eventMonitorCancellables)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func customKeyDown(with event: NSEvent) -> Bool {
         guard let locWindow = self.view.window,
               NSApplication.shared.keyWindow === locWindow else { return false }
@@ -482,6 +483,14 @@ extension MainViewController {
             .subtracting(.capsLock)
 
         switch Int(event.keyCode) {
+        case kVK_Return:
+            if let addressBarTextField = navigationBarViewController.addressBarViewController?.addressBarTextField,
+               addressBarTextField.isFirstResponder {
+                addressBarTextField.addressBarEnterPressed()
+                return true
+            }
+            return false
+
         case kVK_Escape:
             var isHandled = false
             if !mainView.findInPageContainerView.isHidden {

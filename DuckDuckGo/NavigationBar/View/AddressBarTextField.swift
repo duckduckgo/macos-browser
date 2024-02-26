@@ -285,7 +285,7 @@ final class AddressBarTextField: NSTextField {
         clearUndoManager()
     }
 
-    private func addressBarEnterPressed() {
+    func addressBarEnterPressed() {
         suggestionContainerViewModel?.clearUserStringValue()
 
         let suggestion = suggestionContainerViewModel?.selectedSuggestionViewModel?.suggestion
