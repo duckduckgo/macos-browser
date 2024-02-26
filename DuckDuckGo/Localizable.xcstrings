@@ -752,7 +752,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Are you sure you want to delete all passwords (%d)"
+            "value" : "Are you sure you want to delete all passwords (%d)?"
           }
         }
       }
