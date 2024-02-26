@@ -97,31 +97,25 @@ final class BookmarkManagementDetailViewController: NSViewController, NSMenuItem
         emptyState.isHidden = true
         emptyState.translatesAutoresizingMaskIntoConstraints = false
 
-        emptyStateTitle.isEditable = false
-        emptyStateTitle.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        emptyStateTitle.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateTitle.translatesAutoresizingMaskIntoConstraints = false
-        emptyStateTitle.alignment = .center
-        emptyStateTitle.drawsBackground = false
-        emptyStateTitle.isBordered = false
-        emptyStateTitle.font = .systemFont(ofSize: 15, weight: .semibold)
-        emptyStateTitle.textColor = .labelColor
-        emptyStateTitle.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateTitle,
-                                                                        lineHeight: 1.14,
-                                                                        kern: -0.23)
+        configureEmptyState(
+            label: emptyStateTitle,
+            font: .systemFont(ofSize: 15, weight: .semibold),
+            attributedTitle: .make(
+                UserText.bookmarksEmptyStateTitle,
+                lineHeight: 1.14,
+                kern: -0.23
+            )
+        )
 
-        emptyStateMessage.isEditable = false
-        emptyStateMessage.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        emptyStateMessage.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
-        emptyStateMessage.translatesAutoresizingMaskIntoConstraints = false
-        emptyStateMessage.alignment = .center
-        emptyStateMessage.drawsBackground = false
-        emptyStateMessage.isBordered = false
-        emptyStateMessage.font = .systemFont(ofSize: 13)
-        emptyStateMessage.textColor = .labelColor
-        emptyStateMessage.attributedStringValue = NSAttributedString.make(UserText.bookmarksEmptyStateMessage,
-                                                                          lineHeight: 1.05,
-                                                                          kern: -0.08)
+        configureEmptyState(
+            label: emptyStateMessage,
+            font: .systemFont(ofSize: 13),
+            attributedTitle: .make(
+                UserText.bookmarksEmptyStateMessage,
+                lineHeight: 1.05,
+                kern: -0.08
+            )
+        )
 
         emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
         emptyStateImageView.setContentHuggingPriority(.init(rawValue: 251), for: .vertical)
@@ -561,6 +555,19 @@ private extension BookmarkManagementDetailViewController {
         button.image = image
         button.imagePosition = .imageLeading
         button.isHidden = isHidden
+    }
+
+    func configureEmptyState(label: NSTextField, font: NSFont, attributedTitle: NSAttributedString) {
+        label.isEditable = false
+        label.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        label.setContentHuggingPriority(.init(rawValue: 251), for: .horizontal)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.alignment = .center
+        label.drawsBackground = false
+        label.isBordered = false
+        label.font = font
+        label.textColor = .labelColor
+        label.attributedStringValue = attributedTitle
     }
 
 }
