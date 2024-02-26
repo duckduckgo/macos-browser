@@ -25,6 +25,7 @@ import Common
 protocol WebViewHandler: NSObject {
     func initializeWebView(showWebView: Bool) async
     func load(url: URL) async throws
+    func takeSnaphost() async throws
     func waitForWebViewLoad(timeoutInSeconds: Int) async throws
     func finish() async
     func execute(action: Action, data: CCFRequestData) async
@@ -121,6 +122,48 @@ final class DataBrokerProtectionWebViewHandler: NSObject, WebViewHandler {
 
     func evaluateJavaScript(_ javaScript: String) async throws {
         _ = webView?.evaluateJavaScript(javaScript, in: nil, in: WKContentWorld.page)
+    }
+
+    func takeSnaphost() async throws {
+        let script = "document.body.scrollHeight"
+
+        let result = try await webView?.evaluateJavaScript(script)
+
+        if let height = result as? CGFloat {
+            webView?.frame = CGRect(origin: .zero, size: CGSize(width: 1024, height: height))
+            let configuration = WKSnapshotConfiguration()
+            configuration.rect = CGRect(x: 0, y: 0, width: webView?.frame.size.width ?? 0.0, height: height)
+            if let image = try await webView?.takeSnapshot(configuration: configuration) {
+                saveToDisk(image: image)
+            }
+        }
+    }
+
+    private func saveToDisk(image: NSImage) {
+        guard let tiffData = image.tiffRepresentation else {
+            // Handle the case where tiff representation is not available
+            return
+        }
+
+        // Create a bitmap representation from the tiff data
+        guard let bitmapImageRep = NSBitmapImageRep(data: tiffData) else {
+            // Handle the case where bitmap representation cannot be created
+            return
+        }
+
+        // Convert the bitmap representation to JPEG or PNG data
+        if let pngData = bitmapImageRep.representation(using: .png, properties: [:]) {
+            // Save the PNG data to a file
+            do {
+                let fileURL = URL(fileURLWithPath: "/Users/juanpereira/Desktop/test.png")
+                try pngData.write(to: fileURL)
+                // Image saved successfully
+            } catch {
+                // Handle the error
+            }
+        } else {
+            // Handle the case where PNG data cannot be created
+        }
     }
 }
 
