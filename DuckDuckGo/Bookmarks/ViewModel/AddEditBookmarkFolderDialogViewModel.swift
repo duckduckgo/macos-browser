@@ -20,18 +20,13 @@ import Foundation
 import Combine
 
 @MainActor
-protocol BookmarkFolderDialogViewModel: ObservableObject {
-    var title: String { get }
-    var folderName: String { get }
-    var folders: [FolderViewModel] { get }
-    var selectedFolder: BookmarkFolder? { get }
-
-    func cancel()
-    func addOrSave()
+protocol BookmarkFolderDialogEditing: BookmarksDialogViewModel {
+    var addFolderPublisher: AnyPublisher<BookmarkFolder, Never> { get }
+    var folderName: String { get set }
 }
 
 @MainActor
-final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
+final class AddEditBookmarkFolderDialogViewModel: BookmarkFolderDialogEditing {
 
     /// The type of operation to perform on a folder
     enum Mode {
@@ -62,14 +57,19 @@ final class AddEditBookmarkFolderDialogViewModel: ObservableObject {
         mode.defaultActionTitle
     }
 
-    let isCancelActionDisabled = false
+    let isOtherActionDisabled = false
 
-    var isDefaultActionButtonDisabled: Bool {
+    var isDefaultActionDisabled: Bool {
         folderName.trimmingWhitespace().isEmpty
+    }
+
+    var addFolderPublisher: AnyPublisher<BookmarkFolder, Never> {
+        addFolderSubject.eraseToAnyPublisher()
     }
 
     private let mode: Mode
     private let bookmarkManager: BookmarkManager
+    private let addFolderSubject: PassthroughSubject<BookmarkFolder, Never> = .init()
 
     init(mode: Mode, bookmarkManager: BookmarkManager = LocalBookmarkManager.shared) {
         self.mode = mode
@@ -124,7 +124,9 @@ private extension AddEditBookmarkFolderDialogViewModel {
     }
 
     func add(folderWithName name: String, to parent: BookmarkFolder?) {
-        bookmarkManager.makeFolder(for: name, parent: parent, completion: { _ in })
+        bookmarkManager.makeFolder(for: name, parent: parent) { [weak self] bookmarkFolder in
+            self?.addFolderSubject.send(bookmarkFolder)
+        }
     }
 
 }

@@ -37,14 +37,18 @@ struct BookmarkDialogStackedContentView: View {
             rowHeight: 22.0,
             leftColumn: {
                 ForEach(items, id: \.title) { item in
-                    Text(item.title)
-                        .foregroundColor(.primary)
-                        .fontWeight(.medium)
+                    if !item.isContentViewHidden {
+                        Text(item.title)
+                            .foregroundColor(.primary)
+                            .fontWeight(.medium)
+                    }
                 }
             },
             rightColumn: {
                 ForEach(items, id: \.title) { item in
-                    item.content
+                    if !item.isContentViewHidden {
+                        item.content
+                    }
                 }
             }
         )
@@ -57,10 +61,12 @@ extension BookmarkDialogStackedContentView {
     struct Item {
         fileprivate let title: String
         fileprivate let content: AnyView
+        fileprivate let isContentViewHidden: Bool
 
-        init(title: String, content: any View) {
+        init(title: String, content: any View, isContentViewHidden: Bool = false) {
             self.title = title
             self.content = AnyView(content)
+            self.isContentViewHidden = isContentViewHidden
         }
     }
 }
