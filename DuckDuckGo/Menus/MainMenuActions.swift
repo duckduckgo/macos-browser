@@ -266,8 +266,8 @@ extension MainViewController {
     /// Finds currently active Tab even if it‘s playing a Full Screen video
     private func getActiveTabAndIndex() -> (tab: Tab, index: TabIndex)? {
         var tab: Tab? {
+            // popup windows don‘t get to lastKeyMainWindowController so try getting their WindowController directly fron a key window
             if let window = self.view.window,
-               window.isKeyWindow,
                let mainWindowController = window.nextResponder as? MainWindowController,
                let tab = mainWindowController.activeTab {
                 return tab
