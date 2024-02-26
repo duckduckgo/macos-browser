@@ -649,14 +649,8 @@ extension BookmarkManagementDetailViewController: BookmarkTableCellViewDelegate 
             return
         }
 
-        if let contextMenu = ContextualMenu.menu(for: [bookmark]), let cursorLocation = self.view.window?.mouseLocationOutsideOfEventStream {
-            let convertedLocation = self.view.convert(cursorLocation, from: nil)
-            contextMenu.items.forEach { item in
-                item.target = self
-            }
-
-            contextMenu.popUp(positioning: nil, at: convertedLocation, in: self.view)
-        }
+        guard let contextMenu = ContextualMenu.menu(for: [bookmark], target: self) else { return }
+        contextMenu.popUpAtMouseLocation(in: view)
     }
 
     func bookmarkTableCellViewToggledFavorite(cell: BookmarkTableCellView) {
@@ -748,6 +742,10 @@ extension BookmarkManagementDetailViewController: FolderMenuItemSelectors {
 
         AddBookmarkFolderModalView(model: AddBookmarkFolderModalViewModel(folder: folder))
             .show(in: view.window)
+    }
+
+    func editFolder(_ sender: NSMenuItem) {
+        // https://app.asana.com/0/0/1206531304671952/f
     }
 
     func deleteFolder(_ sender: NSMenuItem) {
