@@ -32,7 +32,7 @@
 
     },
     "**%lld** tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "%@ does not support storing passwords" : {
       "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
@@ -41,7 +41,7 @@
 
     },
     "%lld tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "• Because data broker sites often have multi-step processes required to have information removed, and because they regularly update their databases with new personal information, this authorization includes ongoing action on your behalf solely to perform the service." : {
 
@@ -230,7 +230,7 @@
       }
     },
     "Address" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify an address (street city etc,)"
     },
     "Address:" : {
       "comment" : "Add Bookmark dialog bookmark url field heading"
@@ -986,7 +986,7 @@
       }
     },
     "Birthday" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify a date of birth"
     },
     "bitwarden.app.found" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -1001,6 +1001,7 @@
       }
     },
     "bitwarden.cant.access.container" : {
+      "comment" : "Requests user Full Disk access in order to access password manager Birwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1012,6 +1013,7 @@
       }
     },
     "bitwarden.connect.communication-info" : {
+      "comment" : "Warns users that all communication between the DuckDuckGo browser and the password manager Bitwarden is encrypted and doesn't leave the user device",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1023,6 +1025,7 @@
       }
     },
     "bitwarden.connect.description" : {
+      "comment" : "Description for when the user wants to connect the browser to the password manager Bitwarned.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1034,6 +1037,7 @@
       }
     },
     "bitwarden.connect.history-info" : {
+      "comment" : "Warn users that the password Manager Bitwarden will have access to their browsing history",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1068,6 +1072,7 @@
       }
     },
     "bitwarden.connecting" : {
+      "comment" : "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action, in this case we are in the progress of connecting the browser to the Bitwarden password maanger.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1079,6 +1084,7 @@
       }
     },
     "bitwarden.error" : {
+      "comment" : "This message appears when the application is unable to find or connect to Bitwarden, indicating a connection issue.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1090,6 +1096,7 @@
       }
     },
     "bitwarden.handshake.not.approved" : {
+      "comment" : "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action. This message indicates that the handshake process was not approved in the Bitwarden app.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1149,6 +1156,7 @@
       }
     },
     "bitwarden.integration.not.approved" : {
+      "comment" : "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates that the integration with DuckDuckGo has not been approved in the Bitwarden app.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1172,6 +1180,7 @@
       }
     },
     "bitwarden.missing.handshake" : {
+      "comment" : "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates a missing handshake (a way for two devices or systems to say hello to each other and agree to communicate or exchange information).",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1194,6 +1203,7 @@
       }
     },
     "bitwarden.old.version" : {
+      "comment" : "Message that warns user they need to update their password manager Bitwarden app vesion",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1205,6 +1215,7 @@
       }
     },
     "bitwarden.preferences.complete-setup" : {
+      "comment" : "action option that prompts the user to complete the setup process in Bitwarden preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1216,6 +1227,7 @@
       }
     },
     "bitwarden.preferences.open-bitwarden" : {
+      "comment" : "Button to open Bitwarden app",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1227,6 +1239,7 @@
       }
     },
     "bitwarden.preferences.run" : {
+      "comment" : "Warns user that the password manager Bitwarden app is not running",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1238,6 +1251,7 @@
       }
     },
     "bitwarden.preferences.unable-to-connect" : {
+      "comment" : "Dialog telling the user Bitwarden (a password manager) is not available",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1249,6 +1263,7 @@
       }
     },
     "bitwarden.preferences.unlock" : {
+      "comment" : "Asks the user to unlock the password manager Bitwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1260,6 +1275,7 @@
       }
     },
     "bitwarden.waiting.for.handshake" : {
+      "comment" : "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates the system is waiting for the handshake (a way for two devices or systems to say hello to each other and agree to communicate or exchange information).",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1283,6 +1299,7 @@
       }
     },
     "bitwarden.waiting.for.status.response" : {
+      "comment" : "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action, in this case that the application is currently waiting for a response from the Bitwarden service.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1768,6 +1785,7 @@
       "comment" : "Main Menu Window item"
     },
     "burner.homepage.description.1" : {
+      "comment" : "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1779,6 +1797,7 @@
       }
     },
     "burner.homepage.description.2" : {
+      "comment" : "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1790,6 +1809,7 @@
       }
     },
     "burner.homepage.description.3" : {
+      "comment" : "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1801,6 +1821,7 @@
       }
     },
     "burner.homepage.description.4" : {
+      "comment" : "This describes the functionality of one of out browser feature Fire Window, highlighting their isolation from other browser data and the automatic deletion of their data upon closure. Additionally, it emphasizes that fire windows offer the same level of tracking protection as other browsing windows.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1974,7 +1995,7 @@
       }
     },
     "Contact Info" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify contact info (phone, email address)"
     },
     "copy" : {
       "comment" : "Copy button",
@@ -2040,7 +2061,7 @@
       }
     },
     "Country" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify a country (US,UK, Italy etc...)"
     },
     "crash-report.description" : {
       "comment" : "Description of the dialog where the user can send a crash report",
@@ -2190,6 +2211,7 @@
       }
     },
     "default.browser.prompt.button" : {
+      "comment" : "represents a prompt message asking the user to make DuckDuckGo their default browser.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2201,6 +2223,7 @@
       }
     },
     "default.browser.prompt.message" : {
+      "comment" : "represents a prompt message asking the user to make DuckDuckGo their default browser.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2808,7 +2831,7 @@
       }
     },
     "email.copied" : {
-      "comment" : "Private email address was copied to clipboard message",
+      "comment" : "Notification that the Private email address was copied to clipboard after the user generated a new address",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2868,7 +2891,7 @@
       }
     },
     "email.optionsMenu.turnOn" : {
-      "comment" : "Enable email sub menu item",
+      "comment" : "Sub menu item to enable Email Protection",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2883,19 +2906,7 @@
       "comment" : "Main Menu View item"
     },
     "Error message & code" : {
-
-    },
-    "error.unknown" : {
-      "comment" : "Error page subtitle",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "An unknown error has occurred"
-          }
-        }
-      }
+      "comment" : "Title of the section of a dialog (form where the user can report feedback) where the error message and the error code are shown"
     },
     "error.unknown.try.again" : {
       "comment" : "Generic error message on a dialog for when the cause is not known.",
@@ -3033,7 +3044,7 @@
       }
     },
     "feedback.bug.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3045,7 +3056,7 @@
       }
     },
     "feedback.disclaimer" : {
-      "comment" : "Disclaimer in breakage form",
+      "comment" : "Disclaimer in breakage form - a form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3057,7 +3068,7 @@
       }
     },
     "feedback.feature.request.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form for feature requests.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3123,7 +3134,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close %1$d active %2$@ and clear all browsing history and cookies (%3$d %4$@)."
+            "value" : "Close active tabs (%1$d) and clear all browsing history and cookies (sites: %2$d)."
           }
         }
       }
@@ -3363,7 +3374,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close this tab and clear its browsing history and cookies (%1$d %2$@)."
+            "value" : "Close this tab and clear its browsing history and cookies (sites: %d)."
           }
         }
       }
@@ -3756,6 +3767,7 @@
       }
     },
     "home.page.empty.state.item.message" : {
+      "comment" : "This string represents the message for an empty state item on the home page, encouraging the user to keep browsing to see how many trackers were blocked",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3767,6 +3779,7 @@
       }
     },
     "home.page.empty.state.item.title" : {
+      "comment" : "This string represents the title for an empty state item on the home page, indicating that recently visited sites will appear here",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3778,6 +3791,7 @@
       }
     },
     "home.page.no.trackers.blocked" : {
+      "comment" : "This string represents a message on the home page indicating that no trackers were blocked",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3789,6 +3803,7 @@
       }
     },
     "home.page.no.trackers.found" : {
+      "comment" : "This string represents a message on the home page indicating that no trackers were found",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3812,6 +3827,7 @@
       }
     },
     "home.page.protection.summary.info" : {
+      "comment" : "This string represents a message in the protection summary on the home page, indicating that there is no recent activity",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3823,6 +3839,7 @@
       }
     },
     "home.page.protection.summary.message" : {
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3840,10 +3857,10 @@
       "comment" : "Menu item"
     },
     "Import Bookmarks" : {
-
+      "comment" : "Title of dialog with instruction for the user to import bookmarks from another browser"
     },
     "Import Passwords" : {
-      "comment" : "my comment"
+      "comment" : "Title of dialog with instruction for the user to import passwords from another browser"
     },
     "Import Results:" : {
       "comment" : "Data Import result summary headline"
@@ -3891,7 +3908,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d bookmarks…"
+            "value" : "Importing bookmarks (%d)…"
           }
         }
       }
@@ -4431,7 +4448,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d passwords…"
+            "value" : "Importing passwords (%d)…"
           }
         }
       }
@@ -4701,7 +4718,7 @@
       }
     },
     "main-menu.edit.paste-and-match-style" : {
-      "comment" : "Main Menu Edit item",
+      "comment" : "Main Menu Edit item - Action that allows the user to paste copy into a target document and the target document's style will be retained (instead of the source style)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -4917,7 +4934,7 @@
       }
     },
     "main-menu.file.open-location" : {
-      "comment" : "Main Menu File item",
+      "comment" : "Main Menu File item- Menu option that allows the user to connect to an address (type an address) on click the address bar of the browser is selected and the user can type.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5075,14 +5092,26 @@
         }
       }
     },
-    "n.more.tabs" : {
-      "comment" : "suffix of string in Recently Closed menu",
+    "mute.tab" : {
+      "comment" : "Menu item. Mute tab",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : " (and %d more tabs)"
+            "value" : "Mute Tab"
+          }
+        }
+      }
+    },
+    "n.more.tabs" : {
+      "comment" : "String in Recently Closed menu item for recently closed browser window and number of tabs contained in the closed window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Window with multiple tabs (%d)"
           }
         }
       }
@@ -5475,7 +5504,7 @@
       }
     },
     "no.access.to.downloads.folder.header" : {
-      "comment" : "Header of the alert dialog informing user about failed download",
+      "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5690,18 +5719,6 @@
         }
       }
     },
-    "one.more.tab" : {
-      "comment" : "suffix of string in Recently Closed menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " (and 1 more tab)"
-          }
-        }
-      }
-    },
     "Only Show on New Tab" : {
       "comment" : "Preference for only showing the bookmarks bar on new tab"
     },
@@ -5766,7 +5783,7 @@
       }
     },
     "open.externally.failed" : {
-      "comment" : "’Link’ is link on a website",
+      "comment" : "’Link’ is link on a website, it couldn't be opened due to the required app not being found",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5874,6 +5891,7 @@
       }
     },
     "open.settings" : {
+      "comment" : "This string represents a prompt or button label prompting the user to open system settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5916,6 +5934,42 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Remove Fireproofing"
+          }
+        }
+      }
+    },
+    "page.crash.header" : {
+      "comment" : "Error page heading text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This webpage has crashed."
+          }
+        }
+      }
+    },
+    "page.crash.message" : {
+      "comment" : "Error page message text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try reloading the page or come back later."
+          }
+        }
+      }
+    },
+    "page.error.header" : {
+      "comment" : "Error page heading text",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo can’t load this page."
           }
         }
       }
@@ -6545,7 +6599,7 @@
       }
     },
     "permission.popup.title" : {
-      "comment" : "List of blocked popups Title",
+      "comment" : "Title of a popup that has a list of blocked popups",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -7100,6 +7154,7 @@
       }
     },
     "pm.lock-screen.duration" : {
+      "comment" : "Message about the duration for which autofill information remains unlocked on the lock screen.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -7855,6 +7910,7 @@
       }
     },
     "preferences.about.unsupported-device-info1" : {
+      "comment" : "This string represents a message informing the user that DuckDuckGo is no longer providing browser updates for their version of macOS",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -7866,61 +7922,13 @@
       }
     },
     "preferences.about.unsupported-device-info2" : {
-      "comment" : "Link to the about page",
+      "comment" : "Copy in section that tells the user to update their macOS version since their current version is unsupported",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Please update to macOS %@ or later to use the most recent version"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part1" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 1",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Please"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part2" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 2 (underlined)",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "update to macOS %@"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part3" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 3",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "or later to use the most recent version"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part4" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 4",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
+            "value" : "Please update to macOS %@ or later to use the most recent version of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
           }
         }
       }
@@ -8082,6 +8090,7 @@
       }
     },
     "preferences.default-browser.button.make-default" : {
+      "comment" : "represents a prompt message asking the user to make DuckDuckGo their default browser.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8184,18 +8193,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Open a new window"
-          }
-        }
-      }
-    },
-    "preferences.subscription" : {
-      "comment" : "Show subscription preferences",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
           }
         }
       }
@@ -8312,6 +8309,7 @@
       "comment" : "Main Menu History item"
     },
     "reopen.last.closed.tab" : {
+      "comment" : "This string represents an action to reopen the last closed tab in the browser",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8323,6 +8321,7 @@
       }
     },
     "reopen.last.closed.window" : {
+      "comment" : "This string represents an action to reopen the last closed window in the browser",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8358,6 +8357,7 @@
       }
     },
     "restart.bitwarden.info" : {
+      "comment" : "This string represents a message informing the user that Bitwarden is not responding and prompts them to restart the application to initiate communication again.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8692,54 +8692,6 @@
         }
       }
     },
-    "subscription.menu.item" : {
-      "comment" : "Title for Subscription item in the options menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
-          }
-        }
-      }
-    },
-    "subscription.progress.view.completing.purchase" : {
-      "comment" : "Progress view title when completing the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Completing purchase..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.purchasing.subscription" : {
-      "comment" : "Progress view title when starting the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Purchase in progress..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.restoring.subscription" : {
-      "comment" : "Progress view title when restoring past subscription purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Restoring subscription..."
-          }
-        }
-      }
-    },
     "tab.bookmarks.title" : {
       "comment" : "Tab bookmarks title",
       "extractionState" : "extracted_with_value",
@@ -8759,7 +8711,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Oops!"
+            "value" : "Failed to open page"
           }
         }
       }
@@ -8948,7 +8900,7 @@
       }
     },
     "tooltip.clearHistory" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8960,7 +8912,7 @@
       }
     },
     "tooltip.clearHistoryAndData" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -9160,6 +9112,18 @@
         }
       }
     },
+    "unmute.tab" : {
+      "comment" : "Menu item. Unmute tab",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unmute Tab"
+          }
+        }
+      }
+    },
     "unpin.tab" : {
       "comment" : "Menu item. Unpin as a verb",
       "extractionState" : "extracted_with_value",
@@ -9173,6 +9137,7 @@
       }
     },
     "unsupported.device.info.alert.header" : {
+      "comment" : "his string represents the header for an alert informing the user that their version of macOS is no longer supported",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

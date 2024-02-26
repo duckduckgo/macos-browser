@@ -275,11 +275,23 @@ public final class PixelKit {
             newParams = nil
         }
 
+        let newError: Error?
+
+        if let event = event as? PixelKitEventV2 {
+            // For v2 events we only consider the error specified in the event
+            // and purposedly ignore the parameter in this call.
+            // This is to encourage moving the error over to the protocol error
+            // instead of still relying on the parameter of this call.
+            newError = event.error
+        } else {
+            newError = error
+        }
+
         fire(pixelNamed: pixelName,
              frequency: frequency,
              withHeaders: headers,
              withAdditionalParameters: newParams,
-             withError: error,
+             withError: newError,
              allowedQueryReservedCharacters: allowedQueryReservedCharacters,
              includeAppVersionParameter: includeAppVersionParameter,
              onComplete: onComplete)
@@ -365,8 +377,16 @@ extension Dictionary where Key == String, Value == String {
 
         self[PixelKit.Parameters.errorCode] = "\(nsError.code)"
         self[PixelKit.Parameters.errorDomain] = nsError.domain
+        self[PixelKit.Parameters.errorDesc] = nsError.localizedDescription
 
-        if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
+        if let error = error as? PixelKitEventErrorDetails,
+           let underlyingError = error.underlyingError {
+
+            let underlyingNSError = underlyingError as NSError
+            self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingNSError.code)"
+            self[PixelKit.Parameters.underlyingErrorDomain] = underlyingNSError.domain
+            self[PixelKit.Parameters.underlyingErrorDesc] = underlyingNSError.localizedDescription
+        } else if let underlyingError = nsError.userInfo["NSUnderlyingError"] as? NSError {
             self[PixelKit.Parameters.underlyingErrorCode] = "\(underlyingError.code)"
             self[PixelKit.Parameters.underlyingErrorDomain] = underlyingError.domain
         } else if let sqlErrorCode = nsError.userInfo["NSSQLiteErrorDomain"] as? NSNumber {

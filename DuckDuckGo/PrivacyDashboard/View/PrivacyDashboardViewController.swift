@@ -274,6 +274,15 @@ extension PrivacyDashboardViewController {
         let configuration = ContentBlocking.shared.privacyConfigurationManager.privacyConfig
         let protectionsState = configuration.isFeature(.contentBlocking, enabledForDomain: currentTab.content.url?.host)
 
+        var errors: [Error]?
+        var statusCodes: [Int]?
+        if let error = tabViewModel?.tab.lastWebError {
+            errors = [error]
+        }
+        if let httpStatusCode = tabViewModel?.tab.lastHttpStatusCode {
+            statusCodes = [httpStatusCode]
+        }
+
         let websiteBreakage = WebsiteBreakage(siteUrl: currentURL,
                                               category: category.lowercased(),
                                               description: description,
@@ -288,8 +297,8 @@ extension PrivacyDashboardViewController {
                                               urlParametersRemoved: urlParametersRemoved,
                                               protectionsState: protectionsState,
                                               reportFlow: source,
-                                              error: nil,
-                                              httpStatusCode: nil)
+                                              errors: errors,
+                                              httpStatusCodes: statusCodes)
         return websiteBreakage
     }
 }

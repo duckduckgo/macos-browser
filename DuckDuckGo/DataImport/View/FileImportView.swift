@@ -476,9 +476,9 @@ struct FileImportView: View {
             {
                 switch dataType {
                 case .bookmarks:
-                    Text("Import Bookmarks")
+                    Text("Import Bookmarks", comment: "Title of dialog with instruction for the user to import bookmarks from another browser")
                 case .passwords:
-                    Text("Import Passwords")
+                    Text("Import Passwords", comment: "Title of dialog with instruction for the user to import passwords from another browser")
                 }
             }().bold()
 

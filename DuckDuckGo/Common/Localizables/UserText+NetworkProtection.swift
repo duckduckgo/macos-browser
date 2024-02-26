@@ -31,7 +31,7 @@ extension UserText {
 
     // MARK: - Invite Code
     // "network.protection.invite.dialog.title" - Title for the network protection invite dialog
-    static let networkProtectionInviteDialogTitle = "You've unlocked a beta feature!"
+    static let networkProtectionInviteDialogTitle = "Enter your invite code"
     // "network.protection.invite.dialog.message" - Message for the network protection invite dialog
     static let networkProtectionInviteDialogMessage = "Enter your invite code to get started."
     // "network.protection.invite.field.prompt" - Prompt for the network protection invite code text field
