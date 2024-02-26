@@ -174,19 +174,19 @@ final class SaveCredentialsViewController: NSViewController {
             titleLabel.stringValue = UserText.pmSaveCredentialsNonEditableTitle
             view.window?.makeFirstResponder(nil)
         }
-        let notNowRrailingToOpenPasswordConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
+        let notNowTrailingToOpenPasswordConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
         let notNowTrailingToSaveButtonConstraint = passwordManagerNotNowButton.trailingAnchor.constraint(equalTo: saveButton.leadingAnchor, constant: -12)
         let dontUpdateRrailingToOpenPasswordConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: openPasswordManagerButton.leadingAnchor, constant: -12)
-        let sontUpdateTrailingToUpdateButtonConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: updateButton.leadingAnchor, constant: -12)
+        let dontUpdateTrailingToUpdateButtonConstraint = dontUpdateButton.trailingAnchor.constraint(equalTo: updateButton.leadingAnchor, constant: -12)
         if openPasswordManagerButton.isHidden {
-            notNowRrailingToOpenPasswordConstraint.isActive = false
+            notNowTrailingToOpenPasswordConstraint.isActive = false
             dontUpdateRrailingToOpenPasswordConstraint.isActive = false
             notNowTrailingToSaveButtonConstraint.isActive = true
-            sontUpdateTrailingToUpdateButtonConstraint.isActive = true
+            dontUpdateTrailingToUpdateButtonConstraint.isActive = true
         } else {
             notNowTrailingToSaveButtonConstraint.isActive = false
-            sontUpdateTrailingToUpdateButtonConstraint.isActive = false
-            notNowRrailingToOpenPasswordConstraint.isActive = true
+            dontUpdateTrailingToUpdateButtonConstraint.isActive = false
+            notNowTrailingToOpenPasswordConstraint.isActive = true
             dontUpdateRrailingToOpenPasswordConstraint.isActive = true
         }
     }
