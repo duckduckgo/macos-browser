@@ -98,8 +98,8 @@ final class DataBrokerProfileQueryOperationManagerTests: XCTestCase {
             let historyEvents = [HistoryEvent(extractedProfileId: extractedProfileId, brokerId: brokerId, profileQueryId: profileQueryId, type: .optOutRequested)]
             let mockScanOperation = ScanOperationData(brokerId: brokerId, profileQueryId: profileQueryId, preferredRunDate: currentPreferredRunDate, historyEvents: historyEvents)
 
-            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc")
-            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz")
+            let extractedProfileSaved1 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "abc", identifier: "abc")
+            let extractedProfileSaved2 = ExtractedProfile(id: 1, name: "Some name", profileUrl: "zxz", identifier: "zxz")
 
             let optOutData = [OptOutOperationData.mock(with: extractedProfileSaved1),
                               OptOutOperationData.mock(with: extractedProfileSaved2)]
@@ -907,19 +907,19 @@ extension ProfileQuery {
 extension ExtractedProfile {
 
     static var mockWithRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date())
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: Date(), identifier: "someURL")
     }
 
     static var mockWithoutRemovedDate: ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL")
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", identifier: "someURL")
     }
 
     static var mockWithoutId: ExtractedProfile {
-        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL")
+        ExtractedProfile(name: "Some name", profileUrl: "someOtherURL", identifier: "someOtherURL")
     }
 
     static func mockWithRemoveDate(_ date: Date) -> ExtractedProfile {
-        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date)
+        ExtractedProfile(id: 1, name: "Some name", profileUrl: "someURL", removedDate: date, identifier: "someURL")
     }
 }
 

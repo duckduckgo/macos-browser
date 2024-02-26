@@ -620,11 +620,11 @@ final class DataBrokerProtectionSecureVaultMock: DataBrokerProtectionSecureVault
 
 public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProtectionPixels> {
 
-    static var lastPixelFired: DataBrokerProtectionPixels?
+    static var lastPixelsFired = [DataBrokerProtectionPixels]()
 
     public init() {
         super.init { event, _, _, _ in
-            MockDataBrokerProtectionPixelsHandler.lastPixelFired = event
+            MockDataBrokerProtectionPixelsHandler.lastPixelsFired.append(event)
         }
     }
 
@@ -633,7 +633,7 @@ public class MockDataBrokerProtectionPixelsHandler: EventMapping<DataBrokerProte
     }
 
     func clear() {
-        MockDataBrokerProtectionPixelsHandler.lastPixelFired = nil
+        MockDataBrokerProtectionPixelsHandler.lastPixelsFired.removeAll()
     }
 }
 
@@ -662,6 +662,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
     var lastParentBrokerWhereChildSitesWhereFetched: String?
     var lastProfileQueryIdOnScanUpdatePreferredRunDate: Int64?
     var brokerProfileQueryDataToReturn = [BrokerProfileQueryData]()
+    var profile: DataBrokerProtectionProfile?
 
     lazy var callsList: [Bool] = [
         wasSaveProfileCalled,
@@ -690,7 +691,11 @@ final class MockDatabase: DataBrokerProtectionRepository {
 
     func fetchProfile() -> DataBrokerProtectionProfile? {
         wasFetchProfileCalled = true
-        return nil
+        return profile
+    }
+
+    func setFetchedProfile(_ profile: DataBrokerProtectionProfile?) {
+        self.profile = profile
     }
 
     func deleteProfileData() {
@@ -802,6 +807,7 @@ final class MockDatabase: DataBrokerProtectionRepository {
         lastParentBrokerWhereChildSitesWhereFetched = nil
         lastProfileQueryIdOnScanUpdatePreferredRunDate = nil
         brokerProfileQueryDataToReturn.removeAll()
+        profile = nil
     }
 }
 

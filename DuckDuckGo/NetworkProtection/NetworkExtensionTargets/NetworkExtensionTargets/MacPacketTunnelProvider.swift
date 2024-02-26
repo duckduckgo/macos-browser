@@ -244,7 +244,6 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    isSubscriptionEnabled: false,
                    entitlementCheck: nil)
 
-        observeConnectionStatusChanges()
         observeServerChanges()
         observeStatusUpdateRequests()
     }
@@ -253,12 +252,11 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Observe connection status changes to broadcast those changes through distributed notifications.
     ///
-    private func observeConnectionStatusChanges() {
-        connectionStatusPublisher.sink { [weak self] status in
-            self?.lastStatusChangeDate = Date()
-            self?.broadcast(status)
-        }
-        .store(in: &cancellables)
+    public override func handleConnectionStatusChange(old: ConnectionStatus, new: ConnectionStatus) {
+        super.handleConnectionStatusChange(old: old, new: new)
+
+        lastStatusChangeDate = Date()
+        broadcast(new)
     }
 
     /// Observe server changes to broadcast those changes through distributed notifications.
@@ -277,8 +275,12 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
     ///
     private func observeStatusUpdateRequests() {
         notificationCenter.publisher(for: .requestStatusUpdate).sink { [weak self] _ in
-            self?.broadcastConnectionStatus()
-            self?.broadcastLastSelectedServerInfo()
+            guard let self else { return }
+
+            Task { @MainActor in
+                self.broadcastConnectionStatus()
+                self.broadcastLastSelectedServerInfo()
+            }
         }
         .store(in: &cancellables)
     }
@@ -287,6 +289,7 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
 
     /// Broadcasts the current connection status.
     ///
+    @MainActor
     private func broadcastConnectionStatus() {
         broadcast(connectionStatus)
     }
