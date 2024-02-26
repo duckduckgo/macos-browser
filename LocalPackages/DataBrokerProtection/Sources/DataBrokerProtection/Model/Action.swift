@@ -29,14 +29,24 @@ enum ActionType: String, Codable, Sendable {
     case solveCaptcha
 }
 
+enum DataSource: String, Codable {
+    case userData
+    case extractedProfile
+}
+
 protocol Action: Codable, Sendable {
     var id: String { get }
     var actionType: ActionType { get }
     var needsEmail: Bool { get }
+    var dataSource: DataSource { get }
 }
 
 extension Action {
     var needsEmail: Bool {
-        get { false }
+        return false
+    }
+
+    var dataSource: DataSource {
+        return .userData
     }
 }
