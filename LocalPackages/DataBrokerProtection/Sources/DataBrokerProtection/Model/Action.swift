@@ -30,7 +30,7 @@ enum ActionType: String, Codable, Sendable {
 }
 
 enum DataSource: String, Codable {
-    case userData
+    case userProfile
     case extractedProfile
 }
 
@@ -47,6 +47,6 @@ extension Action {
     }
 
     var dataSource: DataSource {
-        return .userData
+        return .userProfile
     }
 }

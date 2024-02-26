@@ -35,7 +35,7 @@ struct InitParams: Encodable {
 }
 
 private enum UserDataCodingKeys: String, CodingKey {
-    case userData
+    case userProfile
     case extractedProfile
 }
 
@@ -61,7 +61,7 @@ struct ActionRequest: Encodable {
             try container.encode(extractedProfile, forKey: .data)
         case .userData(let profileQuery, let extractedProfile):
             var userDataContainer = container.nestedContainer(keyedBy: UserDataCodingKeys.self, forKey: .data)
-            try userDataContainer.encode(profileQuery, forKey: .userData)
+            try userDataContainer.encode(profileQuery, forKey: .userProfile)
             if let extractedProfile = extractedProfile {
                 try userDataContainer.encode(extractedProfile, forKey: .extractedProfile)
             }
