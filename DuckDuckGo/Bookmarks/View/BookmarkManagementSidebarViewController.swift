@@ -51,7 +51,7 @@ final class BookmarkManagementSidebarViewController: NSViewController {
     private lazy var outlineView = BookmarksOutlineView(frame: scrollView.frame)
 
     private lazy var treeController = BookmarkTreeController(dataSource: treeControllerDataSource)
-    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController)
+    private lazy var dataSource = BookmarkOutlineViewDataSource(contentMode: .foldersOnly, bookmarkManager: bookmarkManager, treeController: treeController, showMenuButtonOnHover: false)
 
     private var cancellables = Set<AnyCancellable>()
 
