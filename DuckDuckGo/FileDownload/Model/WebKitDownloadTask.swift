@@ -269,7 +269,7 @@ extension WebKitDownloadTask: WKDownloadDelegate {
         // sometimes suggesteFilename has an extension appended to already present URL file extension
         // e.g. feed.xml.rss for www.domain.com/rss.xml
         if let urlSuggestedFilename = response.url?.suggestedFilename,
-           !urlSuggestedFilename.pathExtension.isEmpty,
+           !(urlSuggestedFilename.pathExtension.isEmpty || (self.suggestedFileType == .html && urlSuggestedFilename.pathExtension == "html")),
            suggestedFilename.hasPrefix(urlSuggestedFilename) {
             suggestedFilename = urlSuggestedFilename
         }
