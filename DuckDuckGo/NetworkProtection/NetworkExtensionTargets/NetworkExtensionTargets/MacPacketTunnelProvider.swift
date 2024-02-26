@@ -23,6 +23,7 @@ import NetworkProtection
 import NetworkExtension
 import Networking
 import PixelKit
+import Subscription
 
 final class MacPacketTunnelProvider: PacketTunnelProvider {
 
@@ -241,7 +242,10 @@ final class MacPacketTunnelProvider: PacketTunnelProvider {
                    debugEvents: debugEvents,
                    providerEvents: Self.packetTunnelProviderEvents,
                    settings: settings,
-                   subscriptionConfiguration: .makeConfiguration())
+                   isSubscriptionEnabled: true,
+                   entitlementCheck: {
+            await AccountManager().hasEntitlement(for: .networkProtection)
+        })
 
         observeConnectionStatusChanges()
         observeServerChanges()

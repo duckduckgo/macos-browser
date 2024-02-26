@@ -93,7 +93,7 @@ extension NetworkProtectionStatusView {
         ///
         private let runLoopMode: RunLoop.Mode?
 
-        private let accountManager: SubscriptionAccountManaging
+        private let entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>
         private let entitlementMonitor: NetworkProtectionEntitlementMonitor
 
         private var cancellables = Set<AnyCancellable>()
@@ -115,7 +115,7 @@ extension NetworkProtectionStatusView {
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
                     runLoopMode: RunLoop.Mode? = nil,
-                    accountManager: SubscriptionAccountManaging) {
+                    entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>) {
 
             self.tunnelController = controller
             self.onboardingStatusPublisher = onboardingStatusPublisher

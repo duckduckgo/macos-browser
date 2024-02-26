@@ -333,6 +333,7 @@ final class NavigationBarViewController: NSViewController {
         let accountManager = AccountManager()
         let networkProtectionTokenStorage = NetworkProtectionKeychainTokenStore()
 
+        // TODO: The issue is here
         if accountManager.accessToken != nil && (try? networkProtectionTokenStorage.fetchToken()) == nil {
             print("[NetP Subscription] Got access token but not auth token, meaning token exchange failed")
             return

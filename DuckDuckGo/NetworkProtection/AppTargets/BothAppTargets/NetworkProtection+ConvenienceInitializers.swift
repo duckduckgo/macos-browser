@@ -32,7 +32,8 @@ extension NetworkProtectionDeviceManager {
             environment: settings.selectedEnvironment,
             tokenStore: tokenStore,
             keyStore: keyStore,
-            errorEvents: .networkProtectionAppDebugEvents, subscriptionConfiguration: .init(isSubscriptionEnabled: false, isEntitlementValid: { true })
+            errorEvents: .networkProtectionAppDebugEvents,
+            isSubscriptionEnabled: true
         )
     }
 }
@@ -43,7 +44,7 @@ extension NetworkProtectionCodeRedemptionCoordinator {
         self.init(environment: settings.selectedEnvironment,
                   tokenStore: NetworkProtectionKeychainTokenStore(),
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false)
+                  isSubscriptionEnabled: true)
     }
 }
 
@@ -51,7 +52,7 @@ extension NetworkProtectionKeychainTokenStore {
     convenience init() {
         self.init(keychainType: .default,
                   errorEvents: .networkProtectionAppDebugEvents,
-                  isSubscriptionEnabled: false)
+                  isSubscriptionEnabled: true)
     }
 }
 

@@ -86,8 +86,9 @@ final class NetworkProtectionNavBarPopoverManager {
                 return menuItems
             },
                                                    agentLoginItem: LoginItem.vpnMenu,
-                                                   accountManager: AccountManager()
-            )
+                                                   entitlementCheck: {
+                await AccountManager().hasEntitlement(for: .networkProtection)
+            })
             popover.delegate = delegate
 
             networkProtectionPopover = popover

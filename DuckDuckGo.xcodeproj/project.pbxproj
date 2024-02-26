@@ -3058,11 +3058,6 @@
 		EAC80DE0271F6C0100BBF02D /* fb-sdk.js in Resources */ = {isa = PBXBuildFile; fileRef = EAC80DDF271F6C0100BBF02D /* fb-sdk.js */; };
 		EAE42800275D47FA00DAC26B /* ClickToLoadModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */; };
 		EAFAD6CA2728BD1200F9DF00 /* clickToLoad.js in Resources */ = {isa = PBXBuildFile; fileRef = EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */; };
-		EE297CBD2B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE297CBC2B83B8720083DB29 /* AccountManager+NetworkProtection.swift */; };
-		EE297CBE2B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE297CBC2B83B8720083DB29 /* AccountManager+NetworkProtection.swift */; };
-		EE297CC12B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE297CBC2B83B8720083DB29 /* AccountManager+NetworkProtection.swift */; };
-		EE297CC22B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE297CBC2B83B8720083DB29 /* AccountManager+NetworkProtection.swift */; };
-		EE297CC32B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE297CBC2B83B8720083DB29 /* AccountManager+NetworkProtection.swift */; };
 		EE297CC52B83EF480083DB29 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = EE297CC42B83EF480083DB29 /* Subscription */; };
 		EE297CC72B83EF510083DB29 /* Subscription in Frameworks */ = {isa = PBXBuildFile; productRef = EE297CC62B83EF510083DB29 /* Subscription */; };
 		EE339228291BDEFD009F62C1 /* JSAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE339227291BDEFD009F62C1 /* JSAlertController.swift */; };
@@ -4409,7 +4404,6 @@
 		EAC80DDF271F6C0100BBF02D /* fb-sdk.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "fb-sdk.js"; sourceTree = "<group>"; };
 		EAE427FF275D47FA00DAC26B /* ClickToLoadModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClickToLoadModel.swift; sourceTree = "<group>"; };
 		EAFAD6C92728BD1200F9DF00 /* clickToLoad.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = clickToLoad.js; sourceTree = "<group>"; };
-		EE297CBC2B83B8720083DB29 /* AccountManager+NetworkProtection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountManager+NetworkProtection.swift"; sourceTree = "<group>"; };
 		EE339227291BDEFD009F62C1 /* JSAlertController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSAlertController.swift; sourceTree = "<group>"; };
 		EE66666E2B56EDE4001D898D /* VPNLocationsHostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNLocationsHostingViewController.swift; sourceTree = "<group>"; };
 		EEA3EEB02B24EBD000E8333A /* NetworkProtectionVPNCountryLabelsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkProtectionVPNCountryLabelsModel.swift; sourceTree = "<group>"; };
@@ -8205,7 +8199,6 @@
 				4BF0E5042AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift */,
 				7B934C402A866DD400FC8F9C /* UserDefaults+NetworkProtectionShared.swift */,
 				7BFE95532A9DF2930081ABE9 /* UserDefaults+NetworkProtectionWaitlist.swift */,
-				EE297CBC2B83B8720083DB29 /* AccountManager+NetworkProtection.swift */,
 			);
 			path = AppAndExtensionAndAgentTargets;
 			sourceTree = "<group>";
@@ -9739,7 +9732,6 @@
 				3706FB60293F65D500E42796 /* PasswordManagementIdentityItemView.swift in Sources */,
 				3706FB61293F65D500E42796 /* ProgressExtension.swift in Sources */,
 				B6F9BDD92B45B7D900677B33 /* AddBookmarkModalViewModel.swift in Sources */,
-				EE297CBE2B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */,
 				3706FB62293F65D500E42796 /* CSVParser.swift in Sources */,
 				3706FB64293F65D500E42796 /* PixelDataModel.xcdatamodeld in Sources */,
 				B626A75B29921FAA00053070 /* NavigationActionPolicyExtension.swift in Sources */,
@@ -10543,7 +10535,6 @@
 				EEC589DB2A4F1CE700BCD60C /* AppLauncher.swift in Sources */,
 				B65DA5EF2A77CC3A00CBEE8D /* Bundle+NetworkProtectionExtensions.swift in Sources */,
 				4BF0E5072AD2551A00FFEC9E /* NetworkProtectionPixelEvent.swift in Sources */,
-				EE297CC12B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */,
 				7BA7CC442AD11E490042E5CE /* UserText.swift in Sources */,
 				4BF0E5142AD25A2600FFEC9E /* DuckDuckGoUserAgent.swift in Sources */,
 				7BA7CC422AD11E420042E5CE /* NetworkProtectionBouncer.swift in Sources */,
@@ -10577,7 +10568,6 @@
 				7BAF9E4D2A8A3CCB002D3B6E /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				7BA7CC392AD11E2D0042E5CE /* DuckDuckGoVPNAppDelegate.swift in Sources */,
 				7BA7CC552AD11FFB0042E5CE /* NetworkProtectionOptionKeyExtension.swift in Sources */,
-				EE297CC22B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */,
 				7BA7CC3D2AD11E380042E5CE /* TunnelControllerIPCService.swift in Sources */,
 				4BA7C4DA2B3F639800AFE511 /* NetworkProtectionTunnelController.swift in Sources */,
 				7BA7CC432AD11E480042E5CE /* UserText.swift in Sources */,
@@ -11294,7 +11284,6 @@
 				4B957BA12AC7AE700062CA31 /* UserDefaults+NetworkProtectionShared.swift in Sources */,
 				4B957BA22AC7AE700062CA31 /* NavigationActionPolicyExtension.swift in Sources */,
 				4B957BA32AC7AE700062CA31 /* CIImageExtension.swift in Sources */,
-				EE297CC32B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */,
 				4B957BA42AC7AE700062CA31 /* NSMenuExtension.swift in Sources */,
 				4B957BA52AC7AE700062CA31 /* MainWindowController.swift in Sources */,
 				4B957BA62AC7AE700062CA31 /* Tab.swift in Sources */,
@@ -11543,7 +11532,6 @@
 				4B379C2227BDBA29008A968E /* LocalAuthenticationService.swift in Sources */,
 				37CEFCA92A6737A2001EF741 /* CredentialsCleanupErrorHandling.swift in Sources */,
 				4BB99D0326FE191E001E4761 /* SafariBookmarksReader.swift in Sources */,
-				EE297CBD2B83B8720083DB29 /* AccountManager+NetworkProtection.swift in Sources */,
 				1DA6D0FD2A1FF9A100540406 /* HTTPCookie.swift in Sources */,
 				AACF6FD626BC366D00CF09F9 /* SafariVersionReader.swift in Sources */,
 				4BE65485271FCD7B008D1D63 /* LoginFaviconView.swift in Sources */,
