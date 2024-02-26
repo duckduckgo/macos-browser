@@ -575,13 +575,16 @@ final class BrowserTabViewController: NSViewController {
             addAndLayoutChild(bookmarksViewControllerCreatingIfNeeded())
 
         case let .settings(pane):
-            removeAllTabContent()
             let preferencesViewController = preferencesViewControllerCreatingIfNeeded()
+            if preferencesViewController.parent !== self {
+                removeAllTabContent()
+            }
             if let pane = pane, preferencesViewController.model.selectedPane != pane {
                 preferencesViewController.model.selectPane(pane)
             }
-            addAndLayoutChild(preferencesViewController)
-
+            if preferencesViewController.parent !== self {
+                addAndLayoutChild(preferencesViewController)
+            }
         case .onboarding:
             removeAllTabContent()
             if !OnboardingViewModel.isOnboardingFinished {
@@ -1039,12 +1042,12 @@ extension BrowserTabViewController: TabDownloadsDelegate {
 extension BrowserTabViewController: BrowserTabSelectionDelegate {
 
     func selectedTabContent(_ content: Tab.TabContent) {
-        tabCollectionViewModel.selectedTabViewModel?.tab.setContent(content)
-        showTabContent(of: tabCollectionViewModel.selectedTabViewModel)
+        tabViewModel?.tab.setContent(content)
+        showTabContent(of: tabViewModel)
     }
 
     func selectedPreferencePane(_ identifier: PreferencePaneIdentifier) {
-        guard let selectedTab = tabCollectionViewModel.selectedTabViewModel?.tab else {
+        guard let selectedTab = tabViewModel?.tab else {
             return
         }
 
