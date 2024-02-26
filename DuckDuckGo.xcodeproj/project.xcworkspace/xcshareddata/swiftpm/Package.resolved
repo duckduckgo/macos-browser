@@ -15,11 +15,15 @@
       "location" : "https://github.com/duckduckgo/BrowserServicesKit",
       "state" : {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "branch" : "autofill/anya-delete-all-ios",
         "revision" : "f087cf8389926b58692870bd5a459bad492ce66d"
 =======
         "revision" : "0c20cc3bcab2b7230376daf9ca9042d0a2ae9ee3"
 >>>>>>> 535452ee3 (Add Autofill More menu item & validation, add new image for alert)
+=======
+        "revision" : "f087cf8389926b58692870bd5a459bad492ce66d"
+>>>>>>> 8c85d1185 (Update copy strings)
       }
     },
     {
@@ -28,12 +32,17 @@
       "location" : "https://github.com/duckduckgo/content-scope-scripts",
       "state" : {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "revision" : "36ddba2cbac52a41b9a9275af06d32fa8a56d2d7",
         "version" : "4.64.0"
 =======
         "revision" : "063b560e59a50e03d9b00b88a7fcb2ed2b562395",
         "version" : "4.61.0"
 >>>>>>> 535452ee3 (Add Autofill More menu item & validation, add new image for alert)
+=======
+        "revision" : "36ddba2cbac52a41b9a9275af06d32fa8a56d2d7",
+        "version" : "4.64.0"
+>>>>>>> 8c85d1185 (Update copy strings)
       }
     },
     {

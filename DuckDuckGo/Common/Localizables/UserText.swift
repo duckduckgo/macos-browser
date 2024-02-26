@@ -1064,7 +1064,7 @@ struct UserText {
 
     // Confirmation Message Text
     static func deleteAllPasswordsConfirmationMessageText(count: Int) -> String {
-        let localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "Are you sure you want to delete all passwords (%d)", comment: "Message displayed on dialog asking user to confirm deletion of all passwords")
+        let localized = NSLocalizedString("autofill.items.delete-all-passwords-confirmation-message-text", value: "Are you sure you want to delete all passwords (%d)?", comment: "Message displayed on dialog asking user to confirm deletion of all passwords")
         return String(format: localized, count)
     }
 
