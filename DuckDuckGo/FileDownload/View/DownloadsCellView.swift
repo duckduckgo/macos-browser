@@ -54,6 +54,22 @@ final class DownloadsCellView: NSTableCellView {
     private var progressCancellable: AnyCancellable?
 
     private static let byteFormatter = ByteCountFormatter()
+    private static let estimatedMinutesRemainingFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .full
+        formatter.includesApproximationPhrase = true
+        formatter.includesTimeRemainingPhrase = true
+        return formatter
+    }()
+    private static let estimatedSecondsRemainingFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.second]
+        formatter.unitsStyle = .full
+        formatter.includesApproximationPhrase = true
+        formatter.includesTimeRemainingPhrase = true
+        return formatter
+    }()
 
     var isSelected: Bool = false {
         didSet {
@@ -140,26 +156,34 @@ final class DownloadsCellView: NSTableCellView {
     private var onButtonMouseOverChange: ((Bool) -> Void)?
 
     private func updateDetails(with progress: Progress) {
+        self.detailLabel.toolTip = progress.localizedAdditionalDescription ?? ""
+
         var details: String
         if cancelButton.isMouseOver {
             details = UserText.cancelDownloadToolTip
         } else {
-            details = progress.localizedAdditionalDescription ?? ""
-            if details.isEmpty {
-                if progress.fractionCompleted == 0 {
-                    details = UserText.downloadStarting
-                } else if progress.fractionCompleted == 1.0 {
-                    details = UserText.downloadFinishing
-                } else {
-                    assertionFailure("Unexpected empty description")
-                    details = "Downloading…"
-                }
+            if progress.fractionCompleted == 0 {
+                details = UserText.downloadStarting
+            } else if progress.fractionCompleted == 1.0 {
+                details = UserText.downloadFinishing
+            } else if progress.totalUnitCount > 0 {
+                let completed = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
+                let total = Self.byteFormatter.string(fromByteCount: progress.totalUnitCount)
+                details = String(format: UserText.downloadBytesLoadedFormat, completed, total)
+            } else {
+                details = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
             }
 
-            self.detailLabel.toolTip = progress.localizedDescription
+            if let estimatedTimeRemaining = progress.estimatedTimeRemaining,
+               let estimatedTimeStr = (estimatedTimeRemaining < 60 ? Self.estimatedSecondsRemainingFormatter : Self.estimatedMinutesRemainingFormatter)
+                .string(from: estimatedTimeRemaining) {
+
+                details += " – " + estimatedTimeStr
+            }
+
+            self.detailLabel.stringValue = details
         }
 
-        self.detailLabel.stringValue = details
     }
 
     private func subscribe(to progress: Progress) {

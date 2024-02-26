@@ -123,7 +123,7 @@
                                                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="Iz7-Te-xl9"/>
                                                                         </imageView>
                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="w5d-I6-kEZ">
-                                                                            <rect key="frame" x="43" y="32" width="96" height="16"/>
+                                                                            <rect key="frame" x="43" y="32" width="280" height="16"/>
                                                                             <constraints>
                                                                                 <constraint firstAttribute="height" constant="16" id="e05-6Y-K6e"/>
                                                                             </constraints>
@@ -134,7 +134,7 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="ziJ-5p-mOT">
-                                                                            <rect key="frame" x="43" y="13" width="96" height="16"/>
+                                                                            <rect key="frame" x="43" y="13" width="280" height="16"/>
                                                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Table View Cell" usesSingleLineMode="YES" id="P5k-0F-CZE">
                                                                                 <font key="font" usesAppearanceFont="YES"/>
                                                                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -247,12 +247,12 @@
                                                                         <constraint firstItem="Fue-CV-Ukm" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" id="QBC-Js-e0p"/>
                                                                         <constraint firstItem="Fue-CV-Ukm" firstAttribute="top" secondItem="ziJ-5p-mOT" secondAttribute="bottom" constant="12" id="QwU-JU-idK"/>
                                                                         <constraint firstItem="hpj-1Y-eDv" firstAttribute="centerY" secondItem="0Hy-P1-z0d" secondAttribute="centerY" id="T7a-0E-ouJ"/>
-                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="w5d-I6-kEZ" secondAttribute="trailing" constant="8" id="U1h-uy-ann"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" secondItem="w5d-I6-kEZ" secondAttribute="trailing" constant="8" id="U1h-uy-ann"/>
                                                                         <constraint firstItem="Ejd-n2-PCA" firstAttribute="centerY" secondItem="foT-7L-XqL" secondAttribute="centerY" id="ZL1-MJ-Czx"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="BUB-Ea-xr5" secondAttribute="centerY" id="enG-OL-lav"/>
                                                                         <constraint firstItem="w5d-I6-kEZ" firstAttribute="leading" secondItem="hpj-1Y-eDv" secondAttribute="trailing" constant="6" id="gSS-n9-QXX"/>
                                                                         <constraint firstAttribute="trailing" secondItem="Fue-CV-Ukm" secondAttribute="trailing" id="oZ0-bh-Iaf"/>
-                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ziJ-5p-mOT" secondAttribute="trailing" constant="8" id="rp5-hJ-Ccg"/>
+                                                                        <constraint firstItem="CEa-RP-JgA" firstAttribute="leading" secondItem="ziJ-5p-mOT" secondAttribute="trailing" constant="8" id="rp5-hJ-Ccg"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerX" secondItem="Ejd-n2-PCA" secondAttribute="centerX" id="uRp-Pm-Vkf"/>
                                                                         <constraint firstItem="hpj-1Y-eDv" firstAttribute="leading" secondItem="0Hy-P1-z0d" secondAttribute="leading" constant="7" id="vnq-0C-72q"/>
                                                                         <constraint firstItem="CEa-RP-JgA" firstAttribute="centerY" secondItem="Ejd-n2-PCA" secondAttribute="centerY" id="xeM-DX-IDw"/>

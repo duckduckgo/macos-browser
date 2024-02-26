@@ -37,6 +37,17 @@
     "%@ does not support storing passwords" : {
       "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
     },
+    "%@ of %@" : {
+      "comment" : "Number of bytes out of total bytes downloaded (1Mb of 2Mb)",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
 
     },
