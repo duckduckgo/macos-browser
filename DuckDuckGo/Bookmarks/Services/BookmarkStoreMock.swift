@@ -49,6 +49,7 @@ public final class BookmarkStoreMock: BookmarkStore {
     var capturedFolder: BookmarkFolder?
     var capturedParentFolder: BookmarkFolder?
     var capturedParentFolderType: ParentFolderType?
+    var capturedBookmark: Bookmark?
 
     var loadAllCalled = false
     var bookmarks: [BaseBookmarkEntity]?
@@ -64,6 +65,8 @@ public final class BookmarkStoreMock: BookmarkStore {
     func save(bookmark: Bookmark, parent: BookmarkFolder?, index: Int?, completion: @escaping (Bool, Error?) -> Void) {
         saveBookmarkCalled = true
         bookmarks?.append(bookmark)
+        capturedParentFolder = parent
+        capturedBookmark = bookmark
         completion(saveBookmarkSuccess, saveBookmarkError)
     }
 
@@ -98,6 +101,7 @@ public final class BookmarkStoreMock: BookmarkStore {
         }
 
         updateBookmarkCalled = true
+        capturedBookmark = bookmark
     }
 
     var updateFolderCalled = false
