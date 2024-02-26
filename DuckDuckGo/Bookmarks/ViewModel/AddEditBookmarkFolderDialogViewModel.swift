@@ -20,13 +20,13 @@ import Foundation
 import Combine
 
 @MainActor
-protocol AddEditBookmarkFolderDialogViewModelProtocol: BookmarksDialogViewModel {
+protocol BookmarkFolderDialogEditing: BookmarksDialogViewModel {
     var addFolderPublisher: AnyPublisher<BookmarkFolder, Never> { get }
     var folderName: String { get set }
 }
 
 @MainActor
-final class AddEditBookmarkFolderDialogViewModel: AddEditBookmarkFolderDialogViewModelProtocol {
+final class AddEditBookmarkFolderDialogViewModel: BookmarkFolderDialogEditing {
 
     /// The type of operation to perform on a folder
     enum Mode {

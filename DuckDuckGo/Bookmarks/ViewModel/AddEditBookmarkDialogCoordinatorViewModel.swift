@@ -19,7 +19,7 @@
 import SwiftUI
 import Combine
 
-final class AddEditBookmarkDialogCoordinatorViewModel<BookmarkViewModel: AddEditBookmarkDialogViewModelProtocol, AddFolderViewModel: AddEditBookmarkFolderDialogViewModelProtocol>: ObservableObject {
+final class AddEditBookmarkDialogCoordinatorViewModel<BookmarkViewModel: BookmarkDialogEditing, AddFolderViewModel: BookmarkFolderDialogEditing>: ObservableObject {
     @ObservedObject var bookmarkModel: BookmarkViewModel
     @ObservedObject var folderModel: AddFolderViewModel
     @Published var viewState: ViewState

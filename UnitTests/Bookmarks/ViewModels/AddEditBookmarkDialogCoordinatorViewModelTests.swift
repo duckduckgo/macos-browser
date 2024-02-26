@@ -127,7 +127,7 @@ final class AddEditBookmarkDialogCoordinatorViewModelTests: XCTestCase {
 
 }
 
-final class AddEditBookmarkDialogViewModelMock: AddEditBookmarkDialogViewModelProtocol {
+final class AddEditBookmarkDialogViewModelMock: BookmarkDialogEditing {
     var bookmarkName: String = ""
     var bookmarkURLPath: String = ""
     var isBookmarkFavorite: Bool = false
@@ -150,7 +150,7 @@ final class AddEditBookmarkDialogViewModelMock: AddEditBookmarkDialogViewModelPr
     var selectedFolderExpectation: XCTestExpectation?
 }
 
-final class AddEditBookmarkFolderDialogViewModelMock: AddEditBookmarkFolderDialogViewModelProtocol {
+final class AddEditBookmarkFolderDialogViewModelMock: BookmarkFolderDialogEditing {
     let subject = PassthroughSubject<BookmarkFolder, Never>()
 
     var addFolderPublisher: AnyPublisher<DuckDuckGo_Privacy_Browser.BookmarkFolder, Never> {

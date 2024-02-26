@@ -20,7 +20,7 @@ import Foundation
 import Combine
 
 @MainActor
-protocol AddEditBookmarkDialogViewModelProtocol: BookmarksDialogViewModel {
+protocol BookmarkDialogEditing: BookmarksDialogViewModel {
     var bookmarkName: String { get set }
     var bookmarkURLPath: String { get set }
     var isBookmarkFavorite: Bool { get set }
@@ -29,7 +29,7 @@ protocol AddEditBookmarkDialogViewModelProtocol: BookmarksDialogViewModel {
 }
 
 @MainActor
-final class AddEditBookmarkDialogViewModel: AddEditBookmarkDialogViewModelProtocol {
+final class AddEditBookmarkDialogViewModel: BookmarkDialogEditing {
 
     enum Mode {
         case add(parentFolder: BookmarkFolder? = nil)
@@ -126,7 +126,7 @@ private extension AddEditBookmarkDialogViewModel {
         if bookmark.url != url.absoluteString {
             bookmark = bookmarkManager.updateUrl(of: bookmark, to: url) ?? bookmark
         }
-        //
+
         if bookmark.title != name || bookmark.isFavorite != isBookmarkFavorite {
             bookmark.title = name
             bookmark.isFavorite = isBookmarkFavorite
