@@ -11,9 +11,10 @@ signal(SIGINT) { _ in
     exit(1)
 }
 
+let isCI = ProcessInfo.processInfo.environment["CI"] != nil
 let appcastURLString = "https://staticcdn.duckduckgo.com/macos-desktop-browser/appcast2.xml"
 let appcastURL = URL(string: appcastURLString)!
-let tmpDir = NSString(string: "~/Developer").expandingTildeInPath
+let tmpDir = isCI ? "." : NSString(string: "~/Developer").expandingTildeInPath
 let tmpDirURL = URL(fileURLWithPath: tmpDir, isDirectory: true)
 let specificDir = tmpDirURL.appendingPathComponent("sparkle-updates")
 let appcastFilePath = specificDir.appendingPathComponent("appcast2.xml")
@@ -76,9 +77,9 @@ NAME
     appcastManager – automation of appcast file management
 
 SYNOPSIS
-    appcastManager --release-to-internal-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes>
-    appcastManager --release-to-public-channel --version <version_identifier> [--release-notes <path_to_release_notes>]
-    appcastManager --release-hotfix-to-public-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes>
+    appcastManager --release-to-internal-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes> [--key <path_to_private_key>]
+    appcastManager --release-to-public-channel --version <version_identifier> [--release-notes <path_to_release_notes>] [--key <path_to_private_key>]
+    appcastManager --release-hotfix-to-public-channel --dmg <path_to_dmg_file> --release-notes <path_to_release_notes> [--key <path_to_private_key>]
     appcastManager --help
 
 DESCRIPTION
@@ -112,10 +113,14 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
         print("Missing required parameters")
         exit(1)
     }
+    let keyFile = readKeyFileArgument()
 
     print("➡️  Action: Add to internal channel")
     print("➡️  DMG Path: \(dmgPath)")
     print("➡️  Release Notes Path: \(releaseNotesPath)")
+    if isCI, let keyFile {
+        print("➡️  Key file: \(keyFile)")
+    }
 
     performCommonChecksAndOperations()
 
@@ -132,9 +137,9 @@ case .releaseToInternalChannel, .releaseHotfixToPublicChannel:
 
     // Differentiate between the two actions
     if arguments.action == .releaseToInternalChannel {
-        runGenerateAppcast(with: versionNumber, channel: "internal-channel")
+        runGenerateAppcast(with: versionNumber, channel: "internal-channel", keyFile: keyFile)
     } else {
-        runGenerateAppcast(with: versionNumber)
+        runGenerateAppcast(with: versionNumber, keyFile: keyFile)
     }
 
 case .releaseToPublicChannel:
@@ -142,11 +147,15 @@ case .releaseToPublicChannel:
         print("Missing required version parameter for action '--release-to-public-channel'")
         exit(1)
     }
+    let keyFile = readKeyFileArgument()
 
     let versionNumber = extractVersionNumber(from: versionIdentifier)
 
-    print("Action: Release to public channel")
-    print("Version: \(versionIdentifier)")
+    print("➡️  Action: Release to public channel")
+    print("➡️  Version: \(versionIdentifier)")
+    if isCI, let keyFile {
+        print("➡️  Key file: \(keyFile)")
+    }
 
     performCommonChecksAndOperations()
 
@@ -171,10 +180,24 @@ case .releaseToPublicChannel:
     }
     print("⚠️  Version \(versionIdentifier) removed from the appcast.")
 
-    runGenerateAppcast(with: versionNumber, rolloutInterval: "43200")
+    runGenerateAppcast(with: versionNumber, rolloutInterval: "43200", keyFile: keyFile)
 }
 
 // MARK: - Common
+
+func readKeyFileArgument() -> String? {
+    let keyFile: String? = arguments.parameters["--key"]
+
+    if isCI {
+        print("Running in CI mode")
+        guard keyFile != nil else {
+            print("Missing required key parameter for CI")
+            exit(1)
+        }
+    }
+
+    return keyFile
+}
 
 func extractVersionNumber(from versionIdentifier: String) -> String {
     let components = versionIdentifier.components(separatedBy: ".")
@@ -251,6 +274,10 @@ extension DateFormatter {
 // MARK: - Verification of the signing keys
 
 func verifySigningKeys() -> Bool {
+    if isCI {
+        print("Running in CI mode. Skipping verification of signing keys.")
+        return true
+    }
     let publicKeyOutput = shell("generate_keys", "-p").trimmingCharacters(in: .whitespacesAndNewlines)
     let desiredPublicKey = "ZaO/DNMzMPBldh40b5xVrpNBmqRkuGY0BNRCUng2qRo="
 
@@ -703,7 +730,7 @@ func writeAppcastContent(_ content: String, to filePath: URL) {
 
 // MARK: - Generating of New Appcast
 
-func runGenerateAppcast(with versionNumber: String, channel: String? = nil, rolloutInterval: String? = nil) {
+func runGenerateAppcast(with versionNumber: String, channel: String? = nil, rolloutInterval: String? = nil, keyFile: String? = nil) {
     // Check if backup file already exists and remove it
     if FileManager.default.fileExists(atPath: backupFileURL.path) {
         do {
@@ -730,6 +757,9 @@ func runGenerateAppcast(with versionNumber: String, channel: String? = nil, roll
     commandComponents.append("--versions \(versionNumber)")
     commandComponents.append("--maximum-versions \(maximumVersions)")
     commandComponents.append("--maximum-deltas \(maximumDeltas)")
+    if let keyFile {
+        commandComponents.append("--ed-key-file \(keyFile)")
+    }
 
     if let channel = channel {
         commandComponents.append("--channel \(channel)")
@@ -779,8 +809,10 @@ func runGenerateAppcast(with versionNumber: String, channel: String? = nil, roll
     moveFiles(from: specificDir.appendingPathComponent("old_updates"), to: specificDir)
     print("Old update files moved back to \(specificDir.path)")
 
-    // Open specific directory in Finder
-    shell("open", specificDir.path)
+    if !isCI {
+        // Open specific directory in Finder
+        shell("open", specificDir.path)
+    }
 }
 
 func moveFiles(from sourceDir: URL, to destinationDir: URL) {

@@ -56,6 +56,7 @@ public final class NetworkProtectionPopover: NSPopover {
                          appLauncher: AppLaunching,
                          menuItems: @escaping () -> [MenuItem],
                          agentLoginItem: LoginItem?,
+                         isMenuBarStatusView: Bool,
                          entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>) {
 
         self.statusReporter = statusReporter
@@ -66,7 +67,7 @@ public final class NetworkProtectionPopover: NSPopover {
                                                        appLauncher: appLauncher,
                                                        menuItems: menuItems,
                                                        agentLoginItem: agentLoginItem,
-                                                       entitlementCheck: entitlementCheck)
+                                                       isMenuBarStatusView: isMenuBarStatusView)
 
         super.init()
 

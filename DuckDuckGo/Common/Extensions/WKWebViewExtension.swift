@@ -16,6 +16,7 @@
 //  limitations under the License.
 //
 
+import Common
 import Navigation
 import WebKit
 
@@ -26,6 +27,12 @@ extension WKWebView {
             return true
         }
         return false
+    }
+
+    enum AudioState {
+        case muted
+        case unmuted
+        case notSupported
     }
 
     enum CaptureState {
@@ -127,6 +134,48 @@ extension WKWebView {
         self._setPageMuted(newState)
     }
 #endif
+
+    func muteOrUnmute() {
+#if !APPSTORE
+        guard self.responds(to: #selector(WKWebView._setPageMuted(_:))) else {
+            assertionFailure("WKWebView does not respond to selector _stopMediaCapture")
+            return
+        }
+        let mutedState: _WKMediaMutedState = {
+            guard self.responds(to: #selector(WKWebView._mediaMutedState)) else { return [] }
+            return self._mediaMutedState()
+        }()
+        var newState = mutedState
+
+        if newState == .audioMuted {
+            newState.remove(.audioMuted)
+        } else {
+            newState.insert(.audioMuted)
+        }
+        guard newState != mutedState else { return }
+        self._setPageMuted(newState)
+#endif
+    }
+
+    /// Returns the audio state of the WKWebView.
+    ///
+    /// - Returns: `muted` if the web view is muted
+    ///            `unmuted` if the web view is unmuted
+    ///            `notSupported` if the web view does not support fetching the current audio state
+    func audioState() -> AudioState {
+#if APPSTORE
+        return .notSupported
+#else
+        guard self.responds(to: #selector(WKWebView._mediaMutedState)) else {
+            assertionFailure("WKWebView does not respond to selector _mediaMutedState")
+            return .notSupported
+        }
+
+        let mutedState = self._mediaMutedState()
+
+        return mutedState.contains(.audioMuted) ? .muted : .unmuted
+#endif
+    }
 
     func stopMediaCapture() {
         guard #available(macOS 12.0, *) else {
@@ -231,6 +280,21 @@ extension WKWebView {
         self.evaluateJavaScript("window.open(\(urlEnc), '_blank', 'noopener, noreferrer')")
     }
 
+    func loadAlternateHTML(_ html: String, baseURL: URL, forUnreachableURL failingURL: URL) {
+        guard responds(to: Selector.loadAlternateHTMLString) else {
+            if #available(macOS 12.0, *) {
+                os_log(.error, log: .navigation, "WKWebView._loadAlternateHTMLString not available")
+                loadSimulatedRequest(URLRequest(url: failingURL), responseHTML: html)
+            }
+            return
+        }
+        self.perform(Selector.loadAlternateHTMLString, withArguments: [html, baseURL, failingURL])
+    }
+
+    func setDocumentHtml(_ html: String) {
+        self.evaluateJavaScript("document.open(); document.write('\(html.escapedJavaScriptString())'); document.close()", in: nil, in: .defaultClient)
+    }
+
     @MainActor
     var mimeType: String? {
         get async {
@@ -285,6 +349,7 @@ extension WKWebView {
     enum Selector {
         static let fullScreenPlaceholderView = NSSelectorFromString("_fullScreenPlaceholderView")
         static let printOperationWithPrintInfoForFrame = NSSelectorFromString("_printOperationWithPrintInfo:forFrame:")
+        static let loadAlternateHTMLString = NSSelectorFromString("_loadAlternateHTMLString:baseURL:forUnreachableURL:")
     }
 
 }

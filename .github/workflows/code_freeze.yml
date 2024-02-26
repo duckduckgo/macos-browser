@@ -26,8 +26,9 @@ jobs:
           fi
 
       - name: Check out the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
+          fetch-depth: 0 # Fetch all history and tags in order to extract Asana task URLs from git log
           submodules: recursive
 
       - name: Prepare fastlane
@@ -56,6 +57,8 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{ \"data\": { \"name\": \"$task_name\" }}" \
             | jq -r .data.new_task.gid)"
+          echo "marketing_version=${version}" >> $GITHUB_OUTPUT
+          echo "asana_task_id=${asana_task_id}" >> $GITHUB_OUTPUT
           echo "asana_task_url=https://app.asana.com/0/0/${asana_task_id}/f" >> $GITHUB_OUTPUT
 
           curl -fLSs -X POST "https://app.asana.com/api/1.0/sections/${{ vars.MACOS_APP_DEVELOPMENT_RELEASE_SECTION_ID }}/addTask" \
@@ -72,6 +75,16 @@ jobs:
             -H "Content-Type: application/json" \
             --output /dev/null \
             -d "{ \"data\": { \"assignee\": \"$assignee_id\" }}"
+
+      - name: Update Asana tasks for the release
+        env:
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ./scripts/update_asana_for_release.sh \
+            ${{ steps.create_release_task.outputs.asana_task_id }} \
+            ${{ steps.create_release_task.outputs.marketing_version }} \
+            ${{ vars.MACOS_APP_BOARD_VALIDATION_SECTION_ID }}
 
   run_tests:
 
@@ -95,7 +108,7 @@ jobs:
     steps:
 
       - name: Check out the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           ref: ${{ needs.create_release_branch.outputs.release_branch_name }}
@@ -150,10 +163,11 @@ jobs:
   tag_and_merge:
     name: Tag and Merge Branch
     needs: [ create_release_branch, prepare_release ]
-    uses: ./.github/workflows/tag_and_merge.yml
+    uses: ./.github/workflows/tag_release.yml
     with:
       asana-task-url: ${{ needs.create_release_branch.outputs.asana_task_url }}
       branch: ${{ needs.create_release_branch.outputs.release_branch_name }}
+      prerelease: true
     secrets:
       ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
       GHA_ELEVATED_PERMISSIONS_TOKEN: ${{ secrets.GHA_ELEVATED_PERMISSIONS_TOKEN }}

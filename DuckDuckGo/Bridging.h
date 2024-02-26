@@ -6,6 +6,7 @@
 
 #import "WKWebView+Private.h"
 #import "NSException+Catch.h"
+#import "NSObject+performSelector.h"
 #import "WKGeolocationProvider.h"
 
 #ifndef APPSTORE

@@ -32,7 +32,7 @@
 
     },
     "**%lld** tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "%@ does not support storing passwords" : {
       "comment" : "Data Import disabled checkbox message about a browser (%@) not supporting storing passwords"
@@ -41,7 +41,7 @@
 
     },
     "%lld tracking attempts blocked" : {
-
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@"
     },
     "• Because data broker sites often have multi-step processes required to have information removed, and because they regularly update their databases with new personal information, this authorization includes ongoing action on your behalf solely to perform the service." : {
 
@@ -163,17 +163,11 @@
     "Actual Size" : {
       "comment" : "Main Menu View item"
     },
-    "Add" : {
-      "comment" : "Button to confim a bookmark creation"
-    },
     "Add any details that you think may help us fix the problem" : {
       "comment" : "Data import failure Report dialog suggestion to provide a comments with extra details helping to identify the data import problem."
     },
     "Add Folder" : {
       "comment" : "Add Folder popover: Create folder button"
-    },
-    "Add to Favorites" : {
-
     },
     "add.bookmark.name" : {
       "comment" : "New bookmark folder dialog folder name field heading",
@@ -236,7 +230,7 @@
       }
     },
     "Address" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify an address (street city etc,)"
     },
     "Address:" : {
       "comment" : "Add Bookmark dialog bookmark url field heading"
@@ -992,7 +986,7 @@
       }
     },
     "Birthday" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify a date of birth"
     },
     "bitwarden.app.found" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -1007,6 +1001,7 @@
       }
     },
     "bitwarden.cant.access.container" : {
+      "comment" : "Requests user Full Disk access in order to access password manager Birwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1018,6 +1013,7 @@
       }
     },
     "bitwarden.connect.communication-info" : {
+      "comment" : "Warns users that all communication between the DuckDuckGo browser and the password manager Bitwarden is encrypted and doesn't leave the user device",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1029,6 +1025,7 @@
       }
     },
     "bitwarden.connect.description" : {
+      "comment" : "Description for when the user wants to connect the browser to the password manager Bitwarned.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1040,6 +1037,7 @@
       }
     },
     "bitwarden.connect.history-info" : {
+      "comment" : "Warn users that the password Manager Bitwarden will have access to their browsing history",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1074,6 +1072,7 @@
       }
     },
     "bitwarden.connecting" : {
+      "comment" : "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action, in this case we are in the progress of connecting the browser to the Bitwarden password maanger.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1085,6 +1084,7 @@
       }
     },
     "bitwarden.error" : {
+      "comment" : "This message appears when the application is unable to find or connect to Bitwarden, indicating a connection issue.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1096,6 +1096,7 @@
       }
     },
     "bitwarden.handshake.not.approved" : {
+      "comment" : "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action. This message indicates that the handshake process was not approved in the Bitwarden app.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1155,6 +1156,7 @@
       }
     },
     "bitwarden.integration.not.approved" : {
+      "comment" : "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates that the integration with DuckDuckGo has not been approved in the Bitwarden app.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1178,6 +1180,7 @@
       }
     },
     "bitwarden.missing.handshake" : {
+      "comment" : "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates a missing handshake (a way for two devices or systems to say hello to each other and agree to communicate or exchange information).",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1200,6 +1203,7 @@
       }
     },
     "bitwarden.old.version" : {
+      "comment" : "Message that warns user they need to update their password manager Bitwarden app vesion",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1211,6 +1215,7 @@
       }
     },
     "bitwarden.preferences.complete-setup" : {
+      "comment" : "action option that prompts the user to complete the setup process in Bitwarden preferences",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1222,6 +1227,7 @@
       }
     },
     "bitwarden.preferences.open-bitwarden" : {
+      "comment" : "Button to open Bitwarden app",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1233,6 +1239,7 @@
       }
     },
     "bitwarden.preferences.run" : {
+      "comment" : "Warns user that the password manager Bitwarden app is not running",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1244,6 +1251,7 @@
       }
     },
     "bitwarden.preferences.unable-to-connect" : {
+      "comment" : "Dialog telling the user Bitwarden (a password manager) is not available",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1255,6 +1263,7 @@
       }
     },
     "bitwarden.preferences.unlock" : {
+      "comment" : "Asks the user to unlock the password manager Bitwarden",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1266,6 +1275,7 @@
       }
     },
     "bitwarden.waiting.for.handshake" : {
+      "comment" : "While the user tries to connect the DuckDuckGo Browser to password manager Bitwarden This message indicates the system is waiting for the handshake (a way for two devices or systems to say hello to each other and agree to communicate or exchange information).",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1289,6 +1299,7 @@
       }
     },
     "bitwarden.waiting.for.status.response" : {
+      "comment" : "It appears in a dialog when the users are connecting to Bitwardern and shows the status of the action, in this case that the application is currently waiting for a response from the Bitwarden service.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1368,17 +1379,11 @@
         }
       }
     },
-    "Bookmarks" : {
-
-    },
     "Bookmarks Import Complete:" : {
       "comment" : "Bookmarks Data Import result summary headline"
     },
     "Bookmarks:" : {
       "comment" : "Data import summary format of how many bookmarks (%lld) were successfully imported."
-    },
-    "Bookmarks…" : {
-      "comment" : "Main Menu File-Export item"
     },
     "bookmarks.add.dialog.title" : {
       "comment" : "Bookmark creation dialog title",
@@ -1440,6 +1445,18 @@
         }
       }
     },
+    "bookmarks.bar.preferences.show" : {
+      "comment" : "Preference item for showing the bookmarks bar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Bookmarks Bar"
+          }
+        }
+      }
+    },
     "bookmarks.bar.prompt.accept" : {
       "comment" : "Accept button label on bookmarks bar prompt",
       "extractionState" : "extracted_with_value",
@@ -1489,7 +1506,7 @@
       }
     },
     "bookmarks.bar.show" : {
-      "comment" : "Menu item for showing the bookmarks bar\n   Preference item for showing the bookmarks bar",
+      "comment" : "Menu item for showing the bookmarks bar",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1520,6 +1537,126 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Only show on New Tab"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.action.addBookmark" : {
+      "comment" : "CTA title for adding a Bookmark",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Bookmark"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.action.addFolder" : {
+      "comment" : "CTA title for adding a Folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.location" : {
+      "comment" : "Location field label for Bookmark folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.name" : {
+      "comment" : "Name field label for Bookmark or Folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Name"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.field.url" : {
+      "comment" : "URL field label for Bookmar",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "URL"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.folder.title.add" : {
+      "comment" : "Bookmark folder creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.folder.title.edit" : {
+      "comment" : "Bookmark folder edit dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit Folder"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.add" : {
+      "comment" : "Bookmark creation dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add bookmark"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.added" : {
+      "comment" : "Bookmark added popover title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bookmark Added"
+          }
+        }
+      }
+    },
+    "bookmarks.dialog.title.edit" : {
+      "comment" : "Bookmark edit dialog title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit bookmark"
           }
         }
       }
@@ -1648,6 +1785,7 @@
       "comment" : "Main Menu Window item"
     },
     "burner.homepage.description.1" : {
+      "comment" : "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1659,6 +1797,7 @@
       }
     },
     "burner.homepage.description.2" : {
+      "comment" : "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1670,6 +1809,7 @@
       }
     },
     "burner.homepage.description.3" : {
+      "comment" : "Descriptions of features Fire page. Provides information about browsing functionalities such as browsing without saving local history, signing in to a site with a different account, and troubleshooting websites.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1681,6 +1821,7 @@
       }
     },
     "burner.homepage.description.4" : {
+      "comment" : "This describes the functionality of one of out browser feature Fire Window, highlighting their isolation from other browser data and the automatic deletion of their data upon closure. Additionally, it emphasizes that fire windows offer the same level of tracking protection as other browsing windows.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -1727,9 +1868,6 @@
         }
       }
     },
-    "Cancel" : {
-
-    },
     "cannot.open.file.alert.header" : {
       "comment" : "Header of the alert dialog informing user it is not possible to open the file",
       "extractionState" : "extracted_with_value",
@@ -1756,18 +1894,6 @@
     },
     "Capitalize" : {
       "comment" : "Main Menu Edit-Transformations item"
-    },
-    "Check Document Now" : {
-      "comment" : "Main Menu Edit-Spellingand item"
-    },
-    "Check for Updates…" : {
-      "comment" : "Main Menu DuckDuckGo item"
-    },
-    "Check Grammar With Spelling" : {
-      "comment" : "Main Menu Edit-Spellingand item"
-    },
-    "Check Spelling While Typing" : {
-      "comment" : "Main Menu Edit-Spellingand item"
     },
     "check.allow.integration" : {
       "comment" : "Setup of the integration with Bitwarden app",
@@ -1807,12 +1933,6 @@
     },
     "Clear All History…" : {
       "comment" : "Main Menu History item"
-    },
-    "Close All Windows" : {
-      "comment" : "Main Menu File item"
-    },
-    "Close Window" : {
-      "comment" : "Main Menu File item"
     },
     "close.other.tabs" : {
       "comment" : "Menu item",
@@ -1875,7 +1995,7 @@
       }
     },
     "Contact Info" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify contact info (phone, email address)"
     },
     "copy" : {
       "comment" : "Copy button",
@@ -1940,11 +2060,8 @@
         }
       }
     },
-    "Correct Spelling Automatically" : {
-      "comment" : "Main Menu Edit-Spellingand item"
-    },
     "Country" : {
-
+      "comment" : "Title of the section of the Identities manager where the user can add/modify a country (US,UK, Italy etc...)"
     },
     "crash-report.description" : {
       "comment" : "Description of the dialog where the user can send a crash report",
@@ -2005,9 +2122,6 @@
           }
         }
       }
-    },
-    "Cut" : {
-      "comment" : "Main Menu Edit item"
     },
     "dashboard.permission.allow" : {
       "comment" : "Privacy Dashboard: Website can always access input media device",
@@ -2072,306 +2186,6 @@
     "Data Detectors" : {
       "comment" : "Main Menu Edit-Substitutions item"
     },
-    "data-broker-protection.optionsMenu" : {
-      "comment" : "Menu item data broker protection feature",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Personal Information Removal"
-          }
-        }
-      }
-    },
-    "data-broker-protection.privacy-policy.title" : {
-      "comment" : "Privacy Policy title for Personal Information Removal",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Policy"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.availability-disclaimer" : {
-      "comment" : "Availability disclaimer for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Personal Information Removal is free during the beta.\nJoin the waitlist and we'll notify you when ready."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.agree-and-continue" : {
-      "comment" : "Agree and Continue button for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Agree and Continue"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.cancel" : {
-      "comment" : "Cancel button for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancel"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.close" : {
-      "comment" : "Close button for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Close"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.dismiss" : {
-      "comment" : "Dismiss button for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Dismiss"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.done" : {
-      "comment" : "Close button for Personal Information Removal joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Done"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.enable-notifications" : {
-      "comment" : "Enable Notifications button for Personal Information Removal joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Enable Notifications"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.get-started" : {
-      "comment" : "Get Started button for Personal Information Removal joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Get Started"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.got-it" : {
-      "comment" : "Get started button for Personal Information Removal joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Get started"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.join-waitlist" : {
-      "comment" : "Join Waitlist button for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Join the Waitlist"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.button.no-thanks" : {
-      "comment" : "No Thanks button for Personal Information Removal joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "No Thanks"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.enable-notifications" : {
-      "comment" : "Enable notifications prompt for Personal Information Removal joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Want to get a notification when your Personal Information Removal invite is ready?"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.enable.subtitle" : {
-      "comment" : "Subtitle for Personal Information Removal enable screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We’ll need your name, address and the year you were born in order to find your personal information on data broker sites\n\nThis info is stored securely on your device, and is never sent to DuckDuckGo."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.enable.title" : {
-      "comment" : "Title for Personal Information Removal enable screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Let’s get started"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.invited.subtitle" : {
-      "comment" : "Subtitle for Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically find and remove your personal information – such as your name and address – from 17+ sites that store and sell it, reducing the risk of identity theft and spam."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.invited.title" : {
-      "comment" : "Title for Personal Information Removal invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You’re invited to try\nPersonal Information Removal beta!"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.join.subtitle.1" : {
-      "comment" : "First subtitle for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically scan and remove your data from 17+ sites that sell personal information with DuckDuckGo’s Personal Information Removal."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.join.title" : {
-      "comment" : "Title for Personal Information Removal join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Personal Information Removal Beta"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.joined.title" : {
-      "comment" : "Title for Personal Information Removal joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You’re on the list!"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.joined.with-notifications.subtitle.1" : {
-      "comment" : "Subtitle 1 for Personal Information Removal joined waitlist screen when notifications are enabled",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "New invites are sent every few days, on a first come, first served basis."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.joined.with-notifications.subtitle.2" : {
-      "comment" : "Subtitle 2 for Personal Information Removal joined waitlist screen when notifications are enabled",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We’ll notify you when your invite is ready."
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.notification.text" : {
-      "comment" : "Title for Personal Information Removal waitlist notification",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Open your invite"
-          }
-        }
-      }
-    },
-    "data-broker-protection.waitlist.notification.title" : {
-      "comment" : "Title for Personal Information Removal waitlist notification",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Personal Information Removal beta is ready!"
-          }
-        }
-      }
-    },
     "database.factory.failed.information" : {
       "comment" : "Info to restart macOS after database init failure",
       "extractionState" : "extracted_with_value",
@@ -2397,6 +2211,7 @@
       }
     },
     "default.browser.prompt.button" : {
+      "comment" : "represents a prompt message asking the user to make DuckDuckGo their default browser.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2408,6 +2223,7 @@
       }
     },
     "default.browser.prompt.message" : {
+      "comment" : "represents a prompt message asking the user to make DuckDuckGo their default browser.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -2487,8 +2303,29 @@
     "Display progress" : {
 
     },
-    "Done" : {
-
+    "domain-is-fireproof" : {
+      "comment" : "Domain fireproof status",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@ is now Fireproof"
+          }
+        }
+      }
+    },
+    "done" : {
+      "comment" : "Done button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Done"
+          }
+        }
+      }
     },
     "dont.quit" : {
       "comment" : "Don’t Quit button",
@@ -2534,6 +2371,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Finishing download…"
+          }
+        }
+      }
+    },
+    "download.linked.file.at" : {
+      "comment" : "Context menu item",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Download Linked File As…"
           }
         }
       }
@@ -2954,9 +2803,6 @@
         }
       }
     },
-    "Edit" : {
-      "comment" : "Main Menu Edit"
-    },
     "Edit…" : {
       "comment" : "Command"
     },
@@ -2985,7 +2831,7 @@
       }
     },
     "email.copied" : {
-      "comment" : "Private email address was copied to clipboard message",
+      "comment" : "Notification that the Private email address was copied to clipboard after the user generated a new address",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3045,7 +2891,7 @@
       }
     },
     "email.optionsMenu.turnOn" : {
-      "comment" : "Enable email sub menu item",
+      "comment" : "Sub menu item to enable Email Protection",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3060,19 +2906,7 @@
       "comment" : "Main Menu View item"
     },
     "Error message & code" : {
-
-    },
-    "error.unknown" : {
-      "comment" : "Error page subtitle",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "An unknown error has occurred"
-          }
-        }
-      }
+      "comment" : "Title of the section of a dialog (form where the user can report feedback) where the error message and the error code are shown"
     },
     "error.unknown.try.again" : {
       "comment" : "Generic error message on a dialog for when the cause is not known.",
@@ -3085,9 +2919,6 @@
           }
         }
       }
-    },
-    "Export" : {
-      "comment" : "Main Menu File item"
     },
     "export.bookmarks.failed.informative" : {
       "comment" : "Alert message when exporting bookmarks fails",
@@ -3213,7 +3044,7 @@
       }
     },
     "feedback.bug.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3225,7 +3056,7 @@
       }
     },
     "feedback.disclaimer" : {
-      "comment" : "Disclaimer in breakage form",
+      "comment" : "Disclaimer in breakage form - a form that users can submit to say that a website is not working properly in DuckDuckGo",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3237,7 +3068,7 @@
       }
     },
     "feedback.feature.request.description" : {
-      "comment" : "Label in the feedback form",
+      "comment" : "Label in the feedback form for feature requests.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3259,18 +3090,6 @@
           }
         }
       }
-    },
-    "File" : {
-      "comment" : "Main Menu File"
-    },
-    "Find" : {
-      "comment" : "Main Menu Edit item"
-    },
-    "Find Next" : {
-      "comment" : "Main Menu Edit-Find item"
-    },
-    "Find Previous" : {
-      "comment" : "Main Menu Edit-Find item"
     },
     "find-in-page.text-field.placeholder" : {
       "comment" : "Placeholder text for the text field where the user inputs strings to searcg in the web page",
@@ -3315,7 +3134,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close %1$d active %2$@ and clear all browsing history and cookies (%3$d %4$@)."
+            "value" : "Close active tabs (%1$d) and clear all browsing history and cookies (sites: %2$d)."
           }
         }
       }
@@ -3555,7 +3374,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Close this tab and clear its browsing history and cookies (%1$d %2$@)."
+            "value" : "Close this tab and clear its browsing history and cookies (sites: %d)."
           }
         }
       }
@@ -3585,7 +3404,7 @@
       }
     },
     "fireproof" : {
-      "comment" : "Domain fireproof status\n   Fireproof button",
+      "comment" : "Fireproof button",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3806,15 +3625,6 @@
     "Hide" : {
       "comment" : "Main Menu > View > Home Button > None item\n   Preferences > Home Button > None item"
     },
-    "Hide DuckDuckGo" : {
-      "comment" : "Main Menu DuckDuckGo item"
-    },
-    "Hide Find" : {
-      "comment" : "Main Menu Edit-Find item"
-    },
-    "Hide Others" : {
-      "comment" : "Main Menu DuckDuckGo item"
-    },
     "History" : {
       "comment" : "Main Menu "
     },
@@ -3957,6 +3767,7 @@
       }
     },
     "home.page.empty.state.item.message" : {
+      "comment" : "This string represents the message for an empty state item on the home page, encouraging the user to keep browsing to see how many trackers were blocked",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3968,6 +3779,7 @@
       }
     },
     "home.page.empty.state.item.title" : {
+      "comment" : "This string represents the title for an empty state item on the home page, indicating that recently visited sites will appear here",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3979,6 +3791,7 @@
       }
     },
     "home.page.no.trackers.blocked" : {
+      "comment" : "This string represents a message on the home page indicating that no trackers were blocked",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -3990,6 +3803,7 @@
       }
     },
     "home.page.no.trackers.found" : {
+      "comment" : "This string represents a message on the home page indicating that no trackers were found",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -4013,12 +3827,25 @@
       }
     },
     "home.page.protection.summary.info" : {
+      "comment" : "This string represents a message in the protection summary on the home page, indicating that there is no recent activity",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "No recent activity"
+          }
+        }
+      }
+    },
+    "home.page.protection.summary.message" : {
+      "comment" : "The number of tracking attempts blocked in the last 7 days, shown on a new tab, translate as: Tracking attempts blocked: %@",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@ tracking attempts blocked"
           }
         }
       }
@@ -4030,16 +3857,10 @@
       "comment" : "Menu item"
     },
     "Import Bookmarks" : {
-
-    },
-    "Import Bookmarks and Passwords…" : {
-      "comment" : "Main Menu File item"
-    },
-    "Import Browser Data" : {
-
+      "comment" : "Title of dialog with instruction for the user to import bookmarks from another browser"
     },
     "Import Passwords" : {
-      "comment" : "my comment"
+      "comment" : "Title of dialog with instruction for the user to import passwords from another browser"
     },
     "Import Results:" : {
       "comment" : "Data Import result summary headline"
@@ -4087,7 +3908,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d bookmarks…"
+            "value" : "Importing bookmarks (%d)…"
           }
         }
       }
@@ -4627,7 +4448,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Importing %d passwords…"
+            "value" : "Importing passwords (%d)…"
           }
         }
       }
@@ -4897,7 +4718,7 @@
       }
     },
     "main-menu.edit.paste-and-match-style" : {
-      "comment" : "Main Menu Edit item",
+      "comment" : "Main Menu Edit item - Action that allows the user to paste copy into a target document and the target document's style will be retained (instead of the source style)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5113,7 +4934,7 @@
       }
     },
     "main-menu.file.open-location" : {
-      "comment" : "Main Menu File item",
+      "comment" : "Main Menu File item- Menu option that allows the user to connect to an address (type an address) on click the address bar of the browser is selected and the user can type.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -5193,6 +5014,30 @@
     "Manage Bookmarks" : {
       "comment" : "Main Menu History item"
     },
+    "menu.add.folder" : {
+      "comment" : "Menu item to add a folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add Folder…"
+          }
+        }
+      }
+    },
+    "menu.bookmarks.edit" : {
+      "comment" : "Menu item to edit a bookmark or a folder",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit…"
+          }
+        }
+      }
+    },
     "menu.item.new.tab" : {
       "comment" : "Context menu item",
       "extractionState" : "extracted_with_value",
@@ -5247,14 +5092,26 @@
         }
       }
     },
-    "n.more.tabs" : {
-      "comment" : "suffix of string in Recently Closed menu",
+    "mute.tab" : {
+      "comment" : "Menu item. Mute tab",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : " (and %d more tabs)"
+            "value" : "Mute Tab"
+          }
+        }
+      }
+    },
+    "n.more.tabs" : {
+      "comment" : "String in Recently Closed menu item for recently closed browser window and number of tabs contained in the closed window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Window with multiple tabs (%d)"
           }
         }
       }
@@ -5283,870 +5140,6 @@
         }
       }
     },
-    "network-protection.privacy-policy.section.1.list" : {
-      "comment" : "Privacy Policy list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This Privacy Policy is for our limited waitlist beta VPN product.\n\nOur main [Privacy Policy](https://duckduckgo.com/privacy) also applies here."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.1.title" : {
-      "comment" : "Privacy Policy title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We don’t ask for any personal information from you in order to use this beta service."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.2.list" : {
-      "comment" : "Privacy Policy list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:\n    • Website visits\n    • DNS requests\n    • Connections made\n    • IP addresses used\n    • Session lengths"
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.2.title" : {
-      "comment" : "Privacy Policy title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We don’t keep any logs of your online activity."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.3.list" : {
-      "comment" : "Privacy Policy list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.\n\nWe use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.3.title" : {
-      "comment" : "Privacy Policy title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We only keep anonymous performance metrics that we cannot connect to your online activity."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.4.list" : {
-      "comment" : "Privacy Policy list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Dedicated servers means they are not shared with anyone else.\n\nWe rent our servers from providers we carefully selected because they meet our privacy requirements.\n\nWe have strict access controls in place so that only limited DuckDuckGo team members have access to our servers."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.4.title" : {
-      "comment" : "Privacy Policy title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We use dedicated servers for all VPN traffic."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.5.list" : {
-      "comment" : "Privacy Policy list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\nIf you participate in a voluntary product survey or questionnaire and agree to provide further feedback, we may contact you using the information you provide.\n\nWe will permanently delete all personal information you provided to us (email, contact information), within 30 days after closing a support case or, in the case of follow up feedback, within 60 days after ending this beta service."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.section.5.title" : {
-      "comment" : "Privacy Policy title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We protect and limit use of your data when you communicate directly with DuckDuckGo."
-          }
-        }
-      }
-    },
-    "network-protection.privacy-policy.title" : {
-      "comment" : "Privacy Policy title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Policy"
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.1.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This service is provided for your personal use only.\n\nYou are responsible for all activity in the service that occurs on or through your device.\n\nThis service may only be used through the DuckDuckGo app on the device on which you are given access. If you delete the DuckDuckGo app, you will lose access to the service.\n\nYou may not use this service through a third-party client."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.1.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The service is for limited and personal use only."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.2.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You agree that you will not use the service for any unlawful, illicit, criminal, or fraudulent purpose, or in any manner that could give rise to civil or criminal liability under applicable law.\n\nYou agree to comply with our [DuckDuckGo Terms of Service](https://duckduckgo.com/terms), which are incorporated by reference."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.2.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You agree to comply with all applicable laws, rules, and regulations."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.3.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Access to this beta is randomly awarded. You are responsible for ensuring eligibility.\n\nYou must be at least 18 years old and live in a location where use of a VPN is legal in order to be eligible to use this service."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.3.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You must be eligible to use this service."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.4.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This service is provided as-is and without warranties or guarantees of any kind.\n\nTo the extent possible under applicable law, DuckDuckGo will not be liable for any damage or loss arising from your use of the service. In any event, the total aggregate liability of DuckDuckGo shall not exceed $25 or the equivalent in your local currency.\n\nWe may in the future transfer responsibility for the service to a subsidiary of DuckDuckGo.  If that happens, you agree that references to “DuckDuckGo” will refer to our subsidiary, which will then become responsible for providing the service and for any liabilities relating to it."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.4.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We provide this beta service as-is and without warranty."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.5.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We reserve the right to revoke access to the service at any time in our sole discretion.\n\nWe may also terminate access for violation of these terms, including for repeated infringement of the intellectual property rights of others."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.5.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We may terminate access at any time."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.6.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Access to this service is currently free of charge, but that is limited to this beta period.\n\nYou understand and agree that this service is provided on a temporary, testing basis only."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.6.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The service is free during the beta period."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.7.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The service is in beta, and we are regularly changing it.\n\nService coverage, speed, server locations, and quality may vary without warning."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.7.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We are continually updating the service."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.8.list" : {
-      "comment" : "Terms of Service list for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n\nIf you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.section.8.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We need your feedback."
-          }
-        }
-      }
-    },
-    "network-protection.terms-of-service.title" : {
-      "comment" : "Terms of Service title for Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Terms of Service"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.availability-disclaimer" : {
-      "comment" : "Availability disclaimer for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Network Protection is free to use during the beta."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.agree-and-continue" : {
-      "comment" : "Agree and Continue button for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Agree and Continue"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.cancel" : {
-      "comment" : "Cancel button for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancel"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.close" : {
-      "comment" : "Close button for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Close"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.dismiss" : {
-      "comment" : "Dismiss button for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Dismiss"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.done" : {
-      "comment" : "Close button for Network Protection joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Done"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.enable-notifications" : {
-      "comment" : "Enable Notifications button for Network Protection joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Enable Notifications"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.get-started" : {
-      "comment" : "Get Started button for Network Protection joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Get Started"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.got-it" : {
-      "comment" : "Got It button for Network Protection joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Got It"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.join-waitlist" : {
-      "comment" : "Join Waitlist button for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Join the Waitlist"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.button.no-thanks" : {
-      "comment" : "No Thanks button for Network Protection joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "No Thanks"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.enable-notifications" : {
-      "comment" : "Enable notifications prompt for Network Protection joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Want to get a notification when your Network Protection invite is ready?"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.enable.subtitle" : {
-      "comment" : "Subtitle for Network Protection enable screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Look for the globe icon in the browser toolbar or in the Mac menu bar.\n\nYou'll be asked to Allow a VPN connection once when setting up Network Protection the first time."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.enable.title" : {
-      "comment" : "Title for Network Protection enable screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Ready to enable Network Protection?"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.section-1.subtitle" : {
-      "comment" : "Subtitle for section 1 of the Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Encrypt online traffic across your browsers and apps."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.section-1.title" : {
-      "comment" : "Title for section 1 of the Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Full-device coverage"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.section-2.subtitle" : {
-      "comment" : "Subtitle for section 2 of the Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "No need for a separate app. Connect in one click and see your connection status at a glance."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.section-2.title" : {
-      "comment" : "Title for section 2 of the Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Fast, reliable, and easy to use"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.section-3.subtitle" : {
-      "comment" : "Subtitle for section 3 of the Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We do not log or save any data that can connect you to your online activity."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.section-3.title" : {
-      "comment" : "Title for section 3 of the Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Strict no-logging policy"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.subtitle" : {
-      "comment" : "Subtitle for Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Get an extra layer of protection online with the VPN built for speed and simplicity. Encrypt your internet connection across your entire device and hide your location and IP address from sites you visit."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.invited.title" : {
-      "comment" : "Title for Network Protection invited screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You’re invited to try\nNetwork Protection beta!"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.join.subtitle.1" : {
-      "comment" : "First subtitle for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Secure your connection anytime, anywhere with Network Protection, the VPN from DuckDuckGo."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.join.subtitle.2" : {
-      "comment" : "Second subtitle for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Join the waitlist, and we’ll notify you when it’s your turn."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.join.title" : {
-      "comment" : "Title for Network Protection join waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Network Protection Beta"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.joined.title" : {
-      "comment" : "Title for Network Protection joined waitlist screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You’re on the list!"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.joined.with-notifications.subtitle.1" : {
-      "comment" : "Subtitle 1 for Network Protection joined waitlist screen when notifications are enabled",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "New invites are sent every few days, on a first come, first served basis."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.joined.with-notifications.subtitle.2" : {
-      "comment" : "Subtitle 2 for Network Protection joined waitlist screen when notifications are enabled",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We’ll notify you when your invite is ready."
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.notification.text" : {
-      "comment" : "Title for Network Protection waitlist notification",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Open your invite"
-          }
-        }
-      }
-    },
-    "network-protection.waitlist.notification.title" : {
-      "comment" : "Title for Network Protection waitlist notification",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Network Protection beta is ready!"
-          }
-        }
-      }
-    },
-    "network.protection" : {
-      "comment" : "Menu item for opening Network Protection",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Network Protection"
-          }
-        }
-      }
-    },
-    "network.protection.configuration.system-settings.legacy" : {
-      "comment" : "Text for a label in the Network Protection popover, displayed after attempting to enable Network Protection for the first time while using macOS 12 and below",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Go to Security & Privacy in System Preferences to allow Network Protection to activate"
-          }
-        }
-      }
-    },
-    "network.protection.configuration.system-settings.modern" : {
-      "comment" : "Text for a label in the Network Protection popover, displayed after attempting to enable Network Protection for the first time while using macOS 13 and above",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Go to Privacy & Security in System Settings to allow Network Protection to activate"
-          }
-        }
-      }
-    },
-    "network.protection.invite.dialog.message" : {
-      "comment" : "Message for the network protection invite dialog",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Enter your invite code to get started."
-          }
-        }
-      }
-    },
-    "network.protection.invite.dialog.title" : {
-      "comment" : "Title for the network protection invite dialog",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You've unlocked a beta feature!"
-          }
-        }
-      }
-    },
-    "network.protection.invite.field.prompt" : {
-      "comment" : "Prompt for the network protection invite code text field",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Code"
-          }
-        }
-      }
-    },
-    "network.protection.invite.success.title" : {
-      "comment" : "Message for the network protection invite success view\n   Title for the network protection invite success view",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Success! You’re in."
-          }
-        }
-      }
-    },
-    "network.protection.navbar.status.view.share.feedback" : {
-      "comment" : "Menu item for 'Send VPN Feedback' in the Network Protection status view that's shown in the navigation bar",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Send VPN Feedback…"
-          }
-        }
-      }
-    },
-    "network.protection.status.button.tooltip" : {
-      "comment" : "The tooltip for NetP's nav bar button",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Network Protection"
-          }
-        }
-      }
-    },
-    "network.protection.status.menu.vpn.settings" : {
-      "comment" : "The status menu 'VPN Settings' menu item",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN Settings…"
-          }
-        }
-      }
-    },
-    "network.protection.system.extension.please.reboot" : {
-      "comment" : "Message shown to users when they try to enable NetP and they need to reboot the computer to complete the installation",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Please reboot to activate Network Protection"
-          }
-        }
-      }
-    },
-    "network.protection.system.extension.unknown.activation.error" : {
-      "comment" : "Message shown to users when they try to enable NetP and there is an unexpected activation error.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "There as an unexpected error. Please try again."
-          }
-        }
-      }
-    },
-    "network.protection.tunnel.name" : {
-      "comment" : "The name of the NetP VPN that will be visible in the system to the user",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "DuckDuckGo Network Protection"
-          }
-        }
-      }
-    },
-    "network.protection.vpn.location.country.item.formatted.cities.count" : {
-      "comment" : "Subtitle of countries item when there are multiple cities, example : ",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%d cities"
-          }
-        }
-      }
-    },
     "Never Show" : {
       "comment" : "Preference for never showing the bookmarks bar on new tab"
     },
@@ -6161,12 +5154,6 @@
           }
         }
       }
-    },
-    "New Folder" : {
-      "comment" : "Title for New bookmark folder dialog"
-    },
-    "New Tab" : {
-      "comment" : "Main Menu File item"
     },
     "new.burner.window.menu.item" : {
       "comment" : "Menu item title",
@@ -6517,7 +5504,7 @@
       }
     },
     "no.access.to.downloads.folder.header" : {
-      "comment" : "Header of the alert dialog informing user about failed download",
+      "comment" : "Header of the alert dialog warning the user they need to give the browser permission to access the Downloads folder",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -6732,18 +5719,6 @@
         }
       }
     },
-    "one.more.tab" : {
-      "comment" : "suffix of string in Recently Closed menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " (and 1 more tab)"
-          }
-        }
-      }
-    },
     "Only Show on New Tab" : {
       "comment" : "Preference for only showing the bookmarks bar on new tab"
     },
@@ -6759,8 +5734,29 @@
         }
       }
     },
-    "Open Location…" : {
-      "comment" : "Main Menu File item"
+    "open.all.in.new.tabs" : {
+      "comment" : "Menu item that opens all the bookmarks in a folder to new tabs",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open All in New Tabs"
+          }
+        }
+      }
+    },
+    "open.all.tabs.in.new.window" : {
+      "comment" : "Menu item that opens all the bookmarks in a folder in a new window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open All in New Window"
+          }
+        }
+      }
     },
     "open.bitwarden" : {
       "comment" : "Button to open Bitwarden app",
@@ -6787,7 +5783,7 @@
       }
     },
     "open.externally.failed" : {
-      "comment" : "’Link’ is link on a website",
+      "comment" : "’Link’ is link on a website, it couldn't be opened due to the required app not being found",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -6895,6 +5891,7 @@
       }
     },
     "open.settings" : {
+      "comment" : "This string represents a prompt or button label prompting the user to open system settings",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -6937,6 +5934,42 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Remove Fireproofing"
+          }
+        }
+      }
+    },
+    "page.crash.header" : {
+      "comment" : "Error page heading text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This webpage has crashed."
+          }
+        }
+      }
+    },
+    "page.crash.message" : {
+      "comment" : "Error page message text shown when a Web Page process had crashed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Try reloading the page or come back later."
+          }
+        }
+      }
+    },
+    "page.error.header" : {
+      "comment" : "Error page heading text",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DuckDuckGo can’t load this page."
           }
         }
       }
@@ -7277,15 +6310,6 @@
     "Passwords:" : {
       "comment" : "Data import summary format of how many passwords (%lld) were successfully imported."
     },
-    "Passwords…" : {
-      "comment" : "Main Menu File-Export item"
-    },
-    "Paste" : {
-      "comment" : "Main Menu Edit item"
-    },
-    "Paste and Match Style" : {
-      "comment" : "Main Menu Edit item"
-    },
     "paste-from-clipboard" : {
       "comment" : "Paste button",
       "extractionState" : "extracted_with_value",
@@ -7322,14 +6346,26 @@
         }
       }
     },
-    "permission.allow.externalScheme" : {
-      "comment" : "Allow the App Name(%@ 1) to open “URL Scheme”(%@ 2) links\n   Allow to open External Link (%@ 2) to open on current domain (%@ 1)",
+    "permission.allow.externalScheme.format" : {
+      "comment" : "Allow to open External Link (%@ 2) to open on current domain (%@ 1)",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "Allow “%1$@“ to open %2$@"
+          }
+        }
+      }
+    },
+    "permission.allow.externalScheme.menu-header" : {
+      "comment" : "Allow the App Name(%@ 1) to open “URL Scheme”(%@ 2) links",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow the %1$@ to open “%2$@” links"
           }
         }
       }
@@ -7370,7 +6406,7 @@
         }
       }
     },
-    "permission.authorization.popups" : {
+    "permission.authorization.popups.format" : {
       "comment" : "Popover asking for domain %@ to open Popup Window",
       "extractionState" : "extracted_with_value",
       "localizations" : {
@@ -7378,6 +6414,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Allow “%@“ to open PopUp Window?"
+          }
+        }
+      }
+    },
+    "permission.authorization.popups.menu-header" : {
+      "comment" : "Popover asking for domain %@ to open Popup Window",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow “%@“ to open PopUp Windows?"
           }
         }
       }
@@ -7551,7 +6599,7 @@
       }
     },
     "permission.popup.title" : {
-      "comment" : "List of blocked popups Title",
+      "comment" : "Title of a popup that has a list of blocked popups",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8106,6 +7154,7 @@
       }
     },
     "pm.lock-screen.duration" : {
+      "comment" : "Message about the duration for which autofill information remains unlocked on the lock screen.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8704,18 +7753,6 @@
         }
       }
     },
-    "preferences-homepage" : {
-      "comment" : "Homepage behavior description\n   Title for Homepage section in settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Homepage"
-          }
-        }
-      }
-    },
     "preferences-homepage-address" : {
       "comment" : "Homepage address field label",
       "extractionState" : "extracted_with_value",
@@ -8776,8 +7813,29 @@
         }
       }
     },
-    "Preferences…" : {
-      "comment" : "Main Menu DuckDuckGo item"
+    "preferences-homepage.description" : {
+      "comment" : "Homepage behavior description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "When navigating home or opening new windows."
+          }
+        }
+      }
+    },
+    "preferences-homepage.title" : {
+      "comment" : "Title for Homepage section in settings",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Homepage"
+          }
+        }
+      }
     },
     "preferences.about" : {
       "comment" : "Show about screen",
@@ -8852,6 +7910,7 @@
       }
     },
     "preferences.about.unsupported-device-info1" : {
+      "comment" : "This string represents a message informing the user that DuckDuckGo is no longer providing browser updates for their version of macOS",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -8862,38 +7921,14 @@
         }
       }
     },
-    "preferences.about.unsupported-device-info2-part1" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 1",
+    "preferences.about.unsupported-device-info2" : {
+      "comment" : "Copy in section that tells the user to update their macOS version since their current version is unsupported",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Please"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part2" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 2 (underlined)",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "update to macOS %@"
-          }
-        }
-      }
-    },
-    "preferences.about.unsupported-device-info2-part3" : {
-      "comment" : "Second paragraph of unsupported device info - sentence part 3\n   Second paragraph of unsupported device info - sentence part 4",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "or later to use the most recent version"
+            "value" : "Please update to macOS %@ or later to use the most recent version of DuckDuckGo. You can also keep using your current version of the browser, but it will not receive further updates."
           }
         }
       }
@@ -9055,6 +8090,7 @@
       }
     },
     "preferences.default-browser.button.make-default" : {
+      "comment" : "represents a prompt message asking the user to make DuckDuckGo their default browser.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -9161,18 +8197,6 @@
         }
       }
     },
-    "preferences.subscription" : {
-      "comment" : "Show subscription preferences",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
-          }
-        }
-      }
-    },
     "preferences.sync" : {
       "comment" : "Show sync preferences",
       "extractionState" : "extracted_with_value",
@@ -9236,14 +8260,8 @@
         }
       }
     },
-    "Quit DuckDuckGo" : {
-      "comment" : "Main Menu DuckDuckGo item"
-    },
     "Recently Closed" : {
       "comment" : "Main Menu History item"
-    },
-    "Redo" : {
-      "comment" : "Main Menu Edit item"
     },
     "Reload Page" : {
       "comment" : "Main Menu View item"
@@ -9291,6 +8309,7 @@
       "comment" : "Main Menu History item"
     },
     "reopen.last.closed.tab" : {
+      "comment" : "This string represents an action to reopen the last closed tab in the browser",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -9302,6 +8321,7 @@
       }
     },
     "reopen.last.closed.window" : {
+      "comment" : "This string represents an action to reopen the last closed window in the browser",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -9337,6 +8357,7 @@
       }
     },
     "restart.bitwarden.info" : {
+      "comment" : "This string represents a message informing the user that Bitwarden is not responding and prompts them to restart the application to initiate communication again.",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -9358,9 +8379,6 @@
           }
         }
       }
-    },
-    "Save As…" : {
-      "comment" : "Main Menu File item"
     },
     "save.image.as" : {
       "comment" : "Context menu item",
@@ -9401,17 +8419,8 @@
     "Select %@ Folder…" : {
 
     },
-    "Select All" : {
-      "comment" : "Main Menu Edit item"
-    },
-    "Select Bookmarks HTML File…" : {
-
-    },
     "Select data to import:" : {
       "comment" : "Data Import section title for checkboxes of data type to import: Passwords or Bookmarks."
-    },
-    "Select Passwords CSV File…" : {
-
     },
     "Select Profile:" : {
       "comment" : "Browser Profile picker title for Data Import"
@@ -9536,9 +8545,6 @@
         }
       }
     },
-    "Services" : {
-      "comment" : "Main Menu DuckDuckGo item"
-    },
     "settings" : {
       "comment" : "Menu item for opening settings",
       "extractionState" : "extracted_with_value",
@@ -9590,9 +8596,6 @@
         }
       }
     },
-    "Show All" : {
-      "comment" : "Main Menu DuckDuckGo item"
-    },
     "Show Autofill Shortcut" : {
       "comment" : "Main Menu View item"
     },
@@ -9626,11 +8629,20 @@
     "Show Right of the Reload Button" : {
       "comment" : "Main Menu > View > Home Button > right position item"
     },
-    "Show Spelling and Grammar" : {
-      "comment" : "Main Menu Edit-Spellingand item"
-    },
     "Show Substitutions" : {
       "comment" : "Main Menu Edit-Substitutions item"
+    },
+    "show.folder.contents" : {
+      "comment" : "Menu item that shows the content of a folder ",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Show Folder Contents"
+          }
+        }
+      }
     },
     "Smart Copy/Paste" : {
       "comment" : "Main Menu Edit-Substitutions item"
@@ -9645,9 +8657,6 @@
       "comment" : "Main Menu Edit-Substitutions item"
     },
     "Speech" : {
-      "comment" : "Main Menu Edit item"
-    },
-    "Spelling and Grammar" : {
       "comment" : "Main Menu Edit item"
     },
     "Start Speaking" : {
@@ -9683,57 +8692,6 @@
         }
       }
     },
-    "subscription.menu.item" : {
-      "comment" : "Title for Subscription item in the options menu",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Privacy Pro"
-          }
-        }
-      }
-    },
-    "subscription.progress.view.completing.purchase" : {
-      "comment" : "Progress view title when completing the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Completing purchase..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.purchasing.subscription" : {
-      "comment" : "Progress view title when starting the purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Purchase in progress..."
-          }
-        }
-      }
-    },
-    "subscription.progress.view.restoring.subscription" : {
-      "comment" : "Progress view title when restoring past subscription purchase",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Restoring subscription..."
-          }
-        }
-      }
-    },
-    "Substitutions" : {
-      "comment" : "Main Menu Edit item"
-    },
     "tab.bookmarks.title" : {
       "comment" : "Tab bookmarks title",
       "extractionState" : "extracted_with_value",
@@ -9746,18 +8704,6 @@
         }
       }
     },
-    "tab.dbp.title" : {
-      "comment" : "Tab data broker protection title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Personal Information Removal"
-          }
-        }
-      }
-    },
     "tab.error.title" : {
       "comment" : "Tab error title",
       "extractionState" : "extracted_with_value",
@@ -9765,7 +8711,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Oops!"
+            "value" : "Failed to open page"
           }
         }
       }
@@ -9954,7 +8900,7 @@
       }
     },
     "tooltip.clearHistory" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -9966,7 +8912,7 @@
       }
     },
     "tooltip.clearHistoryAndData" : {
-      "comment" : "Tooltip for burn button",
+      "comment" : "Tooltip for burn button where %@ is the domain",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -10154,9 +9100,6 @@
     "Try importing passwords manually instead." : {
       "comment" : "Data import error subtitle: suggestion to import Passwords manually by selecting a CSV or HTML file."
     },
-    "Undo" : {
-      "comment" : "Main Menu Edit item"
-    },
     "uninstall" : {
       "comment" : "Uninstall button",
       "extractionState" : "extracted_with_value",
@@ -10165,6 +9108,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Uninstall"
+          }
+        }
+      }
+    },
+    "unmute.tab" : {
+      "comment" : "Menu item. Unmute tab",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unmute Tab"
           }
         }
       }
@@ -10182,6 +9137,7 @@
       }
     },
     "unsupported.device.info.alert.header" : {
+      "comment" : "his string represents the header for an alert informing the user that their version of macOS is no longer supported",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
@@ -10218,510 +9174,6 @@
     },
     "View" : {
       "comment" : "Main Menu View"
-    },
-    "vpn.advanced.settings.title" : {
-      "comment" : "VPN Advanced section title in VPN settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Advanced"
-          }
-        }
-      }
-    },
-    "vpn.button.title.uninstall.vpn" : {
-      "comment" : "Uninstall VPN button title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Uninstall DuckDuckGo VPN..."
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.button.cancel" : {
-      "comment" : "Title for the Cancel button of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Cancel"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.button.done" : {
-      "comment" : "Title for the Done button of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Done"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.button.submit" : {
-      "comment" : "Title for the Submit button of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Submit"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.button.submitting" : {
-      "comment" : "Title for the Submitting state of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Submitting…"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.browser-crash-or-freeze" : {
-      "comment" : "Title for the browser crash/freeze category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN causes browser to crash or freeze"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.fails-to-connect" : {
-      "comment" : "Title for the 'VPN fails to connect' category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN fails to connect"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.feature-request" : {
-      "comment" : "Title for the 'VPN feature request' category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN feature request"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.issues-with-apps" : {
-      "comment" : "Title for the category 'VPN causes issues with other apps or websites' category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN causes issues with other apps or websites"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.local-device-connectivity" : {
-      "comment" : "Title for the local device connectivity category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN won't let me connect to local device"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.other" : {
-      "comment" : "Title for the 'other VPN feedback' category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Other VPN feedback"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.select-category" : {
-      "comment" : "Title for the category selection state of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Select a category"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.too-slow" : {
-      "comment" : "Title for the 'VPN is too slow' category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN connection is too slow"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.category.unable-to-install" : {
-      "comment" : "Title for the 'unable to install' category of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Unable to install VPN"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.sending-confirmation.description" : {
-      "comment" : "Title for the feedback sent view description of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your feedback will help us improve the\nDuckDuckGo VPN."
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.sending-confirmation.error" : {
-      "comment" : "Title for the feedback sending error text of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "We couldn't send your feedback right now, please try again."
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.sending-confirmation.title" : {
-      "comment" : "Title for the feedback sent view title of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Thank you!"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.text-1" : {
-      "comment" : "Text for the body of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Please describe what's happening, what you expected to happen, and the steps that led to the issue:"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.text-2" : {
-      "comment" : "Text for the body of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "In addition to the details entered into this form, your app issue report will contain:"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.text-3" : {
-      "comment" : "Bullet text for the body of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "• Whether specific DuckDuckGo features are enabled"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.text-4" : {
-      "comment" : "Bullet text for the body of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "• Aggregate DuckDuckGo app diagnostics"
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.text-5" : {
-      "comment" : "Text for the body of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "By clicking \"Submit\" I agree that DuckDuckGo may use the information in this report for purposes of improving the app's features."
-          }
-        }
-      }
-    },
-    "vpn.feedback-form.title" : {
-      "comment" : "Title for each screen of the VPN feedback form",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Help Improve the DuckDuckGo VPN"
-          }
-        }
-      }
-    },
-    "vpn.general.title" : {
-      "comment" : "General section title in VPN settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "General"
-          }
-        }
-      }
-    },
-    "vpn.location.change.button.title" : {
-      "comment" : "Title of the VPN location preference change button",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Change..."
-          }
-        }
-      }
-    },
-    "vpn.location.custom.section.title" : {
-      "comment" : "Title of the VPN location list cancel button\n   Title of the VPN location list custom section",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Custom"
-          }
-        }
-      }
-    },
-    "vpn.location.description.nearest" : {
-      "comment" : "Nearest city setting description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Nearest"
-          }
-        }
-      }
-    },
-    "vpn.location.description.nearest.available" : {
-      "comment" : "Nearest available location setting description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Nearest available"
-          }
-        }
-      }
-    },
-    "vpn.location.list.title" : {
-      "comment" : "Title of the VPN location list screen",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VPN Location"
-          }
-        }
-      }
-    },
-    "vpn.location.nearest.available.title" : {
-      "comment" : "Subtitle underneath the nearest available vpn location preference text.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically connect to the nearest server we can find."
-          }
-        }
-      }
-    },
-    "vpn.location.recommended.section.title" : {
-      "comment" : "Title of the VPN location list recommended section",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Recommended"
-          }
-        }
-      }
-    },
-    "vpn.location.submit.button.title" : {
-      "comment" : "Title of the VPN location list submit button",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Submit"
-          }
-        }
-      }
-    },
-    "vpn.location.title" : {
-      "comment" : "Location section title in VPN settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Location"
-          }
-        }
-      }
-    },
-    "vpn.notifications.settings.title" : {
-      "comment" : "Notifications section title in VPN settings",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Notifications"
-          }
-        }
-      }
-    },
-    "vpn.setting.description.always.on" : {
-      "comment" : "Always ON setting description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Automatically restores the VPN connection after interruption. For your security, this setting cannot be disabled."
-          }
-        }
-      }
-    },
-    "vpn.setting.description.exclude.local.networks" : {
-      "comment" : "Exclude Local Networks setting description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Bypass the VPN for local network connections, like to a printer."
-          }
-        }
-      }
-    },
-    "vpn.setting.description.secure.dns" : {
-      "comment" : "Secure DNS setting description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Our VPN uses Secure DNS to keep your online activity private, so that your Internet provider can't see what websites you visit."
-          }
-        }
-      }
-    },
-    "vpn.setting.title.connect.on.login" : {
-      "comment" : "Connect on Login setting title\n   Display VPN status in the menu bar.",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Connect on login"
-          }
-        }
-      }
-    },
-    "vpn.setting.title.exclude.local.networks" : {
-      "comment" : "Exclude Local Networks setting title",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Exclude local networks"
-          }
-        }
-      }
-    },
-    "vpn.uninstall.alert.informative.text" : {
-      "comment" : "Informative text for the alert that comes up when the user decides to uninstall our VPN",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Uninstalling the DuckDuckGo VPN will disconnect the VPN and remove it from your device."
-          }
-        }
-      }
-    },
-    "vpn.uninstall.alert.title" : {
-      "comment" : "Alert title when the user selects to uninstall our VPN",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Are you sure you want to uninstall the VPN?"
-          }
-        }
-      }
     },
     "We couldn‘t find any bookmarks." : {
       "comment" : "Data import error message: Bookmarks weren‘t found."

@@ -152,7 +152,7 @@ public struct DataBrokerProtectionBrokerUpdater {
     // 2. If does exist, we check the number version, if the version number is new, we update it
     // 3. If it does not exist, we add it, and we create the scan operations related to it
     private func update(_ broker: DataBroker) throws {
-        guard let savedBroker = try vault.fetchBroker(with: broker.name) else {
+        guard let savedBroker = try vault.fetchBroker(with: broker.url) else {
             // The broker does not exist in the current storage. We need to add it.
             try add(broker)
             return

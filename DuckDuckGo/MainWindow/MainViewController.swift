@@ -65,7 +65,7 @@ final class MainViewController: NSViewController {
 
         tabBarViewController = TabBarViewController.create(tabCollectionViewModel: tabCollectionViewModel)
         navigationBarViewController = NavigationBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, isBurner: isBurner)
-        browserTabViewController = BrowserTabViewController.create(tabCollectionViewModel: tabCollectionViewModel)
+        browserTabViewController = BrowserTabViewController(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
         findInPageViewController = FindInPageViewController.create()
         fireViewController = FireViewController.create(tabCollectionViewModel: tabCollectionViewModel)
         bookmarksBarViewController = BookmarksBarViewController.create(tabCollectionViewModel: tabCollectionViewModel, bookmarkManager: bookmarkManager)
@@ -206,6 +206,14 @@ final class MainViewController: NSViewController {
 
     func windowWillClose() {
         eventMonitorCancellables.removeAll()
+        tabBarViewController.hideTabPreview()
+    }
+
+    func windowWillMiniaturize() {
+        tabBarViewController.hideTabPreview()
+    }
+
+    func windowWillEnterFullScreen() {
         tabBarViewController.hideTabPreview()
     }
 

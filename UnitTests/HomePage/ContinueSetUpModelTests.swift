@@ -109,6 +109,8 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: userDefaults
         )
+#else
+        let messaging =  HomePageRemoteMessaging.defaultMessaging()
 #endif
 
         vm = HomePage.Models.ContinueSetUpModel(
@@ -543,6 +545,8 @@ final class ContinueSetUpModelTests: XCTestCase {
             dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: userDefaults
         )
+#else
+        return HomePageRemoteMessaging.defaultMessaging()
 #endif
     }
 
@@ -587,6 +591,8 @@ extension HomePage.Models.ContinueSetUpModel {
             dataBrokerProtectionRemoteMessaging: MockDataBrokerProtectionRemoteMessaging(),
             dataBrokerProtectionUserDefaults: appGroupUserDefaults
         )
+#else
+        let messaging =  HomePageRemoteMessaging.defaultMessaging()
 #endif
 
         return HomePage.Models.ContinueSetUpModel(

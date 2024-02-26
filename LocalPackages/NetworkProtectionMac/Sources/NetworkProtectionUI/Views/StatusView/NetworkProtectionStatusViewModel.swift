@@ -82,6 +82,7 @@ extension NetworkProtectionStatusView {
         var showDebugInformation: Bool
 
         public let agentLoginItem: LoginItem?
+        private let isMenuBarStatusView: Bool
 
         // MARK: - Extra Menu Items
 
@@ -114,6 +115,7 @@ extension NetworkProtectionStatusView {
                     appLauncher: AppLaunching,
                     menuItems: @escaping () -> [MenuItem],
                     agentLoginItem: LoginItem?,
+                    isMenuBarStatusView: Bool,
                     runLoopMode: RunLoop.Mode? = nil,
                     entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>) {
 
@@ -123,6 +125,7 @@ extension NetworkProtectionStatusView {
             self.debugInformationPublisher = debugInformationPublisher
             self.menuItems = menuItems
             self.agentLoginItem = agentLoginItem
+            self.isMenuBarStatusView = isMenuBarStatusView
             self.runLoopMode = runLoopMode
             self.accountManager = accountManager
             self.entitlementMonitor = NetworkProtectionEntitlementMonitor()
@@ -211,14 +214,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.tunnelErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastTunnelErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastTunnelErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToControllerErrorMessages() {
@@ -226,14 +229,14 @@ extension NetworkProtectionStatusView {
                 .subscribe(on: Self.controllerErrorDispatchQueue)
                 .sink { [weak self] errorMessage in
 
-                guard let self else {
-                    return
-                }
+                    guard let self else {
+                        return
+                    }
 
-                Task { @MainActor in
-                    self.lastControllerErrorMessage = errorMessage
-                }
-            }.store(in: &cancellables)
+                    Task { @MainActor in
+                        self.lastControllerErrorMessage = errorMessage
+                    }
+                }.store(in: &cancellables)
         }
 
         private func subscribeToDebugInformationChanges() {
@@ -333,7 +336,7 @@ extension NetworkProtectionStatusView {
                 switch step {
 
                 case .userNeedsToAllowExtension, .userNeedsToAllowVPNConfiguration:
-                    return PromptActionView.Model(presentationData: step) { [weak self] in
+                    return PromptActionView.Model(onboardingStep: step, isMenuBar: self.isMenuBarStatusView) { [weak self] in
                         self?.tunnelControllerViewModel.startNetworkProtection()
                     }
                 }

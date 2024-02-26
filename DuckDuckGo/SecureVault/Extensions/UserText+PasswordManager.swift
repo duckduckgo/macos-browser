@@ -107,7 +107,7 @@ extension UserText {
     static func pmLockScreenDuration(duration: String) -> String {
         let localized = NSLocalizedString("pm.lock-screen.duration",
                                           value: "Your autofill info will remain unlocked until your computer is idle for %@.",
-                                          comment: "")
+                                          comment: "Message about the duration for which autofill information remains unlocked on the lock screen.")
         return String(format: localized, duration)
     }
 

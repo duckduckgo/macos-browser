@@ -1,8 +1,9 @@
 {
-  "name": "officialusa.com",
-  "version": "0.1.0",
+  "name": "OfficialUSA",
+  "url": "officialusa.com",
+  "version": "0.1.4",
   "parent": "neighbor.report",
-  "addedDatetime": 1692590400000,
+  "addedDatetime": 1692594000000,
   "steps": [
     {
       "stepType": "scan",
@@ -10,12 +11,12 @@
       "actions": [
         {
           "actionType": "navigate",
-          "id": "dad25b4c-743b-4bca-a395-05f1e76ef5c9",
+          "id": "b430e29e-89f0-4994-96b2-08d0cbdc388c",
           "url": "https://officialusa.com/names/${firstName}-${lastName}/"
         },
         {
           "actionType": "extract",
-          "id": "b867d570-6124-40d9-9076-7ee0fa5b4d68",
+          "id": "d989f3b7-9b8a-44a6-a51e-70762255f3fc",
           "selector": ".person",
           "profile": {
             "name": {

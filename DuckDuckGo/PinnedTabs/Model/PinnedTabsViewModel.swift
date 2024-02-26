@@ -46,6 +46,7 @@ final class PinnedTabsViewModel: ObservableObject {
         didSet {
             if let selectedItem = selectedItem {
                 selectedItemIndex = items.firstIndex(of: selectedItem)
+                updateTabAudioState(tab: selectedItem)
             } else {
                 selectedItemIndex = nil
             }
@@ -57,6 +58,7 @@ final class PinnedTabsViewModel: ObservableObject {
         didSet {
             if let hoveredItem = hoveredItem {
                 hoveredItemIndex = items.firstIndex(of: hoveredItem)
+                updateTabAudioState(tab: hoveredItem)
             } else {
                 hoveredItemIndex = nil
             }
@@ -72,6 +74,7 @@ final class PinnedTabsViewModel: ObservableObject {
     @Published private(set) var selectedItemIndex: Int?
     @Published private(set) var hoveredItemIndex: Int?
     @Published private(set) var dragMovesWindow: Bool = true
+    @Published private(set) var audioStateView: AudioStateView = .notSupported
 
     @Published private(set) var itemsWithoutSeparator: Set<Tab> = []
 
@@ -111,6 +114,18 @@ final class PinnedTabsViewModel: ObservableObject {
         }
         itemsWithoutSeparator = items
     }
+
+    private func updateTabAudioState(tab: Tab) {
+        let audioState = tab.audioState
+        switch audioState {
+        case .muted:
+            audioStateView = .muted
+        case .unmuted:
+            audioStateView = .unmuted
+        case .notSupported:
+            audioStateView = .notSupported
+        }
+    }
 }
 
 // MARK: - Context Menu
@@ -124,6 +139,13 @@ extension PinnedTabsViewModel {
         case fireproof(Tab)
         case removeFireproofing(Tab)
         case close(Int)
+        case muteOrUnmute(Tab)
+    }
+
+    enum AudioStateView {
+        case muted
+        case unmuted
+        case notSupported
     }
 
     func isFireproof(_ tab: Tab) -> Bool {
@@ -167,5 +189,10 @@ extension PinnedTabsViewModel {
 
     func removeFireproofing(_ tab: Tab) {
         contextMenuActionSubject.send(.removeFireproofing(tab))
+    }
+
+    func muteOrUmute(_ tab: Tab) {
+        contextMenuActionSubject.send(.muteOrUnmute(tab))
+        updateTabAudioState(tab: tab)
     }
 }

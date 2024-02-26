@@ -31,6 +31,10 @@ final class WKWebViewPrivateMethodsAvailabilityTests: XCTestCase {
         XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.fullScreenPlaceholderView))
     }
 
+    func testWebViewRespondsTo_loadAlternateHTMLString() {
+        XCTAssertTrue(WKWebView.instancesRespond(to: WKWebView.Selector.loadAlternateHTMLString))
+    }
+
     func testWKBackForwardListRespondsTo_removeAllItems() {
         XCTAssertTrue(WKBackForwardList.instancesRespond(to: WKBackForwardList.removeAllItemsSelector))
     }

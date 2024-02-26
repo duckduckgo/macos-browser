@@ -290,4 +290,26 @@ extension InMemoryDataCache: DBPUICommunicationDelegate {
 
         return mapper.maintenanceScanState(brokerProfileQueryData)
     }
+
+    func getDataBrokers() async -> [DBPUIDataBroker] {
+        brokerProfileQueryData
+        // 1. We get all brokers (in this list brokers are repeated)
+            .map { $0.dataBroker }
+        // 2. We map the brokers to the UI model
+            .flatMap { dataBroker -> [DBPUIDataBroker] in
+                var result: [DBPUIDataBroker] = []
+                result.append(DBPUIDataBroker(name: dataBroker.name, url: dataBroker.url))
+
+                for mirrorSite in dataBroker.mirrorSites {
+                    result.append(DBPUIDataBroker(name: mirrorSite.name, url: mirrorSite.url))
+                }
+                return result
+            }
+        // 3. We delete duplicates
+            .reduce(into: [DBPUIDataBroker]()) { (result, dataBroker) in
+                if !result.contains(where: { $0.url == dataBroker.url }) {
+                    result.append(dataBroker)
+                }
+            }
+    }
 }

@@ -56,6 +56,7 @@ public final class StatusBarMenu: NSObject {
                 appLauncher: AppLaunching,
                 menuItems: @escaping () -> [MenuItem],
                 agentLoginItem: LoginItem?,
+                isMenuBarStatusView: Bool,
                 entitlementCheck: @escaping () async -> Swift.Result<Bool, Error>) {
 
         self.model = model
@@ -69,6 +70,7 @@ public final class StatusBarMenu: NSObject {
                                            appLauncher: appLauncher,
                                            menuItems: menuItems,
                                            agentLoginItem: agentLoginItem,
+                                           isMenuBarStatusView: isMenuBarStatusView,
                                            entitlementCheck: entitlementCheck)
 
         popover.behavior = .transient
