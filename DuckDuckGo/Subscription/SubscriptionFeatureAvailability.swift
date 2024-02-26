@@ -33,14 +33,18 @@ protocol SubscriptionFeatureAvailability {
 struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
 
     func isFeatureAvailable() -> Bool {
-        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
+        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isSubscriptionInternalTestingEnabled: [\(isSubscriptionInternalTestingEnabled)] isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
 #if SUBSCRIPTION_OVERRIDE_ENABLED
         return true
 #elseif SUBSCRIPTION
-        return AccountManager().isUserAuthenticated || isInternalUser && !isVPNActivated && !isDBPActivated
+        return AccountManager().isUserAuthenticated || (isSubscriptionInternalTestingEnabled && isInternalUser && !isVPNActivated && !isDBPActivated)
 #else
         return false
 #endif
+    }
+
+    private var isSubscriptionInternalTestingEnabled: Bool {
+        UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false).wrappedValue
     }
 
     private var isInternalUser: Bool {

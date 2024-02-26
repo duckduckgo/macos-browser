@@ -21,6 +21,9 @@ import Subscription
 
 public final class SubscriptionDebugMenu: NSMenuItem {
 
+    var isInternalTestingEnabled: () -> Bool
+    var updateInternalTestingFlag: (Bool) -> Void
+
     var currentViewController: () -> NSViewController?
     private let accountManager = AccountManager()
 
@@ -38,13 +41,17 @@ public final class SubscriptionDebugMenu: NSMenuItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public init(currentViewController: @escaping () -> NSViewController?) {
+    public init(isInternalTestingEnabled: @escaping () -> Bool,
+                updateInternalTestingFlag: @escaping (Bool) -> Void,
+                currentViewController: @escaping () -> NSViewController?) {
+        self.isInternalTestingEnabled = isInternalTestingEnabled
+        self.updateInternalTestingFlag = updateInternalTestingFlag
         self.currentViewController = currentViewController
         super.init(title: "Subscription", action: nil, keyEquivalent: "")
-        self.submenu = submenuItem
+        self.submenu = makeSubmenu()
     }
 
-    private lazy var submenuItem: NSMenu = {
+    private func makeSubmenu() -> NSMenu{
         let menu = NSMenu(title: "")
 
         menu.addItem(NSMenuItem(title: "Simulate Subscription Active State (fake token)", action: #selector(simulateSubscriptionActiveState), target: self))
@@ -61,10 +68,17 @@ public final class SubscriptionDebugMenu: NSMenuItem {
             menu.addItem(NSMenuItem(title: "Purchase Subscription from App Store", action: #selector(showPurchaseView), target: self))
         }
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Error message #1", action: #selector(testError1), target: self))
-        menu.addItem(NSMenuItem(title: "Error message #2", action: #selector(testError2), target: self))
+        
+        let internalTestingItem = NSMenuItem(title: "Internal testing", action: #selector(toggleInternalTesting), target: self)
+        internalTestingItem.state = isInternalTestingEnabled() ? .on : .off
+        menu.addItem(internalTestingItem)
+
         return menu
-    }()
+    }
+
+    private func updateSubmenu() {
+        self.submenu = makeSubmenu()
+    }
 
     @objc
     func simulateSubscriptionActiveState() {
@@ -147,25 +161,25 @@ public final class SubscriptionDebugMenu: NSMenuItem {
     }
 
     @objc
-    func testError1(_ sender: Any?) {
+    func toggleInternalTesting(_ sender: Any?) {
         Task { @MainActor in
-            let alert = NSAlert()
-            alert.messageText = "Something Went Wrong"
-            alert.informativeText = "The App Store was not able to process your purchase. Please try again later."
-            alert.addButton(withTitle: "OK")
-            alert.runModal()
-        }
-    }
+            let currentValue = isInternalTestingEnabled()
+            let shouldShowAlert = currentValue == false
 
-    @objc
-    func testError2(_ sender: Any?) {
-        Task { @MainActor in
-            let alert = NSAlert()
-            alert.messageText = "Subscription Not Found"
-            alert.informativeText = "The subscription associated with this Apple ID is no longer active."
-            alert.addButton(withTitle: "View Plans")
-            alert.addButton(withTitle: "Cancel")
-            alert.runModal()
+            if shouldShowAlert {
+                let alert = NSAlert()
+                alert.messageText = "Are you sure you want to enable internal testing"
+                alert.informativeText = "Only enable this option if you are participating in internal testing and have been requested to do so."
+                alert.addButton(withTitle: "Yes")
+                alert.addButton(withTitle: "No")
+
+                let response = alert.runModal()
+
+                guard case .alertFirstButtonReturn = response else { return }
+            }
+
+            updateInternalTestingFlag(!currentValue)
+            self.updateSubmenu()
         }
     }
 

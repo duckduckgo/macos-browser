@@ -180,6 +180,10 @@ public struct UserDefaultsWrapper<T> {
         case syncDidPresentFaviconsFetcherOnboarding = "sync.did-present-favicons-fetcher-onboarding"
         case syncDidMigrateToImprovedListsHandling = "sync.did-migrate-to-improved-lists-handling"
         case syncDidShowSyncPausedByFeatureFlagAlert = "sync.did-show-sync-paused-by-feature-flag-alert"
+
+        // Subscription
+
+        case subscriptionInternalTesting = "subscription.internal-testing-enabled"
     }
 
     enum RemovedKeys: String, CaseIterable {

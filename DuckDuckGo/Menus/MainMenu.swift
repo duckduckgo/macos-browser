@@ -591,7 +591,11 @@ import SubscriptionUI
             NSMenuItem(title: "Trigger Fatal Error", action: #selector(MainViewController.triggerFatalError))
 
 #if SUBSCRIPTION
-            SubscriptionDebugMenu(currentViewController: {
+            var isInternalTestingWrapper = UserDefaultsWrapper(key: .subscriptionInternalTesting, defaultValue: false)
+
+            SubscriptionDebugMenu(isInternalTestingEnabled: { isInternalTestingWrapper.wrappedValue },
+                                  updateInternalTestingFlag: { isInternalTestingWrapper.wrappedValue = $0 },
+                                  currentViewController: {
                 WindowControllersManager.shared.lastKeyMainWindowController?.mainViewController
             })
 #endif
