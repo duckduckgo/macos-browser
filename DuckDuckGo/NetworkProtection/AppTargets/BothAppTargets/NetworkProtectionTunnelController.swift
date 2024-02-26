@@ -63,8 +63,6 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     ///
     private let controllerErrorStore = NetworkProtectionControllerErrorStore()
 
-    private let notificationCenter: NotificationCenter
-
     // MARK: - VPN Tunnel & Configuration
 
     /// Auth token store
@@ -87,6 +85,12 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
     /// For reference read: https://app.asana.com/0/1203137811378537/1206513608690551/f
     ///
     private var internalManager: NETunnelProviderManager?
+
+    /// The last known VPN status.
+    ///
+    /// Should not be used for checking the current status.
+    ///
+    private var previousStatus: NEVPNStatus = .invalid
 
     // MARK: - User Defaults
 
@@ -174,12 +178,15 @@ final class NetworkProtectionTunnelController: TunnelController, TunnelSessionPr
 
     private func handleStatusChange(_ notification: Notification) {
         guard let session = (notification.object as? NETunnelProviderSession),
-            let manager = session.manager as? NETunnelProviderManager else {
+              session.status != previousStatus,
+              let manager = session.manager as? NETunnelProviderManager else {
 
             return
         }
 
         Task { @MainActor in
+            previousStatus = session.status
+
             switch session.status {
             case .connected:
                 try await enableOnDemand(tunnelManager: manager)
