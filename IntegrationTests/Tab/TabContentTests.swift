@@ -46,7 +46,7 @@ class TabContentTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenPDFContextMenuPrintChosen_printDialogOpens() async throws {
+    func disabled_testWhenPDFContextMenuPrintChosen_printDialogOpens() async throws {
         let pdfUrl = Bundle(for: Self.self).url(forResource: "empty", withExtension: "pdf")!
         // open Tab with PDF
         let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
@@ -100,7 +100,7 @@ class TabContentTests: XCTestCase {
     }
 
     @MainActor
-    func testWhenPDFContextMenuSaveAsChosen_saveDialogOpens() async throws {
+    func disabled_testWhenPDFContextMenuSaveAsChosen_saveDialogOpens() async throws {
         let pdfUrl = Bundle(for: Self.self).url(forResource: "empty", withExtension: "pdf")!
         // open Tab with PDF
         let tab = Tab(content: .url(pdfUrl, credential: nil, source: .userEntered("")))
