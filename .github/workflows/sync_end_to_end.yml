@@ -8,8 +8,11 @@ on:
 jobs:
   sync-end-to-end-tests:
     name: Sync End to end Tests
-    runs-on: [macos-13-xlarge, macos-14-xlarge]
-
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        os: [macos-13-xlarge, macos-14-xlarge]
+        
     timeout-minutes: 60
 
     steps:
