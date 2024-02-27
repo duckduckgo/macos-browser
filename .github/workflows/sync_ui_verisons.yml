@@ -65,7 +65,7 @@ jobs:
     - name: Download and unzip artifact
       uses: actions/download-artifact@v3
       with:
-        name: DuckDuckGo-review-${{ env.app-version }}.zip
+        name: DuckDuckGo-review-${{ env.app-version }}.app
         path: /Applications
 
     - name: Check whats in applications
