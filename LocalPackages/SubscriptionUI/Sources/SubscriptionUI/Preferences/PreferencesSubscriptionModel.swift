@@ -159,13 +159,11 @@ public final class PreferencesSubscriptionModel: ObservableObject {
 
     @MainActor
     func openVPN() {
-//        NotificationCenter.default.post(name: .openVPN, object: self, userInfo: nil)
         openVPNHandler()
     }
 
     @MainActor
     func openPersonalInformationRemoval() {
-//        NotificationCenter.default.post(name: .openPersonalInformationRemoval, object: self, userInfo: nil)
         openDBPHandler()
     }
 
