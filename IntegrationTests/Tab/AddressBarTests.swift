@@ -451,6 +451,7 @@ class AddressBarTests: XCTestCase {
         window = WindowsManager.openNewWindow(with: viewModel)!
 
         try await tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise().value
+        try await Task.sleep(interval: 10)
         XCTAssertEqual(window.firstResponder, tab.webView)
 
         try await tab.setContent(.url(.makeSearchUrl(from: "cats")!, credential: nil, source: .bookmark))?.result.get()
