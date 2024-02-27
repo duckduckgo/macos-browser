@@ -19,7 +19,7 @@
 import XCTest
 @testable import DuckDuckGo_Privacy_Browser
 
-struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
+class DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
 
     var selectedDownloadLocation: String?
     var alwaysRequestDownloadLocation: Bool
@@ -47,6 +47,32 @@ struct DownloadsPreferencesPersistorMock: DownloadsPreferencesPersistor {
         self.defaultDownloadLocation = defaultDownloadLocation
         self.lastUsedCustomDownloadLocation = lastUsedCustomDownloadLocation
         self._isDownloadLocationValid = isDownloadLocationValid
+    }
+
+    func values() -> [String: any Equatable] {
+        var result = [String: any Equatable]()
+        for (label, value) in Mirror(reflecting: self).children {
+            guard let label, let value = value as? any Equatable else { continue }
+            result[label] = value
+        }
+        return result
+    }
+}
+extension [String: any Equatable] {
+    func difference(from other: Self) -> Set<String> {
+        func areEqual<T: Equatable>(_ lhs: T, with rhs: any Equatable) -> Bool {
+            guard let rhs = rhs as? T else { return false }
+            return lhs == rhs
+        }
+
+        var result = Set(self.keys).symmetricDifference(other.keys)
+        for (key, lhs) in self {
+            guard let rhs = other[key] else { continue }
+            if !areEqual(lhs, with: rhs) {
+                result.insert(key)
+            }
+        }
+        return result
     }
 }
 
@@ -127,6 +153,36 @@ class DownloadsPreferencesTests: XCTestCase {
         deleteTemporaryTestDirectory()
 
         XCTAssertEqual(preferences.effectiveDownloadLocation, DownloadsPreferences.defaultDownloadLocation())
+    }
+
+    func testShouldOpenPopupOnCompletionSetting() {
+        let persistor1 = DownloadsPreferencesPersistorMock(shouldOpenPopupOnCompletion: true)
+        var preferences = DownloadsPreferences(persistor: persistor1)
+        XCTAssertTrue(preferences.shouldOpenPopupOnCompletion)
+
+        let persistor2 = DownloadsPreferencesPersistorMock(shouldOpenPopupOnCompletion: false)
+        preferences = DownloadsPreferences(persistor: persistor2)
+        XCTAssertFalse(preferences.shouldOpenPopupOnCompletion)
+
+        var eObjectWillChangeCalled = expectation(description: "object will change called 1")
+        let c = preferences.objectWillChange.sink {
+            eObjectWillChangeCalled.fulfill()
+        }
+
+        let valuesWithTrue = persistor1.values()
+        let valuesWithFalse = persistor2.values()
+        XCTAssertEqual(valuesWithTrue.difference(from: valuesWithFalse), ["\(\DownloadsPreferencesPersistorMock.shouldOpenPopupOnCompletion)".pathExtension])
+
+        preferences.shouldOpenPopupOnCompletion = true
+        waitForExpectations(timeout: 0)
+        XCTAssertTrue(preferences.shouldOpenPopupOnCompletion)
+        XCTAssertEqual(persistor2.values().difference(from: valuesWithTrue), [])
+
+        eObjectWillChangeCalled = expectation(description: "object will change called 2")
+        preferences.shouldOpenPopupOnCompletion = false
+        waitForExpectations(timeout: 0)
+        XCTAssertFalse(preferences.shouldOpenPopupOnCompletion)
+        XCTAssertEqual(persistor2.values().difference(from: valuesWithFalse), [])
     }
 
     private func createTemporaryTestDirectory(named name: String = DownloadsPreferencesTests.defaultTestDirectoryName) -> URL {
