@@ -41,7 +41,9 @@ on:
         required: false
         type: string
     outputs:
-      app-version: ${{ jobs.export-notarized-app.outputs.app-version }}
+      app-version: 
+        description: "app version"
+        value: ${{ jobs.export-notarized-app.outputs.app-version }}
     secrets:
       BUILD_CERTIFICATE_BASE64:
         required: true
