@@ -44,13 +44,12 @@ jobs:
     needs: create-notarized-app
     env:
       app-version: ${{ needs.create-notarized-app.outputs.app-version }}
-      app-name: ${{ needs.create-notarized-app.outputs.app-name }}
 
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runner: [ macos-13-xlarge ]
+        runner: [ macos-13-xlarge ] #for now
 
     timeout-minutes: 60
     steps:
@@ -62,7 +61,6 @@ jobs:
     - name: echo properties
       run:
         echo ${{ env.app-version }}
-        echo ${{ env.app-name }}
 
     - name: Download and unzip artifact
       uses: actions/download-artifact@v3
