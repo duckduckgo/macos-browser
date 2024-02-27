@@ -31,14 +31,14 @@ struct PreferencesSection: Hashable, Identifiable {
     static func defaultSections(includingDuckPlayer: Bool, includingSync: Bool, includingVPN: Bool) -> [PreferencesSection] {
         let regularPanes: [PreferencePaneIdentifier] = {
 
-            var panes: [PreferencePaneIdentifier] = []
+            var panes: [PreferencePaneIdentifier] = [.general, .appearance, .privacy, .autofill, .downloads]
 
+#if SUBSCRIPTION
             if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() {
                 panes = [.privacy, .subscription, .general, .appearance, .autofill, .downloads]
-            } else {
-                panes = [.general, .appearance, .privacy, .autofill, .downloads]
             }
-
+#endif
+            
             if includingSync {
                 if let generalIndex = panes.firstIndex(of: .general) {
                     panes.insert(.sync, at: generalIndex + 1)
