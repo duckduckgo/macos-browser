@@ -11,8 +11,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        os: [macos-13-xlarge, macos-14-xlarge]
-        
+        runner: [macos-13-xlarge, macos-14-xlarge]
+
     timeout-minutes: 60
 
     steps:
