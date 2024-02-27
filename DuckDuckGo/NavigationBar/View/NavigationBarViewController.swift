@@ -64,6 +64,7 @@ final class NavigationBarViewController: NSViewController {
     @IBOutlet var navigationBarButtonsLeadingConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarTopConstraint: NSLayoutConstraint!
     @IBOutlet var addressBarBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var addressBarHeightConstraint: NSLayoutConstraint!
     @IBOutlet var buttonsTopConstraint: NSLayoutConstraint!
     @IBOutlet var logoWidthConstraint: NSLayoutConstraint!
 
@@ -568,36 +569,99 @@ final class NavigationBarViewController: NSViewController {
             })
     }
 
-    var daxFadeInAnimation: DispatchWorkItem?
-    func resizeAddressBarForHomePage(_ homePage: Bool, animated: Bool) {
+    enum AddressBarSizeClass {
+        case `default`
+        case homePage
+        case popUpWindow
+
+        fileprivate var height: CGFloat {
+            switch self {
+            case .homePage: 52
+            case .popUpWindow: 42
+            case .default: 48
+            }
+        }
+
+        fileprivate var topPadding: CGFloat {
+            switch self {
+            case .homePage: 16
+            case .popUpWindow: 0
+            case .default: 6
+            }
+        }
+
+        fileprivate var bottomPadding: CGFloat {
+            switch self {
+            case .homePage: 2
+            case .popUpWindow: 0
+            case .default: 6
+            }
+        }
+
+        fileprivate var logoWidth: CGFloat {
+            switch self {
+            case .homePage: 44
+            case .popUpWindow, .default: 0
+            }
+        }
+
+        fileprivate var isLogoVisible: Bool {
+            switch self {
+            case .homePage: true
+            case .popUpWindow, .default: false
+            }
+        }
+    }
+
+    private var daxFadeInAnimation: DispatchWorkItem?
+    private var heightChangeAnimation: DispatchWorkItem?
+    func resizeAddressBar(for sizeClass: AddressBarSizeClass, animated: Bool) {
         daxFadeInAnimation?.cancel()
+        heightChangeAnimation?.cancel()
 
-        let verticalPadding: CGFloat = view.window?.isPopUpWindow == true ? 0 : 6
+        daxLogo.alphaValue = !sizeClass.isLogoVisible ? 1 : 0 // initial value to animate from
 
-        let barTop = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
-        barTop?.constant = homePage ? 16 : verticalPadding
+        let performResize = { [weak self] in
+            guard let self else { return }
 
-        let bottom = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
-        bottom?.constant = homePage ? 2 : verticalPadding
+            let height: NSLayoutConstraint = animated ? addressBarHeightConstraint.animator() : addressBarHeightConstraint
+            height.constant = sizeClass.height
 
-        let logoWidth = animated ? logoWidthConstraint.animator() : logoWidthConstraint
-        logoWidth?.constant = homePage ? 44 : 0
+            let barTop: NSLayoutConstraint = animated ? addressBarTopConstraint.animator() : addressBarTopConstraint
+            barTop.constant = sizeClass.topPadding
 
-        daxLogo.alphaValue = homePage ? 0 : 1 // initial value to animate from
+            let bottom: NSLayoutConstraint = animated ? addressBarBottomConstraint.animator() : addressBarBottomConstraint
+            bottom.constant = sizeClass.bottomPadding
 
+            let logoWidth: NSLayoutConstraint = animated ? logoWidthConstraint.animator() : logoWidthConstraint
+            logoWidth.constant = sizeClass.logoWidth
+        }
+
+        let heightChange: DispatchWorkItem
         if animated {
+            heightChange = DispatchWorkItem {
+                NSAnimationContext.runAnimationGroup { ctx in
+                    ctx.duration = 0.1
+                    performResize()
+                }
+            }
             let fadeIn = DispatchWorkItem { [weak self] in
+                guard let self else { return }
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.2
-                    self?.daxLogo.animator().alphaValue = homePage ? 1 : 0
+                    self.daxLogo.alphaValue = sizeClass.isLogoVisible ? 1 : 0
                 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: fadeIn)
             self.daxFadeInAnimation = fadeIn
         } else {
-            daxLogo.alphaValue = homePage ? 1 : 0
+            daxLogo.alphaValue = sizeClass.isLogoVisible ? 1 : 0
+            heightChange = DispatchWorkItem {
+                performResize()
+            }
         }
-
+        DispatchQueue.main.async(execute: heightChange)
+        self.heightChangeAnimation = heightChange
     }
 
     private func subscribeToDownloads() {

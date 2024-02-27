@@ -466,7 +466,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.connectionLost.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
-        XCTAssertEqual(tab.currentHistoryItem?.title, URL.test.host)
+        XCTAssertEqual(tab.currentHistoryItem?.title, Self.pageTitle)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
         XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab, "url")
@@ -608,7 +608,7 @@ class ErrorPageTests: XCTestCase {
         XCTAssertEqual(errorDescr?.trimmingWhitespace(), NSError.connectionLost.localizedDescription)
 
         XCTAssertEqual(tab.currentHistoryItem?.url, .test)
-        XCTAssertEqual(tab.currentHistoryItem?.title, URL.test.host)
+        XCTAssertEqual(tab.currentHistoryItem?.title, Self.pageTitle)
 
         XCTAssertEqual(tab.backHistoryItems.count, 1)
         XCTAssertEqual(tab.backHistoryItems.first?.url, .newtab, "url")
@@ -809,24 +809,28 @@ class ErrorPageTests: XCTestCase {
 
     func testPinnedTabDoesNotNavigateAway() async throws {
         schemeHandler.middleware = [{ _ in
-            .ok(.html(Self.testHtml))
+            return .ok(.html(Self.testHtml))
         }]
 
         let tab = Tab(content: .url(.alternative, source: .ui), webViewConfiguration: webViewConfiguration)
+        let eNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         let manager = PinnedTabsManager()
         manager.pin(tab)
 
         let viewModel = TabCollectionViewModel(tabCollection: TabCollection(tabs: []), pinnedTabsManager: manager)
         window = WindowsManager.openNewWindow(with: viewModel)!
         viewModel.select(at: .pinned(0))
+        let webViewShownPromise = tab.webView.publisher(for: \.superview).compactMap { $0 }.timeout(5).first().promise()
 
         // wait for tab to load
-        let eNavigationFinished = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
         _=try await eNavigationFinished.value
+        _=try await webViewShownPromise.value
 
         // refresh: fail
+        let failureExpectation = expectation(description: "request failed")
         schemeHandler.middleware = [{ _ in
-            .failure(NSError.noConnection)
+            failureExpectation.fulfill()
+            return .failure(NSError.noConnection)
         }]
         let eNavigationFailed = tab.$error.compactMap { $0 }.timeout(5).first().promise()
         let eNavigationFinished2 = tab.webViewDidFinishNavigationPublisher.timeout(5).first().promise()
@@ -834,6 +838,7 @@ class ErrorPageTests: XCTestCase {
         tab.reload()
         _=try await eNavigationFailed.value
         _=try await eNavigationFinished2.value
+        await fulfillment(of: [failureExpectation], timeout: 5)
 
         XCTAssertNotNil(tab.error)
 
