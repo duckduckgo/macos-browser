@@ -308,13 +308,15 @@ final class MoreOptionsMenu: NSMenu {
     private func addSubscriptionItems() {
         var items: [NSMenuItem] = []
 
-        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !AccountManager().isUserAuthenticated {
 #if SUBSCRIPTION
+        if DefaultSubscriptionFeatureAvailability().isFeatureAvailable() && !AccountManager().isUserAuthenticated {
             items.append(contentsOf: makeInactiveSubscriptionItems())
-#endif
         } else {
             items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
         }
+#else
+        items.append(contentsOf: makeActiveSubscriptionItems()) // this adds NETP and DBP only if conditionally enabled
+#endif
 
         if !items.isEmpty {
             items.forEach { addItem($0) }

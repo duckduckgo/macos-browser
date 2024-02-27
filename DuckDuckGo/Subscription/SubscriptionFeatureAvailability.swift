@@ -33,10 +33,10 @@ protocol SubscriptionFeatureAvailability {
 struct DefaultSubscriptionFeatureAvailability: SubscriptionFeatureAvailability {
 
     func isFeatureAvailable() -> Bool {
-        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isSubscriptionInternalTestingEnabled: [\(isSubscriptionInternalTestingEnabled)] isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
 #if SUBSCRIPTION_OVERRIDE_ENABLED
         return true
 #elseif SUBSCRIPTION
+        print("isUserAuthenticated: [\(AccountManager().isUserAuthenticated)] | isSubscriptionInternalTestingEnabled: [\(isSubscriptionInternalTestingEnabled)] isInternalUser: [\(isInternalUser)] | isVPNActivated: [\(isVPNActivated)] | isDBPActivated: [\(isDBPActivated)]")
         return AccountManager().isUserAuthenticated || (isSubscriptionInternalTestingEnabled && isInternalUser && !isVPNActivated && !isDBPActivated)
 #else
         return false
