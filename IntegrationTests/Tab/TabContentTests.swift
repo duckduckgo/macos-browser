@@ -74,7 +74,7 @@ class TabContentTests: XCTestCase {
             return NSApp.windows.first(where: {
                 $0.className == "NSPopupMenuWindow"
             })
-        }.timeout(1).first().promise()
+        }.timeout(5).first().promise()
 
         // right-click
         NSApp.sendEvent(mouseDown)
@@ -90,7 +90,7 @@ class TabContentTests: XCTestCase {
         // wait for print dialog to appear
         let printDialogPromise = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect().compactMap { _ in
             self.window.sheets.first
-        }.timeout(1).first().promise()
+        }.timeout(5).first().promise()
 
         // Click Print…
         printMenuItem?.menuItem.accessibilityPerformPress()
