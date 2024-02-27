@@ -40,6 +40,7 @@ final class DownloadsCellView: NSTableCellView {
 
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var detailLabel: NSTextField!
+    @IBOutlet var estimatedTimeLabel: NSTextField!
     @IBOutlet var progressView: CircularProgressView!
     @IBOutlet var cancelButton: MouseOverButton!
     @IBOutlet var revealButton: MouseOverButton!
@@ -57,14 +58,6 @@ final class DownloadsCellView: NSTableCellView {
     private static let estimatedMinutesRemainingFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.hour, .minute]
-        formatter.unitsStyle = .full
-        formatter.includesApproximationPhrase = true
-        formatter.includesTimeRemainingPhrase = true
-        return formatter
-    }()
-    private static let estimatedSecondsRemainingFormatter: DateComponentsFormatter = {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.second]
         formatter.unitsStyle = .full
         formatter.includesApproximationPhrase = true
         formatter.includesTimeRemainingPhrase = true
@@ -155,11 +148,13 @@ final class DownloadsCellView: NSTableCellView {
 
     private var onButtonMouseOverChange: ((Bool) -> Void)?
 
-    private func updateDetails(with progress: Progress) {
+    private func updateDetails(with progress: Progress, isMouseOver: Bool) {
         self.detailLabel.toolTip = progress.localizedAdditionalDescription ?? ""
+        self.estimatedTimeLabel.toolTip = self.detailLabel.toolTip
 
         var details: String
-        if cancelButton.isMouseOver {
+        var estimatedTime: String = ""
+        if isMouseOver {
             details = UserText.cancelDownloadToolTip
         } else {
             if progress.fractionCompleted == 0 {
@@ -170,28 +165,34 @@ final class DownloadsCellView: NSTableCellView {
                 let completed = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
                 let total = Self.byteFormatter.string(fromByteCount: progress.totalUnitCount)
                 details = String(format: UserText.downloadBytesLoadedFormat, completed, total)
+
+                if let throughput = progress.throughput {
+                    let speed = Self.byteFormatter.string(fromByteCount: Int64(throughput))
+                    details += " (\(String(format: UserText.downloadSpeedFormat, speed)))"
+                }
             } else {
                 details = Self.byteFormatter.string(fromByteCount: progress.completedUnitCount)
             }
 
             if let estimatedTimeRemaining = progress.estimatedTimeRemaining,
-               let estimatedTimeStr = (estimatedTimeRemaining < 60 ? Self.estimatedSecondsRemainingFormatter : Self.estimatedMinutesRemainingFormatter)
-                .string(from: estimatedTimeRemaining) {
+               let estimatedTimeStr = (estimatedTimeRemaining < 30 ? UserText.downloadFewSecondsRemaining : Self.estimatedMinutesRemainingFormatter.string(from: estimatedTimeRemaining)) {
 
-                details += " – " + estimatedTimeStr
+                estimatedTime = estimatedTimeStr
             }
-
-            self.detailLabel.stringValue = details
         }
 
+        self.detailLabel.stringValue = details
+        self.estimatedTimeLabel.stringValue = estimatedTime
+        self.estimatedTimeLabel.isHidden = estimatedTime.isEmpty
     }
 
     private func subscribe(to progress: Progress) {
         self.progressView.isHidden = false
         progressCancellable = progress.publisher(for: \.completedUnitCount)
-            .throttle(for: 0.2, scheduler: DispatchQueue.main, latest: true)
+            .throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in
-                self?.updateDetails(with: progress)
+                guard let self else { return }
+                updateDetails(with: progress, isMouseOver: cancelButton.isMouseOver)
         }
 
         self.cancelButton.isHidden = false
@@ -200,8 +201,8 @@ final class DownloadsCellView: NSTableCellView {
 
         self.imageView?.alphaValue = 1.0
 
-        onButtonMouseOverChange = { [weak self] _ in
-            self?.updateDetails(with: progress)
+        onButtonMouseOverChange = { [weak self] isMouseOver in
+            self?.updateDetails(with: progress, isMouseOver: isMouseOver)
         }
         onButtonMouseOverChange!(cancelButton.isMouseOver)
     }
@@ -223,6 +224,9 @@ final class DownloadsCellView: NSTableCellView {
                 self?.detailLabel.stringValue = Self.byteFormatter.string(fromByteCount: Int64(fileSize))
             }
             self?.detailLabel.toolTip = nil
+            self?.estimatedTimeLabel.stringValue = ""
+            self?.estimatedTimeLabel.toolTip = nil
+            self?.estimatedTimeLabel.isHidden = true
         }
         onButtonMouseOverChange!(revealButton.isMouseOver)
     }
@@ -253,6 +257,9 @@ final class DownloadsCellView: NSTableCellView {
                 self?.detailLabel.stringValue = error.shortDescription
                 self?.detailLabel.toolTip = error.localizedDescription
             }
+            self?.estimatedTimeLabel.stringValue = ""
+            self?.estimatedTimeLabel.toolTip = nil
+            self?.estimatedTimeLabel.isHidden = true
         }
         onButtonMouseOverChange!(restartButton.isMouseOver)
     }

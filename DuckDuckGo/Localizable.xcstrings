@@ -2470,6 +2470,18 @@
         }
       }
     },
+    "downloads.bytes.format" : {
+      "comment" : "Number of bytes out of total bytes downloaded (1Mb of 2Mb)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@"
+          }
+        }
+      }
+    },
     "downloads.change" : {
       "comment" : "Change downloads directory button",
       "extractionState" : "extracted_with_value",
@@ -2566,6 +2578,18 @@
         }
       }
     },
+    "downloads.few.seconds.remaining" : {
+      "comment" : "Estimated time info displayed when a file is almost downloaded",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A few seconds remaining"
+          }
+        }
+      }
+    },
     "downloads.location" : {
       "comment" : "Downloads directory location",
       "extractionState" : "extracted_with_value",
@@ -2658,6 +2682,18 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Show in Finder"
+          }
+        }
+      }
+    },
+    "downloads.speed.format" : {
+      "comment" : "Download speed format (1Mb/sec)",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%@/sec"
           }
         }
       }
