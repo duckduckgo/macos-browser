@@ -1039,9 +1039,9 @@ struct UserText {
     enum Bookmarks {
         enum Dialog {
             enum Title {
-                static let addBookmark = NSLocalizedString("bookmarks.dialog.title.add", value: "Add bookmark", comment: "Bookmark creation dialog title")
+                static let addBookmark = NSLocalizedString("bookmarks.dialog.title.add", value: "Add Bookmark", comment: "Bookmark creation dialog title")
                 static let addedBookmark = NSLocalizedString("bookmarks.dialog.title.added", value: "Bookmark Added", comment: "Bookmark added popover title")
-                static let editBookmark = NSLocalizedString("bookmarks.dialog.title.edit", value: "Edit bookmark", comment: "Bookmark edit dialog title")
+                static let editBookmark = NSLocalizedString("bookmarks.dialog.title.edit", value: "Edit Bookmark", comment: "Bookmark edit dialog title")
                 static let addFolder = NSLocalizedString("bookmarks.dialog.folder.title.add", value: "Add Folder", comment: "Bookmark folder creation dialog title")
                 static let editFolder = NSLocalizedString("bookmarks.dialog.folder.title.edit", value: "Edit Folder", comment: "Bookmark folder edit dialog title")
             }
