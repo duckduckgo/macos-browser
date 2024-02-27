@@ -10,6 +10,7 @@ jobs:
     name: Sync End to end Tests
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         runner: [macos-13-xlarge, macos-14-xlarge]
 
@@ -89,11 +90,11 @@ jobs:
     #       --header "Content-Type: application/json" \
     #       --data ' { "data": { "name": "GH Workflow Failure - Sync End to end tests", "projects": [ "${{ vars.MACOS_APP_DEVELOPMENT_ASANA_PROJECT_ID }}" ], "notes" : "The end to end workflow has failed. See https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" } }'
     
-    - name: Publish tests report ${{ matrix.runner }}
+    - name: Publish tests report
       uses: mikepenz/action-junit-report@v3
       if: always() # always run even if the previous step fails
       with:
-        check_name: "Test Report"
+        check_name: "Test Report ${{ matrix.runner }}"
         report_paths: ui-tests.xml
 
     - name: Upload logs when workflow failed
