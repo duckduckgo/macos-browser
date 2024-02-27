@@ -611,7 +611,6 @@ final class NavigationBarViewController: NSViewController {
                     && update.item.destinationURL != nil
                     && update.item.tempURL == nil
                     && !update.item.isBurner
-                    && !downloadListCoordinator.hasActiveDownloads
                     && WindowControllersManager.shared.lastKeyMainWindowController?.window === downloadsButton.window
 
                 if shouldShowPopover {
