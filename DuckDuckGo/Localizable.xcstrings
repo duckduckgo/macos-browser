@@ -836,7 +836,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your password have been deleted from this device."
+            "value" : "Your password has been deleted from this device."
           }
         }
       }
@@ -860,7 +860,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Your password have been deleted from all synced devices."
+            "value" : "Your password has been deleted from all synced devices."
           }
         }
       }
